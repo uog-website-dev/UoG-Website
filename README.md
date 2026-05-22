@@ -19,16 +19,7 @@ uog-website/
 │   └── Dockerfile
 ├── nginx/              # Reverse proxy configuration
 ├── docker-compose.yml
-└── .env               # Environment variables
-```
-
-## Features
-
-✨ **Elegant & Modern Design** - Beautiful gradient UI with smooth animations
-⚡ **Fast & Responsive** - React frontend with Django REST API backend
-🔒 **Secure** - CORS enabled, Django security middleware
-📦 **Docker Ready** - Easy deployment with Docker Compose
-🗄️ **PostgreSQL Database** - Robust data persistence
+└── .env               # Environment variable
 
 ## Prerequisites
 
