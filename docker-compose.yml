@@ -1,0 +1,87 @@
+services:
+  db:
+    image: postgres:15
+    container_name: uog_postgres
+    environment:
+      POSTGRES_USER: ${DB_USER:-uog_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-uog_password}
+      POSTGRES_DB: ${DB_NAME:-uog_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - uog_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-uog_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: uog_backend
+    environment:
+      DEBUG: ${DEBUG:-False}
+      DB_ENGINE: django.db.backends.postgresql
+      DB_NAME: ${DB_NAME:-uog_db}
+      DB_USER: ${DB_USER:-uog_user}
+      DB_PASSWORD: ${DB_PASSWORD:-uog_password}
+      DB_HOST: db
+      DB_PORT: 5432
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1,backend}
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://127.0.0.1:8000/health/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      start_period: 30s
+      retries: 5
+    networks:
+      - uog_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: uog_frontend
+    command: sh -c "npm run build && tail -f /dev/null"
+    environment:
+      REACT_APP_API_URL: ${REACT_APP_API_URL:-/api}
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - uog_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: uog_nginx
+    command: sh -c "until [ -f /usr/share/nginx/html/index.html ]; do echo 'Waiting for frontend build...'; sleep 1; done && nginx -g 'daemon off;'"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./frontend/build:/usr/share/nginx/html:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - uog_network
+
+volumes:
+  postgres_data:
+
+networks:
+  uog_network:
+    driver: bridge
