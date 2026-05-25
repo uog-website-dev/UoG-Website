@@ -1,0 +1,91 @@
+# Production Docker Compose for UoG Website
+# This file is used to deploy containers on the university VM
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: uog-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-uog_database}
+      POSTGRES_USER: ${DB_USER:-uog_admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secure_password_change_me}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - uog-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-uog_admin} -d ${DB_NAME:-uog_database}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Django Backend
+  backend:
+    image: uogwebsite/uog-website-backend:${TAG:-latest}
+    container_name: uog-backend
+    restart: unless-stopped
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings
+      DATABASE_URL: postgres://${DB_USER:-uog_admin}:${DB_PASSWORD:-secure_password_change_me}@postgres:5432/${DB_NAME:-uog_database}
+      SECRET_KEY: ${DJANGO_SECRET_KEY:-change_this_in_production}
+      DEBUG: ${DJANGO_DEBUG:-False}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - uog-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # React Frontend with Nginx
+  frontend:
+    image: uogwebsite/uog-website-frontend:${TAG:-latest}
+    container_name: uog-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - backend
+    networks:
+      - uog-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx Reverse Proxy (Optional - for advanced routing)
+  nginx:
+    image: nginx:alpine
+    container_name: uog-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - uog-network
+    profiles:
+      - with-nginx
+
+networks:
+  uog-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    name: uog_postgres_data
