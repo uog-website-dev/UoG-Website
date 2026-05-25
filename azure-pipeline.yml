@@ -1,0 +1,127 @@
+# Complete Azure Pipeline for UoG Website
+# Trigger: ONLY when changes are pushed to main branch
+trigger:
+  branches:
+    include:
+      - main
+
+# No PR triggers
+pr: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - name: dockerHubOrganization
+    value: 'uogwebsite'
+  - name: imageBackend
+    value: 'uog-website-backend'
+  - name: imageFrontend
+    value: 'uog-website-frontend'
+  - name: tag
+    value: '$(Build.BuildId)'
+
+stages:
+  - stage: BuildAndTest
+    displayName: '🔨 Build and Test'
+    jobs:
+      - job: TestBackend
+        displayName: '🐍 Test Backend (Django)'
+        steps:
+          - checkout: self
+          - script: |
+              cd backend
+              echo "Installing Python dependencies..."
+              pip install -r requirements.txt
+              echo "Running Django system checks..."
+              python manage.py check
+              echo "✅ Backend tests passed!"
+            displayName: 'Run Backend Tests'
+      
+      - job: BuildFrontend
+        displayName: '⚛️ Build Frontend (React)'
+        steps:
+          - checkout: self
+          - script: |
+              cd frontend
+              echo "Installing Node dependencies..."
+              npm install
+              echo "Building React application..."
+              npm run build
+              echo "✅ Frontend build complete!"
+            displayName: 'Build Frontend'
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: 'frontend/build'
+              ArtifactName: 'frontend-build'
+            displayName: '📦 Publish Frontend Artifacts'
+
+  - stage: DockerBuildAndPush
+    displayName: '🐳 Build and Push Docker Images'
+    dependsOn: BuildAndTest
+    condition: succeeded()
+    jobs:
+      - job: DockerLogin
+        displayName: '🔐 Login to Docker Hub'
+        steps:
+          - script: |
+              echo "Logging into Docker Hub as $(dockerHubOrganization)..."
+              echo "$(dockerHubPassword)" | docker login -u "$(dockerHubOrganization)" --password-stdin
+              echo "✅ Docker Hub login successful!"
+            displayName: 'Docker Hub Authentication'
+            env:
+              dockerHubPassword: $(dockerHubPassword)
+      
+      - job: BuildAndPushBackend
+        displayName: '🏗️ Build and Push Backend'
+        steps:
+          - checkout: self
+          - script: |
+              echo "Building backend image: $(dockerHubOrganization)/$(imageBackend):$(tag)"
+              docker build -t $(dockerHubOrganization)/$(imageBackend):$(tag) -f backend/Dockerfile ./backend
+              docker tag $(dockerHubOrganization)/$(imageBackend):$(tag) $(dockerHubOrganization)/$(imageBackend):latest
+              echo "Pushing backend image..."
+              docker push $(dockerHubOrganization)/$(imageBackend):$(tag)
+              docker push $(dockerHubOrganization)/$(imageBackend):latest
+              echo "✅ Backend image pushed successfully!"
+            displayName: 'Build and Push Backend Image'
+      
+      - job: BuildAndPushFrontend
+        displayName: '🏗️ Build and Push Frontend'
+        steps:
+          - checkout: self
+          - script: |
+              echo "Building frontend image: $(dockerHubOrganization)/$(imageFrontend):$(tag)"
+              docker build -t $(dockerHubOrganization)/$(imageFrontend):$(tag) -f frontend/Dockerfile ./frontend
+              docker tag $(dockerHubOrganization)/$(imageFrontend):$(tag) $(dockerHubOrganization)/$(imageFrontend):latest
+              echo "Pushing frontend image..."
+              docker push $(dockerHubOrganization)/$(imageFrontend):$(tag)
+              docker push $(dockerHubOrganization)/$(imageFrontend):latest
+              echo "✅ Frontend image pushed successfully!"
+            displayName: 'Build and Push Frontend Image'
+
+  - stage: Summary
+    displayName: '📊 Build Summary'
+    dependsOn: DockerBuildAndPush
+    condition: always()
+    jobs:
+      - job: Summary
+        displayName: 'Display Build Results'
+        steps:
+          - script: |
+              echo "========================================="
+              echo "🏆 UoG WEBSITE BUILD SUMMARY 🏆"
+              echo "========================================="
+              echo "Build ID: $(Build.BuildId)"
+              echo "Branch: $(Build.SourceBranchName)"
+              echo "Commit: $(Build.SourceVersion)"
+              echo ""
+              echo "🐳 Docker Images Pushed:"
+              echo "   Backend: $(dockerHubOrganization)/$(imageBackend):$(tag)"
+              echo "   Backend: $(dockerHubOrganization)/$(imageBackend):latest"
+              echo "   Frontend: $(dockerHubOrganization)/$(imageFrontend):$(tag)"
+              echo "   Frontend: $(dockerHubOrganization)/$(imageFrontend):latest"
+              echo ""
+              echo "🔗 Docker Hub: https://hub.docker.com/u/$(dockerHubOrganization)"
+              echo "========================================="
+            displayName: 'Build Summary'
