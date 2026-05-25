@@ -1,18 +1,17 @@
 # Complete Azure Pipeline for UoG Website
-# This pipeline: Builds -> Tests -> Creates Docker Images -> Pushes to Docker Hub -> Deploys to VM
-
+# Trigger: ONLY when changes are pushed to main branch
 trigger:
   branches:
     include:
       - main
-      - init
-      - master
+
+# No PR triggers
+pr: none
 
 pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  # Docker Hub Configuration
   - name: dockerHubOrganization
     value: 'uogwebsite'
   - name: imageBackend
@@ -21,25 +20,8 @@ variables:
     value: 'uog-website-frontend'
   - name: tag
     value: '$(Build.BuildId)'
-  
-  # Deployment Configuration (Update these with your VM details)
-  - name: vmHost
-    value: ''  # Enter your VM IP or hostname
-  - name: vmUsername
-    value: ''  # Enter your VM username
-  - name: backendContainerName
-    value: 'uog-backend'
-  - name: frontendContainerName
-    value: 'uog-frontend'
-  - name: backendPort
-    value: '8000'
-  - name: frontendPort
-    value: '80'
 
 stages:
-  # ============================================================
-  # STAGE 1: Build and Test
-  # ============================================================
   - stage: BuildAndTest
     displayName: '🔨 Build and Test'
     jobs:
@@ -47,11 +29,7 @@ stages:
         displayName: '🐍 Test Backend (Django)'
         steps:
           - checkout: self
-          
           - script: |
-              echo "========================================="
-              echo "Testing Backend"
-              echo "========================================="
               cd backend
               echo "Installing Python dependencies..."
               pip install -r requirements.txt
@@ -59,17 +37,12 @@ stages:
               python manage.py check
               echo "✅ Backend tests passed!"
             displayName: 'Run Backend Tests'
-            continueOnError: false
       
       - job: BuildFrontend
         displayName: '⚛️ Build Frontend (React)'
         steps:
           - checkout: self
-          
           - script: |
-              echo "========================================="
-              echo "Building Frontend"
-              echo "========================================="
               cd frontend
               echo "Installing Node dependencies..."
               npm install
@@ -77,16 +50,12 @@ stages:
               npm run build
               echo "✅ Frontend build complete!"
             displayName: 'Build Frontend'
-          
           - task: PublishBuildArtifacts@1
             inputs:
               PathtoPublish: 'frontend/build'
               ArtifactName: 'frontend-build'
             displayName: '📦 Publish Frontend Artifacts'
 
-  # ============================================================
-  # STAGE 2: Docker Build and Push
-  # ============================================================
   - stage: DockerBuildAndPush
     displayName: '🐳 Build and Push Docker Images'
     dependsOn: BuildAndTest
@@ -103,148 +72,37 @@ stages:
             env:
               dockerHubPassword: $(dockerHubPassword)
       
-      - job: BuildBackendImage
-        displayName: '🏗️ Build Backend Docker Image'
-        dependsOn: DockerLogin
+      - job: BuildAndPushBackend
+        displayName: '🏗️ Build and Push Backend'
         steps:
           - checkout: self
-          
           - script: |
-              echo "========================================="
-              echo "Building Backend Docker Image"
-              echo "========================================="
-              echo "Image: $(dockerHubOrganization)/$(imageBackend):$(tag)"
+              echo "Building backend image: $(dockerHubOrganization)/$(imageBackend):$(tag)"
               docker build -t $(dockerHubOrganization)/$(imageBackend):$(tag) -f backend/Dockerfile ./backend
               docker tag $(dockerHubOrganization)/$(imageBackend):$(tag) $(dockerHubOrganization)/$(imageBackend):latest
-              echo "✅ Backend image built successfully!"
-            displayName: 'Build Backend Image'
-          
-          - script: |
-              echo "Pushing backend image to Docker Hub..."
+              echo "Pushing backend image..."
               docker push $(dockerHubOrganization)/$(imageBackend):$(tag)
               docker push $(dockerHubOrganization)/$(imageBackend):latest
               echo "✅ Backend image pushed successfully!"
-            displayName: 'Push Backend Image'
+            displayName: 'Build and Push Backend Image'
       
-      - job: BuildFrontendImage
-        displayName: '🏗️ Build Frontend Docker Image'
-        dependsOn: DockerLogin
+      - job: BuildAndPushFrontend
+        displayName: '🏗️ Build and Push Frontend'
         steps:
           - checkout: self
-          
           - script: |
-              echo "========================================="
-              echo "Building Frontend Docker Image"
-              echo "========================================="
-              echo "Image: $(dockerHubOrganization)/$(imageFrontend):$(tag)"
+              echo "Building frontend image: $(dockerHubOrganization)/$(imageFrontend):$(tag)"
               docker build -t $(dockerHubOrganization)/$(imageFrontend):$(tag) -f frontend/Dockerfile ./frontend
               docker tag $(dockerHubOrganization)/$(imageFrontend):$(tag) $(dockerHubOrganization)/$(imageFrontend):latest
-              echo "✅ Frontend image built successfully!"
-            displayName: 'Build Frontend Image'
-          
-          - script: |
-              echo "Pushing frontend image to Docker Hub..."
+              echo "Pushing frontend image..."
               docker push $(dockerHubOrganization)/$(imageFrontend):$(tag)
               docker push $(dockerHubOrganization)/$(imageFrontend):latest
               echo "✅ Frontend image pushed successfully!"
-            displayName: 'Push Frontend Image'
+            displayName: 'Build and Push Frontend Image'
 
-  # ============================================================
-  # STAGE 3: Deploy to University VM (Self-hosted Agent Required)
-  # ============================================================
-  - stage: DeployToVM
-    displayName: '🚀 Deploy to University VM'
-    dependsOn: DockerBuildAndPush
-    condition: and(succeeded(), ne(variables['vmHost'], ''))
-    jobs:
-      - deployment: Deploy
-        displayName: 'Deploy Containers'
-        pool:
-          name: Default  # This must be your self-hosted agent pool name
-        environment: 'production'
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - script: |
-                    echo "========================================="
-                    echo "Starting Deployment to University VM"
-                    echo "========================================="
-                    echo "Target: $(vmHost)"
-                    echo "Backend Container: $(backendContainerName)"
-                    echo "Frontend Container: $(frontendContainerName)"
-                  displayName: '📋 Deployment Information'
-                
-                - script: |
-                    echo "Logging into Docker Hub on VM..."
-                    ssh $(vmUsername)@$(vmHost) "echo '$(dockerHubPassword)' | docker login -u '$(dockerHubOrganization)' --password-stdin"
-                    echo "✅ Docker Hub login successful on VM!"
-                  displayName: '🔐 Docker Login on VM'
-                  env:
-                    dockerHubPassword: $(dockerHubPassword)
-                
-                - script: |
-                    echo "Stopping and removing old containers..."
-                    ssh $(vmUsername)@$(vmHost) "docker stop $(backendContainerName) $(frontendContainerName) || true"
-                    ssh $(vmUsername)@$(vmHost) "docker rm $(backendContainerName) $(frontendContainerName) || true"
-                    echo "✅ Old containers removed"
-                  displayName: '🛑 Stop Old Containers'
-                
-                - script: |
-                    echo "Pulling latest images from Docker Hub..."
-                    ssh $(vmUsername)@$(vmHost) "docker pull $(dockerHubOrganization)/$(imageBackend):latest"
-                    ssh $(vmUsername)@$(vmHost) "docker pull $(dockerHubOrganization)/$(imageFrontend):latest"
-                    echo "✅ Latest images pulled"
-                  displayName: '📥 Pull Latest Images'
-                
-                - script: |
-                    echo "Starting Backend Container..."
-                    ssh $(vmUsername)@$(vmHost) "docker run -d \
-                      --name $(backendContainerName) \
-                      --restart unless-stopped \
-                      -p $(backendPort):8000 \
-                      -e DJANGO_SETTINGS_MODULE=config.settings \
-                      $(dockerHubOrganization)/$(imageBackend):latest"
-                    echo "✅ Backend container started on port $(backendPort)"
-                  displayName: '▶️ Start Backend Container'
-                
-                - script: |
-                    echo "Starting Frontend Container..."
-                    ssh $(vmUsername)@$(vmHost) "docker run -d \
-                      --name $(frontendContainerName) \
-                      --restart unless-stopped \
-                      -p $(frontendPort):80 \
-                      $(dockerHubOrganization)/$(imageFrontend):latest"
-                    echo "✅ Frontend container started on port $(frontendPort)"
-                  displayName: '▶️ Start Frontend Container'
-                
-                - script: |
-                    echo "========================================="
-                    echo "🎉 DEPLOYMENT COMPLETE! 🎉"
-                    echo "========================================="
-                    echo "🌐 Frontend: http://$(vmHost):$(frontendPort)"
-                    echo "📡 Backend API: http://$(vmHost):$(backendPort)/api/"
-                    echo ""
-                    echo "Running containers on VM:"
-                    ssh $(vmUsername)@$(vmHost) "docker ps --filter 'name=$(backendContainerName)' --filter 'name=$(frontendContainerName)'"
-                    echo "========================================="
-                  displayName: '📊 Deployment Summary'
-                
-                - script: |
-                    echo "Cleaning up old Docker images on VM..."
-                    ssh $(vmUsername)@$(vmHost) "docker system prune -f"
-                    echo "✅ Cleanup complete"
-                  displayName: '🧹 Cleanup Old Images'
-                    continueOnError: true
-
-  # ============================================================
-  # STAGE 4: Final Summary
-  # ============================================================
   - stage: Summary
     displayName: '📊 Build Summary'
-    dependsOn: 
-      - BuildAndTest
-      - DockerBuildAndPush
+    dependsOn: DockerBuildAndPush
     condition: always()
     jobs:
       - job: Summary
@@ -254,29 +112,16 @@ stages:
               echo "========================================="
               echo "🏆 UoG WEBSITE BUILD SUMMARY 🏆"
               echo "========================================="
+              echo "Build ID: $(Build.BuildId)"
+              echo "Branch: $(Build.SourceBranchName)"
+              echo "Commit: $(Build.SourceVersion)"
               echo ""
-              echo "📦 Build Information:"
-              echo "   Build ID: $(Build.BuildId)"
-              echo "   Branch: $(Build.SourceBranchName)"
-              echo "   Commit: $(Build.SourceVersion)"
-              echo "   Status: $(Agent.JobStatus)"
-              echo ""
-              echo "🐳 Docker Images:"
+              echo "🐳 Docker Images Pushed:"
               echo "   Backend: $(dockerHubOrganization)/$(imageBackend):$(tag)"
               echo "   Backend: $(dockerHubOrganization)/$(imageBackend):latest"
               echo "   Frontend: $(dockerHubOrganization)/$(imageFrontend):$(tag)"
               echo "   Frontend: $(dockerHubOrganization)/$(imageFrontend):latest"
               echo ""
               echo "🔗 Docker Hub: https://hub.docker.com/u/$(dockerHubOrganization)"
-              echo ""
-              if [ "$(vmHost)" != "" ]; then
-                echo "🚀 Deployment Target:"
-                echo "   VM: $(vmHost)"
-                echo "   Frontend URL: http://$(vmHost):$(frontendPort)"
-                echo "   Backend API: http://$(vmHost):$(backendPort)/api/"
-              else
-                echo "⚠️  VM Deployment Skipped: vmHost variable not configured"
-                echo "   To enable deployment, set vmHost and vmUsername variables"
-              fi
               echo "========================================="
-            displayName: '📊 Build Summary'
+            displayName: 'Build Summary'
