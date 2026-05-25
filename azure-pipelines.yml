@@ -1,4 +1,4 @@
-# Azure Pipeline for UoG Website
+# Complete Azure Pipeline for UoG Website with Artifacts
 trigger:
   branches:
     include:
@@ -11,6 +11,8 @@ pool:
 
 variables:
   - group: docker-hub-credentials
+  - name: dockerHubOrganization
+    value: 'uogwebsite'
   - name: imageBackend
     value: 'uog-website-backend'
   - name: imageFrontend
@@ -19,42 +21,36 @@ variables:
     value: '$(Build.BuildId)'
 
 stages:
-  - stage: BuildAndTest
-    displayName: 'Build and Test'
+  - stage: BuildTestAndPush
+    displayName: 'Build, Test, Push & Package'
     jobs:
-      - job: TestBackend
-        displayName: 'Test Backend'
+      - job: BuildAndTest
+        displayName: 'Build and Test'
         steps:
           - checkout: self
+          
           - script: |
               cd backend
               pip install -r requirements.txt
               python manage.py check
-            displayName: 'Run Django checks'
-      
-      - job: BuildFrontend
-        displayName: 'Build Frontend'
-        steps:
-          - checkout: self
+            displayName: 'Test Backend'
+          
           - script: |
               cd frontend
               npm install
               npm run build
-            displayName: 'Build React app'
-
-  - stage: DockerPush
-    displayName: 'Push to Docker Hub'
-    dependsOn: BuildAndTest
-    jobs:
-      - job: Push
-        displayName: 'Build and Push'
+            displayName: 'Build Frontend'
+      
+      - job: DockerAndArtifacts
+        displayName: 'Docker Push and Artifacts'
+        dependsOn: BuildAndTest
         steps:
           - checkout: self
           
           - script: |
               echo "Logging into Docker Hub..."
               echo "$(dockerHubPassword)" | docker login -u "$(dockerHubOrganization)" --password-stdin
-            displayName: 'Docker Hub Login'
+            displayName: 'Docker Login'
             env:
               dockerHubPassword: $(dockerHubPassword)
           
@@ -63,65 +59,63 @@ stages:
               docker tag $(dockerHubOrganization)/$(imageBackend):$(tag) $(dockerHubOrganization)/$(imageBackend):latest
               docker push $(dockerHubOrganization)/$(imageBackend):$(tag)
               docker push $(dockerHubOrganization)/$(imageBackend):latest
-            displayName: 'Build and Push Backend'
+            displayName: 'Push Backend'
           
           - script: |
               docker build -t $(dockerHubOrganization)/$(imageFrontend):$(tag) -f frontend/Dockerfile ./frontend
               docker tag $(dockerHubOrganization)/$(imageFrontend):$(tag) $(dockerHubOrganization)/$(imageFrontend):latest
               docker push $(dockerHubOrganization)/$(imageFrontend):$(tag)
               docker push $(dockerHubOrganization)/$(imageFrontend):latest
-            displayName: 'Build and Push Frontend'
-
-  - stage: PublishArtifacts
-    displayName: '📦 Publish Deployment Artifacts'
-    dependsOn: DockerPush
-    jobs:
-      - job: Publish
-        displayName: 'Publish Compose Files'
-        steps:
-          - checkout: self
+            displayName: 'Push Frontend'
           
-          # Create deployment package
+          # Create and publish artifact
           - script: |
+              echo "Creating deployment package..."
               mkdir -p $(Build.ArtifactStagingDirectory)/deployment
-              cp docker-compose.prod.yml $(Build.ArtifactStagingDirectory)/deployment/
-              cp .env.prod.example $(Build.ArtifactStagingDirectory)/deployment/
-              cp deploy.sh $(Build.ArtifactStagingDirectory)/deployment/
-              echo "Tag: $(tag)" > $(Build.ArtifactStagingDirectory)/deployment/VERSION.txt
-              echo "Build ID: $(Build.BuildId)" >> $(Build.ArtifactStagingDirectory)/deployment/VERSION.txt
-            displayName: 'Prepare Deployment Package'
+              
+              # Copy files if they exist
+              if [ -f docker-compose.prod.yml ]; then
+                cp docker-compose.prod.yml $(Build.ArtifactStagingDirectory)/deployment/
+                echo "✅ Copied docker-compose.prod.yml"
+              else
+                echo "⚠️ docker-compose.prod.yml not found"
+              fi
+              
+              if [ -f .env.prod.example ]; then
+                cp .env.prod.example $(Build.ArtifactStagingDirectory)/deployment/
+                echo "✅ Copied .env.prod.example"
+              else
+                echo "⚠️ .env.prod.example not found"
+              fi
+              
+              if [ -f deploy.sh ]; then
+                cp deploy.sh $(Build.ArtifactStagingDirectory)/deployment/
+                echo "✅ Copied deploy.sh"
+              else
+                echo "⚠️ deploy.sh not found"
+              fi
+              
+              echo "VERSION=$(tag)" > $(Build.ArtifactStagingDirectory)/deployment/VERSION.txt
+              echo "BUILD_ID=$(Build.BuildId)" >> $(Build.ArtifactStagingDirectory)/deployment/VERSION.txt
+              echo "BUILD_DATE=$(date -u)" >> $(Build.ArtifactStagingDirectory)/deployment/VERSION.txt
+              
+              echo ""
+              echo "Deployment package contents:"
+              ls -la $(Build.ArtifactStagingDirectory)/deployment/
+            displayName: 'Create Deployment Package'
           
           - task: PublishBuildArtifacts@1
             inputs:
               PathtoPublish: '$(Build.ArtifactStagingDirectory)/deployment'
               ArtifactName: 'deployment'
-            displayName: 'Publish Deployment Artifacts'
-
-  - stage: Summary
-    displayName: '📊 Summary'
-    dependsOn: PublishArtifacts
-    condition: always()
-    jobs:
-      - job: Summary
-        displayName: 'Build Summary'
-        steps:
+              publishLocation: 'Container'
+            displayName: 'Publish Artifacts'
+          
           - script: |
               echo "========================================="
-              echo "🎉 BUILD COMPLETE! 🎉"
+              echo "✅ BUILD COMPLETE!"
               echo "========================================="
-              echo ""
-              echo "🐳 Docker Images:"
-              echo "   Backend: uogwebsite/uog-website-backend:$(tag)"
-              echo "   Backend: uogwebsite/uog-website-backend:latest"
-              echo "   Frontend: uogwebsite/uog-website-frontend:$(tag)"
-              echo "   Frontend: uogwebsite/uog-website-frontend:latest"
-              echo ""
-              echo "📦 Deployment Artifacts:"
-              echo "   docker-compose.prod.yml"
-              echo "   .env.prod.example"
-              echo "   deploy.sh"
-              echo "   VERSION.txt"
-              echo ""
-              echo "🔗 Docker Hub: https://hub.docker.com/u/uogwebsite"
+              echo "Images pushed to Docker Hub"
+              echo "Artifact published: deployment"
               echo "========================================="
             displayName: 'Summary'
