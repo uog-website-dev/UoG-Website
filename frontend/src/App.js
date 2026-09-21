@@ -26,7 +26,7 @@ function App() {
     };
 
     fetchPage();
-  }, []);
+  }, [apiUrl]);
 
   return (
     <div className="App">
@@ -41,6 +41,12 @@ function App() {
             <div className="loading">
               <div className="spinner"></div>
               <p>Loading...</p>
+            </div>
+          )}
+
+          {error && (
+            <div className="error">
+              <p>Failed to load page: {error}</p>
             </div>
           )}
 
