@@ -1,17 +1,18 @@
 """
-URL configuration for UoG Website Backend.
+URL configuration for the UoG Digital Platform backend.
 """
 from django.contrib import admin
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-import api.views as api_views
-from api.views import PageViewSet
+from django.urls import include, path
 
-router = DefaultRouter()
-router.register(r'pages', PageViewSet)
+from apps.core import views as core_views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/', include(router.urls)),
-    path('health/', api_views.health),
+    path("admin/", admin.site.urls),
+    path("api/", include("apps.api.urls")),
+    # Identity endpoints (Keycloak access tokens): /api/me/, /api/admin/*
+    path("api/", include("apps.accounts.urls")),
+    # Health endpoints (documented in docs/development/health.md)
+    path("health/", include("apps.core.urls")),
+    # Legacy liveness URL kept for backward compatibility
+    path("health/", core_views.liveness),
 ]

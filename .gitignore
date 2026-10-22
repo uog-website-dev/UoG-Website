@@ -1,4 +1,30 @@
-node_modules/
-venv/
-__pycache__/
+# Environments
 .env
+.env.*
+!.env.example
+!.env.prod.example
+venv/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Node / frontend
+node_modules/
+.next/
+.turbo/
+dist/
+
+# Django runtime artefacts
+staticfiles/
+media/
+test_media/
+
+# Editors / OS / tooling
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo

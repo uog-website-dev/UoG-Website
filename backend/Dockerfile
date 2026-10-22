@@ -1,25 +1,32 @@
-FROM python:3.11-slim
+# UoG Digital Platform — backend image (Python 3.12 / Django 5.1)
+FROM python:3.12.15-slim-bookworm
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
 
 WORKDIR /app
 
-# Install system dependencies
-ENV DEBIAN_FRONTEND=noninteractive
+# System dependencies: postgresql-client (migration wait/readiness), curl (healthcheck)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    postgresql-client \
-    curl \
+        postgresql-client \
+        curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Install pinned Python dependencies first for layer caching.
+# CI/production can pass --build-arg REQUIREMENTS_FILE=requirements/prod.txt
+COPY requirements/ requirements/
+ARG REQUIREMENTS_FILE=requirements/dev.txt
+RUN pip install -r "${REQUIREMENTS_FILE}"
 
-# Copy project
+# Application source
 COPY . .
-
-# Copy entrypoint script
-COPY entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
+RUN chmod +x entrypoint.sh
 
 EXPOSE 8000
 
+# entrypoint.sh applies migrations with the migration role, then execs the
+# container command (dev: runserver via docker-compose; prod: gunicorn below).
 ENTRYPOINT ["/app/entrypoint.sh"]
+CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "2", "--access-logfile", "-", "--error-logfile", "-"]

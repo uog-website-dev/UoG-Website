@@ -1,0 +1,13 @@
+packages:
+  - frontend/**
+  - backend/**
+
+global-bins: []
+global-dev-bins: []
+
+# Shared packages that can be imported by frontend apps
+shared-packages:
+  - packages/ui
+  - packages/api-client
+  - packages/types
+  - packages/config

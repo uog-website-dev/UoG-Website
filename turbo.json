@@ -1,0 +1,10 @@
+{
+  "$schema": "https://turbo.build/schema",
+  "globalDependencies": ["**/.env*"],
+  "workspaceDefaultDependencies": ["@uog/ui", "@uog/api-client", "@uog/types"],
+  "workspaces": ["frontend/*"],
+  "taskGraph": {
+    "tasksFromDependencies": ["^default"],
+    "isolated": true
+  }
+}

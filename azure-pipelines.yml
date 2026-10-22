@@ -26,19 +26,83 @@ stages:
     jobs:
       - job: BuildAndTest
         displayName: 'Build and Test'
+        services:
+          # The backend test suite needs a real PostgreSQL: pytest-django
+          # creates and drops the temporary `test_uog_db` database, and the
+          # migrations inside it are executed by the migration role. The
+          # container publishes 5432 on the agent, so the steps below reach
+          # it on localhost.
+          postgres:
+            image: postgres:16.15-alpine
+            env:
+              POSTGRES_USER: $(postgresAdminUser)
+              POSTGRES_PASSWORD: $(postgresAdminPassword)
+              POSTGRES_DB: $(appDatabase)
+              POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=C --lc-ctype=C"
+              # Consumed by infrastructure/postgres/init/01-init-roles.sh —
+              # the same role separation the development stack uses.
+              DB_USER: $(appRole)
+              DB_MIGRATE_USER: $(migrateRole)
+              DB_APP_PASSWORD: $(appRolePassword)
+              DB_MIGRATE_PASSWORD: $(migrateRolePassword)
+            ports:
+              - 5432:5432
+            options: >-
+              --health-cmd "pg_isready -U uog_admin -d uog_db"
+              --health-interval 5s
+              --health-timeout 5s
+              --health-retries 12
+        variables:
+          # Throwaway credentials for the ephemeral CI database. They are
+          # derived from the build id, so no static secret is committed and
+          # every build gets fresh ones; the container is destroyed with the
+          # agent.
+          postgresAdminUser: 'uog_admin'
+          postgresAdminPassword: 'ci-postgres-admin-$(Build.BuildId)'
+          appDatabase: 'uog_db'
+          appRole: 'uog_app'
+          migrateRole: 'uog_migrate'
+          appRolePassword: 'ci-app-role-$(Build.BuildId)'
+          migrateRolePassword: 'ci-migrate-role-$(Build.BuildId)'
         steps:
           - checkout: self
-          
+
+          - task: UsePythonVersion@0
+            displayName: 'Use Python 3.12'
+            inputs:
+              versionSpec: '3.12'
+
+          - script: bash scripts/ci/postgres-service.sh
+            displayName: 'Bootstrap PostgreSQL roles'
+            env:
+              DB_USER: $(appRole)
+              DB_MIGRATE_USER: $(migrateRole)
+
           - script: |
+              set -euo pipefail
               cd backend
-              pip install -r requirements.txt
+              python -m pip install --upgrade pip
+              python -m pip install -r requirements/dev.txt
               python manage.py check
+              python -c "import os, psycopg; conn = psycopg.connect(host=os.environ['DB_HOST'], port=int(os.environ['DB_PORT']), dbname=os.environ['DB_NAME'], user=os.environ['DB_MIGRATE_USER'], password=os.environ['DB_MIGRATE_PASSWORD']); cur = conn.cursor(); cur.execute('select current_user'); print('database reachable as', cur.fetchone()[0]); conn.close()"
+              pytest
             displayName: 'Test Backend'
-          
+            env:
+              DB_HOST: localhost
+              DB_PORT: '5432'
+              DB_NAME: $(appDatabase)
+              DB_USER: $(appRole)
+              DB_PASSWORD: $(appRolePassword)
+              DB_MIGRATE_USER: $(migrateRole)
+              DB_MIGRATE_PASSWORD: $(migrateRolePassword)
+              SECRET_KEY: 'ci-only-secret-key'
+              DEBUG: 'False'
+
           - script: |
+              corepack enable
               cd frontend
-              npm install
-              npm run build
+              pnpm install --frozen-lockfile
+              pnpm build
             displayName: 'Build Frontend'
       
       - job: DockerAndArtifacts

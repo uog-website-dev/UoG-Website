@@ -1,0 +1,5 @@
+# Development / CI dependencies
+-r base.txt
+
+pytest==8.4.2
+pytest-django==4.14.0
