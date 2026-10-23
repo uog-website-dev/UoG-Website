@@ -84,7 +84,7 @@
       "webOrigins": ["http://localhost:3000", "http://localhost"],
       "attributes": {
         "pkce.code.challenge.method": "S256",
-        "post.logout.redirect.uris": "http://localhost:3000/*+http://localhost/*"
+        "post.logout.redirect.uris": "http://localhost:3000/*##http://localhost/*"
       },
       "defaultClientScopes": ["web-origins", "acr", "profile", "email", "roles", "uog-api"],
       "optionalClientScopes": ["address", "phone", "offline_access", "microprofile-jwt"]
@@ -107,7 +107,7 @@
       "webOrigins": ["http://localhost:3001", "http://localhost"],
       "attributes": {
         "pkce.code.challenge.method": "S256",
-        "post.logout.redirect.uris": "http://localhost:3001/admin/*+http://localhost/admin/*"
+        "post.logout.redirect.uris": "http://localhost:3001/admin/*##http://localhost/admin/*"
       },
       "defaultClientScopes": ["web-origins", "acr", "profile", "email", "roles", "uog-api"],
       "optionalClientScopes": ["address", "phone", "offline_access", "microprofile-jwt"]

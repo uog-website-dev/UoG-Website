@@ -1,19 +1,22 @@
 import type { Metadata } from "next";
 import type { CSSProperties } from "react";
 import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
+import Button from "@mui/material/Button";
+import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
 import { UogFooter, UogHeader, UogThemeProvider } from "@uog/ui";
 
+import { AdminShell } from "@/admin-shell";
 import { auth } from "@/auth";
 import { signInWithKeycloak, signOutFromSite } from "@/app/actions";
-
-// API base URL for admin - goes through nginx
-const apiBaseUrl = "/api";
 
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "UoG Admin Console",
+  title: {
+    default: "UoG Admin Console",
+    template: "%s · UoG Admin Console",
+  },
   description:
     "Administration console of the University of Gondar Digital Platform (development).",
 };
@@ -34,7 +37,39 @@ export default async function AdminLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   const session = await auth();
 
-  const actions = session ? (
+  if (!session) {
+    return (
+      <html lang="en" suppressHydrationWarning>
+        <body>
+          <UogThemeProvider>
+            <UogHeader title="Admin Console" />
+            <Box
+              component="main"
+              sx={{ display: "flex", justifyContent: "center", px: 2, py: { xs: 8, sm: 12 } }}
+            >
+              <Paper elevation={3} sx={{ p: { xs: 3, sm: 5 }, maxWidth: 440, textAlign: "center" }}>
+                <Typography variant="h5" component="h1" sx={{ fontWeight: 700, mb: 1.5 }}>
+                  Sign in required
+                </Typography>
+                <Typography color="text.secondary" sx={{ mb: 3 }}>
+                  The administration console is restricted to University of Gondar
+                  staff. Sign in with your university account to continue.
+                </Typography>
+                <form action={signInWithKeycloak}>
+                  <Button type="submit" variant="contained" size="large" fullWidth>
+                    Sign in with Keycloak
+                  </Button>
+                </form>
+              </Paper>
+            </Box>
+            <UogFooter />
+          </UogThemeProvider>
+        </body>
+      </html>
+    );
+  }
+
+  const actions = (
     <Box component="span" sx={{ display: "flex", gap: 1.5, alignItems: "center" }}>
       <Box component="span" sx={{ fontSize: 14, opacity: 0.9 }}>
         {session.user?.email ?? session.user?.name ?? "signed in"}
@@ -45,23 +80,13 @@ export default async function AdminLayout({
         </button>
       </form>
     </Box>
-  ) : (
-    <form action={signInWithKeycloak} style={{ display: "inline" }}>
-      <button type="submit" style={linkButtonStyle}>
-        Sign in
-      </button>
-    </form>
   );
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body>
         <UogThemeProvider>
-          <UogHeader title="Digital Platform — Admin Console" actions={actions} />
-          <Container maxWidth="lg" sx={{ py: 4, display: "flex", flexDirection: "column", minHeight: "70vh" }}>
-            {children}
-          </Container>
-          <UogFooter />
+          <AdminShell actions={actions}>{children}</AdminShell>
         </UogThemeProvider>
       </body>
     </html>

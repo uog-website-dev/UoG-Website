@@ -6,11 +6,13 @@
     "dev": "next dev -p 3000",
     "build": "next build",
     "start": "next start -p 3000",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.1",
+    "@mui/icons-material": "6.5.0",
     "@mui/material": "6.5.0",
     "@uog/api-client": "workspace:*",
     "@uog/types": "workspace:*",
@@ -21,10 +23,14 @@
     "react-dom": "19.2.9"
   },
   "devDependencies": {
-    "@uog/config": "workspace:*",
+    "@testing-library/dom": "10.4.0",
+    "@testing-library/react": "16.1.0",
     "@types/node": "22.10.5",
     "@types/react": "19.2.9",
     "@types/react-dom": "19.2.4",
-    "typescript": "5.6.3"
+    "@uog/config": "workspace:*",
+    "jsdom": "25.0.1",
+    "typescript": "5.6.3",
+    "vitest": "5.0.5"
   }
 }

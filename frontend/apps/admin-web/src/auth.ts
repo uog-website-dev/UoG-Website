@@ -10,7 +10,7 @@ import Keycloak from "next-auth/providers/keycloak";
 
 import { APP_BASE_PATH } from "@/base-path";
 
-const issuer =
+export const issuer =
   process.env.KEYCLOAK_ISSUER ?? "http://localhost:8080/realms/uog";
 
 /**
@@ -82,6 +82,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.accessToken = account.access_token;
         token.accessTokenExpires = account.expires_at ?? null;
         token.refreshToken = account.refresh_token ?? null;
+        // Needed for RP-initiated logout at Keycloak (see src/app/actions.ts).
+        token.idToken = account.id_token ?? null;
       }
       return token;
     },

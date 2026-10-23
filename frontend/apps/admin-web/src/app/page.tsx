@@ -1,174 +1,157 @@
 /**
- * Admin dashboard — platform smoke screen.
+ * Admin dashboard — shell placeholder.
  *
- * Server component: the identity and the platform overview come from the
- * protected Django endpoints, called with the Keycloak access token held by
- * the Auth.js session (`src/access-token.ts`) — the browser never sees that
- * token. Only the readiness probe stays client-side.
+ * This screen intentionally performs no privileged API calls: it only
+ * presents the console shell and links to the section placeholders. The
+ * single live probe is the clearly-labelled backend readiness check, which
+ * reports connectivity honestly instead of implying working features.
  */
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import BusinessIcon from "@mui/icons-material/Business";
+import WebIcon from "@mui/icons-material/Web";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
+import CardActionArea from "@mui/material/CardActionArea";
 import Chip from "@mui/material/Chip";
-import Grid from "@mui/material/Grid2";
+import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
-import { ApiError, createApiClient } from "@uog/api-client";
-import type { AdminOverview, Identity } from "@uog/types";
+import NextLink from "next/link";
 
-import { getAccessToken } from "@/access-token";
-import { auth } from "@/auth";
+import { Breadcrumb } from "@/breadcrumb";
 import HealthCheck from "./health-check";
 
-/** Server-side base URL: the Docker-network address of the Django API. */
-const apiBaseUrl = process.env.API_BASE_URL ?? "http://backend:8000/api";
-
-const services = [
-  { name: "PostgreSQL 16", detail: "Shared application database" },
-  { name: "Redis (cache + broker)", detail: "Caching and Celery task queue" },
-  { name: "Celery Worker / Beat", detail: "Background and scheduled processing" },
-  { name: "MinIO", detail: "platform-public / platform-private / platform-documents" },
-  { name: "Keycloak", detail: "OIDC identity provider (realm: uog)" },
-  { name: "Nginx", detail: "Reverse proxy and routing" },
+const sections = [
+  {
+    title: "Organizations",
+    href: "/organizations",
+    description:
+      "University colleges, institutes and departments — the institutional tree every site belongs to.",
+    icon: BusinessIcon,
+  },
+  {
+    title: "Sites",
+    href: "/sites",
+    description:
+      "Public websites and microsites managed by the platform, including domains and publishing state.",
+    icon: WebIcon,
+  },
 ];
 
-interface PlatformIdentity {
-  signedIn: boolean;
-  identity: Identity | null;
-  overview: AdminOverview | null;
-  problem: string | null;
-}
-
-/**
- * Read the signed-in identity from the API — with the access token from the
- * session, server-side. Anonymous visitors never call the protected routes.
- */
-async function loadPlatformIdentity(): Promise<PlatformIdentity> {
-  const session = await auth();
-  if (!session) {
-    return { signedIn: false, identity: null, overview: null, problem: null };
-  }
-
-  const accessToken = await getAccessToken();
-  const api = createApiClient({
-    baseUrl: apiBaseUrl,
-    accessToken: accessToken ?? undefined,
-  });
-
-  try {
-    const [identity, overview] = await Promise.all([
-      api.get<Identity>("/me/"),
-      api.get<AdminOverview>("/admin/overview/"),
-    ]);
-    return { signedIn: true, identity, overview, problem: null };
-  } catch (error) {
-    const status = error instanceof ApiError ? error.status : 0;
-    return {
-      signedIn: true,
-      identity: null,
-      overview: null,
-      problem:
-        status === 401
-          ? "The API rejected this session's access token — sign out and sign in again."
-          : `The platform API could not be reached from the server (${status || "network error"}).`,
-    };
-  }
-}
-
-export default async function AdminDashboard() {
-  const { signedIn, identity, overview, problem } =
-    await loadPlatformIdentity();
-
+export default function AdminDashboard() {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
       <Box>
-        <Typography variant="h4" gutterBottom>
-          Platform administration
+        <Breadcrumb
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Dashboard" },
+          ]}
+        />
+        <Typography variant="h4" component="h1" sx={{ fontWeight: 700 }}>
+          Dashboard
         </Typography>
-        <Typography color="text.secondary">
-          Development dashboard for the UoG Digital Platform foundation.
+        <Typography color="text.secondary" sx={{ mt: 0.5 }}>
+          University of Gondar Digital Platform — administration console.
         </Typography>
       </Box>
 
-      {!signedIn && (
-        <Alert severity="info">
-          Sign in with your University of Gondar account to see the identity
-          the platform API sees for you.
-        </Alert>
-      )}
+      <Alert severity="info" variant="outlined">
+        <strong>Shell preview.</strong> The console framework (navigation,
+        layout, route states) is in place, but management features are not
+        connected to the platform API yet. No data is read or written from
+        these screens.
+      </Alert>
 
-      {signedIn && problem && <Alert severity="warning">{problem}</Alert>}
-
-      {signedIn && identity && (
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Card sx={{ height: "100%" }}>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  Identity behind your access token
-                </Typography>
-                <Typography variant="body1">
-                  {identity.name || identity.username}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {identity.email}
-                </Typography>
-                <Box
-                  sx={{ display: "flex", gap: 0.75, flexWrap: "wrap", mt: 1.5 }}
+      <Box
+        component="section"
+        aria-labelledby="admin-sections-heading"
+        sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}
+      >
+        <Typography id="admin-sections-heading" variant="h6" sx={{ fontWeight: 700 }}>
+          Management sections
+        </Typography>
+        <Box
+          sx={{
+            display: "grid",
+            gap: 2,
+            gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)" },
+          }}
+        >
+          {sections.map((section) => {
+            const Icon = section.icon;
+            return (
+              <Card key={section.title} variant="outlined" sx={{ height: "100%" }}>
+                <CardActionArea
+                  component={NextLink}
+                  href={section.href}
+                  sx={{ height: "100%", p: 2.5, alignItems: "flex-start" }}
+                  aria-label={`Open the ${section.title} section (placeholder)`}
                 >
-                  {identity.roles.map((role) => (
-                    <Chip key={role} label={role} size="small" color="secondary" />
-                  ))}
-                </Box>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  display="block"
-                  sx={{ mt: 1.5 }}
-                >
-                  client {identity.client_id} ·{" "}
-                  {identity.is_staff ? "staff account" : "non-staff account"} ·
-                  scopes {identity.scopes.join(" ") || "—"}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Card sx={{ height: "100%" }}>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  Platform overview
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {overview
-                    ? `${overview.pages} pages (${overview.published_pages} published) · ${overview.users} platform users · requested by ${overview.requested_by}`
-                    : "Overview unavailable."}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-      )}
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: 40,
+                        height: 40,
+                        borderRadius: 2,
+                        bgcolor: "primary.main",
+                        color: "primary.contrastText",
+                      }}
+                    >
+                      <Icon fontSize="small" />
+                    </Box>
+                    <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                      {section.title}
+                    </Typography>
+                    <Chip label="Placeholder" size="small" color="secondary" />
+                  </Box>
+                  <Typography variant="body2" color="text.secondary">
+                    {section.description}
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 0.5,
+                      mt: 2,
+                      color: "primary.main",
+                      fontWeight: 600,
+                      fontSize: 13.5,
+                    }}
+                  >
+                    Open {section.title.toLowerCase()}
+                    <ArrowForwardIcon sx={{ fontSize: 16 }} />
+                  </Box>
+                </CardActionArea>
+              </Card>
+            );
+          })}
+        </Box>
+      </Box>
 
-      <HealthCheck />
-
-      <Grid container spacing={2}>
-        {services.map((service) => (
-          <Grid key={service.name} size={{ xs: 12, sm: 6, md: 4 }}>
-            <Card sx={{ height: "100%" }}>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  {service.name}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {service.detail}
-                </Typography>
-                <Chip label="platform service" size="small" sx={{ mt: 1.5 }} color="secondary" />
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+      <Box
+        component="section"
+        aria-labelledby="admin-diagnostics-heading"
+        sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}
+      >
+        <Typography id="admin-diagnostics-heading" variant="h6" sx={{ fontWeight: 700 }}>
+          Backend connectivity
+        </Typography>
+        <Card variant="outlined">
+          <Box sx={{ p: 2.5, display: "flex", flexDirection: "column", gap: 1.5 }}>
+            <Typography variant="body2" color="text.secondary">
+              Development diagnostic only — pings the public{" "}
+              <Link href="/api/health/ready">health endpoint</Link> to confirm
+              the reverse proxy can reach the Django API. It does not exercise
+              any administration feature.
+            </Typography>
+            <HealthCheck />
+          </Box>
+        </Card>
+      </Box>
     </Box>
   );
 }
