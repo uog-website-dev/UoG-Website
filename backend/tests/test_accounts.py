@@ -69,6 +69,18 @@ def test_the_same_subject_always_maps_to_the_same_account(client, oidc):
 
 
 @pytest.mark.django_db
+def test_a_subject_username_is_replaced_when_the_claim_arrives(client, oidc):
+    client.get("/api/me/", **oidc.header(preferred_username=SUBJECT))
+    user = User.objects.get()
+    assert user.username == SUBJECT
+
+    repaired = client.get("/api/me/", **oidc.header())
+    assert repaired.status_code == 200
+    assert repaired.json()["username"] == "devuser"
+    assert User.objects.count() == 1
+
+
+@pytest.mark.django_db
 def test_a_renamed_keycloak_user_keeps_the_local_account(client, oidc):
     client.get("/api/me/", **oidc.header())
     renamed = client.get("/api/me/", **oidc.header(preferred_username="d.user"))

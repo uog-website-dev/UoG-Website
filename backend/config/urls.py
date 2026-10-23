@@ -5,12 +5,17 @@ from django.contrib import admin
 from django.urls import include, path
 
 from apps.core import views as core_views
+from apps.core.documentation import RedocView, SchemaView, SwaggerView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("api/schema/", SchemaView.as_view(), name="schema"),
+    path("api/docs/", SwaggerView.as_view(url_name="schema"), name="swagger-ui"),
+    path("api/redoc/", RedocView.as_view(url_name="schema"), name="redoc"),
     path("api/", include("apps.api.urls")),
     # Identity endpoints (Keycloak access tokens): /api/me/, /api/admin/*
     path("api/", include("apps.accounts.urls")),
+    path("api/v1/organizations/", include("apps.organizations.api.urls")),
     # Health endpoints (documented in docs/development/health.md)
     path("health/", include("apps.core.urls")),
     # Legacy liveness URL kept for backward compatibility

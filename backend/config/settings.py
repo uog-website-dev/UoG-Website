@@ -7,6 +7,7 @@ at the repository root for the full list of supported variables.
 import sys
 from pathlib import Path
 
+from corsheaders.defaults import default_headers
 from decouple import Csv, config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,14 +29,23 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "drf_spectacular",
+    "drf_spectacular_sidecar",
     "corsheaders",
     "apps.core",
     "apps.api",
     "apps.accounts",
+    "apps.audit",
+    # Organizational structure. Entities and APIs are later stories;
+    # this registration establishes the domain boundary.
+    "apps.organizations",
 ]
 
 MIDDLEWARE = [
+    "apps.core.middleware.RequestIDMiddleware",
+    "apps.audit.middleware.AuditContextMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -128,7 +138,8 @@ USE_TZ = True
 # Static files / media.
 # NOTE: platform media and documents live in MinIO (see STORAGES below);
 # MEDIA_ROOT is kept only for incidental local scratch storage.
-STATIC_URL = "/static/"
+# Under /api/ so the existing API proxy reaches Django. /static/ belongs to the public site.
+STATIC_URL = "/api/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
@@ -139,6 +150,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Django REST Framework
 # ---------------------------------------------------------------------------
 REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "EXCEPTION_HANDLER": "apps.core.errors.api_exception_handler",
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer",
@@ -150,6 +163,52 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "apps.accounts.authentication.KeycloakBearerAuthentication",
         "rest_framework.authentication.SessionAuthentication",
+    ],
+}
+
+# Public in development; production documentation is disabled unless explicitly
+# enabled, in which case all three views require an active staff identity.
+API_DOCS_ENABLED = config("API_DOCS_ENABLED", default=DEBUG, cast=bool)
+ORGANIZATIONS_DEV_WRITES_ENABLED = config("ORGANIZATIONS_DEV_WRITES_ENABLED", default=False, cast=bool)
+SPECTACULAR_SETTINGS = {
+    "TITLE": "University of Gondar Digital Platform API",
+    "VERSION": "1.0.0",
+    "OAS_VERSION": "3.0.3",
+    "DESCRIPTION": (
+        "Live documentation generated from registered DRF endpoints and serializers. "
+        "Use Authorize with a Keycloak access token (paste the JWT without Bearer). "
+        "Backend authentication and permissions always apply. "
+        "Organization administration is platform-admin only; writes require development "
+        "opt-in and remain disabled in production pending scoped IAM/RBAC. "
+        "Pages are currently platform-wide. Site, Domain, Posts and Menus APIs are absent. "
+        "Organization/Site scoping and module activation "
+        "checks must be implemented and tested before those APIs are exposed. "
+        "No scope header grants access. See docs/development/api-documentation.md."
+    ),
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SERVE_PERMISSIONS": ["apps.core.permissions.DocumentationPermission"],
+    "SWAGGER_UI_DIST": "SIDECAR",
+    "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
+    "REDOC_DIST": "SIDECAR",
+    "SWAGGER_UI_SETTINGS": {
+        "deepLinking": True,
+        "persistAuthorization": False,
+        "validatorUrl": None,
+    },
+    "REDOC_UI_SETTINGS": {"disableGoogleFont": True},
+    "COMPONENT_SPLIT_REQUEST": True,
+    "POSTPROCESSING_HOOKS": [
+        "drf_spectacular.hooks.postprocess_schema_enums",
+        "apps.core.openapi.add_common_contract",
+    ],
+    "TAGS": [
+        {"name": "CMS", "description": "Platform pages; site scoping is not implemented."},
+        {"name": "Identity", "description": "Keycloak identity and platform administration."},
+        {"name": "Organizations", "description": "Restricted institutional administration; production writes disabled pending scoped IAM/RBAC."},
+        {"name": "Sites", "description": "Not implemented."},
+        {"name": "Domains", "description": "Not implemented."},
+        {"name": "Posts", "description": "Not implemented."},
+        {"name": "Menus", "description": "Not implemented."},
     ],
 }
 
@@ -195,6 +254,8 @@ CORS_ALLOWED_ORIGINS = config(
     cast=Csv(),
 )
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = [*default_headers, "x-request-id", "if-match"]
+CORS_EXPOSE_HEADERS = ["X-Request-ID", "ETag", "Location"]
 
 # ---------------------------------------------------------------------------
 # Redis cache (redis-cache instance).

@@ -66,6 +66,18 @@ def _claim_local_user(claims: TokenClaims):
 
 
 def _sync_profile(user, claims: TokenClaims) -> None:
+    # Accounts created while tokens omitted preferred_username were stored
+    # under the subject id. Correct that once a real username arrives.
+    # A later rename keeps the same row; it does not replace a real username.
+    if (
+        user.username == claims.subject
+        and claims.username
+        and claims.username != claims.subject
+        and not User.objects.filter(username__iexact=claims.username)
+        .exclude(pk=user.pk)
+        .exists()
+    ):
+        user.username = _INVALID_USERNAME_CHARS.sub("-", claims.username)[:150]
     user.first_name = claims.given_name or user.first_name
     user.last_name = claims.family_name or user.last_name
     if claims.email:

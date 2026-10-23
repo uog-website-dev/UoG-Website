@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "purpose": "Representative test data only; not an approved institutional registry",
+  "units": [
+    {"code": "UOG", "name": "University of Gondar", "organization_type": "UNIVERSITY", "parent_code": null},
+    {"code": "CI", "name": "College of Informatics", "organization_type": "COLLEGE", "parent_code": "UOG"},
+    {"code": "CS", "name": "Computer Science", "organization_type": "DEPARTMENT", "parent_code": "CI"},
+    {"code": "IS", "name": "Information Systems", "organization_type": "DEPARTMENT", "parent_code": "CI"},
+    {"code": "CM", "name": "College of Medicine", "organization_type": "COLLEGE", "parent_code": "UOG"},
+    {"code": "RC", "name": "Research Center", "organization_type": "RESEARCH_CENTER", "parent_code": "UOG"},
+    {"code": "LIBRARY", "name": "Library", "organization_type": "DIRECTORATE", "parent_code": "UOG"},
+    {"code": "REGISTRAR", "name": "Registrar", "organization_type": "ADMINISTRATIVE_UNIT", "parent_code": "UOG"}
+  ]
+}

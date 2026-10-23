@@ -41,6 +41,9 @@ its OIDC clients, and the Celery beat schedule.
 | Public website | http://localhost |
 | Admin console | http://localhost/admin |
 | Django REST API | http://localhost/api/ |
+| Swagger UI | http://localhost/api/docs/ |
+| OpenAPI schema | http://localhost/api/schema/ |
+| ReDoc | http://localhost/api/redoc/ |
 | Backend health | http://localhost/health/ready |
 | Django admin | http://localhost/django-admin/ |
 | Keycloak | http://localhost:8080 (realm `uog`) |
@@ -90,6 +93,74 @@ Notes:
     -d client_secret=backend-api-dev-secret
   ```
 
+## Swagger and authenticated API testing
+
+Open [Swagger UI](http://localhost/api/docs/) to explore the live CMS,
+Identity and Organizations endpoints. Swagger and ReDoc use self-hosted assets.
+
+Run `python scripts/dev-api-token.py` from the repository root. Enter your
+local Keycloak development client secret and user credentials, then copy
+the short-lived access token into **Authorize → keycloakBearer** (JWT only,
+without `Bearer`). Try `GET /api/me/`; the admin overview also requires the
+`platform-admin` role. Backend permissions remain enforced. Tokens are not
+persisted across Swagger reloads.
+
+Production documentation is disabled by default (`API_DOCS_ENABLED=False`).
+If explicitly enabled with `DEBUG=False`, all documentation views require
+an active staff identity. Organization APIs are at `/api/v1/organizations/`;
+all operations require a verified `platform-admin` bearer token. Writes
+additionally require `DEBUG=True` and `ORGANIZATIONS_DEV_WRITES_ENABLED=True`
+(default False); production writes remain disabled pending scoped IAM/RBAC.
+PATCH and lifecycle actions require the current detail ETag in `If-Match`.
+See the [Organization API contract](docs/api/organizations.md),
+[hierarchy navigation and limits](docs/api/organization-hierarchy.md),
+[search/filtering and ordering](docs/api/organization-discovery.md),
+[transactional auditing](docs/api/organization-audit.md),
+[error catalog](docs/api/error-catalog.md), and [OpenAPI snapshot](docs/api/openapi.yaml).
+Site and Domain APIs remain unimplemented.
+
+Generate and validate the same schema used by CI:
+
+```bash
+docker compose exec backend python manage.py spectacular --file /tmp/openapi.yaml --validate --fail-on-warn
+```
+
+See [API documentation instructions](docs/development/api-documentation.md)
+for authentication, errors, request IDs, scope/activation requirements,
+production access, and extending the generated schema. Handled DRF errors
+now use `{error: {code, message, details}, request_id}`; clients should read
+field errors from `error.details`.
+
+## Organization types
+
+Organization types are a managed lookup under
+[DEC-04](docs/architecture/decisions/DEC-04-organization-types.md), seeded with
+the ten UoG institutional classifications. Administrators can manage names
+and add types in Django admin; existing codes are immutable. See
+[organization type instructions](docs/development/organization-types.md)
+for migrations, validation, translation labels, and protected references.
+
+`OrganizationUnit` now stores institutional records, with a protected type
+and parent relationship, one optional root, immutable normalized codes,
+ACTIVE/INACTIVE/ARCHIVED status and object-only metadata. See
+[unit implementation and evidence](docs/development/organization-units.md)
+for model usage, migration and database/index verification.
+[Hierarchy operations](docs/development/organization-hierarchy.md) now provide
+parent, children, ancestors, descendants/subtree and root queries, with
+serialized cycle-safe moves and database enforcement. Site-specific
+configuration remains in the future Site domain; the Organization REST,
+hierarchy, discovery and audit contracts are linked above.
+
+[Lifecycle rules](docs/development/organization-lifecycle.md) enforce
+ACTIVE → INACTIVE → ARCHIVED, an immovable ACTIVE UNIVERSITY root,
+bottom-up deactivation, retained historical references and archive-only
+retirement. Active linked Sites veto retirement through a tested integration
+hook; the future Site domain must wire that hook and the shared write guard.
+
+See the [Organization backend readiness gate](docs/development/organization-readiness.md)
+for the representative UoG acceptance workflow, reproducible validation,
+remaining Site/RBAC dependencies and completion evidence.
+
 ## Common commands
 
 | Task | Command |
@@ -97,7 +168,7 @@ Notes:
 | Start / stop | `docker compose up -d` / `docker compose stop` |
 | Rebuild containers | `docker compose up -d --build` |
 | Logs | `docker compose logs -f [service]` |
-| Run migrations | `docker compose exec backend python manage.py migrate` |
+| Run migrations (migration role) | `docker compose exec backend /app/entrypoint.sh python manage.py check` |
 | Backend tests | `docker compose exec backend pytest` |
 | Frontend tests | `cd frontend && pnpm test` |
 | Frontend builds (Turborepo) | `cd frontend && pnpm build` |
@@ -114,7 +185,7 @@ Full setup, troubleshooting and workflow details:
 uog-digital-platform/
 ├── backend/                 # Django 5.1 + DRF (Python 3.12)
 │   ├── config/              # settings, urls, celery
-│   ├── apps/                # core (health/tasks/storage), api (sample API)
+│   ├── apps/                # core, api, accounts, organizations
 │   ├── requirements/        # pinned base/dev/prod layers
 │   ├── tests/               # pytest suite
 │   ├── manage.py

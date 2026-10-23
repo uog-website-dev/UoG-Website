@@ -1,0 +1,54 @@
+{
+  "validation_date": "2026-10-23",
+  "engineering_gate": "PASS: backend foundation for Site development",
+  "production_authorized": false,
+  "hosted_ci_result": "PENDING: not executed by this local validation",
+  "merged_pr_or_commit": "PENDING: source is an uncommitted working tree",
+  "base_commit_abbrev": "6b4649e",
+  "branch": "P1-ORG-001",
+  "source": {
+    "normalized_backend_sha256": "2b1bc986a9eb4f886a512e67567324562edf98b08887a15052e28c4f9b02834d",
+    "files": 117,
+    "normalization": "relative POSIX path + NUL + LF-normalized file bytes + NUL; paths sorted; apps/config/tests/requirements/scripts .py/.json/.txt plus manage.py and pytest.ini"
+  },
+  "command": "docker compose exec -T backend pytest --create-db -o addopts='' -q --junitxml=/tmp/organization-readiness-results.xml",
+  "tests": {
+    "tests": 317,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "console_result": "317 passed in 91.01s (0:01:31)",
+  "representative_acceptance_cases": 4,
+  "postgresql_clean_migrations": "PASS: pytest --create-db; required lookup seeds and latest audit/organization migration graph asserted",
+  "system_check": "PASS",
+  "migration_drift": "PASS: no changes detected",
+  "pending_migrations": "NONE",
+  "openapi": {
+    "validation": "PASS: DEBUG=False; --validate --fail-on-warn",
+    "snapshot_equal": true,
+    "paths": 14,
+    "operations": 20,
+    "canonical_json_sha256": "38ac27d196f6808b50abb4b221ada59a2fbb969ef11ce298a1e0548b8780a527"
+  },
+  "live_keycloak_nginx": {
+    "development_token_exchange": 200,
+    "authenticated_identity": 200,
+    "authenticated_organization_list": 200,
+    "authenticated_tree": 200,
+    "authenticated_combined_discovery": 200,
+    "correlation_id_preserved": true,
+    "anonymous_tree": 401,
+    "invalid_bearer": 401,
+    "default_opt_in_disabled_write": 403,
+    "organization_data_written": false
+  },
+  "known_open_critical_or_high_defects_in_validated_scope": 0,
+  "remaining_dependencies": [
+    "Scoped IAM/RBAC before production Organization writes",
+    "Site FK/lifecycle hook and shared hierarchy serialization integration",
+    "Site membership, activation and cross-Site isolation tests",
+    "Official institutional data approval; representative fixture is test-only",
+    "Hosted CI/merge and stakeholder acceptance evidence are not supplied by this local engineering gate"
+  ]
+}
