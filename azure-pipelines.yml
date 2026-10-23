@@ -84,8 +84,11 @@ stages:
               python -m pip install --upgrade pip
               python -m pip install -r requirements/dev.txt
               python manage.py check
+              python manage.py collectstatic --noinput
               python -c "import os, psycopg; conn = psycopg.connect(host=os.environ['DB_HOST'], port=int(os.environ['DB_PORT']), dbname=os.environ['DB_NAME'], user=os.environ['DB_MIGRATE_USER'], password=os.environ['DB_MIGRATE_PASSWORD']); cur = conn.cursor(); cur.execute('select current_user'); print('database reachable as', cur.fetchone()[0]); conn.close()"
-              pytest
+              pytest --junitxml=backend-test-results.xml
+              python manage.py spectacular --file openapi.yaml --validate --fail-on-warn
+              python -c "import yaml; from pathlib import Path; assert yaml.safe_load(Path('openapi.yaml').read_text()) == yaml.safe_load(Path('../docs/api/openapi.yaml').read_text()), 'Regenerate docs/api/openapi.yaml for the changed API contract'"
             displayName: 'Test Backend'
             env:
               DB_HOST: localhost
@@ -97,6 +100,21 @@ stages:
               DB_MIGRATE_PASSWORD: $(migrateRolePassword)
               SECRET_KEY: 'ci-only-secret-key'
               DEBUG: 'False'
+
+          - task: PublishTestResults@2
+            displayName: 'Publish backend regression and Organization acceptance results'
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: 'backend/backend-test-results.xml'
+              testRunTitle: 'Organization foundation and backend regression'
+              failTaskOnFailedTests: true
+
+          - task: PublishPipelineArtifact@1
+            displayName: 'Publish validated OpenAPI schema'
+            inputs:
+              targetPath: 'backend/openapi.yaml'
+              artifact: 'openapi-schema'
 
           - script: |
               corepack enable

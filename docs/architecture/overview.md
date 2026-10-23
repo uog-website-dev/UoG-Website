@@ -48,7 +48,7 @@ Keycloak (:8080) ---- OIDC identity for both Next.js apps and API clients
 | Concern | Location |
 | --- | --- |
 | Django settings (env-driven) | `backend/config/settings.py` |
-| Django apps | `backend/apps/core` (platform core), `backend/apps/api` (sample API) |
+| Django apps | `backend/apps/core` (platform core), `backend/apps/api` (sample API), `backend/apps/accounts` (identity), `backend/apps/audit` (shared audit), `backend/apps/organizations` (organizational structure) |
 | Health endpoints | `backend/apps/core/views.py`, `docs/development/health.md` |
 | Celery tasks & beat schedule | `backend/apps/core/tasks.py`, `backend/config/celery.py` |
 | Frontend monorepo | `frontend/` (`apps/`, `packages/`) |
@@ -59,9 +59,25 @@ Keycloak (:8080) ---- OIDC identity for both Next.js apps and API clients
 
 ## Extension points for later stories
 
-* **Organizations/Sites:** new Django app `backend/apps/organizations`
-  (shared schema, FK-scoped rows); cache keys already route through
-  `apps.core.cache.make_cache_key` for future org/site prefixes.
+* **Organizations/Sites:** Django app `backend/apps/organizations`
+  (models, services, selectors, api, admin, migrations, tests). The
+  foundation registers the domain; `OrganizationType` is a managed lookup
+  with seeded classifications under [DEC-04](decisions/DEC-04-organization-types.md).
+  `OrganizationUnit` now stores central institutional records under the
+  [unit data-model choices](organization-unit-data-model.md).
+  [Hierarchy operations](../development/organization-hierarchy.md) use recursive
+  queries and a shared transactional guard with database cycle enforcement.
+  [Lifecycle policy](organization-lifecycle-rules.md) protects the UNIVERSITY
+  root and historical references and enforces forward-only retirement.
+  Restricted [Organization REST APIs](../api/organizations.md),
+  [hierarchy navigation](../api/organization-hierarchy.md),
+  [search/filtering](../api/organization-discovery.md) and
+  [shared transactional auditing](audit-contract.md) are implemented.
+  The [readiness gate](../development/organization-readiness.md) records validation
+  for Site backend development; production writes still await scoped IAM/RBAC.
+  Site rows remain a subsequent story. Cache keys
+  already route through `apps.core.cache.make_cache_key` for future
+  org/site prefixes.
 * **Media workflows:** store under key prefixes in the three platform
   buckets; never create per-site buckets.
 * **RBAC:** Keycloak realm roles/groups plus DRF permission classes; the

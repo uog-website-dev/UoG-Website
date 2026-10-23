@@ -23,6 +23,7 @@ RUN pip install -r "${REQUIREMENTS_FILE}"
 # Application source
 COPY . .
 RUN chmod +x entrypoint.sh
+RUN DEBUG=False python manage.py collectstatic --noinput
 
 EXPOSE 8000
 
