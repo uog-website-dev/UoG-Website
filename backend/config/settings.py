@@ -1,125 +1,304 @@
 """
-Django settings for UoG Website Backend.
-"""
-import os
-from pathlib import Path
-from decouple import config
+Django settings for the UoG Digital Platform backend.
 
-# Build paths inside the project
+All configuration is environment-driven (python-decouple). See .env.example
+at the repository root for the full list of supported variables.
+"""
+import sys
+from pathlib import Path
+
+from decouple import Csv, config
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-dev-key-change-in-production')
+# ---------------------------------------------------------------------------
+# Core
+# ---------------------------------------------------------------------------
+SECRET_KEY = config("SECRET_KEY", default="django-insecure-dev-only-change-me")
+DEBUG = config("DEBUG", default=True, cast=bool)
+ALLOWED_HOSTS = config(
+    "ALLOWED_HOSTS", default="localhost,127.0.0.1,backend", cast=Csv()
+)
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=True, cast=bool)
-
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
-
-# Application definition
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'rest_framework',
-    'corsheaders',
-    'api',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "rest_framework",
+    "corsheaders",
+    "apps.core",
+    "apps.api",
+    "apps.accounts",
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'config.urls'
+ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
+WSGI_APPLICATION = "config.wsgi.application"
 
-# Database
+# ---------------------------------------------------------------------------
+# Database — ONE shared PostgreSQL database and schema for the whole platform
+# (35+ institutional websites are scoped by Organization/Site rows added in
+# later stories; per-site databases or schemas are explicitly out of scope).
+#
+# Privilege separation (approved P0 security architecture):
+#   * the runtime connects as the non-superuser application role (DB_USER)
+#   * migrations run as a separate migration role (DB_MIGRATE_USER), which
+#     owns the schema and grants privileges to the application role
+#     (see infrastructure/postgres/init and backend/entrypoint.sh).
+# Credentials come exclusively from the environment — never from source.
+# ---------------------------------------------------------------------------
 DATABASES = {
-    'default': {
-        'ENGINE': config('DB_ENGINE', default='django.db.backends.postgresql'),
-        'NAME': config('DB_NAME', default='uog_db'),
-        'USER': config('DB_USER', default='uog_user'),
-        'PASSWORD': config('DB_PASSWORD', default='uog_password'),
-        'HOST': config('DB_HOST', default='db'),
-        'PORT': config('DB_PORT', default='5432'),
+    "default": {
+        "ENGINE": config("DB_ENGINE", default="django.db.backends.postgresql"),
+        "NAME": config("DB_NAME", default="uog_db"),
+        "USER": config("DB_USER", default="uog_app"),
+        "PASSWORD": config("DB_PASSWORD", default="uog_app_password"),
+        "HOST": config("DB_HOST", default="postgres"),
+        "PORT": config("DB_PORT", default="5432", cast=int),
+        "CONN_MAX_AGE": config("DB_CONN_MAX_AGE", default=60, cast=int),
+        "OPTIONS": {"connect_timeout": 5},
+        "ATOMIC_REQUESTS": False,
     }
 }
+
+# The test suite creates and drops a temporary database (`test_<DB_NAME>`),
+# which is a database-level DDL action. It therefore connects with the
+# migration role — the runtime role above must never be able to create
+# databases. Detected for both `pytest` and `manage.py test`.
+if "pytest" in sys.modules or "test" in sys.argv:
+    DATABASES["default"]["USER"] = config("DB_MIGRATE_USER", default="uog_migrate")
+    DATABASES["default"]["PASSWORD"] = config(
+        "DB_MIGRATE_PASSWORD", default="uog_migrate_password"
+    )
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
-# Internationalization
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+# ---------------------------------------------------------------------------
+# Internationalisation — UTF-8 database (PostgreSQL default) and UTC everywhere
+# ---------------------------------------------------------------------------
+LANGUAGE_CODE = "en-us"
+TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+# Static files / media.
+# NOTE: platform media and documents live in MinIO (see STORAGES below);
+# MEDIA_ROOT is kept only for incidental local scratch storage.
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
-# Media files
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Default primary key field type
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# REST Framework configuration
+# ---------------------------------------------------------------------------
+# Django REST Framework
+# ---------------------------------------------------------------------------
 REST_FRAMEWORK = {
-    'DEFAULT_RENDERER_CLASSES': [
-        'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
+    ],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 20,
+    # The Keycloak bearer authentication comes first so that unauthenticated
+    # calls answer 401 (with a WWW-Authenticate challenge) instead of 403.
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "apps.accounts.authentication.KeycloakBearerAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
     ],
 }
 
-# CORS configuration
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost',
-    'http://127.0.0.1',
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-    'http://frontend:3000',
-]
+# ---------------------------------------------------------------------------
+# Keycloak / OIDC — the API validates the access tokens the frontends obtain
+# from the identity provider (see apps.accounts).
+#
+# OIDC_ISSUER is the *public* issuer Keycloak stamps into its tokens (the
+# address the browser uses); OIDC_JWKS_URL may point at an internal address
+# because the containers reach Keycloak over the Docker network.
+# ---------------------------------------------------------------------------
+OIDC_ISSUER = config(
+    "OIDC_ISSUER", default="http://localhost:8080/realms/uog"
+)
+OIDC_JWKS_URL = config(
+    "OIDC_JWKS_URL",
+    default="http://keycloak:8080/realms/uog/protocol/openid-connect/certs",
+)
+# The audience a token must carry — tokens are issued for the platform API.
+OIDC_AUDIENCE = config("OIDC_AUDIENCE", default="backend-api", cast=Csv())
+# The clients whose tokens are accepted (the "azp" claim).
+OIDC_ALLOWED_CLIENTS = config(
+    "OIDC_ALLOWED_CLIENTS",
+    default="public-web,admin-web,backend-api",
+    cast=Csv(),
+)
+# Only asymmetric algorithms — a shared secret would let anybody mint tokens.
+OIDC_ALLOWED_ALGORITHMS = config(
+    "OIDC_ALLOWED_ALGORITHMS", default="RS256", cast=Csv()
+)
+OIDC_LEEWAY_SECONDS = config("OIDC_LEEWAY_SECONDS", default=30, cast=int)
+OIDC_JWKS_CACHE_SECONDS = config("OIDC_JWKS_CACHE_SECONDS", default=300, cast=int)
+OIDC_HTTP_TIMEOUT_SECONDS = config("OIDC_HTTP_TIMEOUT_SECONDS", default=10, cast=int)
+# Keycloak roles that make a local account a staff account.
+OIDC_STAFF_ROLES = config("OIDC_STAFF_ROLES", default="platform-admin", cast=Csv())
 
+# ---------------------------------------------------------------------------
+# CORS — Next.js dev servers (public-web :3000, admin-web :3001) and nginx
+# ---------------------------------------------------------------------------
+CORS_ALLOWED_ORIGINS = config(
+    "CORS_ALLOWED_ORIGINS",
+    default="http://localhost:3000,http://localhost:3001,http://localhost",
+    cast=Csv(),
+)
 CORS_ALLOW_CREDENTIALS = True
+
+# ---------------------------------------------------------------------------
+# Redis cache (redis-cache instance).
+# Cache keys carry a prefix and go through a custom key function, leaving a
+# documented extension point for future organization/site scoping
+# (see apps.core.cache.make_cache_key). Redis is a cache/broker ONLY — never
+# authoritative institutional storage.
+# ---------------------------------------------------------------------------
+REDIS_CACHE_HOST = config("REDIS_CACHE_HOST", default="redis-cache")
+REDIS_CACHE_PORT = config("REDIS_CACHE_PORT", default=6379, cast=int)
+REDIS_CACHE_DB = config("REDIS_CACHE_DB", default=0, cast=int)
+CACHE_KEY_PREFIX = config("CACHE_KEY_PREFIX", default="uog")
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": f"redis://{REDIS_CACHE_HOST}:{REDIS_CACHE_PORT}/{REDIS_CACHE_DB}",
+        "KEY_PREFIX": CACHE_KEY_PREFIX,
+        "KEY_FUNCTION": "apps.core.cache.make_cache_key",
+        "TIMEOUT": config("CACHE_TIMEOUT", default=300, cast=int),
+    }
+}
+
+# ---------------------------------------------------------------------------
+# Celery — dedicated broker Redis (redis-broker instance) so cache eviction
+# can never drop queued tasks. Broker and results use separate DB indexes.
+# ---------------------------------------------------------------------------
+CELERY_BROKER_URL = config(
+    "CELERY_BROKER_URL", default="redis://redis-broker:6379/0"
+)
+CELERY_RESULT_BACKEND = config(
+    "CELERY_RESULT_BACKEND", default="redis://redis-broker:6379/1"
+)
+CELERY_TIMEZONE = "UTC"
+CELERY_ENABLE_UTC = True
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_ACKS_LATE = True
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
+CELERY_TASK_DEFAULT_RETRY_DELAY = 10
+# Task failures and retries are logged centrally (apps.core.apps handlers).
+
+# ---------------------------------------------------------------------------
+# MinIO object storage (S3-compatible).
+# Approved buckets: platform-public, platform-private, platform-documents.
+# They are created once by the minio-init service — never one bucket per site.
+# Credentials come from the environment only.
+# ---------------------------------------------------------------------------
+AWS_S3_ENDPOINT_URL = config("MINIO_ENDPOINT", default="http://minio:9000")
+AWS_ACCESS_KEY_ID = config("MINIO_ACCESS_KEY", default="uog_minio_admin")
+AWS_SECRET_ACCESS_KEY = config("MINIO_SECRET_KEY", default="minio_dev_secret_change_me")
+AWS_S3_REGION_NAME = config("MINIO_REGION", default="us-east-1")
+AWS_DEFAULT_ACL = None
+AWS_QUERYSTRING_AUTH = True  # signed URLs for private objects
+AWS_S3_SIGNATURE_VERSION = "s3v4"
+AWS_S3_ADDRESSING_STYLE = "path"
+AWS_S3_USE_SSL = config("MINIO_USE_SSL", default=False, cast=bool)
+AWS_STORAGE_BUCKET_NAME = config("MINIO_BUCKET", default="platform-private")
+
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3.S3Storage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
+# ---------------------------------------------------------------------------
+# Logging — console output for containers; task failure/retry visibility
+# ---------------------------------------------------------------------------
+LOG_LEVEL = config("LOG_LEVEL", default="INFO")
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "standard": {
+            "format": "%(asctime)s %(levelname)s [%(name)s] %(message)s",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "standard",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": LOG_LEVEL,
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+        "apps": {
+            "handlers": ["console"],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+        "celery": {
+            "handlers": ["console"],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+    },
+}

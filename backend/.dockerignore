@@ -1,2 +1,9 @@
-backend/
-frontend/
+**/__pycache__/
+**/*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+staticfiles/
+media/
+test_media/
+.env

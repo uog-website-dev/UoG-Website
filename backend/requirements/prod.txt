@@ -1,0 +1,2 @@
+# Production dependencies (add hardened overrides here as needed)
+-r base.txt

@@ -1,87 +1,460 @@
+# =============================================================================
+# UoG Digital Platform — development environment
+#
+#   Browser -> nginx -> Next.js public-web  ( /        )
+#                      -> Next.js admin-web  ( /admin/  )
+#                      -> Django REST API    ( /api/, /health/ )
+#
+#   Django -> PostgreSQL (shared app DB) | Redis cache | Redis broker
+#           -> Celery worker/beat        | MinIO        | Keycloak (OIDC)
+#
+# All versions are pinned (see docs/architecture/version-matrix.md).
+# Configuration comes from .env (copy .env.example) — no secrets in git.
+# =============================================================================
+name: uog-digital-platform
+
+x-backend-image: &backend-image
+  build:
+    context: ./backend
+    dockerfile: Dockerfile
+  image: uog-backend:dev
+
+x-backend-environment: &backend-environment
+  DEBUG: ${DEBUG:-True}
+  SECRET_KEY: ${DJANGO_SECRET_KEY:-dev-only-insecure-secret-key-change-me}
+  ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1,backend,nginx}
+  LOG_LEVEL: ${LOG_LEVEL:-INFO}
+  # Database (shared application database; runtime uses the app role)
+  DB_NAME: ${DB_NAME:-uog_db}
+  DB_USER: ${DB_USER:-uog_app}
+  DB_PASSWORD: ${DB_PASSWORD:-uog_app_password}
+  DB_HOST: postgres
+  DB_PORT: "5432"
+  DB_MIGRATE_USER: ${DB_MIGRATE_USER:-uog_migrate}
+  DB_MIGRATE_PASSWORD: ${DB_MIGRATE_PASSWORD:-uog_migrate_password}
+  # Redis cache
+  REDIS_CACHE_HOST: redis-cache
+  REDIS_CACHE_PORT: "6379"
+  REDIS_CACHE_DB: "0"
+  CACHE_KEY_PREFIX: ${CACHE_KEY_PREFIX:-uog}
+  # Celery (dedicated broker instance)
+  CELERY_BROKER_URL: redis://redis-broker:6379/0
+  CELERY_RESULT_BACKEND: redis://redis-broker:6379/1
+  # MinIO object storage
+  MINIO_ENDPOINT: http://minio:9000
+  MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-uog_minio_admin}
+  MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minio_dev_secret_change_me}
+  MINIO_BUCKET: platform-private
+  CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:3001,http://localhost}
+
 services:
-  db:
-    image: postgres:15
-    container_name: uog_postgres
+  # ---------------------------------------------------------------------------
+  # PostgreSQL 16 — one shared application database (+ role separation)
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:16.15-alpine
+    container_name: uog-postgres
     environment:
-      POSTGRES_USER: ${DB_USER:-uog_user}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-uog_password}
+      POSTGRES_USER: ${POSTGRES_USER:-uog_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-uog_admin_password}
       POSTGRES_DB: ${DB_NAME:-uog_db}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=C --lc-ctype=C"
+      # Role names/passwords consumed by infrastructure/postgres/init
+      # (same variable names the backend uses, so a rename stays consistent).
+      DB_USER: ${DB_USER:-uog_app}
+      DB_MIGRATE_USER: ${DB_MIGRATE_USER:-uog_migrate}
+      DB_APP_PASSWORD: ${DB_PASSWORD:-uog_app_password}
+      DB_MIGRATE_PASSWORD: ${DB_MIGRATE_PASSWORD:-uog_migrate_password}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/postgres/init:/docker-entrypoint-initdb.d:ro
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     networks:
       - uog_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-uog_user}"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ---------------------------------------------------------------------------
+  # Keycloak's own PostgreSQL — fully isolated from application data
+  # ---------------------------------------------------------------------------
+  keycloak-db:
+    image: postgres:16.15-alpine
+    container_name: uog-keycloak-db
+    environment:
+      POSTGRES_USER: ${KC_DB_USER:-keycloak}
+      POSTGRES_PASSWORD: ${KC_DB_PASSWORD:-keycloak_db_dev_password}
+      POSTGRES_DB: ${KC_DB_NAME:-keycloak}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8"
+    volumes:
+      - keycloak_db_data:/var/lib/postgresql/data
+    networks:
+      - uog_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ---------------------------------------------------------------------------
+  # Redis — cache instance (evicting, barely persistent)
+  # ---------------------------------------------------------------------------
+  redis-cache:
+    image: redis:7.4.11-alpine
+    container_name: uog-redis-cache
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    volumes:
+      - ./infrastructure/redis/redis-cache.conf:/usr/local/etc/redis/redis.conf:ro
+      - redis_cache_data:/data
+    networks:
+      - uog_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: uog_backend
+  # ---------------------------------------------------------------------------
+  # Redis — Celery broker instance (noeviction + AOF; never shares with cache)
+  # ---------------------------------------------------------------------------
+  redis-broker:
+    image: redis:7.4.11-alpine
+    container_name: uog-redis-broker
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    volumes:
+      - ./infrastructure/redis/redis-broker.conf:/usr/local/etc/redis/redis.conf:ro
+      - redis_broker_data:/data
+    networks:
+      - uog_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # MinIO — S3-compatible object storage
+  # ---------------------------------------------------------------------------
+  minio:
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    container_name: uog-minio
+    command: ["server", "/data", "--console-address", ":9001"]
     environment:
-      DEBUG: ${DEBUG:-False}
-      DB_ENGINE: django.db.backends.postgresql
-      DB_NAME: ${DB_NAME:-uog_db}
-      DB_USER: ${DB_USER:-uog_user}
-      DB_PASSWORD: ${DB_PASSWORD:-uog_password}
-      DB_HOST: db
-      DB_PORT: 5432
-      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1,backend}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-uog_minio_admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minio_dev_secret_change_me}
+    volumes:
+      - minio_data:/data
+    ports:
+      - "${MINIO_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    networks:
+      - uog_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # One-shot: creates the approved buckets (idempotent)
+  minio-init:
+    <<: *backend-image
+    container_name: uog-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      RUN_MIGRATIONS: "false"
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-uog_minio_admin}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minio_dev_secret_change_me}
+    command: ["python", "manage.py", "init_storage"]
+    restart: "no"
+    networks:
+      - uog_network
+
+  # ---------------------------------------------------------------------------
+  # Keycloak — identity provider (realm imported from version control)
+  # ---------------------------------------------------------------------------
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.8.1
+    container_name: uog-keycloak
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_ADMIN_USERNAME:-uog_admin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD:-keycloak_admin_dev_password}
+      KC_HEALTH_ENABLED: "true"
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/${KC_DB_NAME:-keycloak}
+      KC_DB_USERNAME: ${KC_DB_USER:-keycloak}
+      KC_DB_PASSWORD: ${KC_DB_PASSWORD:-keycloak_db_dev_password}
+      # The frontend URL is fixed so that the issuer Keycloak advertises is
+      # the one the browser uses (OIDC clients compare it with the "iss"
+      # parameter of the authorization response). The backchannel URLs stay
+      # dynamic, so the containers can still reach Keycloak on the Docker
+      # network while the browser talks to the published port.
+      KC_HOSTNAME: http://localhost:${KEYCLOAK_PORT:-8080}
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: "true"
+    volumes:
+      - ./infrastructure/keycloak/realm-import:/opt/keycloak/data/import:ro
+    ports:
+      - "${KEYCLOAK_PORT:-8080}:8080"
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    networks:
+      - uog_network
+    healthcheck:
+      # TCP-level readiness (the image ships no curl); realm-level readiness
+      # is enforced by keycloak-init below.
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/8080"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  # One-shot: injects client secrets + dev user from env, then smoke-tests
+  # token issuance. Never stores credentials in the repository.
+  keycloak-init:
+    <<: *backend-image
+    container_name: uog-keycloak-init
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    environment:
+      RUN_MIGRATIONS: "false"
+      KC_URL: http://keycloak:8080
+      KC_REALM: uog
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_ADMIN_USERNAME:-uog_admin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD:-keycloak_admin_dev_password}
+      KEYCLOAK_PUBLIC_WEB_SECRET: ${KEYCLOAK_PUBLIC_WEB_SECRET:-public-web-dev-secret}
+      KEYCLOAK_ADMIN_WEB_SECRET: ${KEYCLOAK_ADMIN_WEB_SECRET:-admin-web-dev-secret}
+      KEYCLOAK_BACKEND_API_SECRET: ${KEYCLOAK_BACKEND_API_SECRET:-backend-api-dev-secret}
+      KEYCLOAK_DEV_USERNAME: ${KEYCLOAK_DEV_USERNAME:-devuser}
+      KEYCLOAK_DEV_PASSWORD: ${KEYCLOAK_DEV_PASSWORD:-DevUser!2026}
+    volumes:
+      - ./infrastructure/keycloak/keycloak-init.py:/app/keycloak-init.py:ro
+    command: ["python", "/app/keycloak-init.py"]
+    restart: "no"
+    networks:
+      - uog_network
+
+  # ---------------------------------------------------------------------------
+  # Django backend (runserver for development hot-reload; gunicorn is baked in)
+  # ---------------------------------------------------------------------------
+  backend:
+    <<: *backend-image
+    container_name: uog-backend
+    environment:
+      <<: *backend-environment
+    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
     volumes:
       - ./backend:/app
     ports:
-      - "8000:8000"
+      - "${BACKEND_PORT:-8000}:8000"
     depends_on:
-      db:
+      postgres:
         condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://127.0.0.1:8000/health/ || exit 1"]
-      interval: 10s
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health/ready || exit 1"]
+      interval: 15s
       timeout: 5s
-      start_period: 30s
       retries: 5
+      start_period: 45s
     networks:
       - uog_network
 
-  frontend:
+  # ---------------------------------------------------------------------------
+  # Celery worker + beat (separate services; migrations only run in backend)
+  # ---------------------------------------------------------------------------
+  celery-worker:
+    <<: *backend-image
+    container_name: uog-celery-worker
+    environment:
+      <<: *backend-environment
+      RUN_MIGRATIONS: "false"
+    command: ["celery", "-A", "config", "worker", "--loglevel=INFO", "--concurrency=2"]
+    volumes:
+      - ./backend:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis-broker:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A config inspect ping -d celery@$$HOSTNAME -t 10 | grep -q pong"]
+      interval: 30s
+      timeout: 15s
+      retries: 5
+      start_period: 40s
+    networks:
+      - uog_network
+
+  celery-beat:
+    <<: *backend-image
+    container_name: uog-celery-beat
+    environment:
+      <<: *backend-environment
+      RUN_MIGRATIONS: "false"
+    command: ["celery", "-A", "config", "beat", "--loglevel=INFO", "--schedule", "/tmp/beat-schedule"]
+    volumes:
+      - ./backend:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis-broker:
+        condition: service_healthy
+    networks:
+      - uog_network
+
+  # ---------------------------------------------------------------------------
+  # Next.js frontends (one workspace image, one Turborepo-filtered dev server)
+  # ---------------------------------------------------------------------------
+  frontend-public:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: uog_frontend
-    command: sh -c "npm run build && tail -f /dev/null"
+    image: uog-frontend:dev
+    container_name: uog-frontend-public
+    command: ["pnpm", "dev", "--filter", "@uog/public-web"]
     environment:
-      REACT_APP_API_URL: ${REACT_APP_API_URL:-/api}
+      NEXT_PUBLIC_API_BASE_URL: /api
+      AUTH_SECRET: ${NEXTAUTH_SECRET:-dev-nextauth-secret-change-me}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-dev-nextauth-secret-change-me}
+      # Auth.js derives the OAuth redirect URI from this origin, so it has to
+      # be the one the browser reaches (nginx). All Auth.js calls are made
+      # in-process, so no container-to-container hop is involved.
+      AUTH_URL: http://localhost
+      # Origin the browser returns to after an authentication round-trip.
+      SITE_ORIGIN: http://localhost
+      # OIDC endpoints. Keycloak advertises the public issuer (KC_HOSTNAME) and
+      # answers backchannel requests on the host they arrive on, so the issuer
+      # the browser sees is also the one Auth.js validates the "iss" claim
+      # against. The server-side token/userinfo calls use the Docker network.
+      KEYCLOAK_ISSUER: http://localhost:${KEYCLOAK_PORT:-8080}/realms/uog
+      KEYCLOAK_AUTH_URL: http://localhost:${KEYCLOAK_PORT:-8080}/realms/uog/protocol/openid-connect/auth
+      KEYCLOAK_TOKEN_URL: http://keycloak:8080/realms/uog/protocol/openid-connect/token
+      KEYCLOAK_USERINFO_URL: http://keycloak:8080/realms/uog/protocol/openid-connect/userinfo
+      KEYCLOAK_CLIENT_ID: public-web
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_PUBLIC_WEB_SECRET:-public-web-dev-secret}
     volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    networks:
-      - uog_network
-
-  nginx:
-    image: nginx:alpine
-    container_name: uog_nginx
-    command: sh -c "until [ -f /usr/share/nginx/html/index.html ]; do echo 'Waiting for frontend build...'; sleep 1; done && nginx -g 'daemon off;'"
+      - ./frontend:/workspace
+      - pnpm_store:/pnpm-store
+      - fe_node_modules:/workspace/node_modules
+      - fe_public_node_modules:/workspace/apps/public-web/node_modules
+      - fe_ui_node_modules:/workspace/packages/ui/node_modules
+      - fe_api_client_node_modules:/workspace/packages/api-client/node_modules
+      - fe_types_node_modules:/workspace/packages/types/node_modules
     ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - ./frontend/build:/usr/share/nginx/html:ro
-    depends_on:
-      - frontend
-      - backend
+      - "${PUBLIC_WEB_PORT:-3000}:3000"
     networks:
       - uog_network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/ >/dev/null 2>&1 || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 6
+      start_period: 120s
 
-volumes:
-  postgres_data:
+  frontend-admin:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: uog-frontend:dev
+    container_name: uog-frontend-admin
+    command: ["pnpm", "dev", "--filter", "@uog/admin-web"]
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: /api
+      # Server-side Django API base URL: server components read the Keycloak
+      # access token from the Auth.js session and call protected endpoints
+      # over the Docker network (the browser never sees the token).
+      API_BASE_URL: ${API_BASE_URL:-http://backend:8000/api}
+      AUTH_SECRET: ${NEXTAUTH_SECRET:-dev-nextauth-secret-change-me}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-dev-nextauth-secret-change-me}
+      # Auth.js derives the OAuth redirect URI from this origin, so it has to
+      # be the one the browser reaches (nginx). All Auth.js calls are made
+      # in-process, so no container-to-container hop is involved. The admin
+      # console's Auth.js endpoints live at /admin/api/auth/* (see
+      # apps/admin-web/src/auth.ts).
+      AUTH_URL: http://localhost
+      # Origin the browser returns to after an authentication round-trip.
+      SITE_ORIGIN: http://localhost
+      # OIDC endpoints. Keycloak advertises the public issuer (KC_HOSTNAME) and
+      # answers backchannel requests on the host they arrive on, so the issuer
+      # the browser sees is also the one Auth.js validates the "iss" claim
+      # against. The server-side token/userinfo calls use the Docker network.
+      KEYCLOAK_ISSUER: http://localhost:${KEYCLOAK_PORT:-8080}/realms/uog
+      KEYCLOAK_AUTH_URL: http://localhost:${KEYCLOAK_PORT:-8080}/realms/uog/protocol/openid-connect/auth
+      KEYCLOAK_TOKEN_URL: http://keycloak:8080/realms/uog/protocol/openid-connect/token
+      KEYCLOAK_USERINFO_URL: http://keycloak:8080/realms/uog/protocol/openid-connect/userinfo
+      KEYCLOAK_CLIENT_ID: admin-web
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_ADMIN_WEB_SECRET:-admin-web-dev-secret}
+    volumes:
+      - ./frontend:/workspace
+      - pnpm_store:/pnpm-store
+      - fe_node_modules:/workspace/node_modules
+      - fe_admin_node_modules:/workspace/apps/admin-web/node_modules
+      - fe_ui_node_modules:/workspace/packages/ui/node_modules
+      - fe_api_client_node_modules:/workspace/packages/api-client/node_modules
+      - fe_types_node_modules:/workspace/packages/types/node_modules
+    ports:
+      - "${ADMIN_WEB_PORT:-3001}:3000"
+    networks:
+      - uog_network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/admin >/dev/null 2>&1 || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 6
+      start_period: 120s
+
+  # ---------------------------------------------------------------------------
+  # Nginx — the single entry point in front of everything
+  # ---------------------------------------------------------------------------
+  nginx:
+    image: nginx:1.31.7-alpine
+    container_name: uog-nginx
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    volumes:
+      - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./infrastructure/nginx/conf.d:/etc/nginx/conf.d:ro
+    depends_on:
+      - backend
+      - frontend-public
+      - frontend-admin
+    networks:
+      - uog_network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/nginx-health >/dev/null 2>&1 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
 networks:
   uog_network:
     driver: bridge
+
+volumes:
+  postgres_data:
+  keycloak_db_data:
+  redis_cache_data:
+  redis_broker_data:
+  minio_data:
+  pnpm_store:
+  fe_node_modules:
+  fe_public_node_modules:
+  fe_admin_node_modules:
+  fe_ui_node_modules:
+  fe_api_client_node_modules:
+  fe_types_node_modules:
