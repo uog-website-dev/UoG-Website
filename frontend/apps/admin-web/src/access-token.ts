@@ -13,8 +13,7 @@
  * `Authorization` header and the endpoint answers 401 (the UI then asks the
  * administrator to sign in again).
  */
-import { cookies, headers } from "next/headers";
-import { getToken } from "next-auth/jwt";
+import { getSessionToken } from "@/session-jwt";
 
 /** Seconds of margin before the stored token counts as expired. */
 const EXPIRY_SKEW_SECONDS = 15;
@@ -28,19 +27,7 @@ interface TokenEndpointResponse {
  * (or no usable token can be obtained).
  */
 export async function getAccessToken(): Promise<string | null> {
-  const secret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET;
-  if (!secret) return null;
-
-  // Auth.js switches to the `__Secure-` cookie — and salts the session JWT
-  // with that name — on https origins, so decode whichever one is present.
-  const cookieStore = await cookies();
-  const secure = cookieStore.has("__Secure-authjs.session-token");
-
-  const token = await getToken({
-    req: { headers: await headers() },
-    secret,
-    secureCookie: secure,
-  });
+  const token = await getSessionToken();
   if (!token) return null;
 
   const accessToken =
