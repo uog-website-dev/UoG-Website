@@ -17,6 +17,7 @@
 import type {
   ETaggedResponse,
   Organization,
+  OrganizationHierarchy,
   OrganizationListQuery,
   PaginatedResponse,
 } from "@uog/types";
@@ -33,6 +34,13 @@ export interface OrganizationsAdapter {
   list(query?: OrganizationListQuery): Promise<PaginatedResponse<Organization>>;
   /** Single organization including the strong ETag for mutations. */
   get(id: number): Promise<ETaggedResponse<Organization>>;
+  /**
+   * Flat hierarchy (breadth-first, code order within depth) used to build
+   * the parent selector. The backend caps this at 1000 nodes and answers
+   * 409 on overflow, so callers must surface that rather than assume a
+   * complete tree.
+   */
+  tree(): Promise<OrganizationHierarchy>;
   /** Create an organization (development opt-in on the backend). */
   create(input: OrganizationCreateInput): Promise<ETaggedResponse<Organization>>;
   /** Conditional partial update; `etag` must be the current strong ETag. */
@@ -116,6 +124,9 @@ export function createLiveOrganizationsAdapter(options: {
         etag: result.etag,
         requestId: result.requestId,
       } satisfies ETaggedResponse<Organization>;
+    },
+    async tree() {
+      return client.get<OrganizationHierarchy>(`${ORGANIZATIONS_PATH}tree/`);
     },
     async create(input) {
       const result = await client.postDetailed<Organization>(
@@ -300,6 +311,14 @@ export function createMockOrganizationsAdapter(options?: {
     async get(id) {
       await wait();
       return respond(require(id), mockRequestId());
+    },
+
+    async tree() {
+      await wait();
+      return {
+        count: store.length,
+        results: store.map((org) => ({ ...org })),
+      } satisfies OrganizationHierarchy;
     },
 
     async create(input) {

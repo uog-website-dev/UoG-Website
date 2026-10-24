@@ -1,17 +1,23 @@
 /**
- * Organizations — section placeholder.
+ * Organizations — the institutional tree management screen.
  *
- * Part of the application shell only: the route, breadcrumb, navigation
- * highlight and messaging exist so administrators can learn the console
- * layout. No organization data is read or written yet.
+ * Renders the shared application shell chrome (breadcrumb + heading) as a
+ * server component and hands the data work to `OrganizationsList`, a client
+ * component that reads through a server action so the Keycloak access token
+ * never reaches the browser.
+ *
+ * This screen is intentionally honest about what is wired: listing, editing
+ * and the deactivate/archive transitions are real API calls. The backend still
+ * gates writes behind development mode plus an explicit opt-in, and enforces
+ * authentication, the `platform-admin` realm role, ETag preconditions and the
+ * database lifecycle rules — so a write in a shared environment is refused by
+ * the server, and that refusal is shown rather than masked.
  */
-import BusinessIcon from "@mui/icons-material/Business";
-import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
-import Card from "@mui/material/Card";
 import Typography from "@mui/material/Typography";
 
 import { Breadcrumb } from "@/breadcrumb";
+import { OrganizationsList } from "@/organizations/organizations-list";
 
 export const metadata = { title: "Organizations" };
 
@@ -30,51 +36,11 @@ export default function OrganizationsPage() {
         </Typography>
         <Typography color="text.secondary" sx={{ mt: 0.5 }}>
           Colleges, institutes and departments of the University of Gondar.
+          Create and maintain units here; lifecycle changes are irreversible.
         </Typography>
       </Box>
 
-      <Alert severity="info" variant="outlined">
-        <strong>Placeholder screen.</strong> Organization management is not
-        implemented yet — nothing on this page is backed by the platform API,
-        and no organization data is displayed or modified.
-      </Alert>
-
-      <Card variant="outlined">
-        <Box
-          sx={{
-            p: 6,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 1.5,
-            textAlign: "center",
-          }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: 56,
-              height: 56,
-              borderRadius: 2,
-              bgcolor: "action.hover",
-              color: "text.disabled",
-            }}
-          >
-            <BusinessIcon fontSize="large" />
-          </Box>
-          <Typography variant="h6" sx={{ fontWeight: 700 }}>
-            No data source connected
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 480 }}>
-            Listing, creating and editing organizations will arrive with the
-            organizations management story, which will wire this screen to the
-            protected Django API. Until then this view stays intentionally
-            empty.
-          </Typography>
-        </Box>
-      </Card>
+      <OrganizationsList />
     </Box>
   );
 }

@@ -4,7 +4,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
-import { UogFooter, UogHeader, UogThemeProvider } from "@uog/ui";
+import { UogFooter, UogHeader, UogThemeProvider, ToastProvider } from "@uog/ui";
 
 import { AdminShell } from "@/admin-shell";
 import { auth } from "@/auth";
@@ -86,7 +86,11 @@ export default async function AdminLayout({
     <html lang="en" suppressHydrationWarning>
       <body>
         <UogThemeProvider>
-          <AdminShell actions={actions}>{children}</AdminShell>
+          {/* ToastProvider backs useToast() for success/failure notices on
+              mutation screens (create/edit/lifecycle). */}
+          <ToastProvider>
+            <AdminShell actions={actions}>{children}</AdminShell>
+          </ToastProvider>
         </UogThemeProvider>
       </body>
     </html>

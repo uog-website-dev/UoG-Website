@@ -84,6 +84,13 @@ export interface SelectFilterProps {
   /** Adds an explicit "All" option that clears the filter. */
   includeAll?: boolean;
   allLabel?: string;
+  /**
+   * Locks the select, e.g. for hierarchy fields the backend forbids editing.
+   * Disabled selects stay in the tab order as readable, announced fields.
+   */
+  disabled?: boolean;
+  /** Optional id so a caption/error can reference the control with aria. */
+  id?: string;
 }
 
 /** A single labelled select filter. */
@@ -94,12 +101,15 @@ export function SelectFilter({
   onChange,
   includeAll = true,
   allLabel = "All",
+  disabled = false,
+  id: idProp,
 }: SelectFilterProps) {
-  const id = useId();
+  const generatedId = useId();
+  const id = idProp ?? generatedId;
   const labelId = `${id}-label`;
 
   return (
-    <FormControl size="small" sx={{ minWidth: 180 }}>
+    <FormControl size="small" sx={{ minWidth: 180 }} disabled={disabled}>
       <InputLabel id={labelId}>{label}</InputLabel>
       <Select
         id={id}
