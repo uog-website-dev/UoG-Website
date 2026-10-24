@@ -2,95 +2,58 @@
  * Typed fetch wrapper for the UoG Django REST API.
  *
  * Both frontend apps import this package so API access stays consistent.
- * Pass the base URL explicitly (server-side renders should use the internal
- * Docker URL, e.g. http://backend:8000/api; browser code goes through
- * nginx, e.g. /api).
+ * See ./client.ts for the transport, ./errors.ts for structured errors and
+ * ./adapters for the swappable live/mock data sources.
+ *
+ * The public surface is:
+ *
+ *   - `createApiClient` — low-level typed HTTP client (request ids, ETags,
+ *     structured errors, token redaction).
+ *   - `createOrganizationsAdapter` / `createSitesAdapter` — resource-level
+ *     adapters that pick the live API or local fixtures based on the
+ *     explicit API_MODE (see ./adapters/mode.ts).
+ *   - `ApiError` — the single error type every failure is surfaced as.
  */
-import type { HealthReport, Page, PaginatedResponse } from "@uog/types";
+export {
+  ApiError,
+  apiErrorFromResponse,
+  codeForStatus,
+  redactCredentials,
+} from "./errors";
+export type { ApiErrorCode } from "./errors";
 
-export class ApiError extends Error {
-  readonly status: number;
+export { createApiClient, describeApiError } from "./client";
+export type { ApiClient, ApiClientOptions, ApiResult } from "./client";
 
-  constructor(message: string, status: number) {
-    super(message);
-    this.name = "ApiError";
-    this.status = status;
-  }
-}
+export { buildQueryString, withQuery } from "./query";
+export type { QueryValue } from "./query";
 
-export interface ApiClientOptions {
-  baseUrl: string;
-  fetchFn?: typeof fetch;
-  /**
-   * Keycloak access token sent as `Authorization: Bearer …` on every
-   * request. It stays server-side: only server components / server actions
-   * should construct a client with it (the browser never holds the token).
-   */
-  accessToken?: string;
-  /** Optional request timeout in milliseconds (browser/undici fetch only). */
-  timeoutMs?: number;
-}
+// Resource adapters.
+export {
+  createLiveOrganizationsAdapter,
+  createMockOrganizationsAdapter,
+  organizationListQueryString,
+  ORGANIZATIONS_PAGE_SIZE,
+} from "./adapters/organizations";
+export type {
+  OrganizationsAdapter,
+  OrganizationCreateInput,
+  OrganizationUpdateInput,
+} from "./adapters/organizations";
 
-export interface ApiClient {
-  get<T>(path: string, init?: RequestInit): Promise<T>;
-  post<T>(path: string, body?: unknown, init?: RequestInit): Promise<T>;
-}
+export { createLiveSitesAdapter, createMockSitesAdapter } from "./adapters/sites";
+export type { SitesAdapter, SitesListQuery } from "./adapters/sites";
 
-export function createApiClient(options: ApiClientOptions): ApiClient {
-  const { baseUrl, fetchFn = fetch, timeoutMs = 10_000, accessToken } = options;
-  const root = baseUrl.replace(/\/+$/, "");
+export {
+  ApiModeError,
+  apiModeFromEnv,
+  isNotImplemented,
+  resolveApiMode,
+} from "./adapters/mode";
+export type { ApiMode, ResolveModeOptions } from "./adapters/mode";
 
-  async function request<T>(
-    path: string,
-    init?: RequestInit,
-  ): Promise<T> {
-    const url = `${root}${path.startsWith("/") ? path : `/${path}`}`;
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
-    try {
-      const response = await fetchFn(url, {
-        ...init,
-        signal: init?.signal ?? controller.signal,
-        headers: {
-          Accept: "application/json",
-          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-          ...(init?.headers ?? {}),
-        },
-        cache: init?.cache ?? "no-store",
-      });
-      if (!response.ok) {
-        throw new ApiError(
-          `Request to ${url} failed with HTTP ${response.status}`,
-          response.status,
-        );
-      }
-      return (await response.json()) as T;
-    } finally {
-      clearTimeout(timer);
-    }
-  }
+export { createOrganizationsAdapter, createSitesAdapter } from "./adapters/factory";
 
-  return {
-    get: <T>(path: string, init?: RequestInit) => request<T>(path, init),
-    post: <T>(path: string, body?: unknown, init?: RequestInit) =>
-      request<T>(path, {
-        ...init,
-        method: "POST",
-        body: body === undefined ? undefined : JSON.stringify(body),
-        headers: {
-          "Content-Type": "application/json",
-          ...(init?.headers ?? {}),
-        },
-      }),
-  };
-}
-
-/** Convenience helpers for the platform's sample resources. */
-export function fetchPages(client: ApiClient): Promise<PaginatedResponse<Page>> {
-  return client.get<PaginatedResponse<Page>>("/pages/");
-}
-
-export function fetchHealth(client: ApiClient): Promise<HealthReport> {
-  // Health lives under /health/ on the backend root, not under /api.
-  return client.get<HealthReport>("/health/ready");
-}
+// Fixtures (development only — never used when API_MODE=live).
+export { organizationFixtures, rootOrganizationFixture } from "./fixtures/organizations";
+export { siteFixtures } from "./fixtures/sites";
