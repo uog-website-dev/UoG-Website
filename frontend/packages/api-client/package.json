@@ -16,6 +16,7 @@
     "@uog/types": "workspace:*"
   },
   "devDependencies": {
+    "@types/node": "22.10.5",
     "@uog/config": "workspace:*",
     "typescript": "5.6.3",
     "vitest": "5.0.5"
