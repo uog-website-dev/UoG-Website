@@ -20,7 +20,7 @@
  * answers 403 when mutation is not enabled in that environment — which these
  * actions surface verbatim rather than masking.
  */
-import { createOrganizationsAdapter } from "@uog/api-client";
+import { apiModeFromEnv, createOrganizationsAdapter } from "@uog/api-client";
 import type {
   OrganizationCreateInput,
   OrganizationUpdateInput,
@@ -46,12 +46,27 @@ function apiBaseUrl(): string {
   return process.env.API_BASE_URL ?? "http://backend:8000/api";
 }
 
-/** Build an adapter bound to the signed-in user's token, if any. */
+// The mock adapter owns an in-memory store. Keep it for this server process so
+// mutations remain visible to subsequent mock reads (each server action is a
+// separate invocation). Live adapters remain request-scoped because they are
+// bound to the current user's access token.
+let mockOrganizationsAdapter:
+  | ReturnType<typeof createOrganizationsAdapter>
+  | undefined;
+
+/** Build a request-scoped live adapter or the shared development mock. */
 async function buildAdapter() {
+  const mode = apiModeFromEnv();
+  if (mode === "mock") {
+    mockOrganizationsAdapter ??= createOrganizationsAdapter({ mode });
+    return mockOrganizationsAdapter;
+  }
+
   const accessToken = await getAccessToken();
   return createOrganizationsAdapter({
     baseUrl: apiBaseUrl(),
     accessToken: accessToken ?? undefined,
+    mode,
   });
 }
 

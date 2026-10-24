@@ -11,23 +11,32 @@
  * stale row can never silently overwrite a newer one — a 412 is surfaced as a
  * concurrency message instead.
  *
+ * The applied filters, page and sort live in the URL query string (see
+ * ./list-query), so any view of the list is shareable and survives reload:
+ * every Apply/Reset/page/sort change writes the URL, and the first render
+ * hydrates its state from it. URL values that do not match the discovery
+ * contract are dropped rather than sent — the backend rejects invalid
+ * parameters with 400.
+ *
  * The backend does not expose a reactivation endpoint: the lifecycle is
  * forward-only (ACTIVE -> INACTIVE -> ARCHIVED). The UI therefore never offers
  * an "activate" action, because offering one would present a control that no
  * API supports. Deactivate/archive on the root or on a unit with active
  * descendants are refused by the database rules and shown as errors.
  */
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
+import BusinessRoundedIcon from "@mui/icons-material/BusinessRounded";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
 import IconButton from "@mui/material/IconButton";
+import Paper from "@mui/material/Paper";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   ConfirmDialog,
   DataTable,
@@ -38,6 +47,7 @@ import {
   useAsync,
   useToast,
 } from "@uog/ui";
+import type { FilterOption, SortState } from "@uog/ui";
 import type {
   Organization,
   OrganizationListQuery,
@@ -49,9 +59,18 @@ import {
   archiveOrganization,
   deactivateOrganization,
   getOrganization,
+  getOrganizationTree,
   listOrganizations,
 } from "@/app/organizations/actions";
 import { deserializeApiError, unwrap } from "@/organizations/contract";
+import {
+  draftFromQuery,
+  draftToQuery,
+  emptyDraft,
+  orderingFromSort,
+  parseListQuery,
+  sortFromOrdering,
+} from "@/organizations/list-query";
 import type { ApiError } from "@uog/api-client";
 import {
   ORGANIZATION_STATUS_OPTIONS,
@@ -62,6 +81,22 @@ import {
 type LifecycleAction = "deactivate" | "archive";
 
 const PAGE_SIZE = 20;
+
+function sameQuery(
+  left: OrganizationListQuery,
+  right: OrganizationListQuery,
+): boolean {
+  return (
+    left.search === right.search &&
+    left.name === right.name &&
+    left.code === right.code &&
+    left.type === right.type &&
+    left.status === right.status &&
+    left.parent === right.parent &&
+    left.page === right.page &&
+    left.ordering === right.ordering
+  );
+}
 
 /** Status chip colours, kept consistent across every admin screen. */
 function statusChip(status: OrganizationStatus) {
@@ -77,17 +112,75 @@ function statusChip(status: OrganizationStatus) {
 
 export function OrganizationsList() {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const toast = useToast();
 
+  // The URL is the shareable record of what is being viewed: hydrate from it
+  // on first render, keep the applied state locally, and write every change
+  // back so copy/paste, reload and back/forward all behave predictably.
+  const [applied, setApplied] = useState<OrganizationListQuery>(() => {
+    const { page: _page, ordering: _ordering, ...filters } = parseListQuery(searchParams);
+    return filters;
+  });
+  const [page, setPage] = useState(() => parseListQuery(searchParams).page ?? 1);
+  const [sort, setSort] = useState<SortState>(() =>
+    sortFromOrdering(searchParams.get("ordering")),
+  );
   // Draft filter values, applied only on Apply/Reset so the backend is not
-  // queried per keystroke and the URL stays shareable.
-  const [draft, setDraft] = useState<OrganizationListQuery>({});
-  const [applied, setApplied] = useState<OrganizationListQuery>({});
-  const [page, setPage] = useState(1);
+  // queried per keystroke.
+  const [draft, setDraft] = useState(() => draftFromQuery(parseListQuery(searchParams)));
+  const urlQuery = searchParams.toString();
+
+  // Keep browser back/forward navigation in sync with the controls and the
+  // server query, not just the initial page load.
+  useEffect(() => {
+    const parsed = parseListQuery(new URLSearchParams(urlQuery));
+    const { page: nextPage, ordering, ...filters } = parsed;
+    setApplied((current) => (sameQuery(current, filters) ? current : filters));
+    setPage((current) => (current === (nextPage ?? 1) ? current : nextPage ?? 1));
+    const nextSort = sortFromOrdering(ordering);
+    setSort((current) =>
+      current.field === nextSort.field && current.direction === nextSort.direction
+        ? current
+        : nextSort,
+    );
+    const nextDraft = draftFromQuery(filters);
+    setDraft((current) =>
+      current.search === nextDraft.search &&
+      current.name === nextDraft.name &&
+      current.code === nextDraft.code &&
+      current.type === nextDraft.type &&
+      current.status === nextDraft.status &&
+      current.parent === nextDraft.parent
+        ? current
+        : nextDraft,
+    );
+  }, [urlQuery]);
+
+  /** Write the current view state into the URL (undefined deletes a key). */
+  const writeUrl = useCallback(
+    (patch: Record<string, string | undefined>) => {
+      const params = new URLSearchParams(searchParams.toString());
+      for (const [key, value] of Object.entries(patch)) {
+        if (value === undefined || value === "") params.delete(key);
+        else params.set(key, value);
+      }
+      const queryString = params.toString();
+      router.replace(queryString ? `${pathname}?${queryString}` : pathname, {
+        scroll: false,
+      });
+    },
+    [pathname, router, searchParams],
+  );
 
   const query = useMemo<OrganizationListQuery>(
-    () => ({ ...applied, page }),
-    [applied, page],
+    () => ({
+      ...applied,
+      page,
+      ordering: orderingFromSort(sort),
+    }),
+    [applied, page, sort],
   );
 
   const organizations = useAsync<PaginatedResponse<Organization>>(
@@ -104,15 +197,53 @@ export function OrganizationsList() {
   const [confirmError, setConfirmError] = useState<ApiError | null>(null);
 
   const applyFilters = useCallback(() => {
-    setApplied(draft);
+    const code = draft.code.trim();
+    if (code && !/^[A-Za-z][A-Za-z0-9_-]{0,63}$/.test(code)) return;
+    const next = draftToQuery(draft);
+    setApplied(next);
     setPage(1);
-  }, [draft]);
+    writeUrl({
+      search: next.search,
+      name: next.name,
+      code: next.code,
+      type: next.type,
+      status: next.status,
+      parent: next.parent === undefined ? undefined : String(next.parent),
+      page: undefined, // applying filters returns to the first page
+    });
+  }, [draft, writeUrl]);
 
   const resetFilters = useCallback(() => {
-    setDraft({});
+    setDraft(emptyDraft());
     setApplied({});
     setPage(1);
-  }, []);
+    writeUrl({
+      search: undefined,
+      name: undefined,
+      code: undefined,
+      type: undefined,
+      status: undefined,
+      parent: undefined,
+      page: undefined,
+    });
+  }, [writeUrl]);
+
+  const changePage = useCallback(
+    (nextPage: number) => {
+      setPage(nextPage);
+      writeUrl({ page: nextPage > 1 ? String(nextPage) : undefined });
+    },
+    [writeUrl],
+  );
+
+  const changeSort = useCallback(
+    (nextSort: SortState) => {
+      setSort(nextSort);
+      setPage(1);
+      writeUrl({ ordering: orderingFromSort(nextSort), page: undefined });
+    },
+    [writeUrl],
+  );
 
   const activeFilterCount = useMemo(
     () =>
@@ -121,6 +252,42 @@ export function OrganizationsList() {
       ).length,
     [applied],
   );
+  const invalidCode = Boolean(
+    draft.code.trim() && !/^[A-Za-z][A-Za-z0-9_-]{0,63}$/.test(draft.code.trim()),
+  );
+
+  // Parent choices for the filter: the literal roots filter is always
+  // available, and unit choices come from the flat hierarchy read. If that
+  // read fails, only the roots filter degrades — the URL can still carry a
+  // parent id, and the backend validates it either way.
+  const [parentChoices, setParentChoices] = useState<FilterOption[]>([
+    { value: "null", label: "Roots only" },
+  ]);
+  useEffect(() => {
+    let cancelled = false;
+    getOrganizationTree().then((result) => {
+      if (cancelled || !result.ok) return;
+      setParentChoices([
+        { value: "null", label: "Roots only" },
+        ...result.data.results.map((unit) => ({
+          value: String(unit.id),
+          label: `${unit.code} — ${unit.name}`,
+        })),
+      ]);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // A shared URL may name a parent the tree no longer (or yet) contains; keep
+  // it selectable rather than showing a blank option.
+  const parentOptions = useMemo<FilterOption[]>(() => {
+    if (draft.parent && !parentChoices.some((option) => option.value === draft.parent)) {
+      return [...parentChoices, { value: draft.parent, label: `Unit #${draft.parent}` }];
+    }
+    return parentChoices;
+  }, [draft.parent, parentChoices]);
 
   /**
    * Which lifecycle controls a row may show. The root can never leave ACTIVE,
@@ -207,7 +374,9 @@ export function OrganizationsList() {
       render: (row: Organization) => (
         <Box component="span" sx={{ display: "flex", flexDirection: "column" }}>
           <Typography variant="body2" sx={{ fontWeight: 600 }}>
-            {row.name}
+            <Link href={`/organizations/${row.id}`} style={{ color: "inherit" }}>
+              {row.name}
+            </Link>
           </Typography>
           {row.short_name ? (
             <Typography variant="caption" color="text.secondary">
@@ -222,6 +391,15 @@ export function OrganizationsList() {
       header: "Type",
       render: (row: Organization) => (
         <Typography variant="body2">{organizationTypeLabel(row.organization_type)}</Typography>
+      ),
+    },
+    {
+      field: "parent",
+      header: "Parent",
+      render: (row: Organization) => (
+        <Typography variant="body2" color="text.secondary">
+          {row.parent === null ? "Root" : `Unit #${row.parent}`}
+        </Typography>
       ),
     },
     {
@@ -246,136 +424,191 @@ export function OrganizationsList() {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
-      <Box
-        sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 1.5,
-        }}
-      >
-        <Typography variant="body2" color="text.secondary" aria-live="polite">
-          {organizations.loading
-            ? "Loading organizations…"
-            : `${count} organization${count === 1 ? "" : "s"}`}
-        </Typography>
-        <Button
-          component={Link}
-          href="/organizations/new"
-          variant="contained"
-          startIcon={<AddIcon />}
+      <Paper variant="outlined" sx={{ overflow: "hidden", borderRadius: 3 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 1.5,
+            px: { xs: 2, sm: 3 },
+            py: 2,
+            background:
+              "linear-gradient(110deg, rgba(0,51,102,0.04), rgba(255,255,255,1) 70%)",
+          }}
         >
-          New organization
-        </Button>
-      </Box>
-
-      <FilterBar
-        label="Organization filters"
-        activeCount={activeFilterCount}
-        onApply={applyFilters}
-        onReset={resetFilters}
-        resetDisabled={organizations.loading}
-      >
-        <TextFilter
-          label="Search"
-          value={draft.search ?? ""}
-          onChange={(value) => setDraft((prev) => ({ ...prev, search: value }))}
-          placeholder="Name or code"
-          hint="Case-insensitive substring of name or code."
-        />
-        <SelectFilter
-          label="Type"
-          value={draft.type ?? ""}
-          options={[...ORGANIZATION_TYPE_OPTIONS]}
-          onChange={(value) => setDraft((prev) => ({ ...prev, type: value || undefined }))}
-        />
-        <SelectFilter
-          label="Status"
-          value={draft.status ?? ""}
-          options={[...ORGANIZATION_STATUS_OPTIONS]}
-          onChange={(value) =>
-            setDraft((prev) => ({
-              ...prev,
-              status: (value || undefined) as OrganizationListQuery["status"],
-            }))
-          }
-        />
-      </FilterBar>
-
-      <DataTable<Organization>
-        caption="Organization units"
-        columns={columns}
-        rows={rows}
-        getRowKey={(row) => row.id}
-        loading={organizations.loading}
-        error={organizations.error}
-        onRetry={organizations.reload}
-        emptyState={
-          activeFilterCount > 0 ? (
-            <Box sx={{ py: 5, px: 3, textAlign: "center" }}>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                No organizations match these filters
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                Adjust or reset the filters to see more results.
-              </Typography>
-              <Button onClick={resetFilters} sx={{ mt: 2 }} variant="outlined">
-                Reset filters
-              </Button>
-            </Box>
-          ) : undefined
-        }
-        renderActions={(row) => {
-          const action = availableAction(row);
-          return (
-            <Box sx={{ display: "flex", gap: 0.5, justifyContent: "flex-end" }}>
-              <Tooltip title={`Edit ${row.name}`}>
-                <IconButton
-                  component={Link}
-                  href={`/organizations/${row.id}/edit`}
-                  size="small"
-                  aria-label={`Edit ${row.name}`}
-                >
-                  <EditOutlinedIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-              {action ? (
-                <Button
-                  size="small"
-                  color={action === "archive" ? "error" : "warning"}
-                  variant="outlined"
-                  onClick={() => {
-                    setConfirmError(null);
-                    setConfirmTarget({ organization: row, action });
-                  }}
-                >
-                  {action === "deactivate" ? "Deactivate" : "Archive"}
-                </Button>
-              ) : row.status === "ARCHIVED" ? (
-                <Typography variant="caption" color="text.disabled" sx={{ alignSelf: "center" }}>
-                  Archived
-                </Typography>
-              ) : row.parent === null ? (
-                <Typography variant="caption" color="text.disabled" sx={{ alignSelf: "center" }}>
-                  Root
-                </Typography>
-              ) : null}
-            </Box>
-          );
-        }}
-      />
-
-      {count > 0 ? (
-        <Pagination
-          page={page}
-          count={count}
-          pageSize={PAGE_SIZE}
-          onPageChange={setPage}
-          label="Organizations pagination"
-          disabled={organizations.loading}
-        />
-      ) : null}
+          <Box>
+            <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+              Organization directory
+            </Typography>
+            <Typography variant="body2" color="text.secondary" aria-live="polite">
+              {organizations.loading
+                ? "Loading organizations…"
+                : `${count} organization${count === 1 ? "" : "s"} found`}
+            </Typography>
+          </Box>
+          <Button
+            component={Link}
+            href="/organizations/new"
+            variant="contained"
+            startIcon={<AddIcon />}
+          >
+            New organization
+          </Button>
+        </Box>
+        <Box sx={{ borderTop: 1, borderColor: "divider", p: { xs: 1.5, sm: 2.5 } }}>
+          <FilterBar
+            label="Organization filters"
+            activeCount={activeFilterCount}
+            onApply={applyFilters}
+            onReset={resetFilters}
+            resetDisabled={organizations.loading}
+          >
+            <TextFilter
+              label="Search"
+              value={draft.search ?? ""}
+              onChange={(value) => setDraft((prev) => ({ ...prev, search: value }))}
+              placeholder="Name or code"
+              hint="Case-insensitive substring of name or code."
+            />
+            <TextFilter
+              label="Name"
+              value={draft.name}
+              onChange={(value) => setDraft((prev) => ({ ...prev, name: value }))}
+              placeholder="Organization name"
+              hint="Case-insensitive name substring."
+            />
+            <TextFilter
+              label="Code"
+              value={draft.code}
+              onChange={(value) => setDraft((prev) => ({ ...prev, code: value }))}
+              placeholder="Exact organization code"
+              hint={
+                invalidCode
+                  ? "Use 1-64 letters, digits, underscores or hyphens; start with a letter."
+                  : "Exact code; matching is case-insensitive."
+              }
+              invalid={invalidCode}
+            />
+            <SelectFilter
+              label="Type"
+              value={draft.type ?? ""}
+              options={[...ORGANIZATION_TYPE_OPTIONS]}
+              onChange={(value) => setDraft((prev) => ({ ...prev, type: value }))}
+            />
+            <SelectFilter
+              label="Status"
+              value={draft.status ?? ""}
+              options={[...ORGANIZATION_STATUS_OPTIONS]}
+              onChange={(value) => setDraft((prev) => ({ ...prev, status: value }))}
+            />
+            <SelectFilter
+              label="Parent"
+              value={draft.parent}
+              options={parentOptions}
+              onChange={(value) => setDraft((prev) => ({ ...prev, parent: value }))}
+              allLabel="Any parent"
+            />
+          </FilterBar>
+        </Box>
+        <Box sx={{ borderTop: 1, borderColor: "divider", overflowX: "auto" }}>
+          <DataTable<Organization>
+            caption="Organization units"
+            columns={columns}
+            rows={rows}
+            getRowKey={(row) => row.id}
+            sort={sort}
+            onSortChange={changeSort}
+            loading={organizations.loading}
+            error={organizations.error}
+            onRetry={organizations.reload}
+            emptyState={
+              activeFilterCount > 0 ? (
+                <Box sx={{ py: 5, px: 3, textAlign: "center" }}>
+                  <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                    No organizations match these filters
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                    Adjust or reset the filters to see more results.
+                  </Typography>
+                  <Button onClick={resetFilters} sx={{ mt: 2 }} variant="outlined">
+                    Reset filters
+                  </Button>
+                </Box>
+              ) : undefined
+            }
+            renderActions={(row) => {
+              const action = availableAction(row);
+              return (
+                <Box sx={{ display: "flex", gap: 0.5, justifyContent: "flex-end" }}>
+                  <Tooltip title={`View ${row.name}`}>
+                    <IconButton
+                      component={Link}
+                      href={`/organizations/${row.id}`}
+                      size="small"
+                      aria-label={`View ${row.name}`}
+                    >
+                      <BusinessRoundedIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title={`Edit ${row.name}`}>
+                    <IconButton
+                      component={Link}
+                      href={`/organizations/${row.id}/edit`}
+                      size="small"
+                      aria-label={`Edit ${row.name}`}
+                    >
+                      <EditOutlinedIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  {action ? (
+                    <Button
+                      size="small"
+                      color={action === "archive" ? "error" : "warning"}
+                      variant="outlined"
+                      onClick={() => {
+                        setConfirmError(null);
+                        setConfirmTarget({ organization: row, action });
+                      }}
+                    >
+                      {action === "deactivate" ? "Deactivate" : "Archive"}
+                    </Button>
+                  ) : row.status === "ARCHIVED" ? (
+                    <Typography
+                      variant="caption"
+                      color="text.disabled"
+                      sx={{ alignSelf: "center" }}
+                    >
+                      Archived
+                    </Typography>
+                  ) : row.parent === null ? (
+                    <Typography
+                      variant="caption"
+                      color="text.disabled"
+                      sx={{ alignSelf: "center" }}
+                    >
+                      Root
+                    </Typography>
+                  ) : null}
+                </Box>
+              );
+            }}
+          />
+        </Box>
+        {count > 0 ? (
+          <Box sx={{ borderTop: 1, borderColor: "divider", px: { xs: 1, sm: 2 } }}>
+            <Pagination
+              page={page}
+              count={count}
+              pageSize={PAGE_SIZE}
+              onPageChange={changePage}
+              label="Organizations pagination"
+              disabled={organizations.loading}
+            />
+          </Box>
+        ) : null}
+      </Paper>
 
       <ConfirmDialog
         open={confirmTarget !== null}

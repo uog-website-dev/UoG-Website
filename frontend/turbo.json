@@ -5,7 +5,9 @@
     "AUTH_*",
     "NEXTAUTH_*",
     "KEYCLOAK_*",
-    "SITE_ORIGIN"
+    "SITE_ORIGIN",
+    "API_MODE",
+    "API_BASE_URL"
   ],
   "tasks": {
     "build": {
