@@ -95,6 +95,9 @@ describe("OrganizationsList — reads", () => {
     expect(screen.getByText("University of Gondar")).toBeTruthy();
     expect(screen.getByText("Software Engineering")).toBeTruthy();
     expect(screen.getByText("Inactive")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Hierarchy" }).getAttribute("href")).toBe(
+      "/organizations/hierarchy",
+    );
     // 2 rows of results => summary reports the count.
     expect(await screen.findByText("2 organizations found")).toBeTruthy();
   });

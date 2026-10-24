@@ -20,7 +20,7 @@
  * answers 403 when mutation is not enabled in that environment — which these
  * actions surface verbatim rather than masking.
  */
-import { apiModeFromEnv, createOrganizationsAdapter } from "@uog/api-client";
+import { ApiError, apiModeFromEnv, createOrganizationsAdapter } from "@uog/api-client";
 import type {
   OrganizationCreateInput,
   OrganizationUpdateInput,
@@ -125,6 +125,24 @@ export async function updateOrganization(
   input: OrganizationUpdateInput,
 ): Promise<ActionResult<ETaggedResponse<Organization>>> {
   return attempt((adapter) => adapter.update(id, etag, input));
+}
+
+/** Move a unit using a fresh detail ETag; hierarchy rules stay backend-owned. */
+export async function moveOrganization(
+  id: number,
+  parent: number,
+): Promise<ActionResult<ETaggedResponse<Organization>>> {
+  return attempt(async (adapter) => {
+    const current = await adapter.get(id);
+    if (!current.etag) {
+      throw new ApiError(
+        "The server did not return a concurrency token; the organization was not moved.",
+        428,
+        { code: "precondition_required", requestId: current.requestId },
+      );
+    }
+    return adapter.update(id, current.etag, { parent });
+  });
 }
 
 /** ACTIVE -> INACTIVE. Blocked by the backend for roots and active children. */
