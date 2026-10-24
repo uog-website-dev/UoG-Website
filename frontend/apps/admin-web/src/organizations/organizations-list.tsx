@@ -26,6 +26,7 @@
  */
 import { useCallback, useEffect, useMemo, useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
+import AccountTreeRoundedIcon from "@mui/icons-material/AccountTreeRounded";
 import BusinessRoundedIcon from "@mui/icons-material/BusinessRounded";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import Box from "@mui/material/Box";
@@ -448,14 +449,24 @@ export function OrganizationsList() {
                 : `${count} organization${count === 1 ? "" : "s"} found`}
             </Typography>
           </Box>
-          <Button
-            component={Link}
-            href="/organizations/new"
-            variant="contained"
-            startIcon={<AddIcon />}
-          >
-            New organization
-          </Button>
+          <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", justifyContent: "flex-end" }}>
+            <Button
+              component={Link}
+              href="/organizations/hierarchy"
+              variant="outlined"
+              startIcon={<AccountTreeRoundedIcon />}
+            >
+              Hierarchy
+            </Button>
+            <Button
+              component={Link}
+              href="/organizations/new"
+              variant="contained"
+              startIcon={<AddIcon />}
+            >
+              New organization
+            </Button>
+          </Box>
         </Box>
         <Box sx={{ borderTop: 1, borderColor: "divider", p: { xs: 1.5, sm: 2.5 } }}>
           <FilterBar
