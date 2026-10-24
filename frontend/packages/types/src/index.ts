@@ -127,6 +127,19 @@ export interface Site {
 }
 
 /**
+ * Flat organization hierarchy returned by GET /api/v1/organizations/tree/.
+ *
+ * Breadth-first, code order within each depth, `parent` links nodes. The
+ * backend caps the response at 1000 nodes and answers 409 on overflow, so a
+ * screen must handle `count` reaching that limit rather than assuming the
+ * whole forest is present. No pagination and no depth truncation.
+ */
+export interface OrganizationHierarchy {
+  count: number;
+  results: Organization[];
+}
+
+/**
  * Detail responses carry a strong ETag required for conditional mutations.
  * `requestId` is the backend correlation id (X-Request-ID) for support.
  */
