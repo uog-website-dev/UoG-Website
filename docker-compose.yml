@@ -21,6 +21,7 @@ x-backend-image: &backend-image
 
 x-backend-environment: &backend-environment
   DEBUG: ${DEBUG:-True}
+  ORGANIZATIONS_DEV_WRITES_ENABLED: ${ORGANIZATIONS_DEV_WRITES_ENABLED:-False}
   SECRET_KEY: ${DJANGO_SECRET_KEY:-dev-only-insecure-secret-key-change-me}
   ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1,backend,nginx}
   LOG_LEVEL: ${LOG_LEVEL:-INFO}
@@ -373,6 +374,9 @@ services:
     container_name: uog-frontend-admin
     command: ["pnpm", "dev", "--filter", "@uog/admin-web"]
     environment:
+      # The admin console must use Django for organization reads and writes in
+      # the compose stack; the mock adapter is only for isolated UI work.
+      API_MODE: ${API_MODE:-live}
       NEXT_PUBLIC_API_BASE_URL: /api
       # Server-side Django API base URL: server components read the Keycloak
       # access token from the Auth.js session and call protected endpoints

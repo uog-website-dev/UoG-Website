@@ -27,6 +27,10 @@ describe("DesktopSidebar", () => {
 
     const nav = screen.getByRole("navigation", { name: "Admin sections" });
     expect(nav).toBeTruthy();
+    expect(screen.getByText("UoG Administration")).toBeTruthy();
+    expect(screen.getByText("Workspace")).toBeTruthy();
+    expect(screen.getByText("Admin workspace")).toBeTruthy();
+    expect(screen.queryByText(/Shell preview/)).toBeNull();
 
     const links = screen.getAllByRole("link");
     const byText = (label: string) =>

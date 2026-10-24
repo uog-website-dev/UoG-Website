@@ -8,19 +8,24 @@ import { ToastProvider } from "@uog/ui";
 // --- server action mocks -------------------------------------------------
 const listOrganizations = vi.fn();
 const getOrganization = vi.fn();
+const getOrganizationTree = vi.fn();
 const deactivateOrganization = vi.fn();
 const archiveOrganization = vi.fn();
 
 vi.mock("@/app/organizations/actions", () => ({
   listOrganizations: (...args: unknown[]) => listOrganizations(...args),
   getOrganization: (...args: unknown[]) => getOrganization(...args),
+  getOrganizationTree: (...args: unknown[]) => getOrganizationTree(...args),
   deactivateOrganization: (...args: unknown[]) => deactivateOrganization(...args),
   archiveOrganization: (...args: unknown[]) => archiveOrganization(...args),
 }));
 
 const refresh = vi.fn();
+const replace = vi.fn();
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn(), refresh }),
+  useRouter: () => ({ push: vi.fn(), replace, refresh }),
+  usePathname: () => "/organizations",
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 vi.mock("next/link", () => ({
@@ -68,6 +73,10 @@ function renderList() {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  getOrganizationTree.mockResolvedValue({
+    ok: true,
+    data: { count: 0, results: [] },
+  });
 });
 
 describe("OrganizationsList — reads", () => {
@@ -87,7 +96,7 @@ describe("OrganizationsList — reads", () => {
     expect(screen.getByText("Software Engineering")).toBeTruthy();
     expect(screen.getByText("Inactive")).toBeTruthy();
     // 2 rows of results => summary reports the count.
-    expect(await screen.findByText("2 organizations")).toBeTruthy();
+    expect(await screen.findByText("2 organizations found")).toBeTruthy();
   });
 
   it("shows an empty state and offers a filter reset when filters match nothing", async () => {
@@ -132,6 +141,63 @@ describe("OrganizationsList — reads", () => {
     expect(alert.textContent).toMatch(/permission|Sign-in|required/i);
     expect(alert.textContent).toContain("req-denied");
   });
+
+  it("filters by name and exact code through the server query and shareable URL", async () => {
+    listOrganizations.mockResolvedValue({
+      ok: true,
+      data: page([]),
+    });
+
+    renderList();
+    fireEvent.change(await screen.findByLabelText("Name"), {
+      target: { value: "informatics" },
+    });
+    fireEvent.change(screen.getByLabelText("Code"), {
+      target: { value: "ci" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+
+    await waitFor(() => {
+      expect(listOrganizations).toHaveBeenLastCalledWith(
+        expect.objectContaining({ name: "informatics", code: "CI", page: 1 }),
+      );
+    });
+    expect(replace).toHaveBeenCalledWith(
+      expect.stringContaining("name=informatics"),
+      { scroll: false },
+    );
+    expect(replace).toHaveBeenCalledWith(
+      expect.stringContaining("code=CI"),
+      { scroll: false },
+    );
+  });
+
+  it("does not silently apply an invalid exact code filter", async () => {
+    listOrganizations.mockResolvedValue({
+      ok: true,
+      data: page([]),
+    });
+
+    renderList();
+    fireEvent.change(await screen.findByLabelText("Code"), {
+      target: { value: "not a code" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+
+    expect(screen.getByLabelText("Code").getAttribute("aria-invalid")).toBe("true");
+    expect(listOrganizations).toHaveBeenCalledTimes(1);
+  });
+
+  it("links organization names to their details", async () => {
+    listOrganizations.mockResolvedValue({
+      ok: true,
+      data: page([org({ id: 23, code: "LIB", name: "Library" })]),
+    });
+
+    renderList();
+    const nameLink = await screen.findByRole("link", { name: "Library" });
+    expect(nameLink.getAttribute("href")).toBe("/organizations/23");
+  });
 });
 
 describe("OrganizationsList — lifecycle actions", () => {
@@ -166,7 +232,9 @@ describe("OrganizationsList — lifecycle actions", () => {
     expect(await screen.findByText("UOG")).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Deactivate" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Archive" })).toBeNull();
-    expect(screen.getByText("Root")).toBeTruthy();
+    const rootRow = screen.getByText("UOG").closest("tr");
+    expect(rootRow).toBeTruthy();
+    expect(within(rootRow as HTMLElement).getAllByText("Root").length).toBeGreaterThan(0);
     // "Archived" also appears as the status chip in the same row; scope the
     // assertion to the archived row so both are covered.
     const archivedRow = screen.getByText("Medicine").closest("tr");
@@ -296,4 +364,3 @@ describe("OrganizationsList — lifecycle actions", () => {
     });
   });
 });
-

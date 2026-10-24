@@ -13,7 +13,10 @@
  * database lifecycle rules — so a write in a shared environment is refused by
  * the server, and that refusal is shown rather than masked.
  */
+import AccountTreeRoundedIcon from "@mui/icons-material/AccountTreeRounded";
 import Box from "@mui/material/Box";
+import Chip from "@mui/material/Chip";
+import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 
 import { Breadcrumb } from "@/breadcrumb";
@@ -31,13 +34,51 @@ export default function OrganizationsPage() {
             { label: "Organizations" },
           ]}
         />
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 700 }}>
-          Organizations
-        </Typography>
-        <Typography color="text.secondary" sx={{ mt: 0.5 }}>
-          Colleges, institutes and departments of the University of Gondar.
-          Create and maintain units here; lifecycle changes are irreversible.
-        </Typography>
+        <Paper
+          variant="outlined"
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: { xs: 2, sm: 3 },
+            p: { xs: 2.5, sm: 3.5 },
+            borderRadius: 3,
+            background:
+              "linear-gradient(115deg, rgba(0,51,102,0.08), rgba(255,255,255,0.96) 64%, rgba(255,184,28,0.14))",
+          }}
+        >
+          <Box
+            sx={{
+              display: { xs: "none", sm: "grid" },
+              placeItems: "center",
+              flex: "0 0 auto",
+              width: 64,
+              height: 64,
+              borderRadius: 3,
+              bgcolor: "primary.main",
+              color: "primary.contrastText",
+              boxShadow: 2,
+            }}
+          >
+            <AccountTreeRoundedIcon fontSize="large" />
+          </Box>
+          <Box>
+            <Chip
+              size="small"
+              label="University structure"
+              color="primary"
+              variant="outlined"
+              sx={{ mb: 1, fontWeight: 600 }}
+            />
+            <Typography variant="h4" component="h1" sx={{ fontWeight: 700 }}>
+              Organizations
+            </Typography>
+            <Typography color="text.secondary" sx={{ mt: 0.5, maxWidth: 680 }}>
+              Browse colleges, institutes, departments and other units across
+              the University of Gondar. Search the directory or refine it with
+              filters.
+            </Typography>
+          </Box>
+        </Paper>
       </Box>
 
       <OrganizationsList />
