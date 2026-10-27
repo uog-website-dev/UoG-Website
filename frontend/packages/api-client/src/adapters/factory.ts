@@ -61,5 +61,9 @@ export function createSitesAdapter(
   if (mode === "mock") {
     return createMockSitesAdapter({ latencyMs: options.mockLatencyMs });
   }
-  return createLiveSitesAdapter();
+  return createLiveSitesAdapter({
+    baseUrl: options.baseUrl ?? "/api",
+    accessToken: options.accessToken,
+    fetchFn: options.fetchFn,
+  });
 }

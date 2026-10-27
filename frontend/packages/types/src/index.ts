@@ -101,27 +101,167 @@ export interface OrganizationListQuery {
 }
 
 /**
- * A managed site (public website or microsite).
- *
- * PROVISIONAL: the Django backend does not expose a Sites API yet (there is
- * no `sites` app). This DTO documents the shape the admin console needs so
- * the screen and its mock fixtures are built against a stable contract; it
- * will be reconciled with the real serializer when that endpoint lands.
- *
- * Until then the live adapter refuses to return data (see
- * @uog/api-client's `createLiveSitesAdapter`) rather than fabricating a
- * response, so a deployed integration never presents invented sites as
- * real.
+ * Site lifecycle states, mirroring `Site.Status` in
+ * backend/apps/sites/models/site.py. New sites always start DRAFT and the
+ * transitions are forward-only (see docs/architecture/site-data-model.md).
  */
-export type SiteStatus = "DRAFT" | "PUBLISHED" | "ARCHIVED";
+export type SiteStatus = "DRAFT" | "ACTIVE" | "SUSPENDED" | "ARCHIVED";
 
+/** One navigation entry in the versioned site configuration (schema v1). */
+export interface SiteNavigationItem {
+  code: string;
+  label: string;
+  /** Same-site path such as `/` or `/about`. */
+  path: string;
+}
+
+/** Approved presentation themes (backend `THEMES` allowlist). */
+export type SiteTheme = "institutional" | "high-contrast";
+
+/**
+ * Versioned, allowlisted site settings stored on `Site.configuration`
+ * (schema version 1). This is never a free-form document: unknown keys and
+ * keys that look like secrets are rejected by the backend, and the console
+ * only edits the typed fields below.
+ */
+export interface SiteConfiguration {
+  schema_version: number;
+  identity: {
+    /** `null` means "use `Site.name`". */
+    display_name: string | null;
+    logo_ref: string | null;
+    favicon_ref: string | null;
+  };
+  language: {
+    /** One to ten unique normalized codes; must include `default_language`. */
+    enabled: string[];
+  };
+  presentation: { theme: SiteTheme };
+  navigation: { items: SiteNavigationItem[] };
+  behavior: {
+    show_search: boolean;
+    show_language_switcher: boolean;
+  };
+}
+
+/**
+ * An institutional website, as serialized by
+ * backend/apps/sites/api/serializers.py::SiteSerializer.
+ *
+ * `organization_unit` is the owning unit's id (many sites per owner are
+ * allowed), `template` is the provisioning template whose defaults were
+ * copied once (or `null`), and `configuration` is the read-only versioned
+ * settings document — writable only through the dedicated
+ * `PATCH /sites/{id}/configuration/` endpoint, never through `PATCH /sites/{id}/`.
+ */
 export interface Site {
   id: number;
+  code: string;
   name: string;
-  slug: string;
-  organization: number | null;
+  short_name: string;
+  organization_unit: number;
+  default_language: string;
   status: SiteStatus;
-  domains: string[];
+  is_main: boolean;
+  template: number | null;
+  configuration: SiteConfiguration;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * Validated list query parameters for GET /api/v1/sites/.
+ *
+ * Mirrors SiteQuerySerializer in backend/apps/sites/api/query.py: the
+ * backend rejects unknown, repeated or invalid parameters with 400.
+ */
+export interface SiteListQuery {
+  /** Case-insensitive substring of name OR code. */
+  search?: string;
+  /** Exact code, normalized to uppercase. */
+  code?: string;
+  /** Exact lifecycle status; omit for all states. */
+  status?: SiteStatus;
+  /** Exact owning organization unit id. */
+  organization_unit?: number;
+  /** Comma-separated code, name, status, created_at, updated_at; '-' desc. */
+  ordering?: string;
+  /** Page number (1-based), page size fixed at 20 server-side. */
+  page?: number;
+}
+
+/**
+ * A hostname registered for a Site (backend SiteDomainSerializer).
+ *
+ * A domain row is a routing record only: it does not prove DNS or TLS
+ * exists, and the console never implies that it does. `hostname` is
+ * normalized and immutable after creation.
+ */
+export type SiteDomainStatus = "ACTIVE" | "INACTIVE";
+
+export interface SiteDomain {
+  id: number;
+  site: number;
+  hostname: string;
+  is_primary: boolean;
+  /** Aliases may redirect to the primary; a primary never redirects. */
+  redirect_to_primary: boolean;
+  status: SiteDomainStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Registry capability states (backend Module.Status). */
+export type ModuleStatus = "PLANNED" | "IMPLEMENTED" | "DEPRECATED";
+
+/**
+ * One platform capability in the module registry (backend ModuleSerializer).
+ *
+ * A registry row is not a working feature: a PLANNED module cannot be
+ * enabled for any Site, and registering one does not implement it.
+ */
+export interface PlatformModule {
+  id: number;
+  code: string;
+  name: string;
+  description: string;
+  status: ModuleStatus;
+  is_enabled: boolean;
+  configuration_schema: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * One Site's enablement of one registry module (backend SiteModuleSerializer).
+ *
+ * Disabling keeps the row and its configuration; it does not delete data.
+ * `module` is the registry id — resolve codes/names via GET /api/v1/modules/.
+ */
+export interface SiteModuleAssignment {
+  id: number;
+  site: number;
+  module: number;
+  is_enabled: boolean;
+  configuration: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * A site template: the approved defaults copied onto a Site once at
+ * provisioning (backend SiteTemplateSerializer). Editing a template never
+ * rewrites sites provisioned from it, which is exactly why the console can
+ * compare a Site's configuration against its template to show which values
+ * are inherited and which are explicit overrides.
+ */
+export interface SiteTemplate {
+  id: number;
+  code: string;
+  name: string;
+  description: string;
+  status: "ACTIVE" | "INACTIVE";
+  default_configuration: SiteConfiguration;
   created_at: string;
   updated_at: string;
 }

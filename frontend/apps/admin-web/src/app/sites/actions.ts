@@ -1,0 +1,224 @@
+"use server";
+
+/**
+ * Site mutations and reads, executed on the server.
+ *
+ * Same contract as the organization actions: the Keycloak access token lives
+ * only in the Auth.js session cookie, is read here server-side and handed to
+ * the adapter as an Authorization header — never returned to the browser,
+ * never placed in a query string and never logged.
+ *
+ * Every action returns a clone-safe `ActionResult` (see
+ * @/organizations/contract — the module is resource-agnostic despite its
+ * name, so both features share one serializer instead of drifting). On
+ * failure the error is flattened to an `ApiErrorPayload` because `ApiError`'s
+ * getters do not survive the React Server Component boundary; clients rebuild
+ * a real `ApiError` for the shared UI.
+ *
+ * Authorization is not decided here. The adapter resolves `API_MODE`, so a
+ * production build only ever talks to the live API, and Django independently
+ * enforces authentication, the `platform-admin` realm role, the development
+ * write opt-in, `If-Match` preconditions and the database lifecycle rules.
+ * Their 403/412/428 answers are surfaced verbatim rather than masked.
+ */
+import {
+  ApiError,
+  apiModeFromEnv,
+  createSitesAdapter,
+} from "@uog/api-client";
+import type {
+  SiteConfigurationChanges,
+  SiteCreateInput,
+  SiteUpdateInput,
+} from "@uog/api-client";
+import type {
+  ETaggedResponse,
+  PaginatedResponse,
+  PlatformModule,
+  Site,
+  SiteDomain,
+  SiteListQuery,
+  SiteModuleAssignment,
+  SiteTemplate,
+  ModuleStatus,
+} from "@uog/types";
+
+import { getAccessToken } from "@/access-token";
+import { serializeApiError } from "@/organizations/contract";
+import type { ActionResult } from "@/organizations/contract";
+
+/**
+ * Internal Docker URL for server-side calls. Browser-side requests go through
+ * nginx at `/api`; these run inside the compose network instead.
+ */
+function apiBaseUrl(): string {
+  return process.env.API_BASE_URL ?? "http://backend:8000/api";
+}
+
+// The mock adapter owns an in-memory store; keep it per server process so
+// mock mutations stay visible to later reads. Live adapters remain
+// request-scoped because they are bound to the current user's token.
+let mockSitesAdapter: ReturnType<typeof createSitesAdapter> | undefined;
+
+/** Build a request-scoped live adapter or the shared development mock. */
+async function buildAdapter() {
+  const mode = apiModeFromEnv();
+  if (mode === "mock") {
+    mockSitesAdapter ??= createSitesAdapter({ mode });
+    return mockSitesAdapter;
+  }
+
+  const accessToken = await getAccessToken();
+  return createSitesAdapter({
+    baseUrl: apiBaseUrl(),
+    accessToken: accessToken ?? undefined,
+    mode,
+  });
+}
+
+/** Run an adapter call, converting any failure into a clone-safe payload. */
+async function attempt<T>(
+  run: (adapter: Awaited<ReturnType<typeof buildAdapter>>) => Promise<T>,
+): Promise<ActionResult<T>> {
+  try {
+    const adapter = await buildAdapter();
+    const data = await run(adapter);
+    return { ok: true, data };
+  } catch (cause) {
+    return { ok: false, error: serializeApiError(cause) };
+  }
+}
+
+/** Paged, filtered site list for the list screen. */
+export async function listSites(
+  query: SiteListQuery = {},
+): Promise<ActionResult<PaginatedResponse<Site>>> {
+  return attempt((adapter) => adapter.list(query));
+}
+
+/** Single site plus the strong ETag required for conditional writes. */
+export async function getSite(
+  id: number,
+): Promise<ActionResult<ETaggedResponse<Site>>> {
+  return attempt((adapter) => adapter.get(id));
+}
+
+/**
+ * Hostnames registered for one site. A domain row is a routing record from
+ * the platform's own database — it proves neither DNS nor TLS exists, and
+ * the screens never imply otherwise. An unknown site id answers 404.
+ */
+export async function listSiteDomains(
+  siteId: number,
+  query: { status?: "ACTIVE" | "INACTIVE"; is_primary?: boolean } = {},
+): Promise<ActionResult<PaginatedResponse<SiteDomain>>> {
+  return attempt((adapter) => adapter.listDomains(siteId, query));
+}
+
+/** One site's module enablement rows (empty until a capability ships). */
+export async function listSiteModuleAssignments(
+  siteId: number,
+): Promise<ActionResult<PaginatedResponse<SiteModuleAssignment>>> {
+  return attempt((adapter) => adapter.listModuleAssignments(siteId));
+}
+
+/**
+ * The platform module registry, used to resolve assignment ids to codes and
+ * names. Registry rows are capability *announcements*: a PLANNED row is not
+ * a working feature and is shown as such.
+ */
+export async function listPlatformModules(
+  query: { search?: string; status?: ModuleStatus; page?: number } = {},
+): Promise<ActionResult<PaginatedResponse<PlatformModule>>> {
+  return attempt((adapter) => adapter.listModules(query));
+}
+
+/** Templates for the create/edit selector (includes default configuration). */
+export async function listSiteTemplates(): Promise<
+  ActionResult<PaginatedResponse<SiteTemplate>>
+> {
+  return attempt((adapter) => adapter.listTemplates());
+}
+
+/** One template — the baseline the console compares overrides against. */
+export async function getSiteTemplate(
+  id: number,
+): Promise<ActionResult<ETaggedResponse<SiteTemplate>>> {
+  return attempt((adapter) => adapter.getTemplate(id));
+}
+
+/**
+ * Create a site. The backend always starts it in DRAFT, normalizes the code
+ * to upper case, copies the selected template's defaults once and answers
+ * 409 for duplicate codes.
+ */
+export async function createSite(
+  input: SiteCreateInput,
+): Promise<ActionResult<ETaggedResponse<Site>>> {
+  return attempt((adapter) => adapter.create(input));
+}
+
+/**
+ * Conditional partial update. `etag` must be the strong ETag from the detail
+ * read the form was populated from: stale is 412, missing is 428, so a
+ * concurrent edit can never be silently overwritten. `code`, `status` and
+ * `configuration` are not accepted by this endpoint.
+ */
+export async function updateSite(
+  id: number,
+  etag: string,
+  input: SiteUpdateInput,
+): Promise<ActionResult<ETaggedResponse<Site>>> {
+  return attempt((adapter) => adapter.update(id, etag, input));
+}
+
+/** Merge an allowlisted configuration change (conditional on `etag`). */
+export async function updateSiteConfiguration(
+  id: number,
+  etag: string,
+  changes: SiteConfigurationChanges,
+): Promise<ActionResult<ETaggedResponse<Site>>> {
+  return attempt((adapter) => adapter.updateConfiguration(id, etag, changes));
+}
+
+/**
+ * Lifecycle actions. Each runs against the current strong ETag, fetched
+ * immediately before the call so a stale row can never silently win — a 412
+ * is surfaced as a concurrency message instead.
+ */
+async function lifecycle(
+  id: number,
+  action: "activate" | "suspend" | "archive",
+): Promise<ActionResult<ETaggedResponse<Site>>> {
+  return attempt(async (adapter) => {
+    const current = await adapter.get(id);
+    if (!current.etag) {
+      throw new ApiError(
+        "The server did not return a concurrency token; the site was not changed.",
+        428,
+        { code: "precondition_required", requestId: current.requestId },
+      );
+    }
+    if (action === "activate") return adapter.activate(id, current.etag);
+    if (action === "suspend") return adapter.suspend(id, current.etag);
+    return adapter.archive(id, current.etag);
+  });
+}
+
+export async function activateSite(
+  id: number,
+): Promise<ActionResult<ETaggedResponse<Site>>> {
+  return lifecycle(id, "activate");
+}
+
+export async function suspendSite(
+  id: number,
+): Promise<ActionResult<ETaggedResponse<Site>>> {
+  return lifecycle(id, "suspend");
+}
+
+export async function archiveSite(
+  id: number,
+): Promise<ActionResult<ETaggedResponse<Site>>> {
+  return lifecycle(id, "archive");
+}

@@ -41,8 +41,33 @@ export type {
   OrganizationUpdateInput,
 } from "./adapters/organizations";
 
-export { createLiveSitesAdapter, createMockSitesAdapter } from "./adapters/sites";
-export type { SitesAdapter, SitesListQuery } from "./adapters/sites";
+export {
+  createLiveSitesAdapter,
+  createMockSitesAdapter,
+  siteListQueryString,
+  SITES_PAGE_SIZE,
+} from "./adapters/sites";
+export type {
+  SitesAdapter,
+  SiteCreateInput,
+  SiteUpdateInput,
+  SiteDomainListQuery,
+  SiteModuleListQuery,
+  PlatformModuleListQuery,
+} from "./adapters/sites";
+
+export {
+  SiteConfigurationError,
+  defaultSiteConfiguration,
+  mergeSiteConfiguration,
+  hasSecretKey,
+  SITE_CONFIGURATION_SCHEMA_VERSION,
+  SITE_LANGUAGE_OPTIONS,
+  SITE_THEMES,
+  SITE_BEHAVIOR_FLAGS,
+  SITE_MAX_LANGUAGES,
+} from "./sites-configuration";
+export type { SiteConfigurationChanges } from "./sites-configuration";
 
 export {
   ApiModeError,
@@ -56,4 +81,10 @@ export { createOrganizationsAdapter, createSitesAdapter } from "./adapters/facto
 
 // Fixtures (development only — never used when API_MODE=live).
 export { organizationFixtures, rootOrganizationFixture } from "./fixtures/organizations";
-export { siteFixtures } from "./fixtures/sites";
+export {
+  siteFixtures,
+  siteTemplateFixtures,
+  siteDomainFixtures,
+  siteModuleFixtures,
+  moduleFixtures,
+} from "./fixtures/sites";

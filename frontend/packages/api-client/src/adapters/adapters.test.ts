@@ -4,7 +4,7 @@ import type { Organization } from "@uog/types";
 
 import { ApiError } from "../errors";
 import { organizationFixtures } from "../fixtures/organizations";
-import { siteFixtures } from "../fixtures/sites";
+import { siteFixtures, siteTemplateFixtures } from "../fixtures/sites";
 import {
   createMockOrganizationsAdapter,
   createLiveOrganizationsAdapter,
@@ -65,22 +65,113 @@ describe("factory", () => {
     await expect(adapter.list()).rejects.toBeInstanceOf(ApiError);
   });
 
-  it("builds the Sites adapter and refuses to fabricate in live mode", async () => {
-    const adapter = createSitesAdapter({ mode: "live" });
-    await expect(adapter.list()).rejects.toMatchObject({ status: 501 });
+  it("builds the Sites adapter and talks to the API in live mode", async () => {
+    const adapter = createSitesAdapter({ mode: "live", baseUrl: "/api" });
+    // Without a reachable backend the live adapter rejects with a transport
+    // error — it never falls back to fixture data.
+    await expect(adapter.list()).rejects.toBeInstanceOf(ApiError);
     expect(isNotImplemented).toBeTypeOf("function");
   });
 });
 
 describe("createLiveSitesAdapter", () => {
-  it("refuses list with an explicit 501 instead of inventing data", async () => {
-    const adapter = createLiveSitesAdapter();
-    await expect(adapter.list()).rejects.toMatchObject({ status: 501 });
+  it("sends the request to the configured base URL and path", async () => {
+    const calls: [string, RequestInit][] = [];
+    const fetchFn = vi.fn(async (url: string, init: RequestInit) => {
+      calls.push([url, init]);
+      return new Response(
+        JSON.stringify({ count: 0, next: null, previous: null, results: [] }),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    }) as unknown as typeof fetch;
+
+    const adapter = createLiveSitesAdapter({
+      baseUrl: "http://backend:8000/api",
+      fetchFn,
+    });
+
+    await adapter.list({ search: "uog", status: "DRAFT" });
+
+    const [url] = calls[0];
+    expect(url).toBe(
+      "http://backend:8000/api/v1/sites/?search=uog&status=DRAFT",
+    );
   });
 
-  it("refuses get with an explicit 501", async () => {
-    const adapter = createLiveSitesAdapter();
-    await expect(adapter.get(1)).rejects.toMatchObject({ status: 501 });
+  it("captures the strong ETag from a detail response", async () => {
+    const fetchFn = vi.fn(
+      async () =>
+        new Response(JSON.stringify({ id: 1, code: "UOG_MAIN" }), {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json",
+            ETag: '"abc123"',
+            "X-Request-ID": "req-etag",
+          },
+        }),
+    ) as unknown as typeof fetch;
+
+    const adapter = createLiveSitesAdapter({ baseUrl: "/api", fetchFn });
+    const detail = await adapter.get(1);
+
+    expect(detail.etag).toBe('"abc123"');
+    expect(detail.requestId).toBe("req-etag");
+  });
+
+  it("sends If-Match on a conditional update and on lifecycle actions", async () => {
+    const calls: [string, RequestInit][] = [];
+    const fetchFn = vi.fn(async (url: string, init: RequestInit) => {
+      calls.push([url, init]);
+      return new Response(JSON.stringify({ id: 1, status: "ACTIVE" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json", ETag: '"new"' },
+      });
+    }) as unknown as typeof fetch;
+
+    const adapter = createLiveSitesAdapter({ baseUrl: "/api", fetchFn });
+    await adapter.update(1, '"old"', { name: "Renamed" });
+    await adapter.activate(1, '"new"');
+    await adapter.updateConfiguration(1, '"new"', {
+      presentation: { theme: "high-contrast" },
+    });
+
+    const [patchUrl, patchInit] = calls[0];
+    expect(patchUrl).toBe("/api/v1/sites/1/");
+    expect(patchInit.method).toBe("PATCH");
+    expect((patchInit.headers as Record<string, string>)["If-Match"]).toBe('"old"');
+
+    const [activateUrl, activateInit] = calls[1];
+    expect(activateUrl).toBe("/api/v1/sites/1/activate/");
+    expect((activateInit.headers as Record<string, string>)["If-Match"]).toBe('"new"');
+
+    const [configUrl, configInit] = calls[2];
+    expect(configUrl).toBe("/api/v1/sites/1/configuration/");
+    expect((configInit.headers as Record<string, string>)["If-Match"]).toBe('"new"');
+    expect(configInit.body).toBe(
+      JSON.stringify({ presentation: { theme: "high-contrast" } }),
+    );
+  });
+
+  it("reads domains, site modules and the registry under the documented paths", async () => {
+    const calls: string[] = [];
+    const fetchFn = vi.fn(async (url: string) => {
+      calls.push(url);
+      return new Response(
+        JSON.stringify({ count: 0, next: null, previous: null, results: [] }),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
+    }) as unknown as typeof fetch;
+
+    const adapter = createLiveSitesAdapter({ baseUrl: "/api", fetchFn });
+    await adapter.listDomains(3);
+    await adapter.listModuleAssignments(3, { is_enabled: true });
+    await adapter.listModules({ status: "PLANNED" });
+
+    expect(calls).toEqual([
+      "/api/v1/sites/3/domains/",
+      "/api/v1/sites/3/modules/?is_enabled=true",
+      "/api/v1/modules/?status=PLANNED",
+    ]);
   });
 });
 
@@ -202,12 +293,212 @@ describe("createMockSitesAdapter", () => {
     const adapter = createMockSitesAdapter(instant);
     const page = await adapter.list({ status: "DRAFT" });
 
-    expect(page.results.map((site) => site.slug)).toEqual(["research"]);
+    expect(page.results.map((site) => site.code)).toEqual(["RESEARCH_LAB"]);
+  });
+
+  it("filters by owning organization unit and can return several sites per owner", async () => {
+    const adapter = createMockSitesAdapter(instant);
+    const page = await adapter.list({ organization_unit: 1 });
+
+    // One organization owning multiple sites is a supported shape.
+    expect(page.results.map((site) => site.code)).toEqual([
+      "UOG_MAIN",
+      "UOG_PRESS",
+    ]);
+    expect(page.count).toBe(2);
   });
 
   it("404s for an unknown id", async () => {
     const adapter = createMockSitesAdapter(instant);
     await expect(adapter.get(99999)).rejects.toMatchObject({ status: 404 });
+  });
+
+  it("creates a site in DRAFT with a normalized code", async () => {
+    const adapter = createMockSitesAdapter(instant);
+    const created = await adapter.create({
+      code: "  new_portal ",
+      name: "New Portal",
+      organization_unit: 1,
+      default_language: "am",
+      configuration: { language: { enabled: ["en", "am"] } },
+    });
+
+    expect(created.data.code).toBe("NEW_PORTAL");
+    expect(created.data.status).toBe("DRAFT");
+    expect(created.data.configuration.language.enabled).toEqual(["en", "am"]);
+    expect(created.etag).toMatch(/^".+"$/);
+  });
+
+  it("rejects a duplicate code on create with 409", async () => {
+    const adapter = createMockSitesAdapter(instant);
+    await expect(
+      adapter.create({ code: "uog_main", name: "Duplicate", organization_unit: 1 }),
+    ).rejects.toMatchObject({ status: 409, code: "conflict" });
+  });
+
+  it("refuses a main site that is not owned by the UNIVERSITY root", async () => {
+    const adapter = createMockSitesAdapter(instant);
+    await expect(
+      adapter.create({ code: "BAD_MAIN", name: "Bad", organization_unit: 2, is_main: true }),
+    ).rejects.toMatchObject({
+      status: 400,
+      details: {
+        organization_unit: ["The main university Site must belong to the UNIVERSITY root."],
+      },
+    });
+  });
+
+  it("refuses a new site on an inactive owner", async () => {
+    const adapter = createMockSitesAdapter(instant);
+    await expect(
+      adapter.create({ code: "LAB_PORTAL", name: "Lab", organization_unit: 3 }),
+    ).rejects.toMatchObject({
+      status: 400,
+      details: {
+        organization_unit: ["New Site ownership requires an ACTIVE OrganizationUnit."],
+      },
+    });
+  });
+
+  it("rejects a stale ETag on update with 412", async () => {
+    const adapter = createMockSitesAdapter(instant);
+    await expect(
+      adapter.update(1, '"stale"', { name: "Nope" }),
+    ).rejects.toMatchObject({ status: 412, code: "precondition_failed" });
+  });
+
+  it("transitions through the lifecycle matrix", async () => {
+    const adapter = createMockSitesAdapter(instant);
+    const draft = await adapter.get(3);
+    const failed = await adapter
+      .activate(3, draft.etag!)
+      .catch((error: unknown) => error as { status: number });
+    // Owner 3 is INACTIVE, so activation is refused rather than faked.
+    expect(failed).toMatchObject({ status: 400 });
+
+    const active = await adapter.get(1);
+    const suspended = await adapter.suspend(1, active.etag!);
+    expect(suspended.data.status).toBe("SUSPENDED");
+    const reactivated = await adapter.activate(1, suspended.etag!);
+    expect(reactivated.data.status).toBe("ACTIVE");
+    const archived = await adapter.archive(1, reactivated.etag!);
+    expect(archived.data.status).toBe("ARCHIVED");
+  });
+
+  it("refuses a lifecycle transition the matrix forbids", async () => {
+    const adapter = createMockSitesAdapter(instant);
+    const detail = await adapter.get(1);
+    const archived = await adapter.archive(1, detail.etag!);
+    expect(archived.data.status).toBe("ARCHIVED");
+
+    // ARCHIVED is terminal: no unarchiving, no suspension.
+    await expect(adapter.activate(1, archived.etag!)).rejects.toMatchObject({
+      status: 400,
+      details: { status: ["This Site lifecycle transition is not allowed."] },
+    });
+    await expect(adapter.suspend(1, archived.etag!)).rejects.toMatchObject({
+      status: 400,
+    });
+  });
+
+  it("merges an allowlisted configuration change", async () => {
+    const adapter = createMockSitesAdapter(instant);
+    const detail = await adapter.get(1);
+    const updated = await adapter.updateConfiguration(1, detail.etag!, {
+      presentation: { theme: "high-contrast" },
+      behavior: { show_search: true },
+    });
+
+    expect(updated.data.configuration.presentation.theme).toBe("high-contrast");
+    expect(updated.data.configuration.behavior.show_search).toBe(true);
+    // Untouched sections survive the merge.
+    expect(updated.data.configuration.language.enabled).toEqual(["en-us"]);
+  });
+
+  it("refuses configuration that stores secrets or unknown keys", async () => {
+    const adapter = createMockSitesAdapter(instant);
+    const detail = await adapter.get(1);
+
+    await expect(
+      adapter.updateConfiguration(1, detail.etag!, {
+        identity: { display_name: null, api_key: "nope" } as never,
+      }),
+    ).rejects.toMatchObject({ status: 400 });
+
+    await expect(
+      adapter.updateConfiguration(1, detail.etag!, {
+        presentation: { theme: "neon" } as never,
+      }),
+    ).rejects.toMatchObject({ status: 400 });
+  });
+
+  it("does not leak fixture objects between calls", async () => {
+    const adapter = createMockSitesAdapter(instant);
+    const first = await adapter.get(1);
+    first.data.name = "MUTATED";
+    first.data.configuration.language.enabled.push("fr");
+    const second = await adapter.get(1);
+
+    expect(second.data.name).toBe("University of Gondar");
+    expect(second.data.configuration.language.enabled).toEqual(["en-us"]);
+  });
+
+  it("lists a site's hostnames, ordered and filterable", async () => {
+    const adapter = createMockSitesAdapter(instant);
+    const all = await adapter.listDomains(1);
+    expect(all.results.map((domain) => domain.hostname)).toEqual([
+      "uog.edu.et",
+      "www.uog.edu.et",
+    ]);
+
+    const primary = await adapter.listDomains(1, { is_primary: true });
+    expect(primary.results.map((domain) => domain.hostname)).toEqual([
+      "www.uog.edu.et",
+    ]);
+
+    const inactive = await adapter.listDomains(4, { status: "INACTIVE" });
+    expect(inactive.results.map((domain) => domain.hostname)).toEqual([
+      "press.uog.edu.et",
+    ]);
+  });
+
+  it("returns an empty domain page for a site with none, and 404s an unknown site", async () => {
+    const adapter = createMockSitesAdapter(instant);
+    const empty = await adapter.listDomains(3);
+    expect(empty.count).toBe(0);
+    expect(empty.results).toEqual([]);
+
+    await expect(adapter.listDomains(99999)).rejects.toMatchObject({
+      status: 404,
+    });
+  });
+
+  it("lists per-site module assignments and the planned registry honestly", async () => {
+    const adapter = createMockSitesAdapter(instant);
+    const assignments = await adapter.listModuleAssignments(1);
+    // No shipped capability exists, so no site may claim an enabled module.
+    expect(assignments.count).toBe(0);
+
+    const registry = await adapter.listModules();
+    expect(registry.results.map((entry) => entry.code)).toEqual([
+      "ANALYTICS",
+      "CMS",
+      "MEDIA",
+    ]);
+    for (const entry of registry.results) {
+      expect(entry.status).toBe("PLANNED");
+      expect(entry.is_enabled).toBe(false);
+    }
+
+    const planned = await adapter.listModules({ status: "PLANNED" });
+    expect(planned.count).toBe(registry.count);
+  });
+
+  it("404s module assignments for an unknown site", async () => {
+    const adapter = createMockSitesAdapter(instant);
+    await expect(adapter.listModuleAssignments(99999)).rejects.toMatchObject({
+      status: 404,
+    });
   });
 });
 
@@ -287,14 +578,18 @@ describe("fixture contract conformance", () => {
     }
   });
 
-  it("site fixtures carry exactly the documented provisional fields", () => {
+  it("site fixtures carry exactly the documented SiteSerializer fields", () => {
     const required = [
       "id",
+      "code",
       "name",
-      "slug",
-      "organization",
+      "short_name",
+      "organization_unit",
+      "default_language",
       "status",
-      "domains",
+      "is_main",
+      "template",
+      "configuration",
       "created_at",
       "updated_at",
     ];
@@ -305,7 +600,30 @@ describe("fixture contract conformance", () => {
 
   it("site fixtures use the documented status values", () => {
     for (const fixture of siteFixtures) {
-      expect(["DRAFT", "PUBLISHED", "ARCHIVED"]).toContain(fixture.status);
+      expect(["DRAFT", "ACTIVE", "SUSPENDED", "ARCHIVED"]).toContain(fixture.status);
+    }
+  });
+
+  it("site fixture configurations are schema-version-1 documents", () => {
+    for (const fixture of siteFixtures) {
+      expect(fixture.configuration.schema_version).toBe(1);
+      expect(fixture.configuration.language.enabled).toContain(
+        fixture.default_language,
+      );
+      expect(["institutional", "high-contrast"]).toContain(
+        fixture.configuration.presentation.theme,
+      );
+    }
+  });
+
+  it("site fixture owners and templates resolve within the fixture set", () => {
+    const orgIds = new Set(organizationFixtures.map((org) => org.id));
+    const templateIds = new Set(siteTemplateFixtures.map((template) => template.id));
+    for (const fixture of siteFixtures) {
+      expect(orgIds.has(fixture.organization_unit)).toBe(true);
+      if (fixture.template !== null) {
+        expect(templateIds.has(fixture.template)).toBe(true);
+      }
     }
   });
 });
