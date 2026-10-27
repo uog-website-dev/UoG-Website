@@ -5,7 +5,11 @@ from contextvars import ContextVar
 from django.core.exceptions import ValidationError
 from django.db import DEFAULT_DB_ALIAS, connections, transaction
 
+from apps.audit.context import database_audit_context
+
 from ..models import SiteDomain
+
+PRIMARY_REPLACEMENT = "Select an active domain on this Site before deactivating the primary."
 
 _reassigning = ContextVar("site_domain_reassignment", default=False)
 
@@ -16,7 +20,7 @@ def domain_reassignment_enabled():
 
 @contextmanager
 def domain_write(*, using=DEFAULT_DB_ALIAS):
-    with transaction.atomic(using=using):
+    with transaction.atomic(using=using), database_audit_context(using=using):
         with connections[using].cursor() as cursor:
             cursor.execute("SELECT sites_lock_domains()")
         yield
@@ -38,13 +42,34 @@ def activate_domain(domain_id, *, using=DEFAULT_DB_ALIAS):
     return _set_status(domain_id, SiteDomain.Status.ACTIVE, using=using)
 
 
-def deactivate_domain(domain_id, *, using=DEFAULT_DB_ALIAS):
-    return _set_status(domain_id, SiteDomain.Status.INACTIVE, using=using)
+def deactivate_domain(domain_id, *, replacement_id=None, using=DEFAULT_DB_ALIAS):
+    """Deactivate one domain. An active primary requires another active domain."""
+    with domain_write(using=using):
+        domain = SiteDomain.objects.using(using).select_for_update().get(pk=domain_id)
+        if domain.status == SiteDomain.Status.INACTIVE:
+            return domain
+        if domain.is_primary:
+            if replacement_id is None:
+                raise ValidationError({"replacement": PRIMARY_REPLACEMENT})
+            replacement = SiteDomain.objects.using(using).select_for_update().filter(
+                pk=replacement_id, site_id=domain.site_id, status=SiteDomain.Status.ACTIVE,
+            ).exclude(pk=domain.pk).first()
+            if replacement is None:
+                raise ValidationError({"replacement": PRIMARY_REPLACEMENT})
+            designate_primary(replacement.pk, using=using)
+            domain.refresh_from_db()
+        elif replacement_id is not None:
+            raise ValidationError({"replacement": "A replacement applies only when deactivating the primary domain."})
+        domain.status = SiteDomain.Status.INACTIVE
+        domain.save(using=using, update_fields=["status"])
+        return domain
 
 
 def _set_status(domain_id, status, *, using):
     with domain_write(using=using):
         domain = SiteDomain.objects.using(using).select_for_update().get(pk=domain_id)
+        if status == SiteDomain.Status.INACTIVE and domain.is_primary and domain.status == SiteDomain.Status.ACTIVE:
+            raise ValidationError({"replacement": PRIMARY_REPLACEMENT})
         domain.status = status
         domain.save(using=using, update_fields=["status"])
         return domain

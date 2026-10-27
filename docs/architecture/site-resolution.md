@@ -15,6 +15,9 @@ Unknown hosts, inactive domains, and Sites that are not `ACTIVE`
 (draft, suspended, archived) get the same 404. That lookup does not
 authenticate the caller or grant an Organization permission. Alias domains
 with `redirect_to_primary` redirect only to the stored primary hostname.
+The path and query string are preserved. A path or query that could change
+the redirect host, including a scheme-relative path or a line break, is
+rejected instead of redirected.
 
 Cache keys include `site:{id}` or `site:platform`. Session and CSRF cookies
 are host-only (`SESSION_COOKIE_DOMAIN` and `CSRF_COOKIE_DOMAIN` are unset),
@@ -25,8 +28,9 @@ before a request reaches Django. Django applies this resolver to the Host
 that proxy forwards. A resolved Site hostname is allowed only for that
 request; it is not added to `ALLOWED_HOSTS`.
 
-`GET /api/v1/site-context/` returns the selected Site code, owner, hostname
-and enabled module codes. Anonymous callers may read it. It grants no
+`GET /api/v1/site-context/` returns the selected Site code, owner, hostname,
+public display name, theme, and enabled module codes. Anonymous callers may
+read it. It grants no
 administration permission. Representative hostnames such as `www.uog.local`
 exist only as development data in `apps/sites/fixtures/uog-foundation.json`.
 Adding another hostname is a SiteDomain row, not an application change.

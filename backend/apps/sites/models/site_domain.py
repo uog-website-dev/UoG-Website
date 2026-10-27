@@ -39,11 +39,13 @@ class SiteDomain(models.Model):
         if self.is_primary and self.redirect_to_primary:
             raise ValidationError({"redirect_to_primary": "A primary domain cannot redirect to itself."})
         if self.pk:
-            previous = type(self).objects.filter(pk=self.pk).values("hostname", "site_id").first()
+            previous = type(self).objects.filter(pk=self.pk).values("hostname", "site_id", "status", "is_primary").first()
             if previous and previous["hostname"] != self.hostname:
                 raise ValidationError({"hostname": "Hostnames cannot be changed. Add another domain instead."})
             if previous and previous["site_id"] != self.site_id and not _reassignment_enabled():
                 raise ValidationError({"site": "Move a domain with the reassignment operation."})
+            if previous and previous["is_primary"] and previous["status"] == self.Status.ACTIVE and self.status != self.Status.ACTIVE:
+                raise ValidationError({"replacement": "Select an active domain on this Site before deactivating the primary."})
         if self.is_primary and type(self).objects.filter(site_id=self.site_id, is_primary=True).exclude(pk=self.pk).exists():
             raise ValidationError({"is_primary": "This Site already has a primary domain."})
         if self.status == self.Status.ACTIVE and self.site_id and self.site.status == "ARCHIVED":

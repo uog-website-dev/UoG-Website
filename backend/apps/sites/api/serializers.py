@@ -68,6 +68,10 @@ class SiteDomainSerializer(StrictFields, serializers.ModelSerializer):
         extra_kwargs = {"hostname": {"validators": []}}
 
 
+class DomainDeactivateSerializer(StrictFields, serializers.Serializer):
+    replacement = serializers.IntegerField(required=False, min_value=1)
+
+
 class SiteDomainUpdateSerializer(SiteDomainSerializer):
     immutable_on_update = ("hostname",)
 

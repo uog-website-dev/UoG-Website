@@ -6642,6 +6642,8 @@ paths:
   /api/v1/sites/{site_pk}/domains/{id}/deactivate/:
     post:
       operationId: v1_sites_domains_deactivate_create
+      description: Deactivating the active primary requires replacement, the id of
+        another active domain on this Site. Both changes commit together.
       parameters:
       - in: header
         name: If-Match
@@ -6673,9 +6675,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              additionalProperties: false
-              maxProperties: 0
+              $ref: '#/components/schemas/DomainDeactivateRequest'
       security:
       - keycloakBearer: []
       responses:
@@ -6854,9 +6854,9 @@ paths:
               schema:
                 type: string
                 format: uuid
-  /api/v1/sites/{site_pk}/domains/{id}/make-primary/:
+  /api/v1/sites/{site_pk}/domains/{id}/set-primary/:
     post:
-      operationId: v1_sites_domains_make_primary_create
+      operationId: v1_sites_domains_set_primary_create
       description: Atomically leaves exactly one primary domain for this Site.
       parameters:
       - in: header
@@ -8200,6 +8200,12 @@ components:
       - published_pages
       - requested_by
       - users
+    DomainDeactivateRequest:
+      type: object
+      properties:
+        replacement:
+          type: integer
+          minimum: 1
     Identity:
       type: object
       properties:
@@ -8887,6 +8893,17 @@ components:
           nullable: true
           description: Template whose defaults were copied at provisioning. Later
             template edits do not change this Site.
+    PublicConfiguration:
+      type: object
+      properties:
+        display_name:
+          type: string
+          nullable: true
+        theme:
+          type: string
+      required:
+      - display_name
+      - theme
     ResolvedSite:
       type: object
       properties:
@@ -8969,11 +8986,16 @@ components:
         domain:
           type: string
           nullable: true
+        configuration:
+          allOf:
+          - $ref: '#/components/schemas/PublicConfiguration'
+          nullable: true
         modules:
           type: array
           items:
             type: string
       required:
+      - configuration
       - domain
       - modules
       - site

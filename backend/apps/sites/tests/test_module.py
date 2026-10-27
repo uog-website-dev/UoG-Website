@@ -76,6 +76,7 @@ def test_site_migrations_and_real_organization_hook_are_integrated():
     assert ("sites", "0004_sitetemplate") in loader.disk_migrations
     assert ("sites", "0005_module_registry") in loader.disk_migrations
     assert ("sites", "0006_sitemodule_settings") in loader.disk_migrations
+    assert ("sites", "0007_sitedomain_audit") in loader.disk_migrations
     applied = MigrationRecorder(connection).applied_migrations()
     assert ("organizations", "0006_audit_events") in applied
     assert ("audit", "0002_common_writer") in applied
@@ -85,6 +86,7 @@ def test_site_migrations_and_real_organization_hook_are_integrated():
     assert ("sites", "0004_sitetemplate") in applied
     assert ("sites", "0005_module_registry") in applied
     assert ("sites", "0006_sitemodule_settings") in applied
+    assert ("sites", "0007_sitedomain_audit") in applied
     with connection.cursor() as cursor:
         cursor.execute("SELECT to_regclass('sites_site'), organizations_has_active_sites(ARRAY[]::bigint[])")
         assert cursor.fetchone() == ("sites_site", False)

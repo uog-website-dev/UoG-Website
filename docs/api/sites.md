@@ -37,7 +37,7 @@ A domain or SiteModule id requested under another Site returns 404.
 | PATCH | `/api/v1/sites/{id}/configuration/` | 200 |
 | GET, POST | `/api/v1/sites/{site_pk}/domains/` | 200 list, 201 create |
 | GET, PATCH | `/api/v1/sites/{site_pk}/domains/{id}/` | 200 |
-| POST | `.../domains/{id}/activate/`, `deactivate/`, `make-primary/` | 200 |
+| POST | `.../domains/{id}/activate/`, `deactivate/`, `set-primary/` | 200 |
 | GET, POST | `/api/v1/sites/{site_pk}/modules/` | 200 list, 201 enable |
 | GET, PATCH | `/api/v1/sites/{site_pk}/modules/{id}/` | 200 |
 | POST | `.../modules/{id}/enable/`, `disable/` | 200 |
@@ -47,14 +47,16 @@ A domain or SiteModule id requested under another Site returns 404.
 | GET, PATCH | `/api/v1/modules/{id}/` | 200 |
 | GET | `/api/v1/site-context/` | 200 |
 
-`GET /api/v1/site-context/` is public. It reports the Site, hostname and
-enabled module codes selected from the browser Host. Platform hosts return
+`GET /api/v1/site-context/` is public. It reports the Site, hostname,
+public display name and theme, and enabled module codes selected from the
+browser Host. Platform hosts return
 a null site. Unknown, draft, suspended and archived hosts never reach it
 (404). The body is routing context, not an authorization decision. Administration
 writes remain platform-admin and development-opt-in only.
 
-Lifecycle, domain status, primary designation, and module enable/disable
-bodies are `{}`.
+Lifecycle, domain activation, primary designation, and module enable/disable
+bodies are `{}`. Deactivating an alias is `{}`. Deactivating the active
+primary domain requires `{"replacement": <other-domain-id>}`.
 
 ## Sites
 
@@ -75,11 +77,16 @@ one allowlisted change into that Site only, in the same lock as `If-Match`.
 
 ## Domains
 
-Hostnames are normalized and globally unique. `is_primary` and, on update,
-`hostname` are not body fields. `POST .../make-primary/` is the primary
-switch: it clears the previous primary and sets this domain inside one
-domain lock, so the Site keeps exactly one primary. A primary cannot set
-`redirect_to_primary`.
+Hostnames are normalized and globally unique. A duplicate returns 409.
+`is_primary` and, on update, `hostname` are not body fields.
+`POST .../set-primary/` clears the previous primary and sets this domain
+inside one domain lock. `POST .../deactivate/` with an empty body turns off
+an alias. The active primary cannot be deactivated until `replacement`
+names another active domain on the same Site; that domain becomes primary
+and the previous one becomes inactive in the same transaction. A domain id
+from another Site is rejected. Creates, updates, primary changes and
+deactivations are written to the shared audit log as `sites.sitedomain`
+events. A primary cannot set `redirect_to_primary`.
 
 List filters: `hostname`, `status`, `is_primary`, `ordering`
 (`hostname`, `status`, `is_primary`), `page`.

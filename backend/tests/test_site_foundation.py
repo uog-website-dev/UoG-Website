@@ -178,7 +178,7 @@ def _provision(client, units, templates, entry):
         "hostname": entry["hostname"], "status": "ACTIVE",
     }, content_type="application/json")
     assert domain.status_code == 201, domain.content
-    primary = client.post(domain["Location"] + "make-primary/", {}, content_type="application/json", HTTP_IF_MATCH=domain["ETag"])
+    primary = client.post(domain["Location"] + "set-primary/", {}, content_type="application/json", HTTP_IF_MATCH=domain["ETag"])
     assert primary.status_code == 200 and primary.json()["is_primary"] is True
     assert client.get(CONTEXT, HTTP_HOST=entry["hostname"]).status_code == 404
     module_id = None

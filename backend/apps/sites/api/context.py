@@ -19,9 +19,15 @@ class ResolvedSiteSerializer(serializers.Serializer):
     organization_unit = serializers.IntegerField()
 
 
+class PublicConfigurationSerializer(serializers.Serializer):
+    display_name = serializers.CharField(allow_null=True)
+    theme = serializers.CharField()
+
+
 class SiteContextSerializer(serializers.Serializer):
     site = ResolvedSiteSerializer(allow_null=True)
     domain = serializers.CharField(allow_null=True)
+    configuration = PublicConfigurationSerializer(allow_null=True)
     modules = serializers.ListField(child=serializers.CharField())
 
 
@@ -38,7 +44,7 @@ class SiteContextView(APIView):
     def get(self, request):
         site = getattr(request, "site", None)
         if site is None:
-            body = {"site": None, "domain": None, "modules": []}
+            body = {"site": None, "domain": None, "configuration": None, "modules": []}
         else:
             current = Site.objects.select_related("organization_unit").get(pk=site.pk)
             body = {
@@ -49,6 +55,10 @@ class SiteContextView(APIView):
                     "organization_unit": current.organization_unit_id,
                 },
                 "domain": request.site_domain.hostname,
+                "configuration": {
+                    "display_name": current.configuration["identity"]["display_name"],
+                    "theme": current.configuration["presentation"]["theme"],
+                },
                 "modules": sorted(request.enabled_module_codes),
             }
         response = Response(body)

@@ -89,13 +89,26 @@ def _closed():
 
 
 def _redirect(request, hostname):
-    if any(mark in hostname for mark in (":", "/", "\\", "@", "?", "#")):
+    """Redirect only to the stored primary hostname, keeping a safe path and query."""
+    path = request.path or "/"
+    query = request.META.get("QUERY_STRING", "") or ""
+    if _unsafe_redirect(hostname, path, query):
         return _closed()
     scheme = "https" if request.is_secure() else "http"
-    target = urlunsplit((scheme, hostname, request.path, request.META.get("QUERY_STRING", ""), ""))
+    target = urlunsplit((scheme, hostname, path, query, ""))
+    if not target.startswith(f"{scheme}://{hostname}/"):
+        return _closed()
     response = HttpResponse(status=302, headers={"Location": target})
     response["Cache-Control"] = "private, no-store"
     return response
+
+
+def _unsafe_redirect(hostname, path, query):
+    if any(mark in hostname for mark in (":", "/", "\\", "@", "?", "#", "\r", "\n", "\x00")):
+        return True
+    if not path.startswith("/") or path.startswith("//") or "\\" in path:
+        return True
+    return any(mark in path or mark in query for mark in ("\r", "\n", "\x00"))
 
 
 def _vary(response):
