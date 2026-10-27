@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "purpose": "Representative development data only. Not an approved institutional registry.",
+  "sites": [
+    {
+      "organization_code": "UOG",
+      "code": "MAIN",
+      "name": "Main Site",
+      "is_main": true,
+      "template": "UNIVERSITY_MAIN",
+      "hostname": "www.uog.local",
+      "configuration": {
+        "identity": {"display_name": "University of Gondar"},
+        "presentation": {"theme": "institutional"},
+        "behavior": {"show_search": true, "show_language_switcher": true}
+      },
+      "modules": ["STAFF_DIRECTORY"]
+    },
+    {
+      "organization_code": "CI",
+      "code": "INFORMATICS",
+      "name": "Informatics Site",
+      "is_main": false,
+      "template": "COLLEGE",
+      "hostname": "informatics.uog.local",
+      "configuration": {
+        "identity": {"display_name": "College of Informatics"},
+        "presentation": {"theme": "high-contrast"},
+        "navigation": {"items": [{"code": "DEPARTMENTS", "label": "Departments", "path": "/departments"}]}
+      },
+      "modules": ["EVENTS"]
+    },
+    {
+      "organization_code": "CM",
+      "code": "MEDICINE",
+      "name": "Medicine Site",
+      "is_main": false,
+      "template": "COLLEGE",
+      "hostname": "medicine.uog.local",
+      "configuration": {
+        "identity": {"display_name": "College of Medicine"},
+        "behavior": {"show_search": false, "show_language_switcher": true}
+      },
+      "modules": ["EVENTS", "STAFF_DIRECTORY"]
+    },
+    {
+      "organization_code": "RC",
+      "code": "RESEARCH",
+      "name": "Research Center Site",
+      "is_main": false,
+      "template": "RESEARCH_CENTER",
+      "hostname": "research.uog.local",
+      "configuration": {
+        "identity": {"display_name": "Research Center"},
+        "navigation": {"items": [{"code": "PROJECTS", "label": "Projects", "path": "/projects"}]}
+      },
+      "modules": []
+    }
+  ],
+  "added_without_redeploy": {
+    "organization": {
+      "code": "LAW",
+      "name": "School of Law",
+      "organization_type": "SCHOOL",
+      "parent_code": "UOG"
+    },
+    "site": {
+      "organization_code": "LAW",
+      "code": "LAW",
+      "name": "Law Site",
+      "is_main": false,
+      "template": "GENERAL",
+      "hostname": "law.uog.local",
+      "configuration": {"identity": {"display_name": "School of Law"}},
+      "modules": ["EVENTS"]
+    }
+  }
+}

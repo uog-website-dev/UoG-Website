@@ -62,25 +62,26 @@ def add_common_contract(result, generator, request, public):
             if "{" in path or (method == "get" and path == "/api/pages/"):
                 codes.add("404")
             responses = operation.setdefault("responses", {})
-            if path.startswith("/api/v1/organizations/"):
-                if path == "/api/v1/organizations/" and method == "get":
+            if path.startswith(("/api/v1/organizations/", "/api/v1/sites/", "/api/v1/site-templates/", "/api/v1/modules/")):
+                hierarchy = path.startswith("/api/v1/organizations/") and path.rstrip("/").split("/")[-1] in {"tree", "children", "ancestors", "descendants", "subtree"}
+                if method == "get" and "{" not in path and not hierarchy:
                     codes.update({"400", "404"})
-                hierarchy = path.rstrip("/").split("/")[-1] in {"tree", "children", "ancestors", "descendants", "subtree"}
                 if hierarchy and method == "get":
                     codes.add("409")
                 if method in {"post", "patch"}:
                     codes.update({"409", "503"})
                 if method == "patch" or (method == "post" and "{" in path):
                     codes.update({"412", "428"})
+                collection = path.rstrip("/").split("/")[-1]
                 if method in {"get", "post", "patch"} and not hierarchy and not (method == "get" and "{" not in path):
-                    success = "201" if method == "post" and "{" not in path else "200"
+                    success = "201" if method == "post" and collection in {"organizations", "sites", "domains", "modules", "site-templates"} else "200"
                     responses.setdefault(success, {}).setdefault("headers", {})["ETag"] = {
                         "description": "Strong representation validator. Echo exactly in If-Match for mutations.",
                         "schema": {"type": "string"},
                     }
                     if success == "201":
                         responses[success]["headers"]["Location"] = {
-                            "description": "Created organization detail URL.", "schema": {"type": "string", "format": "uri-reference"},
+                            "description": "Created resource URL.", "schema": {"type": "string", "format": "uri-reference"},
                         }
             for code in sorted(codes):
                 responses.setdefault(code, {

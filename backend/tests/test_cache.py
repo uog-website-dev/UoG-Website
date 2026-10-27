@@ -12,8 +12,8 @@ def test_cache_roundtrip():
 
 def test_cache_key_function_applies_prefix_and_version():
     # Django's KEY_FUNCTION contract: key_func(key, key_prefix, version).
-    assert make_cache_key("pages:all", "uog", 1) == "uog:pages:all:v1"
+    assert make_cache_key("pages:all", "uog", 1) == "uog:site:platform:pages:all:v1"
 
 
 def test_cache_key_function_without_prefix_or_version():
-    assert make_cache_key("pages:all", "", None) == "pages:all"
+    assert make_cache_key("pages:all", "", None) == "site:platform:pages:all"
