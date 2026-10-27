@@ -52,7 +52,12 @@ def translate_domain_errors():
             raise Conflict(errors) from exc
         raise serializers.ValidationError(errors) from exc
     except DatabaseError as exc:
-        if getattr(exc.__cause__, "sqlstate", None) in {"23505", "23503", "23514", "40001", "40P01"}:
+        cause = exc.__cause__
+        if getattr(getattr(cause, "diag", None), "constraint_name", None) == "site_domain_primary_deactivate":
+            raise serializers.ValidationError({
+                "replacement": ["Select an active domain on this Site before deactivating the primary."],
+            }) from exc
+        if getattr(cause, "sqlstate", None) in {"23505", "23503", "23514", "40001", "40P01"}:
             raise Conflict() from exc
         raise
 

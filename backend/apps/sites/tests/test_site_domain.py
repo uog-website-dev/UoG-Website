@@ -6,6 +6,7 @@ import pytest
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, close_old_connections, connections, transaction
 
+from apps.audit.models import AuditEvent
 from apps.organizations.models import OrganizationType, OrganizationUnit
 from apps.sites.hostnames import normalize_hostname
 from apps.sites.models import Site, SiteDomain
@@ -68,8 +69,9 @@ def test_primary_switch_redirect_resolution_and_deactivation(sites):
     primary.refresh_from_db()
     assert alias.is_primary and not alias.redirect_to_primary
     assert not primary.is_primary
-    deactivate_domain(alias.pk)
+    deactivate_domain(alias.pk, replacement_id=primary.pk)
     assert resolve_hostname("computing.uog.edu.et") is None
+    assert SiteDomain.objects.get(pk=primary.pk).is_primary is True
     assert activate_domain(alias.pk).status == "ACTIVE"
 
 
@@ -86,6 +88,27 @@ def test_inactive_domain_and_direct_reassignment_do_not_resolve_or_move(sites):
     primary = SiteDomain.objects.create(site=sites[0], hostname="informatics.uog.edu.et", is_primary=True)
     with pytest.raises(ValidationError):
         reassign_domain(primary.pk, sites[1].pk)
+
+
+def test_active_primary_cannot_be_deactivated_without_a_replacement(sites):
+    primary = SiteDomain.objects.create(site=sites[0], hostname="informatics.uog.edu.et", is_primary=True, status="ACTIVE")
+    alias = SiteDomain.objects.create(site=sites[0], hostname="computing.uog.edu.et", status="ACTIVE")
+    with pytest.raises(ValidationError):
+        deactivate_domain(primary.pk)
+    with pytest.raises(IntegrityError), transaction.atomic():
+        SiteDomain.objects.filter(pk=primary.pk).update(status="INACTIVE")
+    primary.refresh_from_db()
+    assert primary.status == "ACTIVE" and primary.is_primary
+    other = SiteDomain.objects.create(site=sites[1], hostname="medicine.uog.edu.et", status="ACTIVE")
+    with pytest.raises(ValidationError):
+        deactivate_domain(primary.pk, replacement_id=other.pk)
+    deactivated = deactivate_domain(primary.pk, replacement_id=alias.pk)
+    assert deactivated.status == "INACTIVE" and deactivated.is_primary is False
+    assert SiteDomain.objects.get(pk=alias.pk).is_primary is True
+    created = AuditEvent.objects.get(entity_type="sites.sitedomain", entity_id=str(primary.pk), action="SITE_DOMAIN_CREATED")
+    assert created.before is None and created.after["hostname"] == "informatics.uog.edu.et"
+    assert AuditEvent.objects.filter(entity_type="sites.sitedomain", entity_id=str(alias.pk), action="SITE_DOMAIN_PRIMARY_CHANGED").exists()
+    assert AuditEvent.objects.filter(entity_type="sites.sitedomain", entity_id=str(primary.pk), action="SITE_DOMAIN_DEACTIVATED").exists()
 
 
 def test_database_rejects_unnormalized_bulk_hostname(sites):

@@ -1,7 +1,11 @@
 """Site administration API: restricted writes, isolation and standard errors."""
+from uuid import uuid4
+
 import pytest
+from django.contrib.auth import get_user_model
 from django.db import connection
 
+from apps.audit.models import AuditEvent
 from apps.organizations.models import OrganizationType, OrganizationUnit
 from apps.sites.models import Module, Site, SiteDomain, SiteModule
 
@@ -32,7 +36,7 @@ def _etag(response):
 
 
 @pytest.mark.parametrize("method,path", [
-    ("get", SITES), ("post", SITES), ("get", TEMPLATES), ("post", MODULES), ("get", MODULES),
+    ("get", SITES), ("post", SITES), ("post", SITES + "1/domains/"), ("get", TEMPLATES), ("post", MODULES), ("get", MODULES),
 ])
 def test_anonymous_and_non_admin_are_rejected(client, oidc, method, path):
     anonymous = getattr(client, method)(path, content_type="application/json")
@@ -80,7 +84,7 @@ def test_site_lifecycle_configuration_domains_and_cross_site_ids(admin, owner):
     assert primary.status_code == 201 and primary.json()["hostname"] == "informatics.uog.edu.et"
     assert alias.status_code == 201
     assert admin.get(other["Location"] + f"domains/{primary.json()['id']}/").status_code == 404
-    promoted = admin.post(alias["Location"] + "make-primary/", {}, content_type="application/json", HTTP_IF_MATCH=_etag(alias))
+    promoted = admin.post(alias["Location"] + "set-primary/", {}, content_type="application/json", HTTP_IF_MATCH=_etag(alias))
     assert promoted.status_code == 200 and promoted.json()["is_primary"] is True
     assert SiteDomain.objects.filter(site_id=body["id"], is_primary=True).count() == 1
     assert admin.get(SITES + "?status=ACTIVE&search=info").json()["count"] == 1
@@ -124,3 +128,46 @@ def test_templates_modules_and_independent_site_enablement(admin, owner):
     cms = Module.objects.get(code="CMS")
     blocked = admin.post(f"{SITES}{site.pk}/modules/", {"module": cms.pk, "configuration": {}}, content_type="application/json")
     assert blocked.status_code == 400
+
+
+def test_domain_api_audits_primary_switch_and_blocks_primary_deactivation(admin, owner):
+    request_id = str(uuid4())
+    site = admin.post(SITES, {
+        "code": "PORTAL", "name": "Portal", "organization_unit": owner.pk,
+    }, content_type="application/json", HTTP_X_REQUEST_ID=request_id, REMOTE_ADDR="198.51.100.20")
+    assert site.status_code == 201, site.content
+    base = site["Location"] + "domains/"
+    primary = admin.post(base, {"hostname": "portal.uog.local", "status": "ACTIVE"}, content_type="application/json", HTTP_X_REQUEST_ID=request_id, REMOTE_ADDR="198.51.100.20")
+    alias = admin.post(base, {"hostname": "PORTAL.UOG.LOCAL", "status": "ACTIVE"}, content_type="application/json")
+    assert primary.status_code == 201, primary.content
+    assert alias.status_code == 409 and alias.json()["error"]["code"] == "conflict"
+    alias = admin.post(base, {"hostname": "www.portal.uog.local", "status": "ACTIVE"}, content_type="application/json")
+    assert alias.status_code == 201, alias.content
+    listed = admin.get(base)
+    assert listed.status_code == 200 and listed.json()["count"] == 2
+    chosen = admin.post(primary["Location"] + "set-primary/", {}, content_type="application/json", HTTP_IF_MATCH=_etag(primary), HTTP_X_REQUEST_ID=request_id)
+    assert chosen.status_code == 200 and chosen.json()["is_primary"] is True
+    refused = admin.post(primary["Location"] + "deactivate/", {}, content_type="application/json", HTTP_IF_MATCH=_etag(chosen))
+    assert refused.status_code == 400 and refused.json()["error"]["code"] == "validation_error"
+    assert admin.get(primary["Location"]).json()["status"] == "ACTIVE"
+    foreign = admin.post(SITES, {"code": "OTHER", "name": "Other", "organization_unit": owner.pk}, content_type="application/json")
+    foreign_domain = admin.post(foreign["Location"] + "domains/", {"hostname": "other.uog.local", "status": "ACTIVE"}, content_type="application/json")
+    cross = admin.post(primary["Location"] + "deactivate/", {"replacement": foreign_domain.json()["id"]}, content_type="application/json", HTTP_IF_MATCH=_etag(chosen))
+    assert cross.status_code == 400
+    turned_off = admin.post(
+        primary["Location"] + "deactivate/", {"replacement": alias.json()["id"]},
+        content_type="application/json", HTTP_IF_MATCH=_etag(chosen), HTTP_X_REQUEST_ID=request_id,
+    )
+    assert turned_off.status_code == 200, turned_off.content
+    assert turned_off.json()["status"] == "INACTIVE" and turned_off.json()["is_primary"] is False
+    assert admin.get(alias["Location"]).json()["is_primary"] is True
+    assert admin.get(foreign["Location"] + f"domains/{primary.json()['id']}/").status_code == 404
+    records = list(AuditEvent.objects.filter(entity_type="sites.sitedomain", entity_id=str(primary.json()["id"])).order_by("pk"))
+    assert [record.action for record in records] == [
+        "SITE_DOMAIN_CREATED", "SITE_DOMAIN_PRIMARY_CHANGED", "SITE_DOMAIN_PRIMARY_CHANGED", "SITE_DOMAIN_DEACTIVATED",
+    ]
+    assert records[0].actor_kind == "USER"
+    assert records[0].actor_id == str(get_user_model().objects.get(username="devuser").pk)
+    assert str(records[0].request_id) == request_id
+    assert records[0].ip == "198.51.100.20"
+    assert records[-1].after["status"] == "INACTIVE"

@@ -25,4 +25,15 @@ previous primary in the same locked transaction. Concurrent primary writes
 that skip that operation still leave one primary because of
 `site_domain_one_primary`.
 
+An active primary cannot be set inactive, by the API or by a direct update,
+until another active domain of the same Site has been designated primary.
+`deactivate_domain(..., replacement_id=)` does both steps in one transaction.
+The administration path is `POST /api/v1/sites/{site_pk}/domains/{id}/set-primary/`
+and `POST .../deactivate/`.
+
+`sites.0007_sitedomain_audit` records `SITE_DOMAIN_CREATED`,
+`SITE_DOMAIN_UPDATED`, `SITE_DOMAIN_PRIMARY_CHANGED` and
+`SITE_DOMAIN_DEACTIVATED` through the shared audit writer. The snapshot is
+`site_id`, `hostname`, `is_primary`, `redirect_to_primary` and `status`.
+
 `sites.0003_sitedomain` creates the table, constraints and triggers.

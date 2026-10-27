@@ -19,7 +19,7 @@ from .query import (
     SiteQuerySerializer, TemplateQuerySerializer, apply_filters,
 )
 from .serializers import (
-    EmptyObjectSerializer, ModuleSerializer, ModuleUpdateSerializer, SiteCreateSerializer,
+    DomainDeactivateSerializer, EmptyObjectSerializer, ModuleSerializer, ModuleUpdateSerializer, SiteCreateSerializer,
     SiteDomainSerializer, SiteDomainUpdateSerializer, SiteModuleSerializer, SiteSerializer,
     SiteTemplateSerializer, SiteTemplateUpdateSerializer, SiteUpdateSerializer,
 )
@@ -162,14 +162,21 @@ class SiteDomainViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Admini
     def activate(self, request, pk=None, site_pk=None):
         return self._status(request, activate_domain)
 
-    @extend_schema(parameters=[IF_MATCH], request=EMPTY, responses=SiteDomainSerializer)
+    @extend_schema(parameters=[IF_MATCH], request=DomainDeactivateSerializer, responses=SiteDomainSerializer, description="Deactivating the active primary requires replacement, the id of another active domain on this Site. Both changes commit together.")
     @action(detail=True, methods=["post"])
     def deactivate(self, request, pk=None, site_pk=None):
-        return self._status(request, deactivate_domain)
+        with translate_domain_errors(), domain_write():
+            domain = self.lock(request, self.get_queryset(), SiteDomainSerializer)
+            payload = DomainDeactivateSerializer(data=request.data)
+            payload.is_valid(raise_exception=True)
+            return self.respond(
+                deactivate_domain(domain.pk, replacement_id=payload.validated_data.get("replacement")),
+                serializer_class=SiteDomainSerializer,
+            )
 
     @extend_schema(parameters=[IF_MATCH], request=EMPTY, responses=SiteDomainSerializer, description="Atomically leaves exactly one primary domain for this Site.")
-    @action(detail=True, methods=["post"], url_path="make-primary")
-    def make_primary(self, request, pk=None, site_pk=None):
+    @action(detail=True, methods=["post"], url_path="set-primary")
+    def set_primary(self, request, pk=None, site_pk=None):
         with translate_domain_errors(), domain_write():
             domain = self.lock(request, self.get_queryset(), SiteDomainSerializer)
             EmptyObjectSerializer(data=request.data).is_valid(raise_exception=True)

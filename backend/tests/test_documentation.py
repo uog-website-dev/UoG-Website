@@ -53,7 +53,7 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
         "/api/v1/sites/{site_pk}/domains/", "/api/v1/sites/{site_pk}/domains/{id}/",
         "/api/v1/sites/{site_pk}/domains/{id}/activate/",
         "/api/v1/sites/{site_pk}/domains/{id}/deactivate/",
-        "/api/v1/sites/{site_pk}/domains/{id}/make-primary/",
+        "/api/v1/sites/{site_pk}/domains/{id}/set-primary/",
         "/api/v1/sites/{site_pk}/modules/", "/api/v1/sites/{site_pk}/modules/{id}/",
         "/api/v1/sites/{site_pk}/modules/{id}/enable/",
         "/api/v1/sites/{site_pk}/modules/{id}/disable/",
@@ -123,7 +123,7 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
     domains = paths["/api/v1/sites/{site_pk}/domains/"]
     assert domains["get"]["tags"] == ["Domains"]
     assert "Location" in domains["post"]["responses"]["201"]["headers"]
-    primary = paths["/api/v1/sites/{site_pk}/domains/{id}/make-primary/"]["post"]
+    primary = paths["/api/v1/sites/{site_pk}/domains/{id}/set-primary/"]["post"]
     assert primary["tags"] == ["Domains"]
     assert {"409", "412", "428"} <= set(primary["responses"])
     assert paths["/api/v1/site-templates/"]["get"]["tags"] == ["Site templates"]
