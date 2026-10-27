@@ -48,7 +48,7 @@ Keycloak (:8080) ---- OIDC identity for both Next.js apps and API clients
 | Concern | Location |
 | --- | --- |
 | Django settings (env-driven) | `backend/config/settings.py` |
-| Django apps | `backend/apps/core` (platform core), `backend/apps/api` (sample API), `backend/apps/accounts` (identity), `backend/apps/audit` (shared audit), `backend/apps/organizations` (organizational structure) |
+| Django apps | `backend/apps/core` (platform core), `backend/apps/api` (sample API), `backend/apps/accounts` (identity), `backend/apps/audit` (shared audit), `backend/apps/organizations` (organizational structure), `backend/apps/sites` (digital properties) |
 | Health endpoints | `backend/apps/core/views.py`, `docs/development/health.md` |
 | Celery tasks & beat schedule | `backend/apps/core/tasks.py`, `backend/config/celery.py` |
 | Frontend monorepo | `frontend/` (`apps/`, `packages/`) |
@@ -59,7 +59,7 @@ Keycloak (:8080) ---- OIDC identity for both Next.js apps and API clients
 
 ## Extension points for later stories
 
-* **Organizations/Sites:** Django app `backend/apps/organizations`
+* **Organizations:** Django app `backend/apps/organizations`
   (models, services, selectors, api, admin, migrations, tests). The
   foundation registers the domain; `OrganizationType` is a managed lookup
   with seeded classifications under [DEC-04](decisions/DEC-04-organization-types.md).
@@ -75,9 +75,25 @@ Keycloak (:8080) ---- OIDC identity for both Next.js apps and API clients
   [shared transactional auditing](audit-contract.md) are implemented.
   The [readiness gate](../development/organization-readiness.md) records validation
   for Site backend development; production writes still await scoped IAM/RBAC.
-  Site rows remain a subsequent story. Cache keys
+  Site ownership/lifecycle integration is now wired by the Site entity migration. Cache keys
   already route through `apps.core.cache.make_cache_key` for future
   org/site prefixes.
+* **Digital Sites:** `backend/apps/sites` registers the independent digital
+  property domain using the same models/services/selectors/api/admin/migrations/tests
+  structure. OrganizationUnit describes an institutional unit; Site describes
+  a website, and units need not have a website. The [core Site entity](site-data-model.md)
+  is implemented with mandatory ownership, configuration/language, main-root
+  designation and validated lifecycle. Restricted administration is the
+  [Site API](../api/sites.md). `GET /api/v1/site-context/` reports the Site
+  selected from the request Host and does not authorize the caller. Site
+  configuration is the versioned allowlist in
+  [site configuration](site-configuration.md). Hostnames are
+  [Site domains](site-domain.md). The request Host selects
+  [the active Site](site-resolution.md).   [Site templates](site-template.md)
+  copy an approved configuration when a Site is provisioned. The
+  [module registry](module-registry.md) records platform capabilities.
+  [Site modules](site-module.md) turn a shipped module on or off for each
+  Site. A planned or globally disabled module cannot be newly enabled.
 * **Media workflows:** store under key prefixes in the three platform
   buckets; never create per-site buckets.
 * **RBAC:** Keycloak realm roles/groups plus DRF permission classes; the

@@ -47,6 +47,19 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
         "/api/v1/organizations/tree/", "/api/v1/organizations/{id}/children/",
         "/api/v1/organizations/{id}/ancestors/", "/api/v1/organizations/{id}/descendants/",
         "/api/v1/organizations/{id}/subtree/",
+        "/api/v1/sites/", "/api/v1/sites/{id}/",
+        "/api/v1/sites/{id}/activate/", "/api/v1/sites/{id}/suspend/",
+        "/api/v1/sites/{id}/archive/", "/api/v1/sites/{id}/configuration/",
+        "/api/v1/sites/{site_pk}/domains/", "/api/v1/sites/{site_pk}/domains/{id}/",
+        "/api/v1/sites/{site_pk}/domains/{id}/activate/",
+        "/api/v1/sites/{site_pk}/domains/{id}/deactivate/",
+        "/api/v1/sites/{site_pk}/domains/{id}/make-primary/",
+        "/api/v1/sites/{site_pk}/modules/", "/api/v1/sites/{site_pk}/modules/{id}/",
+        "/api/v1/sites/{site_pk}/modules/{id}/enable/",
+        "/api/v1/sites/{site_pk}/modules/{id}/disable/",
+        "/api/v1/site-templates/", "/api/v1/site-templates/{id}/",
+        "/api/v1/modules/", "/api/v1/modules/{id}/",
+        "/api/v1/site-context/",
     }
     assert paths["/api/me/"]["get"]["security"] == [{"keycloakBearer": []}]
     assert {} in paths["/api/pages/"]["get"]["security"]
@@ -93,6 +106,33 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
         success = operation["responses"]["200"]
         assert success["content"]["application/json"]["schema"]["$ref"].endswith("/OrganizationHierarchy")
         assert "ETag" not in success["headers"]
+    sites = paths["/api/v1/sites/"]
+    assert sites["get"]["security"] == [{"keycloakBearer": []}]
+    assert sites["post"]["tags"] == ["Sites"]
+    assert {"search", "code", "status", "organization_unit", "ordering", "page"} <= {
+        parameter["name"] for parameter in sites["get"]["parameters"]
+    }
+    assert {"ETag", "Location"} <= set(sites["post"]["responses"]["201"]["headers"])
+    site_patch = paths["/api/v1/sites/{id}/"]["patch"]
+    assert {"401", "403", "409", "412", "428"} <= set(site_patch["responses"])
+    assert any(parameter["name"] == "If-Match" and parameter["required"] for parameter in site_patch["parameters"])
+    activate = paths["/api/v1/sites/{id}/activate/"]["post"]
+    assert activate["requestBody"]["content"]["application/json"]["schema"]["maxProperties"] == 0
+    assert {"412", "428"} <= set(activate["responses"])
+    assert paths["/api/v1/sites/{id}/configuration/"]["patch"]["tags"] == ["Sites"]
+    domains = paths["/api/v1/sites/{site_pk}/domains/"]
+    assert domains["get"]["tags"] == ["Domains"]
+    assert "Location" in domains["post"]["responses"]["201"]["headers"]
+    primary = paths["/api/v1/sites/{site_pk}/domains/{id}/make-primary/"]["post"]
+    assert primary["tags"] == ["Domains"]
+    assert {"409", "412", "428"} <= set(primary["responses"])
+    assert paths["/api/v1/site-templates/"]["get"]["tags"] == ["Site templates"]
+    assert paths["/api/v1/modules/"]["get"]["tags"] == ["Modules"]
+    assert paths["/api/v1/sites/{site_pk}/modules/"]["post"]["tags"] == ["Sites"]
+    context = paths["/api/v1/site-context/"]["get"]
+    assert {} in context["security"]
+    assert context["tags"] == ["Sites"]
+    assert "post" not in paths["/api/v1/site-context/"]
 
 
 @pytest.mark.parametrize("path", DOC_URLS)

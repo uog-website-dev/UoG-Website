@@ -60,7 +60,7 @@ Dependency lockfiles: `frontend/pnpm-lock.yaml` (committed).
 | --- | --- | --- |
 | postgres | `postgres:16.15-alpine` | app DB **and** Keycloak DB (separate containers/volumes) |
 | redis | `redis:7.4.11-alpine` | two instances: cache + broker |
-| minio | `minio/minio:RELEASE.2025-09-07T16-13-09Z` | release-tag pinned |
+| minio | `pgsty/silo:RELEASE.2026-10-18T00-00-00Z` | S3-compatible server. Upstream `minio/minio` is not anonymously pullable. |
 | keycloak | `quay.io/keycloak/keycloak:26.8.1` | realm auto-import |
 | nginx | `nginx:1.31.7-alpine` | reverse proxy |
 | backend | built from `backend/` | base `python:3.12.15-slim-bookworm` |

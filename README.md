@@ -117,7 +117,7 @@ See the [Organization API contract](docs/api/organizations.md),
 [search/filtering and ordering](docs/api/organization-discovery.md),
 [transactional auditing](docs/api/organization-audit.md),
 [error catalog](docs/api/error-catalog.md), and [OpenAPI snapshot](docs/api/openapi.yaml).
-Site and Domain APIs remain unimplemented.
+Site, domain, template and module administration is in the [Site API contract](docs/api/sites.md).
 
 Generate and validate the same schema used by CI:
 
@@ -160,6 +160,25 @@ hook; the future Site domain must wire that hook and the shared write guard.
 See the [Organization backend readiness gate](docs/development/organization-readiness.md)
 for the representative UoG acceptance workflow, reproducible validation,
 remaining Site/RBAC dependencies and completion evidence.
+
+## Site module foundation
+
+Digital properties have a dedicated `apps.sites` domain, separate from
+`OrganizationUnit`. The core Site model has required institutional ownership,
+globally unique immutable codes, language/configuration fields and validated
+DRAFT/ACTIVE/SUSPENDED/ARCHIVED lifecycle. Its atomic migration wires the
+real active-Site Organization retirement veto and shared write guard.
+Site templates copy an approved configuration when a Site is provisioned;
+later template edits do not change existing Sites. The module registry
+records platform capabilities. Each Site can enable or disable a shipped
+module without a new deployment; a planned or globally disabled module
+cannot be newly enabled. Site administration is exposed at
+`/api/v1/sites/`, `/api/v1/site-templates/` and `/api/v1/modules/` for
+platform-admin tokens; writes use the development opt-in. `GET /api/v1/site-context/`
+reports the Site selected from the request Host. The representative
+multi-site check is the [foundation gate](docs/development/site-foundation.md).
+See [Site model and lifecycle](docs/development/site-entity.md) and the historical
+[module foundation](docs/development/sites-foundation.md).
 
 ## Common commands
 

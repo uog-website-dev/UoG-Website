@@ -20,6 +20,11 @@ DEBUG = config("DEBUG", default=True, cast=bool)
 ALLOWED_HOSTS = config(
     "ALLOWED_HOSTS", default="localhost,127.0.0.1,backend", cast=Csv()
 )
+# The browser Host header selects a Site. Client X-Forwarded-Host is ignored.
+USE_X_FORWARDED_HOST = False
+# Host-only cookies. A parent domain would share a session across websites.
+SESSION_COOKIE_DOMAIN = None
+CSRF_COOKIE_DOMAIN = None
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -39,10 +44,13 @@ INSTALLED_APPS = [
     # Organizational structure. Entities and APIs are later stories;
     # this registration establishes the domain boundary.
     "apps.organizations",
+    # Digital properties are a separate domain from institutional units.
+    "apps.sites",
 ]
 
 MIDDLEWARE = [
     "apps.core.middleware.RequestIDMiddleware",
+    "apps.sites.middleware.SiteResolutionMiddleware",
     "apps.audit.middleware.AuditContextMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -180,9 +188,9 @@ SPECTACULAR_SETTINGS = {
         "Backend authentication and permissions always apply. "
         "Organization administration is platform-admin only; writes require development "
         "opt-in and remain disabled in production pending scoped IAM/RBAC. "
-        "Pages are currently platform-wide. Site, Domain, Posts and Menus APIs are absent. "
-        "Organization/Site scoping and module activation "
-        "checks must be implemented and tested before those APIs are exposed. "
+        "Pages are currently platform-wide. Site, domain, template and module administration "
+        "is platform-admin only and uses the same development write opt-in; production writes "
+        "remain disabled pending scoped IAM/RBAC. Posts and Menus APIs are absent. "
         "No scope header grants access. See docs/development/api-documentation.md."
     ),
     "SERVE_INCLUDE_SCHEMA": False,
@@ -197,6 +205,12 @@ SPECTACULAR_SETTINGS = {
     },
     "REDOC_UI_SETTINGS": {"disableGoogleFont": True},
     "COMPONENT_SPLIT_REQUEST": True,
+    "ENUM_NAME_OVERRIDES": {
+        "OrganizationStatusEnum": "apps.organizations.models.OrganizationUnit.Status",
+        "SiteStatusEnum": "apps.sites.models.Site.Status",
+        "ActiveInactiveStatusEnum": "apps.sites.models.SiteDomain.Status",
+        "ModuleStatusEnum": "apps.sites.models.Module.Status",
+    },
     "POSTPROCESSING_HOOKS": [
         "drf_spectacular.hooks.postprocess_schema_enums",
         "apps.core.openapi.add_common_contract",
@@ -205,8 +219,10 @@ SPECTACULAR_SETTINGS = {
         {"name": "CMS", "description": "Platform pages; site scoping is not implemented."},
         {"name": "Identity", "description": "Keycloak identity and platform administration."},
         {"name": "Organizations", "description": "Restricted institutional administration; production writes disabled pending scoped IAM/RBAC."},
-        {"name": "Sites", "description": "Not implemented."},
-        {"name": "Domains", "description": "Not implemented."},
+        {"name": "Sites", "description": "Restricted Site, configuration and per-site module administration."},
+        {"name": "Domains", "description": "Hostnames for one Site, including an atomic primary-domain switch."},
+        {"name": "Site templates", "description": "Approved starting configurations. Applying one does not rewrite existing Sites."},
+        {"name": "Modules", "description": "Platform capability registry. Planned modules cannot be enabled for a Site."},
         {"name": "Posts", "description": "Not implemented."},
         {"name": "Menus", "description": "Not implemented."},
     ],

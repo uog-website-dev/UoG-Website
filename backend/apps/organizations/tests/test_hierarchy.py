@@ -148,6 +148,7 @@ def test_missing_guard_fails_closed_and_rolls_back(tree):
 def test_migration_rejects_legacy_cycles_and_can_be_reapplied():
     connection = connections["default"]
     executor = MigrationExecutor(connection)
+    latest_targets = executor.loader.graph.leaf_nodes()
     old_target = [("organizations", "0003_organizationunit")]
     new_target = [("organizations", "0006_audit_events")]
     executor.migrate(old_target)
@@ -170,7 +171,7 @@ def test_migration_rejects_legacy_cycles_and_can_be_reapplied():
         # tests execute. This also exercises the reverse and forward DDL.
         if college is not None and root is not None:
             OldUnit.objects.filter(pk=college.pk).update(parent_id=root.pk)
-        MigrationExecutor(connection).migrate(new_target)
+        MigrationExecutor(connection).migrate(latest_targets)
 
 
 @pytest.mark.django_db(transaction=True)

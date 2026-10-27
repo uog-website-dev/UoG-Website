@@ -68,17 +68,17 @@ archival. INACTIVE or ARCHIVED Site links are retained and do not veto the
 change. Sites must be deactivated explicitly in their own domain; organization
 services do not cascade status changes or delete Site links.
 
-There is **no Site model or Site API yet**. This implementation supplies and
-tests the SQL integration hook `organizations_has_active_sites(bigint[])`.
-It receives all relevant subtree IDs and must return whether any linked
-Site is active. The default returns false while Sites is absent and fails
-closed if the conventional `sites_site` table appears without integration.
-That name check is a safeguard, not automatic integration for arbitrary
-future Site table names or schemas.
+The [core Site model](site-data-model.md) and the [Site API](../api/sites.md)
+exist. Production writes still wait for scoped IAM/RBAC. `sites.0001_initial` atomically creates the Site table and
+wires `organizations_has_active_sites(bigint[])` to the actual ACTIVE Site
+query, using the common serialization guard. The original absent-Sites hook
+returns false only when the Site table is absent and fails closed if a
+conventional `sites_site` table appears unwired. That fallback remains useful
+for migration reversal/legacy tests, not the current integrated model.
 
-When implementing Sites, its migration must:
+The Site integration protocol is:
 
-1. Depend on `organizations.0005_lifecycle_rules` and replace the hook with
+1. Depend on the current Organization migration (including `0005_lifecycle_rules`) and replace the hook with
    a query using its actual approved table/status representation. Use the
    ID array in one EXISTS query; do not import Sites into organization models.
 2. Serialize Site insertion, updates, linking, activation and deletion using
@@ -94,8 +94,9 @@ When implementing Sites, its migration must:
 Integration tests use a real FK consumer table and replacement hook in the
 test database, including retained inactive references and active-Site vetoes.
 They also exercise the guarded Site-write protocol on independent connections.
-They do not introduce or certify a production Site module. Concrete Site
-wiring remains part of implementing that domain.
+The Site entity suite additionally tests the actual Site table and concurrent
+activation/reassignment against Organization deactivation. These checks do
+not authorize production Site APIs or claim scoped IAM/RBAC is complete.
 
 ## Enforcement and concurrency
 

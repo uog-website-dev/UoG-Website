@@ -3,6 +3,8 @@
 .env.*
 !.env.example
 !.env.prod.example
+credential.md
+credentials.md
 *.pem
 *.key
 

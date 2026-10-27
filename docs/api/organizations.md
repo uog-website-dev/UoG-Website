@@ -10,7 +10,8 @@ Keycloak `platform-admin` role as `/api/admin/overview/`. Every operation,
 including reads, requires a valid bearer token with this role. Django staff
 or superuser sessions do not grant access. There is no public write bypass.
 These are institutional administration operations, without Site scope or
-module activation. Site APIs and scoped RBAC remain separate work.
+module activation. Site administration is a separate contract
+([Site APIs](sites.md)); scoped RBAC remains later work.
 
 Writes require **both** `DEBUG=True` and
 `ORGANIZATIONS_DEV_WRITES_ENABLED=True`. The opt-in defaults to False. With
