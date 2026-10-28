@@ -111,7 +111,7 @@ export interface SiteDomainCreateInput {
  * Writable fields accepted by `PATCH /sites/{site_pk}/domains/{id}/`.
  * `hostname`, `site` and the primary designation are not editable here —
  * hostnames are immutable, a domain cannot change Site, and the primary
- * moves only through `POST .../make-primary/`.
+ * moves only through `POST .../set-primary/`.
  */
 export interface SiteDomainUpdateInput {
   status?: SiteDomainStatus;
@@ -193,14 +193,21 @@ export interface SitesAdapter {
     id: number,
     etag: string,
   ): Promise<ETaggedResponse<SiteDomain>>;
-  /** `POST .../domains/{id}/deactivate/` — conditional status change. */
+  /**
+   * `POST .../domains/{id}/deactivate/` — conditional status change. An
+   * alias deactivates with no payload (`{}`). Deactivating the *active
+   * primary* requires `replacement`, the id of another ACTIVE domain on the
+   * same Site, which becomes primary in the same transaction; the backend
+   * rejects anything else with a field error under `replacement`.
+   */
   deactivateDomain(
     siteId: number,
     id: number,
     etag: string,
+    replacement?: number,
   ): Promise<ETaggedResponse<SiteDomain>>;
   /**
-   * `POST .../domains/{id}/make-primary/` — atomically leaves exactly one
+   * `POST .../domains/{id}/set-primary/` — atomically leaves exactly one
    * primary domain for the Site (conditional on `etag`).
    */
   makeDomainPrimary(
@@ -499,11 +506,13 @@ export function createLiveSitesAdapter(options: {
         ),
       );
     },
-    async deactivateDomain(siteId, id, etag) {
+    async deactivateDomain(siteId, id, etag, replacement) {
       return toEtagged(
         await client.postDetailed<SiteDomain>(
           `${SITES_PATH}${siteId}/domains/${id}/deactivate/`,
-          {},
+          // An alias deactivates with an empty object; the active primary
+          // must name another active domain on the same Site.
+          replacement === undefined ? {} : { replacement },
           { headers: { "If-Match": etag } },
         ),
       );
@@ -511,7 +520,7 @@ export function createLiveSitesAdapter(options: {
     async makeDomainPrimary(siteId, id, etag) {
       return toEtagged(
         await client.postDetailed<SiteDomain>(
-          `${SITES_PATH}${siteId}/domains/${id}/make-primary/`,
+          `${SITES_PATH}${siteId}/domains/${id}/set-primary/`,
           {},
           { headers: { "If-Match": etag } },
         ),
@@ -1222,10 +1231,71 @@ export function createMockSitesAdapter(options?: {
       return respondDomain(updated, mockRequestId());
     },
 
-    async deactivateDomain(siteId, id, etag) {
+    async deactivateDomain(siteId, id, etag, replacement) {
       await wait();
       const row = requireDomain(siteId, id);
       checkDomainEtag(row, etag);
+      // Idempotent no-op, exactly like the backend service: an already
+      // inactive domain is returned unchanged, before any primary rule runs
+      // — deactivating an inactive primary needs no replacement.
+      if (row.status === "INACTIVE") {
+        return respondDomain(row, mockRequestId());
+      }
+      if (row.is_primary) {
+        // Deactivating the active primary requires `replacement`, the id of
+        // another ACTIVE domain on the same Site. The backend validates this
+        // inside one transaction: the replacement becomes primary and this
+        // row loses the designation while turning off.
+        const replacementRow =
+          replacement === undefined
+            ? undefined
+            : domains.find(
+                (entry) =>
+                  entry.id === replacement &&
+                  entry.site === row.site &&
+                  entry.status === "ACTIVE" &&
+                  entry.id !== row.id,
+              );
+        if (!replacementRow) {
+          throw invalid({
+            replacement: [
+              "Select an active domain on this Site before deactivating the primary.",
+            ],
+          });
+        }
+        const now = new Date().toISOString();
+        domains = domains.map((entry) => {
+          if (entry.id === replacementRow.id) {
+            return {
+              ...entry,
+              is_primary: true,
+              // A primary cannot redirect to itself.
+              redirect_to_primary: false,
+              updated_at: now,
+            };
+          }
+          if (entry.id === row.id) {
+            return {
+              ...entry,
+              is_primary: false,
+              status: "INACTIVE" as SiteDomainStatus,
+              updated_at: now,
+            };
+          }
+          return entry;
+        });
+        return respondDomain(
+          domains.find((entry) => entry.id === row.id)!,
+          mockRequestId(),
+        );
+      }
+      if (replacement !== undefined) {
+        throw invalid({
+          replacement: [
+            "A replacement applies only when deactivating the primary domain.",
+          ],
+        });
+      }
       const updated: SiteDomain = {
         ...row,
         status: "INACTIVE",
@@ -1239,6 +1309,9 @@ export function createMockSitesAdapter(options?: {
       await wait();
       const row = requireDomain(siteId, id);
       checkDomainEtag(row, etag);
+      // The model re-checks on the promoted save: an ACTIVE domain cannot be
+      // designated through a save on an ARCHIVED Site.
+      validateDomainStatus({ status: row.status, site: row.site });
       // designate_primary clears the previous primary inside one domain
       // lock, so the site always keeps exactly one primary.
       const now = new Date().toISOString();
