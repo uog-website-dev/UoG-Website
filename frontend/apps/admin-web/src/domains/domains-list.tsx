@@ -17,6 +17,7 @@
  * here — the per-site Domains panel on the site detail screen owns them.
  */
 import { useState } from "react";
+import AddIcon from "@mui/icons-material/Add";
 import LanguageRoundedIcon from "@mui/icons-material/LanguageRounded";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -49,6 +50,7 @@ import {
 } from "@/app/sites/actions";
 import { getOrganizationTree } from "@/app/organizations/actions";
 import { unwrap } from "@/organizations/contract";
+import { DomainFormDialog } from "@/domains/domain-form-dialog";
 import { siteStatusChip } from "@/sites/validation";
 
 interface DomainFilters {
@@ -90,6 +92,10 @@ export function DomainsList() {
     direction: "asc",
   });
   const [page, setPage] = useState(1);
+
+  // Add/edit dialog: `record` null means "add".
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editing, setEditing] = useState<DomainRecord | null>(null);
 
   const domains = useAsync<PaginatedResponse<DomainRecord>>(
     async () =>
@@ -236,6 +242,30 @@ export function DomainsList() {
     },
   ];
 
+  const renderActions = (row: DomainRecord) => (
+    <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
+      <Button
+        size="small"
+        variant="outlined"
+        onClick={() => {
+          setEditing(row);
+          setDialogOpen(true);
+        }}
+        aria-label={`Edit ${row.hostname}`}
+      >
+        Edit
+      </Button>
+      <Button
+        size="small"
+        variant="outlined"
+        component={NextLink}
+        href={`/sites/${row.site}`}
+      >
+        Site details
+      </Button>
+    </Box>
+  );
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
       <Paper
@@ -374,6 +404,17 @@ export function DomainsList() {
               loaded.
             </Typography>
           ) : null}
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            disabled={sitesState.error !== null}
+            onClick={() => {
+              setEditing(null);
+              setDialogOpen(true);
+            }}
+          >
+            Add domain
+          </Button>
         </Box>
 
         <DataTable
@@ -381,6 +422,7 @@ export function DomainsList() {
           columns={columns}
           rows={domains.data?.results ?? []}
           getRowKey={(row) => row.id}
+          renderActions={renderActions}
           loading={domains.loading}
           error={domains.error}
           onRetry={() => domains.reload()}
@@ -436,6 +478,16 @@ export function DomainsList() {
           />
         ) : null}
       </Paper>
+
+      <DomainFormDialog
+        open={dialogOpen}
+        record={editing}
+        sites={sitesState.data ?? []}
+        onClose={() => setDialogOpen(false)}
+        onSaved={() => {
+          domains.reload();
+        }}
+      />
     </Box>
   );
 }

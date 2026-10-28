@@ -2,14 +2,23 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { DomainRecord, PaginatedResponse } from "@uog/types";
+import { ToastProvider } from "@uog/ui";
 
 const listAllDomains = vi.fn();
 const listAllSites = vi.fn();
 const getOrganizationTree = vi.fn();
+const createSiteDomain = vi.fn();
+const updateSiteDomain = vi.fn();
+const makeSiteDomainPrimary = vi.fn();
+const listSiteDomains = vi.fn();
 
 vi.mock("@/app/sites/actions", () => ({
   listAllDomains: (...args: unknown[]) => listAllDomains(...args),
   listAllSites: (...args: unknown[]) => listAllSites(...args),
+  createSiteDomain: (...args: unknown[]) => createSiteDomain(...args),
+  updateSiteDomain: (...args: unknown[]) => updateSiteDomain(...args),
+  makeSiteDomainPrimary: (...args: unknown[]) => makeSiteDomainPrimary(...args),
+  listSiteDomains: (...args: unknown[]) => listSiteDomains(...args),
 }));
 
 vi.mock("@/app/organizations/actions", () => ({
@@ -29,6 +38,18 @@ vi.mock("next/link", () => ({
 }));
 
 import { DomainsList } from "./domains-list";
+
+/**
+ * The screen mounts the Add/Edit domain dialog, which reads the toast
+ * context, so the list renders inside the same providers as the app shell.
+ */
+function renderList() {
+  return render(
+    <ToastProvider>
+      <DomainsList />
+    </ToastProvider>,
+  );
+}
 
 const STAMP = "2026-01-01T00:00:00Z";
 
@@ -112,11 +133,27 @@ beforeEach(() => {
     ]),
   );
   getOrganizationTree.mockResolvedValue(TREE);
+  // The dialog reads the selected site's primary domain when it opens.
+  listSiteDomains.mockResolvedValue({
+    ok: true as const,
+    data: page([
+      {
+        id: 1,
+        site: 1,
+        hostname: "www.uog.edu.et",
+        is_primary: true,
+        redirect_to_primary: false,
+        status: "ACTIVE",
+        created_at: STAMP,
+        updated_at: STAMP,
+      },
+    ]),
+  });
 });
 
 describe("DomainsList", () => {
   it("renders domains with their site, organization, type and statuses", async () => {
-    render(<DomainsList />);
+    renderList();
 
     expect(await screen.findByText("www.uog.edu.et")).toBeTruthy();
     expect(screen.getByText("press.uog.edu.et")).toBeTruthy();
@@ -143,7 +180,7 @@ describe("DomainsList", () => {
   });
 
   it("searches across hostname and site, and resets to page 1", async () => {
-    render(<DomainsList />);
+    renderList();
     await screen.findByText("www.uog.edu.et");
 
     fireEvent.change(screen.getByRole("textbox", { name: "Search" }), {
@@ -159,7 +196,7 @@ describe("DomainsList", () => {
   });
 
   it("filters by domain type through the select", async () => {
-    render(<DomainsList />);
+    renderList();
     await screen.findByText("www.uog.edu.et");
 
     fireEvent.mouseDown(screen.getByRole("combobox", { name: "Type" }));
@@ -174,7 +211,7 @@ describe("DomainsList", () => {
   });
 
   it("filters by site through the select", async () => {
-    render(<DomainsList />);
+    renderList();
     await screen.findByText("www.uog.edu.et");
 
     fireEvent.mouseDown(screen.getByRole("combobox", { name: "Site" }));
@@ -191,7 +228,7 @@ describe("DomainsList", () => {
   });
 
   it("sorts by the clicked column header", async () => {
-    render(<DomainsList />);
+    renderList();
     await screen.findByText("www.uog.edu.et");
 
     fireEvent.click(screen.getByRole("button", { name: "Hostname" }));
@@ -214,7 +251,7 @@ describe("DomainsList", () => {
       },
     });
 
-    render(<DomainsList />);
+    renderList();
     await screen.findByText("www.uog.edu.et");
 
     const nav = screen.getByRole("navigation", { name: "Domains pagination" });
@@ -232,7 +269,7 @@ describe("DomainsList", () => {
   it("surfaces an API error with a retry instead of an empty table", async () => {
     listAllDomains.mockResolvedValue(failure("Backend exploded."));
 
-    render(<DomainsList />);
+    renderList();
 
     expect(await screen.findByText("Backend exploded.")).toBeTruthy();
     expect(screen.queryByText("No domains are registered")).toBeNull();
@@ -248,7 +285,7 @@ describe("DomainsList", () => {
   it("offers a reset when filters match nothing", async () => {
     listAllDomains.mockResolvedValue(ok(page([])));
 
-    render(<DomainsList />);
+    renderList();
 
     fireEvent.change(screen.getByRole("textbox", { name: "Search" }), {
       target: { value: "nothing-matches" },
@@ -266,7 +303,7 @@ describe("DomainsList", () => {
   it("says so honestly when no domains exist at all", async () => {
     listAllDomains.mockResolvedValue(ok(page([])));
 
-    render(<DomainsList />);
+    renderList();
 
     expect(await screen.findByText("No domains are registered")).toBeTruthy();
     expect(
@@ -277,7 +314,7 @@ describe("DomainsList", () => {
   it("falls back to unit ids when the hierarchy read fails", async () => {
     getOrganizationTree.mockResolvedValue(failure("Tree unavailable."));
 
-    render(<DomainsList />);
+    renderList();
 
     expect(await screen.findByText("www.uog.edu.et")).toBeTruthy();
     expect((await screen.findAllByText("Unit #1")).length).toBeGreaterThan(0);
@@ -289,11 +326,41 @@ describe("DomainsList", () => {
   it("warns when the site filter list could not be loaded", async () => {
     listAllSites.mockResolvedValue(failure("Sites unavailable."));
 
-    render(<DomainsList />);
+    renderList();
 
     expect(await screen.findByText("www.uog.edu.et")).toBeTruthy();
     expect(
       await screen.findByText(/site filter may be incomplete/i),
     ).toBeTruthy();
+  });
+
+  it("opens the Add domain dialog from the toolbar button", async () => {
+    renderList();
+    await screen.findByText("www.uog.edu.et");
+
+    fireEvent.click(screen.getByRole("button", { name: "Add domain" }));
+
+    const dialog = await screen.findByRole("dialog", { name: /Add domain/i });
+    expect(dialog).toBeTruthy();
+    // The dialog never submits on open.
+    expect(createSiteDomain).not.toHaveBeenCalled();
+
+    fireEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
+    await waitFor(() =>
+      expect(screen.queryByRole("dialog", { name: /Add domain/i })).toBeNull(),
+    );
+  });
+
+  it("opens the Edit dialog from a row action, pre-filled with the record", async () => {
+    renderList();
+    await screen.findByText("www.uog.edu.et");
+
+    fireEvent.click(screen.getByRole("button", { name: "Edit www.uog.edu.et" }));
+
+    const dialog = await screen.findByRole("dialog", { name: /Edit domain/i });
+    const hostname = within(dialog).getByLabelText(/Hostname/i) as HTMLInputElement;
+    expect(hostname.value).toBe("www.uog.edu.et");
+    expect(hostname.disabled).toBe(true);
+    expect(updateSiteDomain).not.toHaveBeenCalled();
   });
 });

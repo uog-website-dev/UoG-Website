@@ -54,10 +54,15 @@ export type {
   SiteCreateInput,
   SiteUpdateInput,
   SiteDomainListQuery,
+  SiteDomainCreateInput,
+  SiteDomainUpdateInput,
   SiteModuleListQuery,
   SiteModuleInput,
   PlatformModuleListQuery,
 } from "./adapters/sites";
+
+export { normalizeHostname } from "./hostname";
+export type { HostnameResult } from "./hostname";
 
 export {
   SiteConfigurationError,

@@ -218,3 +218,185 @@ describe("createLiveSitesAdapter — listDomainsAll", () => {
     });
   });
 });
+
+describe("createLiveSitesAdapter — domain mutations", () => {
+  const ROW = {
+    id: 7,
+    site: 1,
+    hostname: "eth.uog.edu.et",
+    is_primary: false,
+    redirect_to_primary: false,
+    status: "INACTIVE",
+    created_at: STAMP,
+    updated_at: STAMP,
+  };
+
+  it("POSTs a create to the per-site domain endpoint with the typed body", async () => {
+    const calls: [string, RequestInit][] = [];
+    const fetchFn = vi.fn(async (url: string, init: RequestInit) => {
+      calls.push([url, init]);
+      return new Response(JSON.stringify(ROW), {
+        status: 201,
+        headers: { "Content-Type": "application/json", ETag: '"e1"' },
+      });
+    }) as unknown as typeof fetch;
+
+    const adapter = createLiveSitesAdapter({ baseUrl: "/api", fetchFn });
+    const result = await adapter.createDomain(1, {
+      hostname: "eth.uog.edu.et",
+      status: "INACTIVE",
+    });
+
+    expect(calls[0][0]).toBe("/api/v1/sites/1/domains/");
+    expect(calls[0][1].method).toBe("POST");
+    expect(calls[0][1].body).toBe(
+      JSON.stringify({ hostname: "eth.uog.edu.et", status: "INACTIVE" }),
+    );
+    expect(result.etag).toBe('"e1"');
+    expect(result.data.hostname).toBe("eth.uog.edu.et");
+  });
+
+  it("surfaces a duplicate hostname as the backend's structured 409", async () => {
+    const fetchFn = vi.fn(
+      async () =>
+        new Response(
+          JSON.stringify({
+            error: {
+              code: "conflict",
+              message: "The request conflicts with the current resource state.",
+              details: {
+                hostname: ["Site domain with this hostname already exists."],
+              },
+            },
+            request_id: "req-dup",
+          }),
+          { status: 409, headers: { "Content-Type": "application/json" } },
+        ),
+    ) as unknown as typeof fetch;
+
+    const adapter = createLiveSitesAdapter({ baseUrl: "/api", fetchFn });
+    await expect(
+      adapter.createDomain(1, { hostname: "www.uog.edu.et" }),
+    ).rejects.toMatchObject({
+      status: 409,
+      code: "conflict",
+      requestId: "req-dup",
+      // fieldErrors is a 400-only getter; a 409 carries its structured
+      // body in `details`, which the dialog maps onto the field.
+      details: {
+        hostname: ["Site domain with this hostname already exists."],
+      },
+    });
+  });
+
+  it("sends If-Match on status updates, activate and make-primary", async () => {
+    const calls: [string, RequestInit][] = [];
+    const fetchFn = vi.fn(async (url: string, init: RequestInit) => {
+      calls.push([url, init]);
+      return new Response(JSON.stringify({ ...ROW, status: "ACTIVE" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json", ETag: '"e2"' },
+      });
+    }) as unknown as typeof fetch;
+
+    const adapter = createLiveSitesAdapter({ baseUrl: "/api", fetchFn });
+
+    await adapter.updateDomain(1, 7, '"e1"', { status: "ACTIVE" });
+    expect(calls[0][0]).toBe("/api/v1/sites/1/domains/7/");
+    expect(calls[0][1].method).toBe("PATCH");
+    expect((calls[0][1].headers as Record<string, string>)["If-Match"]).toBe('"e1"');
+
+    await adapter.activateDomain(1, 7, '"e2"');
+    expect(calls[1][0]).toBe("/api/v1/sites/1/domains/7/activate/");
+    expect((calls[1][1].headers as Record<string, string>)["If-Match"]).toBe('"e2"');
+
+    await adapter.makeDomainPrimary(1, 7, '"e2"');
+    expect(calls[2][0]).toBe("/api/v1/sites/1/domains/7/make-primary/");
+    expect((calls[2][1].headers as Record<string, string>)["If-Match"]).toBe('"e2"');
+  });
+
+  it("propagates 412 on a stale precondition instead of double-applying", async () => {
+    const fetchFn = vi.fn(
+      async () =>
+        new Response(
+          JSON.stringify({
+            error: {
+              code: "precondition_failed",
+              message:
+                "The resource changed. Retrieve it and reconcile your changes.",
+            },
+            request_id: "req-412",
+          }),
+          { status: 412, headers: { "Content-Type": "application/json" } },
+        ),
+    ) as unknown as typeof fetch;
+
+    const adapter = createLiveSitesAdapter({ baseUrl: "/api", fetchFn });
+    await expect(
+      adapter.updateDomain(1, 7, '"stale"', { status: "ACTIVE" }),
+    ).rejects.toMatchObject({ status: 412, requestId: "req-412" });
+  });
+});
+
+describe("createMockSitesAdapter — domain mutations", () => {
+  it("creates a domain, rejecting a duplicate hostname with 409", async () => {
+    const adapter = createMockSitesAdapter(instant);
+
+    const created = await adapter.createDomain(1, {
+      hostname: "  ETH.UoG.Edu.et ",
+      status: "ACTIVE",
+    });
+    // Normalized like the backend does.
+    expect(created.data.hostname).toBe("eth.uog.edu.et");
+    // New rows are never primary.
+    expect(created.data.is_primary).toBe(false);
+
+    await expect(
+      adapter.createDomain(1, { hostname: "ETH.uog.edu.et" }),
+    ).rejects.toMatchObject({
+      status: 409,
+      details: {
+        hostname: ["Site domain with this hostname already exists."],
+      },
+    });
+  });
+
+  it("404s an unknown site, like any detail read", async () => {
+    const adapter = createMockSitesAdapter(instant);
+    await expect(
+      adapter.createDomain(99999, { hostname: "gone.uog.edu.et" }),
+    ).rejects.toMatchObject({ status: 404 });
+  });
+
+  it("enforces If-Match on update, then applies the status change", async () => {
+    const adapter = createMockSitesAdapter(instant);
+    // Site 1 alias: id 2, uog.edu.et.
+    const current = await adapter.getDomain(1, 2);
+
+    await expect(
+      adapter.updateDomain(1, 2, '"stale"', { status: "INACTIVE" }),
+    ).rejects.toMatchObject({ status: 412 });
+
+    const updated = await adapter.updateDomain(1, 2, current.etag!, {
+      status: "INACTIVE",
+    });
+    expect(updated.data.status).toBe("INACTIVE");
+    // Hostname is immutable through update.
+    expect(updated.data.hostname).toBe("uog.edu.et");
+  });
+
+  it("keeps exactly one primary per site across make-primary calls", async () => {
+    const adapter = createMockSitesAdapter(instant);
+
+    const alias = await adapter.getDomain(1, 2);
+    expect(alias.data.is_primary).toBe(false);
+
+    const promoted = await adapter.makeDomainPrimary(1, 2, alias.etag!);
+    expect(promoted.data.is_primary).toBe(true);
+
+    const all = await adapter.listDomains(1);
+    const primaries = all.results.filter((row) => row.is_primary);
+    expect(primaries).toHaveLength(1);
+    expect(primaries[0].hostname).toBe("uog.edu.et");
+  });
+});
