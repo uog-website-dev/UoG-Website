@@ -43,6 +43,28 @@ const authorizationUrl = process.env.KEYCLOAK_AUTH_URL;
 const tokenUrl = process.env.KEYCLOAK_TOKEN_URL;
 const userinfoUrl = process.env.KEYCLOAK_USERINFO_URL;
 
+/**
+ * The only origins a sign-in or sign-out redirect may land on.
+ *
+ * Default Auth.js behaviour rejects a redirect target on a different origin
+ * than the one it sees on the server. Here the server-side origin is the
+ * container port, while the administrator enters through nginx, so the
+ * platform origin is allowed explicitly — and only that one.
+ *
+ * Exported so the allowlist is directly testable (see src/auth.test.ts).
+ */
+export async function redirect({
+  url,
+  baseUrl,
+}: {
+  url: string;
+  baseUrl: string;
+}): Promise<string> {
+  if (url.startsWith("/")) return `${baseUrl}${url}`;
+  if (url === siteOrigin || url.startsWith(`${siteOrigin}/`)) return url;
+  return baseUrl;
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   basePath: authBasePath,
   providers: [
@@ -50,6 +72,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       clientId: process.env.KEYCLOAK_CLIENT_ID ?? "admin-web",
       clientSecret: process.env.KEYCLOAK_CLIENT_SECRET,
       issuer,
+      // Auth.js defaults to PKCE alone. This platform also requires the
+      // `state` check (CSRF protection on the callback) and the `nonce`
+      // check (binds the issued ID token to this authorization request),
+      // both of which Auth.js stores in httpOnly cookies server-side.
+      checks: ["pkce", "state", "nonce"],
       ...(authorizationUrl
         ? {
             authorization: {
@@ -87,16 +114,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       return token;
     },
-    /**
-     * Default Auth.js behaviour rejects a redirect target on a different
-     * origin than the one it sees on the server. Here the server-side origin
-     * is the container port, while the administrator enters through nginx, so
-     * the platform origin is allowed explicitly — and only that one.
-     */
-    async redirect({ url, baseUrl }) {
-      if (url.startsWith("/")) return `${baseUrl}${url}`;
-      if (url === siteOrigin || url.startsWith(`${siteOrigin}/`)) return url;
-      return baseUrl;
-    },
+    redirect,
   },
 });
