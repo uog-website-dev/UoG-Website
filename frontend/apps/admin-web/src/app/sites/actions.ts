@@ -172,6 +172,7 @@ async function domainStatus(
   siteId: number,
   id: number,
   action: "activate" | "deactivate",
+  replacementId?: number,
 ): Promise<ActionResult<ETaggedResponse<SiteDomain>>> {
   return attempt(async (adapter) => {
     const current = await adapter.getDomain(siteId, id);
@@ -184,7 +185,7 @@ async function domainStatus(
     }
     return action === "activate"
       ? adapter.activateDomain(siteId, id, current.etag)
-      : adapter.deactivateDomain(siteId, id, current.etag);
+      : adapter.deactivateDomain(siteId, id, current.etag, replacementId);
   });
 }
 
@@ -195,17 +196,26 @@ export async function activateSiteDomain(
   return domainStatus(siteId, id, "activate");
 }
 
+/**
+ * Deactivate one domain. For aliases the change needs no payload; the
+ * backend turns the row off conditionally. Deactivating the *active
+ * primary* is refused unless `replacementId` names another ACTIVE domain on
+ * the same Site — that domain becomes primary in the same transaction, so
+ * the Site always keeps exactly one primary.
+ */
 export async function deactivateSiteDomain(
   siteId: number,
   id: number,
+  replacementId?: number,
 ): Promise<ActionResult<ETaggedResponse<SiteDomain>>> {
-  return domainStatus(siteId, id, "deactivate");
+  return domainStatus(siteId, id, "deactivate", replacementId);
 }
 
 /**
- * Designate a domain as the Site's primary. The backend clears the previous
- * primary inside one domain lock, so the Site keeps exactly one; callers
- * must confirm with the operator first because this changes routing.
+ * Designate a domain as the Site's primary. The backend's `set-primary`
+ * action clears the previous primary inside one domain lock, so the Site
+ * keeps exactly one; callers must confirm with the operator first because
+ * this changes routing.
  */
 export async function makeSiteDomainPrimary(
   siteId: number,
@@ -221,6 +231,26 @@ export async function makeSiteDomainPrimary(
       );
     }
     return adapter.makeDomainPrimary(siteId, id, current.etag);
+  });
+}
+
+/**
+ * Every hostname registered for one site, collected across pages (bounded at
+ * 50 pages like the other composed reads). Lifecycle decisions need the
+ * whole set at once — the primary domain and the eligible replacements — so
+ * a screen must not reason from a single page.
+ */
+export async function listAllSiteDomains(
+  siteId: number,
+): Promise<ActionResult<SiteDomain[]>> {
+  return attempt(async (adapter) => {
+    const domains: SiteDomain[] = [];
+    for (let page = 1; page <= 50; page += 1) {
+      const result = await adapter.listDomains(siteId, { page });
+      domains.push(...result.results);
+      if (!result.next) break;
+    }
+    return domains;
   });
 }
 

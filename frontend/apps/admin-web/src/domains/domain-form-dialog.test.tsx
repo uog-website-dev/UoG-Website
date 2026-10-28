@@ -371,7 +371,9 @@ describe("DomainFormDialog — edit", () => {
       tagged({ status: "INACTIVE" }),
     );
 
-    const record = domainRecord({});
+    // An ACTIVE alias can be switched off with a plain status edit; the
+    // active primary cannot (locked in the next test).
+    const record = domainRecord({ is_primary: false });
     const onSaved = vi.fn();
     renderDialog({ record, onSaved });
 
@@ -406,7 +408,7 @@ describe("DomainFormDialog — edit", () => {
       },
     });
 
-    renderDialog({ record: domainRecord({}) });
+    renderDialog({ record: domainRecord({ is_primary: false }) });
     await pickOption(/^Status$/i, "Inactive");
     fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
 
@@ -417,6 +419,24 @@ describe("DomainFormDialog — edit", () => {
     );
     // The dialog stays open so the operator can reload and retry.
     expect(screen.getByRole("dialog", { name: /Edit domain/i })).toBeTruthy();
+  });
+
+  it("removes the Inactive option for the site's active primary", async () => {
+    // Deactivating the active primary requires a replacement, which a plain
+    // status edit cannot supply — the backend would refuse it, so the
+    // dialog does not offer the doomed choice.
+    renderDialog({ record: domainRecord({}) });
+
+    expect(
+      screen.getByText(/cannot be switched off here/i),
+    ).toBeTruthy();
+    fireEvent.mouseDown(screen.getByRole("combobox", { name: /^Status$/i }));
+    expect(
+      await screen.findByRole("option", { name: "Active" }),
+    ).toBeTruthy();
+    expect(
+      screen.queryByRole("option", { name: /^Inactive$/ }),
+    ).toBeNull();
   });
 
   it("reports no changes instead of calling the API when nothing was edited", async () => {

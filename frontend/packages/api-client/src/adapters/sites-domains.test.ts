@@ -311,8 +311,45 @@ describe("createLiveSitesAdapter — domain mutations", () => {
     expect((calls[1][1].headers as Record<string, string>)["If-Match"]).toBe('"e2"');
 
     await adapter.makeDomainPrimary(1, 7, '"e2"');
-    expect(calls[2][0]).toBe("/api/v1/sites/1/domains/7/make-primary/");
+    expect(calls[2][0]).toBe("/api/v1/sites/1/domains/7/set-primary/");
     expect((calls[2][1].headers as Record<string, string>)["If-Match"]).toBe('"e2"');
+  });
+
+  it("POSTs deactivate with an empty body and If-Match", async () => {
+    const calls: [string, RequestInit][] = [];
+    const fetchFn = vi.fn(async (url: string, init: RequestInit) => {
+      calls.push([url, init]);
+      return new Response(JSON.stringify({ ...ROW, status: "INACTIVE" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json", ETag: '"e3"' },
+      });
+    }) as unknown as typeof fetch;
+
+    const adapter = createLiveSitesAdapter({ baseUrl: "/api", fetchFn });
+    await adapter.deactivateDomain(1, 7, '"e2"');
+
+    expect(calls[0][0]).toBe("/api/v1/sites/1/domains/7/deactivate/");
+    expect(calls[0][1].method).toBe("POST");
+    expect(calls[0][1].body).toBe("{}");
+    expect((calls[0][1].headers as Record<string, string>)["If-Match"]).toBe('"e2"');
+  });
+
+  it("POSTs deactivate with the replacement id when supplied", async () => {
+    const calls: [string, RequestInit][] = [];
+    const fetchFn = vi.fn(async (url: string, init: RequestInit) => {
+      calls.push([url, init]);
+      return new Response(JSON.stringify(ROW), {
+        status: 200,
+        headers: { "Content-Type": "application/json", ETag: '"e4"' },
+      });
+    }) as unknown as typeof fetch;
+
+    const adapter = createLiveSitesAdapter({ baseUrl: "/api", fetchFn });
+    await adapter.deactivateDomain(1, 7, '"e2"', 12);
+
+    expect(calls[0][0]).toBe("/api/v1/sites/1/domains/7/deactivate/");
+    expect(calls[0][1].body).toBe(JSON.stringify({ replacement: 12 }));
+    expect((calls[0][1].headers as Record<string, string>)["If-Match"]).toBe('"e2"');
   });
 
   it("propagates 412 on a stale precondition instead of double-applying", async () => {
@@ -398,5 +435,97 @@ describe("createMockSitesAdapter — domain mutations", () => {
     const primaries = all.results.filter((row) => row.is_primary);
     expect(primaries).toHaveLength(1);
     expect(primaries[0].hostname).toBe("uog.edu.et");
+  });
+});
+
+describe("createMockSitesAdapter — primary deactivation", () => {
+  it("rejects deactivating the active primary without a replacement", async () => {
+    const adapter = createMockSitesAdapter(instant);
+    const current = await adapter.getDomain(1, 1); // www.uog.edu.et, ACTIVE primary
+
+    await expect(
+      adapter.deactivateDomain(1, 1, current.etag!),
+    ).rejects.toMatchObject({
+      status: 400,
+      code: "validation_error",
+      details: {
+        replacement: [
+          "Select an active domain on this Site before deactivating the primary.",
+        ],
+      },
+    });
+  });
+
+  it("rejects a replacement that is inactive or on another site", async () => {
+    const adapter = createMockSitesAdapter(instant);
+    const current = await adapter.getDomain(1, 1);
+
+    // press.uog.edu.et (id 4) is INACTIVE and belongs to site 4 — the
+    // replacement must be another ACTIVE domain on the same Site, so this
+    // fails both conditions and is rejected.
+    await expect(
+      adapter.deactivateDomain(1, 1, current.etag!, 4),
+    ).rejects.toMatchObject({ status: 400, details: { replacement: expect.any(Array) } });
+  });
+
+  it("switches primary and deactivates in one change when a valid replacement is given", async () => {
+    const adapter = createMockSitesAdapter(instant);
+    const current = await adapter.getDomain(1, 1);
+
+    const result = await adapter.deactivateDomain(1, 1, current.etag!, 2);
+
+    // The previous primary is now inactive and no longer primary...
+    expect(result.data.status).toBe("INACTIVE");
+    expect(result.data.is_primary).toBe(false);
+
+    const all = await adapter.listDomains(1);
+    // ...and exactly one primary remains: the replacement, whose redirect
+    // flag was cleared because a primary never redirects.
+    const primaries = all.results.filter((row) => row.is_primary);
+    expect(primaries).toHaveLength(1);
+    expect(primaries[0].hostname).toBe("uog.edu.et");
+    expect(primaries[0].redirect_to_primary).toBe(false);
+    expect(primaries[0].status).toBe("ACTIVE");
+  });
+
+  it("rejects a replacement for an alias deactivation", async () => {
+    const adapter = createMockSitesAdapter(instant);
+    const alias = await adapter.getDomain(1, 2); // uog.edu.et, ACTIVE alias
+
+    await expect(
+      adapter.deactivateDomain(1, 2, alias.etag!, 1),
+    ).rejects.toMatchObject({
+      status: 400,
+      details: {
+        replacement: [
+          "A replacement applies only when deactivating the primary domain.",
+        ],
+      },
+    });
+  });
+
+  it("deactivates an alias with no payload", async () => {
+    const adapter = createMockSitesAdapter(instant);
+    const alias = await adapter.getDomain(1, 2);
+
+    const result = await adapter.deactivateDomain(1, 2, alias.etag!);
+
+    expect(result.data.status).toBe("INACTIVE");
+    expect(result.data.is_primary).toBe(false);
+    // Aliases keep their redirect flag through a plain deactivation.
+    expect(result.data.redirect_to_primary).toBe(true);
+  });
+
+  it("returns an already-inactive domain unchanged, without needing a replacement", async () => {
+    const adapter = createMockSitesAdapter(instant);
+    // press.uog.edu.et (id 4, site 4) is an INACTIVE primary.
+    const current = await adapter.getDomain(4, 4);
+
+    const result = await adapter.deactivateDomain(4, 4, current.etag!, 1);
+
+    expect(result.data.status).toBe("INACTIVE");
+    expect(result.data.is_primary).toBe(true);
+    const all = await adapter.listDomains(4);
+    expect(all.results).toHaveLength(1);
   });
 });

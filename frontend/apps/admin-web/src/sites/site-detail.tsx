@@ -2,7 +2,9 @@
 
 /**
  * Site detail: read-only inspection of one managed site, its lifecycle
- * controls and its configuration with provenance.
+ * controls and its configuration with provenance. Domain lifecycle
+ * management (activate/deactivate/set-primary) lives in the dedicated
+ * `SiteDomainsPanel` rendered below the owner card.
  *
  * The read runs through the `getSite` server action, so the Keycloak access
  * token stays server-side; the view only sees approved DTO fields. Lifecycle
@@ -59,6 +61,7 @@ import { getOrganizationTree } from "@/app/organizations/actions";
 import { deserializeApiError, unwrap } from "@/organizations/contract";
 import type { ApiErrorPayload } from "@/organizations/contract";
 import { configurationRows, originCaption } from "@/sites/configuration";
+import { SiteDomainsPanel } from "@/sites/site-domains-panel";
 import { ownerInfoFor, relationLabel } from "@/sites/owner";
 import { siteStatusChip, siteStatusLabel } from "@/sites/validation";
 
@@ -170,21 +173,20 @@ export function SiteDetail({ site, error }: SiteDetailProps) {
     [],
   );
 
-  // Domains and module rows are per-site reads; failures degrade to an
-  // explicit "could not be loaded" message rather than an empty panel, so
-  // missing data is never mistaken for "no domains / no modules".
-  const domains = useAsync<PaginatedResponse<SiteDomain> | null>(
-    async () => (site ? unwrap(await listSiteDomains(site.id)) : null),
-    [site?.id],
-  );
   // The hero shows the primary domain prominently, so it reads that row
   // explicitly (the API can filter on is_primary) instead of hoping the
-  // first page of the full list happens to contain it.
+  // first page of the full list happens to contain it. It reloads whenever
+  // the domain panel applies a lifecycle change (`onDomainChange`).
   const primaryDomain = useAsync<PaginatedResponse<SiteDomain> | null>(
     async () =>
       site ? unwrap(await listSiteDomains(site.id, { is_primary: true })) : null,
     [site?.id],
   );
+  // Modules are a per-site read; a failure degrades to an explicit "could
+  // not be loaded" message rather than an empty panel, so missing data is
+  // never mistaken for "no modules". The domain list lives in
+  // `SiteDomainsPanel`, which reads it through `listAllSiteDomains` —
+  // lifecycle decisions must see the whole domain set, not one page.
   const assignments = useAsync<PaginatedResponse<SiteModuleAssignment> | null>(
     async () => (site ? unwrap(await listSiteModuleAssignments(site.id)) : null),
     [site?.id],
@@ -655,88 +657,17 @@ export function SiteDetail({ site, error }: SiteDetailProps) {
         ) : null}
       </Paper>
 
-      {/* Domains: routing records only, never a DNS/TLS claim. */}
-      <Paper variant="outlined" sx={{ overflow: "hidden", borderRadius: 3 }}>
-        <Box sx={{ px: { xs: 2, sm: 3 }, py: 2 }}>
-          <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-            Domains
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Hostnames registered for this site. A domain row is routing data
-            only — it does not claim that DNS records or TLS certificates
-            exist, and this platform does not provision them.
-          </Typography>
-        </Box>
-        <Divider />
-        <Box sx={{ px: { xs: 2, sm: 3 }, py: 2 }}>
-          {domains.loading ? (
-            <Typography variant="body2" color="text.secondary" aria-live="polite">
-              Loading domains…
-            </Typography>
-          ) : domains.error ? (
-            <Alert severity="warning" variant="outlined">
-              The domain list could not be loaded: {domains.error.message}
-              {domains.error.requestId
-                ? ` (reference ${domains.error.requestId})`
-                : ""}
-              . This is a read failure — it does not mean the site has no
-              domains.
-            </Alert>
-          ) : (domains.data?.results ?? []).length === 0 ? (
-            <Alert severity="info" variant="outlined">
-              No hostnames are registered for this site yet.
-            </Alert>
-          ) : (
-            <Box
-              component="ul"
-              sx={{
-                m: 0,
-                pl: 2,
-                display: "flex",
-                flexDirection: "column",
-                gap: 1,
-              }}
-            >
-              {domains.data!.results.map((domain) => (
-                <Box
-                  component="li"
-                  key={domain.id}
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1,
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <Typography
-                    variant="body2"
-                    sx={{ fontFamily: "monospace", fontWeight: 600 }}
-                  >
-                    {domain.hostname}
-                  </Typography>
-                  <Chip
-                    size="small"
-                    variant="outlined"
-                    color={domain.is_primary ? "primary" : "default"}
-                    label={domain.is_primary ? "Primary" : "Alias"}
-                  />
-                  <Chip
-                    size="small"
-                    variant="outlined"
-                    color={domain.status === "ACTIVE" ? "success" : "default"}
-                    label={domain.status === "ACTIVE" ? "Active" : "Inactive"}
-                  />
-                  {domain.redirect_to_primary ? (
-                    <Typography variant="caption" color="text.secondary">
-                      Redirects to the primary domain
-                    </Typography>
-                  ) : null}
-                </Box>
-              ))}
-            </Box>
-          )}
-        </Box>
-      </Paper>
+      {/* Domains: full lifecycle management in a dedicated panel. */}
+      <SiteDomainsPanel
+        site={site}
+        onChanged={() => {
+          // The hero caches its own primary-domain read, and anything bound
+          // to the site row (e.g. timestamps) comes from the RSC tree —
+          // refresh both after a lifecycle change.
+          primaryDomain.reload();
+          router.refresh();
+        }}
+      />
 
       {/* Per-site module enablement, honest about planned capabilities. */}
       <Paper variant="outlined" sx={{ overflow: "hidden", borderRadius: 3 }}>

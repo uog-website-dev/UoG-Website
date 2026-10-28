@@ -313,6 +313,16 @@ export function DomainFormDialog({
 
   const typeDisabled = record?.is_primary === true;
 
+  /**
+   * An *active* primary cannot simply be switched to Inactive: the backend's
+   * model validation refuses a plain status edit because deactivating the
+   * primary requires a replacement (which PATCH cannot supply). The dedicated
+   * deactivate action in the site's Domains panel is the only supported path,
+   * so this dialog removes the option rather than submit a doomed change.
+   */
+  const activePrimaryLock =
+    record?.is_primary === true && record.status === "ACTIVE";
+
   return (
     <>
       <Dialog
@@ -481,10 +491,14 @@ export function DomainFormDialog({
                 id="domain-status"
                 label="Status"
                 value={values.status}
-                options={[
-                  { value: "ACTIVE", label: "Active" },
-                  { value: "INACTIVE", label: "Inactive" },
-                ]}
+                options={
+                  activePrimaryLock
+                    ? [{ value: "ACTIVE", label: "Active" }]
+                    : [
+                        { value: "ACTIVE", label: "Active" },
+                        { value: "INACTIVE", label: "Inactive" },
+                      ]
+                }
                 onChange={(value) =>
                   setValues((previous) => ({
                     ...previous,
@@ -499,7 +513,9 @@ export function DomainFormDialog({
                 color="text.secondary"
                 sx={{ display: "block", mt: 0.5 }}
               >
-                Inactive domains stay registered but are not served.
+                {activePrimaryLock
+                  ? "This is the site's active primary domain, so it cannot be switched off here — deactivating requires a replacement, which the status edit cannot provide. Use the Deactivate action in the site's Domains panel."
+                  : "Inactive domains stay registered but are not served."}
               </Typography>
             </Box>
           </Box>

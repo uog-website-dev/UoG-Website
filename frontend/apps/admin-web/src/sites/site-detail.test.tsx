@@ -9,21 +9,29 @@ import { ToastProvider } from "@uog/ui";
 // --- server action mocks -------------------------------------------------
 const getSiteTemplate = vi.fn();
 const listSiteDomains = vi.fn();
+const listAllSiteDomains = vi.fn();
 const listSiteModuleAssignments = vi.fn();
 const listPlatformModules = vi.fn();
 const activateSite = vi.fn();
 const suspendSite = vi.fn();
 const archiveSite = vi.fn();
+const activateSiteDomain = vi.fn();
+const deactivateSiteDomain = vi.fn();
+const makeSiteDomainPrimary = vi.fn();
 const getOrganizationTree = vi.fn();
 
 vi.mock("@/app/sites/actions", () => ({
   getSiteTemplate: (...args: unknown[]) => getSiteTemplate(...args),
   listSiteDomains: (...args: unknown[]) => listSiteDomains(...args),
+  listAllSiteDomains: (...args: unknown[]) => listAllSiteDomains(...args),
   listSiteModuleAssignments: (...args: unknown[]) => listSiteModuleAssignments(...args),
   listPlatformModules: (...args: unknown[]) => listPlatformModules(...args),
   activateSite: (...args: unknown[]) => activateSite(...args),
   suspendSite: (...args: unknown[]) => suspendSite(...args),
   archiveSite: (...args: unknown[]) => archiveSite(...args),
+  activateSiteDomain: (...args: unknown[]) => activateSiteDomain(...args),
+  deactivateSiteDomain: (...args: unknown[]) => deactivateSiteDomain(...args),
+  makeSiteDomainPrimary: (...args: unknown[]) => makeSiteDomainPrimary(...args),
 }));
 
 vi.mock("@/app/organizations/actions", () => ({
@@ -133,7 +141,10 @@ function renderDetail(props: { site?: Site | null }) {
 beforeEach(() => {
   vi.clearAllMocks();
   getOrganizationTree.mockResolvedValue(treeResults());
+  // The hero's primary-domain read stays a filtered single-page read; the
+  // panel's lifecycle read composes every page into a plain array.
   listSiteDomains.mockResolvedValue({ ok: true, data: page([]) });
+  listAllSiteDomains.mockResolvedValue({ ok: true, data: [] });
   listSiteModuleAssignments.mockResolvedValue({ ok: true, data: page([]) });
   listPlatformModules.mockResolvedValue({ ok: true, data: page([]) });
   getSiteTemplate.mockResolvedValue({
@@ -192,9 +203,9 @@ describe("SiteDetail — owner organization", () => {
 
 describe("SiteDetail — domains", () => {
   it("lists hostnames with their primary and status flags", async () => {
-    listSiteDomains.mockResolvedValue({
+    listAllSiteDomains.mockResolvedValue({
       ok: true,
-      data: page([
+      data: [
         domain(),
         domain({
           id: 2,
@@ -202,7 +213,7 @@ describe("SiteDetail — domains", () => {
           is_primary: false,
           redirect_to_primary: true,
         }),
-      ]),
+      ],
     });
 
     renderDetail({ site: site() });
@@ -226,7 +237,7 @@ describe("SiteDetail — domains", () => {
   });
 
   it("reports a failed domain read instead of implying there are no domains", async () => {
-    listSiteDomains.mockResolvedValue({
+    listAllSiteDomains.mockResolvedValue({
       ok: false,
       error: {
         status: 403,
@@ -349,6 +360,10 @@ describe("SiteDetail — primary domain", () => {
             })
           : Promise.resolve({ ok: true, data: page([domain()]) }),
     );
+    listAllSiteDomains.mockResolvedValue({
+      ok: true,
+      data: [domain({ id: 9, hostname: "www.uog.edu.et", is_primary: true })],
+    });
 
     renderDetail({ site: site() });
 
