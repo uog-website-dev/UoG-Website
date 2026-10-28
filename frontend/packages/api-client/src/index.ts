@@ -45,7 +45,9 @@ export {
   createLiveSitesAdapter,
   createMockSitesAdapter,
   siteListQueryString,
+  queryDomainRecords,
   SITES_PAGE_SIZE,
+  DOMAINS_PAGE_SIZE,
 } from "./adapters/sites";
 export type {
   SitesAdapter,

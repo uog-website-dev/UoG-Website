@@ -211,6 +211,42 @@ export interface SiteDomain {
   updated_at: string;
 }
 
+/**
+ * Validated query for the central Domain Management listing.
+ *
+ * The platform API has no cross-site domain endpoint yet — domains are read
+ * per Site (`GET /api/v1/sites/{site_pk}/domains/`) — so this query is
+ * applied by the typed client over the composed result. It mirrors what the
+ * per-site endpoint validates (status, is_primary) plus the join filters
+ * the console needs (search across hostname and site, exact site).
+ */
+export interface DomainListQuery {
+  /** Case-insensitive substring of hostname, site code or site name. */
+  search?: string;
+  /** Exact owning Site id. */
+  site?: number;
+  /** `true` = Primary, `false` = Alias; omit for both. */
+  is_primary?: boolean;
+  /** Exact domain status; omit for both. */
+  status?: SiteDomainStatus;
+  /** Comma-separated fields with optional '-'; default `hostname`. */
+  ordering?: string;
+  /** Page number (1-based), page size fixed at 20. */
+  page?: number;
+}
+
+/**
+ * One domain row for the central Domain Management table: the domain itself
+ * plus the Site fields needed to display its context without a second read
+ * (`site_code`, `site_name`, `site_status`, `organization_unit`).
+ */
+export interface DomainRecord extends SiteDomain {
+  site_code: string;
+  site_name: string;
+  site_status: SiteStatus;
+  organization_unit: number;
+}
+
 /** Registry capability states (backend Module.Status). */
 export type ModuleStatus = "PLANNED" | "IMPLEMENTED" | "DEPRECATED";
 
