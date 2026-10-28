@@ -414,6 +414,9 @@ export function SiteDetail({ site, error }: SiteDetailProps) {
               <Button component={Link} href="/sites" startIcon={<ArrowBackIcon />} variant="outlined">
                 Directory
               </Button>
+              <Button component={Link} href={`/sites/${site.id}/modules`} variant="outlined">
+                Manage modules
+              </Button>
               {site.status !== "ARCHIVED" ? (
                 <Button
                   component={Link}

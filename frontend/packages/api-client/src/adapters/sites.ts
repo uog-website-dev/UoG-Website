@@ -90,8 +90,21 @@ export interface SiteDomainListQuery {
 
 /** Validated filters for GET /sites/{id}/modules/. */
 export interface SiteModuleListQuery {
+  /** Exact registry module id. */
+  module?: number;
   is_enabled?: boolean;
   page?: number;
+}
+
+/**
+ * Body accepted by `POST /sites/{site_pk}/modules/` — the endpoint that
+ * enables one module for a Site. The configuration is validated by the
+ * backend against that module's approved `configuration_schema`; anything
+ * unknown, secret-looking or wrongly typed is a 400.
+ */
+export interface SiteModuleInput {
+  module: number;
+  configuration?: Record<string, unknown>;
 }
 
 /** Validated filters for the platform module registry (GET /modules/). */
@@ -116,6 +129,49 @@ export interface SitesAdapter {
     siteId: number,
     query?: SiteModuleListQuery,
   ): Promise<PaginatedResponse<SiteModuleAssignment>>;
+  /** One assignment including the strong ETag required for mutations. */
+  getModuleAssignment(
+    siteId: number,
+    id: number,
+  ): Promise<ETaggedResponse<SiteModuleAssignment>>;
+  /**
+   * `POST /sites/{site_pk}/modules/` — enable one usable module. A duplicate
+   * site/module pair is 409; a planned, unshipped or globally disabled
+   * module is 400.
+   */
+  createModuleAssignment(
+    siteId: number,
+    input: SiteModuleInput,
+  ): Promise<ETaggedResponse<SiteModuleAssignment>>;
+  /**
+   * `POST .../modules/{id}/enable/` — turn an existing assignment back on
+   * (conditional on `etag`). Its stored configuration is kept as-is.
+   */
+  enableModuleAssignment(
+    siteId: number,
+    id: number,
+    etag: string,
+  ): Promise<ETaggedResponse<SiteModuleAssignment>>;
+  /**
+   * `POST .../modules/{id}/disable/` — turn the module off for this Site
+   * (conditional on `etag`). The row and its configuration are preserved.
+   */
+  disableModuleAssignment(
+    siteId: number,
+    id: number,
+    etag: string,
+  ): Promise<ETaggedResponse<SiteModuleAssignment>>;
+  /**
+   * `PATCH .../modules/{id}/` — replace this assignment's settings
+   * (conditional on `etag`). Enablement is not writable here: `is_enabled`
+   * is read-only on the endpoint.
+   */
+  updateModuleAssignment(
+    siteId: number,
+    id: number,
+    etag: string,
+    configuration: Record<string, unknown>,
+  ): Promise<ETaggedResponse<SiteModuleAssignment>>;
   /** Platform module registry, used to resolve assignment ids to codes. */
   listModules(
     query?: PlatformModuleListQuery,
@@ -210,6 +266,7 @@ export function createLiveSitesAdapter(options: {
       const path = withQuery(
         `${SITES_PATH}${siteId}/modules/`,
         buildQueryString({
+          module: query?.module,
           is_enabled:
             query?.is_enabled === undefined
               ? undefined
@@ -218,6 +275,48 @@ export function createLiveSitesAdapter(options: {
         }),
       );
       return client.get<PaginatedResponse<SiteModuleAssignment>>(path);
+    },
+    async getModuleAssignment(siteId, id) {
+      return toEtagged(
+        await client.getDetailed<SiteModuleAssignment>(
+          `${SITES_PATH}${siteId}/modules/${id}/`,
+        ),
+      );
+    },
+    async createModuleAssignment(siteId, input) {
+      return toEtagged(
+        await client.postDetailed<SiteModuleAssignment>(
+          `${SITES_PATH}${siteId}/modules/`,
+          input,
+        ),
+      );
+    },
+    async enableModuleAssignment(siteId, id, etag) {
+      return toEtagged(
+        await client.postDetailed<SiteModuleAssignment>(
+          `${SITES_PATH}${siteId}/modules/${id}/enable/`,
+          {},
+          { headers: { "If-Match": etag } },
+        ),
+      );
+    },
+    async disableModuleAssignment(siteId, id, etag) {
+      return toEtagged(
+        await client.postDetailed<SiteModuleAssignment>(
+          `${SITES_PATH}${siteId}/modules/${id}/disable/`,
+          {},
+          { headers: { "If-Match": etag } },
+        ),
+      );
+    },
+    async updateModuleAssignment(siteId, id, etag, configuration) {
+      return toEtagged(
+        await client.patchDetailed<SiteModuleAssignment>(
+          `${SITES_PATH}${siteId}/modules/${id}/`,
+          { configuration },
+          { ifMatch: etag },
+        ),
+      );
     },
     async listModules(query) {
       const path = withQuery(
@@ -308,6 +407,10 @@ const CODE_PATTERN = /^[A-Z][A-Z0-9_-]{0,63}$/;
  */
 export function createMockSitesAdapter(options?: {
   seed?: Site[];
+  /** Registry rows to serve instead of the default (all-planned) fixtures. */
+  seedModules?: PlatformModule[];
+  /** Existing per-site assignments, e.g. for local enable/disable work. */
+  seedModuleAssignments?: SiteModuleAssignment[];
   latencyMs?: number;
 }): SitesAdapter {
   const latencyMs = options?.latencyMs ?? 150;
@@ -329,6 +432,23 @@ export function createMockSitesAdapter(options?: {
     },
   }));
   let nextId = store.reduce((max, site) => Math.max(max, site.id), 0) + 1;
+
+  // Registry and assignment stores: the default fixtures keep every seeded
+  // capability PLANNED and globally disabled (registering a row is not
+  // implementing a feature), so enabling anything out of the box is refused
+  // exactly as the live API would refuse it. Tests/local work can seed an
+  // IMPLEMENTED, globally enabled module to exercise the success paths.
+  let modules: PlatformModule[] = (options?.seedModules ?? moduleFixtures).map(
+    (entry) => ({
+      ...entry,
+      configuration_schema: { ...entry.configuration_schema },
+    }),
+  );
+  let assignments: SiteModuleAssignment[] = (
+    options?.seedModuleAssignments ?? siteModuleFixtures
+  ).map((row) => ({ ...row, configuration: { ...row.configuration } }));
+  let nextAssignmentId =
+    assignments.reduce((max, row) => Math.max(max, row.id), 0) + 1;
 
   const wait = () =>
     latencyMs > 0
@@ -359,6 +479,19 @@ export function createMockSitesAdapter(options?: {
     }
   };
 
+  const checkEtagAssignment = (
+    row: SiteModuleAssignment,
+    etag: string,
+  ) => {
+    if (etag !== assignmentEtag(row)) {
+      throw new ApiError(
+        "The resource changed. Retrieve it and reconcile your changes.",
+        412,
+        { code: "precondition_failed" },
+      );
+    }
+  };
+
   const respond = (site: Site, requestId: string): ETaggedResponse<Site> => ({
     data: { ...site, configuration: structuredCloneSafe(site.configuration) },
     etag: etagFor(site),
@@ -379,6 +512,149 @@ export function createMockSitesAdapter(options?: {
       code: "conflict",
       details,
     });
+
+  const assignmentEtag = (row: SiteModuleAssignment): string =>
+    `"mock-assignment-${row.id}-${row.updated_at}"`;
+
+  const requireAssignment = (
+    siteId: number,
+    id: number,
+  ): SiteModuleAssignment => {
+    // The API scopes the queryset to the site, so an unknown assignment id
+    // and an assignment belonging to another Site both answer 404.
+    const found = assignments.find(
+      (row) => row.id === id && row.site === siteId,
+    );
+    if (!found) {
+      throw new ApiError("The requested resource was not found.", 404, {
+        code: "not_found",
+        details: { detail: "No SiteModule matches the given query." },
+      });
+    }
+    return found;
+  };
+
+  const requireModule = (id: number): PlatformModule => {
+    const found = modules.find((entry) => entry.id === id);
+    if (!found) {
+      throw invalid({
+        module: ["Invalid pk — no Module matches the given query."],
+      });
+    }
+    return found;
+  };
+
+  /**
+   * Usable = IMPLEMENTED and globally enabled. The live database also
+   * requires a recorded shipped capability, but it enforces that *before* a
+   * row can even be marked IMPLEMENTED — so an IMPLEMENTED fixture is by
+   * construction shipped, and this predicate matches `module_is_usable`.
+   */
+  const moduleIsUsable = (module: PlatformModule): boolean =>
+    module.status === "IMPLEMENTED" && module.is_enabled;
+
+  const SECRET_KEY =
+    /password|secret|token|credential|api_key|private_key|session/i;
+
+  interface ModuleProperty {
+    code: string;
+    type: "boolean" | "string" | "integer";
+    required: boolean;
+  }
+
+  /** Approved property list of a module's schema, or null if unapproved. */
+  const schemaProperties = (module: PlatformModule): ModuleProperty[] | null => {
+    const schema = module.configuration_schema as
+      | { properties?: unknown }
+      | undefined
+      | null;
+    if (schema === null || schema === undefined || typeof schema !== "object") {
+      return null;
+    }
+    const properties = schema.properties ?? [];
+    if (!Array.isArray(properties)) return null;
+    const approved = properties.filter(
+      (item): item is ModuleProperty =>
+        typeof item === "object" &&
+        item !== null &&
+        typeof (item as ModuleProperty).code === "string" &&
+        typeof (item as ModuleProperty).type === "string" &&
+        typeof (item as ModuleProperty).required === "boolean",
+    );
+    return approved.length === properties.length ? approved : null;
+  };
+
+  /** Mirror of normalize_site_module_configuration (module_schema.py). */
+  const validateModuleConfiguration = (
+    module: PlatformModule,
+    document: unknown,
+  ): void => {
+    if (document === null || typeof document !== "object" || Array.isArray(document)) {
+      throw invalid({
+        configuration: ["Site module configuration must be a JSON object."],
+      });
+    }
+    for (const key of Object.keys(document)) {
+      if (SECRET_KEY.test(key)) {
+        throw invalid({
+          configuration: [
+            "Module configuration schema cannot describe secrets.",
+          ],
+        });
+      }
+    }
+    const properties = schemaProperties(module);
+    if (properties === null) {
+      throw invalid({
+        configuration: ["Site module configuration is not approved."],
+      });
+    }
+    const allowed = new Map(properties.map((item) => [item.code, item]));
+    const documentKeys = Object.keys(document);
+    if (documentKeys.some((key) => !allowed.has(key))) {
+      throw invalid({
+        configuration: ["Site module configuration is not approved."],
+      });
+    }
+    for (const [code, spec] of allowed) {
+      if (!(code in document)) {
+        if (spec.required) {
+          throw invalid({
+            configuration: [
+              "Site module configuration is missing a required property.",
+            ],
+          });
+        }
+        continue;
+      }
+      const value = (document as Record<string, unknown>)[code];
+      const approved =
+        spec.type === "boolean"
+          ? typeof value === "boolean"
+          : spec.type === "string"
+            ? typeof value === "string" &&
+              value.trim() !== "" &&
+              value === value.trim() &&
+              value.length <= 500
+            : typeof value === "number" &&
+              Number.isInteger(value) &&
+              !Number.isNaN(value);
+      if (!approved) {
+        throw invalid({
+          configuration: ["Site module configuration is not approved."],
+        });
+      }
+    }
+  };
+
+  const respondAssignment = (
+    row: SiteModuleAssignment,
+    requestId: string,
+  ): ETaggedResponse<SiteModuleAssignment> => ({
+    data: { ...row, configuration: { ...row.configuration } },
+    etag: assignmentEtag(row),
+    requestId,
+  });
 
   const mockRequestId = () =>
     typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
@@ -545,12 +821,118 @@ export function createMockSitesAdapter(options?: {
     async listModuleAssignments(siteId, query = {}) {
       await wait();
       require(siteId);
-      let results = siteModuleFixtures.filter((row) => row.site === siteId);
+      let results = assignments.filter((row) => row.site === siteId);
+      if (query.module !== undefined) {
+        results = results.filter((row) => row.module === query.module);
+      }
       if (query.is_enabled !== undefined) {
         results = results.filter((row) => row.is_enabled === query.is_enabled);
       }
       results.sort((left, right) => left.module - right.module);
       return pageOf(results, query.page);
+    },
+
+    async getModuleAssignment(siteId, id) {
+      await wait();
+      return respondAssignment(
+        requireAssignment(siteId, id),
+        mockRequestId(),
+      );
+    },
+
+    async createModuleAssignment(siteId, input) {
+      await wait();
+      require(siteId);
+      const module = requireModule(input.module);
+      if (
+        assignments.some(
+          (row) => row.site === siteId && row.module === input.module,
+        )
+      ) {
+        throw conflict({ module: ["This Site already has this module."] });
+      }
+      // Model.full_clean normalizes settings before the insert trigger runs,
+      // so an unapproved document is a 400 ahead of the usability check.
+      validateModuleConfiguration(module, input.configuration ?? {});
+      if (!moduleIsUsable(module)) {
+        throw invalid({
+          module: [
+            "A disabled or unimplemented module cannot be enabled for a Site.",
+          ],
+        });
+      }
+      const now = new Date().toISOString();
+      const created: SiteModuleAssignment = {
+        id: nextAssignmentId++,
+        site: siteId,
+        module: input.module,
+        is_enabled: true,
+        configuration: { ...(input.configuration ?? {}) },
+        created_at: now,
+        updated_at: now,
+      };
+      assignments = [...assignments, created];
+      return respondAssignment(created, mockRequestId());
+    },
+
+    async enableModuleAssignment(siteId, id, etag) {
+      await wait();
+      const row = requireAssignment(siteId, id);
+      checkEtagAssignment(row, etag);
+      // Re-enabling a disabled row re-checks usability in model.clean(); an
+      // already-enabled row is an idempotent no-op, exactly as the service.
+      if (!row.is_enabled && !moduleIsUsable(requireModule(row.module))) {
+        throw invalid({
+          module: [
+            "A disabled or unimplemented module cannot be enabled for a Site.",
+          ],
+        });
+      }
+      const updated: SiteModuleAssignment = {
+        ...row,
+        is_enabled: true,
+        updated_at: new Date().toISOString(),
+      };
+      assignments = assignments.map((entry) =>
+        entry.id === row.id ? updated : entry,
+      );
+      return respondAssignment(updated, mockRequestId());
+    },
+
+    async disableModuleAssignment(siteId, id, etag) {
+      await wait();
+      const row = requireAssignment(siteId, id);
+      checkEtagAssignment(row, etag);
+      // Disabling flips a flag only: the row and its configuration stay, so
+      // later re-enabling restores exactly the settings that were stored.
+      const updated: SiteModuleAssignment = {
+        ...row,
+        is_enabled: false,
+        updated_at: new Date().toISOString(),
+      };
+      assignments = assignments.map((entry) =>
+        entry.id === row.id ? updated : entry,
+      );
+      return respondAssignment(updated, mockRequestId());
+    },
+
+    async updateModuleAssignment(siteId, id, etag, configuration) {
+      await wait();
+      const row = requireAssignment(siteId, id);
+      checkEtagAssignment(row, etag);
+      const module = requireModule(row.module);
+      // PATCH replaces the settings document wholesale and never touches
+      // enablement (`is_enabled` is read-only on the endpoint).
+      validateModuleConfiguration(module, configuration);
+      const updated: SiteModuleAssignment = {
+        ...row,
+        configuration: { ...configuration },
+        updated_at: new Date().toISOString(),
+      };
+      assignments = assignments.map((entry) =>
+        entry.id === row.id ? updated : entry,
+      );
+      return respondAssignment(updated, mockRequestId());
     },
 
     async listModules(query = {}) {

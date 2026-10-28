@@ -7,9 +7,9 @@ import {
 } from "@/navigation";
 
 describe("adminNavItems", () => {
-  it("exposes the Organizations and Sites entries required by the shell", () => {
+  it("exposes the Organizations, Sites and Modules entries required by the shell", () => {
     const hrefs = adminNavItems.map((item) => item.href);
-    expect(hrefs).toEqual(["/", "/organizations", "/sites"]);
+    expect(hrefs).toEqual(["/", "/organizations", "/sites", "/modules"]);
   });
 
   it("labels every entry for the navigation list", () => {
