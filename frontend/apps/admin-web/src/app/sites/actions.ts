@@ -44,6 +44,10 @@ import type {
   SiteTemplate,
   ModuleStatus,
 } from "@uog/types";
+import type {
+  SiteDomainCreateInput,
+  SiteDomainUpdateInput,
+} from "@uog/api-client";
 
 import { getAccessToken } from "@/access-token";
 import { serializeApiError } from "@/organizations/contract";
@@ -115,6 +119,109 @@ export async function listSiteDomains(
   query: { status?: "ACTIVE" | "INACTIVE"; is_primary?: boolean } = {},
 ): Promise<ActionResult<PaginatedResponse<SiteDomain>>> {
   return attempt((adapter) => adapter.listDomains(siteId, query));
+}
+
+/**
+ * One domain including the strong ETag required for conditional mutations.
+ * An unknown id — or one belonging to another Site — answers 404.
+ */
+export async function getSiteDomain(
+  siteId: number,
+  id: number,
+): Promise<ActionResult<ETaggedResponse<SiteDomain>>> {
+  return attempt((adapter) => adapter.getDomain(siteId, id));
+}
+
+/**
+ * Register a hostname for a Site. The backend normalizes the value,
+ * enforces global uniqueness (a duplicate is 409 under `hostname`) and
+ * refuses an ACTIVE domain on an ARCHIVED Site. A new row is never the
+ * primary — use `makeSiteDomainPrimary` for that designation.
+ */
+export async function createSiteDomain(
+  siteId: number,
+  input: SiteDomainCreateInput,
+): Promise<ActionResult<ETaggedResponse<SiteDomain>>> {
+  return attempt((adapter) => adapter.createDomain(siteId, input));
+}
+
+/**
+ * Change a domain's status or alias-redirect flag (conditional PATCH).
+ * Hostname, Site and the primary designation are not editable here.
+ */
+export async function updateSiteDomain(
+  siteId: number,
+  id: number,
+  input: SiteDomainUpdateInput,
+): Promise<ActionResult<ETaggedResponse<SiteDomain>>> {
+  return attempt(async (adapter) => {
+    const current = await adapter.getDomain(siteId, id);
+    if (!current.etag) {
+      throw new ApiError(
+        "The server did not return a concurrency token; the domain was not changed.",
+        428,
+        { code: "precondition_required", requestId: current.requestId },
+      );
+    }
+    return adapter.updateDomain(siteId, id, current.etag, input);
+  });
+}
+
+/** Conditional status changes, each against a freshly fetched ETag. */
+async function domainStatus(
+  siteId: number,
+  id: number,
+  action: "activate" | "deactivate",
+): Promise<ActionResult<ETaggedResponse<SiteDomain>>> {
+  return attempt(async (adapter) => {
+    const current = await adapter.getDomain(siteId, id);
+    if (!current.etag) {
+      throw new ApiError(
+        "The server did not return a concurrency token; the domain was not changed.",
+        428,
+        { code: "precondition_required", requestId: current.requestId },
+      );
+    }
+    return action === "activate"
+      ? adapter.activateDomain(siteId, id, current.etag)
+      : adapter.deactivateDomain(siteId, id, current.etag);
+  });
+}
+
+export async function activateSiteDomain(
+  siteId: number,
+  id: number,
+): Promise<ActionResult<ETaggedResponse<SiteDomain>>> {
+  return domainStatus(siteId, id, "activate");
+}
+
+export async function deactivateSiteDomain(
+  siteId: number,
+  id: number,
+): Promise<ActionResult<ETaggedResponse<SiteDomain>>> {
+  return domainStatus(siteId, id, "deactivate");
+}
+
+/**
+ * Designate a domain as the Site's primary. The backend clears the previous
+ * primary inside one domain lock, so the Site keeps exactly one; callers
+ * must confirm with the operator first because this changes routing.
+ */
+export async function makeSiteDomainPrimary(
+  siteId: number,
+  id: number,
+): Promise<ActionResult<ETaggedResponse<SiteDomain>>> {
+  return attempt(async (adapter) => {
+    const current = await adapter.getDomain(siteId, id);
+    if (!current.etag) {
+      throw new ApiError(
+        "The server did not return a concurrency token; the domain was not changed.",
+        428,
+        { code: "precondition_required", requestId: current.requestId },
+      );
+    }
+    return adapter.makeDomainPrimary(siteId, id, current.etag);
+  });
 }
 
 /**

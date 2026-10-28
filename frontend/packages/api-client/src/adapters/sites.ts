@@ -35,6 +35,7 @@ import type {
 } from "@uog/types";
 
 import { ApiError, createApiClient } from "../client";
+import { normalizeHostname } from "../hostname";
 import { buildQueryString, withQuery } from "../query";
 import { organizationFixtures } from "../fixtures/organizations";
 import {
@@ -93,6 +94,30 @@ export interface SiteDomainListQuery {
   page?: number;
 }
 
+/**
+ * Writable fields accepted by `POST /sites/{site_pk}/domains/`. The
+ * hostname is normalized by the backend and must be globally unique;
+ * `is_primary` is not a body field (use `make-primary` after creating).
+ */
+export interface SiteDomainCreateInput {
+  hostname: string;
+  /** Defaults to INACTIVE; an ACTIVE domain on an ARCHIVED site is a 400. */
+  status?: SiteDomainStatus;
+  /** Aliases may redirect to the primary; a primary never redirects. */
+  redirect_to_primary?: boolean;
+}
+
+/**
+ * Writable fields accepted by `PATCH /sites/{site_pk}/domains/{id}/`.
+ * `hostname`, `site` and the primary designation are not editable here —
+ * hostnames are immutable, a domain cannot change Site, and the primary
+ * moves only through `POST .../make-primary/`.
+ */
+export interface SiteDomainUpdateInput {
+  status?: SiteDomainStatus;
+  redirect_to_primary?: boolean;
+}
+
 /** Validated filters for GET /sites/{id}/modules/. */
 export interface SiteModuleListQuery {
   /** Exact registry module id. */
@@ -142,6 +167,47 @@ export interface SitesAdapter {
   listDomainsAll(
     query?: DomainListQuery,
   ): Promise<PaginatedResponse<DomainRecord>>;
+  /** One domain including the strong ETag required for mutations. */
+  getDomain(
+    siteId: number,
+    id: number,
+  ): Promise<ETaggedResponse<SiteDomain>>;
+  /** `POST /sites/{site_pk}/domains/` — hostname normalized and unique. */
+  createDomain(
+    siteId: number,
+    input: SiteDomainCreateInput,
+  ): Promise<ETaggedResponse<SiteDomain>>;
+  /**
+   * `PATCH .../domains/{id}/` — change status or the alias redirect flag
+   * (conditional on `etag`). Hostname, Site and primary are not writable.
+   */
+  updateDomain(
+    siteId: number,
+    id: number,
+    etag: string,
+    input: SiteDomainUpdateInput,
+  ): Promise<ETaggedResponse<SiteDomain>>;
+  /** `POST .../domains/{id}/activate/` — conditional status change. */
+  activateDomain(
+    siteId: number,
+    id: number,
+    etag: string,
+  ): Promise<ETaggedResponse<SiteDomain>>;
+  /** `POST .../domains/{id}/deactivate/` — conditional status change. */
+  deactivateDomain(
+    siteId: number,
+    id: number,
+    etag: string,
+  ): Promise<ETaggedResponse<SiteDomain>>;
+  /**
+   * `POST .../domains/{id}/make-primary/` — atomically leaves exactly one
+   * primary domain for the Site (conditional on `etag`).
+   */
+  makeDomainPrimary(
+    siteId: number,
+    id: number,
+    etag: string,
+  ): Promise<ETaggedResponse<SiteDomain>>;
   /** One site's module enablement rows (empty until a capability ships). */
   listModuleAssignments(
     siteId: number,
@@ -400,6 +466,57 @@ export function createLiveSitesAdapter(options: {
       }
       return queryDomainRecords(records, query);
     },
+    async getDomain(siteId, id) {
+      return toEtagged(
+        await client.getDetailed<SiteDomain>(
+          `${SITES_PATH}${siteId}/domains/${id}/`,
+        ),
+      );
+    },
+    async createDomain(siteId, input) {
+      return toEtagged(
+        await client.postDetailed<SiteDomain>(
+          `${SITES_PATH}${siteId}/domains/`,
+          input,
+        ),
+      );
+    },
+    async updateDomain(siteId, id, etag, input) {
+      return toEtagged(
+        await client.patchDetailed<SiteDomain>(
+          `${SITES_PATH}${siteId}/domains/${id}/`,
+          input,
+          { ifMatch: etag },
+        ),
+      );
+    },
+    async activateDomain(siteId, id, etag) {
+      return toEtagged(
+        await client.postDetailed<SiteDomain>(
+          `${SITES_PATH}${siteId}/domains/${id}/activate/`,
+          {},
+          { headers: { "If-Match": etag } },
+        ),
+      );
+    },
+    async deactivateDomain(siteId, id, etag) {
+      return toEtagged(
+        await client.postDetailed<SiteDomain>(
+          `${SITES_PATH}${siteId}/domains/${id}/deactivate/`,
+          {},
+          { headers: { "If-Match": etag } },
+        ),
+      );
+    },
+    async makeDomainPrimary(siteId, id, etag) {
+      return toEtagged(
+        await client.postDetailed<SiteDomain>(
+          `${SITES_PATH}${siteId}/domains/${id}/make-primary/`,
+          {},
+          { headers: { "If-Match": etag } },
+        ),
+      );
+    },
     async listModuleAssignments(siteId, query) {
       const path = withQuery(
         `${SITES_PATH}${siteId}/modules/`,
@@ -587,6 +704,12 @@ export function createMockSitesAdapter(options?: {
   ).map((row) => ({ ...row, configuration: { ...row.configuration } }));
   let nextAssignmentId =
     assignments.reduce((max, row) => Math.max(max, row.id), 0) + 1;
+
+  // Domain rows are mutable in the mock so add/edit flows can be exercised
+  // locally with the same observable rules the API enforces.
+  let domains: SiteDomain[] = siteDomainFixtures.map((row) => ({ ...row }));
+  let nextDomainId =
+    domains.reduce((max, row) => Math.max(max, row.id), 0) + 1;
 
   const wait = () =>
     latencyMs > 0
@@ -794,6 +917,61 @@ export function createMockSitesAdapter(options?: {
     requestId,
   });
 
+  const domainEtag = (row: SiteDomain): string =>
+    `"mock-domain-${row.id}-${row.updated_at}"`;
+
+  const checkDomainEtag = (row: SiteDomain, etag: string) => {
+    if (etag !== domainEtag(row)) {
+      throw new ApiError(
+        "The resource changed. Retrieve it and reconcile your changes.",
+        412,
+        { code: "precondition_failed" },
+      );
+    }
+  };
+
+  const requireDomain = (siteId: number, id: number): SiteDomain => {
+    // The queryset is scoped to the site, so an unknown id and an id that
+    // belongs to another Site both answer 404.
+    const found = domains.find((row) => row.id === id && row.site === siteId);
+    if (!found) {
+      throw new ApiError("The requested resource was not found.", 404, {
+        code: "not_found",
+        details: { detail: "No SiteDomain matches the given query." },
+      });
+    }
+    return found;
+  };
+
+  const respondDomain = (
+    row: SiteDomain,
+    requestId: string,
+  ): ETaggedResponse<SiteDomain> => ({
+    data: { ...row },
+    etag: domainEtag(row),
+    requestId,
+  });
+
+  /** Mirror of normalize_hostname + the archived-site status rule. */
+  const validatedHostname = (raw: string): string => {
+    const parsed = normalizeHostname(raw);
+    if (parsed.error !== undefined) {
+      throw invalid({ hostname: [parsed.error] });
+    }
+    return parsed.hostname;
+  };
+
+  const validateDomainStatus = (row: { status: SiteDomainStatus; site: number }) => {
+    if (row.status === "ACTIVE") {
+      const owner = store.find((site) => site.id === row.site);
+      if (owner?.status === "ARCHIVED") {
+        throw invalid({
+          status: ["An archived Site cannot have an active domain."],
+        });
+      }
+    }
+  };
+
   const mockRequestId = () =>
     typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
       ? crypto.randomUUID()
@@ -943,7 +1121,7 @@ export function createMockSitesAdapter(options?: {
       await wait();
       // The API 404s when the site itself does not exist, before any filter.
       require(siteId);
-      let results = siteDomainFixtures.filter((domain) => domain.site === siteId);
+      let results = domains.filter((domain) => domain.site === siteId);
       if (query.status) {
         results = results.filter((domain) => domain.status === query.status);
       }
@@ -963,11 +1141,125 @@ export function createMockSitesAdapter(options?: {
       const sites =
         query.site !== undefined ? [require(query.site)] : store;
       const records: DomainRecord[] = sites.flatMap((site) =>
-        siteDomainFixtures
+        domains
           .filter((domain) => domain.site === site.id)
           .map((domain) => toDomainRecord(domain, site)),
       );
       return queryDomainRecords(records, query);
+    },
+
+    async getDomain(siteId, id) {
+      await wait();
+      return respondDomain(requireDomain(siteId, id), mockRequestId());
+    },
+
+    async createDomain(siteId, input) {
+      await wait();
+      const owner = require(siteId);
+      const hostname = validatedHostname(input.hostname);
+      if (domains.some((row) => row.hostname === hostname)) {
+        // translate_domain_errors maps "already exists" onto a 409 with the
+        // offending field.
+        throw conflict({
+          hostname: ["Site domain with this hostname already exists."],
+        });
+      }
+      const status = input.status ?? "INACTIVE";
+      validateDomainStatus({ status, site: siteId });
+      if (input.redirect_to_primary) {
+        // New rows are never primary (is_primary is not a body field), so an
+        // alias redirect is fine — but it cannot point at a missing primary.
+        // The backend stores the flag regardless; no extra rule here.
+      }
+      const now = new Date().toISOString();
+      const created: SiteDomain = {
+        id: nextDomainId++,
+        site: owner.id,
+        hostname,
+        is_primary: false,
+        redirect_to_primary: input.redirect_to_primary ?? false,
+        status,
+        created_at: now,
+        updated_at: now,
+      };
+      domains = [...domains, created];
+      return respondDomain(created, mockRequestId());
+    },
+
+    async updateDomain(siteId, id, etag, input) {
+      await wait();
+      const row = requireDomain(siteId, id);
+      checkDomainEtag(row, etag);
+      // Hostname, Site and the primary designation are not writable here.
+      if (input.redirect_to_primary && row.is_primary) {
+        throw invalid({
+          redirect_to_primary: ["A primary domain cannot redirect to itself."],
+        });
+      }
+      const status = input.status ?? row.status;
+      validateDomainStatus({ status, site: row.site });
+      const updated: SiteDomain = {
+        ...row,
+        status,
+        redirect_to_primary: input.redirect_to_primary ?? row.redirect_to_primary,
+        updated_at: new Date().toISOString(),
+      };
+      domains = domains.map((entry) => (entry.id === row.id ? updated : entry));
+      return respondDomain(updated, mockRequestId());
+    },
+
+    async activateDomain(siteId, id, etag) {
+      await wait();
+      const row = requireDomain(siteId, id);
+      checkDomainEtag(row, etag);
+      validateDomainStatus({ status: "ACTIVE", site: row.site });
+      const updated: SiteDomain = {
+        ...row,
+        status: "ACTIVE",
+        updated_at: new Date().toISOString(),
+      };
+      domains = domains.map((entry) => (entry.id === row.id ? updated : entry));
+      return respondDomain(updated, mockRequestId());
+    },
+
+    async deactivateDomain(siteId, id, etag) {
+      await wait();
+      const row = requireDomain(siteId, id);
+      checkDomainEtag(row, etag);
+      const updated: SiteDomain = {
+        ...row,
+        status: "INACTIVE",
+        updated_at: new Date().toISOString(),
+      };
+      domains = domains.map((entry) => (entry.id === row.id ? updated : entry));
+      return respondDomain(updated, mockRequestId());
+    },
+
+    async makeDomainPrimary(siteId, id, etag) {
+      await wait();
+      const row = requireDomain(siteId, id);
+      checkDomainEtag(row, etag);
+      // designate_primary clears the previous primary inside one domain
+      // lock, so the site always keeps exactly one primary.
+      const now = new Date().toISOString();
+      domains = domains.map((entry) => {
+        if (entry.site !== row.site) return entry;
+        if (entry.id === row.id) {
+          return {
+            ...entry,
+            is_primary: true,
+            redirect_to_primary: false,
+            updated_at: now,
+          };
+        }
+        return entry.is_primary
+          ? { ...entry, is_primary: false, updated_at: now }
+          : entry;
+      });
+      return respondDomain(
+        domains.find((entry) => entry.id === row.id)!,
+        mockRequestId(),
+      );
     },
 
     async listModuleAssignments(siteId, query = {}) {
