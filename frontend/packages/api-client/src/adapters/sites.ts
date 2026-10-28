@@ -19,6 +19,8 @@
  * deployed integration can never serve a fabricated response.
  */
 import type {
+  DomainListQuery,
+  DomainRecord,
   ETaggedResponse,
   PaginatedResponse,
   PlatformModule,
@@ -51,6 +53,9 @@ import type { SiteConfigurationChanges } from "../sites-configuration";
 
 /** Page size the backend enforces (20 per page, not client-selectable). */
 export const SITES_PAGE_SIZE = 20;
+
+/** Page size of the composed Domain Management listing. */
+export const DOMAINS_PAGE_SIZE = 20;
 
 /** Writable fields accepted by `POST /sites/` (status always starts DRAFT). */
 export interface SiteCreateInput {
@@ -124,6 +129,19 @@ export interface SitesAdapter {
     siteId: number,
     query?: SiteDomainListQuery,
   ): Promise<PaginatedResponse<SiteDomain>>;
+  /**
+   * Central Domain Management listing: every domain across all Sites, joined
+   * with its Site's code/name/status/owner.
+   *
+   * The platform API exposes domains per Site only, so the live adapter
+   * composes this from the approved endpoints (sites page loop + per-site
+   * domain loops) and applies the documented query filters/sorting over the
+   * composed result. The mock serves the same shape from fixtures.
+   * An unknown `query.site` answers 404, like a detail read.
+   */
+  listDomainsAll(
+    query?: DomainListQuery,
+  ): Promise<PaginatedResponse<DomainRecord>>;
   /** One site's module enablement rows (empty until a capability ships). */
   listModuleAssignments(
     siteId: number,
@@ -218,6 +236,92 @@ export function siteListQueryString(query: SiteListQuery = {}): string {
   });
 }
 
+/**
+ * Sortable fields of the composed Domain Management listing. Each maps to a
+ * value on `DomainRecord`; `ordering` accepts them comma-separated with a
+ * `-` prefix for descending, like the backend's ordering contract.
+ */
+const DOMAIN_ORDER_FIELDS: Record<
+  string,
+  (record: DomainRecord) => string | number | boolean
+> = {
+  hostname: (record) => record.hostname,
+  site: (record) => record.site_code,
+  organization: (record) => record.organization_unit,
+  type: (record) => record.is_primary,
+  status: (record) => record.status,
+  site_status: (record) => record.site_status,
+};
+
+/** Join one domain with the Site fields the listing needs to display. */
+function toDomainRecord(domain: SiteDomain, site: Site): DomainRecord {
+  return {
+    ...domain,
+    site_code: site.code,
+    site_name: site.name,
+    site_status: site.status,
+    organization_unit: site.organization_unit,
+  };
+}
+
+/** Apply a DomainListQuery to composed rows: filter, order, paginate. */
+export function queryDomainRecords(
+  records: DomainRecord[],
+  query: DomainListQuery = {},
+): PaginatedResponse<DomainRecord> {
+  let results = [...records];
+
+  if (query.site !== undefined) {
+    results = results.filter((record) => record.site === query.site);
+  }
+  if (query.is_primary !== undefined) {
+    results = results.filter((record) => record.is_primary === query.is_primary);
+  }
+  if (query.status) {
+    results = results.filter((record) => record.status === query.status);
+  }
+  if (query.search) {
+    const needle = query.search.trim().toLowerCase();
+    results = results.filter((record) =>
+      `${record.hostname} ${record.site_code} ${record.site_name}`
+        .toLowerCase()
+        .includes(needle),
+    );
+  }
+
+  // Successive stable sorts, last field first — same semantics the sites
+  // list uses. Unknown ordering fields are ignored rather than guessed.
+  const ordering = (query.ordering ?? "hostname").split(",");
+  for (const field of [...ordering].reverse()) {
+    const descending = field.startsWith("-");
+    const name = field.startsWith("-") ? field.slice(1) : field;
+    const keyOf = DOMAIN_ORDER_FIELDS[name];
+    if (!keyOf) continue;
+    results.sort((left, right) => {
+      const a = keyOf(left);
+      const b = keyOf(right);
+      const cmp =
+        typeof a === "number" && typeof b === "number"
+          ? a - b
+          : typeof a === "boolean" && typeof b === "boolean"
+            ? Number(a) - Number(b)
+            : String(a).localeCompare(String(b));
+      return descending ? -cmp : cmp;
+    });
+  }
+
+  const count = results.length;
+  const page = Math.max(1, query.page ?? 1);
+  const start = (page - 1) * DOMAINS_PAGE_SIZE;
+  const slice = results.slice(start, start + DOMAINS_PAGE_SIZE);
+  return {
+    count,
+    next: start + DOMAINS_PAGE_SIZE < count ? `?page=${page + 1}` : null,
+    previous: page > 1 ? `?page=${page - 1}` : null,
+    results: slice,
+  };
+}
+
 /** Live adapter: the real Django Sites API via the typed HTTP client. */
 export function createLiveSitesAdapter(options: {
   baseUrl: string;
@@ -240,6 +344,22 @@ export function createLiveSitesAdapter(options: {
     requestId: result.requestId,
   });
 
+  /**
+   * Walk a paginated endpoint to exhaustion (bounded at 50 pages / 1000
+   * rows, matching the platform's documented scale for composed reads).
+   */
+  async function collect<T>(path: string): Promise<T[]> {
+    const rows: T[] = [];
+    for (let page = 1; page <= 50; page += 1) {
+      const result = await client.get<PaginatedResponse<T>>(
+        withQuery(path, buildQueryString({ page })),
+      );
+      rows.push(...result.results);
+      if (!result.next) break;
+    }
+    return rows;
+  }
+
   return {
     async list(query) {
       const path = withQuery(SITES_PATH, siteListQueryString(query));
@@ -261,6 +381,24 @@ export function createLiveSitesAdapter(options: {
         }),
       );
       return client.get<PaginatedResponse<SiteDomain>>(path);
+    },
+    async listDomainsAll(query = {}) {
+      // Compose from the approved per-site endpoints: collect the sites
+      // (one, when filtered — a detail read, so unknown ids answer 404),
+      // then each site's domains, then apply the documented filters/sort.
+      const sites: Site[] =
+        query.site !== undefined
+          ? [await client.get<Site>(`${SITES_PATH}${query.site}/`)]
+          : await collect<Site>(SITES_PATH);
+
+      const records: DomainRecord[] = [];
+      for (const site of sites) {
+        const domains = await collect<SiteDomain>(`${SITES_PATH}${site.id}/domains/`);
+        for (const domain of domains) {
+          records.push(toDomainRecord(domain, site));
+        }
+      }
+      return queryDomainRecords(records, query);
     },
     async listModuleAssignments(siteId, query) {
       const path = withQuery(
@@ -816,6 +954,20 @@ export function createMockSitesAdapter(options?: {
       }
       results.sort((left, right) => left.hostname.localeCompare(right.hostname));
       return pageOf(results, query.page);
+    },
+
+    async listDomainsAll(query = {}) {
+      await wait();
+      // Same join the live adapter performs over the per-site endpoints; an
+      // unknown site filter 404s exactly like a detail read.
+      const sites =
+        query.site !== undefined ? [require(query.site)] : store;
+      const records: DomainRecord[] = sites.flatMap((site) =>
+        siteDomainFixtures
+          .filter((domain) => domain.site === site.id)
+          .map((domain) => toDomainRecord(domain, site)),
+      );
+      return queryDomainRecords(records, query);
     },
 
     async listModuleAssignments(siteId, query = {}) {

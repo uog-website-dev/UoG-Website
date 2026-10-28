@@ -177,6 +177,14 @@ export function SiteDetail({ site, error }: SiteDetailProps) {
     async () => (site ? unwrap(await listSiteDomains(site.id)) : null),
     [site?.id],
   );
+  // The hero shows the primary domain prominently, so it reads that row
+  // explicitly (the API can filter on is_primary) instead of hoping the
+  // first page of the full list happens to contain it.
+  const primaryDomain = useAsync<PaginatedResponse<SiteDomain> | null>(
+    async () =>
+      site ? unwrap(await listSiteDomains(site.id, { is_primary: true })) : null,
+    [site?.id],
+  );
   const assignments = useAsync<PaginatedResponse<SiteModuleAssignment> | null>(
     async () => (site ? unwrap(await listSiteModuleAssignments(site.id)) : null),
     [site?.id],
@@ -408,6 +416,66 @@ export function SiteDetail({ site, error }: SiteDetailProps) {
                   {siteStatusLabel(site.status)}
                   {site.is_main ? " · main university site" : ""}
                 </Typography>
+                {/* Primary domain, shown prominently with honest states. */}
+                <Box
+                  sx={{
+                    mt: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    flexWrap: "wrap",
+                  }}
+                >
+                  {primaryDomain.loading ? (
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      aria-live="polite"
+                    >
+                      Loading primary domain…
+                    </Typography>
+                  ) : primaryDomain.error ? (
+                    <Typography variant="body2" color="warning.main">
+                      Primary domain unavailable — the domain read failed and
+                      nothing is guessed. See the Domains panel below.
+                    </Typography>
+                  ) : (
+                    (() => {
+                      const primary = primaryDomain.data?.results?.[0];
+                      return primary ? (
+                        <>
+                          <LanguageRoundedIcon
+                            sx={{ fontSize: 18, color: "primary.main" }}
+                            aria-hidden="true"
+                          />
+                          <Typography
+                            variant="body1"
+                            sx={{ fontFamily: "monospace", fontWeight: 700 }}
+                          >
+                            {primary.hostname}
+                          </Typography>
+                          <Chip
+                            size="small"
+                            variant="outlined"
+                            color={
+                              primary.status === "ACTIVE" ? "success" : "default"
+                            }
+                            label="Primary domain"
+                          />
+                          {primary.status !== "ACTIVE" ? (
+                            <Typography variant="caption" color="text.secondary">
+                              Inactive — not currently served
+                            </Typography>
+                          ) : null}
+                        </>
+                      ) : (
+                        <Typography variant="body2" color="text.secondary">
+                          No primary domain registered
+                        </Typography>
+                      );
+                    })()
+                  )}
+                </Box>
               </Box>
             </Box>
             <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>

@@ -1,13 +1,15 @@
 /**
- * Admin dashboard — shell placeholder.
+ * Admin dashboard — console entry point.
  *
- * This screen intentionally performs no privileged API calls: it only
- * presents the console shell and links to the section placeholders. The
- * single live probe is the clearly-labelled backend readiness check, which
- * reports connectivity honestly instead of implying working features.
+ * The Organizations, Sites and Modules sections are live-wired: their
+ * screens read and write through the Django API using server actions, so
+ * the Keycloak access token stays server-side and the backend remains the
+ * authority on permissions, concurrency and lifecycle rules. The single
+ * diagnostic on this page is the clearly-labelled backend readiness probe.
  */
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import BusinessIcon from "@mui/icons-material/Business";
+import ExtensionIcon from "@mui/icons-material/Extension";
 import WebIcon from "@mui/icons-material/Web";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
@@ -36,6 +38,13 @@ const sections = [
       "Public websites and microsites managed by the platform, including domains and publishing state.",
     icon: WebIcon,
   },
+  {
+    title: "Modules",
+    href: "/modules",
+    description:
+      "Platform capability registry — what each site may enable, and on what terms.",
+    icon: ExtensionIcon,
+  },
 ];
 
 export default function AdminDashboard() {
@@ -57,10 +66,11 @@ export default function AdminDashboard() {
       </Box>
 
       <Alert severity="info" variant="outlined">
-        <strong>Shell preview.</strong> The console framework (navigation,
-        layout, route states) is in place, but management features are not
-        connected to the platform API yet. No data is read or written from
-        these screens.
+        <strong>Connected to the platform API.</strong> The sections below
+        read and write through the Django API using your Keycloak session.
+        The server decides every request: it enforces the platform-admin
+        role, rejects stale writes, and applies the organization and site
+        lifecycle rules — any refusal is shown on the screen that caused it.
       </Alert>
 
       <Box
@@ -75,7 +85,7 @@ export default function AdminDashboard() {
           sx={{
             display: "grid",
             gap: 2,
-            gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)" },
+            gridTemplateColumns: { xs: "1fr", sm: "repeat(3, 1fr)" },
           }}
         >
           {sections.map((section) => {
@@ -86,7 +96,7 @@ export default function AdminDashboard() {
                   component={NextLink}
                   href={section.href}
                   sx={{ height: "100%", p: 2.5, alignItems: "flex-start" }}
-                  aria-label={`Open the ${section.title} section (placeholder)`}
+                  aria-label={`Open the ${section.title} section`}
                 >
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1 }}>
                     <Box
@@ -106,7 +116,7 @@ export default function AdminDashboard() {
                     <Typography variant="h6" sx={{ fontWeight: 700 }}>
                       {section.title}
                     </Typography>
-                    <Chip label="Placeholder" size="small" color="secondary" />
+                    <Chip label="Live API" size="small" color="success" variant="outlined" />
                   </Box>
                   <Typography variant="body2" color="text.secondary">
                     {section.description}

@@ -1,6 +1,7 @@
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import BusinessIcon from "@mui/icons-material/Business";
 import ExtensionIcon from "@mui/icons-material/Extension";
+import LanguageIcon from "@mui/icons-material/Language";
 import WebIcon from "@mui/icons-material/Web";
 import type { SvgIconComponent } from "@mui/icons-material";
 
@@ -43,6 +44,13 @@ export const adminNavItems: AdminNavItem[] = [
     href: "/sites",
     description: "Managed websites",
     icon: WebIcon,
+  },
+  {
+    key: "domains",
+    label: "Domains",
+    href: "/domains",
+    description: "Website addresses",
+    icon: LanguageIcon,
   },
   {
     key: "modules",

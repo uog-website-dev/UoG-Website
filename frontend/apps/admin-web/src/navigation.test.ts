@@ -7,9 +7,15 @@ import {
 } from "@/navigation";
 
 describe("adminNavItems", () => {
-  it("exposes the Organizations, Sites and Modules entries required by the shell", () => {
+  it("exposes the Organizations, Sites, Domains and Modules entries required by the shell", () => {
     const hrefs = adminNavItems.map((item) => item.href);
-    expect(hrefs).toEqual(["/", "/organizations", "/sites", "/modules"]);
+    expect(hrefs).toEqual([
+      "/",
+      "/organizations",
+      "/sites",
+      "/domains",
+      "/modules",
+    ]);
   });
 
   it("labels every entry for the navigation list", () => {

@@ -32,6 +32,8 @@ import type {
   SiteUpdateInput,
 } from "@uog/api-client";
 import type {
+  DomainListQuery,
+  DomainRecord,
   ETaggedResponse,
   PaginatedResponse,
   PlatformModule,
@@ -113,6 +115,38 @@ export async function listSiteDomains(
   query: { status?: "ACTIVE" | "INACTIVE"; is_primary?: boolean } = {},
 ): Promise<ActionResult<PaginatedResponse<SiteDomain>>> {
   return attempt((adapter) => adapter.listDomains(siteId, query));
+}
+
+/**
+ * Central Domain Management listing: every domain across all Sites, joined
+ * with its Site's code, name, status and owning unit.
+ *
+ * The platform API exposes domains per Site only, so the typed client
+ * composes this view from the approved endpoints (`GET /sites/` plus
+ * `GET /sites/{id}/domains/`) and applies the documented filters, ordering
+ * and pagination over the composed rows. No backend change is required,
+ * and in mock mode the same interface serves the in-repo fixtures.
+ */
+export async function listAllDomains(
+  query: DomainListQuery = {},
+): Promise<ActionResult<PaginatedResponse<DomainRecord>>> {
+  return attempt((adapter) => adapter.listDomainsAll(query));
+}
+
+/**
+ * Every site, for the Domain Management filter select. Bounded by the
+ * same 50-page cap the composed domain read uses.
+ */
+export async function listAllSites(): Promise<ActionResult<Site[]>> {
+  return attempt(async (adapter) => {
+    const sites: Site[] = [];
+    for (let page = 1; page <= 50; page += 1) {
+      const result = await adapter.list({ page });
+      sites.push(...result.results);
+      if (!result.next) break;
+    }
+    return sites;
+  });
 }
 
 /** One site's module enablement rows (empty until a capability ships). */

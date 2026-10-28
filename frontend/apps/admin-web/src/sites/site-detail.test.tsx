@@ -207,7 +207,8 @@ describe("SiteDetail — domains", () => {
 
     renderDetail({ site: site() });
 
-    expect(await screen.findByText("www.uog.edu.et")).toBeTruthy();
+    // The primary hostname now appears in the hero profile and the panel.
+    expect((await screen.findAllByText("www.uog.edu.et")).length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("uog.edu.et")).toBeTruthy();
     expect(screen.getByText("Primary")).toBeTruthy();
     expect(screen.getByText("Alias")).toBeTruthy();
@@ -332,6 +333,57 @@ describe("SiteDetail — modules", () => {
     ).toBeTruthy();
     // The empty-state message must not appear alongside the failure.
     expect(screen.queryByText(/No modules are enabled for this site/i)).toBeNull();
+  });
+});
+
+describe("SiteDetail — primary domain", () => {
+  it("shows the primary domain prominently on the site profile", async () => {
+    listSiteDomains.mockImplementation(
+      (_siteId: number, query?: { is_primary?: boolean }) =>
+        query?.is_primary
+          ? Promise.resolve({
+              ok: true,
+              data: page([
+                domain({ id: 9, hostname: "www.uog.edu.et", is_primary: true }),
+              ]),
+            })
+          : Promise.resolve({ ok: true, data: page([domain()]) }),
+    );
+
+    renderDetail({ site: site() });
+
+    // The hostname appears in the hero profile and in the Domains panel.
+    expect(
+      (await screen.findAllByText("www.uog.edu.et")).length,
+    ).toBeGreaterThanOrEqual(2);
+    // Shown in the hero profile, not only in the Domains panel below.
+    expect(screen.getByText("Primary domain")).toBeTruthy();
+    expect(
+      screen.queryByText("No primary domain registered"),
+    ).toBeNull();
+  });
+
+  it("says so when the site has no primary domain", async () => {
+    listSiteDomains.mockResolvedValue({ ok: true, data: page([]) });
+
+    renderDetail({ site: site() });
+
+    expect(
+      await screen.findByText("No primary domain registered"),
+    ).toBeTruthy();
+  });
+
+  it("reports a failed primary-domain read instead of guessing", async () => {
+    listSiteDomains.mockResolvedValue({
+      ok: false,
+      error: { status: 500, code: "api_error", message: "Boom.", details: null, requestId: null },
+    });
+
+    renderDetail({ site: site() });
+
+    expect(
+      await screen.findByText(/Primary domain unavailable/i),
+    ).toBeTruthy();
   });
 });
 
