@@ -120,8 +120,13 @@ stages:
               corepack enable
               cd frontend
               pnpm install --frozen-lockfile
+              # Frontend unit tests (vitest) — includes the Auth.js OIDC
+              # sign-in, token refresh and session-gate suites. Running them
+              # before the build keeps a broken test from reaching production
+              # images.
+              pnpm test
               pnpm build
-            displayName: 'Build Frontend'
+            displayName: 'Test and Build Frontend'
       
       - job: DockerAndArtifacts
         displayName: 'Docker Push and Artifacts'

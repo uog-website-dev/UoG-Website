@@ -4,6 +4,8 @@ Unit tests for the Keycloak access-token validation.
 These tests do not touch the database or the network — they exercise the
 signature, issuer, audience and client checks in isolation.
 """
+import base64
+import json
 import time
 
 import jwt
@@ -21,6 +23,7 @@ from .oidc_helpers import (
     AUDIENCE,
     ISSUER,
     JWKS_URL,
+    KEY_ID,
     generate_signing_key,
     jwks_cache,
     jwks_document,
@@ -165,6 +168,29 @@ def test_symmetric_algorithm_is_rejected(signing_key, config, jwks):
 def test_garbage_token_is_rejected(config, jwks):
     with pytest.raises(TokenValidationError, match="not a readable JWT"):
         validate_access_token("not-a-jwt", config, jwks)
+
+
+def test_unsigned_token_is_rejected(config, jwks):
+    """An `alg: none` token with valid claims must never be accepted."""
+    now = int(time.time())
+
+    def segment(claim_set: dict) -> str:
+        raw = json.dumps(claim_set, separators=(",", ":")).encode()
+        return base64.urlsafe_b64encode(raw).rstrip(b"=").decode()
+
+    header = {"alg": "none", "typ": "JWT", "kid": KEY_ID}
+    claims = {
+        "iss": ISSUER,
+        "aud": AUDIENCE,
+        "sub": "5f1b2c3d-0000-4000-8000-000000000001",
+        "azp": "public-web",
+        "iat": now,
+        "exp": now + 60,
+    }
+    token = f"{segment(header)}.{segment(claims)}."
+
+    with pytest.raises(TokenValidationError, match="unsupported algorithm"):
+        validate_access_token(token, config, jwks)
 
 
 def test_empty_token_is_rejected(config, jwks):

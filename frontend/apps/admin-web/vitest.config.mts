@@ -19,5 +19,13 @@ export default defineConfig({
     environment: "jsdom",
     include: ["src/**/*.test.{ts,tsx}"],
     setupFiles: ["./src/test/setup.ts"],
+    server: {
+      deps: {
+        // Auth.js (`next-auth`) is ESM and imports `next/server`, which Node's
+        // native resolver cannot map without Next's bundler. Transform it
+        // through Vite instead so the OIDC route tests can drive it.
+        inline: ["next-auth", "@auth/core"],
+      },
+    },
   },
 });
