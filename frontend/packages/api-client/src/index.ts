@@ -53,6 +53,7 @@ export type {
   SiteUpdateInput,
   SiteDomainListQuery,
   SiteModuleListQuery,
+  SiteModuleInput,
   PlatformModuleListQuery,
 } from "./adapters/sites";
 

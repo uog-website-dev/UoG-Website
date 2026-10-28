@@ -123,6 +123,100 @@ export async function listSiteModuleAssignments(
 }
 
 /**
+ * Enable one registry module for a site.
+ *
+ * Creates the assignment when the site has none for that module (applying
+ * the initial settings), or re-enables an existing disabled row — which
+ * keeps the settings stored on it, exactly as the backend's `enable` action
+ * does (its body must be `{}`). `initialConfiguration` therefore only applies
+ * to the create path.
+ *
+ * The strong ETag for a conditional re-enable is fetched immediately before
+ * the call, so a stale row can never silently win; the server's usability
+ * rule (implemented, globally enabled, shipped) decides whether the write is
+ * allowed, and its 400/403 answer is surfaced verbatim.
+ */
+export async function enableSiteModule(
+  siteId: number,
+  moduleId: number,
+  initialConfiguration?: Record<string, unknown>,
+): Promise<ActionResult<ETaggedResponse<SiteModuleAssignment>>> {
+  return attempt(async (adapter) => {
+    const current = await adapter.listModuleAssignments(siteId, {
+      module: moduleId,
+    });
+    const existing = current.results[0];
+    if (!existing) {
+      return adapter.createModuleAssignment(siteId, {
+        module: moduleId,
+        ...(initialConfiguration !== undefined
+          ? { configuration: initialConfiguration }
+          : {}),
+      });
+    }
+    const detail = await adapter.getModuleAssignment(siteId, existing.id);
+    if (!detail.etag) {
+      throw new ApiError(
+        "The server did not return a concurrency token; the module was not changed.",
+        428,
+        { code: "precondition_required", requestId: detail.requestId },
+      );
+    }
+    return adapter.enableModuleAssignment(siteId, existing.id, detail.etag);
+  });
+}
+
+/**
+ * Turn a module off for a site. The row and its configuration are kept, so
+ * re-enabling later restores the same settings — disabling never deletes
+ * data. Conditional on the assignment's current strong ETag.
+ */
+export async function disableSiteModule(
+  siteId: number,
+  assignmentId: number,
+): Promise<ActionResult<ETaggedResponse<SiteModuleAssignment>>> {
+  return attempt(async (adapter) => {
+    const current = await adapter.getModuleAssignment(siteId, assignmentId);
+    if (!current.etag) {
+      throw new ApiError(
+        "The server did not return a concurrency token; the module was not changed.",
+        428,
+        { code: "precondition_required", requestId: current.requestId },
+      );
+    }
+    return adapter.disableModuleAssignment(siteId, assignmentId, current.etag);
+  });
+}
+
+/**
+ * Replace this site's settings for one module (conditional PATCH). The
+ * document is validated by the backend against the module's approved
+ * `configuration_schema`; enablement is never changed here.
+ */
+export async function updateSiteModuleSettings(
+  siteId: number,
+  assignmentId: number,
+  configuration: Record<string, unknown>,
+): Promise<ActionResult<ETaggedResponse<SiteModuleAssignment>>> {
+  return attempt(async (adapter) => {
+    const current = await adapter.getModuleAssignment(siteId, assignmentId);
+    if (!current.etag) {
+      throw new ApiError(
+        "The server did not return a concurrency token; the module was not changed.",
+        428,
+        { code: "precondition_required", requestId: current.requestId },
+      );
+    }
+    return adapter.updateModuleAssignment(
+      siteId,
+      assignmentId,
+      current.etag,
+      configuration,
+    );
+  });
+}
+
+/**
  * The platform module registry, used to resolve assignment ids to codes and
  * names. Registry rows are capability *announcements*: a PLANNED row is not
  * a working feature and is shown as such.
