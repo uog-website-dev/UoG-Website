@@ -23,7 +23,7 @@ x-backend-environment: &backend-environment
   DEBUG: ${DEBUG:-True}
   ORGANIZATIONS_DEV_WRITES_ENABLED: ${ORGANIZATIONS_DEV_WRITES_ENABLED:-False}
   SECRET_KEY: ${DJANGO_SECRET_KEY:-dev-only-insecure-secret-key-change-me}
-  ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1,backend,nginx}
+  ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1,backend,nginx,.uog.local}
   LOG_LEVEL: ${LOG_LEVEL:-INFO}
   # Database (shared application database; runtime uses the app role)
   DB_NAME: ${DB_NAME:-uog_db}

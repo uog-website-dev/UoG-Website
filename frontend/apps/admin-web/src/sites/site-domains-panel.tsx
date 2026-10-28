@@ -1,10 +1,12 @@
 "use client";
 
 /**
- * Per-site domain lifecycle management.
+ * Per-site domain lifecycle management — the Site Domain Overview.
  *
- * This panel is the single place where an administrator activates,
- * deactivates and re-designates a Site's hostnames:
+ * This panel is the single place where an administrator inspects and changes
+ * a Site's hostnames. At a glance it shows the associated Site, the primary
+ * domain, every alias, each row's lifecycle status and — for active
+ * hostnames — a direct preview link to the public website:
  *
  *   - every alias carries a "Set as primary" action, confirmed first with
  *     the current primary and the proposed replacement named side by side;
@@ -392,6 +394,18 @@ export function SiteDomainsPanel({ site, onChanged }: SiteDomainsPanelProps) {
         <Box sx={{ px: { xs: 2, sm: 3 }, py: 2 }}>
           <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
             Domains
+          </Typography>
+          {/* The overview is explicitly scoped: every lifecycle decision on
+              this panel applies to this one Site. */}
+          <Typography variant="body2" color="text.secondary">
+            Site domain overview for{" "}
+            <Box
+              component="span"
+              sx={{ fontFamily: "monospace", fontWeight: 700, color: "text.primary" }}
+            >
+              {site.code}
+            </Box>{" "}
+            — {site.name}.
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Hostnames registered for this site, with their lifecycle. A domain

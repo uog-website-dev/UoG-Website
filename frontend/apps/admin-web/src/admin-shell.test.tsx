@@ -39,6 +39,22 @@ describe("AdminShell", () => {
     ).toBe(1);
   });
 
+  it("pins the footer and header outside the scroll isolation: main owns the scrolling column", () => {
+    render(
+      <AdminShell>
+        <p>Page content</p>
+      </AdminShell>,
+    );
+
+    // The footer lives inside the scrolling content column (so it is
+    // reachable by scrolling the content alone), while the banner frame
+    // stays outside it — only `main` scrolls, never the navigation frame.
+    const main = screen.getByRole("main");
+    expect(within(main).getByText(/University of Gondar — Digital Platform/)).toBeTruthy();
+    expect(within(main).queryByRole("banner")).toBeNull();
+    expect(screen.getByRole("banner")).toBeTruthy();
+  });
+
   it("opens and closes the mobile navigation drawer from the header toggle", async () => {
     render(
       <AdminShell>

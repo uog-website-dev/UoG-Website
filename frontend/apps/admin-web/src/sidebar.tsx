@@ -141,7 +141,15 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
-/** Persistent left rail — visible on desktop (md and up). */
+/**
+ * Persistent left rail — visible on desktop (md and up).
+ *
+ * The rail is a plain flex column that fills the shell's middle row exactly
+ * (`height: "100%"` of a row the viewport lock already constrains). It never
+ * scrolls with the page: the brand stays pinned at the top, the link list
+ * gets its own scrollbar (`overflowY: "auto"`) when the navigation outgrows
+ * the viewport, and the workspace card stays pinned at the bottom.
+ */
 export function DesktopSidebar() {
   return (
     <Box
@@ -154,17 +162,15 @@ export function DesktopSidebar() {
         borderRight: 1,
         borderColor: "divider",
         bgcolor: "#f8fafc",
-        position: "sticky",
-        top: 0,
-        alignSelf: "flex-start",
-        minHeight: "calc(100vh - 64px)",
-        height: "calc(100vh - 64px)",
+        height: "100%",
+        minHeight: 0,
+        overflow: "hidden",
       }}
     >
       <Box sx={{ px: 2.5, py: 2.25, borderBottom: 1, borderColor: "divider" }}>
         <SidebarBrand />
       </Box>
-      <Box sx={{ flex: 1, overflowY: "auto", py: 2 }}>
+      <Box sx={{ flex: 1, minHeight: 0, overflowY: "auto", py: 2 }}>
         <SidebarNav />
       </Box>
       <Box sx={{ p: 2, borderTop: 1, borderColor: "divider" }}>
