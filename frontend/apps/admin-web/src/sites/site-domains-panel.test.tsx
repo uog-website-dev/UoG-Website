@@ -143,6 +143,17 @@ beforeEach(() => {
 });
 
 describe("SiteDomainsPanel — reads", () => {
+  it("names the associated site the overview is scoped to", async () => {
+    renderPanel();
+
+    expect(
+      await screen.findByText((_, element) =>
+        element?.textContent ===
+        "Site domain overview for UOG_MAIN — University of Gondar.",
+      ),
+    ).toBeTruthy();
+  });
+
   it("renders domains with lifecycle chips, the redirect warning and lifecycle info", async () => {
     renderPanel();
 
