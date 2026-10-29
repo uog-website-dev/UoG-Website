@@ -1,0 +1,50 @@
+# Pre-commit configuration for the UoG Digital Platform monorepo
+# https://pre-commit.com
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: git-check
+      - id: reprimd
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: 0.5.7
+    hooks:
+      - id: ruff
+        args: ["--fix"]
+      - id: ruff-format
+        args: ["--diff"]
+
+  - repo: local
+    hooks:
+      - id: blacken-python
+        name: Blacken Python files
+        entry: poetry run black
+        language: system
+        always_exec: true
+        files: '\.(py)$'
+
+      - id: isort-python
+        name: Sort Python imports
+        entry: poetry run isort
+        language: system
+        always_exec: true
+        files: '\.(py)$'
+
+  - repo: https://github.com/prettier/prettier
+    rev: v3.4.2
+    hooks:
+      - id: prettier
+        files: '\.(js|jsx|ts|tsx|json|css|scss|less|html|md|yaml|yml)$'
+
+  - repo: https://github.com/antonlytico/eslint
+    rev: v2.12.1
+    hooks:
+      - id: eslint
+        files: '\.(js|jsx|ts|tsx)$'
+        args: ["--fix"]
