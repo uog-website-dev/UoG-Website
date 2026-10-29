@@ -95,6 +95,6 @@ Keycloak (:8080) ---- OIDC identity for both Next.js apps and API clients
   [Site modules](site-module.md) turn a shipped module on or off for each
   Site. A planned or globally disabled module cannot be newly enabled.
 * **Media workflows:** store under key prefixes in the three platform
-  buckets; never create per-site buckets.
-* **RBAC:** Keycloak realm roles/groups plus DRF permission classes; the
-  `backend-api` client already supports client-credentials flows.
+  buckets; never create per-site buckets.* **RBAC:** Keycloak establishes identity; PostgreSQL-backed registered
+  capabilities, role templates and scoped assignments authorize protected APIs.
+  See [the RBAC model and endpoint matrix](rbac.md).

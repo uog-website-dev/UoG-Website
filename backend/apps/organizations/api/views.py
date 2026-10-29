@@ -16,7 +16,8 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 
 from apps.accounts.authentication import KeycloakBearerAuthentication
-from apps.accounts.permissions import HasRealmRole
+from apps.authorization.access import authorized_organization_ids
+from apps.authorization.permissions import ManagementPermission
 
 from ..hierarchy_lock import hierarchy_write
 from ..models import OrganizationUnit
@@ -42,12 +43,10 @@ class PreconditionFailed(APIException):
 
 
 class DevelopmentWritesOnly(BasePermission):
-    message = "Organization writes require development mode and explicit opt-in; production writes await scoped IAM/RBAC."
+    message = "Organization writes require development mode and explicit opt-in."
 
     def has_permission(self, request, view):
-        return request.method in SAFE_METHODS or (
-            settings.DEBUG and settings.ORGANIZATIONS_DEV_WRITES_ENABLED
-        )
+        return request.method in SAFE_METHODS or (settings.DEBUG and settings.ORGANIZATIONS_DEV_WRITES_ENABLED)
 
 
 @contextmanager
@@ -75,27 +74,44 @@ LIFECYCLE_BODY = {"application/json": {"type": "object", "additionalProperties":
 
 
 @extend_schema_view(
-    list=extend_schema(parameters=DISCOVERY_PARAMETERS, description="Platform-admin only. Database-backed discovery with combined AND filters; search matches name OR code. All lifecycle states unless filtered. Page-number pagination (20), deterministic ordering. Unknown, repeated or invalid query parameters return 400."),
-    retrieve=extend_schema(description="Platform-admin only. Returns a strong ETag for conditional mutations."),
+    list=extend_schema(parameters=DISCOVERY_PARAMETERS, description="Organization-scoped access is restricted to the assigned organization subtree. Database-backed discovery uses combined AND filters; search matches name OR code. Page-number pagination (20), deterministic ordering. Unknown, repeated or invalid query parameters return 400."),
+    retrieve=extend_schema(description="Requires organization.view in the assigned organization subtree. Returns a strong ETag for conditional mutations."),
     create=extend_schema(
-        description="Development opt-in and platform-admin required. Creates ACTIVE units. Production writes are disabled. Codes normalize to uppercase and are immutable; duplicate codes return 409. No Idempotency-Key replay is supported.",
+        description="Requires organization.create in the target parent scope (or explicit platform administration for the root), plus the existing development-only write gate. Codes normalize to uppercase and are immutable; duplicate codes return 409.",
         examples=[OpenApiExample("College", value={"code": "INFORMATICS", "name": "College of Informatics", "organization_type": "COLLEGE", "parent": 1, "metadata": {}}, request_only=True)],
     ),
-    partial_update=extend_schema(parameters=[IF_MATCH], description="Development admin only. Conditional partial update; code/status/IDs/timestamps cannot be supplied. Parent moves use serialized cycle validation."),
+    partial_update=extend_schema(parameters=[IF_MATCH], description="Requires organization.update in the target organization scope and the existing development-only write gate. Conditional partial update; code/status/IDs/timestamps cannot be supplied."),
 )
 @extend_schema(tags=["Organizations"])
 class OrganizationViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     serializer_class = OrganizationSerializer
     queryset = OrganizationUnit.objects.select_related("organization_type").order_by("code")
     authentication_classes = [KeycloakBearerAuthentication]
-    permission_classes = [IsAuthenticated, HasRealmRole, DevelopmentWritesOnly]
-    required_roles = {"platform-admin"}
+    permission_classes = [IsAuthenticated, ManagementPermission, DevelopmentWritesOnly]
+    permission_by_action = {
+        "list": "platform.organizations.view", "retrieve": "platform.organizations.view",
+        "tree": "platform.organizations.view", "children": "platform.organizations.view",
+        "ancestors": "platform.organizations.view", "descendants": "platform.organizations.view",
+        "subtree": "platform.organizations.view", "create": "platform.organizations.create",
+        "partial_update": "platform.organizations.update", "deactivate": "platform.organizations.update",
+        "archive": "platform.organizations.update",
+    }
     http_method_names = ["get", "post", "patch", "head", "options"]
     parser_classes = [JSONParser]
     renderer_classes = [JSONRenderer]
 
     def get_serializer_class(self):
         return OrganizationUpdateSerializer if self.action == "partial_update" else OrganizationSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        code = self.permission_by_action.get(self.action, "platform.organizations.view")
+        if self.action == "create":
+            return queryset
+        allowed = authorized_organization_ids(self.request.user, code)
+        if allowed is not None:
+            queryset = queryset.filter(pk__in=allowed)
+        return queryset
 
     def finalize_response(self, request, response, *args, **kwargs):
         response = super().finalize_response(request, response, *args, **kwargs)

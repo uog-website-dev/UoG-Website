@@ -9,6 +9,7 @@
  * used, a sign-in POST without a CSRF token is refused, and a callback whose
  * state does not match the session never establishes a session.
  */
+import { NextRequest } from "next/server";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 const AUTH_BASE = "http://localhost/admin/api/auth";
@@ -79,13 +80,13 @@ function cookieHeader(response: Response): string {
 }
 
 /**
- * Auth.js types its handlers for NextRequest; a plain Request satisfies them
- * at runtime, which keeps these tests free of the Next.js server objects.
+ * Auth.js reads NextRequest.nextUrl while preparing the request, so tests use
+ * the same request implementation as the route instead of a plain Request.
  */
 type AuthRequest = Parameters<typeof handlers.GET>[0];
 
 function authRequest(input: Request): AuthRequest {
-  return input as unknown as AuthRequest;
+  return new NextRequest(input) as AuthRequest;
 }
 
 /** POST /admin/api/auth/csrf → the token plus its cookie. */

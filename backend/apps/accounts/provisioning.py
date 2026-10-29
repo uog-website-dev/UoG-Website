@@ -11,7 +11,6 @@ import re
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
 from django.db import transaction
 
 from .models import OIDCIdentity
@@ -86,14 +85,10 @@ def _sync_profile(user, claims: TokenClaims) -> None:
 
 
 def _sync_roles(user, claims: TokenClaims) -> None:
-    """Mirror the Keycloak roles as Django groups and staff flag."""
-    groups = []
-    for role in claims.roles:
-        group, _created = Group.objects.get_or_create(name=role)
-        groups.append(group)
-    user.groups.set(groups)
-    staff_roles = set(getattr(settings, "OIDC_STAFF_ROLES", ()) or ())
-    user.is_staff = bool(staff_roles & set(claims.roles))
+    """Keycloak roles describe identity; Django application grants are separate."""
+    # Do not mirror realm roles into Django groups or is_staff. They are not
+    # application authorization and must not unlock Django admin access.
+    return None
 
 
 @transaction.atomic
@@ -120,7 +115,6 @@ def provision_user(claims: TokenClaims):
         )
 
     _sync_profile(user, claims)
-    _sync_roles(user, claims)
     user.save()
     identity.save()
     return user
