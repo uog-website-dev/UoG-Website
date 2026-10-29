@@ -15,6 +15,7 @@ urlpatterns = [
     path("api/", include("apps.api.urls")),
     # Identity endpoints (Keycloak access tokens): /api/me/, /api/admin/*
     path("api/", include("apps.accounts.urls")),
+    path("api/v1/authorization/", include("apps.authorization.urls")),
     path("api/v1/organizations/", include("apps.organizations.api.urls")),
     path("api/v1/sites/", include("apps.sites.api.urls")),
     path("api/v1/site-context/", include("apps.sites.api.context_urls")),

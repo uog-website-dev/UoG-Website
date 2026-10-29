@@ -6,7 +6,7 @@ from apps.api.models import Page
 
 @pytest.mark.django_db
 def test_pages_list(client):
-    Page.objects.create(title="One", slug="one", content="c1")
+    Page.objects.create(title="One", slug="one", content="c1", is_published=True)
     Page.objects.create(title="Two", slug="two", content="c2", is_published=False)
     response = client.get("/api/pages/")
     assert response.status_code == 200
@@ -16,8 +16,12 @@ def test_pages_list(client):
 
 
 @pytest.mark.django_db
-def test_pages_home_seeds_home_page(client):
+def test_pages_home_is_read_only_and_returns_published_home_page(client):
+    response = client.get("/api/pages/home/")
+    assert response.status_code == 404
+    assert not Page.objects.filter(slug="home").exists()
+
+    Page.objects.create(title="Home", slug="home", content="welcome", is_published=True)
     response = client.get("/api/pages/home/")
     assert response.status_code == 200
     assert response.json()["slug"] == "home"
-    assert Page.objects.filter(slug="home").exists()

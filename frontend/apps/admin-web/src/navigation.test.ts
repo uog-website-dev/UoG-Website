@@ -7,7 +7,7 @@ import {
 } from "@/navigation";
 
 describe("adminNavItems", () => {
-  it("exposes the Organizations, Sites, Domains and Modules entries required by the shell", () => {
+  it("exposes the Organizations, Sites, Domains, Modules and permission-gated Access control entries", () => {
     const hrefs = adminNavItems.map((item) => item.href);
     expect(hrefs).toEqual([
       "/",
@@ -15,7 +15,9 @@ describe("adminNavItems", () => {
       "/sites",
       "/domains",
       "/modules",
+      "/access",
     ]);
+    expect(adminNavItems.at(-1)?.requiresAny).toContain("platform.roles.view");
   });
 
   it("labels every entry for the navigation list", () => {

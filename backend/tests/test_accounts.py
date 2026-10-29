@@ -33,10 +33,11 @@ def test_me_with_a_valid_token_returns_the_identity(client, oidc):
     assert body["email"] == "devuser@uog.et"
     assert body["client_id"] == "public-web"
     assert "platform-admin" in body["roles"]
-    assert body["is_staff"] is True
+    assert body["is_staff"] is False
 
     user = User.objects.get(username="devuser")
-    assert user.groups.filter(name="platform-admin").exists()
+    assert not user.is_staff
+    assert not user.groups.exists()
     assert OIDCIdentity.objects.get(user=user).subject == SUBJECT
 
 
@@ -91,16 +92,39 @@ def test_a_renamed_keycloak_user_keeps_the_local_account(client, oidc):
 
 
 @pytest.mark.django_db
-def test_the_admin_overview_requires_the_admin_role(client, oidc):
-    without_role = client.get(
-        "/api/admin/overview/",
-        **oidc.header(realm_access={"roles": ["platform-viewer"]}),
-    )
-    assert without_role.status_code == 403
+def test_the_admin_overview_requires_database_platform_assignment(client, oidc):
+    from apps.authorization.catalog import STANDARD_ROLES
+    from apps.authorization.models import Permission, Role, RolePermission, UserRoleAssignment
 
-    with_role = client.get("/api/admin/overview/", **oidc.header())
-    assert with_role.status_code == 200
-    assert with_role.json()["requested_by"] == "devuser"
+    denied = client.get("/api/admin/overview/", **oidc.header())
+    assert denied.status_code == 403
+
+    user = User.objects.get(username="devuser")
+    role_template = next(item for item in STANDARD_ROLES if item[0] == "platform-administrator")
+    role, _ = Role.objects.get_or_create(
+        code=role_template[0],
+        defaults={"name": role_template[1], "description": role_template[2], "is_system": True},
+    )
+    permissions = {p.code: p for p in Permission.objects.filter(code__in=role_template[3])}
+    missing = [code for code in role_template[3] if code not in permissions]
+    if missing:
+        from apps.authorization.catalog import CAPABILITIES
+        for capability in CAPABILITIES:
+            if capability.code in missing:
+                permissions[capability.code] = Permission.objects.create(
+                    code=capability.code, name=capability.name, description=capability.description,
+                    module=capability.module, resource_type=capability.resource_type,
+                    action=capability.action, risk=capability.risk, delegable=capability.delegable,
+                )
+    RolePermission.objects.bulk_create(
+        [RolePermission(role=role, permission=permissions[code]) for code in role_template[3]],
+        ignore_conflicts=True,
+    )
+    UserRoleAssignment.objects.create(user=user, role=role, scope=UserRoleAssignment.Scope.PLATFORM)
+
+    allowed = client.get("/api/admin/overview/", **oidc.header(realm_access={"roles": []}))
+    assert allowed.status_code == 200
+    assert allowed.json()["requested_by"] == "devuser"
 
 
 @pytest.mark.django_db
@@ -121,6 +145,16 @@ def test_writing_a_page_requires_a_token(client):
 
 @pytest.mark.django_db
 def test_writing_a_page_with_a_token_is_allowed(client, oidc):
+    from django.core.management import call_command
+    from apps.authorization.models import Role, UserRoleAssignment
+
+    call_command("seed_rbac", verbosity=0)
+    user_response = client.get("/api/me/", **oidc.header())
+    user = User.objects.get(username=user_response.json()["username"])
+    UserRoleAssignment.objects.create(
+        user=user, role=Role.objects.get(code="platform-administrator"),
+        scope=UserRoleAssignment.Scope.PLATFORM,
+    )
     response = client.post(
         "/api/pages/",
         {"title": "From Keycloak", "slug": "from-keycloak", "content": "hello"},

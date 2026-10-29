@@ -53,13 +53,13 @@ def test_model_and_services_generate_create_update_move_lifecycle_events(units):
     assert all((record.actor_kind, record.actor_id) == ("SYSTEM", "job:organization-maintenance") for record in records[1:])
 
 
-def test_api_actor_request_peer_and_sanitized_snapshots(client, oidc, settings, units):
+def test_api_actor_request_peer_and_sanitized_snapshots(platform_admin_client, settings, units):
     settings.DEBUG = True
     settings.ORGANIZATIONS_DEV_WRITES_ENABLED = True
     root, college, _ = units
     request_id = str(uuid4())
-    headers = {**oidc.header(), "HTTP_X_REQUEST_ID": request_id, "REMOTE_ADDR": "198.51.100.10", "HTTP_X_FORWARDED_FOR": "203.0.113.77", "HTTP_X_ACTOR_ID": "forged"}
-    response = client.post(BASE, {"code": "AUDITED", "name": "Audited unit", "parent": root.pk, "organization_type": "COLLEGE", "description": "private secret text", "metadata": {"password": "nope", "nested": {"token": "never-log"}}}, content_type="application/json", **headers)
+    headers = {**platform_admin_client.defaults, "HTTP_X_REQUEST_ID": request_id, "REMOTE_ADDR": "198.51.100.10", "HTTP_X_FORWARDED_FOR": "203.0.113.77", "HTTP_X_ACTOR_ID": "forged"}
+    response = platform_admin_client.post(BASE, {"code": "AUDITED", "name": "Audited unit", "parent": root.pk, "organization_type": "COLLEGE", "description": "private secret text", "metadata": {"password": "nope", "nested": {"token": "never-log"}}}, content_type="application/json", **headers)
     assert response.status_code == 201, response.content
     unit = OrganizationUnit.objects.get(pk=response.json()["id"])
     record = events(unit).get()
@@ -69,13 +69,13 @@ def test_api_actor_request_peer_and_sanitized_snapshots(client, oidc, settings, 
     assert "metadata" not in record.after and "description" not in record.after
     assert not any(secret in json.dumps(record.after) for secret in ["nope", "never-log", "private secret"])
     url = response["Location"]
-    changed = client.patch(url, {"name": "Updated", "parent": college.pk, "metadata": {"token": "another-secret"}}, content_type="application/json", HTTP_IF_MATCH=response["ETag"], **headers)
+    changed = platform_admin_client.patch(url, {"name": "Updated", "parent": college.pk, "metadata": {"token": "another-secret"}}, content_type="application/json", HTTP_IF_MATCH=response["ETag"], **headers)
     assert changed.status_code == 200
     assert list(events(unit).values_list("action", flat=True)) == ["ORGANIZATION_CREATED", "ORGANIZATION_UPDATED", "ORGANIZATION_MOVED"]
     assert "metadata" in events(unit).last().changed_fields
-    inactive = client.post(url + "deactivate/", {}, content_type="application/json", HTTP_IF_MATCH=changed["ETag"], **headers)
+    inactive = platform_admin_client.post(url + "deactivate/", {}, content_type="application/json", HTTP_IF_MATCH=changed["ETag"], **headers)
     assert inactive.status_code == 200
-    archived = client.post(url + "archive/", {}, content_type="application/json", HTTP_IF_MATCH=inactive["ETag"], **headers)
+    archived = platform_admin_client.post(url + "archive/", {}, content_type="application/json", HTTP_IF_MATCH=inactive["ETag"], **headers)
     assert archived.status_code == 200
     assert events(unit).last().action == "ORGANIZATION_ARCHIVED"
 
@@ -147,11 +147,11 @@ def test_audit_failure_rolls_back_domain_operation(units, broken_audit_storage):
     assert events(unit).count() == 1
 
 
-def test_api_audit_failure_is_sanitized_503_and_rolls_back(client, oidc, settings, units, broken_audit_storage):
+def test_api_audit_failure_is_sanitized_503_and_rolls_back(platform_admin_client, settings, units, broken_audit_storage):
     settings.DEBUG = True
     settings.ORGANIZATIONS_DEV_WRITES_ENABLED = True
     root, _, _ = units
-    response = client.post(BASE, {"code": "FAILED", "name": "Not committed", "organization_type": "COLLEGE", "parent": root.pk}, content_type="application/json", **oidc.header())
+    response = platform_admin_client.post(BASE, {"code": "FAILED", "name": "Not committed", "organization_type": "COLLEGE", "parent": root.pk}, content_type="application/json")
     assert response.status_code == 503, response.content
     assert response.json()["error"]["code"] == "service_unavailable"
     assert "password" not in response.content.decode()

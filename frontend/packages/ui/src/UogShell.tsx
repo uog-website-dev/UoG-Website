@@ -51,7 +51,7 @@ export function UogHeader({
   );
 }
 
-export function UogFooter() {
+export function UogFooter({ apiBaseUrl }: { apiBaseUrl: string | undefined }) {
   return (
     <Box component="footer" sx={{ mt: "auto", py: 3, textAlign: "center" }}>
       <Typography variant="body2" color="text.secondary">
@@ -59,9 +59,11 @@ export function UogFooter() {
         (development environment)
       </Typography>
       <Typography variant="caption" color="text.secondary">
-        <Link href="http://localhost/api/health/ready" color="inherit">
-          API health
-        </Link>
+        {apiBaseUrl != null && (
+          <Link href={`${apiBaseUrl}/health/ready`} color="inherit">
+            API health
+          </Link>
+        )}
       </Typography>
     </Box>
   );

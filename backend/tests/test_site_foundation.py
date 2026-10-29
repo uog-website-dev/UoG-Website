@@ -24,11 +24,10 @@ SHIPPED = ("EVENTS", "STAFF_DIRECTORY")
 
 
 @pytest.fixture
-def admin(client, oidc, settings):
+def admin(platform_admin_client, settings):
     settings.DEBUG = True
     settings.ORGANIZATIONS_DEV_WRITES_ENABLED = True
-    client.defaults.update(oidc.header())
-    return client
+    return platform_admin_client
 
 
 def test_application_code_does_not_name_institutional_hostnames():

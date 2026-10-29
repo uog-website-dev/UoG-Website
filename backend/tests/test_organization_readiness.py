@@ -18,12 +18,13 @@ MANIFEST = Path(__file__).parent / "fixtures" / "organizations" / "uog-structure
 
 
 @pytest.fixture
-def representative_structure(client, oidc, settings):
+def representative_structure(platform_admin_client, settings):
     settings.DEBUG = True
     settings.ORGANIZATIONS_DEV_WRITES_ENABLED = True
     settings.API_DOCS_ENABLED = True
     correlation_id = str(uuid4())
-    client.defaults.update(oidc.header(), HTTP_X_REQUEST_ID=correlation_id, REMOTE_ADDR="198.51.100.42")
+    client = platform_admin_client
+    client.defaults.update(HTTP_X_REQUEST_ID=correlation_id, REMOTE_ADDR="198.51.100.42")
     manifest = json.loads(MANIFEST.read_text())
     assert manifest["schema_version"] == 1
     units = {}
@@ -126,7 +127,7 @@ def test_representative_uog_backend_acceptance_workflow(representative_structure
     assert mutate(client, department, action="archive").status_code == 200
     assert client.get(unit_url(root)).json()["status"] == "ACTIVE"
     assert client.get(unit_url(information_systems)).json()["status"] == "INACTIVE"
-    assert client.delete(unit_url(college)).status_code == 405
+    assert client.delete(unit_url(college)).status_code == 403  # unsupported methods fail closed before method dispatch
     with pytest.raises(IntegrityError), transaction.atomic(), connection.cursor() as cursor:
         cursor.execute("DELETE FROM organizations_organizationunit WHERE id=%s", [college["id"]])
     with connection.cursor() as cursor:
@@ -154,13 +155,36 @@ def test_representative_uog_backend_acceptance_workflow(representative_structure
 
 
 @pytest.mark.parametrize("debug,opt_in", [(False, True), (True, False)])
+
 def test_readiness_does_not_authorize_production_or_default_writes(client, oidc, settings, debug, opt_in):
     settings.DEBUG = debug
     settings.ORGANIZATIONS_DEV_WRITES_ENABLED = opt_in
-    for method, suffix in [("post", ""), ("patch", "1/"), ("post", "1/deactivate/"), ("post", "1/archive/")]:
+    from apps.authorization.models import Role, UserRoleAssignment
+    from apps.organizations.models import OrganizationType, OrganizationUnit
+    from django.contrib.auth import get_user_model
+    from django.core.management import call_command
+
+    call_command("seed_rbac", verbosity=0)
+    client.get("/api/me/", **oidc.header())
+    user = get_user_model().objects.get(username="devuser")
+    root_type, _ = OrganizationType.objects.get_or_create(code="UNIVERSITY", defaults={"name": "University"})
+    root = OrganizationUnit.objects.create(code="RBAC-GATE", name="RBAC gate", organization_type=root_type)
+    baseline_audit_events = AuditEvent.objects.count()
+    role = Role.objects.get(code="platform-administrator")
+    UserRoleAssignment.objects.get_or_create(
+        user=user, role=role, scope=UserRoleAssignment.Scope.PLATFORM,
+        defaults={"assigned_by": user},
+    )
+    authorized = {**oidc.header(), "HTTP_X_REQUEST_ID": str(uuid4())}
+    for method, suffix in [("post", ""), ("patch", f"{root.pk}/"), ("post", f"{root.pk}/deactivate/"), ("post", f"{root.pk}/archive/")]:
         url = BASE + suffix
         assert getattr(client, method)(url, {}, content_type="application/json").status_code == 401
-        assert getattr(client, method)(url, {}, content_type="application/json", **oidc.header(realm_access={"roles": ["platform-viewer"]})).status_code == 403
-        assert getattr(client, method)(url, {}, content_type="application/json", **oidc.header()).status_code == 403
-    assert not OrganizationUnit.objects.exists()
-    assert not AuditEvent.objects.exists()
+        claim_only = getattr(client, method)(url, {}, content_type="application/json", **oidc.header(realm_access={"roles": ["platform-admin"]}))
+        assert claim_only.status_code in {403, 404}
+        # Even a real database platform grant cannot override the independent
+        # production/default-off development write gate.
+        denied = getattr(client, method)(url, {}, content_type="application/json", **authorized)
+        assert denied.status_code in {403, 404}
+        assert denied.status_code >= 400
+    assert OrganizationUnit.objects.count() == 1
+    assert AuditEvent.objects.count() == baseline_audit_events

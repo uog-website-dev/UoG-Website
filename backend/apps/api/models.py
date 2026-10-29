@@ -12,7 +12,11 @@ class Page(models.Model):
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    is_published = models.BooleanField(default=True)
+    is_published = models.BooleanField(default=False)
+    site = models.ForeignKey(
+        "sites.Site", null=True, blank=True, on_delete=models.PROTECT,
+        related_name="pages",
+    )
 
     class Meta:
         ordering = ['-created_at']

@@ -1,4 +1,5 @@
 import DashboardIcon from "@mui/icons-material/Dashboard";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import BusinessIcon from "@mui/icons-material/Business";
 import ExtensionIcon from "@mui/icons-material/Extension";
 import LanguageIcon from "@mui/icons-material/Language";
@@ -14,14 +15,14 @@ export interface AdminNavItem {
   href: string;
   description: string;
   icon: SvgIconComponent;
+  requiresAny?: readonly string[];
 }
 
 /**
  * Primary navigation of the admin console shell.
  *
- * Every entry must point at a route that exists in this app; none of them
- * may claim to be backed by a live data source until the corresponding
- * management story lands.
+ * Every entry must point at a route that exists in this app. Restricted
+ * sections declare the database permissions used for client-side visibility.
  */
 export const adminNavItems: AdminNavItem[] = [
   {
@@ -58,6 +59,14 @@ export const adminNavItems: AdminNavItem[] = [
     href: "/modules",
     description: "Capability registry",
     icon: ExtensionIcon,
+  },
+  {
+    key: "access",
+    label: "Access control",
+    href: "/access",
+    description: "Roles, permissions and assignments",
+    icon: AdminPanelSettingsIcon,
+    requiresAny: ["platform.roles.view", "platform.roles.create", "platform.roles.update", "platform.roles.assign_permissions", "platform.users.view", "platform.users.assign_roles", "audit.logs.view"],
   },
 ];
 

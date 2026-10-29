@@ -1,10 +1,13 @@
-"""
-Role-based permissions for API endpoints.
+"""Legacy identity-claim adapter retained for non-authorization compatibility.
 
-The roles come from the validated access token (Keycloak realm roles and
-client roles), so a permission check never depends on client-supplied data.
+Application management authorization must use registered database capabilities;
+Keycloak realm roles establish identity context only and never grant access.
 """
 from rest_framework.permissions import BasePermission
+
+from apps.authorization.access import is_platform_administrator
+from apps.authorization.services import record_decision
+from rest_framework.exceptions import PermissionDenied
 
 
 class HasRealmRole(BasePermission):
@@ -18,9 +21,11 @@ class HasRealmRole(BasePermission):
     """
 
     def has_permission(self, request, view) -> bool:
-        required = set(getattr(view, "required_roles", ()) or ())
-        if not required:
-            return False
-        claims = getattr(request, "auth", None)
-        roles = set(getattr(claims, "roles", ()) or ())
-        return bool(required & roles)
+        permitted = is_platform_administrator(request.user)
+        record_decision(
+            user=request.user,
+            action="LEGACY_REALM_ROLE_GATE",
+            outcome="ALLOW" if permitted else "DENY",
+            request=request,
+        )
+        return permitted
