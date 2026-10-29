@@ -105,3 +105,110 @@ The legacy platform-wide `apps.api.Page` model and `/api/pages/` endpoints
 are untouched: they are the existing unscoped CMS surface and their migration
 into this site-scoped domain is a later story. Nothing here claims that
 legacy content has been re-homed.
+
+## Page: models, slugs, hierarchy and metadata (P2-CMS-002)
+
+`Page` is the first concrete content type: a multi-table child of
+`SiteContent` that inherits identity, Site ownership, status, locale,
+authorship and metadata, and adds routing. A translation is a sibling row in
+another locale — the trees are per language (still no translation workflow).
+
+| Field | Contract |
+| --- | --- |
+| title | Required, max 255 characters, in this row's language |
+| slug | One route segment. Normalized before validation (lowercased, every run of other characters collapsed to a single hyphen, trimmed) and constrained to `[a-z0-9]+(-[a-z0-9]+)*` |
+| parent | Self-FK with `PROTECT`. Must share the page's Site and locale, never be the page itself or one of its ancestors, and the hierarchy is capped at 15 levels |
+| path | Computed full route within Site and locale (`/about/people`), `editable=False`, rebuilt from the slug chain on every save |
+| layout | Optional approved layout code (`[A-Z][A-Z0-9_-]{0,63}`), resolved by the rendering layer. A reference — not a template file, not a secret |
+| seo | Allowlisted object: `meta_title` (≤120), `meta_description` (≤300), `og_image_ref` (≤512). Unknown keys and non-string values are rejected in the domain; `jsonb_typeof = 'object'` at the database |
+| visibility | `PUBLIC` served and listed, `UNLISTED` served only by its direct route, `HIDDEN` never served publicly |
+| position | Sibling ordering hint; ties are broken by `id` so listings are stable |
+| is_homepage | Designates the page that serves the Site root. At most one per Site |
+
+### Hierarchy rules
+
+- **Same Site, same language.** A parent must carry the child's `site_id`
+  and `locale`; cross-Site and cross-locale parenting are rejected, so a
+  subtree can never straddle tenants or languages.
+- **No cycles.** The domain walks the ancestor chain on every save and
+  rejects a page that becomes its own ancestor; the database trigger repeats
+  the walk with a bounded recursive CTE (`page_acyclic`, `page_depth`) so
+  raw SQL cannot introduce one either. Self-parenting is refused by the same
+  domain and trigger (`page_parent_not_self`) — Django's declarative
+  constraints cannot reference the parent-table `id` from an MTI child, so
+  the trigger is the database-level enforcement point.
+- **`PROTECT` both ways.** Deleting a parent with children fails, and a Site
+  that owns pages cannot be deleted.
+- **The language is fixed at creation.** Changing `locale` afterwards is
+  rejected ("create a translated page instead"), which keeps parent/locale
+  agreement and route uniqueness meaningful.
+
+### Route and canonical policy
+
+`path` *is* the canonical route: it is stored, not derived at request time,
+and it is unique per `(site, locale, path)` — no duplicate full routes
+within a Site and locale. Sibling slug uniqueness follows from this, because
+siblings share their parent's prefix; two pages may reuse a slug when they
+sit under different parents (`/a/slug` vs `/b/slug`). Two Sites, or two
+locales of one Site, freely reuse the same path.
+
+Physically, `site` and `locale` live on the shared `cms_sitecontent` row
+while `path` lives on `cms_page`, so this key cannot be a plain index on one
+table. It is enforced twice: in the domain (`Page._assert_route_is_free`
+raises a friendly `ValidationError`) and in the database by the
+`cms_validate_page` trigger, which joins the parent row and serializes
+writers per Site with an advisory lock so racing saves cannot both commit
+(`page_route_uniq`). The Page table's own index (`page_parent_idx` on
+`(parent)`) serves subtree reads; tenant scoping for everything else comes
+from the SiteContent ownership indexes and the route key itself.
+
+### Homepage
+
+`is_homepage` marks the page that serves the Site root; zero homepages is
+valid ("where configured"), two never are. Replacement goes through
+`services.pages.set_as_homepage`, which clears the previous flag and sets
+the new one inside one transaction — a failed swap leaves the old homepage
+in place. The database trigger (`page_homepage_uniq`) enforces the same
+rule against concurrent writers, so even two racing transactions resolve to
+exactly one homepage. The flag is site-wide, not per locale, and it does
+not publish anything: the serving layer still applies the published rules.
+
+### Visibility and serving
+
+The public URL space is served exclusively through
+`apps.cms.selectors.pages`: `published_page` returns a route's page only
+when `status = PUBLISHED` and visibility is `PUBLIC` or `UNLISTED`;
+`public_pages` lists `PUBLIC` published pages in sibling order;
+`homepage_of` reads the root candidate. **Draft pages are never publicly
+served**, and `HIDDEN` pages are never served publicly — a draft homepage
+is configurable but not renderable. No endpoint mounts these selectors yet;
+the PAGES capability stays `PLANNED` until public serving ships, so no
+module gate has opened.
+
+### URL history and redirect policy
+
+When `services.pages.change_route` renames or re-parents a page it records
+every vanished path — for the page *and its whole subtree*, since moving an
+ancestor moves every descendant route — as `PageRedirect` rows keyed by
+`(site, locale, old_path)`. The policy:
+
+- **Live routes win.** A redirect is consulted only when no live page
+  matches the request; a page recreated on an old path removes its own
+  redirect row.
+- **Redirects are re-pointed, not chained.** A redirect always targets the
+  page's current path, so history never grows a chain of hops.
+- **History belongs to the page.** Deleting a page deletes its redirects
+  (`CASCADE`); the Site itself is `PROTECT`-ed either way.
+- **A route change is transactional.** Path recomputation, subtree
+  re-saves and redirect rows commit together or not at all.
+
+### API contract
+
+`apps.cms.api.serializers.PageSerializer` extends the shared contract:
+`id`, `site`, `path`, `is_homepage`, `status`, authorship and timestamps
+are server-managed; `title`, `slug`, `layout`, `seo`, `visibility`,
+`position` and `metadata` are writable; `parent` and `locale` are accepted
+on create only — moves must go through `change_route` so URL history is
+recorded, and the language is fixed. No routes are mounted, so the
+[OpenAPI snapshot](../api/openapi.yaml) is unchanged and no URL namespace
+appears for `cms`.

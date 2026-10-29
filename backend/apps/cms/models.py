@@ -6,6 +6,7 @@ This module is a *primitive*: it defines the shared domain and its rules,
 not a generic content API. See docs/architecture/cms-content-data-model.md
 for the site-scoped uniqueness and index strategy.
 """
+import re
 import uuid
 
 from django.conf import settings
@@ -182,3 +183,314 @@ class SiteContent(models.Model):
                 fields.add("published_at")
             kwargs["update_fields"] = fields
         return super().save(*args, **kwargs)
+
+
+class Visibility(models.TextChoices):
+    """How a published page participates in public serving and listings."""
+
+    PUBLIC = "PUBLIC", "Public"
+    UNLISTED = "UNLISTED", "Unlisted"
+    HIDDEN = "HIDDEN", "Hidden"
+
+
+SLUG_FORMAT = r"\A[a-z0-9]+(?:-[a-z0-9]+)*\Z"
+PATH_FORMAT = r"\A/[a-z0-9]+(?:-[a-z0-9]+)*(?:/[a-z0-9]+(?:-[a-z0-9]+)*)*\Z"
+LAYOUT_FORMAT = r"\A[A-Z][A-Z0-9_-]{0,63}\Z"
+
+# Hard cap on hierarchy depth. It bounds path length (15 * 129 + 1 < 2048)
+# and makes the ancestor walk in Page.clean() terminate even if raw SQL ever
+# produced a cycle behind the domain's back.
+MAX_PAGE_DEPTH = 15
+
+# The SEO document is an allowlist, never a settings dump: only these string
+# keys may appear, each with a length ceiling.
+SEO_KEYS = {
+    "meta_title": 120,
+    "meta_description": 300,
+    "og_image_ref": 512,
+}
+
+
+def normalize_slug(value):
+    """Lowercase, collapse every run of non-alphanumerics into one hyphen."""
+    return re.sub(r"[^a-z0-9]+", "-", str(value).strip().lower()).strip("-")
+
+
+class Page(SiteContent):
+    """One Site-owned page: a node in the Site's per-locale route tree.
+
+    Pages inherit identity, Site ownership, status, locale, authorship and
+    metadata from SiteContent and add routing: a slug, a parent within the
+    same Site and language, and the computed full `path` that the URL space
+    treats as canonical. The tree is per locale — a translation is a sibling
+    row in another language, not a property of the original (no translation
+    workflow is claimed yet).
+    """
+
+    parent = models.ForeignKey(
+        "self", null=True, blank=True, on_delete=models.PROTECT,
+        related_name="children",
+        help_text="Parent page. Must belong to the same Site and locale; "
+                  "pages never move across Sites or languages and a page "
+                  "can never become its own ancestor.",
+    )
+    title = models.CharField(
+        max_length=255,
+        help_text="Human-readable page title in this row's language.",
+    )
+    slug = models.CharField(
+        max_length=128,
+        validators=[RegexValidator(
+            SLUG_FORMAT,
+            "Use lowercase letters, digits and hyphens, such as about-us.",
+        )],
+        help_text="One route segment. Input is normalized (lowercased, runs "
+                  "of other characters collapsed to hyphens) before "
+                  "validation, mirroring hostname normalization.",
+    )
+    path = models.CharField(
+        max_length=2048, editable=False,
+        help_text="Computed full route within this Site and locale, such as "
+                  "/about/people. Recomputed on every save and unique per "
+                  "(site, locale).",
+    )
+    layout = models.CharField(
+        max_length=64, blank=True, default="",
+        validators=[RegexValidator(
+            LAYOUT_FORMAT,
+            "Use an uppercase layout code such as STANDARD or LANDING.",
+        )],
+        help_text="Approved layout code the rendering layer resolves; empty "
+                  "uses the Site's default layout. A reference, never a "
+                  "template file and never a secret.",
+    )
+    seo = models.JSONField(
+        blank=True, default=dict,
+        help_text="Allowlisted SEO object: meta_title, meta_description, "
+                  "og_image_ref. Unsupported keys and non-string values are "
+                  "rejected; never a place for secrets.",
+    )
+    visibility = models.CharField(
+        max_length=9, choices=Visibility.choices, default=Visibility.PUBLIC,
+        help_text="PUBLIC is served and listed, UNLISTED is served only by "
+                  "its direct route, HIDDEN is never served publicly. None "
+                  "of them publish a draft.",
+    )
+    position = models.PositiveIntegerField(
+        default=0,
+        help_text="Sibling ordering hint; ties are broken by id so lists are "
+                  "stable.",
+    )
+    is_homepage = models.BooleanField(
+        default=False,
+        help_text="Designates the page that serves the Site root. At most "
+                  "one per Site (partial unique index), maintained through "
+                  "the set_as_homepage service so replacement is atomic.",
+    )
+
+    class Meta:
+        ordering = ("position", "id")
+        constraints = [
+            # Self-parenting is refused by clean() and by the database
+            # (cms_validate_page, constraint ``page_parent_not_self``). A
+            # Django CheckConstraint cannot express `!= pk` here: ``id`` is
+            # local to SiteContent, and a constraint referencing a parent
+            # field fails the model check that `migrate` runs (models.E016).
+            models.CheckConstraint(
+                condition=Q(slug__regex=SLUG_FORMAT), name="page_slug_format",
+            ),
+            models.CheckConstraint(
+                condition=Q(path__regex=PATH_FORMAT), name="page_path_format",
+            ),
+            models.CheckConstraint(
+                condition=Q(layout="") | Q(layout__regex=LAYOUT_FORMAT),
+                name="page_layout_format",
+            ),
+            models.CheckConstraint(
+                condition=Q(visibility__in=["PUBLIC", "UNLISTED", "HIDDEN"]),
+                name="page_visibility",
+            ),
+            models.CheckConstraint(
+                condition=Exact(
+                    models.Func("seo", function="jsonb_typeof", output_field=models.CharField()),
+                    Value("object"),
+                ),
+                name="page_seo_object",
+            ),
+        ]
+        indexes = [
+            # The Page table holds no site or locale column (they live on the
+            # shared SiteContent row), so its local index leads with parent;
+            # tenant scoping comes from the parent table's ownership indexes
+            # and from the trigger-enforced (site, locale, path) route key —
+            # see apps/cms/page_sql.py and the data-model document.
+            models.Index(fields=["parent"], name="page_parent_idx"),
+        ]
+
+    def __str__(self):
+        return f"{self.site_id}:{self.path or self.slug}"
+
+    def full_clean(self, *args, **kwargs):
+        if isinstance(self.slug, str):
+            self.slug = normalize_slug(self.slug)
+        if isinstance(self.layout, str) and self.layout.strip():
+            self.layout = self.layout.strip().upper()
+        return super().full_clean(*args, **kwargs)
+
+    def clean(self):
+        super().clean()
+        if not isinstance(self.seo, dict):
+            raise ValidationError({"seo": "SEO metadata must be a JSON object."})
+        unknown = sorted(set(self.seo) - set(SEO_KEYS))
+        if unknown:
+            raise ValidationError({
+                "seo": "Unsupported SEO keys: " + ", ".join(unknown)
+                       + ". Approved: " + ", ".join(sorted(SEO_KEYS)) + ".",
+            })
+        for key, value in self.seo.items():
+            if value is not None and not isinstance(value, str):
+                raise ValidationError({"seo": f"{key} must be a string or null."})
+            if isinstance(value, str) and len(value) > SEO_KEYS[key]:
+                raise ValidationError({
+                    "seo": f"{key} must be at most {SEO_KEYS[key]} characters.",
+                })
+
+        if not self.slug or not self.site_id:
+            # clean_fields already reported the missing value.
+            return
+
+        if not self._state.adding:
+            previous_locale = (
+                type(self).objects.filter(pk=self.pk)
+                .values_list("locale", flat=True).first()
+            )
+            if previous_locale is not None and previous_locale != self.locale:
+                raise ValidationError({
+                    "locale": "Page language is fixed after creation; create "
+                              "a translated page instead.",
+                })
+
+        if not self.parent_id:
+            self.path = f"/{self.slug}"
+            self._assert_route_is_free()
+            return
+        if self.parent_id == self.pk:
+            raise ValidationError({"parent": "A page cannot be its own parent."})
+        parent = (
+            type(self).objects.filter(pk=self.parent_id)
+            .only("pk", "site_id", "locale", "path", "parent_id")
+            .first()
+        )
+        if parent is None:
+            # clean_fields already reported the dangling reference.
+            return
+        if parent.site_id != self.site_id:
+            raise ValidationError({
+                "parent": "The parent must belong to the same Site.",
+            })
+        if parent.locale != self.locale:
+            raise ValidationError({
+                "parent": "The parent must be in the same language as the page.",
+            })
+        # The route is checked in the DB after this walk (page_sql.py) and the
+        # ancestor walk runs next — derive the tentative path *now* so that a
+        # cycle/depth rejection never additionally reports the (still empty)
+        # computed field as violating its format constraint.
+        self.path = f"{parent.path.rstrip('/')}/{self.slug}"
+        # Walk the ancestor chain: reject cycles and runaway depth before the
+        # path is trusted.
+        seen = {self.pk}
+        cursor = parent
+        depth = 1
+        while cursor is not None:
+            if cursor.pk in seen:
+                raise ValidationError({
+                    "parent": "A page cannot be its own ancestor.",
+                })
+            seen.add(cursor.pk)
+            depth += 1
+            if depth > MAX_PAGE_DEPTH:
+                raise ValidationError({
+                    "parent": f"Page hierarchy cannot be deeper than {MAX_PAGE_DEPTH} levels.",
+                })
+            if cursor.parent_id is None:
+                break
+            cursor = (
+                type(self).objects.filter(pk=cursor.parent_id)
+                .only("pk", "parent_id")
+                .first()
+            )
+
+        # Domain-level uniqueness: friendly errors before the database's
+        # trigger backstops the same rules for racing writers (page_sql.py).
+        self._assert_route_is_free()
+
+    def _assert_route_is_free(self):
+        routes = type(self).objects.filter(
+            site_id=self.site_id, locale=self.locale, path=self.path,
+        ).exclude(pk=self.pk)
+        if routes.exists():
+            raise ValidationError({
+                "path": "A page with this route already exists in this Site "
+                        "and language. Change the slug or the parent.",
+            })
+        if self.is_homepage:
+            homepages = type(self).objects.filter(
+                site_id=self.site_id, is_homepage=True,
+            ).exclude(pk=self.pk)
+            if homepages.exists():
+                raise ValidationError({
+                    "is_homepage": "This Site already has a homepage. Use the "
+                                   "set_as_homepage service to replace it.",
+                })
+
+
+class PageRedirect(models.Model):
+    """URL history: one former route of one Page, per Site and locale.
+
+    Written only by the change_route service when a page's path actually
+    changes, and resolved only when no live page matches the request — a live
+    route always wins. Deleting the page deletes its history (CASCADE).
+    """
+
+    site = models.ForeignKey(
+        "sites.Site", on_delete=models.PROTECT, related_name="page_redirects",
+    )
+    page = models.ForeignKey(
+        Page, on_delete=models.CASCADE, related_name="redirects",
+        help_text="The page that used to answer this route. Redirects are "
+                  "re-pointed when the page moves again, never chained.",
+    )
+    locale = models.CharField(
+        max_length=35,
+        validators=[RegexValidator(
+            LANGUAGE_FORMAT,
+            "Use a normalized language code such as en, am or en-us.",
+        )],
+        help_text="Language the former route belonged to.",
+    )
+    old_path = models.CharField(
+        max_length=2048,
+        help_text="The route this page used to answer.",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("site_id", "locale", "old_path")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["site", "locale", "old_path"],
+                name="page_redirect_route_uniq",
+            ),
+            models.CheckConstraint(
+                condition=Q(old_path__regex=PATH_FORMAT),
+                name="page_redirect_path_format",
+            ),
+            models.CheckConstraint(
+                condition=Q(locale__regex=LANGUAGE_FORMAT),
+                name="page_redirect_locale_format",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.site_id}:{self.locale}:{self.old_path}->{self.page_id}"
