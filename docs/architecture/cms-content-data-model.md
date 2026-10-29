@@ -101,6 +101,18 @@ fields are rejected explicitly. This story mounts no routes, so the
 [OpenAPI snapshot](../api/openapi.yaml) is unchanged and the `cms` app
 publishes no URL namespace.
 
+## Structured blocks (P2-CMS-003)
+
+Every content type on `SiteContent` — pages today, posts when they ship —
+carries an ordered, versioned list of typed block objects (`blocks` +
+`blocks_version`): heading, paragraph (sanitized rich text), image, button,
+list and the optional section container. The schema, its validators, and
+the safe-rendering and asset-scope contracts are documented and versioned
+in [cms-content-blocks](cms-content-blocks.md); one schema is reused by all
+content types, no per-type dialect. The database trigger
+`cms_validate_blocks` repeats the structural envelope for writers that
+bypass the domain.
+
 The legacy platform-wide `apps.api.Page` model and `/api/pages/` endpoints
 are untouched: they are the existing unscoped CMS surface and their migration
 into this site-scoped domain is a later story. Nothing here claims that

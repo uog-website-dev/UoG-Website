@@ -14,7 +14,8 @@ _UNCHANGED = object()
 
 def create_page(
     *, site, title, slug, parent=None, locale="", layout="", seo=None,
-    visibility=Visibility.PUBLIC, position=0, metadata=None, actor=None,
+    visibility=Visibility.PUBLIC, position=0, metadata=None, blocks=None,
+    actor=None,
 ):
     """Create one page. Route, locale inheritance and validation are the
     model's job; this only assembles the row and records authorship."""
@@ -22,6 +23,7 @@ def create_page(
         site=site, title=title, slug=slug, parent=parent, locale=locale,
         layout=layout, seo=seo or {}, visibility=visibility,
         position=position, metadata=metadata or {},
+        blocks=blocks if blocks is not None else [],
     )
     if actor is not None:
         page.created_by = actor

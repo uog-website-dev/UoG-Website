@@ -25,3 +25,7 @@ boto3==1.35.84
 # OIDC access-token validation (Keycloak-issued RS256 tokens)
 PyJWT[crypto]==2.15.1
 cryptography==50.0.2
+
+# Structured content: allowlist HTML sanitizer for rich-text blocks
+# (XSS payloads cannot be stored, let alone rendered). Rust/ammonia backed.
+nh3==0.3.7

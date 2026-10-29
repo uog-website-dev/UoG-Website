@@ -9,8 +9,9 @@ pytestmark = pytest.mark.django_db
 FIELDS = {
     "id", "site", "status", "locale", "published_at",
     "created_by", "updated_by", "metadata", "created_at", "updated_at",
+    "blocks", "blocks_version",
 }
-EDITABLES = {"locale", "metadata"}
+EDITABLES = {"locale", "metadata", "blocks"}
 
 
 def test_contract_exposes_only_approved_fields():
@@ -59,6 +60,50 @@ def test_valid_editables_validate_and_malformed_locale_does_not(sites):
     assert "locale" in malformed.errors
 
 
+def test_block_serializer_validation_is_field_level_and_site_scoped(sites):
+    site, other = sites
+    valid = PageSerializer(
+        data={
+            "title": "Welcome",
+            "slug": "welcome",
+            "blocks": [{
+                "type": "image",
+                "ref": f"sites/{site.pk}/hero.png",
+                "alt": "Campus",
+            }],
+        },
+        context={"site": site},
+    )
+    assert valid.is_valid(), valid.errors
+    assert valid.validated_data["blocks"][0]["ref"] == f"sites/{site.pk}/hero.png"
+
+    invalid = PageSerializer(
+        data={
+            "title": "Welcome",
+            "slug": "welcome",
+            "blocks": [{
+                "type": "image",
+                "ref": f"sites/{other.pk}/hero.png",
+                "alt": "Campus",
+            }],
+        },
+        context={"site": site},
+    )
+    assert not invalid.is_valid()
+    assert "blocks[0].ref" in invalid.errors["blocks"]
+
+    malformed = PageSerializer(
+        data={
+            "title": "Welcome",
+            "slug": "welcome",
+            "blocks": [{"type": "heading", "level": 1, "text": "No h1"}],
+        },
+        context={"site": site},
+    )
+    assert not malformed.is_valid()
+    assert "blocks[0].level" in malformed.errors["blocks"]
+
+
 def test_serialized_shape_matches_the_documented_contract(sites):
     site, other = sites
     content = SiteContent(site=site, metadata={"audience": "students"})
@@ -77,12 +122,12 @@ def test_serialized_shape_matches_the_documented_contract(sites):
 PAGE_FIELDS = {
     "id", "site", "parent", "locale", "title", "slug", "path", "layout",
     "seo", "visibility", "position", "is_homepage", "status",
-    "published_at", "created_by", "updated_by", "metadata", "created_at",
-    "updated_at",
+    "published_at", "created_by", "updated_by", "blocks", "blocks_version",
+    "metadata", "created_at", "updated_at",
 }
 PAGE_EDITABLES = {
     "parent", "locale", "title", "slug", "layout", "seo", "visibility",
-    "position", "metadata",
+    "position", "metadata", "blocks",
 }
 
 

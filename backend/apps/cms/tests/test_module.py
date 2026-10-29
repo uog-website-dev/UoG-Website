@@ -22,7 +22,8 @@ CONTENT_CODES = {"PAGES", "POSTS", "MENUS"}
 
 def test_cms_packages_import_and_application_loads():
     for suffix in (
-        "", ".apps", ".models", ".page_sql", ".api", ".api.serializers",
+        "", ".apps", ".models", ".page_sql", ".blocks", ".blocks_sql",
+        ".api", ".api.serializers",
         ".selectors", ".selectors.pages", ".services", ".services.pages",
         ".migrations", ".tests",
     ):

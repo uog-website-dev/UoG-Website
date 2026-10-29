@@ -9,14 +9,39 @@ This story ships no content endpoints — shared primitives are deliberately
 contract is reviewable, testable and reused instead of re-invented, and the
 OpenAPI snapshot therefore stays unchanged.
 """
+from django.core.exceptions import ValidationError as DjangoValidationError
+
 from rest_framework import serializers
 
 from apps.sites.api.serializers import StrictFields
 
+from ..blocks import validate_blocks
 from ..models import Page, SiteContent
 
 
-class SiteContentSerializer(StrictFields, serializers.ModelSerializer):
+class BlocksValidationMixin:
+    """Validate blocks before serializer.save(), using the owning Site scope."""
+
+    def validate_blocks(self, value):
+        site_id = getattr(self.instance, "site_id", None)
+        if site_id is None:
+            site = self.context.get("site")
+            site_id = getattr(site, "pk", None)
+            if site_id is None:
+                site_id = self.context.get("site_id")
+        try:
+            return validate_blocks(value, site_id=site_id)
+        except DjangoValidationError as error:
+            detail = (
+                error.message_dict if hasattr(error, "message_dict")
+                else error.messages
+            )
+            raise serializers.ValidationError(detail) from error
+
+
+class SiteContentSerializer(
+    BlocksValidationMixin, StrictFields, serializers.ModelSerializer,
+):
     """Read-only identity/scope fields; writable content editables."""
 
     immutable_on_update = ("id", "site", "created_by", "created_at")
@@ -24,16 +49,20 @@ class SiteContentSerializer(StrictFields, serializers.ModelSerializer):
     class Meta:
         model = SiteContent
         fields = (
-            "id", "site", "status", "locale", "published_at",
-            "created_by", "updated_by", "metadata", "created_at", "updated_at",
+            "id", "site", "status", "locale", "published_at", "blocks",
+            "blocks_version", "created_by", "updated_by", "metadata",
+            "created_at", "updated_at",
         )
         read_only_fields = (
             "id", "site", "status", "published_at",
-            "created_by", "updated_by", "created_at", "updated_at",
+            "blocks_version", "created_by", "updated_by", "created_at",
+            "updated_at",
         )
 
 
-class PageSerializer(StrictFields, serializers.ModelSerializer):
+class PageSerializer(
+    BlocksValidationMixin, StrictFields, serializers.ModelSerializer,
+):
     """The Page contract future content endpoints reuse.
 
     Identity, Site, computed route, homepage flag and lifecycle are
@@ -50,10 +79,11 @@ class PageSerializer(StrictFields, serializers.ModelSerializer):
         fields = (
             "id", "site", "parent", "locale", "title", "slug", "path",
             "layout", "seo", "visibility", "position", "is_homepage",
-            "status", "published_at", "created_by", "updated_by",
-            "metadata", "created_at", "updated_at",
+            "status", "published_at", "blocks", "blocks_version",
+            "created_by", "updated_by", "metadata", "created_at", "updated_at",
         )
         read_only_fields = (
             "id", "site", "path", "is_homepage", "status", "published_at",
-            "created_by", "updated_by", "created_at", "updated_at",
+            "blocks_version", "created_by", "updated_by",
+            "created_at", "updated_at",
         )
