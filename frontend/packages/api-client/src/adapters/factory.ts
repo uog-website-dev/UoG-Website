@@ -19,6 +19,8 @@ import {
   createMockOrganizationsAdapter,
   type OrganizationsAdapter,
 } from "./organizations";
+import { createLiveIamAdapter, createMockIamAdapter, type IamAdapter } from "./iam";
+import type { MockIamAdapterOptions } from "./iam";
 import { apiModeFromEnv } from "./mode";
 
 export interface AdapterFactoryOptions {
@@ -62,6 +64,31 @@ export function createSitesAdapter(
     return createMockSitesAdapter({ latencyMs: options.mockLatencyMs });
   }
   return createLiveSitesAdapter({
+    baseUrl: options.baseUrl ?? "/api",
+    accessToken: options.accessToken,
+    fetchFn: options.fetchFn,
+  });
+}
+
+/**
+ * Build the User Assignment / access-management adapter for the configured
+ * mode. The mock additionally needs to know who is signed in: it derives
+ * what that administrator may grant and which scopes they manage, exactly
+ * as the backend will once the IAM endpoints exist.
+ */
+export function createIamAdapter(
+  options: AdapterFactoryOptions & MockIamAdapterOptions = {},
+): IamAdapter {
+  const mode = resolve(options);
+  if (mode === "mock") {
+    return createMockIamAdapter({
+      latencyMs: options.mockLatencyMs,
+      callerRoles: options.callerRoles,
+      callerUsername: options.callerUsername,
+      manageableScopes: options.manageableScopes,
+    });
+  }
+  return createLiveIamAdapter({
     baseUrl: options.baseUrl ?? "/api",
     accessToken: options.accessToken,
     fetchFn: options.fetchFn,

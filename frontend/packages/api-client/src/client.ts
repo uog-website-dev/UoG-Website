@@ -73,6 +73,11 @@ export interface ApiClient {
     body: unknown,
     options: { ifMatch: string; init?: RequestInit },
   ): Promise<ApiResult<T>>;
+  /** DELETE with a required `If-Match` precondition (conditional delete). */
+  delDetailed<T>(
+    path: string,
+    options: { ifMatch: string; init?: RequestInit },
+  ): Promise<ApiResult<T>>;
 }
 
 /** Default correlation id: a UUID, matching the backend's X-Request-ID spec. */
@@ -221,6 +226,20 @@ export function createApiClient(options: ApiClientOptions): ApiClient {
         },
         // Conditional mutations require the exact strong ETag from GET
         // detail; the backend answers 412 when it is stale.
+        { "If-Match": ifMatch },
+      ),
+    delDetailed: <T>(
+      path: string,
+      { ifMatch, init }: { ifMatch: string; init?: RequestInit },
+    ) =>
+      request<T>(
+        path,
+        {
+          ...init,
+          method: "DELETE",
+        },
+        // Revocation is a conditional delete: the exact strong ETag from
+        // GET detail is required, and a stale one is answered with 412.
         { "If-Match": ifMatch },
       ),
   };

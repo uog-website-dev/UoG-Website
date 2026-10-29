@@ -340,6 +340,150 @@ export interface ApiErrorResponse {
   request_id: string | null;
 }
 
+/**
+ * User assignment and access management (P2-IAM).
+ *
+ * The console never decides what a user may do: it renders what the backend
+ * reports (`CallerAccess`, `EffectiveAccess`) and sends assignment requests
+ * that the backend authorizes. These DTOs mirror the contract the IAM API
+ * exposes (users lookup, assignments, effective permissions, audit).
+ */
+
+/**
+ * Roles the identity provider manages — the Keycloak realm roles created by
+ * infrastructure/keycloak/keycloak-init.py. A grant of a role happens at a
+ * scope (platform-wide, one Site or one Organization), so a role alone never
+ * describes what a user can reach.
+ */
+export type PlatformRole =
+  | "platform-admin"
+  | "platform-editor"
+  | "platform-viewer";
+
+/** Where an assignment (or an admin's authority) applies. */
+export type AssignmentScopeType = "PLATFORM" | "SITE" | "ORGANIZATION";
+
+/**
+ * A scope an assignment applies to, or one an administrator may manage.
+ * `id` is null for `PLATFORM` and the Site/Organization id otherwise;
+ * `label` is resolved by the backend so the console never has to guess a
+ * display name from an id.
+ */
+export interface AccessScope {
+  type: AssignmentScopeType;
+  id: number | null;
+  label: string;
+}
+
+/**
+ * One Keycloak account as returned by the platform user lookup.
+ * `id` is the stable subject (`sub`), not the username — a renamed user
+ * keeps the same identity, and assignments follow it.
+ */
+export interface PlatformUser {
+  id: string;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  enabled: boolean;
+}
+
+/** Validated search query for the platform user lookup. */
+export interface UserSearchQuery {
+  /** Case-insensitive substring of username, email or display name. */
+  search?: string;
+  /** Page number (1-based); page size is fixed server-side. */
+  page?: number;
+}
+
+/**
+ * One role grant: a user holds `role` within one scope.
+ * `created_by` is the username of the administrator who granted it.
+ */
+export interface UserAssignment {
+  id: number;
+  user_id: string;
+  username: string;
+  role: PlatformRole;
+  scope_type: AssignmentScopeType;
+  scope_id: number | null;
+  scope_label: string;
+  created_at: string;
+  created_by: string;
+}
+
+/** Validated filters for GET /api/v1/assignments/. */
+export interface AssignmentListQuery {
+  /** Exact Keycloak subject (`sub`) of the assigned user. */
+  user?: string;
+  role?: PlatformRole;
+  scope_type?: AssignmentScopeType;
+  scope_id?: number;
+  /** Comma-separated fields with optional '-'; default `created_at`. */
+  ordering?: string;
+  page?: number;
+}
+
+/** Body accepted by POST /api/v1/assignments/. */
+export interface AssignmentCreateInput {
+  user_id: string;
+  role: PlatformRole;
+  scope_type: AssignmentScopeType;
+  /** Required for SITE/ORGANIZATION scopes; absent for PLATFORM. */
+  scope_id?: number | null;
+}
+
+/**
+ * One effective grant for a user, as computed by the backend.
+ * The console displays this answer; it never derives permissions itself.
+ */
+export interface EffectivePermission {
+  role: PlatformRole;
+  scope_type: AssignmentScopeType;
+  scope_id: number | null;
+  scope_label: string;
+  /** Permission keys the backend says this grant confers. */
+  permissions: string[];
+}
+
+export interface EffectiveAccess {
+  user_id: string;
+  username: string;
+  permissions: EffectivePermission[];
+}
+
+/**
+ * What the signed-in administrator may manage, computed by the backend from
+ * their own roles and grants. The console offers only these roles and
+ * scopes in its forms — as a usability boundary, not a security one; the
+ * backend re-checks every request.
+ */
+export interface CallerAccess {
+  username: string;
+  roles: PlatformRole[];
+  /** Roles the caller may grant. Empty means assignments are read-only. */
+  assignable_roles: PlatformRole[];
+  /** Scopes the caller may manage; the scope picker offers only these. */
+  manageable_scopes: AccessScope[];
+}
+
+/**
+ * One entry of the append-only audit trail (backend/apps/audit AuditEvent),
+ * as exposed for the access-management screens. Fields mirror the model —
+ * no enrichment is invented client-side.
+ */
+export interface AssignmentAuditEvent {
+  id: number;
+  action: string;
+  entity_type: string;
+  entity_id: string;
+  actor_kind: "USER" | "SYSTEM";
+  actor_id: string;
+  timestamp: string;
+  request_id: string | null;
+}
+
 /** Backend readiness report (GET /health/ready). */
 export type HealthState = "ok" | "unavailable";
 

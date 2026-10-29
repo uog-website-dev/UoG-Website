@@ -1,9 +1,11 @@
 # Module registry
 
-Implementation date: 2026-10-27. `Module` is the platform catalog of
-capabilities. Sites do not invent module names. CMS, Media, Staff directory,
-Academics, News and announcements, Events, Job notice board, Search and
-Analytics are seeded registry rows. This story does not implement those
+Implementation date: 2026-10-27 (content codes added 2026-10-29 by
+P2-CMS-001). `Module` is the platform catalog of capabilities. Sites do not
+invent module names. CMS, Media, Staff directory, Academics, News and
+announcements, Events, Job notice board, Search and Analytics are seeded
+registry rows, as are the content codes PAGES, POSTS and MENUS added with
+the site-scoped CMS domain. No story to date implements any of those
 capabilities.
 
 ## Fields

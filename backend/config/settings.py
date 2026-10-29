@@ -46,6 +46,9 @@ INSTALLED_APPS = [
     "apps.organizations",
     # Digital properties are a separate domain from institutional units.
     "apps.sites",
+    # Site-scoped content primitives shared by Pages/Posts (P2-CMS-001).
+    # Registry codes only; no content endpoints ship with this boundary.
+    "apps.cms",
 ]
 
 MIDDLEWARE = [

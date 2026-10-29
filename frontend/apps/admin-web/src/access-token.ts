@@ -23,6 +23,59 @@ interface TokenEndpointResponse {
 }
 
 /**
+ * Non-sensitive claims read from the session's own access token, for
+ * *display* decisions only (which role options a form offers in mock
+ * development mode).
+ *
+ * The payload is decoded without verification because it is our own token
+ * out of our own httpOnly session cookie — it is never accepted as an
+ * authorization decision. Every call the screen makes still travels to the
+ * backend, which re-derives the caller's authority from the token it
+ * validates itself (see the IAM adapter's `getCallerAccess`).
+ */
+export interface SessionClaims {
+  roles: string[];
+  username: string | null;
+}
+
+function decodeJwtPayload(token: string): Record<string, unknown> | null {
+  const parts = token.split(".");
+  if (parts.length < 2) return null;
+  try {
+    const payload = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const padded = payload + "=".repeat((4 - (payload.length % 4)) % 4);
+    const json =
+      typeof atob === "function"
+        ? atob(padded)
+        : Buffer.from(padded, "base64").toString("utf8");
+    return JSON.parse(json) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+}
+
+/** Roles and username carried by the session's access token, if present. */
+export async function getSessionClaims(): Promise<SessionClaims> {
+  const token = await getSessionToken();
+  const accessToken =
+    token && typeof token.accessToken === "string" ? token.accessToken : null;
+  if (!accessToken) return { roles: [], username: null };
+
+  const payload = decodeJwtPayload(accessToken);
+  if (!payload) return { roles: [], username: null };
+
+  const realmAccess = payload.realm_access as { roles?: unknown } | undefined;
+  const roles = Array.isArray(realmAccess?.roles)
+    ? realmAccess.roles.filter((role): role is string => typeof role === "string")
+    : [];
+  const username =
+    typeof payload.preferred_username === "string"
+      ? payload.preferred_username
+      : null;
+  return { roles, username };
+}
+
+/**
  * The access token of the signed-in user, or `null` when nobody is signed in
  * (or no usable token can be obtained).
  */

@@ -28,6 +28,7 @@ export type ApiErrorCode =
   | "unsupported_media_type"
   | "throttled"
   | "service_unavailable"
+  | "not_implemented"
   | "api_error"
   // Client-side transport failures (no HTTP response).
   | "network_error"

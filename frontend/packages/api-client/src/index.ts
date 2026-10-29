@@ -64,6 +64,18 @@ export type {
 export { normalizeHostname } from "./hostname";
 export type { HostnameResult } from "./hostname";
 
+// User assignment & access management (P2-IAM).
+export {
+  createLiveIamAdapter,
+  createMockIamAdapter,
+  grantableRoles,
+  IAM_PAGE_SIZE,
+} from "./adapters/iam";
+export type {
+  IamAdapter,
+  MockIamAdapterOptions,
+} from "./adapters/iam";
+
 export {
   SiteConfigurationError,
   defaultSiteConfiguration,
@@ -85,7 +97,7 @@ export {
 } from "./adapters/mode";
 export type { ApiMode, ResolveModeOptions } from "./adapters/mode";
 
-export { createOrganizationsAdapter, createSitesAdapter } from "./adapters/factory";
+export { createOrganizationsAdapter, createSitesAdapter, createIamAdapter } from "./adapters/factory";
 
 // Fixtures (development only — never used when API_MODE=live).
 export { organizationFixtures, rootOrganizationFixture } from "./fixtures/organizations";
@@ -96,3 +108,9 @@ export {
   siteModuleFixtures,
   moduleFixtures,
 } from "./fixtures/sites";
+export {
+  ROLE_CATALOG,
+  userFixtures,
+  assignmentFixtures,
+  auditEventFixtures,
+} from "./fixtures/iam";

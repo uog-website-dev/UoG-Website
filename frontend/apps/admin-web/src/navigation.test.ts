@@ -7,7 +7,7 @@ import {
 } from "@/navigation";
 
 describe("adminNavItems", () => {
-  it("exposes the Organizations, Sites, Domains and Modules entries required by the shell", () => {
+  it("exposes the Organizations, Sites, Domains, Modules and Access entries required by the shell", () => {
     const hrefs = adminNavItems.map((item) => item.href);
     expect(hrefs).toEqual([
       "/",
@@ -15,6 +15,7 @@ describe("adminNavItems", () => {
       "/sites",
       "/domains",
       "/modules",
+      "/access",
     ]);
   });
 
