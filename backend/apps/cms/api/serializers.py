@@ -13,7 +13,7 @@ from rest_framework import serializers
 
 from apps.sites.api.serializers import StrictFields
 
-from ..models import SiteContent
+from ..models import Page, SiteContent
 
 
 class SiteContentSerializer(StrictFields, serializers.ModelSerializer):
@@ -29,5 +29,31 @@ class SiteContentSerializer(StrictFields, serializers.ModelSerializer):
         )
         read_only_fields = (
             "id", "site", "status", "published_at",
+            "created_by", "updated_by", "created_at", "updated_at",
+        )
+
+
+class PageSerializer(StrictFields, serializers.ModelSerializer):
+    """The Page contract future content endpoints reuse.
+
+    Identity, Site, computed route, homepage flag and lifecycle are
+    server-managed; the caller may edit content, routing inputs and
+    presentation hints. `parent` and `locale` are create-only: moving a
+    subtree must go through the change_route service (which records URL
+    history) and a page's language is fixed at creation.
+    """
+
+    immutable_on_update = ("id", "site", "parent", "locale", "created_by", "created_at")
+
+    class Meta:
+        model = Page
+        fields = (
+            "id", "site", "parent", "locale", "title", "slug", "path",
+            "layout", "seo", "visibility", "position", "is_homepage",
+            "status", "published_at", "created_by", "updated_by",
+            "metadata", "created_at", "updated_at",
+        )
+        read_only_fields = (
+            "id", "site", "path", "is_homepage", "status", "published_at",
             "created_by", "updated_by", "created_at", "updated_at",
         )
