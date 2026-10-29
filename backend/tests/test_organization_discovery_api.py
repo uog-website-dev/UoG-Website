@@ -32,9 +32,8 @@ def units():
 
 
 @pytest.fixture
-def admin(client, oidc):
-    client.defaults.update(oidc.header())
-    return client
+def admin(platform_admin_client):
+    return platform_admin_client
 
 
 def codes(response):

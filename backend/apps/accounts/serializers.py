@@ -7,7 +7,7 @@ class IdentitySerializer(serializers.Serializer):
     email = serializers.EmailField(allow_blank=True)
     name = serializers.CharField(allow_blank=True)
     roles = serializers.ListField(child=serializers.CharField())
-    is_staff = serializers.BooleanField()
+    is_staff = serializers.BooleanField(help_text="Django staff status; never an application authorization grant.")
     client_id = serializers.CharField()
     scopes = serializers.ListField(child=serializers.CharField())
     expires_at = serializers.IntegerField(help_text="Access-token expiry as Unix seconds.")

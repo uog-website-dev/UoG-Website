@@ -3,18 +3,17 @@ import hashlib
 import json
 from contextlib import contextmanager
 
-from django.conf import settings
 from django.core.exceptions import ValidationError as DomainValidationError
 from django.db import DatabaseError
 from rest_framework import serializers, viewsets
 from rest_framework.exceptions import APIException, NotFound
 from rest_framework.parsers import JSONParser
-from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 
 from apps.accounts.authentication import KeycloakBearerAuthentication
-from apps.accounts.permissions import HasRealmRole
+from apps.authorization.permissions import ManagementPermission
 
 
 class Conflict(APIException):
@@ -32,13 +31,16 @@ class PreconditionFailed(APIException):
     default_detail = "The resource changed. Retrieve it and reconcile your changes."
 
 
+from rest_framework.permissions import BasePermission, SAFE_METHODS
+
+
 class DevelopmentWritesOnly(BasePermission):
-    message = "Administration writes require development mode and explicit opt-in; production writes await scoped IAM/RBAC."
+    """Temporary development-only mutation gate retained for legacy API policy."""
+    message = "Administration writes require development mode and explicit opt-in."
 
     def has_permission(self, request, view):
-        return request.method in SAFE_METHODS or (
-            settings.DEBUG and settings.ORGANIZATIONS_DEV_WRITES_ENABLED
-        )
+        from django.conf import settings
+        return request.method in SAFE_METHODS or (settings.DEBUG and settings.ORGANIZATIONS_DEV_WRITES_ENABLED)
 
 
 @contextmanager
@@ -85,8 +87,12 @@ def representation(serializer_class, instance):
 
 class AdministrationViewSet(viewsets.GenericViewSet):
     authentication_classes = [KeycloakBearerAuthentication]
-    permission_classes = [IsAuthenticated, HasRealmRole, DevelopmentWritesOnly]
-    required_roles = {"platform-admin"}
+    permission_classes = [IsAuthenticated, ManagementPermission, DevelopmentWritesOnly]
+    permission_by_action = {
+        "list": "sites.view", "retrieve": "sites.view", "create": "sites.create",
+        "partial_update": "sites.update", "activate": "sites.update", "suspend": "sites.update",
+        "archive": "sites.update", "configuration": "sites.update",
+    }
     http_method_names = ["get", "post", "patch", "head", "options"]
     parser_classes = [JSONParser]
     renderer_classes = [JSONRenderer]

@@ -1,6 +1,5 @@
+import { defineConfig } from "vitest";
 import { fileURLToPath } from "node:url";
-
-import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   // The app tsconfig keeps `jsx: "preserve"` for Next.js; the oxc transform

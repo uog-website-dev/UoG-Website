@@ -30,6 +30,8 @@ if [ "${RUN_MIGRATIONS:-true}" = "true" ]; then
     DB_PASSWORD="${DB_MIGRATE_PASSWORD:-uog_migrate_password}" \
         python manage.py migrate --noinput
     echo "==> Migrations complete"
+    echo "==> Seeding registered RBAC capabilities and standard roles..."
+    python manage.py seed_rbac
 fi
 
 if [ "${RUN_MAKEMIGRATIONS:-false}" = "true" ]; then

@@ -19,11 +19,10 @@ def tree():
 
 
 @pytest.fixture
-def admin(client, oidc, settings):
+def admin(platform_admin_client, settings):
     settings.DEBUG = True
     settings.ORGANIZATIONS_DEV_WRITES_ENABLED = True
-    client.defaults.update(oidc.header())
-    return client
+    return platform_admin_client
 
 
 def detail(unit):
@@ -38,9 +37,11 @@ def test_anonymous_denied_before_validation(client, method, suffix):
 
 
 @pytest.mark.parametrize("method,suffix", [("get", ""), ("post", ""), ("patch", "1/"), ("post", "1/archive/"), ("post", "1/deactivate/")])
-def test_non_admin_token_denied(client, oidc, settings, method, suffix):
+def test_non_admin_token_denied(client, oidc, settings, tree, method, suffix):
     settings.DEBUG = True
     settings.ORGANIZATIONS_DEV_WRITES_ENABLED = True
+    root, _college = tree
+    suffix = suffix.replace("1/", f"{root.pk}/", 1)
     response = getattr(client, method)(BASE + suffix, content_type="application/json", **oidc.header(realm_access={"roles": ["platform-viewer"]}))
     assert response.status_code == 403
 
@@ -53,9 +54,11 @@ def test_superuser_session_has_no_bearer_bypass(client):
 
 @pytest.mark.parametrize("debug,opt_in", [(False, False), (False, True), (True, False)])
 @pytest.mark.parametrize("method,suffix", [("post", ""), ("patch", "1/"), ("post", "1/archive/"), ("post", "1/deactivate/")])
-def test_write_gate_cannot_be_enabled_in_production(admin, settings, debug, opt_in, method, suffix):
+def test_write_gate_cannot_be_enabled_in_production(admin, settings, tree, debug, opt_in, method, suffix):
     settings.DEBUG = debug
     settings.ORGANIZATIONS_DEV_WRITES_ENABLED = opt_in
+    root, _college = tree
+    suffix = suffix.replace("1/", f"{root.pk}/", 1)
     assert getattr(admin, method)(BASE + suffix, {}, content_type="application/json").status_code == 403
 
 
@@ -132,8 +135,9 @@ def test_lifecycle_retains_references_and_rejects_illegal_transitions(admin, tre
     assert archived.json()["status"] == "ARCHIVED"
     college.refresh_from_db()
     assert college.parent_id == root.pk
-    assert admin.delete(url).status_code == 405
-    assert admin.put(url, {}, content_type="application/json").status_code == 405
+    # DELETE has no registered application capability and therefore fails closed.
+    assert admin.delete(url).status_code == 403
+    assert admin.put(url, {}, content_type="application/json").status_code == 403
     assert admin.post(url + "deactivate/", {}, content_type="application/json", HTTP_IF_MATCH=archived["ETag"]).status_code == 400
 
 

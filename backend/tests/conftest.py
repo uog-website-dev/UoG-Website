@@ -59,7 +59,9 @@ def oidc(settings, monkeypatch, signing_key):
     settings.OIDC_STAFF_ROLES = ["platform-admin"]
 
     cache = jwks_cache(signing_key)
-    monkeypatch.setattr("apps.accounts.authentication.get_jwks_cache", lambda: cache)
+    monkeypatch.setattr(
+        "apps.accounts.authentication.get_jwks_cache", lambda: cache
+    )
 
     def token(**overrides) -> str:
         return make_token(signing_key, **overrides)
@@ -70,3 +72,26 @@ def oidc(settings, monkeypatch, signing_key):
     return SimpleNamespace(
         key=signing_key, cache=cache, token=token, header=header
     )
+
+
+@pytest.fixture
+def platform_admin_client(client, oidc):
+    """Authenticated legacy management-test client with an explicit DB grant."""
+    from django.contrib.auth import get_user_model
+    from django.core.management import call_command
+
+    from apps.authorization.models import Role, UserRoleAssignment
+
+    client.defaults.update(oidc.header())
+    response = client.get("/api/me/")
+    assert response.status_code == 200
+    call_command("seed_rbac", verbosity=0)
+    user = get_user_model().objects.get(username="devuser")
+    role = Role.objects.get(code="platform-administrator")
+    UserRoleAssignment.objects.get_or_create(
+        user=user,
+        role=role,
+        scope=UserRoleAssignment.Scope.PLATFORM,
+        defaults={"assigned_by": user},
+    )
+    return client

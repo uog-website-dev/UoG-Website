@@ -1,11 +1,13 @@
 """Restricted Site administration API. Production writes await scoped IAM/RBAC."""
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
+from django.db.models import Q
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from apps.authorization.access import authorized_site_ids, authorized_organization_ids, reject_disabled_module
 from apps.organizations.hierarchy_lock import hierarchy_write
 
 from ..models import Module, Site, SiteDomain, SiteModule, SiteTemplate
@@ -40,14 +42,26 @@ def _list(view, serializer, specs, default):
 
 @extend_schema(tags=["Sites"])
 @extend_schema_view(
-    list=extend_schema(parameters=[*LIST_PARAMETERS, OpenApiParameter("status", str, enum=Site.Status.values), OpenApiParameter("organization_unit", int)], description="Platform-admin only. Page size 20, ordered by code."),
-    retrieve=extend_schema(description="Platform-admin only. Returns a strong ETag."),
-    create=extend_schema(description="Development opt-in and platform-admin required. New Sites start DRAFT. An optional template copies approved defaults once."),
-    partial_update=extend_schema(parameters=[IF_MATCH], description="Development admin only. Code, status and configuration are not changed here."),
+    list=extend_schema(parameters=[*LIST_PARAMETERS, OpenApiParameter("status", str, enum=Site.Status.values), OpenApiParameter("organization_unit", int)], description="Requires sites.view and returns only authorized site scopes. Page size 20, ordered by code."),
+    retrieve=extend_schema(description="Requires sites.view in this Site scope. Returns a strong ETag."),
+    create=extend_schema(description="Requires sites.create in the target organization scope and the existing development-only write gate."),
+    partial_update=extend_schema(parameters=[IF_MATCH], description="Requires sites.update in this Site scope and the existing development-only write gate."),
 )
 class SiteViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, AdministrationViewSet):
     queryset = Site.objects.select_related("organization_unit", "template").order_by("code")
     serializer_class = SiteSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.action == "create":
+            return queryset
+        code = self.permission_by_action.get(self.action, "sites.view")
+        allowed = authorized_site_ids(self.request.user, code)
+        if allowed is None:
+            return queryset
+        org_ids = authorized_organization_ids(self.request.user, code) or []
+        return queryset.filter(Q(pk__in=allowed) | Q(organization_unit_id__in=org_ids))
+
 
     def get_serializer_class(self):
         if self.action == "create":
@@ -119,11 +133,23 @@ class SiteViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Administrati
 class SiteDomainViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, AdministrationViewSet):
     queryset = SiteDomain.objects.select_related("site").order_by("hostname")
     serializer_class = SiteDomainSerializer
+    permission_by_action = {
+        "list": "sites.view", "retrieve": "sites.view", "create": "sites.update",
+        "partial_update": "sites.update", "activate": "sites.update", "deactivate": "sites.update",
+        "set_primary": "sites.update",
+    }
 
     def get_queryset(self):
         queryset = super().get_queryset()
         site_pk = self.kwargs.get("site_pk")
-        return queryset.filter(site_id=site_pk) if site_pk is not None else queryset
+        if site_pk is not None:
+            return queryset.filter(site_id=site_pk)
+        code = self.permission_by_action.get(self.action, "sites.view")
+        allowed = authorized_site_ids(self.request.user, code)
+        if allowed is None:
+            return queryset
+        org_ids = authorized_organization_ids(self.request.user, code) or []
+        return queryset.filter(Q(site_id__in=allowed) | Q(site__organization_unit_id__in=org_ids))
 
     def get_serializer_class(self):
         return SiteDomainUpdateSerializer if self.action == "partial_update" else SiteDomainSerializer
@@ -193,11 +219,22 @@ class SiteDomainViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Admini
 class SiteModuleViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, AdministrationViewSet):
     queryset = SiteModule.objects.select_related("site", "module").order_by("module_id")
     serializer_class = SiteModuleSerializer
+    permission_by_action = {
+        "list": "sites.view", "retrieve": "sites.view", "create": "sites.update",
+        "partial_update": "sites.update", "enable": "sites.update", "disable": "sites.update",
+    }
 
     def get_queryset(self):
         queryset = super().get_queryset()
         site_pk = self.kwargs.get("site_pk")
-        return queryset.filter(site_id=site_pk) if site_pk is not None else queryset
+        if site_pk is not None:
+            return queryset.filter(site_id=site_pk)
+        code = self.permission_by_action.get(self.action, "sites.view")
+        allowed = authorized_site_ids(self.request.user, code)
+        if allowed is None:
+            return queryset
+        org_ids = authorized_organization_ids(self.request.user, code) or []
+        return queryset.filter(Q(site_id__in=allowed) | Q(site__organization_unit_id__in=org_ids))
 
     def list(self, request, *args, **kwargs):
         get_object_or_404(Site, pk=self.kwargs["site_pk"])
@@ -215,12 +252,16 @@ class SiteModuleViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Admini
             module = serializer.validated_data["module"]
             if SiteModule.objects.filter(site=site, module=module).exists():
                 raise Conflict({"module": ["This Site already has this module."]})
+            # Authoritative backend gate: reject if module is disabled or unimplemented for this site
+            reject_disabled_module(site.pk, module.code, request=request)
             enablement = enable_module_for_site(site.pk, module.pk, configuration=serializer.validated_data.get("configuration"))
         return self.respond(enablement, serializer_class=SiteModuleSerializer, status=201, location=reverse("sites:sitemodule-detail", args=[site.pk, enablement.pk]))
 
     def partial_update(self, request, *args, **kwargs):
         with translate_domain_errors():
             enablement = self.lock(request, self.get_queryset(), SiteModuleSerializer)
+            # Authoritative backend gate: reject if module is disabled or unimplemented
+            reject_disabled_module(enablement.site_id, enablement.module.code, request=request)
             serializer = self.get_serializer(enablement, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
             return self.respond(serializer.save(), serializer_class=SiteModuleSerializer)
@@ -228,17 +269,25 @@ class SiteModuleViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Admini
     def _switch(self, request, command):
         with translate_domain_errors():
             enablement = self.lock(request, self.get_queryset(), SiteModuleSerializer)
+            # Authoritative backend gate: reject if module is disabled or unimplemented
+            reject_disabled_module(enablement.site_id, enablement.module.code, request=request)
             EmptyObjectSerializer(data=request.data).is_valid(raise_exception=True)
             return self.respond(command(enablement.site_id, enablement.module_id), serializer_class=SiteModuleSerializer)
 
     @extend_schema(parameters=[IF_MATCH], request=EMPTY, responses=SiteModuleSerializer)
     @action(detail=True, methods=["post"])
     def enable(self, request, pk=None, site_pk=None):
+        with translate_domain_errors():
+            enablement = self.lock(request, self.get_queryset(), SiteModuleSerializer)
+            reject_disabled_module(enablement.site_id, enablement.module.code, request=request)
         return self._switch(request, enable_module_for_site)
 
     @extend_schema(parameters=[IF_MATCH], request=EMPTY, responses=SiteModuleSerializer, description="Turns the module off for this Site and keeps its configuration.")
     @action(detail=True, methods=["post"])
     def disable(self, request, pk=None, site_pk=None):
+        with translate_domain_errors():
+            enablement = self.lock(request, self.get_queryset(), SiteModuleSerializer)
+            reject_disabled_module(enablement.site_id, enablement.module.code, request=request)
         return self._switch(request, disable_module_for_site)
 
 
@@ -252,6 +301,10 @@ class SiteModuleViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Admini
 class SiteTemplateViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, AdministrationViewSet):
     queryset = SiteTemplate.objects.order_by("code")
     serializer_class = SiteTemplateSerializer
+    permission_by_action = {
+        "list": "platform.sites.manage_registry", "retrieve": "platform.sites.manage_registry",
+        "create": "platform.sites.manage_registry", "partial_update": "platform.sites.manage_registry",
+    }
 
     def get_serializer_class(self):
         return SiteTemplateUpdateSerializer if self.action == "partial_update" else SiteTemplateSerializer
@@ -288,6 +341,10 @@ class SiteTemplateViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Admi
 class ModuleViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, AdministrationViewSet):
     queryset = Module.objects.order_by("code")
     serializer_class = ModuleSerializer
+    permission_by_action = {
+        "list": "platform.sites.manage_registry", "retrieve": "platform.sites.manage_registry",
+        "create": "platform.sites.manage_registry", "partial_update": "platform.sites.manage_registry",
+    }
 
     def get_serializer_class(self):
         return ModuleUpdateSerializer if self.action == "partial_update" else ModuleSerializer
