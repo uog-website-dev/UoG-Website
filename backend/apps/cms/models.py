@@ -17,6 +17,8 @@ from django.db.models import Q, Value
 from django.db.models.lookups import Exact
 from django.utils import timezone
 
+from . import blocks as blocks_schema
+
 
 class ContentStatus(models.TextChoices):
     """Lifecycle shared by every content record. Archived is terminal."""
@@ -88,6 +90,21 @@ class SiteContent(models.Model):
         help_text="Free-form JSON object for approved content metadata. Not a "
                   "settings document and never a place for secrets.",
     )
+    blocks = models.JSONField(
+        blank=True, default=list,
+        help_text="Ordered structured content: a JSON array of typed block "
+                  "objects (heading, paragraph, image, button, list, "
+                  "section) validated against the documented, versioned "
+                  "block schema. Paragraph rich text is sanitized on write. "
+                  "An empty list is valid and every content type — this one "
+                  "and future Post records — shares the same blocks.",
+    )
+    blocks_version = models.CharField(
+        max_length=8, default=blocks_schema.SCHEMA_VERSION,
+        help_text="Schema version the blocks were written with, stored so "
+                  "future block-schema migrations can interpret and "
+                  "migrate stored payloads. Server-managed.",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -109,6 +126,17 @@ class SiteContent(models.Model):
                 ),
                 name="content_metadata_object",
             ),
+            models.CheckConstraint(
+                condition=Exact(
+                    models.Func("blocks", function="jsonb_typeof", output_field=models.CharField()),
+                    Value("array"),
+                ),
+                name="content_blocks_array",
+            ),
+            models.CheckConstraint(
+                condition=Q(blocks_version__in=sorted(blocks_schema.SUPPORTED_SCHEMA_VERSIONS)),
+                name="content_blocks_version",
+            ),
         ]
         indexes = [
             # Ownership-leading indexes: every content query is scoped by the
@@ -120,8 +148,7 @@ class SiteContent(models.Model):
     def __str__(self):
         return f"{self.site_id}:{self.pk}"
 
-    def clean(self):
-        super().clean()
+    def _validate_content(self):
         previous = None
         if not self._state.adding:
             using = self._state.db or router.db_for_write(type(self), instance=self)
@@ -159,6 +186,34 @@ class SiteContent(models.Model):
         if self.status == ContentStatus.PUBLISHED and self.published_at is None:
             self.published_at = timezone.now()
 
+    def _validate_blocks(self):
+        """Validate the block payload; the subclass calls this last so its
+        own field normalization (locale, path, …) has settled before a
+        rejection — the model's constraint checks run against this
+        instance after clean, and an unset field from an earlier raise
+        would otherwise shadow the real error with format-constraint
+        noise.
+        """
+        if self.blocks_version not in blocks_schema.SUPPORTED_SCHEMA_VERSIONS:
+            raise ValidationError({
+                "blocks_version": (
+                    "This block schema version is not supported here. "
+                    "Supported: " + ", ".join(sorted(blocks_schema.SUPPORTED_SCHEMA_VERSIONS)) + "."
+                ),
+            })
+        if not isinstance(self.blocks, list):
+            raise ValidationError({"blocks": "blocks must be a JSON array of block objects."})
+        try:
+            self.blocks = blocks_schema.validate_blocks(self.blocks, site_id=self.site_id)
+        except ValidationError as error:
+            if hasattr(error, "error_dict"):
+                raise ValidationError(dict(error.error_dict)) from error
+            raise
+
+    def clean(self):
+        self._validate_content()
+        self._validate_blocks()
+
     def _enabled_languages(self):
         configuration = (self.site.configuration or {}) if self.site_id else {}
         enabled = configuration.get("language", {}).get("enabled")
@@ -174,6 +229,7 @@ class SiteContent(models.Model):
     def save(self, *args, **kwargs):
         supplied_locale = self.locale
         supplied_published_at = self.published_at
+        supplied_blocks = self.blocks
         self.full_clean()
         if kwargs.get("update_fields"):
             fields = set(kwargs["update_fields"]) | {"updated_at"}
@@ -181,6 +237,10 @@ class SiteContent(models.Model):
                 fields.add("locale")
             if self.published_at != supplied_published_at:
                 fields.add("published_at")
+            # clean() stores the sanitized block payload; when it changed
+            # (or update_fields was given explicitly) persist the copy.
+            if self.blocks != supplied_blocks:
+                fields.add("blocks")
             kwargs["update_fields"] = fields
         return super().save(*args, **kwargs)
 
@@ -338,7 +398,12 @@ class Page(SiteContent):
         return super().full_clean(*args, **kwargs)
 
     def clean(self):
-        super().clean()
+        # Content rules first (the parent/locale checks below need the
+        # normalized locale), then the page's own route/hierarchy rules, and
+        # only then blocks: a block rejection must not leave route
+        # normalization half-done, and the constraint checks that run after
+        # clean read the instance — settled fields, no shadowing noise.
+        self._validate_content()
         if not isinstance(self.seo, dict):
             raise ValidationError({"seo": "SEO metadata must be a JSON object."})
         unknown = sorted(set(self.seo) - set(SEO_KEYS))
@@ -355,6 +420,15 @@ class Page(SiteContent):
                     "seo": f"{key} must be at most {SEO_KEYS[key]} characters.",
                 })
 
+        self._validate_route()
+        # Blocks last, after the route is settled (see _validate_blocks):
+        # a block rejection must not leave route normalization half-done,
+        # and the constraint checks that run after clean read the instance —
+        # settled fields, no shadowing noise.
+        self._validate_blocks()
+
+    def _validate_route(self):
+        """Compute and police the page's route within its Site and locale."""
         if not self.slug or not self.site_id:
             # clean_fields already reported the missing value.
             return

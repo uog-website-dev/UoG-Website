@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uog.edu.et/schemas/cms/blocks-v1.schema.json",
+  "title": "UoG CMS content blocks, version 1",
+  "description": "Ordered block array. The owning Site id and sanitized rich-text policy are enforced by the application validator.",
+  "x-content-blocks-version": "1",
+  "x-max-serialized-bytes": 262144,
+  "x-max-item-serialized-bytes": 12288,
+  "type": "array",
+  "maxItems": 100,
+  "items": {
+    "oneOf": [
+      { "$ref": "#/$defs/heading" },
+      { "$ref": "#/$defs/paragraph" },
+      { "$ref": "#/$defs/image" },
+      { "$ref": "#/$defs/button" },
+      { "$ref": "#/$defs/list" },
+      { "$ref": "#/$defs/section" }
+    ]
+  },
+  "$defs": {
+    "heading": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "level", "text"],
+      "properties": {
+        "type": { "const": "heading" },
+        "level": { "type": "integer", "enum": [2, 3, 4] },
+        "text": { "type": "string", "minLength": 1, "maxLength": 400 }
+      }
+    },
+    "paragraph": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "html"],
+      "properties": {
+        "type": { "const": "paragraph" },
+        "html": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20000,
+          "description": "Sanitized on write using the allowlist documented in cms-content-blocks.md.",
+          "x-sanitized-html": true
+        }
+      }
+    },
+    "image": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "ref", "alt"],
+      "properties": {
+        "type": { "const": "image" },
+        "ref": {
+          "type": "string",
+          "maxLength": 512,
+          "pattern": "^(shared/[a-z0-9][a-z0-9._-]*(/[a-z0-9][a-z0-9._-]*)*|sites/[0-9]+/[a-z0-9][a-z0-9._-]*(/[a-z0-9][a-z0-9._-]*)*)$",
+          "description": "Shared scope or the owning Site's scope; site-id ownership is checked at runtime."
+        },
+        "alt": { "type": "string", "minLength": 1, "maxLength": 255 },
+        "caption": { "type": "string", "minLength": 1, "maxLength": 400 }
+      }
+    },
+    "button": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "label", "href"],
+      "properties": {
+        "type": { "const": "button" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "href": {
+          "type": "string",
+          "maxLength": 2000,
+          "pattern": "^(?:/(?!/)|https?://|mailto:)",
+          "description": "A site-root path or http(s)/mailto URL; full safety checks are performed at runtime."
+        },
+        "new_tab": { "type": "boolean", "default": false }
+      }
+    },
+    "list": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "style", "items"],
+      "properties": {
+        "type": { "const": "list" },
+        "style": { "type": "string", "enum": ["ordered", "unordered"] },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 50,
+          "items": { "type": "string", "minLength": 1, "maxLength": 1200 }
+        }
+      }
+    },
+    "section": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "children"],
+      "properties": {
+        "type": { "const": "section" },
+        "heading": { "type": "string", "minLength": 1, "maxLength": 400 },
+        "children": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 100,
+          "items": {
+            "oneOf": [
+              { "$ref": "#/$defs/heading" },
+              { "$ref": "#/$defs/paragraph" },
+              { "$ref": "#/$defs/image" },
+              { "$ref": "#/$defs/button" },
+              { "$ref": "#/$defs/list" }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

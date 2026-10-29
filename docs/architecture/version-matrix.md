@@ -35,6 +35,7 @@ The P0 reports disagreed on React, Redis and Keycloak. Resolutions:
 | boto3 | 1.35.84 | `backend/requirements/base.txt` |
 | PyJWT\[crypto\] | 2.15.1 | `backend/requirements/base.txt` (OIDC access-token validation) |
 | cryptography | 46.0.3 | `backend/requirements/base.txt` (RS256 signature verification) |
+| nh3 | 0.3.7 | `backend/requirements/base.txt` (allowlist HTML sanitizer for block rich text — XSS payloads cannot be stored) |
 | pytest / pytest-django | 8.4.2 / 4.14.0 | `backend/requirements/dev.txt` |
 
 ## Frontend
