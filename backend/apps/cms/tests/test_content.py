@@ -127,11 +127,15 @@ def test_authorship_is_recorded_and_survives_account_removal(sites):
     author = get_user_model().objects.create(username="content-author")
     content = SiteContent(site=site, created_by=author, updated_by=author)
     content.save()
+    revision = content.revisions.get(revision_number=1)
+    editor_id = author.pk
     assert content.created_by_id == author.pk
     author.delete()
     content.refresh_from_db()
+    revision.refresh_from_db()
     assert content.created_by_id is None
     assert content.updated_by_id is None
+    assert revision.editor_identity == str(editor_id)
     assert SiteContent.objects.filter(pk=content.pk).exists()
 
 

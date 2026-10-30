@@ -23,10 +23,11 @@ CONTENT_CODES = {"PAGES", "POSTS", "MENUS"}
 def test_cms_packages_import_and_application_loads():
     for suffix in (
         "", ".apps", ".models", ".page_sql", ".blocks", ".blocks_sql",
-        ".workflow_sql",
-        ".api", ".api.serializers", ".api.workflow", ".api.urls",
+        ".workflow_sql", ".revision_sql",
+        ".api", ".api.serializers", ".api.workflow", ".api.revisions",
+        ".api.urls",
         ".selectors", ".selectors.pages", ".services", ".services.pages",
-        ".services.workflow", ".migrations", ".tests",
+        ".services.workflow", ".services.revisions", ".migrations", ".tests",
     ):
         importlib.import_module(f"apps.cms{suffix}")
     config = django_apps.get_app_config("cms")
@@ -35,18 +36,21 @@ def test_cms_packages_import_and_application_loads():
     assert {model.__name__ for model in config.get_models()} == {
         "SiteContent", "Page", "PageRedirect", "SiteContentRoleAssignment",
         "ContentWorkflowTransition", "PublishedContentSnapshot",
+        "ContentRevision",
     }
 
 
-def test_cms_mounts_only_site_scoped_workflow_endpoints():
-    # CMS exposes role administration and workflow actions, not a generic
-    # content CRUD/public-serving endpoint.
+def test_cms_mounts_only_site_scoped_workflow_and_revision_endpoints():
+    # CMS exposes scoped administration/history, not generic content CRUD or
+    # public serving.
     assert "cms" in get_resolver().namespace_dict
     urls = importlib.import_module("apps.cms.api.urls")
     assert {
         pattern.name for pattern in urls.urlpatterns
     } == {
         "content-role-list", "content-role-detail", "content-workflow",
+        "content-revision-list", "content-revision-detail",
+        "content-revision-restore",
     }
 
 
@@ -82,6 +86,11 @@ def test_cms_migrations_are_repeatable_and_applied():
     assert ("audit", "0002_common_writer") in workflow_graph.dependencies
     assert "RunSQL" in [
         type(operation).__name__ for operation in workflow_graph.operations
+    ]
+    revision_graph = loader.disk_migrations[("cms", "0006_sitecontent_revision_number_contentrevision")]
+    assert ("cms", "0006_sitecontent_revision_number_contentrevision") in loader.applied_migrations
+    assert "RunSQL" in [
+        type(operation).__name__ for operation in revision_graph.operations
     ]
 
 

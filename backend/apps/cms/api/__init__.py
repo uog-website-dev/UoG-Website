@@ -1,1 +1,1 @@
-"""Site-scoped CMS serializers and workflow endpoints."""
+"""Site-scoped CMS workflow, revision history and restore endpoints."""

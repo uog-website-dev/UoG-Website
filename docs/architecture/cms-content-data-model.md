@@ -3,8 +3,8 @@
 Implementation date: 2026-10-29. This story initializes the shared CMS
 domain: one Django `cms` app, one content base record that Pages, Posts and
 later content types inherit, and registry codes for the capabilities built
-on top of it. No content endpoints ship here — shared primitives are not a
-generic, unrestricted content API.
+on top of it. CMS exposes only scoped workflow and revision-management
+endpoints, not generic content CRUD or public serving.
 
 ## Fields
 
@@ -18,6 +18,7 @@ generic, unrestricted content API.
 | created_by / updated_by | Nullable FKs to the local platform user (`settings.AUTH_USER_MODEL`, `SET_NULL`). Write services set them from the authenticated principal; they are never accepted from a request body. Removing an account keeps the content and clears the attribution |
 | submitted_by / reviewed_by / review_comment | Server-managed workflow attribution and the latest reviewer comment. Full transition history is append-only in `ContentWorkflowTransition` |
 | metadata | JSON object (`jsonb_typeof = 'object'` check constraint). Free-form approved content metadata, never a settings document and never secrets |
+| revision_number | Server-managed optimistic concurrency token, incremented on every meaningful save and matched to an immutable `ContentRevision` |
 | created_at / updated_at | Timezone-aware automatic timestamps; every save updates `updated_at` |
 
 Model writes normalize `locale`, run `full_clean()` and enforce the rules
@@ -54,6 +55,10 @@ separation is expressed in the rows themselves:
   automatic foreign-key index on `site_id` for exact owner lookups. Author
   lookups use the automatic `created_by`/`updated_at` FK indexes. No
   speculative search-engine or cross-tenant index is introduced.
+- **Revision history is owner-scoped.** `cms_revision_site_recent_idx`
+  indexes `(site, content, -revision_number)` for tenant-filtered revision
+  lists. A unique `(content, revision_number)` constraint makes version
+  allocation deterministic under the content row lock.
 
 ## Locale
 
@@ -80,12 +85,28 @@ by the registry trigger. See the [module registry](module-registry.md).
 ## API contract
 
 `apps.cms.api.serializers.SiteContentSerializer` is the shared serialization
-contract future content endpoints build on: `id`, `site`, `status`,
-`published_at`, authorship and timestamps are server-managed and read-only;
-`locale` and `metadata` are the writable editables; unknown or immutable
-fields are rejected explicitly. This story mounts no routes, so the
-[OpenAPI snapshot](../api/openapi.yaml) is unchanged and the `cms` app
-publishes no URL namespace.
+contract: `id`, `site`, workflow state, revision number, `published_at`,
+authorship and timestamps are server-managed and read-only; unknown or
+immutable fields are rejected explicitly. The site-scoped workflow and
+revision-management routes are documented in the
+[OpenAPI snapshot](../api/openapi.yaml) and [workflow contract](cms-workflow.md).
+The CMS API intentionally has no generic content CRUD or public serving route.
+
+## Revisions and optimistic concurrency (P2-CMS-005)
+
+Each creation and meaningful save stores a complete, immutable JSON snapshot
+with its editor identity, timestamp, status, changed fields and SHA-256 hash.
+The `revision_number` token detects stale ORM instances; a stale save raises
+`ContentEditConflict`. Revision history is Site-scoped in the API, and a
+restore requires a current `If-Match` ETag and creates a new DRAFT revision.
+Published snapshots and published-status revisions are never edited.
+
+Snapshots are capped at 1 MiB. The newest 100 non-published revisions are
+retained, with all PUBLISHED revisions and revisions referenced by a restore
+kept indefinitely. Older eligible drafts are pruned transactionally.
+PostgreSQL triggers require a corresponding immutable revision for each
+content version and reject direct content changes that bypass the revision
+service.
 
 ## Structured blocks (P2-CMS-003)
 

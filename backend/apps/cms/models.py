@@ -14,7 +14,7 @@ from contextvars import ContextVar
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
-from django.db import models, router
+from django.db import models, router, transaction
 from django.db.models import Q, Value
 from django.db.models.lookups import Exact
 from django.utils import timezone
@@ -34,6 +34,11 @@ class ContentStatus(models.TextChoices):
 
 
 _workflow_write = ContextVar("cms_workflow_write", default=False)
+_revision_origin = ContextVar("cms_revision_origin", default=None)
+
+
+class ContentEditConflict(Exception):
+    """Raised when a stale content instance attempts to overwrite newer data."""
 
 
 @contextmanager
@@ -44,6 +49,16 @@ def workflow_write():
         yield
     finally:
         _workflow_write.reset(token)
+
+
+@contextmanager
+def revision_origin(revision):
+    token = _revision_origin.set(revision)
+    try:
+        yield
+    finally:
+        _revision_origin.reset(token)
+
 
 LANGUAGE_FORMAT = r"\A[a-z]{2,3}(?:-[a-z0-9]{2,8})*\Z"
 
@@ -130,6 +145,11 @@ class SiteContent(models.Model):
                   "future block-schema migrations can interpret and "
                   "migrate stored payloads. Server-managed.",
     )
+    revision_number = models.PositiveIntegerField(
+        default=0,
+        editable=False,
+        help_text="Monotonically increasing content revision used for optimistic concurrency.",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -172,6 +192,26 @@ class SiteContent(models.Model):
 
     def __str__(self):
         return f"{self.site_id}:{self.pk}"
+
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        instance = super().from_db(db, field_names, values)
+        if "revision_number" in field_names:
+            instance._loaded_revision_number = instance.revision_number
+        else:
+            instance._loaded_revision_number = (
+                cls._base_manager.using(db)
+                .filter(pk=instance.pk)
+                .values_list("revision_number", flat=True)
+                .first()
+            )
+        return instance
+
+    def refresh_from_db(self, using=None, fields=None, from_queryset=None):
+        super().refresh_from_db(
+            using=using, fields=fields, from_queryset=from_queryset,
+        )
+        self._loaded_revision_number = self.revision_number
 
     def _validate_content(self):
         previous = None
@@ -279,22 +319,147 @@ class SiteContent(models.Model):
         return super().full_clean(*args, **kwargs)
 
     def save(self, *args, **kwargs):
+        from .services.revisions import (
+            MAX_REVISION_SNAPSHOT_BYTES,
+            content_revision_write,
+            create_content_revision,
+            revision_snapshot,
+            snapshot_size,
+        )
+
+        using = kwargs.get("using") or router.db_for_write(
+            type(self), instance=self,
+        )
         supplied_locale = self.locale
         supplied_published_at = self.published_at
         supplied_blocks = self.blocks
-        self.full_clean()
-        if kwargs.get("update_fields"):
-            fields = set(kwargs["update_fields"]) | {"updated_at"}
-            if self.locale != supplied_locale:
-                fields.add("locale")
-            if self.published_at != supplied_published_at:
-                fields.add("published_at")
-            # clean() stores the sanitized block payload; when it changed
-            # (or update_fields was given explicitly) persist the copy.
-            if self.blocks != supplied_blocks:
-                fields.add("blocks")
-            kwargs["update_fields"] = fields
-        return super().save(*args, **kwargs)
+        with transaction.atomic(using=using):
+            previous = None
+            before = None
+            if not self._state.adding:
+                previous = (
+                    type(self).objects.using(using)
+                    .select_for_update()
+                    .filter(pk=self.pk)
+                    .first()
+                )
+                if previous is None:
+                    raise ValidationError({"id": "Content identifiers are immutable."})
+                loaded_revision = getattr(self, "_loaded_revision_number", None)
+                if (
+                    loaded_revision is not None
+                    and loaded_revision != previous.revision_number
+                ):
+                    raise ContentEditConflict(
+                        "Content changed after this instance was loaded."
+                    )
+                before = revision_snapshot(previous)
+                self.revision_number = previous.revision_number
+
+            self.full_clean()
+            update_fields = kwargs.get("update_fields")
+            if update_fields is not None:
+                fields = set(update_fields) | {"updated_at"}
+                if self.locale != supplied_locale:
+                    fields.add("locale")
+                if self.published_at != supplied_published_at:
+                    fields.add("published_at")
+                if self.blocks != supplied_blocks:
+                    fields.add("blocks")
+                if previous is not None and getattr(self, "path", None) != getattr(previous, "path", None):
+                    fields.add("path")
+                kwargs["update_fields"] = fields
+
+            candidate = revision_snapshot(self)
+            if previous is not None and kwargs.get("update_fields") is not None:
+                candidate = _merge_revision_snapshot(
+                    before, candidate, kwargs["update_fields"],
+                )
+            changed_fields = (
+                _revision_changed_fields(before, candidate)
+                if before is not None
+                else sorted(
+                    key for key in candidate
+                    if key not in {"content_id", "content_type", "site_id"}
+                )
+            )
+            if snapshot_size(candidate) > MAX_REVISION_SNAPSHOT_BYTES:
+                raise ValidationError({
+                    "revision": (
+                        "Content snapshots must not exceed "
+                        f"{MAX_REVISION_SNAPSHOT_BYTES} bytes."
+                    ),
+                })
+
+            if previous is None:
+                self.revision_number = 1
+            elif changed_fields:
+                self.revision_number = previous.revision_number + 1
+            if kwargs.get("update_fields") is not None and changed_fields:
+                kwargs["update_fields"].add("revision_number")
+
+            with content_revision_write(using=using):
+                result = super().save(*args, **kwargs)
+                if changed_fields:
+                    saved = (
+                        type(self).objects.using(using)
+                        .select_for_update()
+                        .get(pk=self.pk)
+                    )
+                    saved_snapshot = revision_snapshot(saved)
+                    actual_changes = (
+                        _revision_changed_fields(before, saved_snapshot)
+                        if before is not None
+                        else changed_fields
+                    )
+                    if actual_changes:
+                        create_content_revision(
+                            saved,
+                            snapshot=saved_snapshot,
+                            changed_fields=actual_changes,
+                            using=using,
+                            restored_from=_revision_origin.get(),
+                        )
+                    self.revision_number = saved.revision_number
+            self._loaded_revision_number = self.revision_number
+            return result
+
+    def delete(self, *args, **kwargs):
+        from .services.revisions import content_revision_delete
+
+        using = kwargs.get("using") or self._state.db or router.db_for_write(
+            type(self), instance=self,
+        )
+        with transaction.atomic(using=using):
+            with content_revision_delete(using=using):
+                return super().delete(*args, **kwargs)
+
+
+def _merge_revision_snapshot(before, candidate, update_fields):
+    """Reflect only fields a partial model save will persist."""
+    aliases = {
+        "parent_id": "parent",
+        "created_by_id": "created_by",
+        "updated_by_id": "updated_by",
+        "submitted_by_id": "submitted_by",
+        "reviewed_by_id": "reviewed_by",
+    }
+    merged = dict(before)
+    for key, value in candidate.items():
+        field_name = aliases.get(key, key)
+        if field_name in update_fields:
+            merged[key] = value
+    return merged
+
+
+def _revision_changed_fields(before, after):
+    if before is None:
+        return []
+    return sorted(
+        key for key in before
+        if key not in {"content_id", "content_type", "site_id"}
+        and before[key] != after[key]
+    )
 
 
 class Visibility(models.TextChoices):
@@ -785,3 +950,71 @@ class PublishedContentSnapshot(models.Model):
 
     def delete(self, *args, **kwargs):
         raise ValidationError("Published snapshots are immutable.")
+
+
+class ContentRevision(models.Model):
+    """Immutable, Site-scoped snapshot of one meaningful content save."""
+
+    content = models.ForeignKey(
+        SiteContent, on_delete=models.CASCADE, related_name="revisions",
+    )
+    site = models.ForeignKey(
+        "sites.Site", on_delete=models.PROTECT, related_name="content_revisions",
+    )
+    revision_number = models.PositiveIntegerField()
+    editor_identity = models.CharField(max_length=255, blank=True, default="")
+    status = models.CharField(max_length=11, choices=ContentStatus.choices)
+    snapshot = models.JSONField()
+    changed_fields = models.JSONField(default=list)
+    content_hash = models.CharField(max_length=64)
+    restored_from_revision = models.PositiveIntegerField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("content_id", "-revision_number")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("content", "revision_number"),
+                name="cms_content_revision_uniq",
+            ),
+            models.CheckConstraint(
+                condition=Q(revision_number__gte=1),
+                name="cms_content_revision_positive",
+            ),
+            models.CheckConstraint(
+                condition=Q(status__in=ContentStatus.values),
+                name="cms_content_revision_status",
+            ),
+            models.CheckConstraint(
+                condition=Exact(
+                    models.Func("snapshot", function="jsonb_typeof", output_field=models.CharField()),
+                    Value("object"),
+                ),
+                name="cms_content_revision_snapshot_object",
+            ),
+            models.CheckConstraint(
+                condition=Exact(
+                    models.Func("changed_fields", function="jsonb_typeof", output_field=models.CharField()),
+                    Value("array"),
+                ),
+                name="cms_content_revision_changed_array",
+            ),
+            models.CheckConstraint(
+                condition=Q(content_hash__regex=r"\A[a-f0-9]{64}\Z"),
+                name="cms_content_revision_hash",
+            ),
+        ]
+        indexes = [
+            models.Index(
+                fields=("site", "content", "-revision_number"),
+                name="cms_revision_site_recent_idx",
+            ),
+        ]
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError("Content revisions are immutable.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Content revisions are immutable.")

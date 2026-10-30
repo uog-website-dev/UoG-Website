@@ -84,11 +84,14 @@ def set_as_homepage(page, *, actor=None):
     """Designate this page as the Site's homepage, replacing any previous
     one atomically: either the swap happens entirely or neither flag moved."""
     with transaction.atomic():
-        (
-            Page.objects.filter(site_id=page.site_id, is_homepage=True)
-            .exclude(pk=page.pk)
-            .update(is_homepage=False)
-        )
+        previous_homepages = Page.objects.filter(
+            site_id=page.site_id, is_homepage=True,
+        ).exclude(pk=page.pk)
+        for previous in previous_homepages:
+            previous.is_homepage = False
+            if actor is not None:
+                previous.updated_by = actor
+            previous.save()
         page.is_homepage = True
         if actor is not None:
             page.updated_by = actor
