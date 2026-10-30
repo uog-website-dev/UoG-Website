@@ -73,14 +73,11 @@ multilingual stories.
 
 ## Module gating
 
-`PAGES`, `POSTS` and `MENUS` are seeded registry rows by this migration.
-All three start `PLANNED` with `is_enabled = False`. A registry row is not a
-working feature: enabling anything requires status `IMPLEMENTED`, the global
-switch, and a row in `sites_module_implementation`, which is inserted only by
-the deployment that ships the corresponding feature. Until then
-`usable_modules()` never advertises them, `SiteModule` enablement is
-rejected, and any direct attempt to flip status to `IMPLEMENTED` is refused
-by the registry trigger. See the [module registry](module-registry.md).
+`PAGES`, `POSTS` and `MENUS` are seeded registry rows. P2-CMS-006 ships PAGES
+and records it as `IMPLEMENTED`; its global switch remains off by default.
+Public Page delivery additionally requires PAGES to be enabled for the
+resolved Site. POSTS and MENUS remain planned and cannot be enabled. See the
+[module registry](module-registry.md).
 
 ## API contract
 
@@ -90,7 +87,8 @@ authorship and timestamps are server-managed and read-only; unknown or
 immutable fields are rejected explicitly. The site-scoped workflow and
 revision-management routes are documented in the
 [OpenAPI snapshot](../api/openapi.yaml) and [workflow contract](cms-workflow.md).
-The CMS API intentionally has no generic content CRUD or public serving route.
+Page management is exposed through the Site-scoped authoring API and public
+host-resolved delivery API described in [cms-pages](../api/cms-pages.md).
 
 ## Revisions and optimistic concurrency (P2-CMS-005)
 

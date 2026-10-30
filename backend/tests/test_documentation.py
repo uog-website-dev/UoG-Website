@@ -54,6 +54,9 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
         "/api/v1/sites/{site_pk}/domains/{id}/activate/",
         "/api/v1/sites/{site_pk}/domains/{id}/deactivate/",
         "/api/v1/sites/{site_pk}/domains/{id}/set-primary/",
+        "/api/v1/sites/{site_pk}/pages/",
+        "/api/v1/sites/{site_pk}/pages/{id}/",
+        "/api/v1/sites/{site_pk}/pages/{id}/workflow/",
         "/api/v1/sites/{site_pk}/modules/", "/api/v1/sites/{site_pk}/modules/{id}/",
         "/api/v1/sites/{site_pk}/modules/{id}/enable/",
         "/api/v1/sites/{site_pk}/modules/{id}/disable/",
@@ -66,6 +69,9 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
         "/api/v1/site-templates/", "/api/v1/site-templates/{id}/",
         "/api/v1/modules/", "/api/v1/modules/{id}/",
         "/api/v1/site-context/",
+        "/api/v1/site-context/pages/",
+        "/api/v1/site-context/homepage/",
+        "/api/v1/site-context/pages/{page_path}/",
     }
     assert paths["/api/me/"]["get"]["security"] == [{"keycloakBearer": []}]
     assert {} in paths["/api/pages/"]["get"]["security"]
@@ -172,6 +178,30 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
     assert {} in context["security"]
     assert context["tags"] == ["Sites"]
     assert "post" not in paths["/api/v1/site-context/"]
+    admin_pages = paths["/api/v1/sites/{site_pk}/pages/"]
+    assert admin_pages["get"]["security"] == [{"keycloakBearer": []}]
+    assert admin_pages["post"]["security"] == [{"keycloakBearer": []}]
+    assert {"search", "status", "visibility", "locale", "parent", "ordering", "page", "page_size"} <= {
+        parameter["name"] for parameter in admin_pages["get"]["parameters"]
+    }
+    page_patch = paths["/api/v1/sites/{site_pk}/pages/{id}/"]["patch"]
+    assert {"409", "428"} <= set(page_patch["responses"])
+    assert {"200", "409", "428"} <= set(page_patch["responses"])
+    assert any(
+        parameter["name"] == "If-Match" and parameter["required"]
+        for parameter in page_patch["parameters"]
+    )
+    public_list = paths["/api/v1/site-context/pages/"]["get"]
+    assert {} in public_list["security"]
+    assert "site_id" not in {
+        parameter["name"] for parameter in public_list["parameters"]
+    }
+    public_detail = paths["/api/v1/site-context/pages/{page_path}/"]["get"]
+    assert {} in public_detail["security"]
+    assert "308" in public_detail["responses"]
+    assert {
+        "ETag", "Cache-Control", "X-Publication-Version",
+    } <= set(public_detail["responses"]["200"]["headers"])
 
 
 @pytest.mark.parametrize("path", DOC_URLS)

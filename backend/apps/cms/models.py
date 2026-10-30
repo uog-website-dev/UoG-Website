@@ -1018,3 +1018,27 @@ class ContentRevision(models.Model):
 
     def delete(self, *args, **kwargs):
         raise ValidationError("Content revisions are immutable.")
+
+
+class SitePublicationVersion(models.Model):
+    """Monotonic cache generation for public content in a Site locale."""
+
+    site = models.ForeignKey(
+        "sites.Site", on_delete=models.CASCADE,
+        related_name="cms_publication_versions",
+    )
+    locale = models.CharField(max_length=35)
+    version = models.PositiveBigIntegerField(default=0)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=("site", "locale"),
+                name="cms_site_locale_pub_version_uniq",
+            ),
+            models.CheckConstraint(
+                condition=Q(locale__regex=LANGUAGE_FORMAT),
+                name="cms_pub_version_locale_format",
+            ),
+        ]
