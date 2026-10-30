@@ -142,34 +142,26 @@ def module_is_enabled_for_site(site_id, module_code, *, using=None):
 
 
 def reject_disabled_module(site_id, module_code, *, request=None):
-    """Return a 403/409 response if the module is disabled or unimplemented for the site.
+    """Reject an action unless the module is implemented and enabled for the Site.
 
-    This is the authoritative backend gate: if the module row is not present,
-    enabled_modules_for_site() returns empty, and module_is_available() catches the
-    unimplemented case. The response body is consistent across module actions.
+    This is the authoritative backend gate: if the module row is missing or the
+    Site has not enabled it, `enabled_modules_for_site()` returns nothing and the
+    action is refused. The same validation error shape is used for every module
+    action, so callers cannot tell a planned module from a disabled one by the
+    HTTP status alone.
     """
-    from rest_framework.response import Response
-    from rest_framework import status
-    from rest_framework.exceptions import NotFound, ValidationError
+    from rest_framework.exceptions import ValidationError
 
-    available = module_is_enabled_for_site(site_id, module_code, using=using)
-    if not available:
-        # Distinguish unimplemented from disabled for consistent error messages
-        from apps.sites.selectors.modules import module_is_usable
-        from apps.sites.models import Module
-        try:
-            module = Module.objects.get(code=module_code)
-            if module.status != Module.Status.IMPLEMENTED:
-                # Module is planned, not implemented
-                raise ValidationError({
-                    "module": ["This module is not yet implemented and cannot be used."]
-                })
-            # Module is implemented but not enabled for this site
-            raise ValidationError({
-                "module": ["This module is not enabled for this site."]
-            })
-        except Module.DoesNotExist:
-            raise ValidationError({
-                "module": ["Unknown module."]
-            })
-    return None
+    if module_is_enabled_for_site(site_id, module_code):
+        return None
+
+    from apps.sites.models import Module
+
+    module = Module.objects.filter(code=module_code).first()
+    if module is None:
+        raise ValidationError({"module": ["Unknown module."]})
+    if module.status != Module.Status.IMPLEMENTED:
+        raise ValidationError({
+            "module": ["This module is not yet implemented and cannot be used."]
+        })
+    raise ValidationError({"module": ["This module is not enabled for this site."]})
