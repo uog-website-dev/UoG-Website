@@ -1,4 +1,4 @@
-"""The cms app loads, routes nothing, migrates repeatably and seeds planned codes."""
+"""The CMS app loads, routes securely, and keeps module gates testable."""
 import importlib
 from pathlib import Path
 
@@ -25,9 +25,11 @@ def test_cms_packages_import_and_application_loads():
         "", ".apps", ".models", ".page_sql", ".blocks", ".blocks_sql",
         ".workflow_sql", ".revision_sql",
         ".api", ".api.serializers", ".api.workflow", ".api.revisions",
+        ".api.pages", ".api.public",
         ".api.urls",
         ".selectors", ".selectors.pages", ".services", ".services.pages",
-        ".services.workflow", ".services.revisions", ".migrations", ".tests",
+        ".services.workflow", ".services.revisions",
+        ".services.publication_cache", ".migrations", ".tests",
     ):
         importlib.import_module(f"apps.cms{suffix}")
     config = django_apps.get_app_config("cms")
@@ -36,13 +38,11 @@ def test_cms_packages_import_and_application_loads():
     assert {model.__name__ for model in config.get_models()} == {
         "SiteContent", "Page", "PageRedirect", "SiteContentRoleAssignment",
         "ContentWorkflowTransition", "PublishedContentSnapshot",
-        "ContentRevision",
+        "ContentRevision", "SitePublicationVersion",
     }
 
 
-def test_cms_mounts_only_site_scoped_workflow_and_revision_endpoints():
-    # CMS exposes scoped administration/history, not generic content CRUD or
-    # public serving.
+def test_cms_mounts_scoped_workflow_revision_admin_and_public_routes():
     assert "cms" in get_resolver().namespace_dict
     urls = importlib.import_module("apps.cms.api.urls")
     assert {
@@ -51,6 +51,15 @@ def test_cms_mounts_only_site_scoped_workflow_and_revision_endpoints():
         "content-role-list", "content-role-detail", "content-workflow",
         "content-revision-list", "content-revision-detail",
         "content-revision-restore",
+    }
+    site_urls = importlib.import_module("apps.sites.api.urls")
+    assert any("pages" in str(pattern.pattern) for pattern in site_urls.urlpatterns)
+    context_urls = importlib.import_module("apps.sites.api.context_urls")
+    assert {
+        pattern.name for pattern in context_urls.urlpatterns
+    } == {
+        "site-context", "public-page-list", "public-homepage",
+        "public-page-detail",
     }
 
 
@@ -92,12 +101,24 @@ def test_cms_migrations_are_repeatable_and_applied():
     assert "RunSQL" in [
         type(operation).__name__ for operation in revision_graph.operations
     ]
+    assert ("cms", "0007_sitepublicationversion_pages_module") in loader.applied_migrations
+    pages_graph = loader.disk_migrations[
+        ("cms", "0007_sitepublicationversion_pages_module")
+    ]
+    assert any(
+        type(operation).__name__ == "RunSQL"
+        for operation in pages_graph.operations
+    )
 
 
 @pytest.mark.django_db
-def test_content_codes_are_registered_but_never_activated():
+def test_pages_is_shipped_but_all_content_modules_default_to_unavailable():
     assert CONTENT_CODES <= set(Module.objects.values_list("code", flat=True))
-    for code in CONTENT_CODES:
+    pages = Module.objects.get(code="PAGES")
+    assert pages.status == "IMPLEMENTED"
+    assert pages.is_enabled is False
+    assert capability_is_shipped("PAGES")
+    for code in CONTENT_CODES - {"PAGES"}:
         module = Module.objects.get(code=code)
         assert module.status == "PLANNED"
         assert module.is_enabled is False
@@ -111,7 +132,7 @@ def test_content_codes_are_registered_but_never_activated():
 
 @pytest.mark.django_db
 def test_registry_database_gates_activation():
-    pages = Module.objects.get(code="PAGES")
+    pages = Module.objects.get(code="POSTS")
     with pytest.raises(IntegrityError), transaction.atomic():
         Module.objects.filter(pk=pages.pk).update(status="IMPLEMENTED")
     with pytest.raises(IntegrityError), transaction.atomic():
@@ -123,7 +144,12 @@ def test_registry_database_gates_activation():
 @pytest.mark.django_db
 def test_a_site_cannot_enable_a_planned_content_code(sites):
     site, _ = sites
-    for code in CONTENT_CODES:
+    pages = Module.objects.get(code="PAGES")
+    with pytest.raises(ValidationError):
+        enable_module_for_site(site.pk, pages.pk)
+    with pytest.raises(IntegrityError), transaction.atomic():
+        SiteModule.objects.bulk_create([SiteModule(site=site, module=pages)])
+    for code in CONTENT_CODES - {"PAGES"}:
         module = Module.objects.get(code=code)
         with pytest.raises(ValidationError):
             enable_module_for_site(site.pk, module.pk)

@@ -19,6 +19,7 @@ from ..models import (
     SiteContentRoleAssignment,
     workflow_write,
 )
+from .publication_cache import bump_publication_version
 
 _ACTIONS = {
     "submit": (ContentStatus.DRAFT, ContentStatus.IN_REVIEW, ContentRole.AUTHOR),
@@ -120,6 +121,16 @@ def transition_content(
                     )
                     if action == "publish":
                         _create_publication_snapshot(content, using=using)
+                    if isinstance(content, Page) and (
+                        action in {"publish", "unpublish"}
+                        or (action == "archive" and source == ContentStatus.PUBLISHED)
+                    ):
+                        bump_publication_version(
+                            content.site_id,
+                            content.locale,
+                            path=content.path,
+                            using=using,
+                        )
         return content
 
 

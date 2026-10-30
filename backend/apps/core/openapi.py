@@ -59,8 +59,17 @@ def add_common_contract(result, generator, request, public):
             codes = {"401", "403", "405", "406"}
             if method in {"post", "put", "patch"}:
                 codes.update({"400", "415"})
-            if "{" in path or (method == "get" and path == "/api/pages/"):
+            if (
+                "{" in path
+                or (method == "get" and path == "/api/pages/")
+                or path.startswith("/api/v1/site-context/pages")
+            ):
                 codes.add("404")
+            if (
+                path.startswith("/api/v1/sites/")
+                and "/pages" in path
+            ) or path.startswith("/api/v1/site-context/pages"):
+                codes.add("400")
             if (
                 path.startswith("/api/v1/cms/")
                 and method == "post"
@@ -68,6 +77,19 @@ def add_common_contract(result, generator, request, public):
             ):
                 codes.update({"409", "428"})
             responses = operation.setdefault("responses", {})
+            if (
+                method == "get"
+                and path == "/api/v1/site-context/pages/{page_path}/"
+            ):
+                responses.setdefault("308", {
+                    "description": "The Page route moved within this Site.",
+                    "headers": {
+                        "Location": {
+                            "description": "Relative public Page route on the same host.",
+                            "schema": {"type": "string", "format": "uri-reference"},
+                        },
+                    },
+                })
             if path.startswith(("/api/v1/organizations/", "/api/v1/sites/", "/api/v1/site-templates/", "/api/v1/modules/")):
                 hierarchy = path.startswith("/api/v1/organizations/") and path.rstrip("/").split("/")[-1] in {"tree", "children", "ancestors", "descendants", "subtree"}
                 if method == "get" and "{" not in path and not hierarchy:
@@ -80,7 +102,7 @@ def add_common_contract(result, generator, request, public):
                     codes.update({"412", "428"})
                 collection = path.rstrip("/").split("/")[-1]
                 if method in {"get", "post", "patch"} and not hierarchy and not (method == "get" and "{" not in path):
-                    success = "201" if method == "post" and collection in {"organizations", "sites", "domains", "modules", "site-templates"} else "200"
+                    success = "201" if method == "post" and collection in {"organizations", "sites", "domains", "modules", "site-templates", "pages"} else "200"
                     responses.setdefault(success, {}).setdefault("headers", {})["ETag"] = {
                         "description": "Strong representation validator. Echo exactly in If-Match for mutations.",
                         "schema": {"type": "string"},
@@ -123,6 +145,24 @@ def add_common_contract(result, generator, request, public):
                     }
                     responses[success]["headers"]["Cache-Control"] = {
                         "description": "Revision data is private and not cacheable.",
+                        "schema": {"type": "string"},
+                    }
+            if (
+                path.startswith("/api/v1/site-context/pages/")
+                or path == "/api/v1/site-context/homepage/"
+            ) and "200" in responses:
+                headers = responses["200"].setdefault("headers", {})
+                headers["Cache-Control"] = {
+                    "description": "Public clients must revalidate; server caches are publication-versioned.",
+                    "schema": {"type": "string"},
+                }
+                headers["X-Publication-Version"] = {
+                    "description": "Site/locale cache generation for published Page data.",
+                    "schema": {"type": "string"},
+                }
+                if path != "/api/v1/site-context/pages/":
+                    headers["ETag"] = {
+                        "description": "Immutable per-Page publication snapshot version.",
                         "schema": {"type": "string"},
                     }
             for response in responses.values():

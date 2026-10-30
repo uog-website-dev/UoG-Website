@@ -4,9 +4,10 @@ Pages and future Posts share one status machine on `SiteContent`. Status
 changes go through `apps.cms.services.workflow.transition_content`; direct
 model status changes are rejected, and PostgreSQL triggers enforce the state
 edges, audit each accepted status change, and protect the public payload.
-PAGES and POSTS remain planned/disabled content-serving capabilities. The
-workflow administration API is mounted at `/api/v1/cms/sites/`; it does not
-expose generic content CRUD or public serving. Requests pass validated
+PAGES is implemented but globally and per-Site disabled by default; POSTS
+remains planned. The workflow administration API is mounted at
+`/api/v1/cms/sites/`; Page CRUD and public delivery are documented in the
+[Page API contract](../api/cms-pages.md). Requests pass validated
 Keycloak role claims and the authenticated actor into the shared service;
 client-supplied role names are rejected and never used for authorization.
 
