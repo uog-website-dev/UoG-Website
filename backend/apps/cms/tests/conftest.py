@@ -4,10 +4,49 @@ The suite never reaches Redis, MinIO or the Celery broker (the same
 overrides the organizations and sites suites apply), and it shares one
 two-Site fixture so every test exercises real multi-tenant rows.
 """
+from types import SimpleNamespace
+
 import pytest
 
 from apps.organizations.models import OrganizationType, OrganizationUnit
 from apps.sites.models import Site
+
+from tests.oidc_helpers import (
+    AUDIENCE,
+    ISSUER,
+    JWKS_URL,
+    generate_signing_key,
+    jwks_cache,
+    make_token,
+)
+
+
+@pytest.fixture(scope="session")
+def cms_signing_key():
+    return generate_signing_key()
+
+
+@pytest.fixture
+def oidc(settings, monkeypatch, cms_signing_key):
+    settings.OIDC_ISSUER = ISSUER
+    settings.OIDC_JWKS_URL = JWKS_URL
+    settings.OIDC_AUDIENCE = [AUDIENCE]
+    settings.OIDC_ALLOWED_CLIENTS = ["public-web", "admin-web", "backend-api"]
+    settings.OIDC_STAFF_ROLES = ["platform-admin"]
+    cache = jwks_cache(cms_signing_key)
+    monkeypatch.setattr(
+        "apps.accounts.authentication.get_jwks_cache", lambda: cache,
+    )
+
+    def token(**overrides):
+        return make_token(cms_signing_key, **overrides)
+
+    def header(**overrides):
+        return {"HTTP_AUTHORIZATION": f"Bearer {token(**overrides)}"}
+
+    return SimpleNamespace(
+        key=cms_signing_key, cache=cache, token=token, header=header,
+    )
 
 
 @pytest.fixture(autouse=True)

@@ -195,6 +195,64 @@ REST_FRAMEWORK = {
     ],
 }
 
+# Public in development; production documentation is disabled unless explicitly
+# enabled, in which case all three views require an active staff identity.
+API_DOCS_ENABLED = config("API_DOCS_ENABLED", default=DEBUG, cast=bool)
+ORGANIZATIONS_DEV_WRITES_ENABLED = config("ORGANIZATIONS_DEV_WRITES_ENABLED", default=False, cast=bool)
+SPECTACULAR_SETTINGS = {
+    "TITLE": "University of Gondar Digital Platform API",
+    "VERSION": "1.0.0",
+    "OAS_VERSION": "3.0.3",
+    "DESCRIPTION": (
+        "Live documentation generated from registered DRF endpoints and serializers. "
+        "Use Authorize with a Keycloak access token (paste the JWT without Bearer). "
+        "Backend authentication and permissions always apply. "
+        "Organization administration is platform-admin only; writes require development "
+        "opt-in and remain disabled in production pending scoped IAM/RBAC. "
+        "CMS workflow actions require Site-scoped AUTHOR, REVIEWER or PUBLISHER assignments "
+        "or the validated platform-admin token role; assignment management is platform-admin only. "
+        "Site, domain, template and module administration is platform-admin only and uses the "
+        "same development write opt-in; production writes remain disabled pending scoped IAM/RBAC. "
+        "Posts and Menus content APIs are absent. "
+        "No scope header grants access. See docs/development/api-documentation.md."
+    ),
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SERVE_PERMISSIONS": ["apps.core.permissions.DocumentationPermission"],
+    "SWAGGER_UI_DIST": "SIDECAR",
+    "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
+    "REDOC_DIST": "SIDECAR",
+    "SWAGGER_UI_SETTINGS": {
+        "deepLinking": True,
+        "persistAuthorization": False,
+        "validatorUrl": None,
+    },
+    "REDOC_UI_SETTINGS": {"disableGoogleFont": True},
+    "COMPONENT_SPLIT_REQUEST": True,
+    "ENUM_NAME_OVERRIDES": {
+        "OrganizationStatusEnum": "apps.organizations.models.OrganizationUnit.Status",
+        "SiteStatusEnum": "apps.sites.models.Site.Status",
+        "ActiveInactiveStatusEnum": "apps.sites.models.SiteDomain.Status",
+        "ModuleStatusEnum": "apps.sites.models.Module.Status",
+        "CMSContentStatusEnum": "apps.cms.models.ContentStatus",
+    },
+    "POSTPROCESSING_HOOKS": [
+        "drf_spectacular.hooks.postprocess_schema_enums",
+        "apps.core.openapi.add_common_contract",
+    ],
+    "TAGS": [
+        {"name": "CMS", "description": "Platform pages; site scoping is not implemented."},
+        {"name": "CMS workflow", "description": "Site-scoped CMS role assignments and authenticated review/publishing transitions."},
+        {"name": "Identity", "description": "Keycloak identity and platform administration."},
+        {"name": "Organizations", "description": "Restricted institutional administration; production writes disabled pending scoped IAM/RBAC."},
+        {"name": "Sites", "description": "Restricted Site, configuration and per-site module administration."},
+        {"name": "Domains", "description": "Hostnames for one Site, including an atomic primary-domain switch."},
+        {"name": "Site templates", "description": "Approved starting configurations. Applying one does not rewrite existing Sites."},
+        {"name": "Modules", "description": "Platform capability registry. Planned modules cannot be enabled for a Site."},
+        {"name": "Posts", "description": "Not implemented."},
+        {"name": "Menus", "description": "Not implemented."},
+    ],
+}
+
 # ---------------------------------------------------------------------------
 # Keycloak / OIDC — the API validates the access tokens the frontends obtain
 # from the identity provider (see apps.accounts).

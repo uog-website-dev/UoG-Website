@@ -1,1 +1,1 @@
-"""Write paths for the cms app: page creation, route changes, homepage."""
+"""Write paths for the CMS app."""

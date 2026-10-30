@@ -1,5 +1,6 @@
 """Page routing: computed paths, hierarchy rules, uniqueness and serving."""
 import pytest
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.db.models import ProtectedError
@@ -7,6 +8,7 @@ from django.db.models import ProtectedError
 from apps.cms.models import MAX_PAGE_DEPTH, Page, Visibility
 from apps.cms.selectors.pages import public_pages, published_page
 from apps.cms.services.pages import change_route, create_page
+from apps.cms.services.workflow import transition_content
 from apps.sites.configuration import default_configuration
 from apps.sites.models import Site
 
@@ -184,21 +186,18 @@ def test_draft_and_hidden_pages_are_not_publicly_served(sites):
     site, _ = sites
     draft = create_page(site=site, title="Draft", slug="draft")
     assert published_page(site.pk, draft.locale, "/draft") is None
-    draft.status = "PUBLISHED"
-    draft.save()
+    _publish_for_test(draft)
     assert published_page(site.pk, draft.locale, "/draft").pk == draft.pk
     hidden = create_page(
         site=site, title="Hidden", slug="hidden", visibility=Visibility.HIDDEN,
     )
-    hidden.status = "PUBLISHED"
-    hidden.save()
+    _publish_for_test(hidden)
     assert published_page(site.pk, hidden.locale, "/hidden") is None
     unlisted = create_page(
         site=site, title="Unlisted", slug="unlisted",
         visibility=Visibility.UNLISTED,
     )
-    unlisted.status = "PUBLISHED"
-    unlisted.save()
+    _publish_for_test(unlisted)
     # Served by its direct route, but never listed.
     assert published_page(site.pk, unlisted.locale, "/unlisted").pk == unlisted.pk
     listed = [page.pk for page in public_pages(site.pk, draft.locale)]
@@ -215,8 +214,7 @@ def test_pages_never_leak_between_sites(sites):
     assert list(Page.objects.filter(site=site).values_list("pk", flat=True)) == [mine.pk]
     assert list(Page.objects.filter(site=other).values_list("pk", flat=True)) == [theirs.pk]
     # A route belongs to exactly one Site's URL space.
-    theirs.status = "PUBLISHED"
-    theirs.save()
+    _publish_for_test(theirs)
     assert published_page(other.pk, theirs.locale, "/shared-slug").pk == theirs.pk
     assert published_page(site.pk, mine.locale, "/shared-slug") is None
 
@@ -229,3 +227,18 @@ def test_sibling_ordering_follows_position(sites):
     assert list(Page.objects.filter(parent=None).values_list("slug", flat=True)) == [
         "first", "second", "third",
     ]
+
+
+def _publish_for_test(page):
+    author, reviewer, publisher = [
+        get_user_model().objects.create_user(
+            username=f"public-test-{page.slug}-{role}",
+        )
+        for role in ("author", "reviewer", "publisher")
+    ]
+    for action, actor in (
+        ("submit", author), ("approve", reviewer), ("publish", publisher),
+    ):
+        transition_content(
+            page.pk, action=action, actor=actor, roles={"platform-admin"},
+        )
