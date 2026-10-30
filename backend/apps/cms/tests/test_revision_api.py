@@ -10,13 +10,6 @@ pytestmark = pytest.mark.django_db
 BASE = "/api/v1/cms/sites/"
 
 
-@pytest.fixture
-def platform_admin(client, oidc):
-    client.defaults.update(oidc.header())
-    client.get("/api/me/")
-    return client
-
-
 def _url(site, content, suffix="revisions/"):
     return f"{BASE}{site.pk}/content/{content.pk}/{suffix}"
 
@@ -31,7 +24,7 @@ def _identity(oidc, subject, username, roles=("platform-viewer",)):
 
 
 def test_revision_history_requires_site_role_and_is_site_scoped(
-    client, oidc, platform_admin, sites,
+    client, oidc, platform_admin, pages_module, sites,
 ):
     site, other_site = sites
     author = get_user_model().objects.get(username="devuser")
@@ -63,7 +56,7 @@ def test_revision_history_requires_site_role_and_is_site_scoped(
 
 
 def test_revision_detail_and_restore_are_authorized_conditional_and_safe(
-    client, oidc, platform_admin, sites,
+    client, oidc, platform_admin, pages_module, sites,
 ):
     site, _ = sites
     author = get_user_model().objects.get(username="devuser")
@@ -126,7 +119,7 @@ def test_revision_detail_and_restore_are_authorized_conditional_and_safe(
 
 
 def test_reviewer_can_inspect_but_cannot_restore_history(
-    client, oidc, platform_admin, sites,
+    client, oidc, platform_admin, pages_module, sites,
 ):
     site, _ = sites
     page = create_page(site=site, title="Review", slug="review")

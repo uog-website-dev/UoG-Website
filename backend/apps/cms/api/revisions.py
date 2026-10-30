@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.authentication import KeycloakBearerAuthentication
+from apps.authorization.access import reject_disabled_module
 from apps.sites.api.serializers import StrictFields
 from apps.sites.models import Site
 
@@ -231,6 +232,8 @@ class ContentRestorePreconditionRequired(APIException):
 
 def _scoped_content(site_pk, content_id):
     get_object_or_404(Site, pk=site_pk)
+    # A Site that has PAGES disabled cannot manage its Page history.
+    reject_disabled_module(site_pk, "PAGES")
     return get_object_or_404(
         SiteContent.objects.select_related("site").filter(site_id=site_pk),
         pk=content_id,

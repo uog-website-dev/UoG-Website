@@ -17,12 +17,6 @@ pytestmark = pytest.mark.django_db
 BASE = "/api/v1/cms/sites/"
 
 
-@pytest.fixture
-def platform_admin(client, oidc):
-    client.defaults.update(oidc.header())
-    return client
-
-
 def _role_url(site):
     return f"{BASE}{site.pk}/content-roles/"
 
@@ -99,12 +93,9 @@ def test_platform_admin_manages_roles_with_site_scoping_and_strict_input(
 
 
 def test_site_role_workflow_uses_validated_token_and_never_body_roles(
-    client, oidc, sites,
+    client, oidc, platform_admin, pages_module, sites,
 ):
     site, other_site = sites
-    platform_admin = client
-    platform_admin.defaults.update(oidc.header())
-    platform_admin.get("/api/me/")
     author = get_user_model().objects.get(username="devuser")
     role_response = platform_admin.post(
         _role_url(site),
@@ -157,7 +148,9 @@ def test_site_role_workflow_uses_validated_token_and_never_body_roles(
     assert cross_site.status_code == 404
 
 
-def test_http_review_publish_flow_and_publish_retry(platform_admin, oidc, sites):
+def test_http_review_publish_flow_and_publish_retry(
+    platform_admin, oidc, pages_module, sites,
+):
     site, _ = sites
     platform_admin.get("/api/me/")
     author = get_user_model().objects.get(username="devuser")

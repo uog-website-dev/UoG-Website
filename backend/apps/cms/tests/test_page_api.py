@@ -18,7 +18,10 @@ from apps.cms.services.publication_cache import (
 from apps.cms.services.workflow import transition_content
 from apps.sites.models import Module, SiteDomain
 from apps.sites.services.lifecycle import activate_site
-from apps.sites.services.modules import enable_module_for_site
+from apps.sites.services.modules import (
+    disable_module_for_site,
+    enable_module_for_site,
+)
 
 
 pytestmark = pytest.mark.django_db
@@ -78,7 +81,7 @@ def _publish(page, *, title=None):
 
 
 def test_admin_pages_are_site_scoped_filterable_and_conditionally_updated(
-    client, oidc, sites,
+    client, oidc, pages_module, sites,
 ):
     site, other_site = sites
     client.defaults.update(oidc.header())
@@ -154,7 +157,9 @@ def test_admin_pages_are_site_scoped_filterable_and_conditionally_updated(
     assert submitted.json()["status"] == ContentStatus.IN_REVIEW
 
 
-def test_page_authoring_requires_an_active_site_author_role(client, oidc, sites):
+def test_page_authoring_requires_an_active_site_author_role(
+    client, oidc, pages_module, sites,
+):
     site, _ = sites
     outsider = get_user_model().objects.create_user(username="pages-outsider")
     denied = client.post(
@@ -312,6 +317,46 @@ def test_publication_versions_invalidate_public_cache_on_unpublish(
     assert get_public_cache(site.pk, current_page_key) is None
     assert client.get(url, HTTP_HOST=host).status_code == 404
     assert client.get(PUBLIC_PAGES, HTTP_HOST=host).json()["count"] == 1
+
+
+def test_disabling_pages_blocks_management_and_delivery_but_keeps_content(
+    client, oidc, platform_admin, pages_module, settings, sites,
+):
+    settings.ALLOWED_HOSTS = ["*"]
+    site, _ = sites
+    _enable_public_pages((site,))
+    host = {"HTTP_HOST": f"site-{site.pk}.uog.edu.et"}
+    page_url = ADMIN_PAGES.format(site_id=site.pk)
+
+    created = client.post(
+        page_url,
+        {"title": "Retained", "slug": "retained"},
+        content_type="application/json",
+    )
+    assert created.status_code == 201, created.content
+    page_id = created.json()["id"]
+    _publish(Page.objects.get(pk=page_id))
+    assert client.get(f"{PUBLIC_PAGES}retained/", **host).status_code == 200
+
+    disable_module_for_site(site.pk, pages_module.pk)
+
+    blocked = client.get(page_url)
+    assert blocked.status_code == 400
+    assert "not enabled for this site" in blocked.content.decode()
+    assert client.post(
+        page_url,
+        {"title": "Blocked", "slug": "blocked"},
+        content_type="application/json",
+    ).status_code == 400
+    assert client.get(f"{PUBLIC_PAGES}retained/", **host).status_code == 404
+
+    enable_module_for_site(site.pk, pages_module.pk)
+
+    restored = client.get(page_url)
+    assert restored.status_code == 200
+    assert restored.json()["count"] == 1
+    assert Page.objects.filter(pk=page_id).exists()
+    assert client.get(f"{PUBLIC_PAGES}retained/", **host).status_code == 200
 
 
 def test_public_delivery_is_closed_when_the_pages_module_is_not_enabled(

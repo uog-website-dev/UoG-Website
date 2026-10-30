@@ -5,9 +5,11 @@ from django.db.models import Q
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import mixins
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from apps.authorization.access import authorized_site_ids, authorized_organization_ids, reject_disabled_module
+from apps.sites.selectors.modules import module_is_usable
 from apps.organizations.hierarchy_lock import hierarchy_write
 
 from ..models import Module, Site, SiteDomain, SiteModule, SiteTemplate
@@ -252,8 +254,9 @@ class SiteModuleViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Admini
             module = serializer.validated_data["module"]
             if SiteModule.objects.filter(site=site, module=module).exists():
                 raise Conflict({"module": ["This Site already has this module."]})
-            # Authoritative backend gate: reject if module is disabled or unimplemented for this site
-            reject_disabled_module(site.pk, module.code, request=request)
+            # Enabling needs a shipped implementation, not an existing enablement.
+            if not module_is_usable(module):
+                raise ValidationError({"module": ["This module is not yet implemented and cannot be used."]})
             enablement = enable_module_for_site(site.pk, module.pk, configuration=serializer.validated_data.get("configuration"))
         return self.respond(enablement, serializer_class=SiteModuleSerializer, status=201, location=reverse("sites:sitemodule-detail", args=[site.pk, enablement.pk]))
 
@@ -267,27 +270,20 @@ class SiteModuleViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Admini
             return self.respond(serializer.save(), serializer_class=SiteModuleSerializer)
 
     def _switch(self, request, command):
+        """Flip the enablement; the on/off switch itself is never gated."""
         with translate_domain_errors():
             enablement = self.lock(request, self.get_queryset(), SiteModuleSerializer)
-            # Authoritative backend gate: reject if module is disabled or unimplemented
-            reject_disabled_module(enablement.site_id, enablement.module.code, request=request)
             EmptyObjectSerializer(data=request.data).is_valid(raise_exception=True)
             return self.respond(command(enablement.site_id, enablement.module_id), serializer_class=SiteModuleSerializer)
 
     @extend_schema(parameters=[IF_MATCH], request=EMPTY, responses=SiteModuleSerializer)
     @action(detail=True, methods=["post"])
     def enable(self, request, pk=None, site_pk=None):
-        with translate_domain_errors():
-            enablement = self.lock(request, self.get_queryset(), SiteModuleSerializer)
-            reject_disabled_module(enablement.site_id, enablement.module.code, request=request)
         return self._switch(request, enable_module_for_site)
 
     @extend_schema(parameters=[IF_MATCH], request=EMPTY, responses=SiteModuleSerializer, description="Turns the module off for this Site and keeps its configuration.")
     @action(detail=True, methods=["post"])
     def disable(self, request, pk=None, site_pk=None):
-        with translate_domain_errors():
-            enablement = self.lock(request, self.get_queryset(), SiteModuleSerializer)
-            reject_disabled_module(enablement.site_id, enablement.module.code, request=request)
         return self._switch(request, disable_module_for_site)
 
 

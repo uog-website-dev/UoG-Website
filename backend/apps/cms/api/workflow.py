@@ -11,6 +11,7 @@ from rest_framework.views import APIView
 
 from apps.accounts.authentication import KeycloakBearerAuthentication
 from apps.accounts.permissions import HasRealmRole
+from apps.authorization.access import reject_disabled_module
 from apps.sites.api.serializers import StrictFields
 from apps.sites.models import Site
 
@@ -169,6 +170,8 @@ class ContentWorkflowActionView(APIView):
     )
     def post(self, request, site_pk, content_id):
         site = get_object_or_404(Site, pk=site_pk)
+        # Disabling PAGES for a Site blocks transitions, not just delivery.
+        reject_disabled_module(site.pk, "PAGES", request=request)
         content = get_object_or_404(
             SiteContent.objects.filter(site_id=site.pk),
             pk=content_id,
