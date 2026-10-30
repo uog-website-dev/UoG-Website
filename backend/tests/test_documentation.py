@@ -25,6 +25,7 @@ def test_production_default_disables_docs():
 
 def test_self_hosted_assets_work_with_debug_false(client, settings):
     settings.DEBUG = False
+    call_command("collectstatic", interactive=False, verbosity=0)
     assert settings.STATIC_URL == "/api/static/"
     response = client.get("/api/static/drf_spectacular_sidecar/swagger-ui-dist/swagger-ui-bundle.js")
     assert response.status_code == 200
@@ -42,6 +43,17 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
     assert set(paths) == {
         "/api/pages/", "/api/pages/{id}/", "/api/pages/home/",
         "/api/me/", "/api/admin/overview/",
+        "/api/v1/authorization/assignments/",
+        "/api/v1/authorization/assignments/users/{user_id}/effective/",
+        "/api/v1/authorization/assignments/{id}/revoke/",
+        "/api/v1/authorization/assignments/{id}/scope/",
+        "/api/v1/authorization/audit/",
+        "/api/v1/authorization/me/permissions/",
+        "/api/v1/authorization/permissions/",
+        "/api/v1/authorization/permissions/{id}/",
+        "/api/v1/authorization/roles/",
+        "/api/v1/authorization/roles/{code}/",
+        "/api/v1/authorization/roles/{code}/permissions/",
         "/api/v1/organizations/", "/api/v1/organizations/{id}/",
         "/api/v1/organizations/{id}/archive/", "/api/v1/organizations/{id}/deactivate/",
         "/api/v1/organizations/tree/", "/api/v1/organizations/{id}/children/",
@@ -65,8 +77,10 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
         "/api/v1/site-context/",
     }
     assert paths["/api/me/"]["get"]["security"] == [{"keycloakBearer": []}]
-    assert {} in paths["/api/pages/"]["get"]["security"]
-    assert {} not in paths["/api/pages/"]["post"]["security"]
+    assert not paths["/api/pages/"]["get"].get("security", [])
+    assert paths["/api/pages/"]["post"]["security"] == [{"keycloakBearer": []}, {"cookieAuth": []}]
+    assert not paths["/api/pages/home/"]["get"].get("security", [])
+    assert paths["/api/v1/authorization/roles/"]["get"]["security"] == [{"keycloakBearer": []}]
     assert paths["/api/me/"]["get"]["tags"] == ["Identity"]
     page_list = paths["/api/pages/"]["get"]
     assert page_list["tags"] == ["CMS"]
@@ -179,11 +193,26 @@ def test_production_docs_disabled_even_for_staff(client, settings, path):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize("path", DOC_URLS)
-def test_enabled_production_docs_require_staff_identity(client, settings, oidc, path):
+def test_enabled_production_docs_require_database_platform_assignment(client, settings, oidc, path):
     settings.DEBUG = False
     settings.API_DOCS_ENABLED = True
     assert client.get(path).status_code == 401
-    assert client.get(path, **oidc.header(realm_access={"roles": ["platform-viewer"]})).status_code == 403
+    assert client.get(path, **oidc.header(realm_access={"roles": ["platform-admin"]})).status_code == 403
+    staff = get_user_model().objects.create_user(username="docs-staff", is_staff=True)
+    from django.test import Client
+    staff_client = Client()
+    staff_client.force_login(staff)
+    assert staff_client.get(path).status_code == 200
+
+    client.get("/api/me/", **oidc.header())
+    user = get_user_model().objects.get(username="devuser")
+    from django.core.management import call_command
+    from apps.authorization.models import Role, UserRoleAssignment
+    call_command("seed_rbac", verbosity=0)
+    UserRoleAssignment.objects.create(
+        user=user, role=Role.objects.get(code="platform-administrator"),
+        scope=UserRoleAssignment.Scope.PLATFORM, assigned_by=user,
+    )
     assert client.get(path, **oidc.header()).status_code == 200
     assert client.get(path, **oidc.header(exp=int(time.time()) - 60)).status_code == 401
     settings.API_DOCS_ENABLED = False
@@ -196,13 +225,22 @@ def test_session_can_open_staff_docs_but_cannot_bypass_bearer_api_permissions(cl
     settings.API_DOCS_ENABLED = True
     user = get_user_model().objects.create_user(username="docs-staff", is_staff=True)
     client.force_login(user)
-    assert client.get("/api/docs/").status_code == 200
+    assert client.get("/api/docs/").status_code == 200  # docs retain the staff-only operational gate
     assert client.get("/api/me/").status_code == 401
     assert client.get("/api/admin/overview/").status_code == 401
 
 
 @pytest.mark.django_db
 def test_validation_and_auth_errors_match_envelope_and_request_id(client, oidc):
+    client.get("/api/me/", **oidc.header())
+    user = get_user_model().objects.get(username="devuser")
+    from django.core.management import call_command
+    from apps.authorization.models import Role, UserRoleAssignment
+    call_command("seed_rbac", verbosity=0)
+    UserRoleAssignment.objects.create(
+        user=user, role=Role.objects.get(code="platform-administrator"),
+        scope=UserRoleAssignment.Scope.PLATFORM, assigned_by=user,
+    )
     request_id = str(uuid4())
     response = client.post(
         "/api/pages/", {}, content_type="application/json",

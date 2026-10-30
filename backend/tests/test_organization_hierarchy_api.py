@@ -25,9 +25,8 @@ def nodes():
 
 
 @pytest.fixture
-def admin(client, oidc):
-    client.defaults.update(oidc.header())
-    return client
+def admin(platform_admin_client):
+    return platform_admin_client
 
 
 def url(unit, relation):
@@ -79,7 +78,10 @@ def test_all_lifecycle_states_preserve_structural_links(admin, nodes):
 
 
 @pytest.mark.parametrize("suffix", ["tree/", *[f"1/{relation}/" for relation in RELATIONS]])
-def test_hierarchy_anonymous_and_viewer_denied(client, oidc, suffix):
+def test_hierarchy_anonymous_and_viewer_denied(client, oidc, nodes, suffix):
+    root, _college, _department, _sibling = nodes
+    if suffix != "tree/":
+        suffix = suffix.replace("1/", f"{root.pk}/", 1)
     assert client.get(BASE + suffix).status_code == 401
     response = client.get(BASE + suffix, **oidc.header(realm_access={"roles": ["platform-viewer"]}))
     assert response.status_code == 403

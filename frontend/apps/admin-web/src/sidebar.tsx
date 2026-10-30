@@ -21,6 +21,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 
 import { adminNavItems, isNavItemActive, normalizeAdminPathname } from "@/navigation";
+import { AccessNav } from "@/access-nav";
 
 const DRAWER_WIDTH = 296;
 
@@ -60,18 +61,20 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const currentPath = normalizeAdminPathname(pathname);
 
   return (
-    <Box
-      component="nav"
-      aria-label="Admin sections"
-      sx={{ display: "flex", flexDirection: "column", gap: 0.75, px: 1.5, py: 1 }}
-    >
-      <Typography
-        variant="overline"
-        sx={{ px: 1.25, pb: 0.5, color: "text.secondary", fontWeight: 700, letterSpacing: 1.1 }}
-      >
-        Workspace
-      </Typography>
-      {adminNavItems.map((item) => {
+    <AccessNav items={adminNavItems}>
+      {(visibleItems) => (
+        <Box
+          component="nav"
+          aria-label="Admin sections"
+          sx={{ display: "flex", flexDirection: "column", gap: 0.75, px: 1.5, py: 1 }}
+        >
+          <Typography
+            variant="overline"
+            sx={{ px: 1.25, pb: 0.5, color: "text.secondary", fontWeight: 700, letterSpacing: 1.1 }}
+          >
+            Workspace
+          </Typography>
+          {visibleItems.map((item) => {
         const active = isNavItemActive(item, currentPath);
         const Icon = item.icon;
         return (
@@ -136,8 +139,10 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
             />
           </ListItemButton>
         );
-      })}
-    </Box>
+          })}
+        </Box>
+      )}
+    </AccessNav>
   );
 }
 

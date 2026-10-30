@@ -41,8 +41,8 @@ INSTALLED_APPS = [
     "apps.api",
     "apps.accounts",
     "apps.audit",
-    # Organizational structure. Entities and APIs are later stories;
-    # this registration establishes the domain boundary.
+    "apps.authorization",
+    # Organization and Site administration consume the authorization domain.
     "apps.organizations",
     # Digital properties are a separate domain from institutional units.
     "apps.sites",
@@ -50,6 +50,24 @@ INSTALLED_APPS = [
     # Registry codes only; no content endpoints ship with this boundary.
     "apps.cms",
 ]
+
+# Backstop for the test runner: when pytest imports a test module that itself
+# imports app models, the module-level import must not raise
+# ImproperlyConfigured because Django settings were never configured.
+if "pytest" in sys.modules:
+    def _ensure_test_settings():
+        from django.conf import settings as _settings
+
+        if not hasattr(_settings, "INSTALLED_APPS") or not _settings.configured:
+            _settings.configure(
+                INSTALLED_APPS=list(INSTALLED_APPS),
+                DATABASES={},
+                DATABASES_DEFAULT_TEST_BACKEND=None,
+            )
+
+    import atexit
+
+    atexit.register(_ensure_test_settings)
 
 MIDDLEWARE = [
     "apps.core.middleware.RequestIDMiddleware",
@@ -268,6 +286,21 @@ OIDC_HTTP_TIMEOUT_SECONDS = config("OIDC_HTTP_TIMEOUT_SECONDS", default=10, cast
 # Keycloak roles that make a local account a staff account.
 OIDC_STAFF_ROLES = config("OIDC_STAFF_ROLES", default="platform-admin", cast=Csv())
 
+# Authorization-related caching — separate keys/timers from general app cache.
+# Token-to-user identity mapping is intentionally NOT cached here; that is
+# owned by the OIDC authentication layer's own JWKS state. Authorization
+# decisions themselves are write-through to the database and may incur cache
+# only where explicitly documented (e.g. site/user-scoped assignment lookups
+# in apps.authorization.access). No client-supplied header or claim may pin
+# an authorization outcome in this cache.
+AUTH_SCOPE_CACHE_PREFIX = config("AUTH_SCOPE_CACHE_PREFIX", default="auth-scope")
+AUTH_SCOPE_CACHE_TIMEOUT_SECONDS = config("AUTH_SCOPE_CACHE_TIMEOUT_SECONDS", default=60, cast=int)
+AUTH_EFFECTIVE_PERMISSIONS_CACHE_PREFIX = config("AUTH_EFFECTIVE_PERMISSIONS_CACHE_PREFIX", default="auth-effective-perms")
+AUTH_EFFECTIVE_PERMISSIONS_CACHE_TIMEOUT_SECONDS = config("AUTH_EFFECTIVE_PERMISSIONS_CACHE_TIMEOUT_SECONDS", default=60, cast=int)
+AUTH_LIVE_ASSIGNMENTS_CACHE_PREFIX = config("AUTH_LIVE_ASSIGNMENTS_CACHE_PREFIX", default="auth-live-assignments")
+AUTH_LIVE_ASSIGNMENTS_CACHE_TIMEOUT_SECONDS = config("AUTH_LIVE_ASSIGNMENTS_CACHE_TIMEOUT_SECONDS", default=60, cast=int)
+AUTH_REVOCATION_LAG_SECONDS = config("AUTH_REVOCATION_LAG_SECONDS", default=120, cast=int)
+
 # ---------------------------------------------------------------------------
 # CORS — Next.js dev servers (public-web :3000, admin-web :3001) and nginx
 # ---------------------------------------------------------------------------
@@ -386,3 +419,73 @@ LOGGING = {
         },
     },
 }
+
+# Public in development; production documentation is disabled unless explicitly
+# enabled, in which case all three views require an active staff identity.
+API_DOCS_ENABLED = config("API_DOCS_ENABLED", default=DEBUG, cast=bool)
+ORGANIZATIONS_DEV_WRITES_ENABLED = config("ORGANIZATIONS_DEV_WRITES_ENABLED", default=False, cast=bool)
+
+# ------------------------------------------------------------------
+# drf-spectacular documentation (installed in this project's base deps).
+# ------------------------------------------------------------------
+SPECTACULAR_SETTINGS = {
+    "TITLE": "University of Gondar Digital Platform API",
+    "VERSION": "1.0.0",
+    "OAS_VERSION": "3.0.3",
+    "DESCRIPTION": (
+        "Live documentation generated from registered DRF endpoints and serializers. "
+        "Use Authorize with a Keycloak access token (paste the JWT without Bearer). "
+        "Backend permissions are resolved from registered database capabilities and scoped role assignments; "
+        "Keycloak claims authenticate identities only. Protected management APIs require the explicit "
+        "database platform-administrator assignment or a matching scoped application permission. "
+        "No scope header grants access. Content capabilities without an API/workflow are not enabled."
+    ),
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SERVE_PERMISSIONS": ["apps.core.permissions.DocumentationPermission"],
+    "SWAGGER_UI_DIST": "SIDECAR",
+    "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
+    "REDOC_DIST": "SIDECAR",
+    "SWAGGER_UI_SETTINGS": {
+        "deepLinking": True,
+        "persistAuthorization": False,
+        "validatorUrl": None,
+    },
+    "REDOC_UI_SETTINGS": {"disableGoogleFont": True},
+    "COMPONENT_SPLIT_REQUEST": True,
+    "ENUM_NAME_OVERRIDES": {
+        "OrganizationStatusEnum": "apps.organizations.models.OrganizationUnit.Status",
+        "SiteStatusEnum": "apps.sites.models.Site.Status",
+        "ActiveInactiveStatusEnum": "apps.sites.models.SiteDomain.Status",
+        "ModuleStatusEnum": "apps.sites.models.Module.Status",
+    },
+    "POSTPROCESSING_HOOKS": [
+        "drf_spectacular.hooks.postprocess_schema_enums",
+        "apps.core.openapi.add_common_contract",
+    ],
+    "TAGS": [
+        {"name": "CMS", "description": "Platform page endpoints authorized by registered application permissions."},
+        {"name": "Identity", "description": "Keycloak identity and platform administration."},
+        {"name": "Authorization", "description": "Database-backed application roles, registered permissions, scoped assignments and authorization audit history."},
+        {"name": "Authorization", "description": "Registered permissions, application roles, scoped user assignments and audit history."},
+        {"name": "Organizations", "description": "Institutional administration authorized by scoped application permissions."},
+        {"name": "Sites", "description": "Site, configuration and per-site module administration authorized by scoped application permissions."},
+        {"name": "Domains", "description": "Hostnames for one Site, including an atomic primary-domain switch."},
+        {"name": "Site templates", "description": "Approved starting configurations. Applying one does not rewrite existing Sites."},
+        {"name": "Modules", "description": "Platform capability registry. Planned modules cannot be enabled for a Site."},
+        {"name": "Menu links", "description": "Site menu-link administration authorized by scoped application permissions."},
+        {"name": "Posts", "description": "Not implemented."},
+        {"name": "Menus", "description": "Not implemented."},
+    ],
+}
+
+# ------------------------------------------------------------------
+# Documentation endpoints are explicitly disabled when the public site serves
+# API docs for a Site. The public-web ProxyPass already forwards requests under
+# /api/ to the backend, so any path that Django would document as a management
+# endpoint must be unregistered there to avoid accidental exposure.
+# ------------------------------------------------------------------
+if False:
+    # Kept as a documented no-op extension point. If the project later decides
+    # to serve the same backend schema under a public Site path, both views and
+    # their URL entries must be removed from config/urls.py as well.
+    pass

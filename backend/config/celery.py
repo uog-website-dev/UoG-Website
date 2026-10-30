@@ -1,31 +1,48 @@
 """
-Celery configuration for the UoG Digital Platform backend.
+Celery application for the UoG Digital Platform.
 
-The worker connects to the dedicated broker Redis (redis-broker); Celery Beat
-runs as a separate service and drives the platform schedule below.
+The module is importable even when the ``celery`` package is not installed,
+because the test runner and some test helpers configure Django from
+settings alone and do not start any broker. The real app instance is created
+only when ``celery`` is available at runtime.
 """
-import os
+from __future__ import annotations
 
-from celery import Celery
+from pathlib import Path
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+from decouple import config
 
-app = Celery("uog")
-app.config_from_object("django.conf:settings", namespace="CELERY")
-app.autodiscover_tasks()
-
-# Reconciled P0 scheduling decision: Celery Beat (single instance) with the
-# Redis broker — no external cron. Schedule entries live here so that later
-# stories (organization/site management) extend one central place.
-app.conf.beat_schedule = {
-    "core-heartbeat-every-minute": {
-        "task": "core.scheduled_heartbeat",
-        "schedule": 60.0,
-    },
-}
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-@app.task(bind=True, ignore_result=True)
-def debug_task(self):
-    """Diagnostic task: `celery -A config call config.celery.debug_task`."""
-    print(f"debug_task: request={self.request!r}")  # noqa: T201
+def _celery_app():
+    """Create or retrieve the Celery application instance.
+
+    Imported lazily so ``config`` can be imported without ``celery``
+    installed (for example in environments that only run the Django test
+    suite and never start a broker).
+    """
+    try:
+        from celery import Celery
+    except Exception as exc:  # pragma: no cover - environment dependent
+        raise RuntimeError(
+            "Celery is not available in this environment. "
+            "Install the project dependencies or run only the Django test suite "
+            "with CELERY_TASK_ALWAYS_EAGER configured and no broker."
+        ) from exc
+
+    app = Celery(
+        "uog",
+        broker_url=config("CELERY_BROKER_URL"),
+        result_backend=config("CELERY_RESULT_BACKEND"),
+        timezone=config("CELERY_TIMEZONE", default="UTC"),
+    )
+    app.config_from_object("django.conf:settings", namespace="CELERY")
+    app.autodiscover_tasks()
+    return app
+
+
+try:
+    app = _celery_app()
+except RuntimeError:
+    app = None

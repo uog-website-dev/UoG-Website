@@ -24,11 +24,10 @@ def owner():
 
 
 @pytest.fixture
-def admin(client, oidc, settings):
+def admin(platform_admin_client, settings):
     settings.DEBUG = True
     settings.ORGANIZATIONS_DEV_WRITES_ENABLED = True
-    client.defaults.update(oidc.header())
-    return client
+    return platform_admin_client
 
 
 def _etag(response):
@@ -38,7 +37,9 @@ def _etag(response):
 @pytest.mark.parametrize("method,path", [
     ("get", SITES), ("post", SITES), ("post", SITES + "1/domains/"), ("get", TEMPLATES), ("post", MODULES), ("get", MODULES),
 ])
-def test_anonymous_and_non_admin_are_rejected(client, oidc, method, path):
+def test_anonymous_and_non_admin_are_rejected(client, oidc, owner, method, path):
+    site = Site.objects.create(code="AUTHZ-SITE", name="Authorization test", organization_unit=owner)
+    path = path.replace("/sites/1/", f"/sites/{site.pk}/", 1) if "/sites/1/" in path else path
     anonymous = getattr(client, method)(path, content_type="application/json")
     assert anonymous.status_code == 401
     assert anonymous.json()["error"]["code"] == "not_authenticated"
