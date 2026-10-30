@@ -113,6 +113,7 @@ def test_state_machine_permissions_snapshot_and_publish_idempotency(sites):
     assert submitted_audit.actor_id == str(author.pk)
     assert submitted_audit.after["site_id"] == site.pk
 
+    page.refresh_from_db()
     page.title = "Silent live edit"
     with pytest.raises(ValidationError):
         page.save()

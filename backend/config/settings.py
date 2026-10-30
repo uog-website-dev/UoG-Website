@@ -209,8 +209,9 @@ SPECTACULAR_SETTINGS = {
         "Backend authentication and permissions always apply. "
         "Organization administration is platform-admin only; writes require development "
         "opt-in and remain disabled in production pending scoped IAM/RBAC. "
-        "CMS workflow actions require Site-scoped AUTHOR, REVIEWER or PUBLISHER assignments "
-        "or the validated platform-admin token role; assignment management is platform-admin only. "
+        "CMS workflow and revision history require Site-scoped AUTHOR, REVIEWER or PUBLISHER "
+        "assignments or the validated platform-admin token role; revision restore is AUTHOR-only "
+        "and assignment management is platform-admin only. "
         "Site, domain, template and module administration is platform-admin only and uses the "
         "same development write opt-in; production writes remain disabled pending scoped IAM/RBAC. "
         "Posts and Menus content APIs are absent. "
@@ -240,8 +241,8 @@ SPECTACULAR_SETTINGS = {
         "apps.core.openapi.add_common_contract",
     ],
     "TAGS": [
-        {"name": "CMS", "description": "Platform pages; site scoping is not implemented."},
-        {"name": "CMS workflow", "description": "Site-scoped CMS role assignments and authenticated review/publishing transitions."},
+        {"name": "CMS", "description": "Site-scoped page content primitives; public serving remains disabled."},
+        {"name": "CMS workflow", "description": "Site-scoped roles, review/publishing workflow, immutable revision history and safe restore."},
         {"name": "Identity", "description": "Keycloak identity and platform administration."},
         {"name": "Organizations", "description": "Restricted institutional administration; production writes disabled pending scoped IAM/RBAC."},
         {"name": "Sites", "description": "Restricted Site, configuration and per-site module administration."},

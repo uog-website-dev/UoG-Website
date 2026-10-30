@@ -72,6 +72,9 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
         "/api/v1/cms/sites/{site_pk}/content-roles/",
         "/api/v1/cms/sites/{site_pk}/content-roles/{assignment_id}/",
         "/api/v1/cms/sites/{site_pk}/content/{content_id}/workflow/",
+        "/api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/",
+        "/api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/{revision_number}/",
+        "/api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/{revision_number}/restore/",
         "/api/v1/site-templates/", "/api/v1/site-templates/{id}/",
         "/api/v1/modules/", "/api/v1/modules/{id}/",
         "/api/v1/site-context/",
@@ -163,6 +166,22 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
     workflow_fields = schema["components"]["schemas"][workflow_input]["properties"]
     assert set(workflow_fields) == {"action", "comment"}
     assert "WorkflowContent" in schema["components"]["schemas"]
+    revisions = paths[
+        "/api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/"
+    ]["get"]
+    assert revisions["security"] == [{"keycloakBearer": []}]
+    assert "ETag" in revisions["responses"]["200"]["headers"]
+    restore = paths[
+        "/api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/{revision_number}/restore/"
+    ]["post"]
+    assert restore["security"] == [{"keycloakBearer": []}]
+    assert {"409", "428"} <= set(restore["responses"])
+    assert "ETag" in restore["responses"]["200"]["headers"]
+    assert any(
+        parameter["name"] == "If-Match" and parameter["required"]
+        for parameter in restore["parameters"]
+    )
+    assert "requestBody" not in restore
     context = paths["/api/v1/site-context/"]["get"]
     assert {} in context["security"]
     assert context["tags"] == ["Sites"]

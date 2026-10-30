@@ -6,7 +6,7 @@ import pytest
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, close_old_connections, connections, transaction
 
-from apps.cms.models import Page
+from apps.cms.models import ContentEditConflict, Page
 from apps.cms.selectors.pages import homepage_of
 from apps.cms.services.pages import create_page, set_as_homepage
 
@@ -92,7 +92,7 @@ def test_racing_homepage_saves_leave_exactly_one(sites):
                 page.is_homepage = True
                 page.save(update_fields=["is_homepage"])
             return "committed"
-        except (ValidationError, IntegrityError):
+        except (ContentEditConflict, ValidationError, IntegrityError):
             return "rejected"
         finally:
             connections.close_all()

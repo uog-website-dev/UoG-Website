@@ -10,7 +10,7 @@ FIELDS = {
     "id", "site", "status", "locale", "published_at",
     "created_by", "updated_by", "submitted_by", "reviewed_by",
     "review_comment", "metadata", "created_at", "updated_at",
-    "blocks", "blocks_version",
+    "blocks", "blocks_version", "revision_number",
 }
 EDITABLES = {"locale", "metadata", "blocks"}
 
@@ -125,6 +125,7 @@ PAGE_FIELDS = {
     "seo", "visibility", "position", "is_homepage", "status",
     "published_at", "created_by", "updated_by", "submitted_by", "reviewed_by",
     "review_comment", "blocks", "blocks_version",
+    "revision_number",
     "metadata", "created_at", "updated_at",
 }
 PAGE_EDITABLES = {

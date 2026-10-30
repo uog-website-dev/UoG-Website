@@ -41,7 +41,7 @@ def add_common_contract(result, generator, request, public):
         "404": "Resource or requested page does not exist.",
         "405": "Method is not supported.",
         "406": "Requested response format is unavailable.",
-        "409": "Duplicate normalized code, database integrity/concurrent transaction conflict, or hierarchy response exceeding 1000 nodes. Reconcile state or navigate smaller branches/use the paginated list.",
+        "409": "A unique-resource, transaction or optimistic-concurrency conflict occurred. Retrieve current state and reconcile before retrying.",
         "412": "If-Match does not match the current strong ETag. Retrieve and reconcile changes.",
         "428": "If-Match header is required for this mutation.",
         "415": "Unsupported request content type.",
@@ -61,6 +61,12 @@ def add_common_contract(result, generator, request, public):
                 codes.update({"400", "415"})
             if "{" in path or (method == "get" and path == "/api/pages/"):
                 codes.add("404")
+            if (
+                path.startswith("/api/v1/cms/")
+                and method == "post"
+                and path.endswith("/restore/")
+            ):
+                codes.update({"409", "428"})
             responses = operation.setdefault("responses", {})
             if path.startswith(("/api/v1/organizations/", "/api/v1/sites/", "/api/v1/site-templates/", "/api/v1/modules/")):
                 hierarchy = path.startswith("/api/v1/organizations/") and path.rstrip("/").split("/")[-1] in {"tree", "children", "ancestors", "descendants", "subtree"}
@@ -104,6 +110,20 @@ def add_common_contract(result, generator, request, public):
                     responses[code]["content"]["application/json"]["example"] = {
                         "error": {"code": names[code], "message": messages[code], "details": detail},
                         "request_id": "1ea47c51-f2d7-402b-ad9a-4df619d03055",
+                    }
+            if (
+                path.startswith("/api/v1/cms/sites/")
+                and "/revisions" in path
+            ):
+                success = "200"
+                if success in responses:
+                    responses[success].setdefault("headers", {})["ETag"] = {
+                        "description": "Current content revision. Echo exactly in If-Match for restore.",
+                        "schema": {"type": "string"},
+                    }
+                    responses[success]["headers"]["Cache-Control"] = {
+                        "description": "Revision data is private and not cacheable.",
+                        "schema": {"type": "string"},
                     }
             for response in responses.values():
                 response.setdefault("headers", {})["X-Request-ID"] = {

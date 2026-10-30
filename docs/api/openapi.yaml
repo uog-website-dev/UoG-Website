@@ -6,12 +6,13 @@ info:
     Use Authorize with a Keycloak access token (paste the JWT without Bearer). Backend
     authentication and permissions always apply. Organization administration is platform-admin
     only; writes require development opt-in and remain disabled in production pending
-    scoped IAM/RBAC. CMS workflow actions require Site-scoped AUTHOR, REVIEWER or
-    PUBLISHER assignments or the validated platform-admin token role; assignment management
-    is platform-admin only. Site, domain, template and module administration is platform-admin
-    only and uses the same development write opt-in; production writes remain disabled
-    pending scoped IAM/RBAC. Posts and Menus content APIs are absent. No scope header
-    grants access. See docs/development/api-documentation.md.
+    scoped IAM/RBAC. CMS workflow and revision history require Site-scoped AUTHOR,
+    REVIEWER or PUBLISHER assignments or the validated platform-admin token role;
+    revision restore is AUTHOR-only and assignment management is platform-admin only.
+    Site, domain, template and module administration is platform-admin only and uses
+    the same development write opt-in; production writes remain disabled pending scoped
+    IAM/RBAC. Posts and Menus content APIs are absent. No scope header grants access.
+    See docs/development/api-documentation.md.
 paths:
   /api/admin/overview/:
     get:
@@ -1554,6 +1555,467 @@ paths:
               schema:
                 type: string
                 format: uuid
+  /api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/:
+    get:
+      operationId: cms_content_revisions_list
+      description: List immutable revisions in descending version order. Requires
+        an active AUTHOR, REVIEWER or PUBLISHER assignment on this Site, or a validated
+        platform-admin token role. The response ETag is the current content revision
+        and is required to restore.
+      parameters:
+      - in: path
+        name: content_id
+        schema:
+          type: string
+        description: UUID of SiteContent or Page.
+        required: true
+      - in: query
+        name: page
+        schema:
+          type: integer
+      - in: query
+        name: page_size
+        schema:
+          type: integer
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        description: Owning Site id.
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - CMS workflow
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentRevisionPage'
+          description: ''
+          headers:
+            ETag:
+              description: Current content revision. Echo exactly in If-Match for
+                restore.
+              schema:
+                type: string
+            Cache-Control:
+              description: Revision data is private and not cacheable.
+              schema:
+                type: string
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/{revision_number}/:
+    get:
+      operationId: cms_content_revision_detail
+      description: Inspect an immutable prior snapshot and its diff metadata. History
+        is scoped to the URL Site.
+      parameters:
+      - in: path
+        name: content_id
+        schema:
+          type: string
+        description: UUID of SiteContent or Page.
+        required: true
+      - in: path
+        name: revision_number
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        description: Owning Site id.
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - CMS workflow
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentRevisionDetail'
+          description: ''
+          headers:
+            ETag:
+              description: Current content revision. Echo exactly in If-Match for
+                restore.
+              schema:
+                type: string
+            Cache-Control:
+              description: Revision data is private and not cacheable.
+              schema:
+                type: string
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/{revision_number}/restore/:
+    post:
+      operationId: cms_content_revision_restore
+      description: Restore the selected snapshot into a new DRAFT revision. Requires
+        AUTHOR on this Site or platform-admin and the current content ETag from the
+        revision list. A stale ETag returns 409. Published and reviewed content must
+        first follow its workflow back to an editable state; historical snapshots
+        are never modified.
+      parameters:
+      - in: header
+        name: If-Match
+        schema:
+          type: string
+        description: Current ETag returned by the revision-list endpoint.
+        required: true
+      - in: path
+        name: content_id
+        schema:
+          type: string
+        description: UUID of SiteContent or Page.
+        required: true
+      - in: path
+        name: revision_number
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        description: Owning Site id.
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - CMS workflow
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentRevisionDetail'
+          description: ''
+          headers:
+            ETag:
+              description: Current content revision. Echo exactly in If-Match for
+                restore.
+              schema:
+                type: string
+            Cache-Control:
+              description: Revision data is private and not cacheable.
+              schema:
+                type: string
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          description: Invalid body, malformed input, or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    title:
+                    - This field is required.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '409':
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '415':
+          description: Unsupported request content type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '428':
+          description: If-Match header is required for this mutation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
   /api/v1/cms/sites/{site_pk}/content/{content_id}/workflow/:
     post:
       operationId: v1_cms_sites_content_workflow_create
@@ -1992,9 +2454,8 @@ paths:
                 type: string
                 format: uuid
         '409':
-          description: Duplicate normalized code, database integrity/concurrent transaction
-            conflict, or hierarchy response exceeding 1000 nodes. Reconcile state
-            or navigate smaller branches/use the paginated list.
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
           content:
             application/json:
               schema:
@@ -2298,9 +2759,8 @@ paths:
                 type: string
                 format: uuid
         '409':
-          description: Duplicate normalized code, database integrity/concurrent transaction
-            conflict, or hierarchy response exceeding 1000 nodes. Reconcile state
-            or navigate smaller branches/use the paginated list.
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
           content:
             application/json:
               schema:
@@ -2666,9 +3126,8 @@ paths:
                 type: string
                 format: uuid
         '409':
-          description: Duplicate normalized code, database integrity/concurrent transaction
-            conflict, or hierarchy response exceeding 1000 nodes. Reconcile state
-            or navigate smaller branches/use the paginated list.
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
           content:
             application/json:
               schema:
@@ -2973,9 +3432,8 @@ paths:
                 type: string
                 format: uuid
         '409':
-          description: Duplicate normalized code, database integrity/concurrent transaction
-            conflict, or hierarchy response exceeding 1000 nodes. Reconcile state
-            or navigate smaller branches/use the paginated list.
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
           content:
             application/json:
               schema:
@@ -3148,9 +3606,8 @@ paths:
                 type: string
                 format: uuid
         '409':
-          description: Duplicate normalized code, database integrity/concurrent transaction
-            conflict, or hierarchy response exceeding 1000 nodes. Reconcile state
-            or navigate smaller branches/use the paginated list.
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
           content:
             application/json:
               schema:
@@ -3311,9 +3768,8 @@ paths:
                 type: string
                 format: uuid
         '409':
-          description: Duplicate normalized code, database integrity/concurrent transaction
-            conflict, or hierarchy response exceeding 1000 nodes. Reconcile state
-            or navigate smaller branches/use the paginated list.
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
           content:
             application/json:
               schema:
@@ -3486,9 +3942,8 @@ paths:
                 type: string
                 format: uuid
         '409':
-          description: Duplicate normalized code, database integrity/concurrent transaction
-            conflict, or hierarchy response exceeding 1000 nodes. Reconcile state
-            or navigate smaller branches/use the paginated list.
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
           content:
             application/json:
               schema:
@@ -3649,9 +4104,8 @@ paths:
                 type: string
                 format: uuid
         '409':
-          description: Duplicate normalized code, database integrity/concurrent transaction
-            conflict, or hierarchy response exceeding 1000 nodes. Reconcile state
-            or navigate smaller branches/use the paginated list.
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
           content:
             application/json:
               schema:
@@ -3824,9 +4278,8 @@ paths:
                 type: string
                 format: uuid
         '409':
-          description: Duplicate normalized code, database integrity/concurrent transaction
-            conflict, or hierarchy response exceeding 1000 nodes. Reconcile state
-            or navigate smaller branches/use the paginated list.
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
           content:
             application/json:
               schema:
@@ -3948,9 +4401,8 @@ paths:
                 type: string
                 format: uuid
         '409':
-          description: Duplicate normalized code, database integrity/concurrent transaction
-            conflict, or hierarchy response exceeding 1000 nodes. Reconcile state
-            or navigate smaller branches/use the paginated list.
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
           content:
             application/json:
               schema:
@@ -4048,9 +4500,8 @@ paths:
                 type: string
                 format: uuid
         '409':
-          description: Duplicate normalized code, database integrity/concurrent transaction
-            conflict, or hierarchy response exceeding 1000 nodes. Reconcile state
-            or navigate smaller branches/use the paginated list.
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
           content:
             application/json:
               schema:
@@ -4435,9 +4886,8 @@ paths:
                 type: string
                 format: uuid
         '409':
-          description: Duplicate normalized code, database integrity/concurrent transaction
-            conflict, or hierarchy response exceeding 1000 nodes. Reconcile state
-            or navigate smaller branches/use the paginated list.
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
           content:
             application/json:
               schema:
@@ -4741,9 +5191,8 @@ paths:
                 type: string
                 format: uuid
         '409':
-          description: Duplicate normalized code, database integrity/concurrent transaction
-            conflict, or hierarchy response exceeding 1000 nodes. Reconcile state
-            or navigate smaller branches/use the paginated list.
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
           content:
             application/json:
               schema:
@@ -5081,9 +5530,8 @@ paths:
                 type: string
                 format: uuid
         '409':
-          description: Duplicate normalized code, database integrity/concurrent transaction
-            conflict, or hierarchy response exceeding 1000 nodes. Reconcile state
-            or navigate smaller branches/use the paginated list.
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
           content:
             application/json:
               schema:
@@ -5387,9 +5835,8 @@ paths:
                 type: string
                 format: uuid
         '409':
-          description: Duplicate normalized code, database integrity/concurrent transaction
-            conflict, or hierarchy response exceeding 1000 nodes. Reconcile state
-            or navigate smaller branches/use the paginated list.
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
           content:
             application/json:
               schema:
@@ -5597,9 +6044,8 @@ paths:
                 type: string
                 format: uuid
         '409':
-          description: Duplicate normalized code, database integrity/concurrent transaction
-            conflict, or hierarchy response exceeding 1000 nodes. Reconcile state
-            or navigate smaller branches/use the paginated list.
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
           content:
             application/json:
               schema:
@@ -5807,9 +6253,8 @@ paths:
                 type: string
                 format: uuid
         '409':
-          description: Duplicate normalized code, database integrity/concurrent transaction
-            conflict, or hierarchy response exceeding 1000 nodes. Reconcile state
-            or navigate smaller branches/use the paginated list.
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
           content:
             application/json:
               schema:
@@ -6016,9 +6461,8 @@ paths:
                 type: string
                 format: uuid
         '409':
-          description: Duplicate normalized code, database integrity/concurrent transaction
-            conflict, or hierarchy response exceeding 1000 nodes. Reconcile state
-            or navigate smaller branches/use the paginated list.
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
           content:
             application/json:
               schema:
@@ -6226,9 +6670,8 @@ paths:
                 type: string
                 format: uuid
         '409':
-          description: Duplicate normalized code, database integrity/concurrent transaction
-            conflict, or hierarchy response exceeding 1000 nodes. Reconcile state
-            or navigate smaller branches/use the paginated list.
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
           content:
             application/json:
               schema:
@@ -6569,9 +7012,8 @@ paths:
                 type: string
                 format: uuid
         '409':
-          description: Duplicate normalized code, database integrity/concurrent transaction
-            conflict, or hierarchy response exceeding 1000 nodes. Reconcile state
-            or navigate smaller branches/use the paginated list.
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
           content:
             application/json:
               schema:
@@ -6901,9 +7343,8 @@ paths:
                 type: string
                 format: uuid
         '409':
-          description: Duplicate normalized code, database integrity/concurrent transaction
-            conflict, or hierarchy response exceeding 1000 nodes. Reconcile state
-            or navigate smaller branches/use the paginated list.
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
           content:
             application/json:
               schema:
@@ -7116,9 +7557,8 @@ paths:
                 type: string
                 format: uuid
         '409':
-          description: Duplicate normalized code, database integrity/concurrent transaction
-            conflict, or hierarchy response exceeding 1000 nodes. Reconcile state
-            or navigate smaller branches/use the paginated list.
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
           content:
             application/json:
               schema:
@@ -7331,9 +7771,8 @@ paths:
                 type: string
                 format: uuid
         '409':
-          description: Duplicate normalized code, database integrity/concurrent transaction
-            conflict, or hierarchy response exceeding 1000 nodes. Reconcile state
-            or navigate smaller branches/use the paginated list.
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
           content:
             application/json:
               schema:
@@ -7547,9 +7986,8 @@ paths:
                 type: string
                 format: uuid
         '409':
-          description: Duplicate normalized code, database integrity/concurrent transaction
-            conflict, or hierarchy response exceeding 1000 nodes. Reconcile state
-            or navigate smaller branches/use the paginated list.
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
           content:
             application/json:
               schema:
@@ -7885,9 +8323,8 @@ paths:
                 type: string
                 format: uuid
         '409':
-          description: Duplicate normalized code, database integrity/concurrent transaction
-            conflict, or hierarchy response exceeding 1000 nodes. Reconcile state
-            or navigate smaller branches/use the paginated list.
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
           content:
             application/json:
               schema:
@@ -8217,9 +8654,8 @@ paths:
                 type: string
                 format: uuid
         '409':
-          description: Duplicate normalized code, database integrity/concurrent transaction
-            conflict, or hierarchy response exceeding 1000 nodes. Reconcile state
-            or navigate smaller branches/use the paginated list.
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
           content:
             application/json:
               schema:
@@ -8433,9 +8869,8 @@ paths:
                 type: string
                 format: uuid
         '409':
-          description: Duplicate normalized code, database integrity/concurrent transaction
-            conflict, or hierarchy response exceeding 1000 nodes. Reconcile state
-            or navigate smaller branches/use the paginated list.
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
           content:
             application/json:
               schema:
@@ -8648,9 +9083,8 @@ paths:
                 type: string
                 format: uuid
         '409':
-          description: Duplicate normalized code, database integrity/concurrent transaction
-            conflict, or hierarchy response exceeding 1000 nodes. Reconcile state
-            or navigate smaller branches/use the paginated list.
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
           content:
             application/json:
               schema:
@@ -8774,6 +9208,98 @@ components:
         * `PUBLISHED` - Published
         * `UNPUBLISHED` - Unpublished
         * `ARCHIVED` - Archived
+    ContentRevisionDetail:
+      type: object
+      properties:
+        revision_number:
+          type: integer
+          readOnly: true
+        editor:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/CMSContentStatusEnum'
+          readOnly: true
+        changed_fields:
+          readOnly: true
+        content_hash:
+          type: string
+          readOnly: true
+        restored_from_revision:
+          type: integer
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        snapshot: {}
+      required:
+      - changed_fields
+      - content_hash
+      - created_at
+      - editor
+      - restored_from_revision
+      - revision_number
+      - snapshot
+      - status
+    ContentRevisionList:
+      type: object
+      properties:
+        revision_number:
+          type: integer
+          readOnly: true
+        editor:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/CMSContentStatusEnum'
+          readOnly: true
+        changed_fields:
+          readOnly: true
+        content_hash:
+          type: string
+          readOnly: true
+        restored_from_revision:
+          type: integer
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - changed_fields
+      - content_hash
+      - created_at
+      - editor
+      - restored_from_revision
+      - revision_number
+      - status
+    ContentRevisionPage:
+      type: object
+      properties:
+        count:
+          type: integer
+        next:
+          type: string
+          format: uri
+          nullable: true
+        previous:
+          type: string
+          format: uri
+          nullable: true
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContentRevisionList'
+      required:
+      - count
+      - next
+      - previous
+      - results
     ContentRoleAssignmentInputRequest:
       type: object
       properties:
@@ -9653,6 +10179,11 @@ components:
           readOnly: true
           description: Schema version the blocks were written with, stored so future
             block-schema migrations can interpret and migrate stored payloads. Server-managed.
+        revision_number:
+          type: integer
+          readOnly: true
+          description: Monotonically increasing content revision used for optimistic
+            concurrency.
         created_by:
           type: integer
           readOnly: true
@@ -9696,6 +10227,7 @@ components:
       - published_at
       - review_comment
       - reviewed_by
+      - revision_number
       - site
       - status
       - submitted_by
@@ -10057,6 +10589,11 @@ components:
           readOnly: true
           description: Schema version the blocks were written with, stored so future
             block-schema migrations can interpret and migrate stored payloads. Server-managed.
+        revision_number:
+          type: integer
+          readOnly: true
+          description: Monotonically increasing content revision used for optimistic
+            concurrency.
         created_by:
           type: integer
           readOnly: true
@@ -10102,6 +10639,7 @@ components:
       - published_at
       - review_comment
       - reviewed_by
+      - revision_number
       - site
       - slug
       - status
@@ -10340,10 +10878,10 @@ components:
         and platform-admin role checks remain enforced.
 tags:
 - name: CMS
-  description: Platform pages; site scoping is not implemented.
+  description: Site-scoped page content primitives; public serving remains disabled.
 - name: CMS workflow
-  description: Site-scoped CMS role assignments and authenticated review/publishing
-    transitions.
+  description: Site-scoped roles, review/publishing workflow, immutable revision history
+    and safe restore.
 - name: Identity
   description: Keycloak identity and platform administration.
 - name: Organizations

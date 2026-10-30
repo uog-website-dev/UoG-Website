@@ -4,10 +4,8 @@ Every future content endpoint (Pages, Posts, …) serializes the fields defined
 here so the platform publishes one consistent content shape: identity and
 scope are server-managed, `locale` and `metadata` are the caller's editables.
 
-This story ships no content endpoints — shared primitives are deliberately
-*not* a generic, unrestricted content API. The serializer exists so the
-contract is reviewable, testable and reused instead of re-invented, and the
-OpenAPI snapshot therefore stays unchanged.
+These serializers are reused by the workflow API and history responses. CMS
+does not expose unrestricted content CRUD or public serving.
 """
 from django.core.exceptions import ValidationError as DjangoValidationError
 
@@ -51,14 +49,14 @@ class SiteContentSerializer(
         model = SiteContent
         fields = (
             "id", "site", "status", "locale", "published_at", "blocks",
-            "blocks_version", "created_by", "updated_by", "submitted_by",
+            "blocks_version", "revision_number", "created_by", "updated_by", "submitted_by",
             "reviewed_by", "review_comment", "metadata",
             "created_at", "updated_at",
         )
         read_only_fields = (
             "id", "site", "status", "published_at",
             "blocks_version", "created_by", "updated_by", "created_at",
-            "submitted_by", "reviewed_by", "review_comment", "updated_at",
+            "revision_number", "submitted_by", "reviewed_by", "review_comment", "updated_at",
         )
 
 
@@ -83,12 +81,13 @@ class PageSerializer(
             "id", "site", "parent", "locale", "title", "slug", "path",
             "layout", "seo", "visibility", "position", "is_homepage",
             "status", "published_at", "blocks", "blocks_version",
+            "revision_number",
             "created_by", "updated_by", "submitted_by", "reviewed_by",
             "review_comment", "metadata", "created_at", "updated_at",
         )
         read_only_fields = (
             "id", "site", "path", "is_homepage", "status", "published_at",
             "blocks_version", "created_by", "updated_by", "submitted_by",
-            "reviewed_by", "review_comment",
+            "revision_number", "reviewed_by", "review_comment",
             "created_at", "updated_at",
         )
