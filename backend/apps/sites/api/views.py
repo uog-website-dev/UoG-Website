@@ -5,6 +5,7 @@ from django.db.models import Q
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import mixins
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from apps.authorization.access import authorized_site_ids, authorized_organization_ids
@@ -265,6 +266,7 @@ class SiteModuleViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Admini
             return self.respond(serializer.save(), serializer_class=SiteModuleSerializer)
 
     def _switch(self, request, command):
+        """Flip the enablement; the on/off switch itself is never gated."""
         with translate_domain_errors():
             enablement = self.lock(request, self.get_queryset(), SiteModuleSerializer)
             EmptyObjectSerializer(data=request.data).is_valid(raise_exception=True)

@@ -11,6 +11,12 @@ CMS role on the Site named in the path. AUTHOR may create and edit; AUTHOR,
 REVIEWER and PUBLISHER may list and inspect. A validated `platform-admin`
 token role can perform all actions. Client-supplied roles are not accepted.
 
+Every authoring, workflow and revision route is also gated on the `PAGES`
+module being enabled for the Site. When it is disabled, those requests are
+refused with a field-level 400 (`module`) and public delivery returns the same
+404 as an unknown route; nothing is deleted, and re-enabling the module
+restores access to the same Pages.
+
 | Method and path | Contract |
 | --- | --- |
 | `GET /api/v1/sites/{site_pk}/pages/` | Filtered, paginated list scoped to one Site |

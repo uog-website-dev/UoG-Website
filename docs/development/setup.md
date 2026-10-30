@@ -211,6 +211,25 @@ cd backend && \
 > `--frozen-lockfile`, so `frontend/pnpm-lock.yaml` must be committed — a
 > lockfile that does not match the manifests fails the build.
 
+## First platform administrator
+
+No seeded role is assigned to anyone, and no Keycloak claim auto-promotes a user — every gated Admin Console page answers `403` for an account with no assignment. After the volumes exist, grant the development user the platform-wide role once:
+
+```bash
+docker compose exec -T backend python manage.py seed_rbac
+docker compose exec -T backend python manage.py shell -c "
+from django.contrib.auth import get_user_model
+from apps.authorization.models import Role, UserRoleAssignment
+user = get_user_model().objects.get(username='devuser')
+role = Role.objects.get(code='platform-administrator')
+UserRoleAssignment.objects.get_or_create(user=user, role=role, scope='PLATFORM', defaults={'assigned_by': user})
+print('granted', user.username, role.code)
+"
+docker compose restart backend frontend-admin
+```
+
+`down -v` deletes the database, so repeat this after a full reset. The same rule applies to anyone else: assign `platform-administrator` at `PLATFORM`, `organization-administrator` with an organization, or `site-administrator` with an organization and site. See [rbac.md](../architecture/rbac.md).
+
 ## Troubleshooting
 
 | Symptom | Fix |
@@ -221,7 +240,9 @@ cd backend && \
 | Keycloak "realm already exists" | Expected on restarts — import only runs when the realm is absent. |
 | Changed `package.json` but container ignores it | `docker compose up -d --build frontend-public frontend-admin` (image bakes the dependency layer). |
 | Edited a frontend file but the page still shows the old code | The Next.js dev server inside the container does not receive file-system events for edits made on the host (bind mount + inotify). Restart the container: `docker compose restart frontend-public` (or `frontend-admin`). |
+| `/admin/...` returns 404 (OAuth callback, `_next` assets) although the files are correct | The running nginx still has an older `platform.conf` in memory: the config is a bind mount, so editing it or switching branches does not reload the proxy. Run `docker compose exec nginx nginx -s reload` (or `docker compose restart nginx`). |
 | `/admin` ends in a redirect loop | nginx must keep the exact `location = /admin` rule next to `location /admin/` — Next.js answers `/admin/` with a redirect to `/admin`, which would bounce back and forth otherwise. |
 | Sign-in fails with "There is a problem with the server configuration" | The issuer Keycloak advertises must equal `KEYCLOAK_ISSUER`, and the server-side token/userinfo endpoints must be reachable from inside the container (see *Single sign-on* above). Check `docker compose logs frontend-public`. |
+| Admin console shows "You do not have permission to perform this action" with a `Reference:` id | The signed-in account has no role assignment, so every gated page is refused. Seed the catalog, then grant the first platform administrator (see *First platform administrator* above). The `Reference` id matches `request_id` on the `DENY` row in `AuthorizationAuditEvent`. |
 | Port already allocated | Override in `.env`: `NGINX_PORT`, `BACKEND_PORT`, `PUBLIC_WEB_PORT`, `ADMIN_WEB_PORT`, `KEYCLOAK_PORT`, `MINIO_PORT`, `POSTGRES_PORT`. |
 | Weird Windows line-ending errors in containers | `git config core.autocrlf false` once; `.gitattributes` enforces LF for scripts. |
