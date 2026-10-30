@@ -8,11 +8,15 @@ only when ``celery`` is available at runtime.
 """
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Celery's CLI does not run manage.py, which normally selects Django settings.
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 
 
 def _celery_app():
@@ -39,6 +43,12 @@ def _celery_app():
     )
     app.config_from_object("django.conf:settings", namespace="CELERY")
     app.autodiscover_tasks()
+    app.conf.beat_schedule = {
+        "core-heartbeat-every-minute": {
+            "task": "core.scheduled_heartbeat",
+            "schedule": 60.0,
+        },
+    }
     return app
 
 

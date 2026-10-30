@@ -19,6 +19,9 @@ class Capability:
 
 
 CAPABILITIES = (
+    Capability("menu.read", "Read menus", "Inspect menus and menu items within assigned Site scope.", "content", "menu", "read"),
+    Capability("menu.write", "Write menus", "Create draft menus and edit menu structures within assigned Site scope.", "content", "menu", "write", "HIGH", False),
+    Capability("menu.publish", "Publish menus", "Activate/deactivate menus and authorize edits to active menu structures.", "content", "menu", "publish", "HIGH", False),
     Capability("platform.dashboard.view", "View platform dashboard", "Read platform aggregate overview.", "platform", "dashboard", "view", "HIGH", False),
     Capability("platform.sites.manage_registry", "Manage global site registry", "Manage global site templates and module capabilities.", "sites", "registry", "manage", "CRITICAL", False),
     Capability("platform.organizations.view", "View organizations", "Read OrganizationUnit administration records.", "organizations", "organization", "view"),
@@ -45,8 +48,8 @@ CAPABILITIES = (
     Capability("content.posts.submit_review", "Submit posts for review", "Submit a post for review. Not executable: no posts workflow exists.", "content", "post", "submit_review", "HIGH", False),
     Capability("content.posts.approve", "Approve posts", "Approve posts. Not executable: no posts workflow exists.", "content", "post", "approve", "HIGH", False),
     Capability("content.posts.publish", "Publish posts", "Publish posts. Not executable: no posts model or endpoint exists.", "content", "post", "publish", "HIGH", False),
-    Capability("content.menus.view", "View menus", "Read menus. Not executable: no menus model or endpoint exists.", "content", "menu", "view"),
-    Capability("content.menus.manage", "Manage menus", "Manage menus. Not executable: no menus model or endpoint exists.", "content", "menu", "manage", "HIGH", False),
+    Capability("content.menus.view", "View menus", "Legacy catalog record. Menu APIs require menu.read; this code is not an alias.", "content", "menu", "view"),
+    Capability("content.menus.manage", "Manage menus", "Legacy catalog record. Menu APIs require menu.write/menu.publish; this code is not an alias.", "content", "menu", "manage", "HIGH", False),
     Capability("content.media.view", "View media", "Read media. Not executable: no media API exists.", "content", "media", "view"),
     Capability("content.media.upload", "Upload media", "Upload media. Not executable: no media API exists.", "content", "media", "upload", "HIGH", False),
     Capability("content.media.delete", "Delete media", "Delete media. Not executable: no media API exists.", "content", "media", "delete", "HIGH", False),
@@ -59,6 +62,8 @@ CAPABILITIES = (
 CAPABILITY_CODES = frozenset(item.code for item in CAPABILITIES)
 
 PLATFORM_ADMIN = frozenset({
+    "menu.read", "menu.write", "menu.publish",
+    "content.menus.view", "content.menus.manage",
     "platform.dashboard.view", "platform.sites.manage_registry",
     "platform.organizations.view", "platform.organizations.create", "platform.organizations.update",
     "platform.users.view", "platform.users.assign_roles", "platform.roles.view", "platform.roles.create",
@@ -67,22 +72,30 @@ PLATFORM_ADMIN = frozenset({
     "audit.logs.view", "audit.logs.export",
 })
 ORG_ADMIN = frozenset({
+    "menu.read", "menu.write", "menu.publish",
+    "content.menus.view", "content.menus.manage",
     "platform.dashboard.view", "platform.organizations.view", "platform.organizations.update",
     "platform.users.view", "platform.users.assign_roles", "platform.roles.view", "sites.view", "sites.create", "sites.update",
     "content.pages.view", "content.pages.create", "content.pages.update",
     "content.pages.delete", "content.pages.publish",
 })
 SITE_ADMIN = frozenset({
+    "menu.read", "menu.write", "menu.publish",
+    "content.menus.view", "content.menus.manage",
     "platform.dashboard.view", "platform.users.view", "platform.users.assign_roles", "sites.view", "sites.update",
     "content.pages.view", "content.pages.create", "content.pages.update",
     "content.pages.delete", "content.pages.publish",
 })
 EDITOR = frozenset({
+    "menu.read", "menu.write",
+    "content.menus.view",
     "content.pages.view", "content.pages.create", "content.pages.update",
 })
-REVIEWER = frozenset({"content.pages.view"})
-PUBLISHER = frozenset({"content.pages.view", "content.pages.publish"})
+REVIEWER = frozenset({"content.pages.view", "menu.read"})
+PUBLISHER = frozenset({"content.pages.view", "content.pages.publish", "menu.read", "menu.publish"})
 VIEWER = frozenset({
+    "menu.read",
+    "content.menus.view",
     "platform.dashboard.view", "platform.organizations.view", "platform.users.view", "platform.roles.view",
     "sites.view", "content.pages.view",
 })

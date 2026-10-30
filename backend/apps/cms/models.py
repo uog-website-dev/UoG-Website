@@ -1042,3 +1042,6 @@ class SitePublicationVersion(models.Model):
                 name="cms_pub_version_locale_format",
             ),
         ]
+
+
+from apps.cms.menu_models import Menu, MenuDeliveryVersion, MenuInheritance, MenuItem  # noqa: E402,F401

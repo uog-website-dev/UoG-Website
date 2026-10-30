@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Container from "@mui/material/Container";
 import { UogFooter, UogHeader, UogThemeProvider } from "@uog/ui";
 
+import { PublicMenus } from "@/public-menus";
+
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -18,10 +20,12 @@ export default function RootLayout({
       <body>
         <UogThemeProvider>
           <UogHeader title="Digital Platform — Public Website" />
-          <Container maxWidth="lg" sx={{ py: 4, display: "flex", flexDirection: "column", minHeight: "70vh" }}>
-            {children}
-          </Container>
-          <UogFooter />
+          <PublicMenus>
+            <Container maxWidth="lg" sx={{ py: 4, display: "flex", flexDirection: "column", minHeight: "70vh" }}>
+              {children}
+            </Container>
+          </PublicMenus>
+          <UogFooter apiBaseUrl={undefined} />
         </UogThemeProvider>
       </body>
     </html>

@@ -8,8 +8,7 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
-from apps.authorization.access import authorized_site_ids, authorized_organization_ids, reject_disabled_module
-from apps.sites.selectors.modules import module_is_usable
+from apps.authorization.access import authorized_site_ids, authorized_organization_ids
 from apps.organizations.hierarchy_lock import hierarchy_write
 
 from ..models import Module, Site, SiteDomain, SiteModule, SiteTemplate
@@ -254,17 +253,14 @@ class SiteModuleViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Admini
             module = serializer.validated_data["module"]
             if SiteModule.objects.filter(site=site, module=module).exists():
                 raise Conflict({"module": ["This Site already has this module."]})
-            # Enabling needs a shipped implementation, not an existing enablement.
-            if not module_is_usable(module):
-                raise ValidationError({"module": ["This module is not yet implemented and cannot be used."]})
+            # Enabling validates the shipped/global capability in the service.
+            # A per-Site enabled check here would prevent first-time enablement.
             enablement = enable_module_for_site(site.pk, module.pk, configuration=serializer.validated_data.get("configuration"))
         return self.respond(enablement, serializer_class=SiteModuleSerializer, status=201, location=reverse("sites:sitemodule-detail", args=[site.pk, enablement.pk]))
 
     def partial_update(self, request, *args, **kwargs):
         with translate_domain_errors():
             enablement = self.lock(request, self.get_queryset(), SiteModuleSerializer)
-            # Authoritative backend gate: reject if module is disabled or unimplemented
-            reject_disabled_module(enablement.site_id, enablement.module.code, request=request)
             serializer = self.get_serializer(enablement, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
             return self.respond(serializer.save(), serializer_class=SiteModuleSerializer)

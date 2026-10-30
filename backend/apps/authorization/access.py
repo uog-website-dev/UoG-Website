@@ -141,8 +141,8 @@ def module_is_enabled_for_site(site_id, module_code, *, using=None):
     return module_is_available(site_id, module_code, using=using)
 
 
-def reject_disabled_module(site_id, module_code, *, request=None):
-    """Reject an action unless the module is implemented and enabled for the Site.
+def reject_disabled_module(site_id, module_code, *, request=None, using="default"):
+    """Return a 403/409 response if the module is disabled or unimplemented for the site.
 
     This is the authoritative backend gate: if the module row is missing or the
     Site has not enabled it, `enabled_modules_for_site()` returns nothing and the

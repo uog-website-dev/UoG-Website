@@ -69,6 +69,17 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
         "/api/v1/sites/{site_pk}/pages/",
         "/api/v1/sites/{site_pk}/pages/{id}/",
         "/api/v1/sites/{site_pk}/pages/{id}/workflow/",
+        "/api/v1/sites/{site_pk}/menus/",
+        "/api/v1/sites/{site_pk}/menus/{id}/",
+        "/api/v1/sites/{site_pk}/menus/{id}/activate/",
+        "/api/v1/sites/{site_pk}/menus/{id}/deactivate/",
+        "/api/v1/sites/{site_pk}/menus/{id}/reorder/",
+        "/api/v1/sites/{site_pk}/menus/{id}/tree/",
+        "/api/v1/sites/{site_pk}/menus/{menu_pk}/items/",
+        "/api/v1/sites/{site_pk}/menus/{menu_pk}/items/{id}/",
+        "/api/v1/sites/{site_pk}/menus/{menu_pk}/items/{id}/move/",
+        "/api/v1/sites/{site_pk}/menu-inheritance/",
+        "/api/v1/sites/{site_pk}/menu-inheritance/{location}/",
         "/api/v1/sites/{site_pk}/modules/", "/api/v1/sites/{site_pk}/modules/{id}/",
         "/api/v1/sites/{site_pk}/modules/{id}/enable/",
         "/api/v1/sites/{site_pk}/modules/{id}/disable/",
@@ -84,6 +95,7 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
         "/api/v1/site-context/pages/",
         "/api/v1/site-context/homepage/",
         "/api/v1/site-context/pages/{page_path}/",
+        "/api/v1/site-context/menus/",
     }
     assert paths["/api/me/"]["get"]["security"] == [{"keycloakBearer": []}]
     assert not paths["/api/pages/"]["get"].get("security", [])

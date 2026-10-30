@@ -10,6 +10,11 @@ pytestmark = pytest.mark.django_db
 BASE = "/api/v1/cms/sites/"
 
 
+@pytest.fixture
+def platform_admin(cms_platform_admin):
+    return cms_platform_admin
+
+
 def _url(site, content, suffix="revisions/"):
     return f"{BASE}{site.pk}/content/{content.pk}/{suffix}"
 

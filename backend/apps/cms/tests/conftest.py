@@ -89,44 +89,17 @@ def owner(sites):
 
 
 @pytest.fixture
-def pages_module(sites):
-    """Enable the shipped PAGES capability on both fixture Sites.
-
-    Page management is module-gated, so every authoring, workflow and revision
-    test needs the capability on before it can reach the view.
-    """
-    from apps.sites.models import Module
-    from apps.sites.services.modules import enable_module_for_site
-
-    module = Module.objects.get(code="PAGES")
-    if not module.is_enabled:
-        module.is_enabled = True
-        module.save(update_fields=("is_enabled",))
-    for site in sites:
-        enable_module_for_site(site.pk, module.pk)
-    return module
-
-
-@pytest.fixture
-def platform_admin(client, oidc):
-    """A client whose token identity holds a real platform-wide role grant.
-
-    Authorization comes from the database assignment, never from the token's
-    realm roles, so the grant is seeded here rather than assumed from a claim.
-    """
+def cms_platform_admin(client, oidc):
+    """An authenticated identity plus the explicit platform DB assignment."""
     from django.contrib.auth import get_user_model
     from django.core.management import call_command
-
     from apps.authorization.models import Role, UserRoleAssignment
 
     client.defaults.update(oidc.header())
     assert client.get("/api/me/").status_code == 200
     call_command("seed_rbac", verbosity=0)
     user = get_user_model().objects.get(username="devuser")
-    UserRoleAssignment.objects.get_or_create(
-        user=user,
-        role=Role.objects.get(code="platform-administrator"),
-        scope=UserRoleAssignment.Scope.PLATFORM,
-        defaults={"assigned_by": user},
+    UserRoleAssignment.objects.create(
+        user=user, role=Role.objects.get(code="platform-administrator"), scope="PLATFORM",
     )
     return client
