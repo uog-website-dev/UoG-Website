@@ -1,6 +1,6 @@
 """Site-scoped API for CMS role assignments and content workflow actions."""
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError as DomainValidationError
+from django.core.exceptions import PermissionDenied, ValidationError as DomainValidationError
 from django.db import IntegrityError, transaction
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import OpenApiParameter, PolymorphicProxySerializer, extend_schema
@@ -20,6 +20,7 @@ from ..models import (
     SiteContent,
     SiteContentRoleAssignment,
 )
+from ..services.pages import require_pages_module
 from ..services.workflow import transition_content
 from .serializers import PageSerializer, SiteContentSerializer
 
@@ -179,6 +180,22 @@ class ContentWorkflowActionView(APIView):
         roles = getattr(claims, "roles", ())
         if not isinstance(roles, (tuple, list, set, frozenset)):
             roles = ()
+        if "platform-admin" not in set(roles) and not SiteContentRoleAssignment.objects.filter(
+            site_id=site.pk, user_id=request.user.pk, user__is_active=True,
+        ).exists():
+            raise PermissionDenied("A CMS role assigned to this Site is required.")
+        if Page.objects.filter(pk=content.pk).exists():
+            try:
+                require_pages_module(site.pk)
+            except DomainValidationError as error:
+                fields = (
+                    error.message_dict if hasattr(error, "message_dict")
+                    else {"module": error.messages}
+                )
+                raise serializers.ValidationError({
+                    "reason": "module_disabled",
+                    "fields": fields,
+                }) from error
         try:
             transitioned = transition_content(
                 content.pk,

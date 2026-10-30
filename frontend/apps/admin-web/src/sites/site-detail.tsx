@@ -63,6 +63,7 @@ import type { ApiErrorPayload } from "@/organizations/contract";
 import { configurationRows, originCaption } from "@/sites/configuration";
 import { SiteDomainsPanel } from "@/sites/site-domains-panel";
 import { SiteMenusPanel } from "@/sites/site-menus";
+import { SitePagesPanel } from "@/sites/site-pages";
 import { ownerInfoFor, relationLabel } from "@/sites/owner";
 import { siteStatusChip, siteStatusLabel } from "@/sites/validation";
 
@@ -286,6 +287,12 @@ export function SiteDetail({ site, error }: SiteDetailProps) {
       ? null
       : menusModuleId != null &&
         (assignments.data?.results ?? []).some((row) => row.module === menusModuleId && row.is_enabled);
+  const pagesModuleId = registry.data?.results.find((entry) => entry.code === "PAGES")?.id ?? null;
+  const pagesEnabled =
+    assignments.loading || registry.loading
+      ? null
+      : pagesModuleId != null &&
+        (assignments.data?.results ?? []).some((row) => row.module === pagesModuleId && row.is_enabled);
   const baselineLabel =
     template ? `template ${template.code}` : "the platform defaults";
   const showOrigins = site.template === null || baseline === "ready";
@@ -677,6 +684,7 @@ export function SiteDetail({ site, error }: SiteDetailProps) {
       />
 
       <SiteMenusPanel siteId={site.id} menusEnabled={menusEnabled} />
+      <SitePagesPanel siteId={site.id} pagesEnabled={pagesEnabled} />
 
       {/* Per-site module enablement, honest about planned capabilities. */}
       <Paper variant="outlined" sx={{ overflow: "hidden", borderRadius: 3 }}>

@@ -126,9 +126,10 @@ PUBLISHED revision or publication snapshot cannot be deleted.
 
 The backend has validated global Keycloak realm/client roles and persisted
 Site-scoped AUTHOR, REVIEWER and PUBLISHER assignments. Only a validated
-platform-admin token may manage assignments. The content module registry
-remains PLANNED, so these authorized workflow/history administration routes do
-not enable public content serving or bypass module gates.
+platform-admin token may manage assignments. Page workflow actions on these routes also require the PAGES module to be
+available for that Site. A disabled module returns `400` with
+`details.reason` `module_disabled` and leaves the Page row in place. Public
+delivery stays closed. The routes do not bypass that gate.
 
 ## Verification
 

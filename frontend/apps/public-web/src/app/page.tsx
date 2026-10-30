@@ -4,8 +4,8 @@
  * Public home page.
  *
  * Demonstrates the full development wiring: the browser calls the Django
- * REST API through nginx (`/api`) using the shared typed api-client, and
- * renders results with the shared UoG theme components.
+ * REST API through nginx (`/api`) and renders the host-resolved published
+ * homepage. Draft, rejected and unpublished Pages are not shown.
  *
  * The browser's Host header is preserved by nginx (`proxy_set_header Host
  * $host`), so `GET /api/v1/site-context/` reports exactly which Site the
@@ -23,13 +23,13 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
-import Divider from "@mui/material/Divider";
-import Grid from "@mui/material/Grid2";
 import Typography from "@mui/material/Typography";
 import { ApiError, createApiClient } from "@uog/api-client";
-import type { HealthReport, Page } from "@uog/types";
+import { pageFromResponse, PublicPageView } from "@uog/ui";
+import type { PublicPageDocument } from "@uog/ui";
+import type { HealthReport } from "@uog/types";
 
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api";
+const PUBLIC_HOMEPAGE_PATH = "/api/v1/site-context/homepage/";
 
 /** Shape of `GET /api/v1/site-context/` (see apps/sites/api/context.py). */
 interface SiteContext {
@@ -48,7 +48,8 @@ interface SiteContext {
 }
 
 export default function HomePage() {
-  const [pages, setPages] = useState<Page[] | null>(null);
+  const [homepage, setHomepage] = useState<PublicPageDocument | null>(null);
+  const [homepageReady, setHomepageReady] = useState(false);
   const [health, setHealth] = useState<HealthReport | null>(null);
   const [siteContext, setSiteContext] = useState<SiteContext | null>(null);
   const [contextError, setContextError] = useState<string | null>(null);
@@ -56,13 +57,17 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const api = createApiClient({ baseUrl: apiBaseUrl });
     // Health lives at the backend root, not under /api.
     const healthApi = createApiClient({ baseUrl: "" });
     // Site routing context: resolved from the browser's Host header.
     const contextApi = createApiClient({ baseUrl: "/api/v1" });
     Promise.all([
-      api.get<{ results: Page[] }>("/pages/"),
+      fetch(PUBLIC_HOMEPAGE_PATH, { headers: { Accept: "application/json" }, cache: "no-store" })
+        .then(async (response) => {
+          const body = response.ok ? await response.json().catch(() => null) : null;
+          return pageFromResponse(response.status, body);
+        })
+        .catch(() => null),
       healthApi.get<HealthReport>("/health/ready"),
       contextApi.get<SiteContext>("/site-context/").catch((err: unknown) => {
         // Routing context is auxiliary to the page demo; state the failure
@@ -75,8 +80,9 @@ export default function HomePage() {
         return null;
       }),
     ])
-      .then(([pagesRes, healthRes, contextRes]) => {
-        setPages(pagesRes.results);
+      .then(([homepageRes, healthRes, contextRes]) => {
+        setHomepage(homepageRes);
+        setHomepageReady(true);
         setHealth(healthRes);
         setSiteContext(contextRes);
       })
@@ -193,28 +199,7 @@ export default function HomePage() {
         </Alert>
       )}
 
-      {pages && (
-        <Grid container spacing={2}>
-          {pages.length === 0 && (
-            <Grid>
-              <Typography>No published pages yet — add some in the Django admin.</Typography>
-            </Grid>
-          )}
-          {pages.map((page) => (
-            <Grid key={page.id} size={{ xs: 12, md: 6 }}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6">{page.title}</Typography>
-                  <Divider sx={{ my: 1 }} />
-                  <Typography variant="body2" color="text.secondary">
-                    /{page.slug} · updated {new Date(page.updated_at).toLocaleString()}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      )}
+      {homepageReady ? <PublicPageView page={homepage} /> : null}
     </Box>
   );
 }

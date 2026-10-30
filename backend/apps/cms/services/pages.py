@@ -5,9 +5,10 @@ change (or a homepage swap that cleared the old flag but failed to set the
 new one) can never be observed. Authorship is taken from the caller — the
 authenticated principal — never from a request body.
 """
+from django.core.exceptions import ValidationError
 from django.db import transaction
 
-from ..models import Page, PageRedirect, Visibility
+from ..models import ContentStatus, Page, PageRedirect, Visibility
 
 _UNCHANGED = object()
 
@@ -80,9 +81,20 @@ def change_route(page, *, slug=_UNCHANGED, parent=_UNCHANGED, actor=None):
         return page
 
 
+def require_pages_module(site_id, *, using="default"):
+    """Refuse a management write when PAGES is off. Callers do not delete the row."""
+    from apps.sites.selectors.modules import module_is_available
+    if not module_is_available(site_id, "PAGES", using=using):
+        raise ValidationError({"module": "The PAGES module is not enabled for this Site."})
+
+
 def set_as_homepage(page, *, actor=None):
     """Designate this page as the Site's homepage, replacing any previous
     one atomically: either the swap happens entirely or neither flag moved."""
+    if page.status not in {ContentStatus.DRAFT, ContentStatus.UNPUBLISHED}:
+        raise ValidationError({
+            "status": "Set the homepage while the Page is draft or unpublished.",
+        })
     with transaction.atomic():
         previous_homepages = Page.objects.filter(
             site_id=page.site_id, is_homepage=True,

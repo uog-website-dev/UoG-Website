@@ -3,6 +3,8 @@ export { UogThemeProvider } from "./UogThemeProvider";
 export { UogHeader, UogFooter } from "./UogShell";
 export { SiteNavigation, PublicMenuFrame, safeMenuHref, menusFromResponse } from "./site-navigation";
 export type { PublicMenuNode } from "./site-navigation";
+export { PublicPageView, pageFromResponse, paragraphParts } from "./public-page";
+export type { PublicBlock, PublicPageDocument } from "./public-page";
 
 // Shared admin-screen building blocks.
 export { LoadingState, EmptyState, ApiErrorState } from "./async-states";

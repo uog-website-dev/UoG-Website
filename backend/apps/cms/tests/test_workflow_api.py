@@ -97,10 +97,22 @@ def test_platform_admin_manages_roles_with_site_scoping_and_strict_input(
     assert not SiteContentRoleAssignment.objects.filter(pk=assignment_id).exists()
 
 
+def _enable_pages(site):
+    from apps.sites.models import Module
+    from apps.sites.services.modules import enable_module_for_site
+
+    module = Module.objects.get(code="PAGES")
+    if not module.is_enabled:
+        module.is_enabled = True
+        module.save(update_fields=("is_enabled",))
+    enable_module_for_site(site.pk, module.pk)
+
+
 def test_site_role_workflow_uses_validated_token_and_never_body_roles(
     client, oidc, sites, cms_platform_admin,
 ):
     site, other_site = sites
+    _enable_pages(site)
     platform_admin = cms_platform_admin
     author = get_user_model().objects.get(username="devuser")
     role_response = platform_admin.post(
@@ -156,6 +168,7 @@ def test_site_role_workflow_uses_validated_token_and_never_body_roles(
 
 def test_http_review_publish_flow_and_publish_retry(platform_admin, oidc, sites):
     site, _ = sites
+    _enable_pages(site)
     platform_admin.get("/api/me/")
     author = get_user_model().objects.get(username="devuser")
     identities = {}
