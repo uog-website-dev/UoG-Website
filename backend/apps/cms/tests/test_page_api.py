@@ -39,13 +39,18 @@ def _token(oidc, subject, username, roles=("platform-viewer",)):
     )
 
 
-def _enable_public_pages(sites):
+def _enable_pages_module(sites):
     module = Module.objects.get(code="PAGES")
     if not module.is_enabled:
         module.is_enabled = True
         module.save(update_fields=("is_enabled",))
     for site in sites:
         enable_module_for_site(site.pk, module.pk)
+
+
+def _enable_public_pages(sites):
+    _enable_pages_module(sites)
+    for site in sites:
         activate_site(site.pk)
         SiteDomain.objects.create(
             site=site,
@@ -84,6 +89,7 @@ def test_admin_pages_are_site_scoped_filterable_and_conditionally_updated(
     client, oidc, pages_module, sites,
 ):
     site, other_site = sites
+    _enable_pages_module((site,))
     client.defaults.update(oidc.header())
     client.get("/api/me/")
     page_url = ADMIN_PAGES.format(site_id=site.pk)
@@ -161,6 +167,7 @@ def test_page_authoring_requires_an_active_site_author_role(
     client, oidc, pages_module, sites,
 ):
     site, _ = sites
+    _enable_pages_module((site,))
     outsider = get_user_model().objects.create_user(username="pages-outsider")
     denied = client.post(
         ADMIN_PAGES.format(site_id=site.pk),
@@ -376,3 +383,121 @@ def test_public_delivery_is_closed_when_the_pages_module_is_not_enabled(
         HTTP_HOST=f"disabled-{site.pk}.uog.edu.et",
     )
     assert response.status_code == 404
+
+
+def test_disabling_pages_blocks_management_without_deleting_the_page(
+    client, oidc, settings, sites,
+):
+    settings.ALLOWED_HOSTS = ["*"]
+    site, other_site = sites
+    _enable_public_pages((site,))
+    client.defaults.update(oidc.header())
+    client.get("/api/me/")
+    page_url = ADMIN_PAGES.format(site_id=site.pk)
+    created = client.post(
+        page_url,
+        {
+            "title": "Admissions",
+            "slug": "admissions",
+            "blocks": [{
+                "type": "paragraph",
+                "html": "<p>Open<script>alert(1)</script></p>",
+            }],
+        },
+        content_type="application/json",
+    )
+    assert created.status_code == 201, created.content
+    page_id = created.json()["id"]
+    assert "<script" not in created.json()["blocks"][0]["html"]
+    module = Module.objects.get(code="PAGES")
+    from apps.sites.services.modules import disable_module_for_site
+    disable_module_for_site(site.pk, module.pk)
+
+    listed = client.get(page_url)
+    assert listed.status_code == 200
+    assert listed.json()["results"][0]["id"] == page_id
+    blocked = client.post(
+        page_url,
+        {"title": "Another", "slug": "another"},
+        content_type="application/json",
+    )
+    assert blocked.status_code == 400
+    assert blocked.json()["error"]["details"]["reason"] == "module_disabled"
+    etag = client.get(f"{page_url}{page_id}/")["ETag"]
+    edited = client.patch(
+        f"{page_url}{page_id}/",
+        {"title": "Changed"},
+        content_type="application/json",
+        HTTP_IF_MATCH=etag,
+    )
+    assert edited.status_code == 400
+    assert edited.json()["error"]["details"]["reason"] == "module_disabled"
+    submitted = client.post(
+        f"{page_url}{page_id}/workflow/",
+        {"action": "submit"},
+        content_type="application/json",
+    )
+    assert submitted.status_code == 400
+    assert submitted.json()["error"]["details"]["reason"] == "module_disabled"
+    assert Page.objects.get(pk=page_id).title == "Admissions"
+    assert client.get(
+        PUBLIC_PAGES, HTTP_HOST=f"site-{site.pk}.uog.edu.et",
+    ).status_code == 404
+    assert Page.objects.filter(pk=page_id).exists()
+    assert not Page.objects.filter(site=other_site, slug="another").exists()
+
+
+def test_homepage_assignment_publish_and_rejection_stay_on_one_site(
+    client, oidc, settings, sites,
+):
+    settings.ALLOWED_HOSTS = ["*"]
+    site, other_site = sites
+    _enable_public_pages((site, other_site))
+    client.defaults.update(oidc.header())
+    client.get("/api/me/")
+    page_url = ADMIN_PAGES.format(site_id=site.pk)
+    created = client.post(
+        page_url,
+        {"title": "Welcome", "slug": "welcome"},
+        content_type="application/json",
+    )
+    assert created.status_code == 201, created.content
+    page_id = created.json()["id"]
+    homepage = client.post(f"{page_url}{page_id}/homepage/")
+    assert homepage.status_code == 200, homepage.content
+    assert homepage.json()["is_homepage"] is True
+    assert client.post(
+        f"{ADMIN_PAGES.format(site_id=other_site.pk)}{page_id}/homepage/",
+    ).status_code == 404
+
+    submitted = client.post(
+        f"{page_url}{page_id}/workflow/",
+        {"action": "submit"},
+        content_type="application/json",
+    )
+    assert submitted.status_code == 200
+    reviewer = get_user_model().objects.create_user(username="homepage-reviewer")
+    rejected = client.post(
+        f"{page_url}{page_id}/workflow/",
+        {"action": "reject", "comment": "Needs a clearer title."},
+        content_type="application/json",
+    )
+    assert rejected.status_code == 403
+    SiteContentRoleAssignment.objects.create(
+        site=site, user=reviewer, role=ContentRole.REVIEWER,
+    )
+    rejected = client.post(
+        f"{page_url}{page_id}/workflow/",
+        {"action": "reject", "comment": "Needs a clearer title."},
+        content_type="application/json",
+        **_token(oidc, "5f1b2c3d-0000-4000-8000-000000000044", reviewer.username),
+    )
+    assert rejected.status_code == 200, rejected.content
+    assert rejected.json()["status"] == ContentStatus.DRAFT
+    host = f"site-{site.pk}.uog.edu.et"
+    assert client.get(
+        "/api/v1/site-context/homepage/", HTTP_HOST=host,
+    ).status_code == 404
+    assert client.get(
+        f"{PUBLIC_PAGES}welcome/", HTTP_HOST=host,
+    ).status_code == 404

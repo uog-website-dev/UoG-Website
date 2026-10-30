@@ -24,6 +24,13 @@ restores access to the same Pages.
 | `GET /api/v1/sites/{site_pk}/pages/{id}/` | Read a Site-owned Page and its current ETag |
 | `PATCH /api/v1/sites/{site_pk}/pages/{id}/` | Update a DRAFT or UNPUBLISHED Page; requires `If-Match` |
 | `POST /api/v1/sites/{site_pk}/pages/{id}/workflow/` | Apply a validated workflow action |
+| `POST /api/v1/sites/{site_pk}/pages/{id}/homepage/` | Make a draft or unpublished Page this Site's homepage |
+
+Create, edit, workflow and homepage assignment require PAGES to be
+implemented, globally enabled and enabled for that Site. When it is off,
+those writes return `400` with `details.reason` `module_disabled`. List and
+detail still return the existing rows. Public delivery returns the same 404
+as an unknown Page. Nothing is deleted.
 
 List filters are `search`, `status`, `visibility`, `locale`, `parent` and
 `ordering`. `page` and `page_size` pagination defaults to 20 and is capped at

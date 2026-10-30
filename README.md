@@ -262,6 +262,7 @@ uog-digital-platform/
 * [Menu administration API, permissions and concurrency](docs/development/menu-api.md)
 * [Public menu delivery and inheritance](docs/development/menu-delivery.md)
 * [Site navigation editor and public menu](docs/development/menu-navigation.md)
+* [Page authoring, review and public delivery](docs/development/page-verification.md)
 * [Architecture overview](docs/architecture/overview.md)
 * [Version matrix](docs/architecture/version-matrix.md)
 * [Development guide & troubleshooting](docs/development/setup.md)

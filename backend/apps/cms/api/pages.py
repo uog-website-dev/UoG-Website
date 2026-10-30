@@ -25,7 +25,7 @@ from ..models import (
     Page,
     SiteContentRoleAssignment,
 )
-from ..services.pages import change_route
+from ..services.pages import change_route, require_pages_module, set_as_homepage
 from ..services.workflow import transition_content
 from .serializers import PageSerializer
 from .workflow import WorkflowActionInput
@@ -219,6 +219,7 @@ class SitePageViewSet(
     def create(self, request, *args, **kwargs):
         site = self._site()
         self._authorize(site, (ContentRole.AUTHOR,))
+        ensure_pages_module_enabled(site.pk)
         serializer = self.get_serializer(
             data=request.data,
             context={**self.get_serializer_context(), "site": site},
@@ -254,6 +255,7 @@ class SitePageViewSet(
         supplied = request.headers.get("If-Match")
         if not supplied:
             raise PreconditionRequired()
+        ensure_pages_module_enabled(site.pk)
         try:
             with transaction.atomic():
                 page = get_object_or_404(
@@ -303,6 +305,7 @@ class SitePageViewSet(
     @action(detail=True, methods=["post"], url_path="workflow")
     def workflow(self, request, *args, **kwargs):
         site, page = self._page()
+        ensure_pages_module_enabled(site.pk)
         payload = WorkflowActionInput(data=request.data)
         payload.is_valid(raise_exception=True)
         try:
@@ -324,6 +327,38 @@ class SitePageViewSet(
         )
         return self._response(page)
 
+    @extend_schema(
+        tags=["CMS pages"],
+        parameters=[SITE_PARAMETER, PAGE_PARAMETER],
+        request=None,
+        responses=PageSerializer,
+        description=(
+            "Make this draft or unpublished Page the Site homepage. Any "
+            "previous homepage on this Site is cleared in the same "
+            "transaction. Requires Site AUTHOR or platform-admin and an "
+            "enabled PAGES module. The row is not deleted when the module "
+            "is off."
+        ),
+    )
+    @action(detail=True, methods=["post"], url_path="homepage")
+    def homepage(self, request, *args, **kwargs):
+        site, page = self._page()
+        self._authorize(site, (ContentRole.AUTHOR,))
+        ensure_pages_module_enabled(site.pk)
+        try:
+            with transaction.atomic():
+                page = set_as_homepage(page, actor=request.user)
+        except DomainValidationError as error:
+            detail = (
+                error.message_dict if hasattr(error, "message_dict")
+                else {"non_field_errors": error.messages}
+            )
+            raise serializers.ValidationError(detail) from error
+        page = get_object_or_404(
+            Page.objects.filter(site_id=site.pk), pk=page.pk,
+        )
+        return self._response(page)
+
     def _response(self, page, *, status_code=200):
         response = Response(
             PageSerializer(page).data,
@@ -335,3 +370,18 @@ class SitePageViewSet(
 
 def page_etag(page):
     return f'"cms-content-{page.pk}-r{page.revision_number}"'
+
+
+def ensure_pages_module_enabled(site_id):
+    """Map a disabled PAGES module to the shared validation envelope."""
+    try:
+        require_pages_module(site_id)
+    except DomainValidationError as error:
+        fields = (
+            error.message_dict if hasattr(error, "message_dict")
+            else {"module": error.messages}
+        )
+        raise serializers.ValidationError({
+            "reason": "module_disabled",
+            "fields": fields,
+        }) from error

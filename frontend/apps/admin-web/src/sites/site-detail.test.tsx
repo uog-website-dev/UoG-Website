@@ -42,6 +42,14 @@ vi.mock("@/app/sites/menu-actions", () => ({
   setMenuActive: vi.fn(),
 }));
 
+vi.mock("@/app/sites/page-actions", () => ({
+  loadSitePages: vi.fn(async () => ({ ok: true, data: [] })),
+  createSitePage: vi.fn(),
+  updateSitePage: vi.fn(),
+  transitionSitePage: vi.fn(),
+  setSiteHomepage: vi.fn(),
+}));
+
 vi.mock("@/app/organizations/actions", () => ({
   getOrganizationTree: (...args: unknown[]) => getOrganizationTree(...args),
 }));
