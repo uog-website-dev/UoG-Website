@@ -17,6 +17,7 @@ urlpatterns = [
     path("api/", include("apps.accounts.urls")),
     path("api/v1/organizations/", include("apps.organizations.api.urls")),
     path("api/v1/sites/", include("apps.sites.api.urls")),
+    path("api/v1/cms/sites/", include("apps.cms.api.urls")),
     path("api/v1/site-context/", include("apps.sites.api.context_urls")),
     path("api/v1/site-templates/", include("apps.sites.api.template_urls")),
     path("api/v1/modules/", include("apps.sites.api.module_urls")),

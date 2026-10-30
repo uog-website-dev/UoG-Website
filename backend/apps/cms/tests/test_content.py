@@ -51,28 +51,16 @@ def test_content_cannot_move_between_sites(sites):
     assert content.site_id == first.pk
 
 
-def test_status_transitions_follow_the_lifecycle(sites):
+def test_status_changes_must_use_the_workflow_service(sites):
     site, _ = sites
     content = SiteContent(site=site)
     content.save()
     content.status = "PUBLISHED"
-    content.save()
-    assert content.published_at is not None
-    first_publish = content.published_at
-    content.save()  # same-state save is allowed
-    content.status = "DRAFT"
-    content.save()
-    assert content.published_at == first_publish  # history is never erased
-    content.status = "PUBLISHED"
-    content.save()
-    content.status = "ARCHIVED"
-    content.save()
-    content.status = "DRAFT"
     with pytest.raises(ValidationError) as error:
         content.save()
     assert "status" in error.value.error_dict
     content.refresh_from_db()
-    assert content.status == "ARCHIVED"
+    assert content.status == "DRAFT"
 
 
 def test_raw_updates_cannot_invent_a_status(sites):

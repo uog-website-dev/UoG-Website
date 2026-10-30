@@ -12,10 +12,11 @@ generic, unrestricted content API.
 | --- | --- |
 | id | UUID primary key, assigned once, `editable=False`, immutable at the domain layer. UUIDs are not sequential, so ids never leak how many records another Site owns and cannot be enumerated across Sites |
 | site | Required FK to `sites.Site`, ORM `PROTECT` and a real PostgreSQL foreign key, related name `content`. Content cannot be moved between Sites after creation |
-| status | `DRAFT`, `PUBLISHED` or `ARCHIVED`; new records start `DRAFT`. See the transition table below |
+| status | `DRAFT`, `IN_REVIEW`, `APPROVED`, `PUBLISHED`, `UNPUBLISHED` or `ARCHIVED`; new records start `DRAFT`. See [cms-workflow.md](./cms-workflow.md) |
 | locale | Normalized language tag in the same format as `Site.default_language` (`en`, `am`, `en-us`, …), 35 characters. Empty inherits the Site default; an explicit value must be enabled for that Site. Storage format only — no translation workflow is claimed |
 | published_at | Nullable timestamp set on the first publish and kept as history if the record later returns to `DRAFT` or `ARCHIVED` |
 | created_by / updated_by | Nullable FKs to the local platform user (`settings.AUTH_USER_MODEL`, `SET_NULL`). Write services set them from the authenticated principal; they are never accepted from a request body. Removing an account keeps the content and clears the attribution |
+| submitted_by / reviewed_by / review_comment | Server-managed workflow attribution and the latest reviewer comment. Full transition history is append-only in `ContentWorkflowTransition` |
 | metadata | JSON object (`jsonb_typeof = 'object'` check constraint). Free-form approved content metadata, never a settings document and never secrets |
 | created_at / updated_at | Timezone-aware automatic timestamps; every save updates `updated_at` |
 
@@ -31,21 +32,6 @@ existing record whose primary key no longer resolves is rejected with
 forms and serializers. `site` is fixed at creation; re-parenting raises
 "Content cannot be moved between Sites". The `PROTECT` relation means a Site
 that still owns content can never be removed from under it.
-
-## Status transitions
-
-| Current state | Permitted different next states |
-| --- | --- |
-| DRAFT | PUBLISHED, ARCHIVED |
-| PUBLISHED | DRAFT, ARCHIVED |
-| ARCHIVED | None |
-
-Same-state saves are allowed. Archived is terminal, mirroring the Site
-lifecycle: archival is the deliberate end of a content record, not a
-soft-delete that is quietly reversed. The first transition to `PUBLISHED`
-records `published_at`; later transitions never erase it. Status values are
-additionally pinned by a `CHECK` constraint, so bulk or raw updates cannot
-invent a status either.
 
 ## Site-scoped uniqueness and index strategy
 
@@ -219,8 +205,11 @@ ancestor moves every descendant route — as `PageRedirect` rows keyed by
 `apps.cms.api.serializers.PageSerializer` extends the shared contract:
 `id`, `site`, `path`, `is_homepage`, `status`, authorship and timestamps
 are server-managed; `title`, `slug`, `layout`, `seo`, `visibility`,
-`position` and `metadata` are writable; `parent` and `locale` are accepted
-on create only — moves must go through `change_route` so URL history is
-recorded, and the language is fixed. No routes are mounted, so the
+`position`, `metadata` and `blocks` are writable in editable workflow states;
+`submitted_by`, `reviewed_by` and `review_comment` are server-managed.
+`parent` and `locale` are accepted on create only — moves must go through
+`change_route` so URL history is recorded, and the language is fixed. The
+[shared review/publishing workflow](./cms-workflow.md) owns all status
+transitions. No routes are mounted, so the
 [OpenAPI snapshot](../api/openapi.yaml) is unchanged and no URL namespace
 appears for `cms`.

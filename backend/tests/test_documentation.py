@@ -57,6 +57,9 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
         "/api/v1/sites/{site_pk}/modules/", "/api/v1/sites/{site_pk}/modules/{id}/",
         "/api/v1/sites/{site_pk}/modules/{id}/enable/",
         "/api/v1/sites/{site_pk}/modules/{id}/disable/",
+        "/api/v1/cms/sites/{site_pk}/content-roles/",
+        "/api/v1/cms/sites/{site_pk}/content-roles/{assignment_id}/",
+        "/api/v1/cms/sites/{site_pk}/content/{content_id}/workflow/",
         "/api/v1/site-templates/", "/api/v1/site-templates/{id}/",
         "/api/v1/modules/", "/api/v1/modules/{id}/",
         "/api/v1/site-context/",
@@ -129,6 +132,23 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
     assert paths["/api/v1/site-templates/"]["get"]["tags"] == ["Site templates"]
     assert paths["/api/v1/modules/"]["get"]["tags"] == ["Modules"]
     assert paths["/api/v1/sites/{site_pk}/modules/"]["post"]["tags"] == ["Sites"]
+    role_assignments = paths["/api/v1/cms/sites/{site_pk}/content-roles/"]
+    assert role_assignments["get"]["tags"] == ["CMS workflow"]
+    assert role_assignments["post"]["security"] == [{"keycloakBearer": []}]
+    role_input = role_assignments["post"]["requestBody"]["content"][
+        "application/json"
+    ]["schema"]["$ref"].rsplit("/", 1)[-1]
+    role_fields = schema["components"]["schemas"][role_input]["properties"]
+    assert set(role_fields) == {"user_id", "role"}
+    workflow = paths["/api/v1/cms/sites/{site_pk}/content/{content_id}/workflow/"]["post"]
+    assert workflow["tags"] == ["CMS workflow"]
+    assert workflow["security"] == [{"keycloakBearer": []}]
+    workflow_input = workflow["requestBody"]["content"]["application/json"][
+        "schema"
+    ]["$ref"].rsplit("/", 1)[-1]
+    workflow_fields = schema["components"]["schemas"][workflow_input]["properties"]
+    assert set(workflow_fields) == {"action", "comment"}
+    assert "WorkflowContent" in schema["components"]["schemas"]
     context = paths["/api/v1/site-context/"]["get"]
     assert {} in context["security"]
     assert context["tags"] == ["Sites"]

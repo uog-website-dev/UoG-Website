@@ -11,6 +11,7 @@ OpenAPI snapshot therefore stays unchanged.
 """
 from django.core.exceptions import ValidationError as DjangoValidationError
 
+from drf_spectacular.utils import extend_schema_serializer
 from rest_framework import serializers
 
 from apps.sites.api.serializers import StrictFields
@@ -50,16 +51,18 @@ class SiteContentSerializer(
         model = SiteContent
         fields = (
             "id", "site", "status", "locale", "published_at", "blocks",
-            "blocks_version", "created_by", "updated_by", "metadata",
+            "blocks_version", "created_by", "updated_by", "submitted_by",
+            "reviewed_by", "review_comment", "metadata",
             "created_at", "updated_at",
         )
         read_only_fields = (
             "id", "site", "status", "published_at",
             "blocks_version", "created_by", "updated_by", "created_at",
-            "updated_at",
+            "submitted_by", "reviewed_by", "review_comment", "updated_at",
         )
 
 
+@extend_schema_serializer(component_name="SitePage")
 class PageSerializer(
     BlocksValidationMixin, StrictFields, serializers.ModelSerializer,
 ):
@@ -80,10 +83,12 @@ class PageSerializer(
             "id", "site", "parent", "locale", "title", "slug", "path",
             "layout", "seo", "visibility", "position", "is_homepage",
             "status", "published_at", "blocks", "blocks_version",
-            "created_by", "updated_by", "metadata", "created_at", "updated_at",
+            "created_by", "updated_by", "submitted_by", "reviewed_by",
+            "review_comment", "metadata", "created_at", "updated_at",
         )
         read_only_fields = (
             "id", "site", "path", "is_homepage", "status", "published_at",
-            "blocks_version", "created_by", "updated_by",
+            "blocks_version", "created_by", "updated_by", "submitted_by",
+            "reviewed_by", "review_comment",
             "created_at", "updated_at",
         )

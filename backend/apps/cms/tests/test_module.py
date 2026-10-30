@@ -23,27 +23,31 @@ CONTENT_CODES = {"PAGES", "POSTS", "MENUS"}
 def test_cms_packages_import_and_application_loads():
     for suffix in (
         "", ".apps", ".models", ".page_sql", ".blocks", ".blocks_sql",
-        ".api", ".api.serializers",
+        ".workflow_sql",
+        ".api", ".api.serializers", ".api.workflow", ".api.urls",
         ".selectors", ".selectors.pages", ".services", ".services.pages",
-        ".migrations", ".tests",
+        ".services.workflow", ".migrations", ".tests",
     ):
         importlib.import_module(f"apps.cms{suffix}")
     config = django_apps.get_app_config("cms")
     assert config.name == "apps.cms"
     assert "apps.cms" in settings.INSTALLED_APPS
     assert {model.__name__ for model in config.get_models()} == {
-        "SiteContent", "Page", "PageRedirect",
+        "SiteContent", "Page", "PageRedirect", "SiteContentRoleAssignment",
+        "ContentWorkflowTransition", "PublishedContentSnapshot",
     }
 
 
-def test_cms_publishes_no_content_endpoints():
-    # Shared content primitives are deliberately not a generic, unrestricted
-    # content API: the cms app registers no namespace, views or urls module.
-    assert "cms" not in get_resolver().namespace_dict
-    with pytest.raises(ModuleNotFoundError):
-        importlib.import_module("apps.cms.api.urls")
-    with pytest.raises(ModuleNotFoundError):
-        importlib.import_module("apps.cms.api.views")
+def test_cms_mounts_only_site_scoped_workflow_endpoints():
+    # CMS exposes role administration and workflow actions, not a generic
+    # content CRUD/public-serving endpoint.
+    assert "cms" in get_resolver().namespace_dict
+    urls = importlib.import_module("apps.cms.api.urls")
+    assert {
+        pattern.name for pattern in urls.urlpatterns
+    } == {
+        "content-role-list", "content-role-detail", "content-workflow",
+    }
 
 
 def test_django_check_passes():
@@ -69,6 +73,16 @@ def test_cms_migrations_are_repeatable_and_applied():
     assert ("cms", "0001_initial") in page_graph.dependencies
     operations = [type(operation).__name__ for operation in page_graph.operations]
     assert "RunSQL" in operations  # cms_validate_page trigger rules
+    workflow_migration = next(
+        name for app, name in loader.disk_migrations
+        if app == "cms" and name.startswith("0004_")
+    )
+    workflow_graph = loader.disk_migrations[("cms", workflow_migration)]
+    assert ("cms", workflow_migration) in loader.applied_migrations
+    assert ("audit", "0002_common_writer") in workflow_graph.dependencies
+    assert "RunSQL" in [
+        type(operation).__name__ for operation in workflow_graph.operations
+    ]
 
 
 @pytest.mark.django_db

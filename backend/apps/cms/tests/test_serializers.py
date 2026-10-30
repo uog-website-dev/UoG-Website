@@ -8,7 +8,8 @@ pytestmark = pytest.mark.django_db
 
 FIELDS = {
     "id", "site", "status", "locale", "published_at",
-    "created_by", "updated_by", "metadata", "created_at", "updated_at",
+    "created_by", "updated_by", "submitted_by", "reviewed_by",
+    "review_comment", "metadata", "created_at", "updated_at",
     "blocks", "blocks_version",
 }
 EDITABLES = {"locale", "metadata", "blocks"}
@@ -122,7 +123,8 @@ def test_serialized_shape_matches_the_documented_contract(sites):
 PAGE_FIELDS = {
     "id", "site", "parent", "locale", "title", "slug", "path", "layout",
     "seo", "visibility", "position", "is_homepage", "status",
-    "published_at", "created_by", "updated_by", "blocks", "blocks_version",
+    "published_at", "created_by", "updated_by", "submitted_by", "reviewed_by",
+    "review_comment", "blocks", "blocks_version",
     "metadata", "created_at", "updated_at",
 }
 PAGE_EDITABLES = {

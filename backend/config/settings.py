@@ -191,9 +191,11 @@ SPECTACULAR_SETTINGS = {
         "Backend authentication and permissions always apply. "
         "Organization administration is platform-admin only; writes require development "
         "opt-in and remain disabled in production pending scoped IAM/RBAC. "
-        "Pages are currently platform-wide. Site, domain, template and module administration "
-        "is platform-admin only and uses the same development write opt-in; production writes "
-        "remain disabled pending scoped IAM/RBAC. Posts and Menus APIs are absent. "
+        "CMS workflow actions require Site-scoped AUTHOR, REVIEWER or PUBLISHER assignments "
+        "or the validated platform-admin token role; assignment management is platform-admin only. "
+        "Site, domain, template and module administration is platform-admin only and uses the "
+        "same development write opt-in; production writes remain disabled pending scoped IAM/RBAC. "
+        "Posts and Menus content APIs are absent. "
         "No scope header grants access. See docs/development/api-documentation.md."
     ),
     "SERVE_INCLUDE_SCHEMA": False,
@@ -213,6 +215,7 @@ SPECTACULAR_SETTINGS = {
         "SiteStatusEnum": "apps.sites.models.Site.Status",
         "ActiveInactiveStatusEnum": "apps.sites.models.SiteDomain.Status",
         "ModuleStatusEnum": "apps.sites.models.Module.Status",
+        "CMSContentStatusEnum": "apps.cms.models.ContentStatus",
     },
     "POSTPROCESSING_HOOKS": [
         "drf_spectacular.hooks.postprocess_schema_enums",
@@ -220,6 +223,7 @@ SPECTACULAR_SETTINGS = {
     ],
     "TAGS": [
         {"name": "CMS", "description": "Platform pages; site scoping is not implemented."},
+        {"name": "CMS workflow", "description": "Site-scoped CMS role assignments and authenticated review/publishing transitions."},
         {"name": "Identity", "description": "Keycloak identity and platform administration."},
         {"name": "Organizations", "description": "Restricted institutional administration; production writes disabled pending scoped IAM/RBAC."},
         {"name": "Sites", "description": "Restricted Site, configuration and per-site module administration."},

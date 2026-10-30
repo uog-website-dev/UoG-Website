@@ -8,6 +8,8 @@ for the site-scoped uniqueness and index strategy.
 """
 import re
 import uuid
+from contextlib import contextmanager
+from contextvars import ContextVar
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -21,18 +23,27 @@ from . import blocks as blocks_schema
 
 
 class ContentStatus(models.TextChoices):
-    """Lifecycle shared by every content record. Archived is terminal."""
+    """Lifecycle shared by every content record."""
 
     DRAFT = "DRAFT", "Draft"
+    IN_REVIEW = "IN_REVIEW", "In review"
+    APPROVED = "APPROVED", "Approved"
     PUBLISHED = "PUBLISHED", "Published"
+    UNPUBLISHED = "UNPUBLISHED", "Unpublished"
     ARCHIVED = "ARCHIVED", "Archived"
 
 
-_TRANSITIONS = {
-    ContentStatus.DRAFT: {ContentStatus.PUBLISHED, ContentStatus.ARCHIVED},
-    ContentStatus.PUBLISHED: {ContentStatus.DRAFT, ContentStatus.ARCHIVED},
-    ContentStatus.ARCHIVED: set(),
-}
+_workflow_write = ContextVar("cms_workflow_write", default=False)
+
+
+@contextmanager
+def workflow_write():
+    """Allow the workflow service to persist a validated status transition."""
+    token = _workflow_write.set(True)
+    try:
+        yield
+    finally:
+        _workflow_write.reset(token)
 
 LANGUAGE_FORMAT = r"\A[a-z]{2,3}(?:-[a-z0-9]{2,8})*\Z"
 
@@ -56,8 +67,8 @@ class SiteContent(models.Model):
         help_text="Owning Site. Content cannot be moved between Sites.",
     )
     status = models.CharField(
-        max_length=9, choices=ContentStatus.choices, default=ContentStatus.DRAFT,
-        help_text="DRAFT, PUBLISHED or ARCHIVED. Archived is terminal.",
+        max_length=11, choices=ContentStatus.choices, default=ContentStatus.DRAFT,
+        help_text="Shared draft, review, approval, publication, unpublication and archive workflow.",
     )
     locale = models.CharField(
         max_length=35, blank=True, default="",
@@ -84,6 +95,20 @@ class SiteContent(models.Model):
         settings.AUTH_USER_MODEL, null=True, blank=True,
         on_delete=models.SET_NULL, related_name="+",
         help_text="Last editing platform user, cleared if the account is removed.",
+    )
+    submitted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True,
+        on_delete=models.SET_NULL, related_name="+",
+        help_text="User who most recently submitted this content for review.",
+    )
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True,
+        on_delete=models.SET_NULL, related_name="+",
+        help_text="User who most recently approved or rejected this content.",
+    )
+    review_comment = models.TextField(
+        blank=True, default="",
+        help_text="Most recent reviewer comment, retained when content is rejected.",
     )
     metadata = models.JSONField(
         default=dict, blank=True,
@@ -112,7 +137,7 @@ class SiteContent(models.Model):
         ordering = ("-updated_at", "id")
         constraints = [
             models.CheckConstraint(
-                condition=Q(status__in=["DRAFT", "PUBLISHED", "ARCHIVED"]),
+                condition=Q(status__in=ContentStatus.values),
                 name="content_status",
             ),
             models.CheckConstraint(
@@ -155,18 +180,45 @@ class SiteContent(models.Model):
             previous = (
                 type(self).objects.using(using)
                 .filter(pk=self.pk)
-                .values("site_id", "status")
+                .values(
+                    "site_id", "status", "locale", "metadata", "blocks",
+                    "blocks_version", "submitted_by_id", "reviewed_by_id",
+                    "review_comment",
+                )
                 .first()
             )
             if previous is None:
                 raise ValidationError({"id": "Content identifiers are immutable."})
             if previous["site_id"] != self.site_id:
                 raise ValidationError({"site": "Content cannot be moved between Sites."})
-            if (
-                previous["status"] != self.status
-                and self.status not in _TRANSITIONS[previous["status"]]
+            if previous["status"] != self.status and not _workflow_write.get():
+                raise ValidationError({
+                    "status": "Use the content workflow service to change status.",
+                })
+            if not _workflow_write.get() and any(
+                previous[name] != getattr(self, name)
+                for name in (
+                    "submitted_by_id", "reviewed_by_id", "review_comment",
+                )
             ):
-                raise ValidationError({"status": "That content status change is not allowed."})
+                raise ValidationError({
+                    "review_comment": "Workflow attribution and comments are "
+                                      "managed by the workflow service.",
+                })
+            if previous["status"] in {
+                ContentStatus.IN_REVIEW, ContentStatus.APPROVED,
+                ContentStatus.PUBLISHED, ContentStatus.ARCHIVED,
+            } and any(
+                previous[name] != getattr(self, name)
+                for name in ("locale", "metadata", "blocks", "blocks_version")
+            ):
+                raise ValidationError({
+                    "status": "Content is locked while in review, approved, "
+                              "published or archived. Return it to an editable "
+                              "state through the workflow first.",
+                })
+        elif self.status != ContentStatus.DRAFT:
+            raise ValidationError({"status": "New content must start as a draft."})
 
         if not isinstance(self.metadata, dict):
             raise ValidationError({"metadata": "Metadata must be a JSON object."})
@@ -404,6 +456,41 @@ class Page(SiteContent):
         # normalization half-done, and the constraint checks that run after
         # clean read the instance — settled fields, no shadowing noise.
         self._validate_content()
+        if not self._state.adding:
+            current = (
+                SiteContent.objects.using(
+                    self._state.db or router.db_for_write(type(self), instance=self)
+                )
+                .filter(pk=self.pk)
+                .values("status")
+                .first()
+            )
+            if current and current["status"] in {
+                ContentStatus.IN_REVIEW, ContentStatus.APPROVED,
+                ContentStatus.PUBLISHED, ContentStatus.ARCHIVED,
+            }:
+                previous_page = (
+                    type(self).objects.using(
+                        self._state.db or router.db_for_write(type(self), instance=self)
+                    )
+                    .filter(pk=self.pk)
+                    .values(
+                        "parent_id", "title", "slug", "layout", "seo",
+                        "visibility", "position", "is_homepage",
+                    )
+                    .first()
+                )
+                if previous_page and any(
+                    previous_page[name] != getattr(self, name)
+                    for name in (
+                        "parent_id", "title", "slug", "layout", "seo",
+                        "visibility", "position", "is_homepage",
+                    )
+                ):
+                    raise ValidationError({
+                        "status": "Page content is locked while in review, "
+                                  "approved, published or archived.",
+                    })
         if not isinstance(self.seo, dict):
             raise ValidationError({"seo": "SEO metadata must be a JSON object."})
         unknown = sorted(set(self.seo) - set(SEO_KEYS))
@@ -568,3 +655,133 @@ class PageRedirect(models.Model):
 
     def __str__(self):
         return f"{self.site_id}:{self.locale}:{self.old_path}->{self.page_id}"
+
+
+class ContentRole(models.TextChoices):
+    AUTHOR = "AUTHOR", "Author"
+    REVIEWER = "REVIEWER", "Reviewer"
+    PUBLISHER = "PUBLISHER", "Publisher"
+
+
+class SiteContentRoleAssignment(models.Model):
+    """A Site-scoped CMS role; platform-admin remains a validated token role."""
+
+    site = models.ForeignKey(
+        "sites.Site", on_delete=models.CASCADE,
+        related_name="content_role_assignments",
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+        related_name="site_content_roles",
+    )
+    role = models.CharField(max_length=10, choices=ContentRole.choices)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("site_id", "user_id", "role")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("site", "user", "role"),
+                name="cms_site_content_role_uniq",
+            ),
+            models.CheckConstraint(
+                condition=Q(role__in=ContentRole.values),
+                name="cms_site_content_role_valid",
+            ),
+        ]
+        indexes = [
+            models.Index(
+                fields=("user", "site", "role"),
+                name="cms_content_role_lookup_idx",
+            ),
+        ]
+
+
+class ContentWorkflowTransition(models.Model):
+    """Append-only state transition history, including review feedback."""
+
+    content = models.ForeignKey(
+        SiteContent, on_delete=models.PROTECT,
+        related_name="workflow_transitions",
+    )
+    from_status = models.CharField(max_length=11, choices=ContentStatus.choices)
+    to_status = models.CharField(max_length=11, choices=ContentStatus.choices)
+    actor = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True,
+        on_delete=models.SET_NULL, related_name="+",
+    )
+    comment = models.TextField(blank=True, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("created_at", "id")
+        indexes = [
+            models.Index(
+                fields=("content", "created_at"),
+                name="cms_workflow_content_time_idx",
+            ),
+        ]
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(from_status__in=ContentStatus.values),
+                name="cms_workflow_from_status",
+            ),
+            models.CheckConstraint(
+                condition=Q(to_status__in=ContentStatus.values),
+                name="cms_workflow_to_status",
+            ),
+        ]
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError("Workflow history is append-only.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Workflow history is append-only.")
+
+
+class PublishedContentSnapshot(models.Model):
+    """Immutable version of the exact payload exposed by one publication."""
+
+    content = models.ForeignKey(
+        SiteContent, on_delete=models.PROTECT,
+        related_name="publication_snapshots",
+    )
+    version = models.PositiveIntegerField()
+    payload = models.JSONField()
+    published_at = models.DateTimeField(default=timezone.now, editable=False)
+
+    class Meta:
+        ordering = ("content_id", "-version")
+        constraints = [
+            models.CheckConstraint(
+                condition=Exact(
+                    models.Func("payload", function="jsonb_typeof", output_field=models.CharField()),
+                    Value("object"),
+                ),
+                name="cms_published_snapshot_object",
+            ),
+            models.UniqueConstraint(
+                fields=("content", "version"),
+                name="cms_published_snapshot_version_uniq",
+            ),
+            models.CheckConstraint(
+                condition=Q(version__gte=1),
+                name="cms_published_snapshot_version_positive",
+            ),
+        ]
+        indexes = [
+            models.Index(
+                fields=("content", "-version"),
+                name="cms_pub_snapshot_latest_idx",
+            ),
+        ]
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            raise ValidationError("Published snapshots are immutable.")
+        return super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Published snapshots are immutable.")
