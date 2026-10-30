@@ -11,10 +11,8 @@ BASE = "/api/v1/cms/sites/"
 
 
 @pytest.fixture
-def platform_admin(client, oidc):
-    client.defaults.update(oidc.header())
-    client.get("/api/me/")
-    return client
+def platform_admin(cms_platform_admin):
+    return cms_platform_admin
 
 
 def _url(site, content, suffix="revisions/"):

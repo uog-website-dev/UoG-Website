@@ -86,3 +86,20 @@ def sites():
 def owner(sites):
     """The owning Organization of the first Site, for module tests."""
     return sites[0].organization_unit
+
+
+@pytest.fixture
+def cms_platform_admin(client, oidc):
+    """An authenticated identity plus the explicit platform DB assignment."""
+    from django.contrib.auth import get_user_model
+    from django.core.management import call_command
+    from apps.authorization.models import Role, UserRoleAssignment
+
+    client.defaults.update(oidc.header())
+    assert client.get("/api/me/").status_code == 200
+    call_command("seed_rbac", verbosity=0)
+    user = get_user_model().objects.get(username="devuser")
+    UserRoleAssignment.objects.create(
+        user=user, role=Role.objects.get(code="platform-administrator"), scope="PLATFORM",
+    )
+    return client

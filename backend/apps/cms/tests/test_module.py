@@ -26,10 +26,13 @@ def test_cms_packages_import_and_application_loads():
         ".workflow_sql", ".revision_sql",
         ".api", ".api.serializers", ".api.workflow", ".api.revisions",
         ".api.pages", ".api.public",
+        ".api.menus", ".api.menu_delivery", ".menu_api_sql", ".menu_cache",
         ".api.urls",
         ".selectors", ".selectors.pages", ".services", ".services.pages",
         ".services.workflow", ".services.revisions",
-        ".services.publication_cache", ".migrations", ".tests",
+        ".services.publication_cache", ".menu_models", ".migrations", ".tests",
+        ".services.menus", ".services.menu_delivery", ".selectors.menus",
+        ".selectors.menu_delivery", ".menu_sql",
     ):
         importlib.import_module(f"apps.cms{suffix}")
     config = django_apps.get_app_config("cms")
@@ -39,6 +42,7 @@ def test_cms_packages_import_and_application_loads():
         "SiteContent", "Page", "PageRedirect", "SiteContentRoleAssignment",
         "ContentWorkflowTransition", "PublishedContentSnapshot",
         "ContentRevision", "SitePublicationVersion",
+        "Menu", "MenuItem", "MenuInheritance", "MenuDeliveryVersion",
     }
 
 
@@ -58,7 +62,7 @@ def test_cms_mounts_scoped_workflow_revision_admin_and_public_routes():
     assert {
         pattern.name for pattern in context_urls.urlpatterns
     } == {
-        "site-context", "public-page-list", "public-homepage",
+        "site-context", "public-menus", "public-page-list", "public-homepage",
         "public-page-detail",
     }
 
@@ -102,6 +106,10 @@ def test_cms_migrations_are_repeatable_and_applied():
         type(operation).__name__ for operation in revision_graph.operations
     ]
     assert ("cms", "0007_sitepublicationversion_pages_module") in loader.applied_migrations
+    assert ("cms", "0008_menu_menuitem") in loader.disk_migrations
+    assert ("cms", "0008_menu_menuitem") in loader.applied_migrations
+    assert ("cms", "0009_menu_integrity") in loader.applied_migrations
+    assert ("cms", "0010_menu_api_contract") in loader.applied_migrations
     pages_graph = loader.disk_migrations[
         ("cms", "0007_sitepublicationversion_pages_module")
     ]
@@ -114,11 +122,13 @@ def test_cms_migrations_are_repeatable_and_applied():
 @pytest.mark.django_db
 def test_pages_is_shipped_but_all_content_modules_default_to_unavailable():
     assert CONTENT_CODES <= set(Module.objects.values_list("code", flat=True))
-    pages = Module.objects.get(code="PAGES")
-    assert pages.status == "IMPLEMENTED"
-    assert pages.is_enabled is False
-    assert capability_is_shipped("PAGES")
-    for code in CONTENT_CODES - {"PAGES"}:
+    shipped = {"PAGES", "MENUS"}
+    for code in shipped:
+        module = Module.objects.get(code=code)
+        assert module.status == "IMPLEMENTED"
+        assert module.is_enabled is False
+        assert capability_is_shipped(code)
+    for code in CONTENT_CODES - shipped:
         module = Module.objects.get(code=code)
         assert module.status == "PLANNED"
         assert module.is_enabled is False

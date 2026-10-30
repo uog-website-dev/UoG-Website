@@ -45,7 +45,7 @@ def add_common_contract(result, generator, request, public):
         "412": "If-Match does not match the current strong ETag. Retrieve and reconcile changes.",
         "428": "If-Match header is required for this mutation.",
         "415": "Unsupported request content type.",
-        "503": "Audit persistence failed; the entire organization mutation was rolled back. No SQL details are exposed.",
+        "503": "Audit persistence failed; the entire mutation was rolled back. No SQL details are exposed.",
     }
     for path, item in result.get("paths", {}).items():
         for method, operation in item.items():
@@ -63,12 +63,13 @@ def add_common_contract(result, generator, request, public):
                 "{" in path
                 or (method == "get" and path == "/api/pages/")
                 or path.startswith("/api/v1/site-context/pages")
+                or path == "/api/v1/site-context/menus/"
             ):
                 codes.add("404")
             if (
                 path.startswith("/api/v1/sites/")
                 and "/pages" in path
-            ) or path.startswith("/api/v1/site-context/pages"):
+            ) or path.startswith("/api/v1/site-context/pages") or path == "/api/v1/site-context/menus/":
                 codes.add("400")
             if (
                 path.startswith("/api/v1/cms/")
@@ -102,7 +103,7 @@ def add_common_contract(result, generator, request, public):
                     codes.update({"412", "428"})
                 collection = path.rstrip("/").split("/")[-1]
                 if method in {"get", "post", "patch"} and not hierarchy and not (method == "get" and "{" not in path):
-                    success = "201" if method == "post" and collection in {"organizations", "sites", "domains", "modules", "site-templates", "pages"} else "200"
+                    success = "201" if method == "post" and collection in {"organizations", "sites", "domains", "modules", "site-templates", "pages", "menus", "items"} else "200"
                     responses.setdefault(success, {}).setdefault("headers", {})["ETag"] = {
                         "description": "Strong representation validator. Echo exactly in If-Match for mutations.",
                         "schema": {"type": "string"},
@@ -110,6 +111,21 @@ def add_common_contract(result, generator, request, public):
                     if success == "201":
                         responses[success]["headers"]["Location"] = {
                             "description": "Created resource URL.", "schema": {"type": "string", "format": "uri-reference"},
+                        }
+            menu_api = path.startswith("/api/v1/sites/") and "/menus/" in path
+            if menu_api:
+                codes.discard("412")
+                if method in {"post", "patch", "delete"}:
+                    codes.update({"400", "409", "503"})
+                    if method == "post" and path.endswith("/menus/"):
+                        codes.discard("428")
+                    else:
+                        codes.add("428")
+                for success in ("200", "201", "204"):
+                    if success in responses and not (success == "204" and "/items/" not in path):
+                        responses[success].setdefault("headers", {})["ETag"] = {
+                            "description": "Menu-wide version token. Every semantic item change invalidates it; stale If-Match returns 409.",
+                            "schema": {"type": "string"},
                         }
             for code in sorted(codes):
                 responses.setdefault(code, {
@@ -133,6 +149,15 @@ def add_common_contract(result, generator, request, public):
                         "error": {"code": names[code], "message": messages[code], "details": detail},
                         "request_id": "1ea47c51-f2d7-402b-ad9a-4df619d03055",
                     }
+            if menu_api:
+                for code, reason in (("400", "invalid_tree"), ("409", "version_conflict")):
+                    if code in responses:
+                        responses[code]["content"]["application/json"]["example"] = {
+                            "error": {"code": "validation_error" if code == "400" else "conflict",
+                                      "message": "The request is invalid." if code == "400" else "The request conflicts with the current resource state.",
+                                      "details": {"reason": reason}},
+                            "request_id": "1ea47c51-f2d7-402b-ad9a-4df619d03055",
+                        }
             if (
                 path.startswith("/api/v1/cms/sites/")
                 and "/revisions" in path
@@ -147,7 +172,17 @@ def add_common_contract(result, generator, request, public):
                         "description": "Revision data is private and not cacheable.",
                         "schema": {"type": "string"},
                     }
-            if (
+            if path == "/api/v1/site-context/menus/" and "200" in responses:
+                headers = responses["200"].setdefault("headers", {})
+                headers["Cache-Control"] = {
+                    "description": "Public clients must revalidate. Server entries are scoped to the resolved Site and menu-delivery generation.",
+                    "schema": {"type": "string"},
+                }
+                headers["Vary"] = {
+                    "description": "The trusted Host selects the Site. Forwarded host headers are ignored.",
+                    "schema": {"type": "string"},
+                }
+            elif (
                 path.startswith("/api/v1/site-context/pages/")
                 or path == "/api/v1/site-context/homepage/"
             ) and "200" in responses:

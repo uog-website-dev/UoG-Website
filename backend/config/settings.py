@@ -230,6 +230,8 @@ SPECTACULAR_SETTINGS = {
     "REDOC_UI_SETTINGS": {"disableGoogleFont": True},
     "COMPONENT_SPLIT_REQUEST": True,
     "ENUM_NAME_OVERRIDES": {
+        "ContentStatusEnum": "apps.cms.models.ContentStatus",
+        "PublishedContentStatusEnum": ["PUBLISHED"],
         "OrganizationStatusEnum": "apps.organizations.models.OrganizationUnit.Status",
         "SiteStatusEnum": "apps.sites.models.Site.Status",
         "ActiveInactiveStatusEnum": "apps.sites.models.SiteDomain.Status",
@@ -250,7 +252,8 @@ SPECTACULAR_SETTINGS = {
         {"name": "Site templates", "description": "Approved starting configurations. Applying one does not rewrite existing Sites."},
         {"name": "Modules", "description": "Platform capability registry. Planned modules cannot be enabled for a Site."},
         {"name": "Posts", "description": "Not implemented."},
-        {"name": "Menus", "description": "Not implemented."},
+        {"name": "Menus", "description": "Site-scoped menu and item administration, atomic tree operations, inheritance policy and menu-wide ETag concurrency. Permissions: menu.read, menu.write and menu.publish. Inheritance does not grant parent-menu management."},
+        {"name": "Public menus", "description": "Effective navigation for the Site resolved from the trusted Host. Global, inherited and local items follow the Site delivery policy."},
     ],
 }
 
@@ -454,6 +457,8 @@ SPECTACULAR_SETTINGS = {
     "REDOC_UI_SETTINGS": {"disableGoogleFont": True},
     "COMPONENT_SPLIT_REQUEST": True,
     "ENUM_NAME_OVERRIDES": {
+        "ContentStatusEnum": "apps.cms.models.ContentStatus",
+        "PublishedContentStatusEnum": ["PUBLISHED"],
         "OrganizationStatusEnum": "apps.organizations.models.OrganizationUnit.Status",
         "SiteStatusEnum": "apps.sites.models.Site.Status",
         "ActiveInactiveStatusEnum": "apps.sites.models.SiteDomain.Status",
@@ -475,7 +480,8 @@ SPECTACULAR_SETTINGS = {
         {"name": "Modules", "description": "Platform capability registry. Planned modules cannot be enabled for a Site."},
         {"name": "Menu links", "description": "Site menu-link administration authorized by scoped application permissions."},
         {"name": "Posts", "description": "Not implemented."},
-        {"name": "Menus", "description": "Not implemented."},
+        {"name": "Menus", "description": "Site-scoped menu and item administration, atomic tree operations, inheritance policy and menu-wide ETag concurrency. Permissions: menu.read, menu.write and menu.publish. Inheritance does not grant parent-menu management."},
+        {"name": "Public menus", "description": "Effective navigation for the Site resolved from the trusted Host. Global, inherited and local items follow the Site delivery policy."},
     ],
 }
 

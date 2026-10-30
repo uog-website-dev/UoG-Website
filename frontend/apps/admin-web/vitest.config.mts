@@ -1,4 +1,4 @@
-import { defineConfig } from "vitest";
+import { defineConfig } from "vitest/config";
 import { fileURLToPath } from "node:url";
 
 export default defineConfig({

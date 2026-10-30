@@ -6,7 +6,7 @@ def api_exception_handler(exc, context):
     cause = getattr(exc, "__cause__", None)
     if getattr(getattr(cause, "diag", None), "constraint_name", None) == "audit_write_failed":
         from rest_framework.exceptions import APIException
-        unavailable = APIException("Audit persistence is unavailable. No organization change was committed.")
+        unavailable = APIException("Audit persistence is unavailable. No change was committed.")
         unavailable.status_code = 503
         exc = unavailable
     response = exception_handler(exc, context)

@@ -76,8 +76,65 @@ multilingual stories.
 `PAGES`, `POSTS` and `MENUS` are seeded registry rows. P2-CMS-006 ships PAGES
 and records it as `IMPLEMENTED`; its global switch remains off by default.
 Public Page delivery additionally requires PAGES to be enabled for the
-resolved Site. POSTS and MENUS remain planned and cannot be enabled. See the
-[module registry](module-registry.md).
+resolved Site. Menu rows ship with the menu tree: MENUS is `IMPLEMENTED`
+and recorded in `sites_module_implementation`, and its global switch stays
+off until an operator enables it. A Site can store menu edits only while
+MENUS is enabled for that Site. Turning the module off leaves the rows in
+place and rejects later saves. POSTS remains planned and cannot be enabled.
+See the [module registry](module-registry.md).
+
+### Menu trees (P2-MENU-001)
+
+`cms.Menu` owns one Site and one registered location: `header`, `footer`,
+`sidebar`, `primary` or `secondary`. These configured location keys are a
+controlled deployment contract; extending them requires a reviewed migration
+and an update to `MENU_LOCATIONS`. The unique `(site, location)` constraint
+allows the same location in different Sites. Menus and items have active flags.
+
+`cms.MenuItem` uses an adjacency list, immutable menu/Site ownership, UUID
+identifiers and a maximum of four levels (root is level one). Sibling order
+is unique including root siblings, with `(sort_order, id)` deterministic reads.
+`selectors.menus.menu_tree` loads at most 1,001 items in one item query and
+rejects trees above its 1,000-item default response limit. Inactive branches
+hide their entire subtree unless an authorized caller explicitly asks
+to include inactive items. This selector is administrative, not public delivery.
+
+The `0008_menu_menuitem` migration creates the schema and registers MENUS;
+`0009_menu_integrity` adds the active flag, location constraint and PostgreSQL
+guards. Database triggers protect ordinary, bulk and raw writes against cycles,
+depth violations (including moved descendants), menu/Site mismatches, invalid
+target combinations, unsafe URLs and disabled modules. The common transactional
+guard serializes menu, module-switch and Post-owner changes before row locks.
+The guard revision rejects stale repeatable-read snapshots. Deactivation never
+deletes rows, and editing or deleting them while MENUS is off is rejected.
+The integrity migration rejects invalid legacy data rather than leaving a bad
+tree in place; valid records can migrate with MENUS disabled.
+
+User-facing callers use `services.menus`, which resolves ownership from saved
+rows and checks active, database-backed `content.menus.view/manage` grants at
+platform, organization or Site scope. Standard platform, organization and Site
+administrators receive these capabilities when `seed_rbac` reconciles roles.
+Unassigned, inactive, anonymous and foreign-Site actors are rejected. Direct
+model writes are trusted system operations, as with other domain models.
+
+Internal Page/Post links require an existing target in the same Site by default.
+The explicit `allow_cross_site` policy permits foreign targets only when the
+user also has the relevant content-view permission for the target Site. A flag
+in a request never supplies that permission. Referenced Post-owner changes that
+would invalidate a link are blocked; Page ownership is already immutable.
+Targets are PROTECT references. Rendering must still apply content publication
+and visibility rules; a menu link does not publish its target.
+
+External targets accept only well-formed HTTP(S) URLs without credentials,
+control characters, encoded controls/backslashes, ambiguous escaping or invalid
+ports. Custom targets are restricted to normalized same-Site paths. This layer
+stores links and never follows external URLs or issues redirects; it cannot
+certify the behavior of an external server. No Menu HTTP endpoint is introduced
+by the model foundation story. The subsequent
+[Menu administration API](../development/menu-api.md) exposes scoped CRUD and
+atomic tree mutations, adds a Menu-wide version in `0010_menu_api_contract`,
+and records shared durable audit events. The current OpenAPI includes those
+authenticated routes. See the historical [model audit](../development/menu-audit.md).
 
 ## API contract
 
