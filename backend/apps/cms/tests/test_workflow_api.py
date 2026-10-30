@@ -154,7 +154,9 @@ def test_site_role_workflow_uses_validated_token_and_never_body_roles(
     assert cross_site.status_code == 404
 
 
-def test_http_review_publish_flow_and_publish_retry(platform_admin, oidc, sites):
+def test_http_review_publish_flow_and_publish_retry(
+    platform_admin, oidc, pages_module, sites,
+):
     site, _ = sites
     platform_admin.get("/api/me/")
     author = get_user_model().objects.get(username="devuser")

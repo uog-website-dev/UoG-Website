@@ -14,6 +14,7 @@ from rest_framework.viewsets import GenericViewSet
 from uuid import UUID
 
 from apps.accounts.authentication import KeycloakBearerAuthentication
+from apps.authorization.access import reject_disabled_module
 from apps.sites.api.access import Conflict, PreconditionRequired
 from apps.sites.api.serializers import StrictFields
 from apps.sites.models import Site
@@ -123,7 +124,10 @@ class SitePageViewSet(
         )
 
     def _site(self):
-        return get_object_or_404(Site, pk=self.kwargs["site_pk"])
+        site = get_object_or_404(Site, pk=self.kwargs["site_pk"])
+        # Disabling PAGES for a Site blocks authoring too, not just delivery.
+        reject_disabled_module(site.pk, "PAGES", request=self.request)
+        return site
 
     def _roles(self):
         claims = self.request.auth
