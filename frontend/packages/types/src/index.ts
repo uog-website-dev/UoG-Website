@@ -272,12 +272,15 @@ export interface PlatformModule {
  * One Site's enablement of one registry module (backend SiteModuleSerializer).
  *
  * Disabling keeps the row and its configuration; it does not delete data.
- * `module` is the registry id — resolve codes/names via GET /api/v1/modules/.
+ * `module` is the registry id. `module_code` is the stable code (PAGES,
+ * POSTS, MENUS) so a Site administrator can see enablement without the
+ * central module registry.
  */
 export interface SiteModuleAssignment {
   id: number;
   site: number;
   module: number;
+  module_code?: string;
   is_enabled: boolean;
   configuration: Record<string, unknown>;
   created_at: string;

@@ -463,7 +463,6 @@ SPECTACULAR_SETTINGS = {
         "SiteStatusEnum": "apps.sites.models.Site.Status",
         "ActiveInactiveStatusEnum": "apps.sites.models.SiteDomain.Status",
         "ModuleStatusEnum": "apps.sites.models.Module.Status",
-        "SiteTemplateStatusEnum": "apps.sites.models.SiteTemplate.Status",
         "ContentStatusEnum": "apps.cms.models.ContentStatus",
     },
     "POSTPROCESSING_HOOKS": [

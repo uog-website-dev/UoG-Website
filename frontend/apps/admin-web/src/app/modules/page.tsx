@@ -14,12 +14,29 @@ import Chip from "@mui/material/Chip";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 
+import { getEffectivePermissions } from "@/access-control";
 import { Breadcrumb } from "@/breadcrumb";
 import { ModuleRegistry } from "@/modules/module-registry";
+import { canActivateCentralModules } from "@/sites/site-admin";
 
 export const metadata = { title: "Module registry" };
 
-export default function ModulesPage() {
+export default async function ModulesPage() {
+  const permissions = await getEffectivePermissions();
+  if (!canActivateCentralModules(permissions)) {
+    return (
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Modules" }]} />
+        <Typography component="h1" variant="h4" sx={{ fontWeight: 700 }}>
+          Modules
+        </Typography>
+        <Typography role="status">
+          Central module activation is not available for this account.
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
       <Box>

@@ -120,6 +120,7 @@ def test_templates_modules_and_independent_site_enablement(admin, owner):
     other = admin.post(SITES, {"code": "LAW", "name": "Law", "organization_unit": owner.pk}, content_type="application/json").json()
     first = admin.post(f"{SITES}{site.pk}/modules/", {"module": events.pk, "configuration": {}}, content_type="application/json")
     assert first.status_code == 201, first.content
+    assert first.json()["module_code"] == "EVENTS"
     assert admin.post(f"{SITES}{site.pk}/modules/", {"module": events.pk, "configuration": {}}, content_type="application/json").status_code == 409
     assert admin.get(f"{SITES}{other['id']}/modules/{first.json()['id']}/").status_code == 404
     turned_off = admin.post(first["Location"] + "disable/", {}, content_type="application/json", HTTP_IF_MATCH=_etag(first))

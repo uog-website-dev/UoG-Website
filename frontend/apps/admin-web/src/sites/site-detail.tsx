@@ -432,6 +432,14 @@ export function SiteDetail({ site, error }: SiteDetailProps) {
                   {siteStatusLabel(site.status)}
                   {site.is_main ? " · main university site" : ""}
                 </Typography>
+                <Button
+                  component={Link}
+                  href={`/sites/${site.id}/admin`}
+                  variant="outlined"
+                  sx={{ mt: 1.5 }}
+                >
+                  Open site administration
+                </Button>
                 {/* Primary domain, shown prominently with honest states. */}
                 <Box
                   sx={{

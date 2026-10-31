@@ -16441,7 +16441,10 @@ components:
           readOnly: true
           nullable: true
         post:
-          type: integer
+          type: string
+          format: uuid
+          description: Immutable identifier. UUIDs are assigned once and can never
+            be changed or re-sequenced, so ids are not enumerable across Sites.
           readOnly: true
           nullable: true
         target:
@@ -18265,6 +18268,9 @@ components:
           readOnly: true
         module:
           type: integer
+        module_code:
+          type: string
+          readOnly: true
         is_enabled:
           type: boolean
           readOnly: true
@@ -18282,6 +18288,7 @@ components:
       - id
       - is_enabled
       - module
+      - module_code
       - site
       - updated_at
     SiteModuleRequest:
