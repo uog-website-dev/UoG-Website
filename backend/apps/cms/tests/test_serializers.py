@@ -154,17 +154,29 @@ def test_page_serializer_rejects_server_managed_and_unknown_input(sites):
     assert set(unknown.errors) == {"template"}
 
 
-def test_page_serializer_locks_parent_and_locale_on_update(sites):
+def test_page_serializer_allows_same_site_reparenting_and_locks_locale(sites):
     first, second = sites
     page = Page(site=first, title="About", slug="about")
     page.save()
+    same_site_parent = Page.objects.create(
+        site=first, title="Section", slug="section",
+    )
+    foreign_parent = Page.objects.create(
+        site=second, title="Foreign", slug="foreign",
+    )
     moving = PageSerializer(
         page,
-        data={"parent": second.pk, "locale": "am", "title": "Renamed"},
+        data={"parent": foreign_parent.pk, "locale": "am", "title": "Renamed"},
         partial=True,
     )
     assert not moving.is_valid()
-    assert set(moving.errors) == {"parent", "locale"}
+    # The route service/model validates the target parent against the owning
+    # Site when saving; serializer field validation itself locks locale only.
+    assert set(moving.errors) == {"locale"}
+    reparent = PageSerializer(
+        page, data={"parent": same_site_parent.pk}, partial=True,
+    )
+    assert reparent.is_valid(), reparent.errors
     valid = PageSerializer(
         page,
         data={

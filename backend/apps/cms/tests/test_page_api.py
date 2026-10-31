@@ -189,6 +189,70 @@ def test_page_authoring_requires_an_active_site_author_role(
     assert created.status_code == 201, created.content
 
 
+def test_database_platform_administrator_can_author_without_keycloak_role(
+    client, oidc, pages_module, sites,
+):
+    """Platform access comes from the active DB assignment, not a duplicate claim."""
+    from django.core.management import call_command
+    from apps.authorization.models import Role, UserRoleAssignment
+
+    site, _ = sites
+    _enable_pages_module((site,))
+    client.defaults.update(oidc.header(realm_access={"roles": ["platform-viewer"]}))
+    assert client.get("/api/me/").status_code == 200
+    call_command("seed_rbac", verbosity=0)
+    user = get_user_model().objects.get(username="devuser")
+    UserRoleAssignment.objects.create(
+        user=user,
+        role=Role.objects.get(code="platform-administrator"),
+        scope=UserRoleAssignment.Scope.PLATFORM,
+    )
+
+    url = ADMIN_PAGES.format(site_id=site.pk)
+    created = client.post(
+        url,
+        {"title": "Platform draft", "slug": "platform-draft"},
+        content_type="application/json",
+    )
+    assert created.status_code == 201, created.content
+    listed = client.get(url)
+    assert listed.status_code == 200, listed.content
+
+
+def test_page_reparenting_is_same_site_and_keeps_route_history(
+    client, oidc, pages_module, sites,
+):
+    site, other_site = sites
+    _enable_pages_module((site, other_site))
+    client.defaults.update(oidc.header())
+    parent = Page.objects.create(site=site, title="Parent", slug="parent")
+    foreign_parent = Page.objects.create(
+        site=other_site, title="Foreign parent", slug="foreign-parent",
+    )
+    page = Page.objects.create(site=site, title="Child", slug="child")
+    url = f"{ADMIN_PAGES.format(site_id=site.pk)}{page.pk}/"
+    etag = client.get(url)["ETag"]
+
+    moved = client.patch(
+        url,
+        {"parent": str(parent.pk)},
+        content_type="application/json",
+        HTTP_IF_MATCH=etag,
+    )
+    assert moved.status_code == 200, moved.content
+    assert moved.json()["path"] == "/parent/child"
+    assert page.redirects.filter(old_path="/child").exists()
+
+    current_etag = moved["ETag"]
+    cross_site = client.patch(
+        url,
+        {"parent": str(foreign_parent.pk)},
+        content_type="application/json",
+        HTTP_IF_MATCH=current_etag,
+    )
+    assert cross_site.status_code == 400
+
+
 def test_public_routes_are_host_scoped_published_only_and_snapshot_backed(
     client, settings, sites,
 ):
@@ -347,9 +411,10 @@ def test_disabling_pages_blocks_management_and_delivery_but_keeps_content(
 
     disable_module_for_site(site.pk, pages_module.pk)
 
-    blocked = client.get(page_url)
-    assert blocked.status_code == 400
-    assert "not enabled for this site" in blocked.content.decode()
+    retained_list = client.get(page_url)
+    assert retained_list.status_code == 200
+    assert retained_list.json()["count"] == 1
+    assert client.get(f"{page_url}{page_id}/").status_code == 200
     assert client.post(
         page_url,
         {"title": "Blocked", "slug": "blocked"},

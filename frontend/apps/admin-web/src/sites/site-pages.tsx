@@ -11,6 +11,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Paper from "@mui/material/Paper";
+import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { ApiError } from "@uog/api-client";
@@ -42,6 +43,7 @@ import {
 import type {
   SitePageListQuery,
   SitePageListResponse,
+  SitePageBlock,
   SitePageRecord,
   SitePageStatus,
 } from "@/app/sites/page-actions";
@@ -103,7 +105,12 @@ interface PageFilters {
 interface PageForm {
   title: string;
   slug: string;
-  text: string;
+  parent: string;
+  locale: string;
+  visibility: SitePageRecord["visibility"];
+  metadata: string;
+  seo: string;
+  blocks: string[];
 }
 
 function previewOf(page: SitePageRecord): PublicPageDocument {
@@ -129,7 +136,37 @@ function authorLabel(author: SitePageRecord["created_by"]): string {
 }
 
 function emptyForm(): PageForm {
-  return { title: "", slug: "", text: "" };
+  return {
+    title: "", slug: "", parent: "", locale: "en", visibility: "PUBLIC",
+    metadata: "{}", seo: "{}", blocks: ['{"type":"paragraph","html":"<p>Applications are open.</p>"}'],
+  };
+}
+
+function blockInputs(form: PageForm): SitePageBlock[] {
+  return form.blocks.map((raw) => JSON.parse(raw) as SitePageBlock);
+}
+
+function metadataInput(form: PageForm): Record<string, unknown> {
+  return jsonObject(form.metadata, "Metadata");
+}
+
+function jsonObject(source: string, label: string): Record<string, unknown> {
+  const value: unknown = JSON.parse(source);
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error(`${label} must be a JSON object.`);
+  }
+  return value as Record<string, unknown>;
+}
+
+function formSyntaxError(form: PageForm): string | null {
+  try {
+    metadataInput(form);
+    jsonObject(form.seo, "SEO metadata");
+    blockInputs(form);
+  } catch (error) {
+    return error instanceof Error ? error.message : "Correct the JSON fields before saving.";
+  }
+  return null;
 }
 
 function orderingForSort(sort: SortState): SitePageListQuery["ordering"] {
@@ -181,6 +218,8 @@ function SitePagesPanelContent({
   const [saving, setSaving] = useState(false);
   const [dialogError, setDialogError] = useState("");
   const [dialogConflict, setDialogConflict] = useState(false);
+  const [showDraftPreview, setShowDraftPreview] = useState(false);
+  const [parentPages, setParentPages] = useState<SitePageRecord[]>([]);
   const [busyPageId, setBusyPageId] = useState<string | null>(null);
 
   const ordering = orderingForSort(sort);
@@ -222,22 +261,44 @@ function SitePagesPanelContent({
     setPage(1);
   }
 
-  function openCreate() {
+  async function openCreate() {
     setActivePage(null);
-    setForm({ title: "Admissions", slug: "admissions", text: "Applications are open." });
+    setForm({ ...emptyForm(), title: "Admissions", slug: "admissions" });
     setDialogError("");
     setDialogConflict(false);
+    setShowDraftPreview(false);
     setMode("create");
+    try {
+      const results: SitePageRecord[] = [];
+      let pageNumber = 1;
+      let hasNext = true;
+      while (hasNext && pageNumber <= 100) {
+        const response = unwrap(await loadSitePages(siteId, { page: pageNumber, page_size: 100, ordering: "title" }));
+        results.push(...response.results.filter((row) => row.site === siteId));
+        hasNext = response.next !== null;
+        pageNumber += 1;
+      }
+      setParentPages(results);
+    } catch {
+      setParentPages(rows);
+    }
   }
 
   async function openEdit(row: SitePageRecord) {
     setSaving(true);
     setDialogError("");
     setDialogConflict(false);
+      setShowDraftPreview(false);
     try {
       const current = unwrap(await getSitePage(siteId, row.id));
       setActivePage(current);
-      setForm({ title: current.title, slug: current.slug, text: "" });
+      setForm({
+        title: current.title, slug: current.slug, parent: current.parent ?? "",
+        locale: current.locale || "en", visibility: current.visibility,
+        metadata: JSON.stringify(current.metadata ?? {}, null, 2),
+        seo: JSON.stringify(current.seo ?? {}, null, 2),
+        blocks: (current.blocks ?? []).map((block) => JSON.stringify(block, null, 2)),
+      });
       setMode("edit");
     } catch (cause) {
       toast.error(cause instanceof Error ? cause.message : "The Page could not be loaded.");
@@ -250,17 +311,28 @@ function SitePagesPanelContent({
     setSaving(true);
     setDialogError("");
     setDialogConflict(false);
+      setShowDraftPreview(false);
     try {
       if (mode === "create") {
         unwrap(await createSitePage(siteId, {
           title: form.title.trim(),
           slug: form.slug.trim(),
-          text: form.text,
+          parent: form.parent || null,
+          locale: form.locale.trim(),
+          visibility: form.visibility,
+          metadata: metadataInput(form),
+          seo: jsonObject(form.seo, "SEO"),
+          blocks: blockInputs(form),
         }));
       } else if (mode === "edit" && activePage?.etag) {
         unwrap(await updateSitePage(siteId, activePage.id, activePage.etag, {
           title: form.title.trim(),
           slug: form.slug.trim(),
+          parent: form.parent || null,
+          visibility: form.visibility,
+          metadata: metadataInput(form),
+          seo: jsonObject(form.seo, "SEO"),
+          blocks: blockInputs(form),
         }));
       } else {
         throw new Error("The Page revision is unavailable. Close and reopen the editor.");
@@ -272,13 +344,59 @@ function SitePagesPanelContent({
     } catch (cause) {
       if (cause instanceof ApiError && cause.status === 409) {
         setDialogConflict(true);
-        setDialogError(`${cause.message} Check that the slug is available; close and reopen the editor to load the latest Page version.`);
+        setDialogError(`${cause.message} Your edits are still here. Reload the latest version to continue.`);
       } else {
         setDialogError(cause instanceof Error ? cause.message : "The Page could not be saved.");
       }
     } finally {
       setSaving(false);
     }
+  }
+
+  async function reloadLatestAfterConflict() {
+    if (!activePage) return;
+    setSaving(true);
+    try {
+      const current = unwrap(await getSitePage(siteId, activePage.id));
+      setActivePage(current);
+      setForm({
+        title: current.title, slug: current.slug, parent: current.parent ?? "",
+        locale: current.locale || "en", visibility: current.visibility,
+        metadata: JSON.stringify(current.metadata ?? {}, null, 2),
+        seo: JSON.stringify(current.seo ?? {}, null, 2),
+        blocks: (current.blocks ?? []).map((block) => JSON.stringify(block, null, 2)),
+      });
+      setDialogConflict(false);
+      setDialogError("");
+    } catch (cause) {
+      setDialogError(cause instanceof Error ? cause.message : "The latest Page could not be loaded.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function closeEditor() {
+    if (saving) return;
+    const dirty = mode === "create"
+      ? JSON.stringify(form) !== JSON.stringify({ ...emptyForm(), title: "Admissions", slug: "admissions" })
+      : activePage !== null && JSON.stringify(form) !== JSON.stringify({
+          title: activePage.title, slug: activePage.slug, parent: activePage.parent ?? "",
+          locale: activePage.locale || "en", visibility: activePage.visibility,
+          metadata: JSON.stringify(activePage.metadata ?? {}, null, 2),
+          seo: JSON.stringify(activePage.seo ?? {}, null, 2),
+          blocks: (activePage.blocks ?? []).map((block) => JSON.stringify(block, null, 2)),
+        });
+    if (!dirty || window.confirm("Discard your unsaved Page changes?")) setMode(null);
+  }
+
+  function moveBlock(index: number, offset: number) {
+    setForm((current) => {
+      const next = [...current.blocks];
+      const target = index + offset;
+      if (target < 0 || target >= next.length) return current;
+      [next[index], next[target]] = [next[target], next[index]];
+      return { ...current, blocks: next };
+    });
   }
 
   async function runPageAction(row: SitePageRecord, action: () => Promise<unknown>) {
@@ -459,7 +577,7 @@ function SitePagesPanelContent({
           <Button
             variant="contained"
             startIcon={<AddIcon />}
-            onClick={openCreate}
+            onClick={() => void openCreate()}
             disabled={!enabled}
           >
             Create page
@@ -585,9 +703,7 @@ function SitePagesPanelContent({
 
       <Dialog
         open={mode === "create" || mode === "edit"}
-        onClose={() => {
-          if (!saving) setMode(null);
-        }}
+        onClose={closeEditor}
         fullWidth
         maxWidth="sm"
         aria-labelledby="page-editor-title"
@@ -597,10 +713,11 @@ function SitePagesPanelContent({
         </DialogTitle>
         <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, pt: "8px !important" }}>
           {dialogError ? (
-            <Alert severity={dialogConflict ? "warning" : "error"} role="alert">
+            <Alert severity={dialogConflict ? "warning" : "error"} role="alert" action={dialogConflict ? <Button color="inherit" size="small" onClick={() => void reloadLatestAfterConflict()}>Reload latest</Button> : undefined}>
               {dialogError}
             </Alert>
           ) : null}
+          {formSyntaxError(form) ? <Alert severity="error" role="alert">{formSyntaxError(form)}</Alert> : null}
           <TextField
             label="Title"
             value={form.title}
@@ -617,26 +734,79 @@ function SitePagesPanelContent({
             required
             helperText="Use lowercase letters, numbers and hyphens."
           />
-          {mode === "create" ? (
-            <TextField
-              label="Body"
-              value={form.text}
-              onChange={(event) => setForm((current) => ({ ...current, text: event.target.value }))}
-              disabled={!enabled}
-              multiline
-              minRows={3}
-            />
+          <TextField
+            select
+            label="Parent Page"
+            value={form.parent}
+            disabled={!enabled}
+            helperText="Only Pages from this Site are available. Route history is preserved when a Page moves."
+            onChange={(event) => setForm((current) => ({ ...current, parent: event.target.value }))}
+          >
+            <MenuItem value="">No parent (top level)</MenuItem>
+            {parentPages.filter((row) => row.id !== activePage?.id && !(activePage && row.path.startsWith(`${activePage.path}/`))).map((row) => (
+              <MenuItem key={row.id} value={row.id}>{row.title} — {row.path}</MenuItem>
+            ))}
+          </TextField>
+          <TextField label="Locale" value={form.locale} onChange={(event) => setForm((current) => ({ ...current, locale: event.target.value }))} disabled={mode === "edit"} required helperText={mode === "edit" ? "Locale is fixed when the Page is created." : undefined} />
+          <TextField select label="Visibility" value={form.visibility} onChange={(event) => setForm((current) => ({ ...current, visibility: event.target.value as SitePageRecord["visibility"] }))}>
+            <MenuItem value="PUBLIC">Public</MenuItem><MenuItem value="UNLISTED">Unlisted</MenuItem><MenuItem value="HIDDEN">Hidden</MenuItem>
+          </TextField>
+          <TextField label="Metadata (JSON object)" value={form.metadata} onChange={(event) => setForm((current) => ({ ...current, metadata: event.target.value }))} multiline minRows={3} helperText="Structured page metadata. Invalid JSON is rejected before save." />
+          <TextField label="SEO metadata (JSON object)" value={form.seo} onChange={(event) => setForm((current) => ({ ...current, seo: event.target.value }))} multiline minRows={3} helperText="Page title, description and social preview settings." />
+          <Box component="section" aria-label="Content blocks" sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            <Typography variant="subtitle2">Content blocks</Typography>
+            {form.blocks.map((block, index) => (
+              <Paper key={`block-${index}`} variant="outlined" sx={{ p: 1.5, display: "flex", flexDirection: "column", gap: 1 }}>
+                <Typography variant="caption">Block {index + 1} · edit structured JSON</Typography>
+                <TextField
+                  label={`Block ${index + 1} JSON`}
+                  value={block}
+                  onChange={(event) => setForm((current) => ({ ...current, blocks: current.blocks.map((item, itemIndex) => itemIndex === index ? event.target.value : item) }))}
+                  multiline minRows={3} fullWidth inputProps={{ "aria-label": `Block ${index + 1} JSON` }}
+                />
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  <Button aria-label={`Move block ${index + 1} up`} disabled={index === 0} onClick={() => moveBlock(index, -1)}>Move up</Button>
+                  <Button aria-label={`Move block ${index + 1} down`} disabled={index === form.blocks.length - 1} onClick={() => moveBlock(index, 1)}>Move down</Button>
+                  <Button aria-label={`Remove block ${index + 1}`} color="error" onClick={() => setForm((current) => ({ ...current, blocks: current.blocks.filter((_, itemIndex) => itemIndex !== index) }))}>Remove</Button>
+                </Box>
+              </Paper>
+            ))}
+            <Button onClick={() => setForm((current) => ({ ...current, blocks: [...current.blocks, '{"type":"heading","level":2,"text":"New heading"}'] }))}>Add heading block</Button>
+            <Button onClick={() => setForm((current) => ({ ...current, blocks: [...current.blocks, '{"type":"paragraph","html":"<p>New paragraph</p>"}'] }))}>Add paragraph block</Button>
+            <Button onClick={() => setForm((current) => ({ ...current, blocks: [...current.blocks, JSON.stringify({ type: "image", ref: `sites/${siteId}/image`, alt: "Describe this image" })] }))}>Add image block</Button>
+            <Button onClick={() => setForm((current) => ({ ...current, blocks: [...current.blocks, '{"type":"button","label":"Learn more","href":"/"}'] }))}>Add button block</Button>
+            <Button onClick={() => setForm((current) => ({ ...current, blocks: [...current.blocks, '{"type":"list","style":"unordered","items":["First item"]}'] }))}>Add list block</Button>
+            <Button onClick={() => setForm((current) => ({ ...current, blocks: [...current.blocks, '{"type":"section","heading":"New section","children":[{"type":"paragraph","html":"<p>Section content</p>"}]}'] }))}>Add section block</Button>
+          </Box>
+          <Button onClick={() => setShowDraftPreview((value) => !value)} aria-expanded={showDraftPreview}>
+            {showDraftPreview ? "Hide draft preview" : "Preview draft"}
+          </Button>
+          {showDraftPreview ? (
+            <Paper variant="outlined" sx={{ p: 2 }} aria-label="Unpublished Page preview">
+              <Typography variant="overline">Private draft preview</Typography>
+              {(() => {
+                try {
+                  return <PublicPageView page={{ title: form.title || "Untitled Page", path: activePage?.path ?? `/${form.slug}`, blocks: blockInputs(form) }} />;
+                } catch {
+                  return <Alert severity="error">Fix block JSON errors to preview this draft.</Alert>;
+                }
+              })()}
+            </Paper>
           ) : null}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setMode(null)} disabled={saving}>Cancel</Button>
+          <Button onClick={closeEditor} disabled={saving}>Cancel</Button>
           <Button
             variant="contained"
             onClick={() => void savePage()}
             disabled={
               !enabled ||
               !form.title.trim() ||
-              !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(form.slug.trim())
+              !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(form.slug.trim()) ||
+              !form.locale.trim() ||
+              form.blocks.some((block) => { try { JSON.parse(block); return false; } catch { return true; } }) ||
+              (() => { try { metadataInput(form); return false; } catch { return true; } })()
+              || (() => { try { jsonObject(form.seo, "SEO"); return false; } catch { return true; } })()
             }
           >
             {saving ? "Saving…" : mode === "create" ? "Create Page" : "Save changes"}

@@ -9,7 +9,7 @@ from types import SimpleNamespace
 import pytest
 
 from apps.organizations.models import OrganizationType, OrganizationUnit
-from apps.sites.models import Site
+from apps.sites.models import Module, Site
 
 from tests.oidc_helpers import (
     AUDIENCE,
@@ -67,6 +67,20 @@ def _isolate_external_services(settings):
     }
     settings.CELERY_TASK_ALWAYS_EAGER = True
     settings.CELERY_TASK_EAGER_PROPAGATES = False
+    settings.DEV_PLATFORM_ADMIN_BOOTSTRAP = False
+
+
+@pytest.fixture
+def pages_module(sites):
+    """Enable Page authoring for the shared multi-Site CMS test fixture."""
+    module = Module.objects.get(code="PAGES")
+    if not module.is_enabled:
+        module.is_enabled = True
+        module.save(update_fields=("is_enabled",))
+    from apps.sites.services.modules import enable_module_for_site
+    for site in sites:
+        enable_module_for_site(site.pk, module.pk)
+    return module
 
 
 @pytest.fixture
@@ -103,3 +117,9 @@ def cms_platform_admin(client, oidc):
         user=user, role=Role.objects.get(code="platform-administrator"), scope="PLATFORM",
     )
     return client
+
+
+@pytest.fixture
+def platform_admin(cms_platform_admin):
+    """Compatibility name shared with the CMS workflow/revision API suites."""
+    return cms_platform_admin

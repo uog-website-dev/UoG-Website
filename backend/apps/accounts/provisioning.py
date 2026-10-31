@@ -12,6 +12,7 @@ import re
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
+from django.utils import timezone
 
 from .models import OIDCIdentity
 from .oidc import TokenClaims
@@ -91,6 +92,49 @@ def _sync_roles(user, claims: TokenClaims) -> None:
     return None
 
 
+def _bootstrap_configured_development_admin(user, claims: TokenClaims) -> None:
+    """Grant the one explicitly configured local Compose admin, never by claim.
+
+    This path is gated by DEBUG plus a separate opt-in setting. Production
+    deployments and all other usernames continue to require controlled
+    database assignment provisioning.
+    """
+    if not settings.DEV_PLATFORM_ADMIN_BOOTSTRAP:
+        return
+    configured_username = settings.DEV_PLATFORM_ADMIN_USERNAME.strip()
+    if not configured_username or claims.username.casefold() != configured_username.casefold():
+        return
+
+    from apps.authorization.models import Role, UserRoleAssignment
+    from apps.authorization.services import record_decision
+
+    role = Role.objects.filter(
+        code="platform-administrator", is_system=True, is_active=True,
+    ).first()
+    if role is None:
+        return
+    assignment = UserRoleAssignment.objects.filter(
+        user=user, role=role, scope=UserRoleAssignment.Scope.PLATFORM,
+        revoked_at__isnull=True,
+    ).first()
+    now = timezone.now()
+    if assignment and (assignment.expires_at is None or assignment.expires_at > now):
+        return
+    if assignment:
+        assignment.revoked_at = now
+        assignment.save(update_fields=("revoked_at",))
+    assignment = UserRoleAssignment.objects.create(
+        user=user, role=role, scope=UserRoleAssignment.Scope.PLATFORM,
+    )
+    record_decision(
+        user=None,
+        action="DEV_PLATFORM_ADMIN_BOOTSTRAP",
+        outcome="CHANGE",
+        role_code=role.code,
+        details={"target_user_id": user.pk, "assignment_id": assignment.pk},
+    )
+
+
 @transaction.atomic
 def provision_user(claims: TokenClaims):
     """Return the local Django user for the given (validated) claims.
@@ -117,4 +161,5 @@ def provision_user(claims: TokenClaims):
     _sync_profile(user, claims)
     user.save()
     identity.save()
+    _bootstrap_configured_development_admin(user, claims)
     return user

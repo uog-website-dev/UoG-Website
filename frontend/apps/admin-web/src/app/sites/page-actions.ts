@@ -34,7 +34,6 @@ export interface SitePageBlock {
   heading?: string;
   children?: SitePageBlock[];
 }
-
 export interface SitePageRecord {
   id: string;
   site: number;
@@ -49,6 +48,10 @@ export interface SitePageRecord {
   created_by: number | string | null;
   updated_at: string;
   blocks: SitePageBlock[];
+  metadata?: Record<string, unknown>;
+  seo?: Record<string, unknown>;
+  layout?: string;
+  position?: number;
   etag?: string;
 }
 
@@ -166,14 +169,23 @@ export async function getSitePage(
 
 export async function createSitePage(
   siteId: number,
-  input: { title: string; slug: string; text: string },
+  input: {
+    title: string; slug: string; parent: string | null;
+    locale: string; visibility: SitePageRecord["visibility"];
+    metadata: Record<string, unknown>; seo: Record<string, unknown>; blocks: SitePageBlock[];
+  },
 ): Promise<ActionResult<SitePageRecord>> {
   return attempt(async () => {
     const api = await client();
     const created = await api.postDetailed<PageBody>(sitePagePath(siteId), {
       title: input.title,
       slug: input.slug,
-      blocks: [{ type: "paragraph", html: `<p>${escapeHtml(input.text)}</p>` }],
+      parent: input.parent,
+      locale: input.locale,
+      visibility: input.visibility,
+      metadata: input.metadata,
+      seo: input.seo,
+      blocks: input.blocks,
     });
     return withEtag(created.data, created.etag);
   });
@@ -183,13 +195,16 @@ export async function updateSitePage(
   siteId: number,
   pageId: string,
   ifMatch: string,
-  input: { title: string; slug: string },
+  input: {
+    title: string; slug: string; parent: string | null; visibility: SitePageRecord["visibility"];
+    metadata: Record<string, unknown>; seo: Record<string, unknown>; blocks: SitePageBlock[];
+  },
 ): Promise<ActionResult<SitePageRecord>> {
   return attempt(async () => {
     const api = await client();
     const updated = await api.patchDetailed<PageBody>(
       sitePagePath(siteId, `${pageId}/`),
-      { title: input.title, slug: input.slug },
+      input,
       { ifMatch },
     );
     return withEtag(updated.data, updated.etag);
@@ -223,17 +238,5 @@ export async function setSiteHomepage(
       {},
     );
     return withEtag(result.data, result.etag);
-  });
-}
-
-function escapeHtml(value: string): string {
-  return value.replace(/[&<>"']/g, (character) => {
-    switch (character) {
-      case "&": return "&amp;";
-      case "<": return "&lt;";
-      case ">": return "&gt;";
-      case "\"": return "&quot;";
-      default: return "&#39;";
-    }
   });
 }

@@ -277,6 +277,17 @@ def ensure_realm_roles(token: str) -> None:
         log(f"Realm role '{name}' created.")
 
 
+def ensure_realm_login_theme(token: str) -> None:
+    """Apply the version-controlled login theme to realms imported earlier."""
+    realm_url = f"{KC_URL}/admin/realms/{REALM}"
+    realm = request(realm_url, token=token)
+    if realm.get("loginTheme") == "uog":
+        return
+    realm["loginTheme"] = "uog"
+    request(realm_url, method="PUT", token=token, body=realm)
+    log("UoG light login theme selected for the realm.")
+
+
 def ensure_dev_user(token: str) -> str:
     if not DEV_PASSWORD:
         raise RuntimeError("KEYCLOAK_DEV_PASSWORD is not set")
@@ -409,6 +420,7 @@ def main() -> int:
     api_scope = ensure_api_client_scope(token)
     ensure_scope_on_clients(token, api_scope)
     ensure_realm_roles(token)
+    ensure_realm_login_theme(token)
     user_id = ensure_dev_user(token)
     ensure_dev_user_roles(token, user_id)
     smoke_test(token)

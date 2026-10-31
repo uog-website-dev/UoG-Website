@@ -37,6 +37,8 @@ def _test_environment(settings):
     }
     settings.CELERY_TASK_ALWAYS_EAGER = True
     settings.CELERY_TASK_EAGER_PROPAGATES = False
+    # Tests opt in explicitly when exercising the local-only bootstrap path.
+    settings.DEV_PLATFORM_ADMIN_BOOTSTRAP = False
 
 
 @pytest.fixture(scope="session")

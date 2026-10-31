@@ -17,6 +17,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ---------------------------------------------------------------------------
 SECRET_KEY = config("SECRET_KEY", default="django-insecure-dev-only-change-me")
 DEBUG = config("DEBUG", default=True, cast=bool)
+# Local Compose may explicitly bootstrap its configured development identity
+# into the database RBAC system. This is disabled by default and impossible
+# when DEBUG is false; Keycloak role claims never grant application access.
+DEV_PLATFORM_ADMIN_BOOTSTRAP = DEBUG and config(
+    "DEV_PLATFORM_ADMIN_BOOTSTRAP", default=False, cast=bool,
+)
+DEV_PLATFORM_ADMIN_USERNAME = config(
+    "DEV_PLATFORM_ADMIN_USERNAME", default="",
+)
 ALLOWED_HOSTS = config(
     "ALLOWED_HOSTS", default="localhost,127.0.0.1,backend", cast=Csv()
 )
