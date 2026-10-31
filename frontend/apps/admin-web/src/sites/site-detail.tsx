@@ -71,6 +71,7 @@ type LifecycleAction = "activate" | "suspend" | "archive";
 
 interface SiteDetailProps {
   site: Site | null;
+  permissions?: readonly string[];
   error?: ApiErrorPayload;
 }
 
@@ -123,7 +124,7 @@ const CONFIRM_COPY: Record<LifecycleAction, { title: string; description: string
   },
 };
 
-export function SiteDetail({ site, error }: SiteDetailProps) {
+export function SiteDetail({ site, permissions = [], error }: SiteDetailProps) {
   const router = useRouter();
   const toast = useToast();
 
@@ -692,7 +693,7 @@ export function SiteDetail({ site, error }: SiteDetailProps) {
       />
 
       <SiteMenusPanel siteId={site.id} menusEnabled={menusEnabled} />
-      <SitePagesPanel siteId={site.id} pagesEnabled={pagesEnabled} />
+      <SitePagesPanel siteId={site.id} pagesEnabled={pagesEnabled} permissions={permissions} />
 
       {/* Per-site module enablement, honest about planned capabilities. */}
       <Paper variant="outlined" sx={{ overflow: "hidden", borderRadius: 3 }}>
