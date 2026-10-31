@@ -18,6 +18,9 @@ describe("adminNavItems", () => {
       "/access",
     ]);
     expect(adminNavItems.at(-1)?.requiresAny).toContain("platform.roles.view");
+    expect(adminNavItems.find((item) => item.key === "modules")?.requiresAny).toEqual([
+      "platform.sites.manage_registry",
+    ]);
   });
 
   it("labels every entry for the navigation list", () => {

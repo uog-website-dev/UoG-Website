@@ -60,6 +60,7 @@ export const adminNavItems: AdminNavItem[] = [
     href: "/modules",
     description: "Capability registry",
     icon: ExtensionIcon,
+    requiresAny: ["platform.sites.manage_registry"],
   },
   {
     key: "access",

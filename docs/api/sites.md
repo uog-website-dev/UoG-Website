@@ -105,7 +105,9 @@ Seeded CMS, media, staff directory, academics, news, events, jobs, search,
 and analytics rows stay planned until a shipped capability exists.
 
 `POST /api/v1/sites/{site_pk}/modules/` enables one usable module for that
-Site. Usable means implemented, globally enabled, and shipped. A planned or
+Site. Usable means implemented, globally enabled, and shipped. Each enablement
+row includes read-only `module_code`, so a Site administrator can tell
+PAGES, POSTS and MENUS apart without the central registry. A planned or
 globally disabled module returns 400. A second pair returns 409.
 `disable` sets `is_enabled` false and keeps the row and configuration.
 PATCH replaces that Site's module settings and does not toggle enablement.

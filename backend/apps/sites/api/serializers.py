@@ -116,10 +116,12 @@ class ModuleUpdateSerializer(ModuleSerializer):
 
 
 class SiteModuleSerializer(StrictFields, serializers.ModelSerializer):
+    module_code = serializers.CharField(source="module.code", read_only=True)
+
     class Meta:
         model = SiteModule
-        fields = ("id", "site", "module", "is_enabled", "configuration", "created_at", "updated_at")
-        read_only_fields = ("id", "site", "is_enabled", "created_at", "updated_at")
+        fields = ("id", "site", "module", "module_code", "is_enabled", "configuration", "created_at", "updated_at")
+        read_only_fields = ("id", "site", "module_code", "is_enabled", "created_at", "updated_at")
 
 
 class EmptyObjectSerializer(serializers.Serializer):

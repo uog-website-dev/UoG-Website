@@ -263,6 +263,7 @@ uog-digital-platform/
 * [Public menu delivery and inheritance](docs/development/menu-delivery.md)
 * [Site navigation editor and public menu](docs/development/menu-navigation.md)
 * [Page authoring, review and public delivery](docs/development/page-verification.md)
+* [Site administration in the shared console](docs/development/site-administration.md)
 * [Architecture overview](docs/architecture/overview.md)
 * [Version matrix](docs/architecture/version-matrix.md)
 * [Development guide & troubleshooting](docs/development/setup.md)
