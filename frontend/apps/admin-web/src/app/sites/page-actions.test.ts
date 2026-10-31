@@ -113,32 +113,44 @@ describe("Site Page API actions", () => {
     const updated = await updateSitePage(11, "page-1", '"cms-content-page-1-r4"', {
       title: "Admissions updated",
       slug: "admissions",
+      parent: null,
+      visibility: "PUBLIC",
+      metadata: {},
+      seo: {},
+      blocks: [],
     });
 
     expect(api.patchDetailed).toHaveBeenCalledWith(
       "/v1/sites/11/pages/page-1/",
-      { title: "Admissions updated", slug: "admissions" },
+      { title: "Admissions updated", slug: "admissions", parent: null, visibility: "PUBLIC", metadata: {}, seo: {}, blocks: [] },
       { ifMatch: '"cms-content-page-1-r4"' },
     );
     expect(updated).toMatchObject({ ok: true, data: { etag: '"cms-content-page-1-r5"' } });
   });
 
-  it("escapes user text before putting it into the create-block contract", async () => {
+  it("sends structured blocks and same-site hierarchy in the create contract", async () => {
     api.postDetailed.mockResolvedValue({ data: record, etag: '"cms-content-page-1-r1"' });
 
     await createSitePage(11, {
       title: "Admissions",
       slug: "admissions",
-      text: `<script>alert("x")</script> & '`,
+      parent: null,
+      locale: "en",
+      visibility: "PUBLIC",
+      metadata: {},
+      seo: {},
+      blocks: [{ type: "paragraph", html: "<p>Applications</p>" }],
     });
 
     expect(api.postDetailed).toHaveBeenCalledWith("/v1/sites/11/pages/", {
       title: "Admissions",
       slug: "admissions",
-      blocks: [{
-        type: "paragraph",
-        html: "<p>&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt; &amp; &#39;</p>",
-      }],
+      parent: null,
+      locale: "en",
+      visibility: "PUBLIC",
+      metadata: {},
+      seo: {},
+      blocks: [{ type: "paragraph", html: "<p>Applications</p>" }],
     });
   });
 });

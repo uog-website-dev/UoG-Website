@@ -1,0 +1,249 @@
+:root {
+  color-scheme: light;
+  --uog-ink: #172b45;
+  --uog-muted: #65758b;
+  --uog-blue: #174a78;
+  --uog-blue-deep: #10385f;
+  --uog-gold: #d5a33a;
+  --uog-border: #dce4ed;
+  --uog-canvas: #f3f6fa;
+}
+
+html,
+body,
+.login-pf body {
+  min-height: 100%;
+  color: var(--uog-ink);
+  background:
+    radial-gradient(ellipse at 18% 12%, rgba(218, 232, 246, 0.85), transparent 34rem),
+    radial-gradient(ellipse at 92% 88%, rgba(248, 235, 204, 0.56), transparent 28rem),
+    var(--uog-canvas) !important;
+  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+}
+
+.login-pf-page {
+  display: flex;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 2rem 1.25rem;
+}
+
+.login-pf-page #kc-content,
+.login-pf-page #kc-content-wrapper {
+  width: 100%;
+  max-width: 42rem;
+  margin-right: auto;
+  margin-left: auto;
+  float: none;
+}
+
+.pf-v5-c-login {
+  width: 100%;
+  grid-template-columns: minmax(0, 1fr) !important;
+  align-items: center;
+}
+
+.pf-v5-c-login__container {
+  display: flex !important;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.pf-v5-c-login__main {
+  width: min(100%, 42rem);
+  margin-inline: auto;
+  justify-self: center;
+}
+
+#kc-header {
+  display: none;
+}
+
+.login-pf-page .login-pf-header,
+.pf-v5-c-login__main-header {
+  position: relative;
+  margin-bottom: 1.5rem;
+  padding-top: 4.2rem;
+}
+
+.login-pf-page .login-pf-header::before,
+.pf-v5-c-login__main-header::before {
+  position: absolute;
+  top: 0.6rem;
+  left: calc(50% - 8.8rem);
+  width: 2.85rem;
+  height: 2.85rem;
+  content: "U";
+  display: grid;
+  place-items: center;
+  border: 2px solid rgba(213, 163, 58, 0.9);
+  border-radius: 50%;
+  color: #fff;
+  background: linear-gradient(145deg, #1d5b8d, #123c65);
+  box-shadow: 0 3px 9px rgba(19, 55, 89, 0.16);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.55rem;
+  font-weight: 700;
+}
+
+.login-pf-page .login-pf-header::after,
+.pf-v5-c-login__main-header::after {
+  position: absolute;
+  top: 1.45rem;
+  left: calc(50% - 5.1rem);
+  content: "University of Gondar";
+  color: var(--uog-ink);
+  font-size: 1.08rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.card-pf,
+.pf-v5-c-login__main {
+  overflow: hidden;
+  border: 1px solid rgba(194, 207, 222, 0.8) !important;
+  border-radius: 18px !important;
+  background: #fff !important;
+  box-shadow: 0 24px 65px rgba(31, 55, 82, 0.12), 0 3px 10px rgba(31, 55, 82, 0.04) !important;
+}
+
+.card-pf {
+  padding: clamp(1.75rem, 4vw, 2.5rem);
+  border-top: 3px solid var(--uog-gold) !important;
+}
+
+.pf-v5-c-login__main {
+  border-top: 3px solid var(--uog-gold) !important;
+}
+
+.login-pf-page .login-pf-header h1,
+#kc-page-title,
+.pf-v5-c-login__main-header h1 {
+  display: none !important;
+}
+
+.login-pf-page .subtitle,
+#kc-info-wrapper,
+.pf-v5-c-login__main-header p {
+  color: var(--uog-muted) !important;
+}
+
+.login-pf-page .form-group,
+.pf-v5-c-form__group {
+  margin-bottom: 1.15rem;
+}
+
+.login-pf-page label,
+.pf-v5-c-form__label-text {
+  color: #30445d !important;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.login-pf-page input[type="text"],
+.login-pf-page input[type="password"],
+.login-pf-page input[type="email"],
+.login-pf-page input[type="number"],
+.pf-v5-c-form-control {
+  min-height: 2.9rem;
+  border: 1px solid var(--uog-border) !important;
+  border-radius: 8px !important;
+  color: var(--uog-ink) !important;
+  background: #fff !important;
+  box-shadow: none !important;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.login-pf-page input:focus,
+.pf-v5-c-form-control:focus {
+  border-color: var(--uog-blue) !important;
+  outline: 0 !important;
+  box-shadow: 0 0 0 3px rgba(23, 74, 120, 0.16) !important;
+}
+
+#kc-login,
+.pf-v5-c-button.pf-m-primary {
+  min-height: 2.95rem;
+  border: 0 !important;
+  border-radius: 8px !important;
+  color: #fff !important;
+  background: var(--uog-blue) !important;
+  box-shadow: 0 4px 10px rgba(23, 74, 120, 0.2);
+  font-size: 0.98rem;
+  font-weight: 700;
+  transition: background-color 120ms ease, transform 120ms ease, box-shadow 120ms ease;
+}
+
+#kc-login:hover,
+.pf-v5-c-button.pf-m-primary:hover {
+  background: var(--uog-blue-deep) !important;
+  box-shadow: 0 6px 14px rgba(23, 74, 120, 0.25);
+}
+
+#kc-login:active,
+.pf-v5-c-button.pf-m-primary:active {
+  transform: translateY(1px);
+}
+
+.login-pf-page a,
+.pf-v5-c-login a {
+  color: var(--uog-blue) !important;
+  font-weight: 600;
+}
+
+.login-pf-page a:hover,
+.pf-v5-c-login a:hover {
+  color: var(--uog-blue-deep) !important;
+  text-decoration: underline;
+}
+
+.login-pf-page .alert,
+.pf-v5-c-alert {
+  border-radius: 8px;
+}
+
+.login-pf-page .login-pf-signup,
+.login-pf-page #kc-info {
+  color: var(--uog-muted);
+}
+
+.login-pf-page .footer,
+#kc-locale,
+.pf-v5-c-login__footer {
+  color: var(--uog-muted);
+}
+
+:focus-visible {
+  outline: 3px solid rgba(213, 163, 58, 0.9) !important;
+  outline-offset: 3px;
+}
+
+@media (max-width: 520px) {
+  .login-pf-page {
+    min-height: 100vh;
+    padding: 1.5rem 0.9rem;
+  }
+
+  .card-pf {
+    padding: 1.4rem 1.15rem;
+    border-radius: 14px !important;
+  }
+
+  .login-pf-page .login-pf-header::after,
+  .pf-v5-c-login__main-header::after {
+    left: calc(50% - 5.1rem);
+    font-size: 0.98rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

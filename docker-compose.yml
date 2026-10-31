@@ -21,6 +21,8 @@ x-backend-image: &backend-image
 
 x-backend-environment: &backend-environment
   DEBUG: ${DEBUG:-True}
+  DEV_PLATFORM_ADMIN_BOOTSTRAP: ${DEV_PLATFORM_ADMIN_BOOTSTRAP:-True}
+  DEV_PLATFORM_ADMIN_USERNAME: ${DEV_PLATFORM_ADMIN_USERNAME:-${KEYCLOAK_DEV_USERNAME:-devuser}}
   ORGANIZATIONS_DEV_WRITES_ENABLED: ${ORGANIZATIONS_DEV_WRITES_ENABLED:-False}
   SECRET_KEY: ${DJANGO_SECRET_KEY:-dev-only-insecure-secret-key-change-me}
   ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1,backend,nginx,.uog.local}
@@ -205,6 +207,7 @@ services:
       KC_HOSTNAME_BACKCHANNEL_DYNAMIC: "true"
     volumes:
       - ./infrastructure/keycloak/realm-import:/opt/keycloak/data/import:ro
+      - ./infrastructure/keycloak/themes/uog:/opt/keycloak/themes/uog:ro
     ports:
       - "${KEYCLOAK_PORT:-8080}:8080"
     depends_on:

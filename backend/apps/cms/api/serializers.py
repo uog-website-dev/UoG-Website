@@ -68,12 +68,19 @@ class PageSerializer(
 
     Identity, Site, computed route, homepage flag and lifecycle are
     server-managed; the caller may edit content, routing inputs and
-    presentation hints. `parent` and `locale` are create-only: moving a
-    subtree must go through the change_route service (which records URL
-    history) and a page's language is fixed at creation.
+    presentation hints. Moving a subtree goes through the change_route
+    service (which records URL history); a page's language is fixed at creation.
     """
 
-    immutable_on_update = ("id", "site", "parent", "locale", "created_by", "created_at")
+    parent = serializers.PrimaryKeyRelatedField(
+        queryset=Page.objects.all(), required=False, allow_null=True,
+        help_text=(
+            "Parent Page on the same Site and locale. Reparenting preserves "
+            "route history and cannot create a cycle."
+        ),
+    )
+
+    immutable_on_update = ("id", "site", "locale", "created_by", "created_at")
 
     class Meta:
         model = Page
@@ -91,3 +98,13 @@ class PageSerializer(
             "revision_number", "reviewed_by", "review_comment",
             "created_at", "updated_at",
         )
+
+    def validate_parent(self, value):
+        site_id = getattr(self.instance, "site_id", None)
+        if site_id is None:
+            site_id = getattr(self.context.get("site"), "pk", None)
+        if value is not None and value.site_id != site_id:
+            raise serializers.ValidationError("Parent Page must belong to this Site.")
+        if self.instance is not None and value is not None and value.pk == self.instance.pk:
+            raise serializers.ValidationError("A Page cannot be its own parent.")
+        return value

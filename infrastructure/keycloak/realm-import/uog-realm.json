@@ -2,6 +2,7 @@
   "realm": "uog",
   "enabled": true,
   "displayName": "University of Gondar",
+  "loginTheme": "uog",
   "sslRequired": "external",
   "registrationAllowed": false,
   "loginWithEmailAllowed": true,

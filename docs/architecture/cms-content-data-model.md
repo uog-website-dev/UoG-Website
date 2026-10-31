@@ -283,9 +283,10 @@ ancestor moves every descendant route — as `PageRedirect` rows keyed by
 are server-managed; `title`, `slug`, `layout`, `seo`, `visibility`,
 `position`, `metadata` and `blocks` are writable in editable workflow states;
 `submitted_by`, `reviewed_by` and `review_comment` are server-managed.
-`parent` and `locale` are accepted on create only — moves must go through
-`change_route` so URL history is recorded, and the language is fixed. The
+`parent` is accepted on create and update only within the owning Site and
+locale — moves go through `change_route` so URL history is recorded, and the
+language is fixed at creation. The
 [shared review/publishing workflow](./cms-workflow.md) owns all status
-transitions. No routes are mounted, so the
-[OpenAPI snapshot](../api/openapi.yaml) is unchanged and no URL namespace
-appears for `cms`.
+transitions. The Site-scoped Page endpoints are mounted under
+`/api/v1/sites/{site_pk}/pages/`; their request and response schemas are
+generated from `PageSerializer`.

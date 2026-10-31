@@ -8,8 +8,10 @@ immutable publication snapshots.
 
 All authoring routes require a validated Keycloak bearer token and an active
 CMS role on the Site named in the path. AUTHOR may create and edit; AUTHOR,
-REVIEWER and PUBLISHER may list and inspect. A validated `platform-admin`
-token role can perform all actions. Client-supplied roles are not accepted.
+REVIEWER and PUBLISHER may list and inspect. A platform administrator with an
+active database assignment can perform all actions; the validated legacy
+`platform-admin` token role is also supported. Client-supplied roles are not
+accepted.
 
 Every authoring, workflow and revision route is also gated on the `PAGES`
 module being enabled for the Site. When it is disabled, those requests are
@@ -36,7 +38,9 @@ List filters are `search`, `status`, `visibility`, `locale`, `parent` and
 `ordering`. `page` and `page_size` pagination defaults to 20 and is capped at
 100. Unknown or repeated parameters return field-level 400 errors. Site,
 status, computed path, authorship, publication time and revision numbers are
-server managed.
+server managed. Parent Pages must share the Site and locale. Editing a parent
+records redirects for affected routes and is rejected if it would create a
+cycle or cross-Site hierarchy.
 
 The Site admin list uses the paginated response's `results` for Page rows and
 `count` for navigation. Its status dashboard obtains each total by requesting
@@ -44,6 +48,10 @@ the list with that `status`, `page=1` and `page_size=1`; the returned `count`
 is the total for the whole Site, not just the current page. Page rows include
 the title, computed path, status, locale, `created_by` author id and
 `updated_at` timestamp used by the table.
+
+The admin editor previews unpublished blocks inside the authenticated
+administration session. Preview data is loaded through the authorized Site
+Page API and is not exposed through public delivery routes.
 
 Each detail response returns an ETag of the form
 `"cms-content-{uuid}-r{revision}"`. Updates require that exact value in

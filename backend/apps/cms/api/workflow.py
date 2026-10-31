@@ -171,12 +171,14 @@ class ContentWorkflowActionView(APIView):
     )
     def post(self, request, site_pk, content_id):
         site = get_object_or_404(Site, pk=site_pk)
-        # Disabling PAGES for a Site blocks transitions, not just delivery.
-        reject_disabled_module(site.pk, "PAGES", request=request)
         content = get_object_or_404(
             SiteContent.objects.filter(site_id=site.pk),
             pk=content_id,
         )
+        # Resolve the tenant-owned object before checking module state, so a
+        # cross-Site identifier always remains indistinguishable from missing.
+        # Disabling PAGES still blocks transitions for a Page on this Site.
+        reject_disabled_module(site.pk, "PAGES", request=request)
         payload = WorkflowActionInput(data=request.data)
         payload.is_valid(raise_exception=True)
         claims = request.auth

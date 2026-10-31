@@ -9,6 +9,8 @@ import time
 
 import pytest
 from django.contrib.auth import get_user_model
+from django.core.management import call_command
+from django.test import override_settings
 
 from apps.accounts.models import OIDCIdentity
 
@@ -39,6 +41,39 @@ def test_me_with_a_valid_token_returns_the_identity(client, oidc):
     assert not user.is_staff
     assert not user.groups.exists()
     assert OIDCIdentity.objects.get(user=user).subject == SUBJECT
+
+
+@pytest.mark.django_db
+@override_settings(
+    DEBUG=True,
+    DEV_PLATFORM_ADMIN_BOOTSTRAP=True,
+    DEV_PLATFORM_ADMIN_USERNAME="devuser",
+)
+def test_explicit_local_dev_admin_bootstrap_creates_database_assignment(client, oidc):
+    from apps.authorization.access import is_platform_administrator
+    from apps.authorization.models import UserRoleAssignment
+
+    call_command("seed_rbac", verbosity=0)
+    response = client.get("/api/me/", **oidc.header(realm_access={"roles": []}))
+    assert response.status_code == 200
+    user = User.objects.get(username="devuser")
+    assert is_platform_administrator(user)
+    assert UserRoleAssignment.objects.filter(
+        user=user, role__code="platform-administrator",
+        scope=UserRoleAssignment.Scope.PLATFORM, revoked_at__isnull=True,
+    ).exists()
+
+    other = client.get(
+        "/api/me/",
+        **oidc.header(
+            sub="5f1b2c3d-0000-4000-8000-000000000099",
+            preferred_username="another-user",
+            email="another-user@uog.et",
+            realm_access={"roles": ["platform-admin"]},
+        ),
+    )
+    assert other.status_code == 200
+    assert not is_platform_administrator(User.objects.get(username="another-user"))
 
 
 @pytest.mark.django_db

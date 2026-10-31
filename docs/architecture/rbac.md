@@ -8,7 +8,7 @@ Each checked permission must exist in three places: the reviewed executable cata
 
 Assignments are `PLATFORM`, `ORGANIZATION`, or `SITE`. Organization assignments cover that organization and its descendants. Site assignments cover one Site only. Site ownership is read from the Site row, never from a request-provided organization. Expired, revoked, inactive-user, inactive-role, and inactive-permission grants do not authorize. A platform assignment only grants the specific capabilities on its role; the explicit system Platform Administrator is the audited narrow bypass for the documented `PLATFORM_ADMIN` capability set.
 
-Run `python manage.py seed_rbac` after migrations and on every backend startup. It is idempotent, updates the reviewed standard templates, and never grants a user an assignment. To enable a first platform administrator, create and approve an explicit platform-scoped assignment through controlled operational provisioning; no Keycloak claim auto-promotes a user.
+Run `python manage.py seed_rbac` after migrations and on every backend startup. It is idempotent, updates the reviewed standard templates, and never grants a user an assignment. In local Compose only, `DEV_PLATFORM_ADMIN_BOOTSTRAP=True` with `DEBUG=True` grants a database assignment to exactly `DEV_PLATFORM_ADMIN_USERNAME` (default `devuser`) at that user's first authenticated API request. This uses explicit local configuration, not a Keycloak role claim. Production and shared deployments must leave the setting off and provision the first platform administrator through controlled operations.
 
 ## Registered permission catalog
 

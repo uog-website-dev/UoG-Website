@@ -14,7 +14,7 @@ from rest_framework.viewsets import GenericViewSet
 from uuid import UUID
 
 from apps.accounts.authentication import KeycloakBearerAuthentication
-from apps.authorization.access import reject_disabled_module
+from apps.authorization.access import is_platform_administrator
 from apps.sites.api.access import Conflict, PreconditionRequired
 from apps.sites.api.serializers import StrictFields
 from apps.sites.models import Site
@@ -124,18 +124,20 @@ class SitePageViewSet(
         )
 
     def _site(self):
-        site = get_object_or_404(Site, pk=self.kwargs["site_pk"])
-        # Disabling PAGES for a Site blocks authoring too, not just delivery.
-        reject_disabled_module(site.pk, "PAGES", request=self.request)
-        return site
+        return get_object_or_404(Site, pk=self.kwargs["site_pk"])
 
     def _roles(self):
         claims = self.request.auth
         roles = getattr(claims, "roles", ())
-        return roles if isinstance(roles, (tuple, list, set, frozenset)) else ()
+        roles = set(roles) if isinstance(roles, (tuple, list, set, frozenset)) else set()
+        # Database assignments are the platform's authorization source. A
+        # platform administrator must not need a duplicate Keycloak role.
+        if is_platform_administrator(self.request.user):
+            roles.add("platform-admin")
+        return roles
 
     def _authorize(self, site, required_roles):
-        if "platform-admin" in set(self._roles()):
+        if is_platform_administrator(self.request.user) or "platform-admin" in set(self._roles()):
             return
         if SiteContentRoleAssignment.objects.filter(
             site_id=site.pk,
@@ -246,7 +248,8 @@ class SitePageViewSet(
         description=(
             "Partially update a draft or unpublished Page. Requires Site "
             "AUTHOR or platform-admin and the current If-Match ETag. Missing "
-            "preconditions return 428; stale edits return 409."
+            "preconditions return 428; stale edits return 409. Parent changes "
+            "must target this Site and preserve route history for descendants."
         ),
     )
     def partial_update(self, request, *args, **kwargs):
@@ -270,12 +273,18 @@ class SitePageViewSet(
                 serializer.is_valid(raise_exception=True)
                 values = dict(serializer.validated_data)
                 requested_slug = values.pop("slug", page.slug)
+                requested_parent = values.pop("parent", page.parent)
                 for field, value in values.items():
                     setattr(page, field, value)
                 page.updated_by = request.user
+                route_changes = {}
                 if requested_slug != page.slug:
+                    route_changes["slug"] = requested_slug
+                if requested_parent != page.parent:
+                    route_changes["parent"] = requested_parent
+                if route_changes:
                     page = change_route(
-                        page, slug=requested_slug, actor=request.user,
+                        page, **route_changes, actor=request.user,
                     )
                 else:
                     page.save()

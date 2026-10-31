@@ -243,7 +243,12 @@ describe("SitePagesPanel", () => {
     await waitFor(() => expect(createSitePage).toHaveBeenCalledWith(11, {
       title: "Admissions",
       slug: "admissions",
-      text: "Applications are open.",
+      parent: null,
+      locale: "en",
+      visibility: "PUBLIC",
+      metadata: {},
+      seo: {},
+      blocks: [{ type: "paragraph", html: "<p>Applications are open.</p>" }],
     }));
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
 
@@ -257,7 +262,10 @@ describe("SitePagesPanel", () => {
       11,
       "page-1",
       '"cms-content-page-1-r1"',
-      { title: "Admissions updated", slug: "admissions" },
+      {
+        title: "Admissions updated", slug: "admissions", visibility: "PUBLIC",
+        parent: null, metadata: {}, seo: {}, blocks: draft().blocks,
+      },
     ));
   });
 
@@ -270,8 +278,40 @@ describe("SitePagesPanel", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Edit Admissions" }));
     await screen.findByRole("dialog", { name: "Edit Page" });
     fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
-    expect((await screen.findByRole("alert")).textContent).toMatch(/slug is available/i);
+    expect((await screen.findByRole("alert")).textContent).toMatch(/Content changed/i);
     expect(screen.getByRole("textbox", { name: "Title" })).toHaveProperty("value", "Admissions");
+    fireEvent.click(screen.getByRole("button", { name: "Reload latest" }));
+    await waitFor(() => expect(getSitePage).toHaveBeenCalledTimes(2));
+  });
+
+  it("previews private draft content and blocks malformed block JSON", async () => {
+    renderPanel();
+    fireEvent.click(await screen.findByRole("button", { name: "Create page" }));
+    fireEvent.click(screen.getByRole("button", { name: "Preview draft" }));
+    expect(screen.getByText("Private draft preview")).toBeTruthy();
+    expect(screen.queryByRole("script")).toBeNull();
+    fireEvent.change(screen.getByRole("textbox", { name: "Block 1 JSON" }), {
+      target: { value: "{invalid" },
+    });
+    expect(screen.getByRole("button", { name: "Create Page" })).toHaveProperty("disabled", true);
+    expect(screen.getAllByRole("alert").some((alert) => /JSON at position|Expected property/i.test(alert.textContent ?? ""))).toBe(true);
+  });
+
+  it("asks before discarding unsaved editor changes", async () => {
+    const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
+    renderPanel();
+    fireEvent.click(await screen.findByRole("button", { name: "Create page" }));
+    fireEvent.change(screen.getByRole("textbox", { name: "Title" }), {
+      target: { value: "Changed title" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(confirm).toHaveBeenCalledWith("Discard your unsaved Page changes?");
+    expect(screen.getByRole("dialog", { name: "Create Page" })).toBeTruthy();
+
+    confirm.mockReturnValue(true);
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "Create Page" })).toBeNull());
+    confirm.mockRestore();
   });
 
   it("blocks management when the PAGES module is off", async () => {
