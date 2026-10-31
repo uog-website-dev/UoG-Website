@@ -38,6 +38,13 @@ List filters are `search`, `status`, `visibility`, `locale`, `parent` and
 status, computed path, authorship, publication time and revision numbers are
 server managed.
 
+The Site admin list uses the paginated response's `results` for Page rows and
+`count` for navigation. Its status dashboard obtains each total by requesting
+the list with that `status`, `page=1` and `page_size=1`; the returned `count`
+is the total for the whole Site, not just the current page. Page rows include
+the title, computed path, status, locale, `created_by` author id and
+`updated_at` timestamp used by the table.
+
 Each detail response returns an ETag of the form
 `"cms-content-{uuid}-r{revision}"`. Updates require that exact value in
 `If-Match`: a missing precondition returns 428 and a stale value returns 409.

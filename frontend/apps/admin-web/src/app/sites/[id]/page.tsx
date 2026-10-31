@@ -8,6 +8,7 @@
  */
 import { notFound } from "next/navigation";
 
+import { getEffectivePermissions } from "@/access-control";
 import { getSite } from "@/app/sites/actions";
 import { SiteDetail } from "@/sites/site-detail";
 
@@ -29,5 +30,6 @@ export default async function SitePage({ params }: SitePageProps) {
     return <SiteDetail error={result.error} site={null} />;
   }
 
-  return <SiteDetail site={result.data.data} />;
+  const permissions = await getEffectivePermissions(numericId);
+  return <SiteDetail site={result.data.data} permissions={permissions} />;
 }

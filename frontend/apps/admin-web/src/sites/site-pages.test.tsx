@@ -1,10 +1,13 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ToastProvider } from "@uog/ui";
 
-import type { SitePageRecord } from "@/app/sites/page-actions";
+import type { SitePageRecord, SitePageStatus } from "@/app/sites/page-actions";
 
+const { push } = vi.hoisted(() => ({ push: vi.fn() }));
 const loadSitePages = vi.fn();
+const loadSitePageStatusCounts = vi.fn();
+const getSitePage = vi.fn();
 const createSitePage = vi.fn();
 const updateSitePage = vi.fn();
 const transitionSitePage = vi.fn();
@@ -12,23 +15,54 @@ const setSiteHomepage = vi.fn();
 
 vi.mock("@/app/sites/page-actions", () => ({
   loadSitePages: (...args: unknown[]) => loadSitePages(...args),
+  loadSitePageStatusCounts: (...args: unknown[]) => loadSitePageStatusCounts(...args),
+  getSitePage: (...args: unknown[]) => getSitePage(...args),
   createSitePage: (...args: unknown[]) => createSitePage(...args),
   updateSitePage: (...args: unknown[]) => updateSitePage(...args),
   transitionSitePage: (...args: unknown[]) => transitionSitePage(...args),
   setSiteHomepage: (...args: unknown[]) => setSiteHomepage(...args),
 }));
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push }),
+  usePathname: () => "/sites/11/admin/pages",
+}));
+
+vi.mock("next/link", () => ({
+  default: ({
+    href,
+    children,
+    ...props
+  }: React.ComponentProps<"a"> & { href: string }) => (
+    <a href={href} {...props}>{children}</a>
+  ),
+}));
+
 import { SitePagesPanel } from "./site-pages";
+import { SiteAdminFrame, SiteSection } from "./site-admin-frame";
+import type { SiteAdminSite } from "./site-admin-frame";
+
+const ALL_PERMISSIONS = [
+  "content.pages.view",
+  "content.pages.create",
+  "content.pages.update",
+  "content.pages.publish",
+];
 
 function draft(partial: Partial<SitePageRecord> = {}): SitePageRecord {
   return {
     id: "page-1",
     site: 11,
+    parent: null,
     title: "Admissions",
     slug: "admissions",
     path: "/admissions",
     status: "DRAFT",
+    visibility: "PUBLIC",
+    locale: "en-us",
     is_homepage: false,
+    created_by: 7,
+    updated_at: "2026-03-20T10:00:00Z",
     etag: '"cms-content-page-1-r1"',
     blocks: [{
       type: "paragraph",
@@ -38,17 +72,58 @@ function draft(partial: Partial<SitePageRecord> = {}): SitePageRecord {
   };
 }
 
-function renderPanel(siteId = 11, pagesEnabled: boolean | null = true) {
+function counts(): Record<SitePageStatus, number> {
+  return {
+    DRAFT: 1,
+    IN_REVIEW: 0,
+    APPROVED: 0,
+    PUBLISHED: 0,
+    UNPUBLISHED: 0,
+    ARCHIVED: 0,
+  };
+}
+
+function pageResult(results: SitePageRecord[], count = results.length) {
+  return { ok: true, data: { count, next: null, previous: null, results } };
+}
+
+function renderPanel(
+  siteId = 11,
+  pagesEnabled: boolean | null = true,
+  permissions: readonly string[] = ALL_PERMISSIONS,
+) {
   return render(
     <ToastProvider>
-      <SitePagesPanel siteId={siteId} pagesEnabled={pagesEnabled} />
+      <SitePagesPanel siteId={siteId} pagesEnabled={pagesEnabled} permissions={permissions} />
     </ToastProvider>,
+  );
+}
+
+function siteWorkspace(site: SiteAdminSite, permissions: readonly string[]) {
+  return (
+    <ToastProvider>
+      <SiteAdminFrame
+        site={site}
+        sites={[
+          { id: 11, name: "Informatics", code: "INFORMATICS", status: "ACTIVE" },
+          { id: 22, name: "Medicine", code: "MEDICINE", status: "ACTIVE" },
+        ]}
+        enabledModuleCodes={["PAGES"]}
+        permissions={[...permissions]}
+      >
+        <SiteSection sectionKey="pages">
+          <SitePagesPanel siteId={site.id} pagesEnabled permissions={permissions} />
+        </SiteSection>
+      </SiteAdminFrame>
+    </ToastProvider>
   );
 }
 
 beforeEach(() => {
   vi.clearAllMocks();
-  loadSitePages.mockResolvedValue({ ok: true, data: [draft()] });
+  loadSitePages.mockResolvedValue(pageResult([draft()]));
+  loadSitePageStatusCounts.mockResolvedValue({ ok: true, data: counts() });
+  getSitePage.mockResolvedValue({ ok: true, data: draft() });
   createSitePage.mockResolvedValue({ ok: true, data: draft() });
   transitionSitePage.mockResolvedValue({ ok: true, data: draft({ status: "IN_REVIEW" }) });
   setSiteHomepage.mockResolvedValue({ ok: true, data: draft({ is_homepage: true }) });
@@ -56,41 +131,147 @@ beforeEach(() => {
 });
 
 describe("SitePagesPanel", () => {
-  it("submits this Site's draft for review and previews it without unsafe links", async () => {
-    renderPanel(11);
-    const submit = await screen.findByRole("button", { name: "Submit Admissions for review" });
-    expect(submit.tagName).toBe("BUTTON");
-    submit.focus();
-    expect(document.activeElement).toBe(submit);
-    expect(screen.getByRole("link", { name: "About" }).getAttribute("href")).toBe("/about");
-    expect(screen.queryByRole("link", { name: "Bad" })).toBeNull();
-    fireEvent.click(submit);
-    await waitFor(() => expect(transitionSitePage).toHaveBeenCalledWith(11, "page-1", "submit"));
-    expect(JSON.stringify(transitionSitePage.mock.calls)).not.toContain("22");
-    expect(screen.queryByText("Hospital")).toBeNull();
+  it("renders a site-scoped accessible table and status dashboard", async () => {
+    loadSitePages.mockResolvedValue(pageResult([
+      draft(),
+      draft({ id: "page-9", site: 22, title: "Hospital" }),
+    ], 2));
+    renderPanel();
+
+    const table = await screen.findByRole("table", { name: "Pages for this Site" });
+    expect(within(table).getByText("Admissions")).toBeTruthy();
+    expect(within(table).getByText("/admissions")).toBeTruthy();
+    expect(within(table).getByText("User 7")).toBeTruthy();
+    expect(within(table).queryByText("Hospital")).toBeNull();
+    expect(screen.getByRole("region", { name: "Page status dashboard" })).toBeTruthy();
+    expect(screen.getByText("Total").parentElement?.textContent).toContain("1");
+    expect(screen.getByRole("button", { name: "Preview Admissions" })).toBeTruthy();
   });
 
-  it("creates and assigns the homepage only for this Site", async () => {
-    renderPanel(11);
-    fireEvent.click(await screen.findByRole("button", { name: "Create page" }));
+  it("announces empty and failed API list states", async () => {
+    loadSitePages.mockResolvedValueOnce(pageResult([]));
+    const emptyView = renderPanel();
+    expect(await screen.findByText("This Site does not have any Pages yet.")).toBeTruthy();
+    emptyView.unmount();
+
+    loadSitePages.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 403,
+        code: "permission_denied",
+        message: "Pages are unavailable to this account.",
+        details: null,
+        requestId: "request-1",
+      },
+    });
+    renderPanel();
+    expect(await screen.findByRole("alert")).toBeTruthy();
+    expect(screen.getByText("Pages are unavailable to this account.")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Try again" })).toBeTruthy();
+  });
+
+  it("applies server search and status filters and resets pagination", async () => {
+    renderPanel();
+    await screen.findByRole("table", { name: "Pages for this Site" });
+
+    fireEvent.change(screen.getByRole("textbox", { name: "Search Pages" }), {
+      target: { value: "  admissions  " },
+    });
+    fireEvent.mouseDown(screen.getByRole("combobox", { name: "Status" }));
+    fireEvent.click(screen.getByRole("option", { name: "Draft" }));
+    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+
+    await waitFor(() => {
+      expect(loadSitePages).toHaveBeenLastCalledWith(11, {
+        search: "admissions",
+        status: "DRAFT",
+        page: 1,
+        page_size: 20,
+        ordering: "-updated_at",
+      });
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Reset" }));
+    await waitFor(() => {
+      expect(loadSitePages).toHaveBeenLastCalledWith(11, {
+        search: undefined,
+        status: undefined,
+        page: 1,
+        page_size: 20,
+        ordering: "-updated_at",
+      });
+    });
+  });
+
+  it("uses API pagination and resets to the first page when sorting changes", async () => {
+    loadSitePages.mockResolvedValue(pageResult([draft()], 41));
+    renderPanel();
+    await screen.findByRole("table", { name: "Pages for this Site" });
+    expect(screen.getByText("1–20 of 41")).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Next page" }));
+    await waitFor(() => expect(loadSitePages).toHaveBeenLastCalledWith(11, expect.objectContaining({ page: 2 })));
+
+    fireEvent.click(screen.getByRole("button", { name: "Title" }));
+    await waitFor(() => expect(loadSitePages).toHaveBeenLastCalledWith(11, expect.objectContaining({
+      page: 1,
+      ordering: "title",
+    })));
+  });
+
+  it("opens a safe preview and submits this Site's draft for review", async () => {
+    renderPanel();
+    fireEvent.click(await screen.findByRole("button", { name: "Preview Admissions" }));
+    expect(screen.getByRole("dialog", { name: "Preview: Admissions" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "About" }).getAttribute("href")).toBe("/about");
+    expect(screen.queryByRole("link", { name: "Bad" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Close preview" }));
+
+    fireEvent.click(await screen.findByRole("button", { name: "Submit Admissions for review" }));
+    await waitFor(() => expect(transitionSitePage).toHaveBeenCalledWith(11, "page-1", "submit"));
+    expect(JSON.stringify(transitionSitePage.mock.calls)).not.toContain("22");
+  });
+
+  it("creates and edits only with the matching permission and current ETag", async () => {
+    renderPanel();
+    await screen.findByRole("table", { name: "Pages for this Site" });
+
+    fireEvent.click(screen.getByRole("button", { name: "Create page" }));
+    fireEvent.change(screen.getByRole("textbox", { name: "Title" }), {
+      target: { value: "Admissions" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Create Page" }));
     await waitFor(() => expect(createSitePage).toHaveBeenCalledWith(11, {
       title: "Admissions",
       slug: "admissions",
       text: "Applications are open.",
     }));
-    fireEvent.click(screen.getByRole("button", { name: "Set Admissions as homepage" }));
-    await waitFor(() => expect(setSiteHomepage).toHaveBeenCalledWith(11, "page-1"));
-    expect(JSON.stringify(createSitePage.mock.calls)).not.toContain("22");
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+
+    fireEvent.click(await screen.findByRole("button", { name: "Edit Admissions" }));
+    await waitFor(() => expect(getSitePage).toHaveBeenCalledWith(11, "page-1"));
+    fireEvent.change(await screen.findByRole("textbox", { name: "Title" }), {
+      target: { value: "Admissions updated" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+    await waitFor(() => expect(updateSitePage).toHaveBeenCalledWith(
+      11,
+      "page-1",
+      '"cms-content-page-1-r1"',
+      { title: "Admissions updated", slug: "admissions" },
+    ));
   });
 
-  it("hides another Site's page even if the payload includes it", async () => {
-    loadSitePages.mockResolvedValue({
-      ok: true,
-      data: [draft(), draft({ id: "page-9", site: 22, title: "Hospital" })],
+  it("surfaces stale edit conflicts without losing the form", async () => {
+    updateSitePage.mockResolvedValue({
+      ok: false,
+      error: { status: 409, code: "conflict", message: "Content changed. Retrieve the current Page.", details: null, requestId: null },
     });
-    renderPanel(11);
-    expect((await screen.findAllByText("Admissions")).length).toBeGreaterThan(0);
-    expect(screen.queryByText("Hospital")).toBeNull();
+    renderPanel();
+    fireEvent.click(await screen.findByRole("button", { name: "Edit Admissions" }));
+    await screen.findByRole("dialog", { name: "Edit Page" });
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+    expect((await screen.findByRole("alert")).textContent).toMatch(/slug is available/i);
+    expect(screen.getByRole("textbox", { name: "Title" })).toHaveProperty("value", "Admissions");
   });
 
   it("blocks management when the PAGES module is off", async () => {
@@ -98,8 +279,78 @@ describe("SitePagesPanel", () => {
     const submit = await screen.findByRole("button", { name: "Submit Admissions for review" });
     expect(submit).toHaveProperty("disabled", true);
     expect(screen.getByRole("button", { name: "Create page" })).toHaveProperty("disabled", true);
-    expect(screen.getByText(/public website does not serve pages/)).toBeTruthy();
+    expect(screen.getByText(/Create, edit and workflow changes are blocked/)).toBeTruthy();
     fireEvent.click(submit);
     expect(transitionSitePage).not.toHaveBeenCalled();
+  });
+
+  it("clears filter and page state when the selected Site changes", async () => {
+    const view = renderPanel(11);
+    await screen.findByRole("table", { name: "Pages for this Site" });
+    fireEvent.change(screen.getByRole("textbox", { name: "Search Pages" }), {
+      target: { value: "admissions" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+    await waitFor(() => expect(loadSitePages).toHaveBeenLastCalledWith(
+      11,
+      expect.objectContaining({ search: "admissions", page: 1 }),
+    ));
+
+    view.rerender(
+      <ToastProvider>
+        <SitePagesPanel siteId={22} pagesEnabled permissions={ALL_PERMISSIONS} />
+      </ToastProvider>,
+    );
+    await waitFor(() => expect(loadSitePages).toHaveBeenLastCalledWith(
+      22,
+      expect.objectContaining({ search: undefined, status: undefined, page: 1 }),
+    ));
+    expect(screen.getByRole("textbox", { name: "Search Pages" })).toHaveProperty("value", "");
+    expect(screen.queryByText("Admissions")).toBeNull();
+  });
+
+  it("does not fetch or expose Pages without view permission", () => {
+    renderPanel(11, true, ["content.pages.create"]);
+    expect(screen.getByText(/do not have permission to view Pages/)).toBeTruthy();
+    expect(loadSitePages).not.toHaveBeenCalled();
+    expect(loadSitePageStatusCounts).not.toHaveBeenCalled();
+  });
+
+  it("switches Site scope and enforces view-only access across the admin workspace", async () => {
+    loadSitePages.mockImplementation(async (siteId: number) => pageResult([
+      draft({
+        site: siteId,
+        title: siteId === 11 ? "Informatics Admissions" : "Medicine Admissions",
+      }),
+    ]));
+    const informatics: SiteAdminSite = {
+      id: 11,
+      name: "Informatics",
+      code: "INFORMATICS",
+      status: "ACTIVE",
+    };
+    const medicine: SiteAdminSite = {
+      id: 22,
+      name: "Medicine",
+      code: "MEDICINE",
+      status: "ACTIVE",
+    };
+    const view = render(siteWorkspace(informatics, ALL_PERMISSIONS));
+    await screen.findByText("Informatics Admissions");
+
+    fireEvent.change(screen.getByRole("combobox", { name: "Site" }), {
+      target: { value: "22" },
+    });
+    expect(push).toHaveBeenCalledWith("/sites/22/admin");
+
+    view.rerender(siteWorkspace(medicine, ["content.pages.view"]));
+    await screen.findByText("Medicine Admissions");
+    await waitFor(() => expect(loadSitePages).toHaveBeenLastCalledWith(
+      22,
+      expect.objectContaining({ search: undefined, status: undefined, page: 1 }),
+    ));
+    expect(screen.queryByText("Informatics Admissions")).toBeNull();
+    expect(screen.queryByRole("button", { name: "Create page" })).toBeNull();
+    expect(screen.queryByRole("button", { name: /^Edit/ })).toBeNull();
   });
 });
