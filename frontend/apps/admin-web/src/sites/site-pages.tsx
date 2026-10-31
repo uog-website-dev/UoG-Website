@@ -36,6 +36,7 @@ import {
   getSitePage,
   loadSitePages,
   loadSitePageStatusCounts,
+  loadSitePageWorkflowHistory,
   setSiteHomepage,
   transitionSitePage,
   updateSitePage,
@@ -46,6 +47,8 @@ import type {
   SitePageBlock,
   SitePageRecord,
   SitePageStatus,
+  SitePageWorkflowAction,
+  SitePageWorkflowTransition,
 } from "@/app/sites/page-actions";
 import { unwrap } from "@/organizations/contract";
 
@@ -78,7 +81,6 @@ const PERMISSIONS = {
   view: "content.pages.view",
   create: "content.pages.create",
   update: "content.pages.update",
-  publish: "content.pages.publish",
 } as const;
 const EMPTY_PAGE_LIST = {
   count: 0,
@@ -206,12 +208,17 @@ function SitePagesPanelContent({
   const canView = permissions.includes(PERMISSIONS.view);
   const canCreate = permissions.includes(PERMISSIONS.create);
   const canEdit = permissions.includes(PERMISSIONS.update);
-  const canPublish = permissions.includes(PERMISSIONS.publish);
   const [draftFilters, setDraftFilters] = useState<PageFilters>({ search: "", status: "" });
   const [appliedFilters, setAppliedFilters] = useState<PageFilters>({ search: "", status: "" });
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState<SortState>({ field: "updated_at", direction: "desc" });
-  const [reviewComment, setReviewComment] = useState("");
+  const [reviewQueue, setReviewQueue] = useState(false);
+  const [pendingWorkflow, setPendingWorkflow] = useState<{ page: SitePageRecord; action: SitePageWorkflowAction } | null>(null);
+  const [workflowComment, setWorkflowComment] = useState("");
+  const [historyPage, setHistoryPage] = useState<SitePageRecord | null>(null);
+  const [workflowHistory, setWorkflowHistory] = useState<SitePageWorkflowTransition[]>([]);
+  const [historyError, setHistoryError] = useState("");
+  const [historyLoading, setHistoryLoading] = useState(false);
   const [mode, setMode] = useState<DialogMode | null>(null);
   const [activePage, setActivePage] = useState<SitePageRecord | null>(null);
   const [form, setForm] = useState<PageForm>(emptyForm);
@@ -256,6 +263,7 @@ function SitePagesPanelContent({
   }
 
   function resetFilters() {
+    setReviewQueue(false);
     setDraftFilters({ search: "", status: "" });
     setAppliedFilters({ search: "", status: "" });
     setPage(1);
@@ -399,17 +407,54 @@ function SitePagesPanelContent({
     });
   }
 
-  async function runPageAction(row: SitePageRecord, action: () => Promise<unknown>) {
+  async function runPageAction(row: SitePageRecord, action: () => Promise<unknown>): Promise<boolean> {
     setBusyPageId(row.id);
     try {
       await action();
       pages.reload();
       statusCounts.reload();
+      return true;
     } catch (cause) {
-      toast.error(cause instanceof Error ? cause.message : "The Page could not be updated.");
+      if (cause instanceof ApiError && cause.status === 409) {
+        toast.error("The Page workflow changed before this action completed. Refreshing the current status.");
+        pages.reload();
+        statusCounts.reload();
+      } else {
+        toast.error(cause instanceof Error ? cause.message : "The Page could not be updated.");
+      }
+      return false;
     } finally {
       setBusyPageId(null);
     }
+  }
+
+  async function openWorkflowHistory(row: SitePageRecord) {
+    setHistoryPage(row);
+    setWorkflowHistory([]);
+    setHistoryError("");
+    setHistoryLoading(true);
+    try {
+      const result = unwrap(await loadSitePageWorkflowHistory(siteId, row.id));
+      setWorkflowHistory(result);
+    } catch (cause) {
+      setHistoryError(cause instanceof Error ? cause.message : "Workflow history could not be loaded.");
+    } finally {
+      setHistoryLoading(false);
+    }
+  }
+
+  function queueWorkflowAction(row: SitePageRecord, action: SitePageWorkflowAction) {
+    setWorkflowComment("");
+    setPendingWorkflow({ page: row, action });
+  }
+
+  async function confirmWorkflowAction() {
+    if (!pendingWorkflow) return;
+    const { page: row, action } = pendingWorkflow;
+    await runPageAction(row, async () => unwrap(await transitionSitePage(
+      siteId, row.id, action, workflowComment.trim(),
+    )));
+    setPendingWorkflow(null);
   }
 
   const columns: TableColumn<SitePageRecord>[] = [
@@ -457,6 +502,9 @@ function SitePagesPanelContent({
       }}>
         Preview
       </Button>,
+      <Button key="history" size="small" aria-label={`Workflow history for ${row.title}`} onClick={() => void openWorkflowHistory(row)}>
+        History
+      </Button>,
     ];
 
     if (canEdit && (row.status === "DRAFT" || row.status === "UNPUBLISHED")) {
@@ -466,27 +514,28 @@ function SitePagesPanelContent({
         </Button>,
       );
     }
-    if (row.status === "DRAFT" && canEdit) {
+    const availableActions = new Set(row.available_actions ?? []);
+    if (availableActions.has("submit")) {
       actions.push(
         <Button
           key="submit"
           size="small"
           aria-label={`Submit ${row.title} for review`}
           disabled={!enabled}
-          onClick={() => void runPageAction(row, async () => unwrap(await transitionSitePage(siteId, row.id, "submit")))}
+          onClick={() => queueWorkflowAction(row, "submit")}
         >
           Submit
         </Button>,
       );
     }
-    if (row.status === "IN_REVIEW" && canPublish) {
+    if (availableActions.has("approve")) {
       actions.push(
         <Button
           key="approve"
           size="small"
           aria-label={`Approve ${row.title}`}
           disabled={!enabled}
-          onClick={() => void runPageAction(row, async () => unwrap(await transitionSitePage(siteId, row.id, "approve")))}
+          onClick={() => queueWorkflowAction(row, "approve")}
         >
           Approve
         </Button>,
@@ -494,43 +543,44 @@ function SitePagesPanelContent({
           key="reject"
           size="small"
           aria-label={`Reject ${row.title}`}
-          disabled={!enabled || !reviewComment.trim()}
-          onClick={() => void runPageAction(row, async () => unwrap(await transitionSitePage(
-            siteId,
-            row.id,
-            "reject",
-            reviewComment.trim(),
-          )))}
+          disabled={!enabled}
+          onClick={() => queueWorkflowAction(row, "reject")}
         >
           Reject
         </Button>,
       );
     }
-    if (row.status === "APPROVED" && canPublish) {
+    if (availableActions.has("publish")) {
       actions.push(
         <Button
           key="publish"
           size="small"
           aria-label={`Publish ${row.title}`}
           disabled={!enabled}
-          onClick={() => void runPageAction(row, async () => unwrap(await transitionSitePage(siteId, row.id, "publish")))}
+          onClick={() => queueWorkflowAction(row, "publish")}
         >
           Publish
         </Button>,
       );
     }
-    if (row.status === "PUBLISHED" && canPublish) {
+    if (availableActions.has("unpublish")) {
       actions.push(
         <Button
           key="unpublish"
           size="small"
           aria-label={`Unpublish ${row.title}`}
           disabled={!enabled}
-          onClick={() => void runPageAction(row, async () => unwrap(await transitionSitePage(siteId, row.id, "unpublish")))}
+          onClick={() => queueWorkflowAction(row, "unpublish")}
         >
           Unpublish
         </Button>,
       );
+    }
+    if (availableActions.has("archive")) {
+      actions.push(<Button key="archive" size="small" aria-label={`Archive ${row.title}`} disabled={!enabled} onClick={() => queueWorkflowAction(row, "archive")}>Archive</Button>);
+    }
+    if (availableActions.has("restore")) {
+      actions.push(<Button key="restore" size="small" aria-label={`Restore ${row.title}`} disabled={!enabled} onClick={() => queueWorkflowAction(row, "restore")}>Restore</Button>);
     }
     if (
       canEdit &&
@@ -653,15 +703,19 @@ function SitePagesPanelContent({
             />
           </FilterBar>
 
-          {canPublish && rows.some((row) => row.status === "IN_REVIEW") ? (
-            <TextField
-              label="Review comment"
-              value={reviewComment}
-              onChange={(event) => setReviewComment(event.target.value)}
-              size="small"
-              sx={{ maxWidth: 520 }}
-            />
-          ) : null}
+          <Button
+            variant={reviewQueue ? "contained" : "outlined"}
+            aria-pressed={reviewQueue}
+            onClick={() => {
+              const next = !reviewQueue;
+              setReviewQueue(next);
+              setDraftFilters((current) => ({ ...current, status: next ? "IN_REVIEW" : "" }));
+              setAppliedFilters((current) => ({ ...current, status: next ? "IN_REVIEW" : "" }));
+              setPage(1);
+            }}
+          >
+            {reviewQueue ? "Show all Pages" : "Review queue"}
+          </Button>
 
           <Box sx={{ overflowX: "auto" }}>
             <DataTable
@@ -700,6 +754,66 @@ function SitePagesPanelContent({
           ) : null}
         </>
       )}
+
+      <Dialog
+        open={pendingWorkflow !== null}
+        onClose={() => setPendingWorkflow(null)}
+        aria-labelledby="page-workflow-confirm-title"
+        fullWidth
+        maxWidth="xs"
+      >
+        <DialogTitle id="page-workflow-confirm-title">
+          {pendingWorkflow ? `${pendingWorkflow.action[0].toUpperCase()}${pendingWorkflow.action.slice(1)} Page?` : "Confirm Page action"}
+        </DialogTitle>
+        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, pt: "8px !important" }}>
+          <Typography>
+            {pendingWorkflow ? `Confirm ${pendingWorkflow.action} for “${pendingWorkflow.page.title}”. The workflow status will change for this Site.` : ""}
+          </Typography>
+          {pendingWorkflow && ["approve", "reject"].includes(pendingWorkflow.action) ? (
+            <TextField
+              label={pendingWorkflow.action === "reject" ? "Reviewer comment (required)" : "Reviewer comment (optional)"}
+              value={workflowComment}
+              onChange={(event) => setWorkflowComment(event.target.value)}
+              multiline minRows={2} fullWidth required={pendingWorkflow.action === "reject"}
+              inputProps={{ maxLength: 5000 }}
+            />
+          ) : null}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setPendingWorkflow(null)} disabled={busyPageId !== null}>Cancel</Button>
+          <Button
+            variant="contained"
+            onClick={() => void confirmWorkflowAction()}
+            disabled={!enabled || busyPageId !== null || (pendingWorkflow?.action === "reject" && !workflowComment.trim())}
+          >
+            Confirm {pendingWorkflow?.action ?? "action"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={historyPage !== null}
+        onClose={() => setHistoryPage(null)}
+        fullWidth maxWidth="sm"
+        aria-labelledby="page-workflow-history-title"
+      >
+        <DialogTitle id="page-workflow-history-title">Workflow history: {historyPage?.title}</DialogTitle>
+        <DialogContent dividers>
+          {historyLoading ? <Typography role="status">Loading workflow history…</Typography> : null}
+          {historyError ? <Alert severity="error" role="alert">{historyError}</Alert> : null}
+          {!historyLoading && !historyError && workflowHistory.length === 0 ? <Typography color="text.secondary">No workflow transitions have been recorded.</Typography> : null}
+          <Box component="ol" aria-label="Page status timeline" sx={{ m: 0, pl: 3 }}>
+            {workflowHistory.map((transition) => (
+              <Box component="li" key={transition.id} sx={{ mb: 2 }}>
+                <Typography fontWeight={600}>{STATUS_LABELS[transition.from_status]} → {STATUS_LABELS[transition.to_status]}</Typography>
+                <Typography variant="body2" color="text.secondary">{formatUpdatedAt(transition.created_at)} · {transition.actor == null ? "Former user" : `User ${transition.actor}`}</Typography>
+                {transition.comment ? <Typography sx={{ mt: 0.5, whiteSpace: "pre-wrap" }}>{transition.comment}</Typography> : null}
+              </Box>
+            ))}
+          </Box>
+        </DialogContent>
+        <DialogActions><Button onClick={() => setHistoryPage(null)}>Close</Button></DialogActions>
+      </Dialog>
 
       <Dialog
         open={mode === "create" || mode === "edit"}

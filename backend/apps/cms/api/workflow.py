@@ -5,6 +5,7 @@ from django.db import IntegrityError, transaction
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import OpenApiParameter, PolymorphicProxySerializer, extend_schema
 from rest_framework import serializers, status
+from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -29,6 +30,12 @@ from .serializers import PageSerializer, SiteContentSerializer
 SITE_PARAMETER = OpenApiParameter(
     "site_pk", int, OpenApiParameter.PATH, description="Owning Site id.",
 )
+
+
+class WorkflowStateConflict(APIException):
+    status_code = status.HTTP_409_CONFLICT
+    default_detail = "The Page workflow changed. Refresh its status and try again."
+    default_code = "workflow_conflict"
 
 
 class ContentRoleAssignmentInput(StrictFields, serializers.Serializer):
@@ -214,6 +221,8 @@ class ContentWorkflowActionView(APIView):
                 error.message_dict if hasattr(error, "message_dict")
                 else {"non_field_errors": error.messages}
             )
+            if "status" in detail:
+                raise WorkflowStateConflict(detail) from error
             raise serializers.ValidationError(detail) from error
 
         page = Page.objects.filter(pk=transitioned.pk).first()

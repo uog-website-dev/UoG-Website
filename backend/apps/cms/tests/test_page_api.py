@@ -189,6 +189,161 @@ def test_page_authoring_requires_an_active_site_author_role(
     assert created.status_code == 201, created.content
 
 
+def test_page_workflow_actions_and_history_are_site_role_aware(
+    client, oidc, pages_module, sites,
+):
+    site, _ = sites
+    _enable_pages_module((site,))
+    author = get_user_model().objects.create_user(username="workflow-author")
+    reviewer = get_user_model().objects.create_user(username="workflow-reviewer")
+    SiteContentRoleAssignment.objects.create(
+        site=site, user=author, role=ContentRole.AUTHOR,
+    )
+    SiteContentRoleAssignment.objects.create(
+        site=site, user=reviewer, role=ContentRole.REVIEWER,
+    )
+    url = ADMIN_PAGES.format(site_id=site.pk)
+    author_token = _token(
+        oidc, "5f1b2c3d-0000-4000-8000-000000000071", author.username,
+    )
+    created = client.post(
+        url, {"title": "Workflow", "slug": "workflow"},
+        content_type="application/json", **author_token,
+    )
+    assert created.status_code == 201, created.content
+    page_id = created.json()["id"]
+    assert created.json()["available_actions"] == ["submit"]
+
+    submitted = client.post(
+        f"{url}{page_id}/workflow/", {"action": "submit"},
+        content_type="application/json", **author_token,
+    )
+    assert submitted.status_code == 200, submitted.content
+    assert submitted.json()["available_actions"] == []
+    forged_publish = client.post(
+        f"{url}{page_id}/workflow/", {"action": "publish"},
+        content_type="application/json", **author_token,
+    )
+    assert forged_publish.status_code == 403
+
+    reviewer_token = _token(
+        oidc, "5f1b2c3d-0000-4000-8000-000000000072", reviewer.username,
+    )
+    detail = client.get(f"{url}{page_id}/", **reviewer_token)
+    assert detail.status_code == 200
+    assert detail.json()["available_actions"] == ["approve", "reject"]
+    history_url = f"{url}{page_id}/workflow-history/"
+    history = client.get(history_url, **reviewer_token)
+    assert history.status_code == 200
+    assert [(item["from_status"], item["to_status"]) for item in history.json()] == [
+        ("DRAFT", "IN_REVIEW"),
+    ]
+
+    rejected = client.post(
+        f"{url}{page_id}/workflow/", {"action": "reject", "comment": "Needs sources."},
+        content_type="application/json", **reviewer_token,
+    )
+    assert rejected.status_code == 200, rejected.content
+    assert rejected.json()["review_comment"] == "Needs sources."
+    stale_transition = client.post(
+        f"{url}{page_id}/workflow/", {"action": "reject", "comment": "Stale review."},
+        content_type="application/json", **reviewer_token,
+    )
+    assert stale_transition.status_code == 409
+    assert stale_transition.json()["error"]["code"] == "conflict"
+    assert "expected IN_REVIEW" in str(stale_transition.json()["error"]["details"])
+    history = client.get(history_url, **reviewer_token)
+    assert history.json()[-1]["comment"] == "Needs sources."
+
+    outsider = get_user_model().objects.create_user(username="workflow-outsider")
+    denied = client.get(
+        history_url,
+        **_token(oidc, "5f1b2c3d-0000-4000-8000-000000000073", outsider.username),
+    )
+    assert denied.status_code == 403
+
+
+def test_page_review_to_publication_is_site_scoped_and_keeps_live_snapshot_immutable(
+    client, oidc, pages_module, settings, sites,
+):
+    settings.ALLOWED_HOSTS = ["*"]
+    site, other_site = sites
+    _enable_public_pages((site, other_site))
+    author, reviewer, publisher = [
+        get_user_model().objects.create_user(username=f"workflow-e2e-{role}")
+        for role in ("author", "reviewer", "publisher")
+    ]
+    for user, role in (
+        (author, ContentRole.AUTHOR),
+        (reviewer, ContentRole.REVIEWER),
+        (publisher, ContentRole.PUBLISHER),
+    ):
+        SiteContentRoleAssignment.objects.create(site=site, user=user, role=role)
+
+    def auth(user, suffix):
+        return _token(
+            oidc, f"5f1b2c3d-0000-4000-8000-00000000008{suffix}", user.username,
+        )
+
+    page_url = ADMIN_PAGES.format(site_id=site.pk)
+    created = client.post(
+        page_url,
+        {
+            "title": "Workflow E2E",
+            "slug": "workflow-e2e",
+            "blocks": [{"type": "paragraph", "html": "<p>Draft copy</p>"}],
+        },
+        content_type="application/json",
+        **auth(author, "1"),
+    )
+    assert created.status_code == 201, created.content
+    page_id = created.json()["id"]
+
+    submitted = client.post(
+        f"{page_url}{page_id}/workflow/", {"action": "submit"},
+        content_type="application/json", **auth(author, "1"),
+    )
+    assert submitted.status_code == 200, submitted.content
+    approved = client.post(
+        f"{page_url}{page_id}/workflow/",
+        {"action": "approve", "comment": "Reviewed and ready."},
+        content_type="application/json", **auth(reviewer, "2"),
+    )
+    assert approved.status_code == 200, approved.content
+    publisher_view = client.get(f"{page_url}{page_id}/", **auth(publisher, "3"))
+    assert publisher_view.json()["available_actions"] == ["publish", "archive"]
+
+    published = client.post(
+        f"{page_url}{page_id}/workflow/", {"action": "publish"},
+        content_type="application/json", **auth(publisher, "3"),
+    )
+    assert published.status_code == 200, published.content
+    page = Page.objects.get(pk=page_id)
+    snapshot = page.publication_snapshots.get(version=1)
+    assert snapshot.payload["site_id"] == site.pk
+    assert snapshot.payload["title"] == "Workflow E2E"
+
+    live = client.get(
+        f"{PUBLIC_PAGES}workflow-e2e/",
+        HTTP_HOST=f"site-{site.pk}.uog.edu.et",
+    )
+    assert live.status_code == 200, live.content
+    assert live.json()["title"] == "Workflow E2E"
+    assert live.json()["blocks"] == [{"type": "paragraph", "html": "<p>Draft copy</p>"}]
+    assert client.get(
+        f"{PUBLIC_PAGES}workflow-e2e/",
+        HTTP_HOST=f"site-{other_site.pk}.uog.edu.et",
+    ).status_code == 404
+
+    etag = client.get(f"{page_url}{page_id}/", **auth(author, "1"))["ETag"]
+    live_edit = client.patch(
+        f"{page_url}{page_id}/", {"title": "Silent overwrite"},
+        content_type="application/json", HTTP_IF_MATCH=etag, **auth(author, "1"),
+    )
+    assert live_edit.status_code == 400
+    assert page.publication_snapshots.get(version=1).payload["title"] == "Workflow E2E"
+
+
 def test_database_platform_administrator_can_author_without_keycloak_role(
     client, oidc, pages_module, sites,
 ):

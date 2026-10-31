@@ -26,6 +26,7 @@ restores access to the same Pages.
 | `GET /api/v1/sites/{site_pk}/pages/{id}/` | Read a Site-owned Page and its current ETag |
 | `PATCH /api/v1/sites/{site_pk}/pages/{id}/` | Update a DRAFT or UNPUBLISHED Page; requires `If-Match` |
 | `POST /api/v1/sites/{site_pk}/pages/{id}/workflow/` | Apply a validated workflow action |
+| `GET /api/v1/sites/{site_pk}/pages/{id}/workflow-history/` | Read the private, append-only transition timeline and review comments |
 | `POST /api/v1/sites/{site_pk}/pages/{id}/homepage/` | Make a draft or unpublished Page this Site's homepage |
 
 Create, edit, workflow and homepage assignment require PAGES to be
@@ -83,6 +84,16 @@ The response is a Page representation with `status: "DRAFT"`, `revision_number`,
 an ETag and a `Location` header. Workflow actions use the shared state-machine
 contract; for example, `{"action":"submit"}` begins review, while publishing
 requires the REVIEWER and PUBLISHER stages.
+
+Page representations include `available_actions`, calculated for the
+authenticated user from their active Site CMS role, Page status and reviewer
+separation rules. The admin review queue filters to `IN_REVIEW`; confirmation
+dialogs collect rejection comments before submitting transitions. The UI uses
+`available_actions` to decide which controls to show, but the workflow endpoint
+rechecks authority and state on every request. A transition attempted after a
+concurrent status change returns `409 conflict` with the current-state detail. The history endpoint
+requires a Site CMS role (or platform-admin), is private and uncached, and
+returns actor IDs, status changes, timestamps and comments.
 
 ## Public delivery
 
