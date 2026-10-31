@@ -46,6 +46,9 @@ export interface SitePageRecord {
   locale: string;
   is_homepage: boolean;
   created_by: number | string | null;
+  submitted_by?: number | string | null;
+  reviewed_by?: number | string | null;
+  review_comment?: string;
   updated_at: string;
   blocks: SitePageBlock[];
   metadata?: Record<string, unknown>;
@@ -53,6 +56,20 @@ export interface SitePageRecord {
   layout?: string;
   position?: number;
   etag?: string;
+  available_actions?: SitePageWorkflowAction[];
+}
+
+export type SitePageWorkflowAction =
+  | "submit" | "approve" | "reject" | "publish" | "unpublish"
+  | "archive" | "restore";
+
+export interface SitePageWorkflowTransition {
+  id: number;
+  from_status: SitePageStatus;
+  to_status: SitePageStatus;
+  actor: number | null;
+  comment: string;
+  created_at: string;
 }
 
 export interface SitePageListQuery {
@@ -214,7 +231,7 @@ export async function updateSitePage(
 export async function transitionSitePage(
   siteId: number,
   pageId: string,
-  action: "submit" | "approve" | "reject" | "publish" | "unpublish",
+  action: SitePageWorkflowAction,
   comment = "",
 ): Promise<ActionResult<SitePageRecord>> {
   return attempt(async () => {
@@ -224,6 +241,18 @@ export async function transitionSitePage(
       { action, comment },
     );
     return withEtag(result.data, result.etag);
+  });
+}
+
+export async function loadSitePageWorkflowHistory(
+  siteId: number,
+  pageId: string,
+): Promise<ActionResult<SitePageWorkflowTransition[]>> {
+  return attempt(async () => {
+    const api = await client();
+    return api.get<SitePageWorkflowTransition[]>(
+      sitePagePath(siteId, `${pageId}/workflow-history/`),
+    );
   });
 }
 

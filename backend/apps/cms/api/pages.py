@@ -22,13 +22,14 @@ from apps.sites.models import Site
 from ..models import (
     ContentEditConflict,
     ContentRole,
+    ContentWorkflowTransition,
     Page,
     SiteContentRoleAssignment,
 )
 from ..services.pages import change_route, require_pages_module, set_as_homepage
 from ..services.workflow import transition_content
 from .serializers import PageSerializer
-from .workflow import WorkflowActionInput
+from .workflow import WorkflowActionInput, WorkflowStateConflict
 
 
 SITE_PARAMETER = OpenApiParameter(
@@ -100,6 +101,15 @@ class SitePagePagination(PageNumberPagination):
 class PageEditConflict(APIException):
     status_code = 409
     default_detail = "Content changed. Retrieve the current Page and retry."
+
+
+class PageWorkflowHistorySerializer(serializers.ModelSerializer):
+    actor = serializers.IntegerField(source="actor_id", allow_null=True, read_only=True)
+
+    class Meta:
+        model = ContentWorkflowTransition
+        fields = ("id", "from_status", "to_status", "actor", "comment", "created_at")
+        read_only_fields = fields
 
 
 class SitePageViewSet(
@@ -194,7 +204,7 @@ class SitePageViewSet(
         paginator = self.pagination_class()
         page = paginator.paginate_queryset(queryset, request, view=self)
         return paginator.get_paginated_response(
-            PageSerializer(page, many=True).data,
+            self.get_serializer(page, many=True).data,
         )
 
     @extend_schema(
@@ -330,11 +340,38 @@ class SitePageViewSet(
                 error.message_dict if hasattr(error, "message_dict")
                 else {"non_field_errors": error.messages}
             )
+            if "status" in detail:
+                raise WorkflowStateConflict(detail) from error
             raise serializers.ValidationError(detail) from error
         page = get_object_or_404(
             Page.objects.filter(site_id=site.pk), pk=transitioned.pk,
         )
         return self._response(page)
+
+    @extend_schema(
+        tags=["CMS pages"],
+        parameters=[SITE_PARAMETER, PAGE_PARAMETER],
+        responses=PageWorkflowHistorySerializer(many=True),
+        description=(
+            "List append-only workflow transitions and reviewer comments for "
+            "this Site-owned Page. Requires an active CMS role on this Site "
+            "or platform-admin and an enabled PAGES module."
+        ),
+    )
+    @action(
+        detail=True, methods=["get"], url_path="workflow-history",
+        pagination_class=None,
+    )
+    def workflow_history(self, request, *args, **kwargs):
+        site, page = self._page()
+        ensure_pages_module_enabled(site.pk)
+        history = ContentWorkflowTransition.objects.filter(
+            content_id=page.pk,
+        ).select_related("actor")
+        return Response(
+            PageWorkflowHistorySerializer(history, many=True).data,
+            headers={"Cache-Control": "private, no-store"},
+        )
 
     @extend_schema(
         tags=["CMS pages"],
@@ -370,7 +407,7 @@ class SitePageViewSet(
 
     def _response(self, page, *, status_code=200):
         response = Response(
-            PageSerializer(page).data,
+            self.get_serializer(page).data,
             status=status_code,
             headers={"ETag": page_etag(page), "Cache-Control": "private, no-store"},
         )

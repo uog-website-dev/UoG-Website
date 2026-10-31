@@ -15886,6 +15886,151 @@ paths:
               schema:
                 type: string
                 format: uuid
+  /api/v1/sites/{site_pk}/pages/{id}/workflow-history/:
+    get:
+      operationId: v1_sites_pages_workflow_history_list
+      description: List append-only workflow transitions and reviewer comments for
+        this Site-owned Page. Requires an active CMS role on this Site or platform-admin
+        and an enabled PAGES module.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: Page UUID.
+        required: true
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        description: Owning Site id.
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - CMS pages
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PageWorkflowHistory'
+          description: ''
+          headers:
+            ETag:
+              description: Strong representation validator. Echo exactly in If-Match
+                for mutations.
+              schema:
+                type: string
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          description: Invalid body, malformed input, or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    title:
+                    - This field is required.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
 components:
   schemas:
     ActionEnum:
@@ -16955,6 +17100,38 @@ components:
       - content
       - slug
       - title
+    PageWorkflowHistory:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        from_status:
+          allOf:
+          - $ref: '#/components/schemas/ContentStatusEnum'
+          readOnly: true
+        to_status:
+          allOf:
+          - $ref: '#/components/schemas/ContentStatusEnum'
+          readOnly: true
+        actor:
+          type: integer
+          readOnly: true
+          nullable: true
+        comment:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - actor
+      - comment
+      - created_at
+      - from_status
+      - id
+      - to_status
     PaginatedAssignmentList:
       type: object
       required:
@@ -17439,9 +17616,8 @@ components:
 
         Identity, Site, computed route, homepage flag and lifecycle are
         server-managed; the caller may edit content, routing inputs and
-        presentation hints. `parent` may be changed within the owning Site and
-        locale; moves use the change_route service to preserve route history. A
-        page's language is fixed at creation.
+        presentation hints. Moving a subtree goes through the change_route
+        service (which records URL history); a page's language is fixed at creation.
       properties:
         parent:
           type: string
@@ -18306,9 +18482,8 @@ components:
 
         Identity, Site, computed route, homepage flag and lifecycle are
         server-managed; the caller may edit content, routing inputs and
-        presentation hints. `parent` and `locale` are create-only: moving a
-        subtree must go through the change_route service (which records URL
-        history) and a page's language is fixed at creation.
+        presentation hints. Moving a subtree goes through the change_route
+        service (which records URL history); a page's language is fixed at creation.
       properties:
         id:
           type: string
@@ -18323,9 +18498,8 @@ components:
         parent:
           type: string
           format: uuid
-          description: Parent page. Must belong to the same Site and locale; pages
-            never move across Sites or languages and a page can never become its own
-            ancestor.
+          description: Parent Page on the same Site and locale. Reparenting preserves
+            route history and cannot create a cycle.
           nullable: true
         locale:
           description: BCP-47-style language tag in the same format as the Site's
@@ -18459,7 +18633,13 @@ components:
           type: string
           format: date-time
           readOnly: true
+        available_actions:
+          type: array
+          items:
+            type: string
+          readOnly: true
       required:
+      - available_actions
       - blocks_version
       - created_at
       - created_by
@@ -18484,16 +18664,14 @@ components:
 
         Identity, Site, computed route, homepage flag and lifecycle are
         server-managed; the caller may edit content, routing inputs and
-        presentation hints. `parent` and `locale` are create-only: moving a
-        subtree must go through the change_route service (which records URL
-        history) and a page's language is fixed at creation.
+        presentation hints. Moving a subtree goes through the change_route
+        service (which records URL history); a page's language is fixed at creation.
       properties:
         parent:
           type: string
           format: uuid
-          description: Parent page. Must belong to the same Site and locale; pages
-            never move across Sites or languages and a page can never become its own
-            ancestor.
+          description: Parent Page on the same Site and locale. Reparenting preserves
+            route history and cannot create a cycle.
           nullable: true
         locale:
           description: BCP-47-style language tag in the same format as the Site's

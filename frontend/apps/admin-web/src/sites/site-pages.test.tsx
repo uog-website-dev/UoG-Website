@@ -12,6 +12,7 @@ const createSitePage = vi.fn();
 const updateSitePage = vi.fn();
 const transitionSitePage = vi.fn();
 const setSiteHomepage = vi.fn();
+const loadSitePageWorkflowHistory = vi.fn();
 
 vi.mock("@/app/sites/page-actions", () => ({
   loadSitePages: (...args: unknown[]) => loadSitePages(...args),
@@ -20,6 +21,7 @@ vi.mock("@/app/sites/page-actions", () => ({
   createSitePage: (...args: unknown[]) => createSitePage(...args),
   updateSitePage: (...args: unknown[]) => updateSitePage(...args),
   transitionSitePage: (...args: unknown[]) => transitionSitePage(...args),
+  loadSitePageWorkflowHistory: (...args: unknown[]) => loadSitePageWorkflowHistory(...args),
   setSiteHomepage: (...args: unknown[]) => setSiteHomepage(...args),
 }));
 
@@ -68,6 +70,12 @@ function draft(partial: Partial<SitePageRecord> = {}): SitePageRecord {
       type: "paragraph",
       html: "<p>Hello<script>alert(1)</script> <a href=\"javascript:alert(2)\">Bad</a> <a href=\"/about\">About</a></p>",
     }],
+    available_actions: partial.available_actions ?? (partial.status === "IN_REVIEW"
+      ? ["approve", "reject"]
+      : partial.status === "APPROVED" ? ["publish", "archive"]
+        : partial.status === "PUBLISHED" ? ["unpublish", "archive"]
+          : partial.status === "UNPUBLISHED" ? ["restore", "archive"]
+            : partial.status === "ARCHIVED" ? [] : ["submit"]),
     ...partial,
   };
 }
@@ -126,6 +134,7 @@ beforeEach(() => {
   getSitePage.mockResolvedValue({ ok: true, data: draft() });
   createSitePage.mockResolvedValue({ ok: true, data: draft() });
   transitionSitePage.mockResolvedValue({ ok: true, data: draft({ status: "IN_REVIEW" }) });
+  loadSitePageWorkflowHistory.mockResolvedValue({ ok: true, data: [] });
   setSiteHomepage.mockResolvedValue({ ok: true, data: draft({ is_homepage: true }) });
   updateSitePage.mockResolvedValue({ ok: true, data: draft({ title: "Admissions updated" }) });
 });
@@ -227,8 +236,51 @@ describe("SitePagesPanel", () => {
     fireEvent.click(screen.getByRole("button", { name: "Close preview" }));
 
     fireEvent.click(await screen.findByRole("button", { name: "Submit Admissions for review" }));
-    await waitFor(() => expect(transitionSitePage).toHaveBeenCalledWith(11, "page-1", "submit"));
+    expect(screen.getByRole("dialog", { name: "Submit Page?" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Confirm submit" }));
+    await waitFor(() => expect(transitionSitePage).toHaveBeenCalledWith(11, "page-1", "submit", ""));
     expect(JSON.stringify(transitionSitePage.mock.calls)).not.toContain("22");
+  });
+
+  it("shows review controls only from backend-authorized actions and requires a rejection comment", async () => {
+    loadSitePages.mockResolvedValue(pageResult([draft({
+      status: "IN_REVIEW",
+      available_actions: ["approve", "reject"],
+      created_by: 100,
+      submitted_by: 100,
+    })]));
+    renderPanel(11, true, ["content.pages.view"]);
+    expect(await screen.findByRole("button", { name: "Review queue" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Approve Admissions" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Reject Admissions" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Submit Admissions for review" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Publish Admissions" })).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Review queue" }));
+    await waitFor(() => expect(loadSitePages).toHaveBeenLastCalledWith(
+      11, expect.objectContaining({ status: "IN_REVIEW", page: 1 }),
+    ));
+    fireEvent.click(screen.getByRole("button", { name: "Reject Admissions" }));
+    expect(screen.getByRole("button", { name: "Confirm reject" })).toHaveProperty("disabled", true);
+    fireEvent.change(screen.getByRole("textbox", { name: "Reviewer comment (required)" }), {
+      target: { value: "Please add sources." },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Confirm reject" }));
+    await waitFor(() => expect(transitionSitePage).toHaveBeenCalledWith(
+      11, "page-1", "reject", "Please add sources.",
+    ));
+  });
+
+  it("shows append-only workflow history and reviewer feedback in a timeline", async () => {
+    loadSitePageWorkflowHistory.mockResolvedValue({ ok: true, data: [{
+      id: 1, from_status: "IN_REVIEW", to_status: "DRAFT", actor: 9,
+      comment: "Please add sources.", created_at: "2026-03-20T10:00:00Z",
+    }] });
+    renderPanel();
+    fireEvent.click(await screen.findByRole("button", { name: "Workflow history for Admissions" }));
+    expect(await screen.findByRole("dialog", { name: "Workflow history: Admissions" })).toBeTruthy();
+    expect(screen.getByRole("list", { name: "Page status timeline" }).textContent).toContain("Please add sources.");
+    expect(loadSitePageWorkflowHistory).toHaveBeenCalledWith(11, "page-1");
   });
 
   it("creates and edits only with the matching permission and current ETag", async () => {
