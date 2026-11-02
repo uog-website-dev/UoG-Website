@@ -171,9 +171,30 @@ class PostSerializer(StrictContentFields, serializers.ModelSerializer):
             )
         return value
 
+    def validate_featured_media(self, value):
+        """Keep a Post's featured image in this Site's or shared media scope."""
+        if not value:
+            return value
+        from apps.cms.blocks import Rejection, check_image_ref
+
+        try:
+            return check_image_ref(value, site_id=self._site_id())
+        except Rejection as error:
+            raise serializers.ValidationError(str(error)) from error
+
     def validate_seo(self, value):
         if value is None:
             return {}
         if not isinstance(value, dict):
             raise serializers.ValidationError("SEO metadata must be a JSON object.")
+        image_ref = value.get("og_image_ref")
+        if image_ref:
+            from apps.cms.blocks import Rejection, check_image_ref
+
+            try:
+                value = {**value, "og_image_ref": check_image_ref(image_ref, site_id=self._site_id())}
+            except Rejection as error:
+                raise serializers.ValidationError({
+                    "og_image_ref": str(error),
+                }) from error
         return value

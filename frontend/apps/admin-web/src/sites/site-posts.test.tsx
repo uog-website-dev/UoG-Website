@@ -6,6 +6,7 @@ import type { SitePostRecord } from "@/app/sites/post-actions";
 
 const loadSitePosts = vi.fn();
 const loadSiteTaxonomy = vi.fn();
+const createSiteTaxonomy = vi.fn();
 const getSitePost = vi.fn();
 const createSitePost = vi.fn();
 const updateSitePost = vi.fn();
@@ -13,6 +14,7 @@ const updateSitePost = vi.fn();
 vi.mock("@/app/sites/post-actions", () => ({
   loadSitePosts: (...args: unknown[]) => loadSitePosts(...args),
   loadSiteTaxonomy: (...args: unknown[]) => loadSiteTaxonomy(...args),
+  createSiteTaxonomy: (...args: unknown[]) => createSiteTaxonomy(...args),
   getSitePost: (...args: unknown[]) => getSitePost(...args),
   createSitePost: (...args: unknown[]) => createSitePost(...args),
   updateSitePost: (...args: unknown[]) => updateSitePost(...args),
@@ -27,7 +29,8 @@ const tag = { id: "tag-1", site: 11, code: "CAMPUS", name: "Campus", slug: "camp
 function post(partial: Partial<SitePostRecord> = {}): SitePostRecord {
   return {
     id: "post-1", site: 11, title: "Campus update", slug: "campus-update",
-    excerpt: "An update", content: "Post body", featured_media: "/media/campus.jpg",
+    excerpt: "An update", content: "Post body", blocks: [{ type: "paragraph", html: "<p>Post body</p>" }],
+    seo: {}, featured_media: "sites/11/campus.jpg",
     author: 42, categories: [category.id], tags: [tag.id], status: "DRAFT",
     published_at: null, created_at: "2026-10-01T10:00:00Z", updated_at: "2026-10-02T10:00:00Z",
     ...partial,
@@ -57,6 +60,7 @@ function renderPanel(
 beforeEach(() => {
   loadSitePosts.mockReset();
   loadSiteTaxonomy.mockReset();
+  createSiteTaxonomy.mockReset();
   getSitePost.mockReset();
   createSitePost.mockReset();
   updateSitePost.mockReset();
@@ -67,6 +71,7 @@ beforeEach(() => {
   getSitePost.mockResolvedValue(result({ ...post(), etag: '"post-v1"' }));
   createSitePost.mockResolvedValue(result(post({ id: "post-2" })));
   updateSitePost.mockResolvedValue(result(post()));
+  createSiteTaxonomy.mockResolvedValue(result({ ...category, id: "category-new" }));
 });
 
 describe("SitePostsPanel", () => {
@@ -151,10 +156,12 @@ describe("SitePostsPanel", () => {
     fireEvent.click(screen.getByRole("button", { name: "Create Post" }));
     fireEvent.change(screen.getByRole("textbox", { name: "Title" }), { target: { value: "New campus story" } });
     fireEvent.change(screen.getByRole("textbox", { name: "Slug" }), { target: { value: "new-campus-story" } });
-    fireEvent.change(screen.getByRole("textbox", { name: "Post content" }), { target: { value: "Story body" } });
+    fireEvent.click(screen.getByRole("button", { name: "Add paragraph" }));
+    fireEvent.change(screen.getByRole("textbox", { name: "Block 1 JSON" }), { target: { value: '{"type":"paragraph","html":"<p>Story body</p>"}' } });
     fireEvent.click(screen.getByRole("button", { name: "Create draft" }));
     await waitFor(() => expect(createSitePost).toHaveBeenCalledWith(11, expect.objectContaining({
       title: "New campus story", slug: "new-campus-story", content: "Story body",
+      blocks: [{ type: "paragraph", html: "<p>Story body</p>" }], seo: {},
     })));
 
     fireEvent.click(await screen.findByRole("button", { name: "Edit Campus update" }));
@@ -175,5 +182,47 @@ describe("SitePostsPanel", () => {
     renderPanel(22);
     expect(await screen.findByText("Posts are unavailable.")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Try again" })).toBeTruthy();
+  });
+
+  it("validates media scope and offers taxonomy creation only to authorized creators", async () => {
+    const view = renderPanel(11, true, ["content.posts.view"]);
+    await screen.findByRole("table", { name: "Posts for this Site" });
+    expect(screen.queryByRole("button", { name: "Create category" })).toBeNull();
+
+    view.rerender(<ToastProvider><SitePostsPanel siteId={11} postsEnabled permissions={PERMISSIONS} /></ToastProvider>);
+    await waitFor(() => expect(screen.getByRole("button", { name: "Create Post" })).toBeTruthy());
+    fireEvent.click(screen.getByRole("button", { name: "Create Post" }));
+    fireEvent.change(screen.getByRole("textbox", { name: "Title" }), { target: { value: "Scoped story" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "Slug" }), { target: { value: "Bad Slug" } });
+    expect(screen.getByText("Use lowercase letters and numbers separated by single hyphens.")).toBeTruthy();
+    fireEvent.change(screen.getByRole("textbox", { name: "Slug" }), { target: { value: "scoped-story" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "Featured image reference" }), { target: { value: "sites/22/foreign.jpg" } });
+    expect(screen.getByText(/External and other-Site media are not allowed/)).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Create draft" })).toHaveProperty("disabled", true);
+
+    fireEvent.change(screen.getByRole("textbox", { name: "Featured image reference" }), { target: { value: "sites/11/own.jpg" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create category" }));
+    fireEvent.change(screen.getByRole("textbox", { name: "Name" }), { target: { value: "Campus Life" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "Code" }), { target: { value: "BAD CODE" } });
+    expect(screen.getByRole("button", { name: "Create and assign" })).toHaveProperty("disabled", true);
+    fireEvent.change(screen.getByRole("textbox", { name: "Code" }), { target: { value: "CAMPUS_LIFE" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create and assign" }));
+    await waitFor(() => expect(createSiteTaxonomy).toHaveBeenCalledWith(11, "categories", expect.objectContaining({
+      name: "Campus Life", code: "CAMPUS_LIFE", locale: "en",
+    })));
+  });
+
+  it("previews the Site draft through the shared safe block renderer", async () => {
+    renderPanel();
+    await screen.findByRole("table", { name: "Posts for this Site" });
+    fireEvent.click(screen.getByRole("button", { name: "Edit Campus update" }));
+    await screen.findByRole("dialog", { name: "Edit Post" });
+    fireEvent.change(screen.getByRole("textbox", { name: "Block 1 JSON" }), {
+      target: { value: '{"type":"paragraph","html":"<p>Safe<script>alert(1)</script><a href=\\\"javascript:alert(2)\\\">bad</a></p>"}' },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Preview draft" }));
+    expect(await screen.findByText("Private draft preview")).toBeTruthy();
+    expect(document.querySelector("script")).toBeNull();
+    expect(document.body.textContent).not.toContain("javascript:");
   });
 });

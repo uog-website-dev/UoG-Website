@@ -18,6 +18,8 @@ export interface SitePostRecord {
   slug: string;
   excerpt: string;
   content: string;
+  blocks: SitePostBlock[];
+  seo: Record<string, unknown>;
   featured_media: string;
   author: number | string | null;
   categories: string[];
@@ -27,6 +29,22 @@ export interface SitePostRecord {
   created_at: string;
   updated_at: string;
   etag?: string;
+}
+
+export interface SitePostBlock {
+  type: string;
+  text?: string;
+  html?: string;
+  ref?: string;
+  new_tab?: boolean;
+  level?: number;
+  label?: string;
+  href?: string;
+  alt?: string;
+  items?: string[];
+  style?: string;
+  heading?: string;
+  children?: SitePostBlock[];
 }
 
 export interface SiteTaxonomyRecord {
@@ -122,7 +140,7 @@ export async function getSitePost(
 
 export async function createSitePost(
   siteId: number,
-  input: Pick<SitePostRecord, "title" | "slug" | "excerpt" | "content" | "featured_media" | "categories" | "tags">,
+  input: Pick<SitePostRecord, "title" | "slug" | "excerpt" | "content" | "blocks" | "seo" | "featured_media" | "categories" | "tags">,
 ): Promise<ActionResult<SitePostRecord>> {
   return attempt(async () => {
     const api = await client();
@@ -135,7 +153,7 @@ export async function updateSitePost(
   siteId: number,
   postId: string,
   ifMatch: string,
-  input: Pick<SitePostRecord, "title" | "slug" | "excerpt" | "content" | "featured_media" | "categories" | "tags">,
+  input: Pick<SitePostRecord, "title" | "slug" | "excerpt" | "content" | "blocks" | "seo" | "featured_media" | "categories" | "tags">,
 ): Promise<ActionResult<SitePostRecord>> {
   return attempt(async () => {
     const api = await client();
@@ -143,5 +161,19 @@ export async function updateSitePost(
       sitePostsPath(siteId, `${postId}/`), input, { ifMatch },
     );
     return { ...result.data, etag: result.etag ?? "" };
+  });
+}
+
+export async function createSiteTaxonomy(
+  siteId: number,
+  kind: "categories" | "tags",
+  input: { code: string; name: string; slug: string; is_active: true; locale: string },
+): Promise<ActionResult<SiteTaxonomyRecord>> {
+  return attempt(async () => {
+    const api = await client();
+    const path = kind === "categories" ? siteCategoriesPath(siteId) : siteTagsPath(siteId);
+    const result = await api.postDetailed<SiteTaxonomyRecord>(path, input);
+    if (result.data.site !== siteId) throw new Error("The taxonomy record does not belong to this Site.");
+    return result.data;
   });
 }

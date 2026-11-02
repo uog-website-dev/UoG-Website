@@ -5,6 +5,23 @@ The Post admin and taxonomy routes are listed in the
 [OpenAPI contract](./openapi.yaml) and require an active Site CMS role (or the
 validated platform-admin role) plus the `POSTS` module enabled for that Site.
 
+## Authoring data
+
+Create and update Post drafts through `/api/v1/sites/{site_pk}/posts/`. The
+payload accepts `title`, `slug`, `excerpt`, `content`, `blocks`, `seo`,
+`featured_media`, `categories`, and `tags`. `blocks` use the shared CMS block
+schema used by Pages; rich text is sanitized on write and the preview renderer
+renders text and safe links without inserting arbitrary HTML. SEO accepts only
+`meta_title`, `meta_description`, and `og_image_ref`.
+
+Category and Tag IDs must belong to the same Site as the Post. Featured media
+and `og_image_ref` references may use `sites/{site_pk}/...` or the platform
+`shared/...` scope; other Site references and external URLs are rejected. The platform does not
+currently provide a media upload or picker API, so these references must point
+to assets provisioned by the existing deployment process. Taxonomy create
+requests use the corresponding Site categories or tags route and require an
+authorized Site author role and the enabled `POSTS` module.
+
 ## Shared workflow
 
 Use the shared content action route for a Post:

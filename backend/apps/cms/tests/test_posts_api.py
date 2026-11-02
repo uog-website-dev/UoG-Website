@@ -162,6 +162,51 @@ def test_duplicate_slug_and_cross_site_taxonomy_return_actionable_errors(site_ed
     assert site_editor.get(url + f"{hidden.pk}/").status_code == 404
 
 
+def test_featured_media_accepts_only_shared_or_own_site_scope(site_editor, sites):
+    site, other = sites
+    _enable_posts_module(site, other)
+    url = POSTS.format(site=site.pk)
+
+    own = site_editor.post(
+        url,
+        {"title": "Own media", "slug": "own-media", "content": "Body",
+         "featured_media": f"sites/{site.pk}/hero.jpg",
+         "blocks": [{"type": "paragraph", "html": '<p onclick="alert(1)">Safe<script>alert(2)</script></p>'}]},
+        content_type="application/json",
+    )
+    assert own.status_code == 201, own.content
+    assert own.json()["featured_media"] == f"sites/{site.pk}/hero.jpg"
+    assert "<script" not in own.json()["blocks"][0]["html"]
+    assert "onclick" not in own.json()["blocks"][0]["html"]
+
+    shared = site_editor.post(
+        url,
+        {"title": "Shared media", "slug": "shared-media", "content": "Body",
+         "featured_media": "shared/brand/logo.png"},
+        content_type="application/json",
+    )
+    assert shared.status_code == 201, shared.content
+
+    foreign_seo_image = site_editor.post(
+        url,
+        {"title": "Foreign SEO image", "slug": "foreign-seo-image", "content": "Body",
+         "seo": {"og_image_ref": f"sites/{other.pk}/og.jpg"}},
+        content_type="application/json",
+    )
+    assert foreign_seo_image.status_code == 400
+    assert "seo" in foreign_seo_image.json()["error"]["details"]
+
+    for index, ref in enumerate((f"sites/{other.pk}/secret.jpg", "https://cdn.example/hero.jpg", "sites/../secret.jpg")):
+        rejected = site_editor.post(
+            url,
+            {"title": "Rejected media", "slug": f"rejected-media-{index}", "content": "Body",
+             "featured_media": ref},
+            content_type="application/json",
+        )
+        assert rejected.status_code == 400
+        assert "featured_media" in rejected.json()["error"]["details"]
+
+
 def test_taxonomy_crud_is_site_scoped_with_slug_normalization(site_editor, sites):
     site, other = sites
     _enable_posts_module(site, other)

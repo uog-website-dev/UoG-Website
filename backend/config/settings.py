@@ -125,13 +125,19 @@ WSGI_APPLICATION = "config.wsgi.application"
 #     (see infrastructure/postgres/init and backend/entrypoint.sh).
 # Credentials come exclusively from the environment — never from source.
 # ---------------------------------------------------------------------------
+# Compose injects DB_HOST=postgres for containers. When pytest is launched
+# directly from a developer host, that Docker-only DNS name is unavailable;
+# use the local forwarded PostgreSQL port unless the caller overrides it.
+_is_test_process = "pytest" in sys.modules or "test" in sys.argv
+_default_db_host = "127.0.0.1" if _is_test_process else "postgres"
+
 DATABASES = {
     "default": {
         "ENGINE": config("DB_ENGINE", default="django.db.backends.postgresql"),
         "NAME": config("DB_NAME", default="uog_db"),
         "USER": config("DB_USER", default="uog_app"),
         "PASSWORD": config("DB_PASSWORD", default="uog_app_password"),
-        "HOST": config("DB_HOST", default="postgres"),
+        "HOST": config("DB_HOST", default=_default_db_host),
         "PORT": config("DB_PORT", default="5432", cast=int),
         "CONN_MAX_AGE": config("DB_CONN_MAX_AGE", default=60, cast=int),
         "OPTIONS": {"connect_timeout": 5},
@@ -143,7 +149,7 @@ DATABASES = {
 # which is a database-level DDL action. It therefore connects with the
 # migration role — the runtime role above must never be able to create
 # databases. Detected for both `pytest` and `manage.py test`.
-if "pytest" in sys.modules or "test" in sys.argv:
+if _is_test_process:
     DATABASES["default"]["USER"] = config("DB_MIGRATE_USER", default="uog_migrate")
     DATABASES["default"]["PASSWORD"] = config(
         "DB_MIGRATE_PASSWORD", default="uog_migrate_password"
