@@ -239,7 +239,7 @@ def test_page_post_targets_and_explicit_cross_site_policy_are_enforced(api):
     page = create_page(site=api.site, title="About", slug="about")
     post = Post.objects.create(site=api.site, title="News", slug="news", content="News")
     foreign = create_page(site=api.other, title="Other", slug="other")
-    for kind, field, pk in (("page", "page", str(page.pk)), ("post", "post", post.pk)):
+    for kind, field, pk in (("page", "page", str(page.pk)), ("post", "post", str(post.pk))):
         response = _post(api, url + "items/", {"label": kind, "item_type": kind, field: pk}, _tag(api, url))
         assert response.status_code == 201, response.content
         assert response.json()[field] == pk

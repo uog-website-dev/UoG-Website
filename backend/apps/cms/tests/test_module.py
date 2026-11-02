@@ -120,51 +120,42 @@ def test_cms_migrations_are_repeatable_and_applied():
 
 
 @pytest.mark.django_db
-def test_pages_is_shipped_but_all_content_modules_default_to_unavailable():
+def test_content_modules_are_shipped_but_disabled_by_default():
     assert CONTENT_CODES <= set(Module.objects.values_list("code", flat=True))
-    shipped = {"PAGES", "MENUS"}
-    for code in shipped:
+    for code in CONTENT_CODES:
         module = Module.objects.get(code=code)
         assert module.status == "IMPLEMENTED"
         assert module.is_enabled is False
         assert capability_is_shipped(code)
-    for code in CONTENT_CODES - shipped:
-        module = Module.objects.get(code=code)
-        assert module.status == "PLANNED"
-        assert module.is_enabled is False
-        assert module.configuration_schema == empty_module_schema()
-        assert not capability_is_shipped(code)
-        module.status = "IMPLEMENTED"
-        with pytest.raises(ValidationError):
-            module.save()
+    # Planned registry rows stay unusable until their implementation ships.
+    planned = Module.objects.get(code="CMS")
+    assert planned.status == "PLANNED"
+    assert not capability_is_shipped(planned.code)
+    planned.status = "IMPLEMENTED"
+    with pytest.raises(ValidationError):
+        planned.save()
     assert not usable_modules().exists()
 
 
 @pytest.mark.django_db
 def test_registry_database_gates_activation():
-    pages = Module.objects.get(code="POSTS")
+    planned = Module.objects.get(code="CMS")
     with pytest.raises(IntegrityError), transaction.atomic():
-        Module.objects.filter(pk=pages.pk).update(status="IMPLEMENTED")
+        Module.objects.filter(pk=planned.pk).update(status="IMPLEMENTED")
     with pytest.raises(IntegrityError), transaction.atomic():
-        Module.objects.filter(pk=pages.pk).update(is_enabled=True)
-    pages.refresh_from_db()
-    assert pages.status == "PLANNED" and pages.is_enabled is False
+        Module.objects.filter(pk=planned.pk).update(is_enabled=True)
+    planned.refresh_from_db()
+    assert planned.status == "PLANNED" and planned.is_enabled is False
 
 
 @pytest.mark.django_db
-def test_a_site_cannot_enable_a_planned_content_code(sites):
+def test_a_site_cannot_enable_a_planned_module(sites):
     site, _ = sites
-    pages = Module.objects.get(code="PAGES")
+    module = Module.objects.get(code="CMS")
     with pytest.raises(ValidationError):
-        enable_module_for_site(site.pk, pages.pk)
+        enable_module_for_site(site.pk, module.pk)
     with pytest.raises(IntegrityError), transaction.atomic():
-        SiteModule.objects.bulk_create([SiteModule(site=site, module=pages)])
-    for code in CONTENT_CODES - {"PAGES"}:
-        module = Module.objects.get(code=code)
-        with pytest.raises(ValidationError):
-            enable_module_for_site(site.pk, module.pk)
-        with pytest.raises(IntegrityError), transaction.atomic():
-            SiteModule.objects.bulk_create([SiteModule(site=site, module=module)])
+        SiteModule.objects.bulk_create([SiteModule(site=site, module=module)])
     assert not SiteModule.objects.exists()
 
 
