@@ -84,7 +84,6 @@ def test_internal_targets_stay_on_the_site_unless_cross_site_is_explicit(ready):
     foreign_page = create_page(site=other, title="Foreign", slug="foreign")
     local_post = Post.objects.create(site=site, title="News", slug="news", content="News")
     foreign_post = Post.objects.create(site=other, title="Other", slug="other", content="Other")
-    unscoped = Post.objects.create(title="Loose", slug="loose", content="Loose")
 
     linked = _item(menu, "About", item_type=MenuItem.ItemType.PAGE, page=local_page)
     assert linked.page_id == local_page.pk
@@ -94,8 +93,6 @@ def test_internal_targets_stay_on_the_site_unless_cross_site_is_explicit(ready):
     assert "allow_cross_site" in str(blocked_page.value)
     with pytest.raises(ValidationError):
         _item(menu, "Foreign post", item_type=MenuItem.ItemType.POST, post=foreign_post, sort_order=2)
-    with pytest.raises(ValidationError):
-        _item(menu, "Loose", item_type=MenuItem.ItemType.POST, post=unscoped, sort_order=2)
 
     allowed = _item(
         menu, "Shared", item_type=MenuItem.ItemType.PAGE, page=foreign_page,

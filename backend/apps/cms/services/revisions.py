@@ -59,6 +59,26 @@ def revision_snapshot(content):
             "position": content.position,
             "is_homepage": content.is_homepage,
         })
+    elif content._meta.model_name == "post":
+        # Posts are multi-table children of SiteContent; their own columns are
+        # part of the revision so a Post edit advances the content revision.
+        snapshot.update({
+            "title": content.title,
+            "slug": content.slug,
+            "excerpt": content.excerpt,
+            "content": content.content,
+            "excerpt_html": content.excerpt_html,
+            "featured_media": content.featured_media,
+            "seo": content.seo,
+            "author_id": content.author_id,
+        })
+        if content.pk is not None and not content._state.adding:
+            snapshot["categories"] = sorted(
+                str(pk) for pk in content.categories.values_list("pk", flat=True)
+            )
+            snapshot["tags"] = sorted(
+                str(pk) for pk in content.tags.values_list("pk", flat=True)
+            )
     return snapshot
 
 

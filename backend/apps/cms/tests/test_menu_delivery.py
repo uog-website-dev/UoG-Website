@@ -11,6 +11,7 @@ from apps.audit.models import AuditEvent
 from apps.authorization.models import Role, UserRoleAssignment
 from apps.cms.menu_cache import delivery_version
 from apps.cms.menu_models import Menu, MenuInheritance, MenuItem
+from apps.cms.services.workflow import transition_content
 from apps.cms.selectors.menu_delivery import compose_location
 from apps.cms.services.pages import create_page
 from apps.cms.services.publication_cache import get_public_cache
@@ -66,6 +67,15 @@ def _link(menu, label, **overrides):
     if values["item_type"] in {"page", "post"}:
         values["target"] = ""
     return MenuItem.objects.create(**values)
+
+
+def _publish_post(post):
+    for action in ("submit", "approve", "publish"):
+        actor = get_user_model().objects.create_user(
+            username=f"{action}-{post.slug}-{uuid4().hex[:8]}",
+        )
+        transition_content(post.pk, action=action, actor=actor, roles={"platform-admin"})
+    return post
 
 
 def _roots(site_id, location="header"):
@@ -142,8 +152,9 @@ def test_unpublished_targets_and_inactive_branches_are_omitted(family):
     draft = create_page(site=child, title="Draft", slug="draft")
     _link(menu, "Draft page", item_type="page", page=draft, sort_order=1)
     _link(menu, "Outside", item_type="external", target="https://example.com/outside", sort_order=2)
-    Post.objects.create(site=child, title="Hidden", slug="hidden", content="Hidden", is_published=False)
-    visible = Post.objects.create(site=child, title="Visible", slug="visible", content="Visible", is_published=True)
+    Post.objects.create(site=child, title="Hidden", slug="hidden", content="Hidden")
+    visible = Post.objects.create(site=child, title="Visible", slug="visible", content="Visible")
+    _publish_post(visible)
     hidden_post = Post.objects.get(site=child, slug="hidden")
     _link(menu, "Hidden news", item_type="post", post=hidden_post, sort_order=3)
     _link(menu, "Visible news", item_type="post", post=visible, sort_order=4)

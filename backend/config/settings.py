@@ -223,7 +223,7 @@ SPECTACULAR_SETTINGS = {
         "and assignment management is platform-admin only. "
         "Site, domain, template and module administration is platform-admin only and uses the "
         "same development write opt-in; production writes remain disabled pending scoped IAM/RBAC. "
-        "Posts and Menus content APIs are absent. "
+        "Post authoring and taxonomy administration require the POSTS module to be enabled for the Site. "
         "No scope header grants access. See docs/development/api-documentation.md."
     ),
     "SERVE_INCLUDE_SCHEMA": False,
@@ -260,7 +260,7 @@ SPECTACULAR_SETTINGS = {
         {"name": "Domains", "description": "Hostnames for one Site, including an atomic primary-domain switch."},
         {"name": "Site templates", "description": "Approved starting configurations. Applying one does not rewrite existing Sites."},
         {"name": "Modules", "description": "Platform capability registry. Planned modules cannot be enabled for a Site."},
-        {"name": "Posts", "description": "Not implemented."},
+        {"name": "Posts", "description": "Site-scoped post authoring, category and tag administration. Requires a Site CMS authoring role and the POSTS module enabled for the Site."},
         {"name": "Menus", "description": "Site-scoped menu and item administration, atomic tree operations, inheritance policy and menu-wide ETag concurrency. Permissions: menu.read, menu.write and menu.publish. Inheritance does not grant parent-menu management."},
         {"name": "Public menus", "description": "Effective navigation for the Site resolved from the trusted Host. Global, inherited and local items follow the Site delivery policy."},
     ],
@@ -489,7 +489,7 @@ SPECTACULAR_SETTINGS = {
         {"name": "Site templates", "description": "Approved starting configurations. Applying one does not rewrite existing Sites."},
         {"name": "Modules", "description": "Platform capability registry. Planned modules cannot be enabled for a Site."},
         {"name": "Menu links", "description": "Site menu-link administration authorized by scoped application permissions."},
-        {"name": "Posts", "description": "Not implemented."},
+        {"name": "Posts", "description": "Site-scoped post authoring, category and tag administration. Requires a Site CMS authoring role and the POSTS module enabled for the Site."},
         {"name": "Menus", "description": "Site-scoped menu and item administration, atomic tree operations, inheritance policy and menu-wide ETag concurrency. Permissions: menu.read, menu.write and menu.publish. Inheritance does not grant parent-menu management."},
         {"name": "Public menus", "description": "Effective navigation for the Site resolved from the trusted Host. Global, inherited and local items follow the Site delivery policy."},
     ],

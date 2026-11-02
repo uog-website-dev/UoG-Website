@@ -5,6 +5,7 @@ from rest_framework.routers import SimpleRouter
 from apps.cms.api.pages import SitePageViewSet
 from apps.cms.api.menus import MenuViewSet, MenuItemViewSet
 from apps.cms.api.menu_delivery import MenuInheritanceDetailView, MenuInheritanceListView
+from apps.api.posts_api import CategoryViewSet, PostViewSet, TagViewSet
 
 from .views import SiteDomainViewSet, SiteModuleViewSet, SiteViewSet
 
@@ -14,6 +15,9 @@ router = SimpleRouter()
 router.register(r"(?P<site_pk>[0-9]+)/menus/(?P<menu_pk>[0-9a-f-]{36})/items", MenuItemViewSet, basename="menu-item")
 router.register(r"(?P<site_pk>[0-9]+)/menus", MenuViewSet, basename="menu")
 router.register(r"(?P<site_pk>[^/.]+)/pages", SitePageViewSet, basename="site-page")
+router.register(r"(?P<site_pk>[^/.]+)/posts", PostViewSet, basename="site-post")
+router.register(r"(?P<site_pk>[^/.]+)/categories", CategoryViewSet, basename="site-category")
+router.register(r"(?P<site_pk>[^/.]+)/tags", TagViewSet, basename="site-tag")
 router.register(r"(?P<site_pk>[^/.]+)/domains", SiteDomainViewSet, basename="sitedomain")
 router.register(r"(?P<site_pk>[^/.]+)/modules", SiteModuleViewSet, basename="sitemodule")
 router.register("", SiteViewSet, basename="site")

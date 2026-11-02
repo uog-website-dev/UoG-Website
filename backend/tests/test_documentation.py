@@ -70,6 +70,13 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
         "/api/v1/sites/{site_pk}/pages/{id}/",
         "/api/v1/sites/{site_pk}/pages/{id}/workflow/",
         "/api/v1/sites/{site_pk}/pages/{id}/homepage/",
+        "/api/v1/sites/{site_pk}/pages/{id}/workflow-history/",
+        "/api/v1/sites/{site_pk}/posts/",
+        "/api/v1/sites/{site_pk}/posts/{id}/",
+        "/api/v1/sites/{site_pk}/categories/",
+        "/api/v1/sites/{site_pk}/categories/{id}/",
+        "/api/v1/sites/{site_pk}/tags/",
+        "/api/v1/sites/{site_pk}/tags/{id}/",
         "/api/v1/sites/{site_pk}/menus/",
         "/api/v1/sites/{site_pk}/menus/{id}/",
         "/api/v1/sites/{site_pk}/menus/{id}/activate/",
@@ -98,6 +105,24 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
         "/api/v1/site-context/pages/{page_path}/",
         "/api/v1/site-context/menus/",
     }
+    post_list = paths["/api/v1/sites/{site_pk}/posts/"]["get"]
+    assert {
+        "status", "category", "tag", "author", "created_after",
+        "created_before", "published_after", "published_before",
+        "search", "ordering", "page", "page_size",
+    } <= {parameter["name"] for parameter in post_list["parameters"]}
+    assert post_list["security"] == [{"keycloakBearer": []}]
+    post_schemas = schema["components"]["schemas"]
+    assert {"Post", "PostCategory", "PostTag"} <= set(post_schemas)
+    assert {"categories", "tags", "title", "slug"} <= set(
+        post_schemas["Post"]["properties"]
+    )
+    for route in (
+        "/api/v1/sites/{site_pk}/posts/{id}/",
+        "/api/v1/sites/{site_pk}/categories/{id}/",
+        "/api/v1/sites/{site_pk}/tags/{id}/",
+    ):
+        assert {"get", "patch", "delete"} <= set(paths[route])
     assert paths["/api/me/"]["get"]["security"] == [{"keycloakBearer": []}]
     assert not paths["/api/pages/"]["get"].get("security", [])
     assert paths["/api/pages/"]["post"]["security"] == [{"keycloakBearer": []}, {"cookieAuth": []}]

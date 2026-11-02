@@ -103,7 +103,7 @@ def add_common_contract(result, generator, request, public):
                     codes.update({"412", "428"})
                 collection = path.rstrip("/").split("/")[-1]
                 if method in {"get", "post", "patch"} and not hierarchy and not (method == "get" and "{" not in path):
-                    success = "201" if method == "post" and collection in {"organizations", "sites", "domains", "modules", "site-templates", "pages", "menus", "items"} else "200"
+                    success = "201" if method == "post" and collection in {"organizations", "sites", "domains", "modules", "site-templates", "pages", "menus", "items", "posts", "categories", "tags"} else "200"
                     responses.setdefault(success, {}).setdefault("headers", {})["ETag"] = {
                         "description": "Strong representation validator. Echo exactly in If-Match for mutations.",
                         "schema": {"type": "string"},

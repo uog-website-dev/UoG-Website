@@ -87,7 +87,10 @@ def _project(menu, source):
             )
         if row.item_type == MenuItem.ItemType.POST:
             post = posts.get(row.post_id)
-            return bool(post and post.is_published and post.site_id and (post.site_id == row.site_id or row.allow_cross_site))
+            return bool(
+                post and post.status == ContentStatus.PUBLISHED
+                and (post.site_id == row.site_id or row.allow_cross_site)
+            )
         return row.item_type in {MenuItem.ItemType.EXTERNAL, MenuItem.ItemType.CUSTOM}
 
     def branch(parent_id):

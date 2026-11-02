@@ -106,7 +106,7 @@ class ItemInput(StrictFields, serializers.Serializer):
     label = serializers.CharField(max_length=255)
     item_type = serializers.ChoiceField(choices=MenuItem.ItemType.choices)
     page = serializers.UUIDField(required=False, allow_null=True)
-    post = serializers.IntegerField(required=False, allow_null=True, min_value=1)
+    post = serializers.UUIDField(required=False, allow_null=True)
     target = serializers.CharField(required=False, allow_blank=True, max_length=2048, trim_whitespace=False)
     parent = serializers.UUIDField(required=False, allow_null=True)
     sort_order = serializers.IntegerField(required=False, min_value=0)
