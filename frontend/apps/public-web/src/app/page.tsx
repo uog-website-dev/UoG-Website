@@ -17,6 +17,7 @@
  */
 import { useEffect, useState } from "react";
 import Alert from "@mui/material/Alert";
+import Link from "@mui/material/Link";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
@@ -105,6 +106,7 @@ export default function HomePage() {
         <Typography variant="h5" color="text.secondary" gutterBottom>
           Digital Platform — Public Website
         </Typography>
+        <Link href="/posts">Published posts</Link>
         <Typography>
           This application is part of the standardized UoG Digital Platform
           foundation: Next.js 15 + Material UI on the frontend, a Django REST

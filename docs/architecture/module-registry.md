@@ -4,7 +4,8 @@ Implementation date: 2026-10-27 (content codes added 2026-10-29 by
 P2-CMS-001; PAGES shipped by P2-CMS-006). `Module` is the platform catalog of
 capabilities. Sites do not invent module names. Pages, Media, Staff
 directory, Academics, News and announcements, Events, Job notice board,
-Search and Analytics are registry rows. POSTS and MENUS remain planned.
+Search and Analytics are registry rows. POSTS and MENUS are implemented; their
+global switches stay off until an operator enables them.
 
 ## Fields
 

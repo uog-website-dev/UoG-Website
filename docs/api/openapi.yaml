@@ -19506,7 +19506,6 @@ components:
         is_global:
           type: boolean
           readOnly: true
-          default: false
           description: Centrally governed fragment. Only the main Site may own one,
             and only one global menu exists per location.
         version:
@@ -20977,7 +20976,13 @@ components:
           type: string
           format: date-time
           readOnly: true
+        available_actions:
+          type: array
+          items:
+            type: string
+          readOnly: true
       required:
+      - available_actions
       - blocks_version
       - content
       - created_at

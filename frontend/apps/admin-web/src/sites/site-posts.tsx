@@ -31,6 +31,7 @@ import {
   getSitePost,
   loadSitePosts,
   loadSiteTaxonomy,
+  transitionSitePost,
   updateSitePost,
 } from "@/app/sites/post-actions";
 import type {
@@ -39,6 +40,7 @@ import type {
   SitePostRecord,
   SitePostStatus,
   SitePostBlock,
+  SitePostWorkflowAction,
   SiteTaxonomyRecord,
 } from "@/app/sites/post-actions";
 import { unwrap } from "@/organizations/contract";
@@ -232,6 +234,9 @@ function SitePostsPanelContent({
   const [taxonomyCode, setTaxonomyCode] = useState("");
   const [taxonomyDialogError, setTaxonomyDialogError] = useState("");
   const [taxonomySaving, setTaxonomySaving] = useState(false);
+  const [pendingWorkflow, setPendingWorkflow] = useState<{ post: SitePostRecord; action: SitePostWorkflowAction } | null>(null);
+  const [workflowComment, setWorkflowComment] = useState("");
+  const [busyPostId, setBusyPostId] = useState<string | null>(null);
 
   const ordering = orderingForSort(sort);
   const posts = useAsync<SitePostListResponse>(
@@ -264,7 +269,7 @@ function SitePostsPanelContent({
   const categoryNames = useMemo(() => new Map(categories.map((row) => [row.id, row.name])), [categories]);
   const tagNames = useMemo(() => new Map(tags.map((row) => [row.id, row.name])), [tags]);
   const rows = (posts.data?.results ?? []).filter((row) => row.site === siteId);
-  const enabled = postsEnabled === true && !saving;
+  const enabled = postsEnabled === true && !saving && busyPostId === null;
   const activeFilterCount = Number(Boolean(appliedFilters.search))
     + Number(Boolean(appliedFilters.status))
     + Number(Boolean(appliedFilters.category))
@@ -400,6 +405,29 @@ function SitePostsPanelContent({
     }
   }
 
+  function queueWorkflow(row: SitePostRecord, action: SitePostWorkflowAction) {
+    if (!enabled) return;
+    setWorkflowComment("");
+    setPendingWorkflow({ post: row, action });
+  }
+
+  async function confirmWorkflow() {
+    if (!pendingWorkflow || !enabled) return;
+    const { post: row, action } = pendingWorkflow;
+    if (action === "reject" && !workflowComment.trim()) return;
+    setBusyPostId(row.id);
+    try {
+      unwrap(await transitionSitePost(siteId, row.id, action, workflowComment.trim()));
+      setPendingWorkflow(null);
+      posts.reload();
+      toast.success(`Post ${action} completed.`);
+    } catch (cause) {
+      toast.error(apiErrorText(cause, "The Post workflow could not be updated."));
+    } finally {
+      setBusyPostId(null);
+    }
+  }
+
   const columns: TableColumn<SitePostRecord>[] = [
     {
       field: "title", header: "Post", sortable: true,
@@ -441,7 +469,7 @@ function SitePostsPanelContent({
           <Typography variant="h2" component="h2" sx={{ fontSize: "1.25rem", fontWeight: 700 }}>Posts</Typography>
           <Typography variant="body2" color="text.secondary">Search and manage Posts belonging to this Site.</Typography>
         </Box>
-        {canCreate ? <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate} disabled={!enabled}>Create Post</Button> : null}
+        {canCreate && postsEnabled === true ? <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate} disabled={!enabled}>Create Post</Button> : null}
       </Box>
 
       {postsEnabled === null ? <Typography role="status">Checking the POSTS module…</Typography> : null}
@@ -464,9 +492,31 @@ function SitePostsPanelContent({
               columns={columns}
               rows={rows}
               getRowKey={(row) => row.id}
-              renderActions={(row) => canEdit ? (
-                <Button size="small" aria-label={`Edit ${row.title}`} disabled={!enabled} onClick={() => void openEdit(row)}>Edit</Button>
-              ) : null}
+              renderActions={(row) => {
+                const actions = new Set(row.available_actions ?? []);
+                return (
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                    {canEdit ? (
+                      <Button size="small" aria-label={`Edit ${row.title}`} disabled={!enabled} onClick={() => void openEdit(row)}>Edit</Button>
+                    ) : null}
+                    {actions.has("submit") ? (
+                      <Button size="small" aria-label={`Submit ${row.title} for review`} disabled={!enabled} onClick={() => queueWorkflow(row, "submit")}>Submit</Button>
+                    ) : null}
+                    {actions.has("approve") ? (
+                      <Button size="small" aria-label={`Approve ${row.title}`} disabled={!enabled} onClick={() => queueWorkflow(row, "approve")}>Approve</Button>
+                    ) : null}
+                    {actions.has("reject") ? (
+                      <Button size="small" aria-label={`Reject ${row.title}`} disabled={!enabled} onClick={() => queueWorkflow(row, "reject")}>Reject</Button>
+                    ) : null}
+                    {actions.has("publish") ? (
+                      <Button size="small" aria-label={`Publish ${row.title}`} disabled={!enabled} onClick={() => queueWorkflow(row, "publish")}>Publish</Button>
+                    ) : null}
+                    {actions.has("unpublish") ? (
+                      <Button size="small" aria-label={`Unpublish ${row.title}`} disabled={!enabled} onClick={() => queueWorkflow(row, "unpublish")}>Unpublish</Button>
+                    ) : null}
+                  </Box>
+                );
+              }}
               sort={sort}
               onSortChange={(next) => { setSort(next); setPage(1); }}
               loading={posts.loading}
@@ -534,7 +584,7 @@ function SitePostsPanelContent({
           </Box>
           <Button onClick={() => setShowDraftPreview((value) => !value)} aria-expanded={showDraftPreview}>{showDraftPreview ? "Hide preview" : "Preview draft"}</Button>
           {showDraftPreview ? (
-            <Paper variant="outlined" sx={{ p: 2 }} aria-label="Private Post preview">
+            <Paper variant="outlined" sx={{ p: 2 }} role="region" aria-label="Private Post preview">
               <Typography variant="overline">Private draft preview</Typography>
               {(() => {
                 try {
@@ -550,6 +600,24 @@ function SitePostsPanelContent({
           <Button onClick={() => { setEditorOpen(false); setShowDraftPreview(false); }} disabled={saving}>Cancel</Button>
           <Button variant="contained" onClick={() => void savePost()} disabled={!enabled || !form.title.trim() || !form.slug.trim() || Boolean(slugError(form.slug)) || Boolean(blocksError(form)) || Boolean(seoError(form.seo, siteId)) || Boolean(mediaReferenceError(form.featured_media.trim(), siteId)) || (activePost ? !canEdit : !canCreate)}>
             {saving ? "Saving…" : activePost ? "Save changes" : "Create draft"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={pendingWorkflow !== null} onClose={() => { if (busyPostId === null) setPendingWorkflow(null); }} fullWidth maxWidth="sm" aria-labelledby="post-workflow-title">
+        <DialogTitle id="post-workflow-title">Confirm {pendingWorkflow?.action}</DialogTitle>
+        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, pt: "8px !important" }}>
+          <Typography>
+            {pendingWorkflow ? `Confirm ${pendingWorkflow.action} for “${pendingWorkflow.post.title}”. This changes the Post on this Site only.` : ""}
+          </Typography>
+          {pendingWorkflow?.action === "reject" ? (
+            <TextField label="Review comment" value={workflowComment} onChange={(event) => setWorkflowComment(event.target.value)} required multiline minRows={2} />
+          ) : null}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setPendingWorkflow(null)} disabled={busyPostId !== null}>Cancel</Button>
+          <Button variant="contained" onClick={() => void confirmWorkflow()} disabled={!enabled || (pendingWorkflow?.action === "reject" && !workflowComment.trim())}>
+            Confirm
           </Button>
         </DialogActions>
       </Dialog>

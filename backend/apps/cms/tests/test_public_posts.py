@@ -131,7 +131,7 @@ def test_editor_creates_reviews_and_publishes_post_to_public_feed(
                 '<p onclick="alert(1)">Safe <script>alert(2)</script>'
                 '<a href="javascript:alert(3)">bad link</a></p>'
             ),
-            "featured_media": "/media/research.jpg",
+            "featured_media": "shared/research.jpg",
             "seo": {"meta_title": "Research update"},
             "categories": [category.json()["id"]], "tags": [tag.json()["id"]],
         }, content_type="application/json", **auth(ContentRole.AUTHOR),
@@ -139,6 +139,7 @@ def test_editor_creates_reviews_and_publishes_post_to_public_feed(
     assert created.status_code == 201, created.content
     post_id = created.json()["id"]
     assert created.json()["status"] == ContentStatus.DRAFT
+    assert created.json()["available_actions"] == ["submit"]
     assert "<script" not in created.json()["excerpt_html"]
     assert "onclick" not in created.json()["excerpt_html"]
     assert "javascript:" not in created.json()["excerpt_html"]
