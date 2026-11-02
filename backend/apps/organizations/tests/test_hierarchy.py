@@ -204,7 +204,8 @@ def test_simultaneous_inverse_moves_never_commit_a_cycle(tree, isolation, writer
         except ValidationError:
             return "rejected", "validation"
         except (IntegrityError, OperationalError) as exc:
-            return "rejected", getattr(exc.__cause__, "sqlstate", None)
+            cause = exc.__cause__
+            return "rejected", getattr(cause, "sqlstate", None) or getattr(cause, "pgcode", None)
         finally:
             connections.close_all()
 

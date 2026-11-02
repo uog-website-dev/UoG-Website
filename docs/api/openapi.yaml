@@ -3909,16 +3909,18 @@ paths:
   /api/v1/cms/sites/{site_pk}/content/{content_id}/workflow/:
     post:
       operationId: v1_cms_sites_content_workflow_create
-      description: Apply a validated content workflow action. The content must belong
-        to the URL Site. Authorization uses Site CMS role assignments or the validated
-        platform-admin bearer-token role; roles in the request body are ignored and
-        rejected.
+      description: Apply a validated workflow action to a Page or Post owned by the
+        URL Site. Page transitions require PAGES; Post transitions require POSTS enabled
+        for that Site. Authorization uses the action's Site CMS role assignment or
+        the validated platform-admin bearer-token role; body-supplied roles are rejected.
+        Publishing records an immutable snapshot, audit event and cache generation
+        change. A repeated publish is idempotent.
       parameters:
       - in: path
         name: content_id
         schema:
           type: string
-        description: UUID of SiteContent or Page.
+        description: UUID of SiteContent, Page or Post.
         required: true
       - in: path
         name: site_pk
@@ -19174,6 +19176,7 @@ components:
         is_global:
           type: boolean
           readOnly: true
+          default: false
           description: Centrally governed fragment. Only the main Site may own one,
             and only one global menu exists per location.
         version:
@@ -22113,6 +22116,7 @@ components:
     WorkflowContent:
       oneOf:
       - $ref: '#/components/schemas/SitePage'
+      - $ref: '#/components/schemas/Post'
       - $ref: '#/components/schemas/SiteContent'
     APIError:
       type: object

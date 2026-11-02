@@ -15,6 +15,7 @@ from apps.cms.services.workflow import transition_content
 from apps.cms.selectors.menu_delivery import compose_location
 from apps.cms.services.pages import create_page
 from apps.cms.services.publication_cache import get_public_cache
+from apps.cms.models import ContentStatus, PublishedContentSnapshot
 from apps.cms.tests.test_menus import ready  # noqa: F401
 from apps.sites.models import Module, Site, SiteDomain, SiteModule
 from apps.sites.services.lifecycle import activate_site
@@ -160,6 +161,32 @@ def test_unpublished_targets_and_inactive_branches_are_omitted(family):
     _link(menu, "Visible news", item_type="post", post=visible, sort_order=4)
     assert _roots(child.pk) == [("Outside", "local"), ("Visible news", "local")]
     assert compose_location(child.pk, "header")[1]["href"] == "/posts/visible"
+
+
+def test_post_publish_and_unpublish_invalidate_linked_menu_delivery(family):
+    _main, _parent, child, _sibling = family
+    menu = Menu.objects.create(site=child, location="header", name="Local")
+    post = Post.objects.create(
+        site=child, title="Campus update", slug="campus-update", content="News",
+    )
+    _link(menu, "Campus update", item_type="post", post=post)
+    before = delivery_version(child.pk, "header")
+    assert _roots(child.pk) == []
+
+    _publish_post(post)
+    published_version = delivery_version(child.pk, "header")
+    assert published_version > before
+    assert _roots(child.pk) == [("Campus update", "local")]
+    snapshot = PublishedContentSnapshot.objects.get(content_id=post.pk, version=1)
+    assert snapshot.payload["title"] == "Campus update"
+
+    publisher = get_user_model().objects.create_user(username="post-menu-unpublisher")
+    transition_content(
+        post.pk, action="unpublish", actor=publisher, roles={"platform-admin"},
+    )
+    assert delivery_version(child.pk, "header") > published_version
+    assert _roots(child.pk) == []
+    assert Post.objects.get(pk=post.pk).status == ContentStatus.UNPUBLISHED
 
 
 def test_inheritance_rejects_loops_and_does_not_grant_parent_management(family, client, oidc, settings):

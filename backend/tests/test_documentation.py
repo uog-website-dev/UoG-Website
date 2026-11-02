@@ -209,7 +209,11 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
     ]["$ref"].rsplit("/", 1)[-1]
     workflow_fields = schema["components"]["schemas"][workflow_input]["properties"]
     assert set(workflow_fields) == {"action", "comment"}
-    assert "WorkflowContent" in schema["components"]["schemas"]
+    workflow_content = schema["components"]["schemas"]["WorkflowContent"]
+    assert "Post" in {
+        item["$ref"].rsplit("/", 1)[-1]
+        for item in workflow_content["oneOf"]
+    }
     revisions = paths[
         "/api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/"
     ]["get"]

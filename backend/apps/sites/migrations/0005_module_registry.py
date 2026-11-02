@@ -38,8 +38,9 @@ def seed_initial_modules(apps, schema_editor):
 
 
 def remove_initial_modules(apps, schema_editor):
-    Module = apps.get_model("sites", "Module")
-    Module.objects.filter(code__in=[code for code, _name, _description in INITIAL_MODULES]).delete()
+    # The migration drops the Module table immediately afterwards; deleting
+    # these seed rows first only queues unnecessary deferred FK events.
+    pass
 
 
 class Migration(migrations.Migration):

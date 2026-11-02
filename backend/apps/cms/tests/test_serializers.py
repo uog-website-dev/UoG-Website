@@ -126,7 +126,7 @@ PAGE_FIELDS = {
     "published_at", "created_by", "updated_by", "submitted_by", "reviewed_by",
     "review_comment", "blocks", "blocks_version",
     "revision_number",
-    "metadata", "created_at", "updated_at",
+    "metadata", "created_at", "updated_at", "available_actions",
 }
 PAGE_EDITABLES = {
     "parent", "locale", "title", "slug", "layout", "seo", "visibility",

@@ -13,12 +13,14 @@ UPDATE sites_module
 """
 
 REVERSE = """
+ALTER TABLE sites_module DISABLE TRIGGER module_registry_rules;
 UPDATE sites_module
    SET status = 'PLANNED',
        is_enabled = FALSE,
        description = 'Registered pages capability. It is not implemented and cannot be enabled for a Site.'
  WHERE code = 'PAGES';
 DELETE FROM sites_module_implementation WHERE code = 'PAGES';
+ALTER TABLE sites_module ENABLE TRIGGER module_registry_rules;
 """
 
 

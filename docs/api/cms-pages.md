@@ -13,11 +13,17 @@ active database assignment can perform all actions; the validated legacy
 `platform-admin` token role is also supported. Client-supplied roles are not
 accepted.
 
-Every authoring, workflow and revision route is also gated on the `PAGES`
+Page authoring, Page workflow and revision routes are also gated on the `PAGES`
 module being enabled for the Site. When it is disabled, those requests are
 refused with a field-level 400 (`module`) and public delivery returns the same
 404 as an unknown route; nothing is deleted, and re-enabling the module
 restores access to the same Pages.
+
+The shared workflow endpoint also accepts Site-owned Post IDs at
+`POST /api/v1/cms/sites/{site_pk}/content/{content_id}/workflow/`. For a Post,
+the endpoint requires the `POSTS` module; disabling `PAGES` does not block Post
+workflow and disabling `POSTS` does not block Page workflow. The same Site
+AUTHOR, REVIEWER and PUBLISHER role rules apply to both content types.
 
 | Method and path | Contract |
 | --- | --- |
@@ -122,6 +128,11 @@ workflow transition. Previous generation entries cannot be served after the
 transition; the previous direct-route cache entry is deleted immediately.
 Server-side cache entries expire after five minutes. HTTP responses require
 revalidation by downstream caches and vary by Host.
+
+Public menus may link to Posts. A Post link is omitted unless that Post is in
+`PUBLISHED` state; publishing and unpublishing advances the Site/locale
+publication generation and invalidates menu delivery caches for menus that
+reference the Post, including Sites inheriting those menus.
 
 See the generated [OpenAPI contract](./openapi.yaml), [block schema](../architecture/cms-content-blocks.md),
 and [workflow contract](../architecture/cms-workflow.md).

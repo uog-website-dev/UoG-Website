@@ -84,6 +84,19 @@ def pages_module(sites):
 
 
 @pytest.fixture
+def posts_module(sites):
+    """Enable Site-scoped Post workflows for the shared CMS test Sites."""
+    module = Module.objects.get(code="POSTS")
+    if not module.is_enabled:
+        module.is_enabled = True
+        module.save(update_fields=("is_enabled",))
+    from apps.sites.services.modules import enable_module_for_site
+    for site in sites:
+        enable_module_for_site(site.pk, module.pk)
+    return module
+
+
+@pytest.fixture
 def sites():
     """Two Sites owned by different Organizations — the multi-site baseline."""
     university, _ = OrganizationType.objects.get_or_create(code="UNIVERSITY", defaults={"name": "University"})

@@ -8,7 +8,7 @@ import hashlib
 import json
 
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db import connection
+from django.db import connection, transaction
 from django.db.models import Max
 from django.utils import timezone
 
@@ -200,7 +200,10 @@ def _apply_order(rows):
         row.updated_at = timezone.now()
     # One final-state UPDATE, with the unique check deferred until all rows
     # have moved. Tree triggers still validate the complete final graph.
-    MenuItem.objects.bulk_update(rows, ["parent", "sort_order", "updated_at"], batch_size=1000)
+    # Savepoints let callers translate a failed final-state check into the
+    # normal API error response without poisoning the surrounding transaction.
+    with transaction.atomic():
+        MenuItem.objects.bulk_update(rows, ["parent", "sort_order", "updated_at"], batch_size=1000)
     with connection.cursor() as cursor:
         cursor.execute("SET CONSTRAINTS menu_item_sibling_order IMMEDIATE")
 
@@ -243,6 +246,30 @@ def move_menu_item(item_id, *, actor, expected, parent_id, position):
         _check_version(menu, expected)
         if parent_id is not None and not menu.items.filter(pk=parent_id).exists():
             raise ValidationError({"parent": "The parent must belong to this menu."})
+        # Validate the resulting graph before issuing the bulk update. The
+        # database constraint remains the concurrency backstop, while this
+        # check gives ordinary invalid moves a stable 400 response.
+        parents = dict(menu.items.values_list("pk", "parent_id"))
+        parents[item.pk] = parent_id
+        children = {}
+        for child_id, owner_id in parents.items():
+            children.setdefault(owner_id, []).append(child_id)
+
+        def subtree_height(node_id, path):
+            if node_id in path:
+                raise ValidationError({"tree": "A menu move cannot create a cycle."})
+            descendants = children.get(node_id, ())
+            return 1 + max((subtree_height(child, path | {node_id}) for child in descendants), default=0)
+
+        depth = 0
+        ancestor_id = parent_id
+        while ancestor_id is not None:
+            if ancestor_id == item.pk:
+                raise ValidationError({"tree": "A menu move cannot create a cycle."})
+            depth += 1
+            ancestor_id = parents.get(ancestor_id)
+        if depth + subtree_height(item.pk, set()) > 4:
+            raise ValidationError({"tree": "Menu items cannot be nested deeper than 4 levels."})
         groups = [item.parent_id] if item.parent_id == parent_id else [item.parent_id, parent_id]
         affected = []
         for group in groups:
