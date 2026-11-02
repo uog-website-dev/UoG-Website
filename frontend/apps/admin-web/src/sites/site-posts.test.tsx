@@ -242,14 +242,16 @@ describe("SitePostsPanel", () => {
     const table = await screen.findByRole("table", { name: "Posts for this Site" });
     expect(within(table).queryByText("Other Site")).toBeNull();
     fireEvent.click(within(table).getByRole("button", { name: "Submit Campus update for review" }));
-    fireEvent.click(screen.getByRole("button", { name: "Confirm" }));
+    expect(screen.getByRole("dialog", { name: "Submit Post?" })).toBeTruthy();
+    expect(screen.queryByLabelText(/schedule/i)).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Confirm submit" }));
     await waitFor(() => expect(transitionSitePost).toHaveBeenCalledWith(11, postId, "submit", ""));
 
     view.unmount();
     loadSitePosts.mockResolvedValue(list([post({ id: postId, status: "APPROVED", available_actions: ["publish"] })]));
     renderPanel(11, true, [...PERMISSIONS, "content.posts.publish"]);
     fireEvent.click(await screen.findByRole("button", { name: "Publish Campus update" }));
-    fireEvent.click(screen.getByRole("button", { name: "Confirm" }));
+    fireEvent.click(screen.getByRole("button", { name: "Confirm publish" }));
     await waitFor(() => expect(transitionSitePost).toHaveBeenCalledWith(11, postId, "publish", ""));
     expect(screen.queryByRole("button", { name: "Submit Campus update for review" })).toBeNull();
   });

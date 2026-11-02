@@ -6,7 +6,7 @@ import { createApiClient } from "@uog/api-client";
 import { getAccessToken } from "@/access-token";
 import { serializeApiError } from "@/organizations/contract";
 import type { ActionResult } from "@/organizations/contract";
-import { siteCategoriesPath, sitePostWorkflowPath, sitePostsPath, siteTagsPath } from "@/sites/post-paths";
+import { siteCategoriesPath, sitePostWorkflowHistoryPath, sitePostWorkflowPath, sitePostsPath, siteTagsPath } from "@/sites/post-paths";
 
 export type SitePostStatus =
   | "DRAFT" | "IN_REVIEW" | "APPROVED" | "PUBLISHED" | "UNPUBLISHED" | "ARCHIVED";
@@ -165,6 +165,25 @@ export async function updateSitePost(
       sitePostsPath(siteId, `${postId}/`), input, { ifMatch },
     );
     return { ...result.data, etag: result.etag ?? "" };
+  });
+}
+
+export interface SitePostWorkflowTransition {
+  id: number;
+  from_status: SitePostStatus;
+  to_status: SitePostStatus;
+  actor: number | null;
+  comment: string;
+  created_at: string;
+}
+
+export async function loadSitePostWorkflowHistory(
+  siteId: number,
+  postId: string,
+): Promise<ActionResult<SitePostWorkflowTransition[]>> {
+  return attempt(async () => {
+    const api = await client();
+    return api.get<SitePostWorkflowTransition[]>(sitePostWorkflowHistoryPath(siteId, postId));
   });
 }
 

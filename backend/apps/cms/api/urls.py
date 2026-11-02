@@ -5,6 +5,7 @@ from .workflow import (
     ContentRoleAssignmentDetailView,
     ContentRoleAssignmentsView,
     ContentWorkflowActionView,
+    ContentWorkflowHistoryView,
 )
 from .revisions import (
     ContentRevisionDetailView,
@@ -29,6 +30,11 @@ urlpatterns = [
         "<int:site_pk>/content/<uuid:content_id>/workflow/",
         ContentWorkflowActionView.as_view(),
         name="content-workflow",
+    ),
+    path(
+        "<int:site_pk>/content/<uuid:content_id>/workflow-history/",
+        ContentWorkflowHistoryView.as_view(),
+        name="content-workflow-history",
     ),
     path(
         "<int:site_pk>/content/<uuid:content_id>/revisions/",

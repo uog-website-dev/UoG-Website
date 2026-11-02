@@ -4070,6 +4070,125 @@ paths:
               schema:
                 type: string
                 format: uuid
+  /api/v1/cms/sites/{site_pk}/content/{content_id}/workflow-history/:
+    get:
+      operationId: v1_cms_sites_content_workflow_history_list
+      description: List workflow transitions and reviewer comments for content owned
+        by the URL Site. Page history requires PAGES and Post history requires POSTS.
+        A cross-Site id is not found. Scheduling is not part of this history.
+      parameters:
+      - in: path
+        name: content_id
+        schema:
+          type: string
+        description: UUID of SiteContent, Page or Post.
+        required: true
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        description: Owning Site id.
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - CMS workflow
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkflowHistory'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
   /api/v1/modules/:
     get:
       operationId: v1_modules_list
@@ -22585,6 +22704,38 @@ components:
       - $ref: '#/components/schemas/SitePage'
       - $ref: '#/components/schemas/Post'
       - $ref: '#/components/schemas/SiteContent'
+    WorkflowHistory:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        from_status:
+          allOf:
+          - $ref: '#/components/schemas/ContentStatusEnum'
+          readOnly: true
+        to_status:
+          allOf:
+          - $ref: '#/components/schemas/ContentStatusEnum'
+          readOnly: true
+        actor:
+          type: integer
+          readOnly: true
+          nullable: true
+        comment:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - actor
+      - comment
+      - created_at
+      - from_status
+      - id
+      - to_status
     APIError:
       type: object
       required:

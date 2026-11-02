@@ -30,3 +30,7 @@ export function sitePostWorkflowPath(siteId: number, postId: string): string {
   }
   return `/v1/cms/sites/${siteId}/content/${postId}/workflow/`;
 }
+
+export function sitePostWorkflowHistoryPath(siteId: number, postId: string): string {
+  return sitePostWorkflowPath(siteId, postId).replace(/workflow\/$/, "workflow-history/");
+}
