@@ -66,3 +66,14 @@ export const uogTheme: Theme = createTheme({
     },
   },
 });
+
+/** Approved high-contrast presentation. It is selected only by a Site theme name. */
+export const highContrastTheme: Theme = createTheme(uogTheme, {
+  palette: {
+    mode: "light",
+    primary: { main: "#ffffff", contrastText: "#000000" },
+    secondary: { main: "#ffff00", contrastText: "#000000" },
+    background: { default: "#000000", paper: "#000000" },
+    text: { primary: "#ffffff", secondary: "#ffffff" },
+  },
+});

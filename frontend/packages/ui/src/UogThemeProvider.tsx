@@ -10,12 +10,18 @@ import { CssBaseline, ThemeProvider } from "@mui/material";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import type { ReactNode } from "react";
 
-import { uogTheme } from "./theme";
+import { highContrastTheme, uogTheme } from "./theme";
 
-export function UogThemeProvider({ children }: { children: ReactNode }) {
+export function UogThemeProvider({
+  children,
+  theme = "institutional",
+}: {
+  children: ReactNode;
+  theme?: "institutional" | "high-contrast";
+}) {
   return (
     <AppRouterCacheProvider>
-      <ThemeProvider theme={uogTheme}>
+      <ThemeProvider theme={theme === "high-contrast" ? highContrastTheme : uogTheme}>
         <CssBaseline />
         {children}
       </ThemeProvider>

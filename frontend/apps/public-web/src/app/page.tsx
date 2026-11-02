@@ -26,7 +26,7 @@ import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
 import Typography from "@mui/material/Typography";
 import { ApiError, createApiClient } from "@uog/api-client";
-import { pageFromResponse, PublicPageView } from "@uog/ui";
+import { pageFromResponse, pageMetadata, PublicPageView, publicFetchInit, sameSite, siteFromContext } from "@uog/ui";
 import type { PublicPageDocument } from "@uog/ui";
 import type { HealthReport } from "@uog/types";
 
@@ -63,13 +63,20 @@ export default function HomePage() {
     // Site routing context: resolved from the browser's Host header.
     const contextApi = createApiClient({ baseUrl: "/api/v1" });
     Promise.all([
-      fetch(PUBLIC_HOMEPAGE_PATH, { headers: { Accept: "application/json" }, cache: "no-store" })
+      fetch(PUBLIC_HOMEPAGE_PATH, publicFetchInit())
         .then(async (response) => {
           const body = response.ok ? await response.json().catch(() => null) : null;
           return pageFromResponse(response.status, body);
         })
         .catch(() => null),
-      healthApi.get<HealthReport>("/health/ready"),
+      healthApi.get<HealthReport>("/health/ready").catch((err: unknown) => {
+        setError(
+          err instanceof ApiError
+            ? `API error (${err.status})`
+            : "Could not reach the API through this origin — open http://localhost (nginx) instead of a direct port.",
+        );
+        return null;
+      }),
       contextApi.get<SiteContext>("/site-context/").catch((err: unknown) => {
         // Routing context is auxiliary to the page demo; state the failure
         // instead of blocking the page or guessing a Site.
@@ -97,22 +104,45 @@ export default function HomePage() {
       .finally(() => setLoading(false));
   }, []);
 
+  const resolved = siteContext ? siteFromContext(200, siteContext) : null;
+  const visibleHomepage = resolved?.modules.pages && homepage && sameSite(homepage.site, resolved.id)
+    ? homepage
+    : null;
+
+  useEffect(() => {
+    if (!resolved || !visibleHomepage) return;
+    const metadata = pageMetadata(resolved, visibleHomepage);
+    document.title = metadata.title;
+    let description = document.querySelector('meta[name="description"]');
+    if (!description) {
+      description = document.createElement("meta");
+      description.setAttribute("name", "description");
+      document.head.appendChild(description);
+    }
+    description.setAttribute("content", metadata.description);
+  }, [resolved, visibleHomepage]);
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
       <Box>
-        <Typography variant="h3" gutterBottom>
-          University of Gondar
-        </Typography>
-        <Typography variant="h5" color="text.secondary" gutterBottom>
-          Digital Platform — Public Website
-        </Typography>
-        <Link href="/posts">Published posts</Link>
-        <Typography>
-          This application is part of the standardized UoG Digital Platform
-          foundation: Next.js 15 + Material UI on the frontend, a Django REST
-          API on the backend, and shared platform services (PostgreSQL,
-          Redis/Celery, MinIO, Keycloak) running under Docker Compose.
-        </Typography>
+        {resolved?.id ? (
+          resolved.modules.posts ? <Link href="/posts">Published posts</Link> : null
+        ) : (
+          <>
+            <Typography variant="h3" gutterBottom>
+              University of Gondar
+            </Typography>
+            <Typography variant="h5" color="text.secondary" gutterBottom>
+              Digital Platform — Public Website
+            </Typography>
+            <Typography>
+              This application is part of the standardized UoG Digital Platform
+              foundation: Next.js 15 + Material UI on the frontend, a Django REST
+              API on the backend, and shared platform services (PostgreSQL,
+              Redis/Celery, MinIO, Keycloak) running under Docker Compose.
+            </Typography>
+          </>
+        )}
       </Box>
 
       {loading && (
@@ -201,7 +231,7 @@ export default function HomePage() {
         </Alert>
       )}
 
-      {homepageReady ? <PublicPageView page={homepage} /> : null}
+      {homepageReady ? <PublicPageView page={visibleHomepage} /> : null}
     </Box>
   );
 }

@@ -13,7 +13,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { postFromResponse, postsFromResponse, PublicPostDetail, PublicPostFeed } from "@uog/ui";
+import { postFromResponse, postsFromResponse, publicFetchInit, PublicPostDetail, PublicPostFeed, siteFromContext } from "@uog/ui";
 import type { PublicPostDocument, PublicPostSummary } from "@uog/ui";
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -40,11 +40,17 @@ export function PublicPostsPage() {
     if (tag) params.set("tag", tag);
     const query = params.toString();
     let cancelled = false;
-    fetch(`/api/v1/site-context/posts/${query ? `?${query}` : ""}`, {
-      headers: { Accept: "application/json" },
-      cache: "no-store",
-    })
+    fetch("/api/v1/site-context/", publicFetchInit())
       .then(async (response) => {
+        const body = response.ok ? await response.json().catch(() => null) : null;
+        return siteFromContext(response.status, body);
+      })
+      .then(async (site) => {
+        if (!site.modules.posts) return null;
+        const response = await fetch(
+          `/api/v1/site-context/posts/${query ? `?${query}` : ""}`,
+          publicFetchInit(),
+        );
         const body = response.ok ? await response.json().catch(() => null) : null;
         return postsFromResponse(response.status, body);
       })
@@ -102,11 +108,14 @@ export function PublicPostPage({ slug }: { slug: string }) {
       return;
     }
     let cancelled = false;
-    fetch(`/api/v1/site-context/posts/${slug}/`, {
-      headers: { Accept: "application/json" },
-      cache: "no-store",
-    })
+    fetch("/api/v1/site-context/", publicFetchInit())
       .then(async (response) => {
+        const body = response.ok ? await response.json().catch(() => null) : null;
+        return siteFromContext(response.status, body);
+      })
+      .then(async (site) => {
+        if (!site.modules.posts) return null;
+        const response = await fetch(`/api/v1/site-context/posts/${slug}/`, publicFetchInit());
         const body = response.ok ? await response.json().catch(() => null) : null;
         return postFromResponse(response.status, body);
       })
