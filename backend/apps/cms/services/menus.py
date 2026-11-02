@@ -72,8 +72,20 @@ def authorize_menu(actor, site_id, *, edit=False, permission=None):
         require_menus_module(site_id)
 
 
+def authorize_central_menu(actor):
+    """A Site or Organization menu grant does not edit a centrally owned menu.
+
+    The check is platform-scoped: only a platform assignment of menu.write,
+    including the platform-administrator grant, can create or change is_global.
+    """
+    if not permission_granted(actor, "menu.write", audit=False):
+        raise PermissionDenied("Central menu changes require platform menu authority.")
+
+
 def _write_menu(menu, actor):
     authorize_menu(actor, menu.site_id, edit=True)
+    if menu.is_global:
+        authorize_central_menu(actor)
     if menu.is_active:
         authorize_menu(actor, menu.site_id, permission="menu.publish")
 
@@ -117,6 +129,8 @@ def _target_permission(item, actor):
 def create_menu(*, actor, site_id, **fields):
     with _operation(actor):
         authorize_menu(actor, site_id, edit=True)
+        if fields.get("is_global"):
+            authorize_central_menu(actor)
         menu = Menu(site_id=site_id)
         _assign(menu, fields, MENU_FIELDS)
         if menu.is_active:
@@ -129,6 +143,8 @@ def create_menu(*, actor, site_id, **fields):
 def update_menu(menu_id, *, actor, expected=None, **fields):
     with _operation(actor):
         menu = Menu.objects.get(pk=menu_id)
+        if fields.get("is_global"):
+            authorize_central_menu(actor)
         _write_menu(menu, actor)
         _assign(menu, fields, MENU_FIELDS)
         _check_version(menu, expected)
@@ -185,6 +201,8 @@ def set_menu_active(menu_id, *, actor, expected, active):
     with _operation(actor):
         menu = Menu.objects.get(pk=menu_id)
         authorize_menu(actor, menu.site_id, permission="menu.publish")
+        if menu.is_global:
+            authorize_central_menu(actor)
         _check_version(menu, expected)
         menu.is_active = active
         menu.save(update_fields=["is_active"])

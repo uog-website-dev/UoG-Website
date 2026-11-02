@@ -259,7 +259,7 @@ class MenuViewSet(MenuAPIBase):
             return self._response(MenuOutput(menu).data, menu)
 
     @extend_schema(request=MenuInput, responses={201: MenuOutput}, examples=[OpenApiExample("Draft header", value={"name": "Main navigation", "location": "header"}, request_only=True)],
-        description="menu.write. Creates an inactive draft. Locations are unique per Site even when inactive; duplicates return 409 duplicate_location. No If-Match for creation.")
+        description="menu.write. Creates an inactive local draft. Locations are unique per Site even when inactive; duplicates return 409 duplicate_location. is_global requires platform-scoped menu.write and the main Site. No If-Match for creation.")
     def create(self, request, *args, **kwargs):
         with menu_errors(), hierarchy_write():
             site = self._site()
@@ -270,7 +270,7 @@ class MenuViewSet(MenuAPIBase):
             return self._response(MenuOutput(menu).data, menu, status=201,
                 location=reverse("sites:menu-detail", kwargs={"site_pk": site.pk, "pk": menu.pk}))
 
-    @extend_schema(parameters=[IF_MATCH], request=MenuPatch, responses=MenuOutput, description="menu.write; active menus also require menu.publish. Scope, activation and version cannot be patched.")
+    @extend_schema(parameters=[IF_MATCH], request=MenuPatch, responses=MenuOutput, description="menu.write; active menus also require menu.publish. A central menu also requires platform-scoped menu.write. Scope, activation and version cannot be patched.")
     def partial_update(self, request, *args, **kwargs):
         with menu_errors(), hierarchy_write():
             menu = self._menu()

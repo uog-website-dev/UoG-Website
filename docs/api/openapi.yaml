@@ -12302,9 +12302,9 @@ paths:
                 format: uuid
     post:
       operationId: v1_sites_menus_create
-      description: menu.write. Creates an inactive draft. Locations are unique per
-        Site even when inactive; duplicates return 409 duplicate_location. No If-Match
-        for creation.
+      description: menu.write. Creates an inactive local draft. Locations are unique
+        per Site even when inactive; duplicates return 409 duplicate_location. is_global
+        requires platform-scoped menu.write and the main Site. No If-Match for creation.
       parameters:
       - in: path
         name: site_pk
@@ -13725,8 +13725,9 @@ paths:
                 format: uuid
     patch:
       operationId: v1_sites_menus_partial_update
-      description: menu.write; active menus also require menu.publish. Scope, activation
-        and version cannot be patched.
+      description: menu.write; active menus also require menu.publish. A central menu
+        also requires platform-scoped menu.write. Scope, activation and version cannot
+        be patched.
       parameters:
       - in: header
         name: If-Match

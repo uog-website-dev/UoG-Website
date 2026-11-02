@@ -12,7 +12,7 @@ import { createApiClient } from "@uog/api-client";
 import { getAccessToken } from "@/access-token";
 import { serializeApiError } from "@/organizations/contract";
 import type { ActionResult } from "@/organizations/contract";
-import { siteMenuPath } from "@/sites/menu-paths";
+import { siteMenuInheritancePath, siteMenuPath } from "@/sites/menu-paths";
 
 export interface MenuRecord {
   id: string;
@@ -39,6 +39,22 @@ export interface MenuLocationState {
   etag: string;
 }
 
+export interface MenuInheritanceRecord {
+  id: string;
+  site: number;
+  location: string;
+  inherit_from: number | null;
+  include_global: boolean;
+  local_precedence: string;
+}
+
+export interface SiteNavigation {
+  menus: MenuLocationState[];
+  inheritance: MenuInheritanceRecord[];
+}
+
+export type MenuPlace = "header" | "footer";
+
 function apiBaseUrl(): string {
   return process.env.API_BASE_URL ?? "http://backend:8000/api";
 }
@@ -59,40 +75,56 @@ async function attempt<T>(run: () => Promise<T>): Promise<ActionResult<T>> {
   }
 }
 
-export async function loadSiteNavigation(
-  siteId: number,
-): Promise<ActionResult<{ header: MenuLocationState | null; footer: MenuLocationState | null }>> {
+export async function loadSiteNavigation(siteId: number): Promise<ActionResult<SiteNavigation>> {
   return attempt(async () => {
     const api = await client();
     const page = await api.get<{ results: MenuRecord[] }>(
       `${siteMenuPath(siteId)}?page_size=100`,
     );
-    async function location(key: "header" | "footer"): Promise<MenuLocationState | null> {
-      const menu = page.results.find((row) => row.location === key && !row.is_global);
-      if (!menu) return null;
+    const menus: MenuLocationState[] = [];
+    for (const menu of page.results) {
       const tree = await api.getDetailed<{ items: MenuItemRecord[] }>(
         siteMenuPath(siteId, `${menu.id}/tree/`),
       );
       if (!tree.etag) {
         throw new Error("The menu response did not include an ETag.");
       }
-      return { menu, items: tree.data.items, etag: tree.etag };
+      menus.push({ menu, items: tree.data.items, etag: tree.etag });
     }
-    return { header: await location("header"), footer: await location("footer") };
+    const policies = await api.get<MenuInheritanceRecord[]>(siteMenuInheritancePath(siteId));
+    return { menus, inheritance: Array.isArray(policies) ? policies : [] };
   });
 }
 
 export async function createSiteMenu(
   siteId: number,
-  location: "header" | "footer",
+  location: MenuPlace,
+  name?: string,
 ): Promise<ActionResult<MenuRecord>> {
   return attempt(async () => {
     const api = await client();
     const created = await api.postDetailed<MenuRecord>(siteMenuPath(siteId), {
-      name: location === "header" ? "Header" : "Footer",
+      name: name?.trim() || (location === "header" ? "Header" : "Footer"),
       location,
     });
     return created.data;
+  });
+}
+
+export async function updateSiteMenu(
+  siteId: number,
+  menuId: string,
+  ifMatch: string,
+  input: { name: string; location: MenuPlace },
+): Promise<ActionResult<MenuRecord>> {
+  return attempt(async () => {
+    const api = await client();
+    const result = await api.patchDetailed<MenuRecord>(
+      siteMenuPath(siteId, `${menuId}/`),
+      { name: input.name, location: input.location },
+      { headers: { "If-Match": ifMatch } },
+    );
+    return result.data;
   });
 }
 
