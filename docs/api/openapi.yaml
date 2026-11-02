@@ -6544,11 +6544,16 @@ paths:
               schema:
                 type: string
             X-Publication-Version:
-              description: Site/locale cache generation for published Page data.
+              description: Site/locale cache generation for published content.
+              schema:
+                type: string
+            Vary:
+              description: The trusted Host selects the Site. Forwarded host headers
+                are ignored.
               schema:
                 type: string
             ETag:
-              description: Immutable per-Page publication snapshot version.
+              description: Immutable publication snapshot version for this resource.
               schema:
                 type: string
             X-Request-ID:
@@ -6816,7 +6821,12 @@ paths:
               schema:
                 type: string
             X-Publication-Version:
-              description: Site/locale cache generation for published Page data.
+              description: Site/locale cache generation for published content.
+              schema:
+                type: string
+            Vary:
+              description: The trusted Host selects the Site. Forwarded host headers
+                are ignored.
               schema:
                 type: string
             X-Request-ID:
@@ -6960,11 +6970,16 @@ paths:
               schema:
                 type: string
             X-Publication-Version:
-              description: Site/locale cache generation for published Page data.
+              description: Site/locale cache generation for published content.
+              schema:
+                type: string
+            Vary:
+              description: The trusted Host selects the Site. Forwarded host headers
+                are ignored.
               schema:
                 type: string
             ETag:
-              description: Immutable per-Page publication snapshot version.
+              description: Immutable publication snapshot version for this resource.
               schema:
                 type: string
             X-Request-ID:
@@ -6980,6 +6995,321 @@ paths:
               schema:
                 type: string
                 format: uri-reference
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          description: Invalid body, malformed input, or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    title:
+                    - This field is required.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/site-context/posts/:
+    get:
+      operationId: public_site_posts_list
+      description: List published Posts for the Site resolved from the trusted Host.
+        Results use immutable publication snapshots and deterministic publication-time/id
+        ordering. Category and Tag filters resolve only active taxonomy owned by that
+        Site.
+      parameters:
+      - in: query
+        name: category
+        schema:
+          type: string
+        description: Active Category slug owned by this Site.
+      - in: query
+        name: locale
+        schema:
+          type: string
+        description: Enabled Site language; defaults to the Site language.
+      - in: query
+        name: page
+        schema:
+          type: integer
+      - in: query
+        name: page_size
+        schema:
+          type: integer
+        description: Default 20, maximum 100.
+      - in: query
+        name: tag
+        schema:
+          type: string
+        description: Active Tag slug owned by this Site.
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Public Posts
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicPostPage'
+          description: ''
+          headers:
+            Cache-Control:
+              description: Public clients must revalidate; server caches are publication-versioned.
+              schema:
+                type: string
+            X-Publication-Version:
+              description: Site/locale cache generation for published content.
+              schema:
+                type: string
+            Vary:
+              description: The trusted Host selects the Site. Forwarded host headers
+                are ignored.
+              schema:
+                type: string
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          description: Invalid body, malformed input, or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    title:
+                    - This field is required.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/site-context/posts/{post_slug}/:
+    get:
+      operationId: public_site_post_detail
+      description: Return a published Post by slug within the Site resolved from the
+        trusted Host. Foreign-Site, draft and missing Posts return the same not-found
+        response.
+      parameters:
+      - in: query
+        name: locale
+        schema:
+          type: string
+        description: Enabled Site language; defaults to the Site language.
+      - in: path
+        name: post_slug
+        schema:
+          type: string
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Public Posts
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicPostDetail'
+          description: ''
+          headers:
+            Cache-Control:
+              description: Public clients must revalidate; server caches are publication-versioned.
+              schema:
+                type: string
+            X-Publication-Version:
+              description: Site/locale cache generation for published content.
+              schema:
+                type: string
+            Vary:
+              description: The trusted Host selects the Site. Forwarded host headers
+                are ignored.
+              schema:
+                type: string
+            ETag:
+              description: Immutable publication snapshot version for this resource.
+              schema:
+                type: string
             X-Request-ID:
               description: Correlation ID for this request.
               schema:
@@ -21101,6 +21431,138 @@ components:
       - next
       - previous
       - results
+    PublicPostDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        locale:
+          type: string
+        title:
+          type: string
+        slug:
+          type: string
+        excerpt:
+          type: string
+        excerpt_html:
+          type: string
+        featured_media:
+          type: string
+        seo: {}
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicTaxonomy'
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicTaxonomy'
+        published_at:
+          type: string
+          format: date-time
+        publication_version:
+          type: integer
+        content:
+          type: string
+      required:
+      - categories
+      - content
+      - excerpt
+      - excerpt_html
+      - featured_media
+      - id
+      - locale
+      - publication_version
+      - published_at
+      - seo
+      - slug
+      - tags
+      - title
+    PublicPostList:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        locale:
+          type: string
+        title:
+          type: string
+        slug:
+          type: string
+        excerpt:
+          type: string
+        excerpt_html:
+          type: string
+        featured_media:
+          type: string
+        seo: {}
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicTaxonomy'
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicTaxonomy'
+        published_at:
+          type: string
+          format: date-time
+        publication_version:
+          type: integer
+      required:
+      - categories
+      - excerpt
+      - excerpt_html
+      - featured_media
+      - id
+      - locale
+      - publication_version
+      - published_at
+      - seo
+      - slug
+      - tags
+      - title
+    PublicPostPage:
+      type: object
+      properties:
+        count:
+          type: integer
+        next:
+          type: string
+          format: uri
+          nullable: true
+        previous:
+          type: string
+          format: uri
+          nullable: true
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicPostList'
+      required:
+      - count
+      - next
+      - previous
+      - results
+    PublicTaxonomy:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        slug:
+          type: string
+      required:
+      - code
+      - id
+      - name
+      - slug
     PublishedContentStatusEnum:
       enum:
       - PUBLISHED

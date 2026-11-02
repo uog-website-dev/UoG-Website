@@ -63,13 +63,14 @@ def add_common_contract(result, generator, request, public):
                 "{" in path
                 or (method == "get" and path == "/api/pages/")
                 or path.startswith("/api/v1/site-context/pages")
+                or path.startswith("/api/v1/site-context/posts")
                 or path == "/api/v1/site-context/menus/"
             ):
                 codes.add("404")
             if (
                 path.startswith("/api/v1/sites/")
                 and "/pages" in path
-            ) or path.startswith("/api/v1/site-context/pages") or path == "/api/v1/site-context/menus/":
+            ) or path.startswith(("/api/v1/site-context/pages", "/api/v1/site-context/posts")) or path == "/api/v1/site-context/menus/":
                 codes.add("400")
             if (
                 path.startswith("/api/v1/cms/")
@@ -184,6 +185,7 @@ def add_common_contract(result, generator, request, public):
                 }
             elif (
                 path.startswith("/api/v1/site-context/pages/")
+                or path.startswith("/api/v1/site-context/posts/")
                 or path == "/api/v1/site-context/homepage/"
             ) and "200" in responses:
                 headers = responses["200"].setdefault("headers", {})
@@ -192,12 +194,16 @@ def add_common_contract(result, generator, request, public):
                     "schema": {"type": "string"},
                 }
                 headers["X-Publication-Version"] = {
-                    "description": "Site/locale cache generation for published Page data.",
+                    "description": "Site/locale cache generation for published content.",
                     "schema": {"type": "string"},
                 }
-                if path != "/api/v1/site-context/pages/":
+                headers["Vary"] = {
+                    "description": "The trusted Host selects the Site. Forwarded host headers are ignored.",
+                    "schema": {"type": "string"},
+                }
+                if path not in {"/api/v1/site-context/pages/", "/api/v1/site-context/posts/"}:
                     headers["ETag"] = {
-                        "description": "Immutable per-Page publication snapshot version.",
+                        "description": "Immutable publication snapshot version for this resource.",
                         "schema": {"type": "string"},
                     }
             for response in responses.values():

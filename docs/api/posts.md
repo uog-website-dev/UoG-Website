@@ -38,6 +38,29 @@ Draft, in-review, approved, unpublished and archived Posts are omitted. The
 workflow endpoint is gated by `POSTS`; turning off `PAGES` does not disable Post
 workflow.
 
+## Public delivery
+
+Public feeds resolve the Site from the trusted request Host; forwarded-host
+headers and Site IDs in query strings do not select a tenant.
+
+```text
+GET /api/v1/site-context/posts/?category=news&tag=campus&page=1&page_size=20
+GET /api/v1/site-context/posts/{slug}/
+```
+
+Feeds include only `PUBLISHED` Posts and use immutable publication snapshots,
+ordered by publication time descending with UUID as a stable tie-breaker.
+Category and Tag filters accept active taxonomy slugs owned by the resolved
+Site and locale. The list includes excerpt, featured media, SEO and taxonomy
+metadata; detail also includes the Post body. Responses are paginated (default
+20, maximum 100), vary by Host and use a Site/locale publication generation
+for cache keys. Publish, unpublish and archive of a published Post advance that
+generation. Disabling `POSTS` makes both public routes return not found.
+
+The public feed, detail, taxonomy isolation, draft visibility, deterministic
+pagination, Host resolution, module gate and cache invalidation are covered by
+`apps/cms/tests/test_public_posts.py`.
+
 ## Verification
 
 The backend tests cover the role flow, Site module gate, Post snapshot payload,
