@@ -134,6 +134,11 @@ class Post(SiteContent):
     def full_clean(self, *args, **kwargs):
         if isinstance(self.slug, str):
             self.slug = normalize_slug(self.slug)
+        if isinstance(self.excerpt_html, str):
+            # Public clients may render this fragment as HTML, so every
+            # write path must pass it through the shared rich-text allowlist.
+            from apps.cms.blocks import sanitize_rich_text
+            self.excerpt_html = sanitize_rich_text(self.excerpt_html)
         return super().full_clean(*args, **kwargs)
 
     def clean(self):

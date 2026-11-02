@@ -63,7 +63,7 @@ def test_cms_mounts_scoped_workflow_revision_admin_and_public_routes():
         pattern.name for pattern in context_urls.urlpatterns
     } == {
         "site-context", "public-menus", "public-page-list", "public-homepage",
-        "public-page-detail",
+        "public-page-detail", "public-post-list", "public-post-detail",
     }
 
 
