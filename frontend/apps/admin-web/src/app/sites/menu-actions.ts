@@ -13,6 +13,8 @@ import { getAccessToken } from "@/access-token";
 import { serializeApiError } from "@/organizations/contract";
 import type { ActionResult } from "@/organizations/contract";
 import { siteMenuInheritancePath, siteMenuPath } from "@/sites/menu-paths";
+import { sitePagePath } from "@/sites/page-paths";
+import { sitePostsPath } from "@/sites/post-paths";
 
 export interface MenuRecord {
   id: string;
@@ -23,14 +25,39 @@ export interface MenuRecord {
   is_global: boolean;
 }
 
+export type MenuItemKind = "page" | "post" | "external" | "custom";
+
 export interface MenuItemRecord {
   id: string;
   label: string;
   parent: string | null;
   sort_order: number;
   target: string;
-  item_type: string;
+  item_type: MenuItemKind | string;
+  page?: string | null;
+  post?: string | null;
   is_active: boolean;
+}
+
+export interface MenuItemInput {
+  label: string;
+  item_type?: MenuItemKind;
+  target?: string;
+  page?: string | null;
+  post?: string | null;
+  parent?: string | null;
+}
+
+export interface MenuTargetOption {
+  id: string;
+  label: string;
+}
+
+export interface MenuTargets {
+  pages: MenuTargetOption[];
+  posts: MenuTargetOption[];
+  pagesAvailable: boolean;
+  postsAvailable: boolean;
 }
 
 export interface MenuLocationState {
@@ -122,9 +149,46 @@ export async function updateSiteMenu(
     const result = await api.patchDetailed<MenuRecord>(
       siteMenuPath(siteId, `${menuId}/`),
       { name: input.name, location: input.location },
-      { headers: { "If-Match": ifMatch } },
+      { ifMatch },
     );
     return result.data;
+  });
+}
+
+function itemBody(input: MenuItemInput): Record<string, unknown> {
+  const kind = input.item_type ?? "custom";
+  const body: Record<string, unknown> = {
+    label: input.label,
+    item_type: kind,
+    page: kind === "page" ? input.page ?? null : null,
+    post: kind === "post" ? input.post ?? null : null,
+    target: kind === "page" || kind === "post" ? "" : input.target ?? "",
+  };
+  if (input.parent) body.parent = input.parent;
+  return body;
+}
+
+export async function loadMenuTargets(siteId: number): Promise<ActionResult<MenuTargets>> {
+  return attempt(async () => {
+    const api = await client();
+    async function options(path: string): Promise<MenuTargetOption[] | null> {
+      try {
+        const page = await api.get<{ results: { id: string; title: string }[] }>(
+          `${path}?page_size=100`,
+        );
+        return page.results.map((row) => ({ id: row.id, label: row.title }));
+      } catch {
+        return null;
+      }
+    }
+    const pages = await options(sitePagePath(siteId));
+    const posts = await options(sitePostsPath(siteId));
+    return {
+      pages: pages ?? [],
+      posts: posts ?? [],
+      pagesAvailable: pages !== null,
+      postsAvailable: posts !== null,
+    };
   });
 }
 
@@ -132,16 +196,69 @@ export async function createMenuLink(
   siteId: number,
   menuId: string,
   ifMatch: string,
-  input: { label: string; target: string },
+  input: MenuItemInput,
 ): Promise<ActionResult<MenuItemRecord>> {
   return attempt(async () => {
     const api = await client();
     const created = await api.postDetailed<MenuItemRecord>(
       siteMenuPath(siteId, `${menuId}/items/`),
-      { label: input.label, item_type: "custom", target: input.target },
+      itemBody(input),
       { headers: { "If-Match": ifMatch } },
     );
     return created.data;
+  });
+}
+
+export async function updateMenuItem(
+  siteId: number,
+  menuId: string,
+  itemId: string,
+  ifMatch: string,
+  input: MenuItemInput,
+): Promise<ActionResult<MenuItemRecord>> {
+  return attempt(async () => {
+    const api = await client();
+    const result = await api.patchDetailed<MenuItemRecord>(
+      siteMenuPath(siteId, `${menuId}/items/${itemId}/`),
+      itemBody({ ...input, parent: null }),
+      { ifMatch },
+    );
+    return result.data;
+  });
+}
+
+export async function deleteMenuItem(
+  siteId: number,
+  menuId: string,
+  itemId: string,
+  ifMatch: string,
+): Promise<ActionResult<{ etag: string | null }>> {
+  return attempt(async () => {
+    const api = await client();
+    const result = await api.delDetailed(
+      siteMenuPath(siteId, `${menuId}/items/${itemId}/`),
+      { ifMatch },
+    );
+    return { etag: result.etag };
+  });
+}
+
+export async function moveMenuItem(
+  siteId: number,
+  menuId: string,
+  itemId: string,
+  ifMatch: string,
+  parent: string | null,
+  position: number,
+): Promise<ActionResult<{ etag: string | null }>> {
+  return attempt(async () => {
+    const api = await client();
+    const result = await api.postDetailed(
+      siteMenuPath(siteId, `${menuId}/items/${itemId}/move/`),
+      { parent, position },
+      { headers: { "If-Match": ifMatch } },
+    );
+    return { etag: result.etag };
   });
 }
 

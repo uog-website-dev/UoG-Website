@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ToastProvider } from "@uog/ui";
 
@@ -10,9 +10,11 @@ const createMenuLink = vi.fn();
 const reorderSiteMenu = vi.fn();
 const setMenuActive = vi.fn();
 const updateSiteMenu = vi.fn();
+const loadMenuTargets = vi.fn();
 
 vi.mock("@/app/sites/menu-actions", () => ({
   loadSiteNavigation: (...args: unknown[]) => loadSiteNavigation(...args),
+  loadMenuTargets: (...args: unknown[]) => loadMenuTargets(...args),
   createSiteMenu: (...args: unknown[]) => createSiteMenu(...args),
   createMenuLink: (...args: unknown[]) => createMenuLink(...args),
   reorderSiteMenu: (...args: unknown[]) => reorderSiteMenu(...args),
@@ -50,6 +52,11 @@ function navigation(overrides: Partial<SiteNavigation> = {}): SiteNavigation {
   };
 }
 
+function withinMenuItems(): string[] {
+  const list = screen.getByRole("list", { name: "Menu items" });
+  return within(list).getAllByRole("listitem").map((row) => row.getAttribute("aria-label") ?? "");
+}
+
 function renderPanel(
   siteId = 11,
   menusEnabled: boolean | null = true,
@@ -68,6 +75,10 @@ beforeEach(() => {
   reorderSiteMenu.mockResolvedValue({ ok: true, data: { etag: '"menu-1-v4"' } });
   createSiteMenu.mockResolvedValue({ ok: true, data: headerState().menu });
   updateSiteMenu.mockResolvedValue({ ok: true, data: headerState().menu });
+  loadMenuTargets.mockResolvedValue({
+    ok: true,
+    data: { pages: [], posts: [], pagesAvailable: true, postsAvailable: true },
+  });
 });
 
 describe("SiteMenusPanel", () => {
@@ -83,7 +94,25 @@ describe("SiteMenusPanel", () => {
     expect(reorderSiteMenu).toHaveBeenCalledWith(11, "menu-1", '"menu-1-v3"', null, ["b", "a"]);
     expect(loadSiteNavigation).toHaveBeenCalledWith(11);
     expect(JSON.stringify(reorderSiteMenu.mock.calls)).not.toContain("22");
+    expect(loadMenuTargets).toHaveBeenCalledWith(11);
     expect(screen.queryByText("Hospital")).toBeNull();
+  });
+
+  it("shows the reloaded menu order after a move", async () => {
+    const moved = headerState();
+    moved.items = [
+      { id: "b", label: "News", parent: null, sort_order: 0, target: "/news", item_type: "custom", is_active: true },
+      { id: "a", label: "About", parent: null, sort_order: 1, target: "/about", item_type: "custom", is_active: true },
+    ];
+    loadSiteNavigation
+      .mockResolvedValueOnce({ ok: true, data: navigation() })
+      .mockResolvedValue({ ok: true, data: navigation({ menus: [moved] }) });
+    renderPanel(11);
+    fireEvent.click(await screen.findByRole("button", { name: "Move About down" }));
+    await waitFor(() => {
+      const labels = withinMenuItems();
+      expect(labels.indexOf("News")).toBeLessThan(labels.indexOf("About"));
+    });
   });
 
   it("creates a local footer for this Site and edits its name and location", async () => {
