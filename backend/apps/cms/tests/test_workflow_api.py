@@ -334,7 +334,22 @@ def test_post_workflow_uses_roles_post_module_snapshots_audit_and_idempotency(
     ).count() == 1
     assert current_publication_version(site.pk, post.locale) == initial_version + 1
 
+    history = client.get(
+        f"/api/v1/cms/sites/{site.pk}/content/{post.pk}/workflow-history/",
+        **as_role(ContentRole.PUBLISHER),
+    )
+    assert history.status_code == 200, history.content
+    assert any(item["comment"] == "Reviewed." for item in history.json())
+    assert client.get(
+        f"/api/v1/cms/sites/{site.pk}/content/{foreign.pk}/workflow-history/",
+        **as_role(ContentRole.AUTHOR),
+    ).status_code == 404
+
     disable_module_for_site(site.pk, posts_module.pk)
+    assert client.get(
+        f"/api/v1/cms/sites/{site.pk}/content/{post.pk}/workflow-history/",
+        **as_role(ContentRole.PUBLISHER),
+    ).status_code == 400
     blocked = client.post(
         url, {"action": "unpublish"}, content_type="application/json",
         **as_role(ContentRole.PUBLISHER),

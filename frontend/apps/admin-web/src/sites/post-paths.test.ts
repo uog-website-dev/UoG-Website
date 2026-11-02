@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { siteCategoriesPath, sitePostWorkflowPath, sitePostsPath, siteTagsPath } from "./post-paths";
+import { siteCategoriesPath, sitePostWorkflowHistoryPath, sitePostWorkflowPath, sitePostsPath, siteTagsPath } from "./post-paths";
 
 describe("Site Post API paths", () => {
   it("keeps every collection and detail scoped to its Site", () => {
@@ -18,6 +18,7 @@ describe("Site Post API paths", () => {
   it("builds the shared workflow route from the Site and Post id", () => {
     const postId = "11111111-1111-1111-1111-111111111111";
     expect(sitePostWorkflowPath(11, postId)).toBe(`/v1/cms/sites/11/content/${postId}/workflow/`);
+    expect(sitePostWorkflowHistoryPath(11, postId)).toBe(`/v1/cms/sites/11/content/${postId}/workflow-history/`);
     expect(() => sitePostWorkflowPath(11, "../other")).toThrow(/Post id/);
   });
 });

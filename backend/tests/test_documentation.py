@@ -94,6 +94,7 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
         "/api/v1/cms/sites/{site_pk}/content-roles/",
         "/api/v1/cms/sites/{site_pk}/content-roles/{assignment_id}/",
         "/api/v1/cms/sites/{site_pk}/content/{content_id}/workflow/",
+        "/api/v1/cms/sites/{site_pk}/content/{content_id}/workflow-history/",
         "/api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/",
         "/api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/{revision_number}/",
         "/api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/{revision_number}/restore/",

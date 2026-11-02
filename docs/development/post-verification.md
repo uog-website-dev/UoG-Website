@@ -1,11 +1,15 @@
 # Post authoring, review and public delivery
 
 A Site author creates a draft Post with a category and a tag, then submits it.
-A reviewer approves it, and a publisher publishes it. The buttons come from
-`available_actions` on the Post. That list follows the caller's Site CMS role,
-and an author cannot approve their own Post. Every authoring URL is built
-from that Site id. The workflow call is
-`POST /api/v1/cms/sites/{site}/content/{post}/workflow/`.
+A reviewer approves it, and a publisher publishes it. Pages and Posts share
+`ContentWorkflowButtons` and `ContentWorkflowDialog`. The buttons come from
+`available_actions`. That list follows the caller's Site CMS role, and an
+author cannot approve their own Post. Reject requires a reviewer comment;
+approve may include one. There is no schedule control, because the workflow
+API accepts an action and a comment only. Every authoring URL is built from
+that Site id. The workflow call is
+`POST /api/v1/cms/sites/{site}/content/{post}/workflow/`. History is
+`GET /api/v1/cms/sites/{site}/content/{post}/workflow-history/`.
 
 The public site loads `GET /api/v1/site-context/posts/` and
 `GET /api/v1/site-context/posts/{slug}/` with no Site id. The backend chooses

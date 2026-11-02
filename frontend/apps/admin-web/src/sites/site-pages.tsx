@@ -51,6 +51,8 @@ import type {
   SitePageWorkflowTransition,
 } from "@/app/sites/page-actions";
 import { unwrap } from "@/organizations/contract";
+import { ContentWorkflowButtons, ContentWorkflowDialog } from "@/sites/content-workflow";
+import type { WorkflowAction } from "@/sites/content-workflow";
 
 const PAGE_SIZE = 20;
 const STATUSES: readonly SitePageStatus[] = [
@@ -443,7 +445,7 @@ function SitePagesPanelContent({
     }
   }
 
-  function queueWorkflowAction(row: SitePageRecord, action: SitePageWorkflowAction) {
+  function queueWorkflowAction(row: SitePageRecord, action: WorkflowAction) {
     setWorkflowComment("");
     setPendingWorkflow({ page: row, action });
   }
@@ -514,74 +516,15 @@ function SitePagesPanelContent({
         </Button>,
       );
     }
-    const availableActions = new Set(row.available_actions ?? []);
-    if (availableActions.has("submit")) {
-      actions.push(
-        <Button
-          key="submit"
-          size="small"
-          aria-label={`Submit ${row.title} for review`}
-          disabled={!enabled}
-          onClick={() => queueWorkflowAction(row, "submit")}
-        >
-          Submit
-        </Button>,
-      );
-    }
-    if (availableActions.has("approve")) {
-      actions.push(
-        <Button
-          key="approve"
-          size="small"
-          aria-label={`Approve ${row.title}`}
-          disabled={!enabled}
-          onClick={() => queueWorkflowAction(row, "approve")}
-        >
-          Approve
-        </Button>,
-        <Button
-          key="reject"
-          size="small"
-          aria-label={`Reject ${row.title}`}
-          disabled={!enabled}
-          onClick={() => queueWorkflowAction(row, "reject")}
-        >
-          Reject
-        </Button>,
-      );
-    }
-    if (availableActions.has("publish")) {
-      actions.push(
-        <Button
-          key="publish"
-          size="small"
-          aria-label={`Publish ${row.title}`}
-          disabled={!enabled}
-          onClick={() => queueWorkflowAction(row, "publish")}
-        >
-          Publish
-        </Button>,
-      );
-    }
-    if (availableActions.has("unpublish")) {
-      actions.push(
-        <Button
-          key="unpublish"
-          size="small"
-          aria-label={`Unpublish ${row.title}`}
-          disabled={!enabled}
-          onClick={() => queueWorkflowAction(row, "unpublish")}
-        >
-          Unpublish
-        </Button>,
-      );
-    }
-    if (availableActions.has("archive")) {
-      actions.push(<Button key="archive" size="small" aria-label={`Archive ${row.title}`} disabled={!enabled} onClick={() => queueWorkflowAction(row, "archive")}>Archive</Button>);
-    }
-    if (availableActions.has("restore")) {
-      actions.push(<Button key="restore" size="small" aria-label={`Restore ${row.title}`} disabled={!enabled} onClick={() => queueWorkflowAction(row, "restore")}>Restore</Button>);
-    }
+    actions.push(
+      <ContentWorkflowButtons
+        key="workflow"
+        title={row.title}
+        available={row.available_actions ?? []}
+        disabled={!enabled}
+        onAction={(action) => queueWorkflowAction(row, action)}
+      />,
+    );
     if (
       canEdit &&
       (row.status === "DRAFT" || row.status === "UNPUBLISHED") &&
@@ -755,41 +698,17 @@ function SitePagesPanelContent({
         </>
       )}
 
-      <Dialog
-        open={pendingWorkflow !== null}
+      <ContentWorkflowDialog
+        noun="Page"
+        action={pendingWorkflow?.action ?? null}
+        title={pendingWorkflow?.page.title ?? ""}
+        comment={workflowComment}
+        error=""
+        busy={busyPageId !== null || !enabled}
+        onComment={setWorkflowComment}
         onClose={() => setPendingWorkflow(null)}
-        aria-labelledby="page-workflow-confirm-title"
-        fullWidth
-        maxWidth="xs"
-      >
-        <DialogTitle id="page-workflow-confirm-title">
-          {pendingWorkflow ? `${pendingWorkflow.action[0].toUpperCase()}${pendingWorkflow.action.slice(1)} Page?` : "Confirm Page action"}
-        </DialogTitle>
-        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, pt: "8px !important" }}>
-          <Typography>
-            {pendingWorkflow ? `Confirm ${pendingWorkflow.action} for “${pendingWorkflow.page.title}”. The workflow status will change for this Site.` : ""}
-          </Typography>
-          {pendingWorkflow && ["approve", "reject"].includes(pendingWorkflow.action) ? (
-            <TextField
-              label={pendingWorkflow.action === "reject" ? "Reviewer comment (required)" : "Reviewer comment (optional)"}
-              value={workflowComment}
-              onChange={(event) => setWorkflowComment(event.target.value)}
-              multiline minRows={2} fullWidth required={pendingWorkflow.action === "reject"}
-              inputProps={{ maxLength: 5000 }}
-            />
-          ) : null}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setPendingWorkflow(null)} disabled={busyPageId !== null}>Cancel</Button>
-          <Button
-            variant="contained"
-            onClick={() => void confirmWorkflowAction()}
-            disabled={!enabled || busyPageId !== null || (pendingWorkflow?.action === "reject" && !workflowComment.trim())}
-          >
-            Confirm {pendingWorkflow?.action ?? "action"}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        onConfirm={() => void confirmWorkflowAction()}
+      />
 
       <Dialog
         open={historyPage !== null}

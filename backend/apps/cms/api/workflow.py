@@ -20,6 +20,7 @@ from apps.sites.models import Site
 
 from ..models import (
     ContentRole,
+    ContentWorkflowTransition,
     Page,
     SiteContent,
     SiteContentRoleAssignment,
@@ -149,6 +150,79 @@ class ContentRoleAssignmentDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class WorkflowHistorySerializer(serializers.ModelSerializer):
+    actor = serializers.IntegerField(source="actor_id", allow_null=True, read_only=True)
+
+    class Meta:
+        model = ContentWorkflowTransition
+        fields = ("id", "from_status", "to_status", "actor", "comment", "created_at")
+        read_only_fields = fields
+
+
+def _content_module(content):
+    if Page.objects.filter(pk=content.pk).exists():
+        return "PAGES"
+    if Post.objects.filter(pk=content.pk).exists():
+        return "POSTS"
+    return "PAGES"
+
+
+def _workflow_roles(request):
+    claims = request.auth
+    roles = getattr(claims, "roles", ())
+    if not isinstance(roles, (tuple, list, set, frozenset)):
+        return set()
+    return set(roles)
+
+
+def _require_workflow_reader(request, site):
+    if "platform-admin" in _workflow_roles(request):
+        return
+    if SiteContentRoleAssignment.objects.filter(
+        site_id=site.pk, user_id=request.user.pk, user__is_active=True,
+    ).exists():
+        return
+    raise PermissionDenied("A CMS role assigned to this Site is required.")
+
+
+class ContentWorkflowHistoryView(APIView):
+    """Append-only workflow history for one Page or Post on this Site."""
+
+    authentication_classes = [KeycloakBearerAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        tags=["CMS workflow"],
+        parameters=[
+            SITE_PARAMETER,
+            OpenApiParameter(
+                "content_id", str, OpenApiParameter.PATH,
+                description="UUID of SiteContent, Page or Post.",
+            ),
+        ],
+        responses=WorkflowHistorySerializer(many=True),
+        description=(
+            "List workflow transitions and reviewer comments for content "
+            "owned by the URL Site. Page history requires PAGES and Post "
+            "history requires POSTS. A cross-Site id is not found. Scheduling "
+            "is not part of this history."
+        ),
+    )
+    def get(self, request, site_pk, content_id):
+        site = get_object_or_404(Site, pk=site_pk)
+        content = get_object_or_404(
+            SiteContent.objects.filter(site_id=site.pk),
+            pk=content_id,
+        )
+        reject_disabled_module(site.pk, _content_module(content), request=request)
+        _require_workflow_reader(request, site)
+        history = ContentWorkflowTransition.objects.filter(content_id=content.pk)
+        return Response(
+            WorkflowHistorySerializer(history, many=True).data,
+            headers={"Cache-Control": "private, no-store"},
+        )
+
+
 class ContentWorkflowActionView(APIView):
     """Perform one authorized transition for content owned by the URL Site."""
 
@@ -189,11 +263,7 @@ class ContentWorkflowActionView(APIView):
         # Resolve the tenant-owned object before checking module state, so a
         # cross-Site identifier always remains indistinguishable from missing.
         # Each content type is governed by its own Site module.
-        if Page.objects.filter(pk=content.pk).exists():
-            module_code = "PAGES"
-        else:
-            module_code = "POSTS" if Post.objects.filter(pk=content.pk).exists() else "PAGES"
-        reject_disabled_module(site.pk, module_code, request=request)
+        reject_disabled_module(site.pk, _content_module(content), request=request)
         payload = WorkflowActionInput(data=request.data)
         payload.is_valid(raise_exception=True)
         claims = request.auth

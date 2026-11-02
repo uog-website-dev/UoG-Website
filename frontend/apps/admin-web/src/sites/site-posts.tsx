@@ -29,6 +29,7 @@ import {
   createSiteTaxonomy,
   createSitePost,
   getSitePost,
+  loadSitePostWorkflowHistory,
   loadSitePosts,
   loadSiteTaxonomy,
   transitionSitePost,
@@ -44,6 +45,8 @@ import type {
   SiteTaxonomyRecord,
 } from "@/app/sites/post-actions";
 import { unwrap } from "@/organizations/contract";
+import { ContentWorkflowButtons, ContentWorkflowDialog, ContentWorkflowHistory } from "@/sites/content-workflow";
+import type { WorkflowAction, WorkflowTransition } from "@/sites/content-workflow";
 
 const PAGE_SIZE = 20;
 const STATUSES: readonly SitePostStatus[] = [
@@ -236,7 +239,12 @@ function SitePostsPanelContent({
   const [taxonomySaving, setTaxonomySaving] = useState(false);
   const [pendingWorkflow, setPendingWorkflow] = useState<{ post: SitePostRecord; action: SitePostWorkflowAction } | null>(null);
   const [workflowComment, setWorkflowComment] = useState("");
+  const [workflowError, setWorkflowError] = useState("");
   const [busyPostId, setBusyPostId] = useState<string | null>(null);
+  const [historyPost, setHistoryPost] = useState<SitePostRecord | null>(null);
+  const [history, setHistory] = useState<WorkflowTransition[]>([]);
+  const [historyError, setHistoryError] = useState("");
+  const [historyLoading, setHistoryLoading] = useState(false);
 
   const ordering = orderingForSort(sort);
   const posts = useAsync<SitePostListResponse>(
@@ -405,10 +413,25 @@ function SitePostsPanelContent({
     }
   }
 
-  function queueWorkflow(row: SitePostRecord, action: SitePostWorkflowAction) {
+  function queueWorkflow(row: SitePostRecord, action: WorkflowAction) {
     if (!enabled) return;
     setWorkflowComment("");
+    setWorkflowError("");
     setPendingWorkflow({ post: row, action });
+  }
+
+  async function openHistory(row: SitePostRecord) {
+    setHistoryPost(row);
+    setHistory([]);
+    setHistoryError("");
+    setHistoryLoading(true);
+    try {
+      setHistory(unwrap(await loadSitePostWorkflowHistory(siteId, row.id)));
+    } catch (cause) {
+      setHistoryError(apiErrorText(cause, "Workflow history could not be loaded."));
+    } finally {
+      setHistoryLoading(false);
+    }
   }
 
   async function confirmWorkflow() {
@@ -416,13 +439,15 @@ function SitePostsPanelContent({
     const { post: row, action } = pendingWorkflow;
     if (action === "reject" && !workflowComment.trim()) return;
     setBusyPostId(row.id);
+    setWorkflowError("");
     try {
       unwrap(await transitionSitePost(siteId, row.id, action, workflowComment.trim()));
       setPendingWorkflow(null);
       posts.reload();
       toast.success(`Post ${action} completed.`);
     } catch (cause) {
-      toast.error(apiErrorText(cause, "The Post workflow could not be updated."));
+      if (cause instanceof ApiError && cause.status === 409) posts.reload();
+      setWorkflowError(apiErrorText(cause, "The Post workflow could not be updated."));
     } finally {
       setBusyPostId(null);
     }
@@ -450,7 +475,7 @@ function SitePostsPanelContent({
     { field: "tags", header: "Tags", render: (row) => row.tags.map((id) => tagNames.get(id) ?? "Tag").join(", ") || "—" },
     {
       field: "published_at", header: "Published", sortable: true,
-      render: (row) => formatDate(row.published_at),
+      render: (row) => row.published_at ? formatDate(row.published_at) : "Not published",
     },
     {
       field: "created_at", header: "Created", sortable: true,
@@ -492,31 +517,22 @@ function SitePostsPanelContent({
               columns={columns}
               rows={rows}
               getRowKey={(row) => row.id}
-              renderActions={(row) => {
-                const actions = new Set(row.available_actions ?? []);
-                return (
-                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                    {canEdit ? (
-                      <Button size="small" aria-label={`Edit ${row.title}`} disabled={!enabled} onClick={() => void openEdit(row)}>Edit</Button>
-                    ) : null}
-                    {actions.has("submit") ? (
-                      <Button size="small" aria-label={`Submit ${row.title} for review`} disabled={!enabled} onClick={() => queueWorkflow(row, "submit")}>Submit</Button>
-                    ) : null}
-                    {actions.has("approve") ? (
-                      <Button size="small" aria-label={`Approve ${row.title}`} disabled={!enabled} onClick={() => queueWorkflow(row, "approve")}>Approve</Button>
-                    ) : null}
-                    {actions.has("reject") ? (
-                      <Button size="small" aria-label={`Reject ${row.title}`} disabled={!enabled} onClick={() => queueWorkflow(row, "reject")}>Reject</Button>
-                    ) : null}
-                    {actions.has("publish") ? (
-                      <Button size="small" aria-label={`Publish ${row.title}`} disabled={!enabled} onClick={() => queueWorkflow(row, "publish")}>Publish</Button>
-                    ) : null}
-                    {actions.has("unpublish") ? (
-                      <Button size="small" aria-label={`Unpublish ${row.title}`} disabled={!enabled} onClick={() => queueWorkflow(row, "unpublish")}>Unpublish</Button>
-                    ) : null}
-                  </Box>
-                );
-              }}
+              renderActions={(row) => (
+                <Box role="group" aria-label={`Actions for ${row.title}`} sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                  <Button size="small" aria-label={`Workflow history for ${row.title}`} onClick={() => void openHistory(row)}>History</Button>
+                  {canEdit ? (
+                    <Button size="small" aria-label={`Edit ${row.title}`} disabled={!enabled} onClick={() => void openEdit(row)}>Edit</Button>
+                  ) : null}
+                  {postsEnabled === true ? (
+                    <ContentWorkflowButtons
+                      title={row.title}
+                      available={row.available_actions ?? []}
+                      disabled={!enabled}
+                      onAction={(action) => queueWorkflow(row, action)}
+                    />
+                  ) : null}
+                </Box>
+              )}
               sort={sort}
               onSortChange={(next) => { setSort(next); setPage(1); }}
               loading={posts.loading}
@@ -604,23 +620,27 @@ function SitePostsPanelContent({
         </DialogActions>
       </Dialog>
 
-      <Dialog open={pendingWorkflow !== null} onClose={() => { if (busyPostId === null) setPendingWorkflow(null); }} fullWidth maxWidth="sm" aria-labelledby="post-workflow-title">
-        <DialogTitle id="post-workflow-title">Confirm {pendingWorkflow?.action}</DialogTitle>
-        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, pt: "8px !important" }}>
-          <Typography>
-            {pendingWorkflow ? `Confirm ${pendingWorkflow.action} for “${pendingWorkflow.post.title}”. This changes the Post on this Site only.` : ""}
-          </Typography>
-          {pendingWorkflow?.action === "reject" ? (
-            <TextField label="Review comment" value={workflowComment} onChange={(event) => setWorkflowComment(event.target.value)} required multiline minRows={2} />
-          ) : null}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setPendingWorkflow(null)} disabled={busyPostId !== null}>Cancel</Button>
-          <Button variant="contained" onClick={() => void confirmWorkflow()} disabled={!enabled || (pendingWorkflow?.action === "reject" && !workflowComment.trim())}>
-            Confirm
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <ContentWorkflowDialog
+        noun="Post"
+        action={pendingWorkflow?.action ?? null}
+        title={pendingWorkflow?.post.title ?? ""}
+        comment={workflowComment}
+        error={workflowError}
+        busy={busyPostId !== null}
+        onComment={setWorkflowComment}
+        onClose={() => { if (busyPostId === null) setPendingWorkflow(null); }}
+        onConfirm={() => void confirmWorkflow()}
+      />
+      <ContentWorkflowHistory
+        title={historyPost?.title ?? ""}
+        open={historyPost !== null}
+        loading={historyLoading}
+        error={historyError}
+        transitions={history}
+        formatWhen={formatDate}
+        statusLabel={(status) => STATUS_LABELS[status as SitePostStatus] ?? status}
+        onClose={() => setHistoryPost(null)}
+      />
 
       <Dialog open={taxonomyTarget !== null} onClose={() => { if (!taxonomySaving) setTaxonomyTarget(null); }} fullWidth maxWidth="sm" aria-labelledby="taxonomy-dialog-title">
         <DialogTitle id="taxonomy-dialog-title">Create {taxonomyTarget === "categories" ? "category" : "tag"}</DialogTitle>
