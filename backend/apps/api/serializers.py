@@ -4,7 +4,8 @@ Serializers for the API app
 import re
 
 from rest_framework import serializers
-from drf_spectacular.utils import OpenApiExample, extend_schema_serializer
+from drf_spectacular.utils import OpenApiExample, extend_schema_field, extend_schema_serializer
+from apps.cms.workflow_actions import available_workflow_actions
 from apps.sites.models import Site
 from .models import Category, Page, Post, Tag
 
@@ -109,6 +110,7 @@ class PostSerializer(StrictContentFields, serializers.ModelSerializer):
     """
 
     slug = serializers.SlugField(required=False, allow_blank=True, max_length=128)
+    available_actions = serializers.SerializerMethodField()
     categories = serializers.PrimaryKeyRelatedField(
         queryset=Category.objects.all(), many=True, required=False,
     )
@@ -125,13 +127,18 @@ class PostSerializer(StrictContentFields, serializers.ModelSerializer):
             "status", "published_at", "blocks", "blocks_version",
             "revision_number", "created_by", "updated_by", "submitted_by",
             "reviewed_by", "review_comment", "metadata", "created_at",
-            "updated_at",
+            "updated_at", "available_actions",
         )
         read_only_fields = (
             "id", "site", "status", "published_at", "blocks_version",
             "revision_number", "created_by", "updated_by", "submitted_by",
             "reviewed_by", "review_comment", "created_at", "updated_at",
         )
+
+    @extend_schema_field(serializers.ListField(child=serializers.CharField()))
+    def get_available_actions(self, post):
+        """Return workflow actions the current caller may attempt for this Post."""
+        return available_workflow_actions(post, self.context.get("request"))
 
     def _site_id(self):
         if self.instance is not None:

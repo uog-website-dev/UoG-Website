@@ -15,10 +15,8 @@ from rest_framework import serializers
 from apps.sites.api.serializers import StrictFields
 
 from ..blocks import validate_blocks
-from ..models import (
-    ContentRole, ContentStatus, Page, SiteContent,
-    SiteContentRoleAssignment,
-)
+from ..models import Page, SiteContent
+from ..workflow_actions import available_workflow_actions
 
 
 class BlocksValidationMixin:
@@ -116,52 +114,5 @@ class PageSerializer(
 
     @extend_schema_field(serializers.ListField(child=serializers.CharField()))
     def get_available_actions(self, page):
-        """Return workflow actions the current authenticated user may attempt.
-
-        The workflow service remains authoritative; this list only drives
-        controls and is derived from the same Site role assignments.
-        """
-        request = self.context.get("request")
-        user = getattr(request, "user", None)
-        if not getattr(user, "is_authenticated", False):
-            return []
-        claims = getattr(request, "auth", None)
-        roles = getattr(claims, "roles", ())
-        roles = set(roles) if isinstance(roles, (tuple, list, set, frozenset)) else set()
-        is_admin = getattr(request, "_cms_is_platform_admin", None)
-        if is_admin is None:
-            try:
-                from apps.authorization.access import is_platform_administrator
-                is_admin = is_platform_administrator(user)
-            except (ImportError, AttributeError):
-                is_admin = False
-            request._cms_is_platform_admin = is_admin
-        if is_admin or "platform-admin" in roles:
-            content_roles = set(ContentRole.values)
-        else:
-            roles_by_site = getattr(request, "_cms_content_roles_by_site", {})
-            if page.site_id not in roles_by_site:
-                roles_by_site[page.site_id] = set(SiteContentRoleAssignment.objects.filter(
-                    site_id=page.site_id, user_id=user.pk, user__is_active=True,
-                ).values_list("role", flat=True))
-                request._cms_content_roles_by_site = roles_by_site
-            content_roles = roles_by_site[page.site_id]
-
-        actions = []
-        if page.status == ContentStatus.DRAFT and ContentRole.AUTHOR in content_roles:
-            actions.append("submit")
-        if (
-            page.status == ContentStatus.IN_REVIEW
-            and ContentRole.REVIEWER in content_roles
-            and user.pk not in {page.created_by_id, page.submitted_by_id}
-        ):
-            actions.extend(("approve", "reject"))
-        if page.status == ContentStatus.APPROVED and ContentRole.PUBLISHER in content_roles:
-            actions.append("publish")
-        if page.status == ContentStatus.PUBLISHED and ContentRole.PUBLISHER in content_roles:
-            actions.append("unpublish")
-        if page.status in {ContentStatus.APPROVED, ContentStatus.PUBLISHED, ContentStatus.UNPUBLISHED} and ContentRole.PUBLISHER in content_roles:
-            actions.append("archive")
-        if page.status == ContentStatus.UNPUBLISHED and ContentRole.AUTHOR in content_roles:
-            actions.append("restore")
-        return actions
+        """Return workflow actions the current authenticated user may attempt."""
+        return available_workflow_actions(page, self.context.get("request"))

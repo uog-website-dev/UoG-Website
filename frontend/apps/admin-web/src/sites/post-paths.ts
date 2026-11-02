@@ -19,3 +19,14 @@ export function siteCategoriesPath(siteId: number, suffix = ""): string {
 export function siteTagsPath(siteId: number, suffix = ""): string {
   return sitePath(siteId, "tags", suffix);
 }
+
+const POST_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Shared content workflow route. The Post id is the content id, still scoped to one Site. */
+export function sitePostWorkflowPath(siteId: number, postId: string): string {
+  sitePath(siteId, "posts");
+  if (!POST_ID.test(postId)) {
+    throw new Error("A Post workflow request needs the Post id.");
+  }
+  return `/v1/cms/sites/${siteId}/content/${postId}/workflow/`;
+}

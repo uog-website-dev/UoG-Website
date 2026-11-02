@@ -80,7 +80,10 @@ resolved Site. Menu rows ship with the menu tree: MENUS is `IMPLEMENTED`
 and recorded in `sites_module_implementation`, and its global switch stays
 off until an operator enables it. A Site can store menu edits only while
 MENUS is enabled for that Site. Turning the module off leaves the rows in
-place and rejects later saves. POSTS remains planned and cannot be enabled.
+place and rejects later saves. POSTS is `IMPLEMENTED` and recorded in
+`sites_module_implementation`. Its global switch stays off until an operator
+enables it, and a Site can author Posts only while POSTS is enabled for that
+Site.
 See the [module registry](module-registry.md).
 
 ### Menu trees (P2-MENU-001)

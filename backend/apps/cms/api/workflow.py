@@ -226,5 +226,5 @@ class ContentWorkflowActionView(APIView):
             return Response(PageSerializer(page).data)
         post = Post.objects.filter(pk=transitioned.pk).first()
         if post is not None:
-            return Response(PostSerializer(post).data)
+            return Response(PostSerializer(post, context={"request": request}).data)
         return Response(SiteContentSerializer(transitioned).data)

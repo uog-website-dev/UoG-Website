@@ -10,6 +10,7 @@ const createSiteTaxonomy = vi.fn();
 const getSitePost = vi.fn();
 const createSitePost = vi.fn();
 const updateSitePost = vi.fn();
+const transitionSitePost = vi.fn();
 
 vi.mock("@/app/sites/post-actions", () => ({
   loadSitePosts: (...args: unknown[]) => loadSitePosts(...args),
@@ -18,6 +19,7 @@ vi.mock("@/app/sites/post-actions", () => ({
   getSitePost: (...args: unknown[]) => getSitePost(...args),
   createSitePost: (...args: unknown[]) => createSitePost(...args),
   updateSitePost: (...args: unknown[]) => updateSitePost(...args),
+  transitionSitePost: (...args: unknown[]) => transitionSitePost(...args),
 }));
 
 import { SitePostsPanel } from "./site-posts";
@@ -64,6 +66,7 @@ beforeEach(() => {
   getSitePost.mockReset();
   createSitePost.mockReset();
   updateSitePost.mockReset();
+  transitionSitePost.mockReset();
   loadSitePosts.mockResolvedValue(list([post()]));
   loadSiteTaxonomy.mockImplementation(async (siteId: number, kind: "categories" | "tags") => result(
     (siteId === 11 ? (kind === "categories" ? [category] : [tag]) : []).map((row) => ({ ...row, site: siteId })),
@@ -72,6 +75,7 @@ beforeEach(() => {
   createSitePost.mockResolvedValue(result(post({ id: "post-2" })));
   updateSitePost.mockResolvedValue(result(post()));
   createSiteTaxonomy.mockResolvedValue(result({ ...category, id: "category-new" }));
+  transitionSitePost.mockResolvedValue(result(post({ status: "IN_REVIEW", available_actions: [] })));
 });
 
 describe("SitePostsPanel", () => {
@@ -221,8 +225,32 @@ describe("SitePostsPanel", () => {
       target: { value: '{"type":"paragraph","html":"<p>Safe<script>alert(1)</script><a href=\\\"javascript:alert(2)\\\">bad</a></p>"}' },
     });
     fireEvent.click(screen.getByRole("button", { name: "Preview draft" }));
-    expect(await screen.findByText("Private draft preview")).toBeTruthy();
-    expect(document.querySelector("script")).toBeNull();
-    expect(document.body.textContent).not.toContain("javascript:");
+    const preview = await screen.findByRole("region", { name: "Private Post preview" });
+    expect(preview.textContent).toContain("Safe");
+    expect(preview.querySelector("script")).toBeNull();
+    expect(preview.querySelector("a")).toBeNull();
+    expect(preview.textContent).not.toContain("javascript:");
+  });
+
+  it("runs submit, approve and publish only when the API offers that action for this Site", async () => {
+    const postId = "11111111-1111-1111-1111-111111111111";
+    loadSitePosts.mockResolvedValue(list([
+      post({ id: postId, available_actions: ["submit"] }),
+      post({ id: "22222222-2222-2222-2222-222222222222", site: 22, title: "Other Site", available_actions: ["publish"] }),
+    ]));
+    const view = renderPanel();
+    const table = await screen.findByRole("table", { name: "Posts for this Site" });
+    expect(within(table).queryByText("Other Site")).toBeNull();
+    fireEvent.click(within(table).getByRole("button", { name: "Submit Campus update for review" }));
+    fireEvent.click(screen.getByRole("button", { name: "Confirm" }));
+    await waitFor(() => expect(transitionSitePost).toHaveBeenCalledWith(11, postId, "submit", ""));
+
+    view.unmount();
+    loadSitePosts.mockResolvedValue(list([post({ id: postId, status: "APPROVED", available_actions: ["publish"] })]));
+    renderPanel(11, true, [...PERMISSIONS, "content.posts.publish"]);
+    fireEvent.click(await screen.findByRole("button", { name: "Publish Campus update" }));
+    fireEvent.click(screen.getByRole("button", { name: "Confirm" }));
+    await waitFor(() => expect(transitionSitePost).toHaveBeenCalledWith(11, postId, "publish", ""));
+    expect(screen.queryByRole("button", { name: "Submit Campus update for review" })).toBeNull();
   });
 });

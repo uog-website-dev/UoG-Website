@@ -22,6 +22,11 @@ to assets provisioned by the existing deployment process. Taxonomy create
 requests use the corresponding Site categories or tags route and require an
 authorized Site author role and the enabled `POSTS` module.
 
+Authoring responses include `available_actions`. That list is the set of
+workflow buttons the current caller may attempt. It is derived from the Site
+CMS role assignments. An author does not see approve or reject on their own
+submission. The workflow service remains the authority.
+
 ## Shared workflow
 
 Use the shared content action route for a Post:
@@ -75,10 +80,21 @@ cache keys include the Site and locale publication generation. Publishing or
 unpublishing advances that generation. A disabled `POSTS` module suppresses
 both routes with not found.
 
+## Public website
+
+The public Next.js site renders the host-resolved feed at `/posts` and one
+Post at `/posts/{slug}`. Category and tag filters are slugs for the resolved
+Site. Drafts, another Site's Posts, and a disabled POSTS module are not
+rendered. Body HTML is shown as text plus links whose targets are same-site
+paths or http(s) URLs.
+
 ## Verification
 
 The backend tests cover the role flow, Site module gate, Post snapshot payload,
 audit events, publication retry, concurrent publish retries, draft visibility,
 public feed/detail isolation, taxonomy filters, pagination, Host resolution,
-cache invalidation, and XSS sanitization. Scheduled publishing is not
+cache invalidation, and XSS sanitization. The admin console tests cover
+submit, publish, Site isolation, the disabled module, and the private preview.
+The public renderer tests cover the feed, detail, draft omission, keyboard
+focus, and unsafe HTML. Scheduled publishing is not
 implemented; it is optional scope for this API.

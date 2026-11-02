@@ -6,7 +6,7 @@ import { createApiClient } from "@uog/api-client";
 import { getAccessToken } from "@/access-token";
 import { serializeApiError } from "@/organizations/contract";
 import type { ActionResult } from "@/organizations/contract";
-import { siteCategoriesPath, sitePostsPath, siteTagsPath } from "@/sites/post-paths";
+import { siteCategoriesPath, sitePostWorkflowPath, sitePostsPath, siteTagsPath } from "@/sites/post-paths";
 
 export type SitePostStatus =
   | "DRAFT" | "IN_REVIEW" | "APPROVED" | "PUBLISHED" | "UNPUBLISHED" | "ARCHIVED";
@@ -25,6 +25,7 @@ export interface SitePostRecord {
   categories: string[];
   tags: string[];
   status: SitePostStatus;
+  available_actions?: SitePostWorkflowAction[];
   published_at: string | null;
   created_at: string;
   updated_at: string;
@@ -46,6 +47,9 @@ export interface SitePostBlock {
   heading?: string;
   children?: SitePostBlock[];
 }
+
+export type SitePostWorkflowAction =
+  | "submit" | "approve" | "reject" | "publish" | "unpublish" | "archive" | "restore";
 
 export interface SiteTaxonomyRecord {
   id: string;
@@ -160,6 +164,23 @@ export async function updateSitePost(
     const result = await api.patchDetailed<SitePostRecord>(
       sitePostsPath(siteId, `${postId}/`), input, { ifMatch },
     );
+    return { ...result.data, etag: result.etag ?? "" };
+  });
+}
+
+export async function transitionSitePost(
+  siteId: number,
+  postId: string,
+  action: SitePostWorkflowAction,
+  comment = "",
+): Promise<ActionResult<SitePostRecord>> {
+  return attempt(async () => {
+    const api = await client();
+    const result = await api.postDetailed<SitePostRecord>(
+      sitePostWorkflowPath(siteId, postId),
+      { action, comment },
+    );
+    if (result.data.site !== siteId) throw new Error("The Post does not belong to this Site.");
     return { ...result.data, etag: result.etag ?? "" };
   });
 }
