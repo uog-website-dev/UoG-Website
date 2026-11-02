@@ -32,7 +32,9 @@ export interface PublicBlock {
 export interface PublicPageDocument {
   title: string;
   path: string;
+  site: number | null;
   blocks: PublicBlock[];
+  seo: { title: string; description: string };
 }
 
 interface TextPart {
@@ -51,15 +53,26 @@ export function pageFromResponse(status: number, body: unknown): PublicPageDocum
   if (status !== 200 || body == null || typeof body !== "object" || Array.isArray(body)) {
     return null;
   }
-  const row = body as { title?: unknown; path?: unknown; status?: unknown; blocks?: unknown };
+  const row = body as { title?: unknown; path?: unknown; status?: unknown; blocks?: unknown; site?: unknown; seo?: unknown };
   if (row.status != null && row.status !== "PUBLISHED") return null;
   if (typeof row.title !== "string" || !row.title.trim()) return null;
   const path = typeof row.path === "string" && row.path.startsWith("/") ? row.path : "/";
+  const seo = row.seo != null && typeof row.seo === "object" ? row.seo as { meta_title?: unknown; meta_description?: unknown } : {};
   return {
     title: row.title.trim(),
     path,
+    site: typeof row.site === "number" ? row.site : null,
     blocks: normalizeBlocks(row.blocks),
+    seo: {
+      title: plainSeo(seo.meta_title, 120),
+      description: plainSeo(seo.meta_description, 300),
+    },
   };
+}
+
+function plainSeo(value: unknown, max: number): string {
+  if (typeof value !== "string") return "";
+  return stripTags(value).replace(/\s+/g, " ").trim().slice(0, max);
 }
 
 function normalizeBlocks(value: unknown): PublicBlock[] {

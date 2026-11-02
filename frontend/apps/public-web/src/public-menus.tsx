@@ -8,7 +8,7 @@
  */
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import { PublicMenuFrame, menusFromResponse } from "@uog/ui";
+import { PublicMenuFrame, menusFromResponse, publicFetchInit } from "@uog/ui";
 import type { PublicMenuNode } from "@uog/ui";
 
 const EMPTY: { header: PublicMenuNode[]; footer: PublicMenuNode[] } = {
@@ -23,10 +23,7 @@ export function PublicMenus({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let cancelled = false;
-    fetch(PUBLIC_MENUS_PATH, {
-      headers: { Accept: "application/json" },
-      cache: "no-store",
-    })
+    fetch(PUBLIC_MENUS_PATH, publicFetchInit())
       .then(async (response) => {
         const body = response.ok ? await response.json().catch(() => null) : null;
         if (!cancelled) setMenus(menusFromResponse(response.status, body));

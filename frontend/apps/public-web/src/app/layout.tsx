@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
-import Container from "@mui/material/Container";
-import { UogFooter, UogHeader, UogThemeProvider } from "@uog/ui";
 
-import { PublicMenus } from "@/public-menus";
+import { PublicSiteChrome } from "@/public-site";
 
 import "./globals.css";
 
@@ -18,15 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <UogThemeProvider>
-          <UogHeader title="Digital Platform — Public Website" />
-          <PublicMenus>
-            <Container maxWidth="lg" sx={{ py: 4, display: "flex", flexDirection: "column", minHeight: "70vh" }}>
-              {children}
-            </Container>
-          </PublicMenus>
-          <UogFooter apiBaseUrl={undefined} />
-        </UogThemeProvider>
+        <PublicSiteChrome>{children}</PublicSiteChrome>
       </body>
     </html>
   );
