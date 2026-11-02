@@ -99,6 +99,7 @@ CREATE TABLE api_post (
     site_id bigint NULL REFERENCES sites_site (id) DEFERRABLE INITIALLY DEFERRED,
     tag_id bigint NULL REFERENCES api_tag (id) DEFERRABLE INITIALLY DEFERRED
 );
+ALTER TABLE api_post ADD CONSTRAINT api_post_slug_site_id_a04e02c9_uniq UNIQUE (slug, site_id);
 
 -- cms.0008 owns this column in the migration state; the forward migration
 -- recreated it against the content row instead, so restore the original.

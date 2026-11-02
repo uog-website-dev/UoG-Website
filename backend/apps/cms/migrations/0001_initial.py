@@ -36,8 +36,9 @@ def seed_content_modules(apps, schema_editor):
 
 
 def remove_content_modules(apps, schema_editor):
-    Module = apps.get_model("sites", "Module")
-    Module.objects.filter(code__in=[code for code, _name, _description in CONTENT_MODULES]).delete()
+    # The same migration drops the Module table. Leaving the seed rows in
+    # place avoids firing deferred SiteModule/FK events during schema teardown.
+    pass
 
 
 class Migration(migrations.Migration):

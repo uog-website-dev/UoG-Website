@@ -131,6 +131,18 @@ def transition_content(
                             path=content.path,
                             using=using,
                         )
+                    elif content._meta.model_name == "post" and (
+                        action in {"publish", "unpublish"}
+                        or (action == "archive" and source == ContentStatus.PUBLISHED)
+                    ):
+                        bump_publication_version(
+                            content.site_id,
+                            content.locale,
+                            path=f"/posts/{content.slug}",
+                            using=using,
+                        )
+                        from ..menu_cache import invalidate_post_delivery
+                        invalidate_post_delivery(content.pk, using=using)
         return content
 
 
@@ -187,6 +199,10 @@ def _content_instance(base, *, using):
     page = Page.objects.using(using).filter(pk=base.pk).first()
     if page is not None:
         return page
+    from apps.api.models import Post
+    post = Post.objects.using(using).filter(pk=base.pk).first()
+    if post is not None:
+        return post
     return base
 
 
@@ -219,6 +235,35 @@ def _create_publication_snapshot(content, *, using):
             "position": content.position,
             "is_homepage": content.is_homepage,
             "parent_id": content.parent_id,
+        })
+    elif content._meta.model_name == "post":
+        payload.update({
+            "title": content.title,
+            "slug": content.slug,
+            "excerpt": content.excerpt,
+            "content": content.content,
+            "excerpt_html": content.excerpt_html,
+            "author_id": content.author_id,
+            "featured_media": content.featured_media,
+            "seo": content.seo,
+            "categories": [
+                {
+                    "id": str(row["id"]), "code": row["code"],
+                    "name": row["name"], "slug": row["slug"],
+                }
+                for row in content.categories.order_by("name", "id").values(
+                    "id", "code", "name", "slug",
+                )
+            ],
+            "tags": [
+                {
+                    "id": str(row["id"]), "code": row["code"],
+                    "name": row["name"], "slug": row["slug"],
+                }
+                for row in content.tags.order_by("name", "id").values(
+                    "id", "code", "name", "slug",
+                )
+            ],
         })
     PublishedContentSnapshot.objects.using(using).create(
         content_id=content.pk,

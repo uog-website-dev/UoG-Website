@@ -12,6 +12,8 @@ from rest_framework.views import APIView
 
 from apps.accounts.authentication import KeycloakBearerAuthentication
 from apps.accounts.permissions import HasRealmRole
+from apps.api.models import Post
+from apps.api.serializers import PostSerializer
 from apps.authorization.access import reject_disabled_module
 from apps.sites.api.serializers import StrictFields
 from apps.sites.models import Site
@@ -22,7 +24,6 @@ from ..models import (
     SiteContent,
     SiteContentRoleAssignment,
 )
-from ..services.pages import require_pages_module
 from ..services.workflow import transition_content
 from .serializers import PageSerializer, SiteContentSerializer
 
@@ -34,7 +35,7 @@ SITE_PARAMETER = OpenApiParameter(
 
 class WorkflowStateConflict(APIException):
     status_code = status.HTTP_409_CONFLICT
-    default_detail = "The Page workflow changed. Refresh its status and try again."
+    default_detail = "The content workflow changed. Refresh its status and try again."
     default_code = "workflow_conflict"
 
 
@@ -160,20 +161,23 @@ class ContentWorkflowActionView(APIView):
             SITE_PARAMETER,
             OpenApiParameter(
                 "content_id", str, OpenApiParameter.PATH,
-                description="UUID of SiteContent or Page.",
+                description="UUID of SiteContent, Page or Post.",
             ),
         ],
         request=WorkflowActionInput,
         responses=PolymorphicProxySerializer(
             component_name="WorkflowContent",
-            serializers=[PageSerializer, SiteContentSerializer],
+            serializers=[PageSerializer, PostSerializer, SiteContentSerializer],
             resource_type_field_name=None,
         ),
         description=(
-            "Apply a validated content workflow action. The content must "
-            "belong to the URL Site. Authorization uses Site CMS role "
-            "assignments or the validated platform-admin bearer-token role; "
-            "roles in the request body are ignored and rejected."
+            "Apply a validated workflow action to a Page or Post owned by the "
+            "URL Site. Page transitions require PAGES; Post transitions "
+            "require POSTS enabled for that Site. Authorization uses the "
+            "action's Site CMS role assignment or the validated "
+            "platform-admin bearer-token role; body-supplied roles are "
+            "rejected. Publishing records an immutable snapshot, audit event "
+            "and cache generation change. A repeated publish is idempotent."
         ),
     )
     def post(self, request, site_pk, content_id):
@@ -184,8 +188,12 @@ class ContentWorkflowActionView(APIView):
         )
         # Resolve the tenant-owned object before checking module state, so a
         # cross-Site identifier always remains indistinguishable from missing.
-        # Disabling PAGES still blocks transitions for a Page on this Site.
-        reject_disabled_module(site.pk, "PAGES", request=request)
+        # Each content type is governed by its own Site module.
+        if Page.objects.filter(pk=content.pk).exists():
+            module_code = "PAGES"
+        else:
+            module_code = "POSTS" if Post.objects.filter(pk=content.pk).exists() else "PAGES"
+        reject_disabled_module(site.pk, module_code, request=request)
         payload = WorkflowActionInput(data=request.data)
         payload.is_valid(raise_exception=True)
         claims = request.auth
@@ -196,18 +204,6 @@ class ContentWorkflowActionView(APIView):
             site_id=site.pk, user_id=request.user.pk, user__is_active=True,
         ).exists():
             raise PermissionDenied("A CMS role assigned to this Site is required.")
-        if Page.objects.filter(pk=content.pk).exists():
-            try:
-                require_pages_module(site.pk)
-            except DomainValidationError as error:
-                fields = (
-                    error.message_dict if hasattr(error, "message_dict")
-                    else {"module": error.messages}
-                )
-                raise serializers.ValidationError({
-                    "reason": "module_disabled",
-                    "fields": fields,
-                }) from error
         try:
             transitioned = transition_content(
                 content.pk,
@@ -228,4 +224,7 @@ class ContentWorkflowActionView(APIView):
         page = Page.objects.filter(pk=transitioned.pk).first()
         if page is not None:
             return Response(PageSerializer(page).data)
+        post = Post.objects.filter(pk=transitioned.pk).first()
+        if post is not None:
+            return Response(PostSerializer(post).data)
         return Response(SiteContentSerializer(transitioned).data)

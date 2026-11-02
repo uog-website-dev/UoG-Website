@@ -1,15 +1,21 @@
 """HTTP integration tests: validated identity, Site roles and workflow."""
 import pytest
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 
+from apps.api.models import Category, Post, Tag
 from apps.audit.models import AuditEvent
 from apps.cms.models import (
     ContentRole,
     ContentStatus,
     Page,
+    PublishedContentSnapshot,
     SiteContentRoleAssignment,
 )
 from apps.cms.services.pages import create_page
+from apps.cms.services.publication_cache import current_publication_version
+from apps.sites.models import Module
+from apps.sites.services.modules import disable_module_for_site, enable_module_for_site
 
 
 pytestmark = pytest.mark.django_db
@@ -225,6 +231,126 @@ def test_http_review_publish_flow_and_publish_retry(
     assert Page.objects.get(pk=page.pk).status == ContentStatus.PUBLISHED
     assert page.publication_snapshots.count() == 1
     assert page.workflow_transitions.count() == 3
+
+
+def test_post_workflow_uses_roles_post_module_snapshots_audit_and_idempotency(
+    client, oidc, posts_module, sites,
+):
+    site, _other = sites
+    users = {
+        ContentRole.AUTHOR: get_user_model().objects.create_user(username="post-flow-author"),
+        ContentRole.REVIEWER: get_user_model().objects.create_user(username="post-flow-reviewer"),
+        ContentRole.PUBLISHER: get_user_model().objects.create_user(username="post-flow-publisher"),
+    }
+    for role, user in users.items():
+        SiteContentRoleAssignment.objects.create(site=site, user=user, role=role)
+
+    category = Category.objects.create(site=site, code="FLOW_NEWS", name="Flow News")
+    tag = Tag.objects.create(site=site, code="FLOW", name="Workflow")
+    post = Post.objects.create(
+        site=site, title="Workflow story", slug="workflow-story",
+        excerpt="A summary", content="The immutable published body.",
+        author=users[ContentRole.AUTHOR], created_by=users[ContentRole.AUTHOR],
+        seo={"meta_title": "Workflow story"},
+    )
+    post.categories.add(category)
+    post.tags.add(tag)
+    url = _workflow_url(site, post)
+    foreign = Post.objects.create(
+        site=_other, title="Foreign workflow", slug="foreign-workflow", content="Body",
+    )
+
+    def as_role(role):
+        user = users[role]
+        return oidc.header(
+            sub=f"post-workflow-{role.lower()}",
+            preferred_username=user.username,
+            email=f"{user.username}@uog.et",
+            realm_access={"roles": ["platform-viewer"]},
+        )
+
+    assert client.post(
+        _workflow_url(site, foreign), {"action": "submit"},
+        content_type="application/json", **as_role(ContentRole.AUTHOR),
+    ).status_code == 404
+
+    # Posts workflow is independent from PAGES; this Site has only POSTS on.
+    refused_early_publish = client.post(
+        url, {"action": "publish"}, content_type="application/json",
+        **as_role(ContentRole.PUBLISHER),
+    )
+    assert refused_early_publish.status_code == 409
+    submitted = client.post(
+        url, {"action": "submit"}, content_type="application/json",
+        **as_role(ContentRole.AUTHOR),
+    )
+    assert submitted.status_code == 200, submitted.content
+    assert submitted.json()["status"] == ContentStatus.IN_REVIEW
+    assert submitted.json()["title"] == "Workflow story"
+
+    self_review = client.post(
+        url, {"action": "approve"}, content_type="application/json",
+        **as_role(ContentRole.AUTHOR),
+    )
+    assert self_review.status_code == 403
+    approved = client.post(
+        url, {"action": "approve", "comment": "Reviewed."},
+        content_type="application/json", **as_role(ContentRole.REVIEWER),
+    )
+    assert approved.status_code == 200, approved.content
+    wrong_role_publish = client.post(
+        url, {"action": "publish"}, content_type="application/json",
+        **as_role(ContentRole.REVIEWER),
+    )
+    assert wrong_role_publish.status_code == 403
+
+    initial_version = current_publication_version(site.pk, post.locale)
+    published = client.post(
+        url, {"action": "publish"}, content_type="application/json",
+        **as_role(ContentRole.PUBLISHER),
+    )
+    assert published.status_code == 200, published.content
+    snapshot = PublishedContentSnapshot.objects.get(content_id=post.pk, version=1)
+    assert snapshot.payload["content_type"] == "api.post"
+    assert snapshot.payload["title"] == "Workflow story"
+    assert snapshot.payload["content"] == "The immutable published body."
+    assert snapshot.payload["categories"][0]["id"] == str(category.pk)
+    assert snapshot.payload["tags"][0]["id"] == str(tag.pk)
+    snapshot.payload["title"] = "Tampered"
+    with pytest.raises(ValidationError):
+        snapshot.save()
+    snapshot.refresh_from_db()
+    assert snapshot.payload["title"] == "Workflow story"
+    assert current_publication_version(site.pk, post.locale) == initial_version + 1
+
+    retry = client.post(
+        url, {"action": "publish"}, content_type="application/json",
+        **as_role(ContentRole.PUBLISHER),
+    )
+    assert retry.status_code == 200
+    assert PublishedContentSnapshot.objects.filter(content_id=post.pk).count() == 1
+    assert AuditEvent.objects.filter(
+        entity_id=str(post.pk), action="CONTENT_PUBLISHED",
+    ).count() == 1
+    assert current_publication_version(site.pk, post.locale) == initial_version + 1
+
+    disable_module_for_site(site.pk, posts_module.pk)
+    blocked = client.post(
+        url, {"action": "unpublish"}, content_type="application/json",
+        **as_role(ContentRole.PUBLISHER),
+    )
+    assert blocked.status_code == 400
+    enable_module_for_site(site.pk, posts_module.pk)
+    unpublished = client.post(
+        url, {"action": "unpublish"}, content_type="application/json",
+        **as_role(ContentRole.PUBLISHER),
+    )
+    assert unpublished.status_code == 200, unpublished.content
+    assert unpublished.json()["status"] == ContentStatus.UNPUBLISHED
+    assert AuditEvent.objects.filter(
+        entity_id=str(post.pk), action="CONTENT_UNPUBLISHED",
+    ).count() == 1
+    assert current_publication_version(site.pk, post.locale) == initial_version + 2
 
 
 def _token_header(oidc, subject, username):

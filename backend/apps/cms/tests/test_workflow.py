@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError, close_old_connections, connections, transaction
 
+from apps.api.models import Post
 from apps.audit.models import AuditEvent
 from apps.cms.models import (
     ContentRole,
@@ -318,4 +319,46 @@ def test_concurrent_publish_retries_create_one_snapshot_and_audit(sites):
     ).count() == 1
     assert AuditEvent.objects.filter(
         entity_id=str(page.pk), action="CONTENT_PUBLISHED",
+    ).count() == 1
+
+
+@pytest.mark.django_db(transaction=True)
+def test_concurrent_post_publish_retries_create_one_snapshot_and_audit(sites):
+    site, _ = sites
+    author, reviewer, publisher = (
+        _user("concurrent-post-author"),
+        _user("concurrent-post-reviewer"),
+        _user("concurrent-post-publisher"),
+    )
+    _grant(site, author, ContentRole.AUTHOR)
+    _grant(site, reviewer, ContentRole.REVIEWER)
+    _grant(site, publisher, ContentRole.PUBLISHER)
+    post = Post.objects.create(
+        site=site, title="Concurrent news", slug="concurrent-news",
+        content="Body", created_by=author,
+    )
+    _transition(post, "submit", author)
+    _transition(post, "approve", reviewer)
+    barrier = Barrier(2)
+
+    def publish():
+        close_old_connections()
+        try:
+            barrier.wait(timeout=10)
+            return transition_content(
+                post.pk, action="publish", actor=publisher,
+            ).status
+        finally:
+            connections.close_all()
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        outcomes = list(pool.map(lambda _: publish(), range(2)))
+
+    assert outcomes == [ContentStatus.PUBLISHED, ContentStatus.PUBLISHED]
+    assert PublishedContentSnapshot.objects.filter(content_id=post.pk).count() == 1
+    assert ContentWorkflowTransition.objects.filter(
+        content_id=post.pk, to_status=ContentStatus.PUBLISHED,
+    ).count() == 1
+    assert AuditEvent.objects.filter(
+        entity_id=str(post.pk), action="CONTENT_PUBLISHED",
     ).count() == 1
