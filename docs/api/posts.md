@@ -40,30 +40,28 @@ workflow.
 
 ## Public delivery
 
-Public feeds resolve the Site from the trusted request Host; forwarded-host
-headers and Site IDs in query strings do not select a tenant.
+Public Post feeds resolve the Site from the trusted request Host; forwarded
+host headers and Site IDs in query strings do not select a tenant.
 
 ```text
 GET /api/v1/site-context/posts/?category=news&tag=campus&page=1&page_size=20
 GET /api/v1/site-context/posts/{slug}/
 ```
 
-Feeds include only `PUBLISHED` Posts and use immutable publication snapshots,
-ordered by publication time descending with UUID as a stable tie-breaker.
-Category and Tag filters accept active taxonomy slugs owned by the resolved
-Site and locale. The list includes excerpt, featured media, SEO and taxonomy
-metadata; detail also includes the Post body. Responses are paginated (default
-20, maximum 100), vary by Host and use a Site/locale publication generation
-for cache keys. Publish, unpublish and archive of a published Post advance that
-generation. Disabling `POSTS` makes both public routes return not found.
-
-The public feed, detail, taxonomy isolation, draft visibility, deterministic
-pagination, Host resolution, module gate and cache invalidation are covered by
-`apps/cms/tests/test_public_posts.py`.
+The feed returns only published Posts for that Site and locale, ordered by
+publication time descending with UUID as a stable tie-breaker. Category and Tag
+filters accept active taxonomy slugs belonging to that Site and locale. List
+responses are paginated (default 20, maximum 100), include excerpt, featured
+media, SEO and taxonomy metadata, and use immutable publication snapshots;
+detail responses also include the Post body. Responses vary by Host and server
+cache keys include the Site and locale publication generation. Publishing or
+unpublishing advances that generation. A disabled `POSTS` module suppresses
+both routes with not found.
 
 ## Verification
 
 The backend tests cover the role flow, Site module gate, Post snapshot payload,
-audit events, publication retry, concurrent publish retries, draft visibility
-and linked-menu cache invalidation. Scheduled publishing is not implemented;
-it is optional scope for this API.
+audit events, publication retry, concurrent publish retries, draft visibility,
+public feed/detail isolation, taxonomy filters, pagination, Host resolution,
+cache invalidation, and XSS sanitization. Scheduled publishing is not
+implemented; it is optional scope for this API.

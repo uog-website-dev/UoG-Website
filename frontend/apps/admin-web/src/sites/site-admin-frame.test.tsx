@@ -110,6 +110,16 @@ describe("SiteAdminFrame", () => {
     expect(screen.queryByRole("button", { name: "Create page" })).toBeNull();
   });
 
+  it("blocks direct Posts administration when the Posts module is disabled", () => {
+    renderFrame(
+      { enabledModuleCodes: [], permissions: ["content.posts.view", "content.posts.create"] },
+      informatics,
+      <SiteSection sectionKey="posts"><button type="button">Create Post</button></SiteSection>,
+    );
+    expect(screen.getByText(/Posts are not enabled for this Site/)).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Create Post" })).toBeNull();
+  });
+
   it("opens the site menu from the keyboard and closes it with Escape", () => {
     renderFrame({
       enabledModuleCodes: ["MENUS"],

@@ -189,13 +189,15 @@ class PublicPostListView(APIView):
             site_id=site.pk, locale=locale, status=ContentStatus.PUBLISHED,
         )
         if "category" in filters:
-            posts = posts.filter(categories__site_id=site.pk,
-                                 categories__locale=locale,
-                                 categories__is_active=True,
-                                 categories__slug=filters["category"])
+            posts = posts.filter(
+                categories__site_id=site.pk, categories__locale=locale,
+                categories__is_active=True, categories__slug=filters["category"],
+            )
         if "tag" in filters:
-            posts = posts.filter(tags__site_id=site.pk, tags__locale=locale,
-                                 tags__is_active=True, tags__slug=filters["tag"])
+            posts = posts.filter(
+                tags__site_id=site.pk, tags__locale=locale,
+                tags__is_active=True, tags__slug=filters["tag"],
+            )
         posts = posts.distinct().order_by("-published_at", "-pk")
         paginator = self.pagination_class()
         page = paginator.paginate_queryset(posts, request, view=self)
@@ -263,21 +265,17 @@ class PublicPostDetailView(APIView):
 def _post_snapshot_data(posts, *, detail):
     post_ids = [post.pk for post in posts]
     latest = {}
-    snapshots = PublishedContentSnapshot.objects.filter(
+    for snapshot in PublishedContentSnapshot.objects.filter(
         content_id__in=post_ids,
-    ).order_by("content_id", "-version")
-    for snapshot in snapshots:
+    ).order_by("content_id", "-version"):
         latest.setdefault(snapshot.content_id, snapshot)
     if set(post_ids) != set(latest):
         raise RuntimeError("A published Post is missing its serving snapshot.")
     serializer = PublicPostDetailSerializer if detail else PublicPostListSerializer
-    return [
-        serializer(_serialize_post_snapshot(latest[post.pk])).data
-        for post in posts
-    ]
+    return [serializer(_post_snapshot_payload(latest[post.pk])).data for post in posts]
 
 
-def _serialize_post_snapshot(snapshot):
+def _post_snapshot_payload(snapshot):
     payload = snapshot.payload
     data = {
         "id": payload["content_id"],
@@ -293,7 +291,8 @@ def _serialize_post_snapshot(snapshot):
         "published_at": snapshot.published_at,
         "publication_version": snapshot.version,
     }
-    data["content"] = payload["content"]
+    if "content" in payload:
+        data["content"] = payload["content"]
     return data
 
 

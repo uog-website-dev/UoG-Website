@@ -114,6 +114,16 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
         "search", "ordering", "page", "page_size",
     } <= {parameter["name"] for parameter in post_list["parameters"]}
     assert post_list["security"] == [{"keycloakBearer": []}]
+    public_post_list = paths["/api/v1/site-context/posts/"]["get"]
+    assert {} in public_post_list["security"]
+    assert {"category", "tag", "locale", "page", "page_size"} <= {
+        parameter["name"] for parameter in public_post_list["parameters"]
+    }
+    assert {"Cache-Control", "Vary", "X-Publication-Version"} <= set(
+        public_post_list["responses"]["200"]["headers"]
+    )
+    public_detail = paths["/api/v1/site-context/posts/{post_slug}/"]["get"]
+    assert {} in public_detail["security"]
     post_schemas = schema["components"]["schemas"]
     assert {"Post", "PostCategory", "PostTag"} <= set(post_schemas)
     assert {"categories", "tags", "title", "slug"} <= set(
