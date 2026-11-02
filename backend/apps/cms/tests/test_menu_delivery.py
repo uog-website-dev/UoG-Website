@@ -239,8 +239,7 @@ def test_inheritance_rejects_loops_and_does_not_grant_parent_management(family, 
         {"name": "Global", "location": "footer", "is_global": True},
         content_type="application/json", **header,
     )
-    assert rejected.status_code == 400
-    assert rejected.json()["error"]["details"]["reason"] == "invalid_menu"
+    assert rejected.status_code == 403
     with pytest.raises(ValidationError):
         Menu.objects.create(site=child, location="sidebar", name="Not central", is_global=True)
 

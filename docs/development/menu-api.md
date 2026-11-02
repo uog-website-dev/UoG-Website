@@ -27,6 +27,13 @@ codes; Editor receives read/write, Publisher read/publish, and Viewer/Reviewer
 read. This creates no user assignments. Existing `content.menus.*` catalog rows
 are retained for compatibility but are **not** permission aliases for these APIs.
 
+A menu with `is_global` is centrally owned. Creating one, or changing an
+existing one, requires platform-scoped `menu.write` (the platform-administrator
+grant includes it). A Site or Organization `menu.write` grant can still create
+and edit that scope's local menus, including assigning `header` or `footer`,
+and is rejected with 403 for a central menu. A central menu can belong only to
+the main Site; other Sites receive 400 `invalid_menu`.
+
 All mutations require MENUS to be shipped, globally enabled and enabled on the
 Site. Disabling MENUS retains records and permits authorized administrative
 inspection, but blocks content changes, moves, reorder, deletion and publication.

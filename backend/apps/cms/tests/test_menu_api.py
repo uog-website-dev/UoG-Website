@@ -18,7 +18,8 @@ from apps.cms.menu_models import Menu, MenuItem
 from apps.cms.services.pages import create_page
 from apps.api.models import Post
 from apps.cms.tests.test_menus import ready  # noqa: F401
-from apps.sites.models import Module
+from apps.sites.models import Module, Site
+from apps.sites.services.modules import enable_module_for_site
 
 pytestmark = pytest.mark.django_db
 
@@ -354,3 +355,90 @@ def test_menu_openapi_contract_is_typed_scoped_and_documents_conflicts():
         assert "412" not in operation["responses"]
         assert any(parameter["name"] == "If-Match" and parameter["required"] for parameter in operation["parameters"])
     assert paths[base+"{id}/tree/"]["get"]["responses"]["200"]["content"]["application/json"]["schema"]["$ref"].endswith("/TreeOutput")
+
+
+def test_local_location_edit_cross_site_block_and_central_menu_authority(api, settings):
+    settings.DEBUG = False
+    settings.ORGANIZATIONS_DEV_WRITES_ENABLED = False
+    created = api.client.post(
+        api.base, {"name": "Campus", "location": "header"},
+        content_type="application/json", **api.header,
+    )
+    assert created.status_code == 201, created.content
+    url = created["Location"]
+    assert f"/sites/{api.site.pk}/menus/" in url
+    moved = api.client.patch(
+        url, {"name": "Campus footer", "location": "footer"},
+        content_type="application/json", HTTP_IF_MATCH=created["ETag"], **api.header,
+    )
+    assert moved.status_code == 200, moved.content
+    assert moved.json()["site"] == api.site.pk
+    assert moved.json()["location"] == "footer"
+    assert moved.json()["is_global"] is False
+    foreign = api.client.patch(
+        f"/api/v1/sites/{api.other.pk}/menus/{moved.json()['id']}/",
+        {"name": "Taken"}, content_type="application/json", HTTP_IF_MATCH=moved["ETag"], **api.header,
+    )
+    assert foreign.status_code == 403
+
+    root = api.site.organization_unit.parent
+    main = Site.objects.create(organization_unit=root, code="MAIN", name="University website", is_main=True)
+    enable_module_for_site(main.pk, Module.objects.get(code="MENUS").pk)
+    central = Menu.objects.create(site=main, location="header", name="University", is_global=True)
+    main_menu = f"/api/v1/sites/{main.pk}/menus/{central.pk}/"
+    assert api.client.patch(
+        main_menu, {"name": "Hijack"}, content_type="application/json",
+        HTTP_IF_MATCH='"menu-stale"', **api.header,
+    ).status_code == 403
+    UserRoleAssignment.objects.create(
+        user=api.user, role=Role.objects.get(code="site-administrator"), scope="SITE",
+        site=main, organization=main.organization_unit,
+    )
+    local = api.client.post(
+        f"/api/v1/sites/{main.pk}/menus/", {"name": "Main local", "location": "footer"},
+        content_type="application/json", **api.header,
+    )
+    assert local.status_code == 201, local.content
+    assert local.json()["is_global"] is False
+    assert api.client.patch(
+        main_menu, {"name": "Hijack"}, content_type="application/json",
+        HTTP_IF_MATCH='"menu-stale"', **api.header,
+    ).status_code == 403
+    assert api.client.post(
+        f"/api/v1/sites/{main.pk}/menus/",
+        {"name": "Second central", "location": "sidebar", "is_global": True},
+        content_type="application/json", **api.header,
+    ).status_code == 403
+
+    platform = get_user_model().objects.create_user(username="menu-platform", email="menu-platform@uog.et")
+    UserRoleAssignment.objects.create(
+        user=platform, role=Role.objects.get(code="platform-administrator"), scope="PLATFORM",
+    )
+    header = api.oidc.header(
+        sub=str(uuid4()), preferred_username=platform.username, email=platform.email,
+        realm_access={"roles": ["platform-admin"]},
+    )
+    assert api.client.get("/api/me/", **header).status_code == 200
+    off_main = api.client.post(
+        api.base, {"name": "Not central", "location": "sidebar", "is_global": True},
+        content_type="application/json", **header,
+    )
+    assert off_main.status_code == 400
+    assert off_main.json()["error"]["details"]["reason"] == "invalid_menu"
+    token = api.client.get(main_menu, **header)["ETag"]
+    renamed = api.client.patch(
+        main_menu, {"name": "University header"},
+        content_type="application/json", HTTP_IF_MATCH=token, **header,
+    )
+    assert renamed.status_code == 200, renamed.content
+    assert renamed.json()["is_global"] is True
+    assert renamed.json()["site"] == main.pk
+
+    api.site.site_modules.filter(module__code="MENUS").update(is_enabled=False)
+    blocked = api.client.patch(
+        url, {"name": "After disable"}, content_type="application/json",
+        HTTP_IF_MATCH=moved["ETag"], **api.header,
+    )
+    assert blocked.status_code == 400
+    assert blocked.json()["error"]["details"]["reason"] == "module_disabled"
+    assert Menu.objects.get(pk=moved.json()["id"]).name == "Campus footer"

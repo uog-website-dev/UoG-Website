@@ -692,7 +692,7 @@ export function SiteDetail({ site, permissions = [], error }: SiteDetailProps) {
         }}
       />
 
-      <SiteMenusPanel siteId={site.id} menusEnabled={menusEnabled} />
+      <SiteMenusPanel siteId={site.id} menusEnabled={menusEnabled} permissions={permissions} />
       <SitePagesPanel siteId={site.id} pagesEnabled={pagesEnabled} permissions={permissions} />
 
       {/* Per-site module enablement, honest about planned capabilities. */}
