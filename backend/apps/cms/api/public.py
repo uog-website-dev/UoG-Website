@@ -9,6 +9,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.api.models import Post
 from apps.sites.selectors.modules import module_available_on_request
 
 from ..models import (
@@ -98,6 +99,213 @@ class PublicPagePagination(PageNumberPagination):
     page_size = 20
     page_size_query_param = "page_size"
     max_page_size = 100
+
+
+class PublicTaxonomySerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    code = serializers.CharField()
+    name = serializers.CharField()
+    slug = serializers.CharField()
+
+
+class PublicPostListSerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    locale = serializers.CharField()
+    title = serializers.CharField()
+    slug = serializers.CharField()
+    excerpt = serializers.CharField(allow_blank=True)
+    excerpt_html = serializers.CharField(allow_blank=True)
+    featured_media = serializers.CharField(allow_blank=True)
+    seo = serializers.JSONField()
+    categories = PublicTaxonomySerializer(many=True)
+    tags = PublicTaxonomySerializer(many=True)
+    published_at = serializers.DateTimeField()
+    publication_version = serializers.IntegerField()
+
+
+class PublicPostDetailSerializer(PublicPostListSerializer):
+    content = serializers.CharField()
+
+
+class PublicPostPageSerializer(serializers.Serializer):
+    count = serializers.IntegerField()
+    next = serializers.URLField(allow_null=True)
+    previous = serializers.URLField(allow_null=True)
+    results = PublicPostListSerializer(many=True)
+
+
+class PublicPostQuery(serializers.Serializer):
+    locale = serializers.CharField(required=False, max_length=35)
+    category = serializers.SlugField(required=False, max_length=128)
+    tag = serializers.SlugField(required=False, max_length=128)
+
+    def to_internal_value(self, data):
+        allowed = set(self.fields) | {"page", "page_size"}
+        errors = {key: ["Unknown query parameter."] for key in set(data) - allowed}
+        if hasattr(data, "getlist"):
+            errors.update({
+                key: ["Supply this query parameter only once."]
+                for key in data if len(data.getlist(key)) != 1
+            })
+        if errors:
+            raise serializers.ValidationError(errors)
+        return super().to_internal_value({
+            key: value for key, value in data.items() if key in self.fields
+        })
+
+
+class PublicPostListView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+    pagination_class = PublicPagePagination
+    http_method_names = ["get", "head", "options"]
+
+    @extend_schema(
+        operation_id="public_site_posts_list",
+        tags=["Public Posts"],
+        parameters=[
+            OpenApiParameter("locale", str, description="Enabled Site language; defaults to the Site language."),
+            OpenApiParameter("category", str, description="Active Category slug owned by this Site."),
+            OpenApiParameter("tag", str, description="Active Tag slug owned by this Site."),
+            OpenApiParameter("page", int),
+            OpenApiParameter("page_size", int, description="Default 20, maximum 100."),
+        ],
+        responses=PublicPostPageSerializer,
+        description=(
+            "List published Posts for the Site resolved from the trusted Host. "
+            "Results use immutable publication snapshots and deterministic "
+            "publication-time/id ordering. Category and Tag filters resolve "
+            "only active taxonomy owned by that Site."
+        ),
+    )
+    def get(self, request):
+        site = _resolved_site(request)
+        _require_posts_module(request)
+        query = PublicPostQuery(data=request.query_params)
+        query.is_valid(raise_exception=True)
+        filters = query.validated_data
+        locale = _locale(site, filters.get("locale"))
+        posts = Post.objects.filter(
+            site_id=site.pk, locale=locale, status=ContentStatus.PUBLISHED,
+        )
+        if "category" in filters:
+            posts = posts.filter(categories__site_id=site.pk,
+                                 categories__locale=locale,
+                                 categories__is_active=True,
+                                 categories__slug=filters["category"])
+        if "tag" in filters:
+            posts = posts.filter(tags__site_id=site.pk, tags__locale=locale,
+                                 tags__is_active=True, tags__slug=filters["tag"])
+        posts = posts.distinct().order_by("-published_at", "-pk")
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(posts, request, view=self)
+        resource = (
+            f"posts:locale={locale}:category={filters.get('category', '')}:"
+            f"tag={filters.get('tag', '')}:page={request.query_params.get('page', '1')}:"
+            f"size={request.query_params.get('page_size', paginator.page_size)}"
+        )
+        version = current_publication_version(site.pk, locale)
+        key = public_cache_key(site.pk, locale, resource, version=version)
+        results = get_public_cache(site.pk, key)
+        if results is None:
+            results = _post_snapshot_data(page, detail=False)
+            set_public_cache(site.pk, key, results)
+        response = paginator.get_paginated_response(results)
+        _public_post_headers(response, version)
+        return response
+
+
+class PublicPostDetailView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+    http_method_names = ["get", "head", "options"]
+
+    @extend_schema(
+        operation_id="public_site_post_detail",
+        tags=["Public Posts"],
+        parameters=[
+            OpenApiParameter("post_slug", str, OpenApiParameter.PATH),
+            OpenApiParameter("locale", str, description="Enabled Site language; defaults to the Site language."),
+        ],
+        responses=PublicPostDetailSerializer,
+        description=(
+            "Return a published Post by slug within the Site resolved from "
+            "the trusted Host. Foreign-Site, draft and missing Posts return "
+            "the same not-found response."
+        ),
+    )
+    def get(self, request, post_slug):
+        site = _resolved_site(request)
+        _require_posts_module(request)
+        query = PublicLocaleQuery(data=request.query_params)
+        query.is_valid(raise_exception=True)
+        locale = _locale(site, query.validated_data.get("locale"))
+        post = Post.objects.filter(
+            site_id=site.pk, locale=locale, slug=post_slug,
+            status=ContentStatus.PUBLISHED,
+        ).first()
+        if post is None:
+            raise NotFound("The requested Post was not found.")
+        version = current_publication_version(site.pk, locale)
+        key = public_cache_key(
+            site.pk, locale, f"post:{post_slug}", version=version,
+        )
+        data = get_public_cache(site.pk, key)
+        if data is None:
+            data = _post_snapshot_data([post], detail=True)[0]
+            set_public_cache(site.pk, key, data)
+        response = Response(data)
+        _public_post_headers(response, version)
+        response["ETag"] = f'"cms-post-{post.pk}-publication-{data["publication_version"]}"'
+        return response
+
+
+def _post_snapshot_data(posts, *, detail):
+    post_ids = [post.pk for post in posts]
+    latest = {}
+    snapshots = PublishedContentSnapshot.objects.filter(
+        content_id__in=post_ids,
+    ).order_by("content_id", "-version")
+    for snapshot in snapshots:
+        latest.setdefault(snapshot.content_id, snapshot)
+    if set(post_ids) != set(latest):
+        raise RuntimeError("A published Post is missing its serving snapshot.")
+    serializer = PublicPostDetailSerializer if detail else PublicPostListSerializer
+    return [
+        serializer(_serialize_post_snapshot(latest[post.pk])).data
+        for post in posts
+    ]
+
+
+def _serialize_post_snapshot(snapshot):
+    payload = snapshot.payload
+    data = {
+        "id": payload["content_id"],
+        "locale": payload["locale"],
+        "title": payload["title"],
+        "slug": payload["slug"],
+        "excerpt": payload["excerpt"],
+        "excerpt_html": payload["excerpt_html"],
+        "featured_media": payload["featured_media"],
+        "seo": payload["seo"],
+        "categories": payload["categories"],
+        "tags": payload["tags"],
+        "published_at": snapshot.published_at,
+        "publication_version": snapshot.version,
+    }
+    data["content"] = payload["content"]
+    return data
+
+
+def _public_post_headers(response, version):
+    response["Cache-Control"] = "public, max-age=0, must-revalidate"
+    response["X-Publication-Version"] = str(version)
+    response["Vary"] = "Host"
+
+
+def _require_posts_module(request):
+    if not module_available_on_request(request, "POSTS"):
+        raise NotFound("The requested Post was not found.")
 
 
 class PublicPageListView(APIView):

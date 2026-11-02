@@ -101,6 +101,8 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
         "/api/v1/modules/", "/api/v1/modules/{id}/",
         "/api/v1/site-context/",
         "/api/v1/site-context/pages/",
+        "/api/v1/site-context/posts/",
+        "/api/v1/site-context/posts/{post_slug}/",
         "/api/v1/site-context/homepage/",
         "/api/v1/site-context/pages/{page_path}/",
         "/api/v1/site-context/menus/",
@@ -127,6 +129,19 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
     assert not paths["/api/pages/"]["get"].get("security", [])
     assert paths["/api/pages/"]["post"]["security"] == [{"keycloakBearer": []}, {"cookieAuth": []}]
     assert not paths["/api/pages/home/"]["get"].get("security", [])
+    public_posts = paths["/api/v1/site-context/posts/"]["get"]
+    assert {} in public_posts["security"]
+    assert {"category", "tag", "locale", "page", "page_size"} <= {
+        parameter["name"] for parameter in public_posts["parameters"]
+    }
+    assert {"Cache-Control", "Vary", "X-Publication-Version"} <= set(
+        public_posts["responses"]["200"]["headers"]
+    )
+    assert {} in paths["/api/v1/site-context/posts/{post_slug}/"]["get"]["security"]
+    public_post_schema = schema["components"]["schemas"]["PublicPostDetail"]
+    assert {"content", "excerpt", "featured_media", "seo", "categories", "tags"} <= set(
+        public_post_schema["properties"]
+    )
     assert paths["/api/v1/authorization/roles/"]["get"]["security"] == [{"keycloakBearer": []}]
     assert paths["/api/me/"]["get"]["tags"] == ["Identity"]
     page_list = paths["/api/pages/"]["get"]
