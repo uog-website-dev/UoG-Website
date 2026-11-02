@@ -20,31 +20,24 @@ import Typography from "@mui/material/Typography";
 import { useAsync, useToast } from "@uog/ui";
 
 import {
-  createMenuLink,
   createSiteMenu,
+  loadMenuTargets,
   loadSiteNavigation,
-  reorderSiteMenu,
   setMenuActive,
   updateSiteMenu,
 } from "@/app/sites/menu-actions";
 import type {
   MenuInheritanceRecord,
-  MenuItemRecord,
   MenuLocationState,
   MenuPlace,
   MenuRecord,
+  MenuTargets,
 } from "@/app/sites/menu-actions";
+import { MenuItemTree } from "@/sites/menu-items";
 import { unwrap } from "@/organizations/contract";
 
-const PATH = /^\/(?:[a-z0-9][a-z0-9-]{0,63}(?:\/[a-z0-9][a-z0-9-]{0,63})*)?$/;
 const PLACES: readonly MenuPlace[] = ["header", "footer"];
-
-function siblings(items: MenuItemRecord[], parent: string | null): MenuItemRecord[] {
-  return items
-    .filter((item) => item.parent === parent)
-    .slice()
-    .sort((left, right) => left.sort_order - right.sort_order || left.id.localeCompare(right.id));
-}
+const NO_TARGETS: MenuTargets = { pages: [], posts: [], pagesAvailable: true, postsAvailable: true };
 
 function placeLabel(location: string): string {
   if (location === "header") return "Header";
@@ -72,84 +65,8 @@ function inheritanceText(policy: MenuInheritanceRecord): string {
   return `${placeLabel(policy.location)}: ${central} ${parent} ${order}`;
 }
 
-function MenuLinks({
-  siteId,
-  state,
-  enabled,
-  onChanged,
-}: {
-  siteId: number;
-  state: MenuLocationState;
-  enabled: boolean;
-  onChanged: () => void;
-}) {
-  const toast = useToast();
-  const [label, setLabel] = useState("");
-  const [target, setTarget] = useState("/about");
-  const [busy, setBusy] = useState(false);
-  const roots = siblings(state.items, null);
-
-  async function run(action: () => Promise<void>) {
-    setBusy(true);
-    try {
-      await action();
-      onChanged();
-    } catch (cause) {
-      toast.error(cause instanceof Error ? cause.message : "The menu could not be saved.");
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function move(item: MenuItemRecord, direction: -1 | 1) {
-    const group = siblings(state.items, item.parent);
-    const index = group.findIndex((row) => row.id === item.id);
-    const next = index + direction;
-    if (index < 0 || next < 0 || next >= group.length) return;
-    const order = group.map((row) => row.id);
-    const [moved] = order.splice(index, 1);
-    order.splice(next, 0, moved!);
-    await run(async () => {
-      unwrap(await reorderSiteMenu(siteId, state.menu.id, state.etag, item.parent, order));
-    });
-  }
-
-  return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-      <Box component="ul" sx={{ listStyle: "none", m: 0, p: 0, display: "flex", flexDirection: "column", gap: 1 }}>
-        {roots.map((item, index) => (
-          <Box component="li" key={item.id} sx={{ display: "flex", gap: 1, alignItems: "center", flexWrap: "wrap" }}>
-            <Typography sx={{ minWidth: 120 }}>{item.label}</Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ fontFamily: "monospace" }}>{item.target}</Typography>
-            <Button size="small" aria-label={`Move ${item.label} up`} disabled={!enabled || busy || index === 0} onClick={() => move(item, -1)}>
-              Move up
-            </Button>
-            <Button size="small" aria-label={`Move ${item.label} down`} disabled={!enabled || busy || index === roots.length - 1} onClick={() => move(item, 1)}>
-              Move down
-            </Button>
-          </Box>
-        ))}
-      </Box>
-      <Box component="form" sx={{ display: "flex", gap: 1, flexWrap: "wrap" }} onSubmit={(event) => {
-        event.preventDefault();
-        if (!PATH.test(target)) {
-          toast.error("Use a same-site path such as /about.");
-          return;
-        }
-        void run(async () => {
-          unwrap(await createMenuLink(siteId, state.menu.id, state.etag, { label: label.trim(), target }));
-          setLabel("");
-        });
-      }}>
-        <TextField size="small" label={`${state.menu.name} label`} value={label} disabled={!enabled || busy} onChange={(event) => setLabel(event.target.value)} required />
-        <TextField size="small" label="Path" value={target} disabled={!enabled || busy} onChange={(event) => setTarget(event.target.value)} required />
-        <Button type="submit" variant="contained" disabled={!enabled || busy || !label.trim()}>Add link</Button>
-      </Box>
-    </Box>
-  );
-}
-
 function LocalMenuEditor({
+  targets,
   siteId,
   state,
   taken,
@@ -164,6 +81,7 @@ function LocalMenuEditor({
   canWrite: boolean;
   canPublish: boolean;
   moduleOn: boolean;
+  targets: MenuTargets;
   onChanged: () => void;
 }) {
   const toast = useToast();
@@ -252,7 +170,7 @@ function LocalMenuEditor({
           This menu is active. Changing it also needs menu publish permission.
         </Typography>
       ) : null}
-      <MenuLinks siteId={siteId} state={state} enabled={structural} onChanged={onChanged} />
+      <MenuItemTree siteId={siteId} state={state} targets={targets} enabled={structural} onChanged={onChanged} />
     </Box>
   );
 }
@@ -271,6 +189,11 @@ export function SiteMenusPanel({
     async () => unwrap(await loadSiteNavigation(siteId)),
     [siteId],
   );
+  const targetState = useAsync(
+    async () => unwrap(await loadMenuTargets(siteId)),
+    [siteId],
+  );
+  const targets = targetState.data ?? NO_TARGETS;
   const canWrite = permissions.includes("menu.write");
   const canPublish = permissions.includes("menu.publish");
   const moduleOn = menusEnabled === true;
@@ -352,6 +275,7 @@ export function SiteMenusPanel({
                     canWrite={canWrite}
                     canPublish={canPublish}
                     moduleOn={moduleOn}
+                    targets={targets}
                     onChanged={navigation.reload}
                   />
                 ))}
