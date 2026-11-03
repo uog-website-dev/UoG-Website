@@ -829,7 +829,11 @@ class ContentRole(models.TextChoices):
 
 
 class SiteContentRoleAssignment(models.Model):
-    """A Site-scoped CMS role; platform-admin remains a validated token role."""
+    """A Site-scoped CMS role.
+
+    Platform-wide CMS authority is an active database platform-administrator
+    assignment. A Keycloak realm role is not a CMS grant.
+    """
 
     site = models.ForeignKey(
         "sites.Site", on_delete=models.CASCADE,

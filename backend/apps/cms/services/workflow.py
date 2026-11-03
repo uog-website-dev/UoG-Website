@@ -9,6 +9,7 @@ from apps.audit.context import (
     audit_context, current_audit_context, database_audit_context,
 )
 
+from ..authorization import cms_grant_allows
 from ..models import (
     ContentRole,
     ContentStatus,
@@ -16,7 +17,6 @@ from ..models import (
     Page,
     PublishedContentSnapshot,
     SiteContent,
-    SiteContentRoleAssignment,
     workflow_write,
 )
 from .publication_cache import bump_publication_version
@@ -179,12 +179,10 @@ def _action_transition(action, current_status):
 
 
 def _authorize(actor, *, site_id, role, roles, using):
-    if "platform-admin" in set(roles or ()):
-        return
-    if SiteContentRoleAssignment.objects.using(using).filter(
-        site_id=site_id, user_id=actor.pk, role=role,
-        user__is_active=True,
-    ).exists():
+    # ``roles`` is retained for callers that used to forward bearer claims.
+    # Those claims are not an authorization source.
+    del roles
+    if cms_grant_allows(actor, site_id, (role,), using=using):
         return
     raise PermissionDenied(
         f"The {role.label.lower()} role is required for this Site."

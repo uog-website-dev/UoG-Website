@@ -1,0 +1,20 @@
+﻿[
+  {
+    "command": "python manage.py check",
+    "exit_code": 0,
+    "stdout": "System check identified no issues (0 silenced).",
+    "stderr": ""
+  },
+  {
+    "command": "python manage.py migrate --check",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": "python manage.py makemigrations --check --dry-run",
+    "exit_code": 0,
+    "stdout": "No changes detected",
+    "stderr": ""
+  }
+]

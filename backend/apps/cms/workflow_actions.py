@@ -12,9 +12,6 @@ def available_workflow_actions(content, request):
     user = getattr(request, "user", None) if request is not None else None
     if not getattr(user, "is_authenticated", False):
         return []
-    claims = getattr(request, "auth", None)
-    roles = getattr(claims, "roles", ())
-    roles = set(roles) if isinstance(roles, (tuple, list, set, frozenset)) else set()
     is_admin = getattr(request, "_cms_is_platform_admin", None)
     if is_admin is None:
         try:
@@ -23,7 +20,7 @@ def available_workflow_actions(content, request):
         except (ImportError, AttributeError):
             is_admin = False
         request._cms_is_platform_admin = is_admin
-    if is_admin or "platform-admin" in roles:
+    if is_admin:
         content_roles = set(ContentRole.values)
     else:
         roles_by_site = getattr(request, "_cms_content_roles_by_site", {})

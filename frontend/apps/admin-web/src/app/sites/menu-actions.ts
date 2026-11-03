@@ -118,8 +118,11 @@ export async function loadSiteNavigation(siteId: number): Promise<ActionResult<S
       }
       menus.push({ menu, items: tree.data.items, etag: tree.etag });
     }
-    const policies = await api.get<MenuInheritanceRecord[]>(siteMenuInheritancePath(siteId));
-    return { menus, inheritance: Array.isArray(policies) ? policies : [] };
+    const policies = await api.get<MenuInheritanceRecord[] | { results?: MenuInheritanceRecord[] }>(
+      siteMenuInheritancePath(siteId),
+    );
+    const rows = Array.isArray(policies) ? policies : policies?.results;
+    return { menus, inheritance: Array.isArray(rows) ? rows : [] };
   });
 }
 

@@ -8,7 +8,7 @@ from django.db.models import ProtectedError
 from apps.cms.models import MAX_PAGE_DEPTH, Page, Visibility
 from apps.cms.selectors.pages import public_pages, published_page
 from apps.cms.services.pages import change_route, create_page
-from apps.cms.services.workflow import transition_content
+from apps.cms.tests.support import transition_with_site_role
 from apps.sites.configuration import default_configuration
 from apps.sites.models import Site
 
@@ -239,6 +239,4 @@ def _publish_for_test(page):
     for action, actor in (
         ("submit", author), ("approve", reviewer), ("publish", publisher),
     ):
-        transition_content(
-            page.pk, action=action, actor=actor, roles={"platform-admin"},
-        )
+        transition_with_site_role(page, action, actor)

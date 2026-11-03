@@ -110,6 +110,10 @@ row includes read-only `module_code`, so a Site administrator can tell
 PAGES, POSTS and MENUS apart without the central registry. A planned or
 globally disabled module returns 400. A second pair returns 409.
 `disable` sets `is_enabled` false and keeps the row and configuration.
+Global module PATCH, Site module PATCH, and enable/disable take the row lock,
+compare `If-Match`, validate, and save in one transaction. A stale `If-Match`
+returns 412 and leaves the winning write in place. A validation failure rolls
+the change back. `disable` on one Site does not change another Site.
 PATCH replaces that Site's module settings and does not toggle enablement.
 Another Site's assignment id returns 404. List filters: `module`,
 `is_enabled`, `ordering` (`module_id`), `page`.

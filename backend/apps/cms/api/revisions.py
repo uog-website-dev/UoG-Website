@@ -11,6 +11,7 @@ from rest_framework.views import APIView
 
 from apps.accounts.authentication import KeycloakBearerAuthentication
 from apps.authorization.access import reject_disabled_module
+from apps.cms.authorization import require_cms_grant
 from apps.sites.api.serializers import StrictFields
 from apps.sites.models import Site
 
@@ -19,7 +20,6 @@ from ..models import (
     ContentRole,
     ContentRevision,
     SiteContent,
-    SiteContentRoleAssignment,
 )
 from ..services.revisions import (
     authorize_revision_access,
@@ -94,7 +94,8 @@ class ContentRevisionListView(APIView):
         description=(
             "List immutable revisions in descending version order. Requires "
             "an active AUTHOR, REVIEWER or PUBLISHER assignment on this Site, "
-            "or a validated platform-admin token role. The response ETag is "
+            "or an active database platform-administrator assignment. "
+            "Keycloak realm roles do not grant access. The response ETag is "
             "the current content revision and is required to restore."
         ),
     )
@@ -163,7 +164,8 @@ class ContentRevisionRestoreView(APIView):
         responses=ContentRevisionDetailSerializer,
         description=(
             "Restore the selected snapshot into a new DRAFT revision. Requires "
-            "AUTHOR on this Site or platform-admin and the current content "
+            "an active AUTHOR assignment on this Site or an active database "
+            "platform-administrator assignment, and the current content "
             "ETag from the revision list. A stale ETag returns 409. Published "
             "and reviewed content must first follow its workflow back to an "
             "editable state; historical snapshots are never modified."
@@ -183,16 +185,11 @@ class ContentRevisionRestoreView(APIView):
                     "with its current ETag."
                 ],
             })
-        claims = request.auth
-        roles = getattr(claims, "roles", ())
-        if not isinstance(roles, (tuple, list, set, frozenset)):
-            roles = ()
         try:
             restored, source = restore_content_revision(
                 content.pk,
                 revision_number,
                 actor=request.user,
-                roles=roles,
                 expected_revision=content.revision_number,
             )
         except ContentEditConflict as error:
@@ -241,26 +238,13 @@ def _scoped_content(site_pk, content_id):
 
 
 def _authorize(request, site_id, *, author_only=False):
-    claims = request.auth
-    roles = getattr(claims, "roles", ())
-    if not isinstance(roles, (tuple, list, set, frozenset)):
-        roles = ()
-    if author_only and "platform-admin" not in set(roles):
-        if not SiteContentRoleAssignment.objects.filter(
-            site_id=site_id,
-            user_id=request.user.pk,
-            role=ContentRole.AUTHOR,
-            user__is_active=True,
-        ).exists():
-            from django.core.exceptions import PermissionDenied
-            raise PermissionDenied(
-                "The AUTHOR role is required to restore content."
-            )
-    else:
-        authorize_revision_access(
-            request.user, site_id=site_id, roles=roles,
+    if author_only:
+        require_cms_grant(
+            request.user, site_id, (ContentRole.AUTHOR,), request=request,
+            message="The AUTHOR role is required to restore content.",
         )
-    return roles
+        return
+    authorize_revision_access(request.user, site_id=site_id)
 
 
 def content_etag(content):

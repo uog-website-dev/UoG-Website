@@ -7,21 +7,22 @@ edges, audit each accepted status change, and protect the public payload.
 PAGES and POSTS are implemented but globally and per-Site disabled by default.
 The workflow administration API is mounted at
 `/api/v1/cms/sites/`; Page CRUD and public delivery are documented in the
-[Page API contract](../api/cms-pages.md). Requests pass validated
-Keycloak role claims and the authenticated actor into the shared service;
-client-supplied role names are rejected and never used for authorization.
+[Page API contract](../api/cms-pages.md). The authenticated actor is resolved from the Keycloak token. Application
+authority comes from an active database platform-administrator assignment or
+a Site CMS role on the resource's Site. Realm roles, staff flags, and
+client-supplied role names are not authorization sources.
 
 ## HTTP integration
 
 | Method and path | Access | Contract |
 | --- | --- | --- |
-| `GET /api/v1/cms/sites/{site_pk}/content-roles/` | platform-admin token role | List CMS role assignments for this Site |
-| `POST /api/v1/cms/sites/{site_pk}/content-roles/` | platform-admin token role | Assign an active local user AUTHOR, REVIEWER or PUBLISHER |
-| `DELETE /api/v1/cms/sites/{site_pk}/content-roles/{assignment_id}/` | platform-admin token role | Revoke only an assignment owned by the path Site |
-| `POST /api/v1/cms/sites/{site_pk}/content/{content_id}/workflow/` | authenticated token plus required Site CMS role or platform-admin | Apply one workflow action; content is looked up under the path Site |
-| `GET /api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/` | any active Site CMS role or platform-admin | List immutable revisions, newest first; returns the current content ETag |
-| `GET /api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/{revision_number}/` | any active Site CMS role or platform-admin | Inspect one immutable snapshot and its diff metadata |
-| `POST /api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/{revision_number}/restore/` | Site AUTHOR or platform-admin | Restore a prior snapshot as a new DRAFT revision, requiring the current `If-Match` ETag |
+| `GET /api/v1/cms/sites/{site_pk}/content-roles/` | active database platform-administrator assignment | List CMS role assignments for this Site |
+| `POST /api/v1/cms/sites/{site_pk}/content-roles/` | active database platform-administrator assignment | Assign an active local user AUTHOR, REVIEWER or PUBLISHER |
+| `DELETE /api/v1/cms/sites/{site_pk}/content-roles/{assignment_id}/` | active database platform-administrator assignment | Revoke only an assignment owned by the path Site |
+| `POST /api/v1/cms/sites/{site_pk}/content/{content_id}/workflow/` | matching Site CMS role or active database platform-administrator assignment | Apply one workflow action; content is looked up under the path Site |
+| `GET /api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/` | any active Site CMS role or active database platform-administrator assignment | List immutable revisions, newest first; returns the current content ETag |
+| `GET /api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/{revision_number}/` | any active Site CMS role or active database platform-administrator assignment | Inspect one immutable snapshot and its diff metadata |
+| `POST /api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/{revision_number}/restore/` | Site AUTHOR or active database platform-administrator assignment | Restore a prior snapshot as a new DRAFT revision, requiring the current `If-Match` ETag |
 
 The action body accepts only `action` and optional `comment`. The endpoint
 derives its role set from validated bearer-token claims and rejects unknown
@@ -50,10 +51,12 @@ return 428; stale ETags and edits racing a restore return 409.
 | ARCHIVED | — | — | — | No outgoing transition |
 
 All omitted edges are rejected. A user assigned more than one Site role still
-cannot approve or reject content they authored or submitted. `platform-admin`
-is accepted only from validated token claims; `is_staff` and `is_superuser`
-flags do not grant workflow rights. Site-specific roles are represented by
-unique `(site, user, role)` assignments in `SiteContentRoleAssignment`.
+cannot approve or reject content they authored or submitted. An active
+database `platform-administrator` assignment covers the workflow roles.
+Keycloak realm roles, `is_staff`, and `is_superuser` do not grant workflow
+rights. Site-specific roles are represented by unique `(site, user, role)`
+assignments in `SiteContentRoleAssignment`. Inactive, expired, and revoked
+platform assignments do not authorize.
 
 ## Atomicity, audit and repeat requests
 

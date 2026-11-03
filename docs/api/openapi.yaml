@@ -1676,7 +1676,37 @@ paths:
   /api/v1/authorization/assignments/users/{user_id}/effective/:
     get:
       operationId: v1_authorization_assignments_users_effective_retrieve
+      description: Registered effective permissions for one active user at one validated
+        scope. Requires platform.users.view in that scope, or an active database platform-administrator
+        assignment. Keycloak realm roles do not grant access. Expired, revoked, inactive-role
+        and inactive-permission grants are omitted. The platform-administrator policy
+        returns only that role's approved capability set. A denied caller receives
+        403 and no permission list. Unknown users, sites and organizations return
+        404. Malformed identifiers and inconsistent scope combinations return 400.
       parameters:
+      - in: query
+        name: organization
+        schema:
+          type: integer
+        description: Organization id. Required for ORGANIZATION. With a site, it must
+          be that site's owner.
+      - in: query
+        name: scope
+        schema:
+          type: string
+          enum:
+          - ORGANIZATION
+          - PLATFORM
+          - SITE
+        description: PLATFORM rejects organization and site. ORGANIZATION requires
+          organization and rejects site. SITE requires site.
+        required: true
+      - in: query
+        name: site
+        schema:
+          type: integer
+        description: Site id. Required for SITE. When organization is omitted, ownership
+          is read from the Site.
       - in: path
         name: user_id
         schema:
@@ -1698,8 +1728,28 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Assignment'
+                $ref: '#/components/schemas/EffectivePermission'
           description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          description: Invalid body, malformed input, or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    scope:
+                    - This scope is not valid.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
           headers:
             X-Request-ID:
               description: Correlation ID for this request.
@@ -3073,7 +3123,8 @@ paths:
     get:
       operationId: v1_cms_sites_content_roles_list
       description: List AUTHOR, REVIEWER and PUBLISHER assignments for this Site.
-        Requires the validated platform-admin token role.
+        Requires an active database platform-administrator assignment. A Keycloak
+        realm role does not grant this operation.
       parameters:
       - in: path
         name: site_pk
@@ -3183,8 +3234,9 @@ paths:
                 format: uuid
     post:
       operationId: v1_cms_sites_content_roles_create
-      description: Assign one CMS role to a local platform user on this Site. Only
-        a validated platform-admin token may manage assignments.
+      description: Assign one CMS role to a local platform user on this Site. Requires
+        an active database platform-administrator assignment. A Keycloak realm role
+        does not grant this operation.
       parameters:
       - in: path
         name: site_pk
@@ -3449,9 +3501,10 @@ paths:
     get:
       operationId: cms_content_revisions_list
       description: List immutable revisions in descending version order. Requires
-        an active AUTHOR, REVIEWER or PUBLISHER assignment on this Site, or a validated
-        platform-admin token role. The response ETag is the current content revision
-        and is required to restore.
+        an active AUTHOR, REVIEWER or PUBLISHER assignment on this Site, or an active
+        database platform-administrator assignment. Keycloak realm roles do not grant
+        access. The response ETag is the current content revision and is required
+        to restore.
       parameters:
       - in: path
         name: content_id
@@ -3714,10 +3767,10 @@ paths:
     post:
       operationId: cms_content_revision_restore
       description: Restore the selected snapshot into a new DRAFT revision. Requires
-        AUTHOR on this Site or platform-admin and the current content ETag from the
-        revision list. A stale ETag returns 409. Published and reviewed content must
-        first follow its workflow back to an editable state; historical snapshots
-        are never modified.
+        an active AUTHOR assignment on this Site or an active database platform-administrator
+        assignment, and the current content ETag from the revision list. A stale ETag
+        returns 409. Published and reviewed content must first follow its workflow
+        back to an editable state; historical snapshots are never modified.
       parameters:
       - in: header
         name: If-Match
@@ -3912,9 +3965,10 @@ paths:
       description: Apply a validated workflow action to a Page or Post owned by the
         URL Site. Page transitions require PAGES; Post transitions require POSTS enabled
         for that Site. Authorization uses the action's Site CMS role assignment or
-        the validated platform-admin bearer-token role; body-supplied roles are rejected.
-        Publishing records an immutable snapshot, audit event and cache generation
-        change. A repeated publish is idempotent.
+        an active database platform-administrator assignment. Keycloak realm roles
+        and body-supplied roles do not grant access. An author cannot review their
+        own content. Publishing records an immutable snapshot, audit event and cache
+        generation change. A repeated publish is idempotent.
       parameters:
       - in: path
         name: content_id
@@ -4626,8 +4680,10 @@ paths:
                 format: uuid
     patch:
       operationId: v1_modules_partial_update
-      description: Development admin only. A planned module cannot be marked implemented
-        or globally enabled.
+      description: Development admin only. The row lock, If-Match check, validation
+        and save commit in one transaction. A planned or unshipped module cannot be
+        marked implemented or globally enabled. A rejected change leaves the previous
+        row intact.
       parameters:
       - in: header
         name: If-Match
@@ -9650,7 +9706,8 @@ paths:
     get:
       operationId: v1_sites_categories_list
       description: List only taxonomy terms belonging to this Site. Requires an active
-        Site CMS role or platform-admin and an enabled POSTS module.
+        Site CMS role or an active database platform-administrator assignment, and
+        an enabled POSTS module. Keycloak realm roles do not grant access.
       parameters:
       - in: query
         name: is_active
@@ -15319,7 +15376,8 @@ paths:
                 format: uuid
     patch:
       operationId: v1_sites_modules_partial_update
-      description: Replace this Site's module settings. Enabling uses the enable action.
+      description: Replace this Site's module settings. The row lock, If-Match check
+        and save commit in one transaction. Enabling uses the enable action.
       parameters:
       - in: header
         name: If-Match
@@ -15532,7 +15590,10 @@ paths:
   /api/v1/sites/{site_pk}/modules/{id}/disable/:
     post:
       operationId: v1_sites_modules_disable_create
-      description: Turns the module off for this Site and keeps its configuration.
+      description: Turns the module off for this Site and keeps its row and configuration.
+        The row lock, If-Match check and save commit in one transaction. Another Site's
+        enablement is unchanged. Content rows stay; authoring and public delivery
+        for that module stop.
       parameters:
       - in: header
         name: If-Match
@@ -15747,6 +15808,9 @@ paths:
   /api/v1/sites/{site_pk}/modules/{id}/enable/:
     post:
       operationId: v1_sites_modules_enable_create
+      description: Turns a shipped, globally enabled module back on for this Site.
+        The row lock, If-Match check and save commit in one transaction. A planned
+        or globally disabled module stays unavailable.
       parameters:
       - in: header
         name: If-Match
@@ -15962,7 +16026,8 @@ paths:
     get:
       operationId: v1_sites_pages_list
       description: List only Pages belonging to this Site. Requires an active Site
-        AUTHOR, REVIEWER or PUBLISHER assignment or platform-admin. Unknown or repeated
+        AUTHOR, REVIEWER or PUBLISHER assignment, or an active database platform-administrator
+        assignment. Keycloak realm roles do not grant access. Unknown or repeated
         query parameters return field-level 400 errors.
       parameters:
       - in: query
@@ -16143,8 +16208,10 @@ paths:
                 format: uuid
     post:
       operationId: v1_sites_pages_create
-      description: Create a draft Page in this Site. Requires Site AUTHOR or platform-admin.
-        The Site, status, route path and authorship are server-controlled.
+      description: Create a draft Page in this Site. Requires an active Site AUTHOR
+        assignment or an active database platform-administrator assignment. Keycloak
+        realm roles do not grant access. The Site, status, route path and authorship
+        are server-controlled.
       parameters:
       - in: path
         name: site_pk
@@ -16499,10 +16566,11 @@ paths:
                 format: uuid
     patch:
       operationId: v1_sites_pages_partial_update
-      description: Partially update a draft or unpublished Page. Requires Site AUTHOR
-        or platform-admin and the current If-Match ETag. Missing preconditions return
-        428; stale edits return 409. Parent changes must target this Site and preserve
-        route history for descendants.
+      description: Partially update a draft or unpublished Page. Requires an active
+        Site AUTHOR assignment or an active database platform-administrator assignment,
+        and the current If-Match ETag. Keycloak realm roles do not grant access. Missing
+        preconditions return 428; stale edits return 409. Parent changes must target
+        this Site and preserve route history for descendants.
       parameters:
       - in: header
         name: If-Match
@@ -16724,9 +16792,10 @@ paths:
     post:
       operationId: v1_sites_pages_homepage_create
       description: Make this draft or unpublished Page the Site homepage. Any previous
-        homepage on this Site is cleared in the same transaction. Requires Site AUTHOR
-        or platform-admin and an enabled PAGES module. The row is not deleted when
-        the module is off.
+        homepage on this Site is cleared in the same transaction. Requires an active
+        Site AUTHOR assignment or an active database platform-administrator assignment,
+        and an enabled PAGES module. Keycloak realm roles do not grant access. The
+        row is not deleted when the module is off.
       parameters:
       - in: path
         name: id
@@ -16931,8 +17000,10 @@ paths:
     post:
       operationId: v1_sites_pages_workflow_create
       description: Submit, review, approve, reject, publish, unpublish, archive or
-        restore this Site-owned Page using the shared CMS state machine. Role claims
-        are read only from the validated bearer token.
+        restore this Site-owned Page using the shared CMS state machine. The action
+        requires the matching Site CMS role, or an active database platform-administrator
+        assignment. Keycloak realm roles and body-supplied roles do not grant access.
+        An author cannot review their own content.
       parameters:
       - in: path
         name: id
@@ -17149,8 +17220,9 @@ paths:
     get:
       operationId: v1_sites_pages_workflow_history_list
       description: List append-only workflow transitions and reviewer comments for
-        this Site-owned Page. Requires an active CMS role on this Site or platform-admin
-        and an enabled PAGES module.
+        this Site-owned Page. Requires an active CMS role on this Site or an active
+        database platform-administrator assignment, and an enabled PAGES module. Keycloak
+        realm roles do not grant access.
       parameters:
       - in: path
         name: id
@@ -17294,7 +17366,8 @@ paths:
     get:
       operationId: v1_sites_posts_list
       description: List only Posts belonging to this Site. Requires an active Site
-        AUTHOR, REVIEWER or PUBLISHER assignment or platform-admin, and an enabled
+        AUTHOR, REVIEWER or PUBLISHER assignment, or an active database platform-administrator
+        assignment. Keycloak realm roles do not grant access. Also requires an enabled
         POSTS module. Unknown or repeated query parameters return field-level 400
         errors.
       parameters:
@@ -17479,9 +17552,10 @@ paths:
                 format: uuid
     post:
       operationId: v1_sites_posts_create
-      description: Create a draft Post in this Site. Requires Site AUTHOR or platform-admin
-        and an enabled POSTS module. Site, status, publication timestamp and revision
-        are server-controlled.
+      description: Create a draft Post in this Site. Requires an active Site AUTHOR
+        assignment or an active database platform-administrator assignment. Keycloak
+        realm roles do not grant access. Requires an enabled POSTS module. Site, status,
+        publication timestamp and revision are server-controlled.
       parameters:
       - in: path
         name: site_pk
@@ -17814,9 +17888,11 @@ paths:
                 format: uuid
     patch:
       operationId: v1_sites_posts_partial_update
-      description: Partially update a Post. Requires Site AUTHOR or platform-admin,
-        an enabled POSTS module and the current If-Match ETag. Missing preconditions
-        return 428; stale edits and duplicate slugs return 409.
+      description: Partially update a Post. Requires an active Site AUTHOR assignment
+        or an active database platform-administrator assignment. Keycloak realm roles
+        do not grant access. Also requires an enabled POSTS module and the current
+        If-Match ETag. Missing preconditions return 428; stale edits and duplicate
+        slugs return 409.
       parameters:
       - in: header
         name: If-Match
@@ -18147,7 +18223,8 @@ paths:
     get:
       operationId: v1_sites_tags_list
       description: List only tags belonging to this Site. Requires an active Site
-        CMS role or platform-admin and an enabled POSTS module.
+        CMS role or an active database platform-administrator assignment, and an enabled
+        POSTS module. Keycloak realm roles do not grant access.
       parameters:
       - in: query
         name: is_active

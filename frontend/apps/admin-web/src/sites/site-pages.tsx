@@ -117,11 +117,20 @@ interface PageForm {
   blocks: string[];
 }
 
+function seoPreview(seo: Record<string, unknown> | undefined): PublicPageDocument["seo"] {
+  return {
+    title: typeof seo?.meta_title === "string" ? seo.meta_title : "",
+    description: typeof seo?.meta_description === "string" ? seo.meta_description : "",
+  };
+}
+
 function previewOf(page: SitePageRecord): PublicPageDocument {
   return {
     title: page.title,
     path: page.path,
+    site: page.site,
     blocks: page.blocks,
+    seo: seoPreview(page.seo),
   };
 }
 
@@ -819,7 +828,17 @@ function SitePagesPanelContent({
               <Typography variant="overline">Private draft preview</Typography>
               {(() => {
                 try {
-                  return <PublicPageView page={{ title: form.title || "Untitled Page", path: activePage?.path ?? `/${form.slug}`, blocks: blockInputs(form) }} />;
+                  return (
+                    <PublicPageView
+                      page={{
+                        title: form.title || "Untitled Page",
+                        path: activePage?.path ?? `/${form.slug}`,
+                        site: siteId,
+                        blocks: blockInputs(form),
+                        seo: seoPreview(jsonObject(form.seo, "SEO")),
+                      }}
+                    />
+                  );
                 } catch {
                   return <Alert severity="error">Fix block JSON errors to preview this draft.</Alert>;
                 }

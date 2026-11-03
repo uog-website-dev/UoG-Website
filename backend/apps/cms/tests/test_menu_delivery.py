@@ -11,7 +11,7 @@ from apps.audit.models import AuditEvent
 from apps.authorization.models import Role, UserRoleAssignment
 from apps.cms.menu_cache import delivery_version
 from apps.cms.menu_models import Menu, MenuInheritance, MenuItem
-from apps.cms.services.workflow import transition_content
+from apps.cms.tests.support import transition_with_site_role
 from apps.cms.selectors.menu_delivery import compose_location
 from apps.cms.services.pages import create_page
 from apps.cms.services.publication_cache import get_public_cache
@@ -75,7 +75,7 @@ def _publish_post(post):
         actor = get_user_model().objects.create_user(
             username=f"{action}-{post.slug}-{uuid4().hex[:8]}",
         )
-        transition_content(post.pk, action=action, actor=actor, roles={"platform-admin"})
+        transition_with_site_role(post, action, actor)
     return post
 
 
@@ -181,9 +181,7 @@ def test_post_publish_and_unpublish_invalidate_linked_menu_delivery(family):
     assert snapshot.payload["title"] == "Campus update"
 
     publisher = get_user_model().objects.create_user(username="post-menu-unpublisher")
-    transition_content(
-        post.pk, action="unpublish", actor=publisher, roles={"platform-admin"},
-    )
+    transition_with_site_role(post, "unpublish", publisher)
     assert delivery_version(child.pk, "header") > published_version
     assert _roots(child.pk) == []
     assert Post.objects.get(pk=post.pk).status == ContentStatus.UNPUBLISHED

@@ -52,6 +52,20 @@ function ownershipText(menu: MenuRecord): string {
   return "Local. This Site owns this menu. Header and footer are assigned here.";
 }
 
+/**
+ * The inheritance endpoint returns an array of policy objects. A missing
+ * field or a non-array is no policy. Entries that are not objects are
+ * ignored so one malformed row cannot crash the Site screen.
+ */
+function inheritancePolicies(data: { inheritance?: unknown }): MenuInheritanceRecord[] {
+  if (!Array.isArray(data.inheritance)) return [];
+  return data.inheritance.filter((entry): entry is MenuInheritanceRecord => {
+    if (entry == null || typeof entry !== "object") return false;
+    const row = entry as Partial<MenuInheritanceRecord>;
+    return typeof row.id === "string" && typeof row.location === "string";
+  });
+}
+
 function inheritanceText(policy: MenuInheritanceRecord): string {
   const parent = policy.inherit_from == null
     ? "It does not copy another Site's menu."
@@ -198,6 +212,7 @@ export function SiteMenusPanel({
   const canPublish = permissions.includes("menu.publish");
   const moduleOn = menusEnabled === true;
   const menus = navigation.data?.menus ?? [];
+  const policies = navigation.data ? inheritancePolicies(navigation.data) : [];
   const taken = new Set(menus.filter((row) => !row.menu.is_global).map((row) => row.menu.location));
   const openPlaces = PLACES.filter((place) => !taken.has(place));
   const [name, setName] = useState("");
@@ -238,13 +253,13 @@ export function SiteMenusPanel({
           <>
             <Box>
               <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Ownership</Typography>
-              {navigation.data.inheritance.length === 0 ? (
+              {policies.length === 0 ? (
                 <Typography variant="body2" color="text.secondary">
                   This Site has no inheritance policy. Public navigation uses its own active local menus and does not add a central fragment unless a delivery policy says so.
                 </Typography>
               ) : (
                 <Box component="ul" aria-label="Inherited menu policy" sx={{ m: 0, pl: 2 }}>
-                  {navigation.data.inheritance.map((policy) => (
+                  {policies.map((policy) => (
                     <Typography component="li" variant="body2" color="text.secondary" key={policy.id}>
                       {inheritanceText(policy)}
                     </Typography>

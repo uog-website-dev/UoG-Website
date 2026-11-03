@@ -11,13 +11,10 @@ from rest_framework.exceptions import PermissionDenied
 
 
 class HasRealmRole(BasePermission):
-    """Allows access to principals holding one of the roles the view requires.
+    """Historical name for the database platform-administrator gate.
 
-    The view declares the roles it accepts through ``required_roles``::
-
-        class AdminOverviewView(APIView):
-            permission_classes = [IsAuthenticated, HasRealmRole]
-            required_roles = {"platform-admin"}
+    Keycloak realm roles, including ``platform-admin``, do not grant access.
+    The check is an active platform-scoped ``platform-administrator`` assignment.
     """
 
     def has_permission(self, request, view) -> bool:

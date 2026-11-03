@@ -15,7 +15,7 @@ from apps.api.models import Post
 from apps.cms.menu_models import Menu, MenuItem
 from apps.cms.models import Page
 from apps.cms.services.pages import change_route
-from apps.cms.services.workflow import transition_content
+from apps.cms.tests.support import transition_with_site_role
 from apps.sites.models import Module, Site, SiteDomain
 from apps.sites.services.lifecycle import activate_site
 from apps.sites.services.modules import disable_module_for_site, enable_module_for_site
@@ -37,9 +37,7 @@ def _actor(prefix):
 
 def _publish(record):
     for action in ("submit", "approve", "publish"):
-        transition_content(
-            record.pk, action=action, actor=_actor(action), roles={"platform-admin"},
-        )
+        transition_with_site_role(record, action, _actor(action))
     record.refresh_from_db()
     return record
 
@@ -176,9 +174,8 @@ def test_main_and_two_colleges_stay_isolated_through_publish_and_module_gates(
     assert crossed.json()["title"] == "Informatics welcome"
     assert client.get(HOMEPAGE, HTTP_HOST="unknown.uog.edu.et").status_code == 404
 
-    transition_content(
-        Page.objects.get(site=main, is_homepage=True).pk,
-        action="unpublish", actor=_actor("unpublish"), roles={"platform-admin"},
+    transition_with_site_role(
+        Page.objects.get(site=main, is_homepage=True), "unpublish", _actor("unpublish"),
     )
     removed = client.get(HOMEPAGE, HTTP_HOST=hosts[main.pk])
     assert removed.status_code == 404

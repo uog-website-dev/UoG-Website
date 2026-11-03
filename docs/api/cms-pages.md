@@ -8,10 +8,10 @@ immutable publication snapshots.
 
 All authoring routes require a validated Keycloak bearer token and an active
 CMS role on the Site named in the path. AUTHOR may create and edit; AUTHOR,
-REVIEWER and PUBLISHER may list and inspect. A platform administrator with an
-active database assignment can perform all actions; the validated legacy
-`platform-admin` token role is also supported. Client-supplied roles are not
-accepted.
+REVIEWER and PUBLISHER may list and inspect. An active database
+platform-administrator assignment can perform those actions on any Site.
+A Keycloak realm role, including `platform-admin`, does not. Client-supplied
+roles are not accepted. Inactive, expired, and revoked grants are denied.
 
 Page authoring, Page workflow and revision routes are also gated on the `PAGES`
 module being enabled for the Site. When it is disabled, those requests are

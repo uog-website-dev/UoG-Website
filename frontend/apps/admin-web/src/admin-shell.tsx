@@ -120,7 +120,7 @@ export function AdminShell({
           >
             {children}
           </Container>
-          <UogFooter />
+          <UogFooter apiBaseUrl={undefined} />
         </Box>
       </Box>
     </Box>

@@ -2,11 +2,12 @@
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError, transaction
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from drf_spectacular.utils import extend_schema, extend_schema_view
+from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import mixins, serializers, viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -26,6 +27,7 @@ from .serializers import (
     AssignmentSerializer,
     AuthorizationAuditSerializer,
     EffectivePermissionSerializer,
+    EffectiveScopeQuerySerializer,
     PermissionSerializer,
     PermissionSetSerializer,
     RoleSerializer,
@@ -285,45 +287,58 @@ class AssignmentViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Authoriz
                                 "organization": assignment.organization_id, "site": assignment.site_id}}, request=request)
         return Response(AssignmentSerializer(assignment).data)
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter("scope", str, enum=["PLATFORM", "ORGANIZATION", "SITE"], required=True, description="PLATFORM rejects organization and site. ORGANIZATION requires organization and rejects site. SITE requires site."),
+            OpenApiParameter("organization", int, required=False, description="Organization id. Required for ORGANIZATION. With a site, it must be that site's owner."),
+            OpenApiParameter("site", int, required=False, description="Site id. Required for SITE. When organization is omitted, ownership is read from the Site."),
+        ],
+        responses={200: EffectivePermissionSerializer},
+        description=(
+            "Registered effective permissions for one active user at one validated scope. "
+            "Requires platform.users.view in that scope, or an active database platform-administrator assignment. "
+            "Keycloak realm roles do not grant access. Expired, revoked, inactive-role and inactive-permission grants are omitted. "
+            "The platform-administrator policy returns only that role's approved capability set. "
+            "A denied caller receives 403 and no permission list. Unknown users, sites and organizations return 404. "
+            "Malformed identifiers and inconsistent scope combinations return 400."
+        ),
+    )
     @action(detail=False, methods=["get"], url_path=r"users/(?P<user_id>[^/.]+)/effective")
     def effective(self, request, user_id=None):
-        target = get_object_or_404(get_user_model(), pk=user_id, is_active=True)
-        scope = request.query_params.get("scope")
-        organization_id = request.query_params.get("organization")
-        site_id = request.query_params.get("site")
-        if scope not in {None, "PLATFORM", "ORGANIZATION", "SITE"}:
-            raise serializers.ValidationError({"scope": ["Unknown scope."]})
-        if site_id is not None:
-            from apps.sites.models import Site
-            site = get_object_or_404(Site, pk=_positive_id(site_id, "site"))
-            site_id = site.pk
-            organization_id = site.organization_unit_id
-
-        if organization_id is not None and not str(organization_id).isdigit():
-            raise serializers.ValidationError({"organization": ["Expected an integer identifier."]})
-        normalized_org_id = int(organization_id) if organization_id else None
-        normalized_site_id = int(site_id) if site_id else None
-        if scope == "PLATFORM" and (normalized_org_id is not None or normalized_site_id is not None):
-            raise serializers.ValidationError({"scope": ["Platform scope cannot include organization or site identifiers."]})
-        if normalized_site_id is not None and normalized_org_id is not None:
-            from apps.sites.models import Site
-            if not Site.objects.filter(pk=normalized_site_id, organization_unit_id=normalized_org_id).exists():
-                raise serializers.ValidationError({"site": ["The site does not belong to the selected organization."]})
-        if scope == "ORGANIZATION" and normalized_org_id is None:
-            raise serializers.ValidationError({"organization": ["Organization scope requires an organization identifier."]})
-        if scope == "SITE" and normalized_site_id is None:
-            raise serializers.ValidationError({"site": ["Site scope requires a site identifier."]})
+        target = get_object_or_404(
+            get_user_model(), pk=_positive_id(user_id, "user_id"), is_active=True,
+        )
+        for name in ("scope", "organization", "site"):
+            if len(request.query_params.getlist(name)) > 1:
+                raise serializers.ValidationError({name: ["Supply this query parameter only once."]})
+        query = EffectiveScopeQuerySerializer(data=request.query_params)
+        query.is_valid(raise_exception=True)
+        scope = query.validated_data["scope"]
+        organization_id = query.validated_data.get("organization")
+        site_id = query.validated_data.get("site")
+        organization, site = _resolve_effective_scope(scope, organization_id, site_id)
+        normalized_org_id = organization.pk if organization is not None else None
+        normalized_site_id = site.pk if site is not None else None
         if not is_platform_administrator(request.user) and target.pk != request.user.pk:
-            if not permission_granted(request.user, "platform.users.view", organization_id=normalized_org_id, site_id=normalized_site_id, request=request):
+            if not permission_granted(
+                request.user, "platform.users.view",
+                organization_id=normalized_org_id, site_id=normalized_site_id, request=request,
+            ):
                 raise PermissionDenied("You can only inspect users in a scope you are authorized to view.")
         if not is_platform_administrator(request.user) and target.pk == request.user.pk:
             allowed_scopes = live_assignments(request.user)
-            if not any(assignment_covers_target(item, organization_id=normalized_org_id, site_id=normalized_site_id) for item in allowed_scopes):
+            if not any(
+                assignment_covers_target(item, organization_id=normalized_org_id, site_id=normalized_site_id)
+                for item in allowed_scopes
+            ):
                 raise PermissionDenied("The requested effective permissions are outside your assigned scope.")
-        permissions = effective_permissions(target, organization_id=normalized_org_id,
-                                            site_id=int(site_id) if site_id else None)
-        result = {"user": target.pk, "organization": normalized_org_id,
-                  "site": normalized_site_id, "permissions": permissions}
+        permissions = effective_permissions(
+            target, organization_id=normalized_org_id, site_id=normalized_site_id,
+        )
+        result = {
+            "user": target.pk, "organization": normalized_org_id,
+            "site": normalized_site_id, "permissions": permissions,
+        }
         return Response(EffectivePermissionSerializer(result).data)
 
 
@@ -374,7 +389,6 @@ class EffectivePermissionViewSet(viewsets.GenericViewSet):
             site_id = _positive_id(site_id, "site")
             organization_id = effective_scope_for_site(site_id)
             if organization_id is None:
-                from rest_framework.exceptions import NotFound
                 raise NotFound()
         else:
             organization_id = _positive_id(organization_id, "organization") if organization_id is not None else None
@@ -382,7 +396,6 @@ class EffectivePermissionViewSet(viewsets.GenericViewSet):
             site_id = _positive_id(site_id, "site")
             organization_id = effective_scope_for_site(site_id)
             if organization_id is None:
-                from rest_framework.exceptions import NotFound
                 raise NotFound()
         if not is_platform_administrator(request.user):
             from .access import assignment_covers_target
@@ -401,6 +414,24 @@ def _positive_id(value, field):
         result = int(value)
     except (TypeError, ValueError) as exc:
         raise serializers.ValidationError({field: ["Expected an integer identifier."]}) from exc
-    if result <= 0:
+    if result <= 0 or result > 9223372036854775807:
         raise serializers.ValidationError({field: ["Expected a positive identifier."]})
     return result
+
+
+def _resolve_effective_scope(scope, organization_id, site_id):
+    """Load the requested scope and reject an organization that does not own the site."""
+    from apps.organizations.models import OrganizationUnit
+    from apps.sites.models import Site
+
+    organization = None
+    site = None
+    if organization_id is not None:
+        organization = get_object_or_404(OrganizationUnit, pk=organization_id)
+    if site_id is not None:
+        site = get_object_or_404(Site, pk=site_id)
+    if scope == "SITE" and organization is not None and site.organization_unit_id != organization.pk:
+        raise serializers.ValidationError({"site": ["The site does not belong to the selected organization."]})
+    if scope == "SITE" and organization is None:
+        organization = site.organization_unit
+    return organization, site

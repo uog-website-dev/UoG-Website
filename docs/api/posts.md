@@ -2,8 +2,11 @@
 
 Posts and their Categories/Tags are scoped to the Site in the request path.
 The Post admin and taxonomy routes are listed in the
-[OpenAPI contract](./openapi.yaml) and require an active Site CMS role (or the
-validated platform-admin role) plus the `POSTS` module enabled for that Site.
+[OpenAPI contract](./openapi.yaml) and require an active Site CMS role, or an
+active database platform-administrator assignment, plus the `POSTS` module
+enabled for that Site. A Keycloak realm role does not grant Post access.
+Menus use `menu.read`, `menu.write`, and `menu.publish` from the same
+database assignment contract and do not accept a realm-role bypass.
 
 ## Authoring data
 

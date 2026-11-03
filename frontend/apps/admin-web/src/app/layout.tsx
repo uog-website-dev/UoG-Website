@@ -62,7 +62,7 @@ export default async function AdminLayout({
                 </form>
               </Paper>
             </Box>
-            <UogFooter />
+            <UogFooter apiBaseUrl={undefined} />
           </UogThemeProvider>
         </body>
       </html>

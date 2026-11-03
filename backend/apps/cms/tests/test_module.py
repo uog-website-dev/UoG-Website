@@ -53,6 +53,7 @@ def test_cms_mounts_scoped_workflow_revision_admin_and_public_routes():
         pattern.name for pattern in urls.urlpatterns
     } == {
         "content-role-list", "content-role-detail", "content-workflow",
+        "content-workflow-history",
         "content-revision-list", "content-revision-detail",
         "content-revision-restore",
     }
