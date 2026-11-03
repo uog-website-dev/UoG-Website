@@ -24,27 +24,67 @@ import {
   assignRole,
   createRole,
   getAccessControlData,
+  getUserEffectivePermissions,
   replaceRolePermissions,
   revokeRoleAssignment,
   updateRole,
 } from "@/app/access/actions";
 import type {
+  AccessControlData,
+  AccessScopeSelection,
+  AccessSection,
   AssignmentDefinition,
-  PermissionDefinition,
-  RoleDefinition,
+  EffectiveGrant,
 } from "@/app/access/actions";
+import type { ApiErrorPayload } from "@/organizations/contract";
+
+const CONTENT_ROLES = ["editor", "reviewer", "viewer"] as const;
 
 function Field(props: React.ComponentProps<typeof TextField>) {
   return <TextField size="small" fullWidth {...props} />;
 }
 
+function detailText(details: unknown): string | null {
+  if (typeof details === "string" && details.trim()) return details.trim();
+  if (!details || typeof details !== "object" || Array.isArray(details)) return null;
+  const detail = (details as { detail?: unknown }).detail;
+  if (typeof detail === "string" && detail.trim()) return detail.trim();
+  const sentences = Object.entries(details as Record<string, unknown>)
+    .flatMap(([field, value]) => {
+      const items = Array.isArray(value) ? value : [value];
+      return items
+        .filter((item): item is string => typeof item === "string" && item.trim().length > 0)
+        .map((item) => `${field}: ${item.trim()}`);
+    });
+  return sentences.length ? sentences.join(" ") : null;
+}
+
+function failureText(error: ApiErrorPayload): string {
+  const specific = detailText(error.details);
+  const message = specific && specific !== error.message ? `${error.message} ${specific}` : error.message;
+  return error.requestId ? `${message} Reference ${error.requestId}.` : message;
+}
+
+function SectionFailure({ error }: { error: ApiErrorPayload }) {
+  return (
+    <Typography color="error" role="alert">
+      {failureText(error)}
+    </Typography>
+  );
+}
+
+function emptySection<T>(section: AccessSection<T> | null, empty: string, render: (data: T) => React.ReactNode) {
+  if (!section) return <Typography color="text.secondary">Loading registered access data…</Typography>;
+  if (section.status === "error") return <SectionFailure error={section.error} />;
+  const data = section.data;
+  const isEmpty = Array.isArray(data) ? data.length === 0 : false;
+  if (isEmpty) return <Typography color="text.secondary">{empty}</Typography>;
+  return render(data);
+}
+
 export function AccessControlManager() {
-  const [permissions, setPermissions] = useState<PermissionDefinition[]>([]);
-  const [roles, setRoles] = useState<RoleDefinition[]>([]);
-  const [assignments, setAssignments] = useState<AssignmentDefinition[]>([]);
-  const [effective, setEffective] = useState<string[]>([]);
-  const [errors, setErrors] = useState<string[]>([]);
-  const [message, setMessage] = useState("");
+  const [data, setData] = useState<AccessControlData | null>(null);
+  const [notice, setNotice] = useState<{ tone: "success" | "error"; text: string } | null>(null);
   const [pending, setPending] = useState(false);
   const [selectedCode, setSelectedCode] = useState("");
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
@@ -54,31 +94,44 @@ export function AccessControlManager() {
   const [newRole, setNewRole] = useState({ code: "", name: "", description: "" });
   const [userId, setUserId] = useState("");
   const [roleId, setRoleId] = useState("");
-  const [scope, setScope] = useState<"PLATFORM" | "ORGANIZATION" | "SITE">("ORGANIZATION");
+  const [scope, setScope] = useState<"PLATFORM" | "ORGANIZATION" | "SITE">("SITE");
   const [organizationId, setOrganizationId] = useState("");
   const [siteId, setSiteId] = useState("");
   const [expiresAt, setExpiresAt] = useState("");
+  const [inspection, setInspection] = useState<AccessScopeSelection>({ scope: "PLATFORM" });
+  const [draftScope, setDraftScope] = useState<"PLATFORM" | "ORGANIZATION" | "SITE">("PLATFORM");
+  const [draftOrganization, setDraftOrganization] = useState("");
+  const [draftSite, setDraftSite] = useState("");
+  const [inspected, setInspected] = useState<AccessSection<EffectiveGrant> | null>(null);
 
-  const refresh = useCallback(async () => {
-    const data = await getAccessControlData();
-    setPermissions(data.permissions);
-    setRoles(data.roles);
-    setAssignments(data.assignments);
-    setEffective(data.effective);
-    setErrors(data.errors);
-  }, []);
+  const refresh = useCallback(async (scopeSelection?: AccessScopeSelection) => {
+    const next = await getAccessControlData(scopeSelection ?? inspection);
+    setData(next);
+    return next;
+  }, [inspection]);
 
   useEffect(() => {
     void refresh();
   }, [refresh]);
 
+  const permissions = data?.permissions.status === "ready" ? data.permissions.data : [];
+  const roles = data?.roles.status === "ready" ? data.roles.data : [];
+  const assignments = data?.assignments.status === "ready" ? data.assignments.data : [];
+  const effective = data?.effective.status === "ready" ? data.effective.data : [];
   const selectedRole = roles.find((role) => role.code === selectedCode) ?? null;
   const activeRoles = useMemo(() => roles.filter((role) => role.is_active), [roles]);
-  const canCreateRoles = effective.includes("platform.roles.create");
-  const canUpdateRoles = effective.includes("platform.roles.update");
-  const canAssignPermissions = effective.includes("platform.roles.assign_permissions");
-  const canAssignRoles = effective.includes("platform.users.assign_roles");
-  const canViewAssignments = effective.includes("platform.users.view");
+  const permissionsReady = data?.effective.status === "ready";
+  const canCreateRoles = permissionsReady && effective.includes("platform.roles.create");
+  const canUpdateRoles = permissionsReady && effective.includes("platform.roles.update");
+  const canAssignPermissions = permissionsReady && effective.includes("platform.roles.assign_permissions");
+  const canAssignRoles = permissionsReady && effective.includes("platform.users.assign_roles");
+  const visibleAssignments = assignments.filter((assignment) => {
+    if (inspection.scope === "PLATFORM") return assignment.scope === "PLATFORM";
+    if (inspection.scope === "ORGANIZATION") {
+      return assignment.scope === "ORGANIZATION" && assignment.organization === inspection.organization;
+    }
+    return assignment.scope === "SITE" && assignment.site === inspection.site;
+  });
 
   useEffect(() => {
     if (selectedRole) {
@@ -94,24 +147,79 @@ export function AccessControlManager() {
     }
   }, [selectedRole]);
 
-  async function mutate(operation: () => Promise<{ ok: boolean; error?: { message: string } }>, success: string) {
+  async function mutate(
+    operation: () => Promise<{ ok: boolean; error?: ApiErrorPayload }>,
+    success: string,
+    nextScope?: AccessScopeSelection,
+  ) {
     setPending(true);
-    setMessage("");
+    setNotice(null);
     try {
       const result = await operation();
       if (!result.ok) {
-        setMessage(result.error?.message ?? "The change was rejected.");
+        setNotice({
+          tone: "error",
+          text: result.error ? failureText(result.error) : "The change was rejected.",
+        });
         return false;
       }
-      setMessage(success);
-      await refresh();
+      setNotice({ tone: "success", text: success });
+      if (nextScope) setInspection(nextScope);
+      await refresh(nextScope);
       return true;
     } catch {
-      setMessage("The request could not be completed. Please try again.");
+      setNotice({ tone: "error", text: "The request could not be completed. Please try again." });
       return false;
     } finally {
       setPending(false);
     }
+  }
+
+  function selectionFromDraft(): AccessScopeSelection | null {
+    const organization = draftOrganization ? Number(draftOrganization) : undefined;
+    const site = draftSite ? Number(draftSite) : undefined;
+    if (draftScope === "ORGANIZATION" && (!organization || !Number.isSafeInteger(organization) || organization < 1)) {
+      setNotice({ tone: "error", text: "Enter the organization to inspect." });
+      return null;
+    }
+    if (draftScope === "SITE" && (!site || !Number.isSafeInteger(site) || site < 1)) {
+      setNotice({ tone: "error", text: "Enter the site to inspect." });
+      return null;
+    }
+    return {
+      scope: draftScope,
+      ...(draftScope !== "PLATFORM" && organization ? { organization } : {}),
+      ...(draftScope === "SITE" && site ? { site } : {}),
+    };
+  }
+
+  async function applyScope(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const next = selectionFromDraft();
+    if (!next) return;
+    setInspection(next);
+    setInspected(null);
+    setNotice(null);
+    await refresh(next);
+  }
+
+  async function inspectUser(targetUser: number, targetScope: AccessScopeSelection) {
+    const result = await getUserEffectivePermissions(targetUser, targetScope);
+    setInspected(result.ok ? { status: "ready", data: result.data } : { status: "error", error: result.error });
+  }
+
+  async function revokeAndRefresh(assignment: AssignmentDefinition) {
+    const revokedScope: AccessScopeSelection = {
+      scope: assignment.scope,
+      ...(assignment.organization ? { organization: assignment.organization } : {}),
+      ...(assignment.site ? { site: assignment.site } : {}),
+    };
+    const revoked = await mutate(
+      () => revokeRoleAssignment(assignment.id),
+      "Role assignment revoked.",
+      revokedScope,
+    );
+    if (revoked) await inspectUser(assignment.user, revokedScope);
   }
 
   async function submitRole(event: React.FormEvent<HTMLFormElement>) {
@@ -153,19 +261,24 @@ export function AccessControlManager() {
     const user = Number(userId);
     const role = Number(roleId);
     if (!Number.isSafeInteger(user) || user < 1 || !Number.isSafeInteger(role) || role < 1) {
-      setMessage("Enter a valid existing user ID and select a role.");
+      setNotice({ tone: "error", text: "Enter a valid existing user ID and select a role." });
       return;
     }
     const organization = organizationId ? Number(organizationId) : undefined;
     const site = siteId ? Number(siteId) : undefined;
     if (scope !== "PLATFORM" && (!organization || !Number.isSafeInteger(organization))) {
-      setMessage("Enter a valid organization ID for this assignment scope.");
+      setNotice({ tone: "error", text: "Enter a valid organization ID for this assignment scope." });
       return;
     }
     if (scope === "SITE" && (!site || !Number.isSafeInteger(site))) {
-      setMessage("Enter a valid site ID for a site-scoped assignment.");
+      setNotice({ tone: "error", text: "Enter a valid site ID for a site-scoped assignment." });
       return;
     }
+    const assignedScope: AccessScopeSelection = {
+      scope,
+      ...(scope !== "PLATFORM" && organization ? { organization } : {}),
+      ...(scope === "SITE" && site ? { site } : {}),
+    };
     const result = await mutate(
       () => assignRole({
         user,
@@ -176,8 +289,13 @@ export function AccessControlManager() {
         ...(expiresAt ? { expires_at: new Date(expiresAt).toISOString() } : {}),
       }),
       "Role assigned.",
+      assignedScope,
     );
     if (result) {
+      setDraftScope(scope);
+      setDraftOrganization(organization ? String(organization) : "");
+      setDraftSite(site ? String(site) : "");
+      await inspectUser(user, assignedScope);
       setUserId("");
       setRoleId("");
       setExpiresAt("");
@@ -186,21 +304,47 @@ export function AccessControlManager() {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-      {errors.length > 0 && (
-        <Paper variant="outlined" role="status" sx={{ p: 2, borderColor: "warning.main" }}>
-          <Typography variant="subtitle2">Some access-control data is unavailable</Typography>
-          <Typography variant="body2" color="text.secondary">{errors.join(" · ")}</Typography>
+      {notice && (
+        <Paper variant="outlined" role={notice.tone === "error" ? "alert" : "status"} sx={{ p: 1.5, borderColor: notice.tone === "error" ? "error.main" : "divider" }}>
+          <Typography>{notice.text}</Typography>
         </Paper>
       )}
-      {message && <Paper variant="outlined" role="status" sx={{ p: 1.5 }}><Typography>{message}</Typography></Paper>}
+
+      <Paper variant="outlined" sx={{ p: 2.5 }}>
+        <Typography variant="h6" sx={{ mb: 1 }}>Scope</Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Effective permissions and the assignment list below follow this scope. Platform is the signed-in administrator’s platform grant.
+        </Typography>
+        <Box component="form" onSubmit={applyScope} sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "repeat(4, 1fr)" }, gap: 1.5, alignItems: "center" }}>
+          <FormControl size="small" fullWidth>
+            <InputLabel id="inspection-scope-label">Scope</InputLabel>
+            <Select labelId="inspection-scope-label" label="Scope" value={draftScope} onChange={(event) => setDraftScope(event.target.value as typeof draftScope)}>
+              <MenuItem value="PLATFORM">Platform</MenuItem>
+              <MenuItem value="ORGANIZATION">Organization</MenuItem>
+              <MenuItem value="SITE">Site</MenuItem>
+            </Select>
+          </FormControl>
+          {draftScope !== "PLATFORM" && (
+            <Field label="Organization ID" type="number" value={draftOrganization} onChange={(event) => setDraftOrganization(event.target.value)} inputProps={{ min: 1 }} />
+          )}
+          {draftScope === "SITE" && (
+            <Field label="Site ID" type="number" value={draftSite} onChange={(event) => setDraftSite(event.target.value)} inputProps={{ min: 1 }} required />
+          )}
+          <Button type="submit" variant="outlined" disabled={pending}>Show this scope</Button>
+        </Box>
+      </Paper>
 
       <Paper variant="outlined" sx={{ p: 2.5 }}>
         <Typography variant="h6" sx={{ mb: 1.5 }}>Your effective permissions</Typography>
-        {effective.length ? (
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-            {[...effective].sort().map((code) => <Chip key={code} label={code} size="small" color="primary" variant="outlined" />)}
-          </Box>
-        ) : <Typography color="text.secondary">No effective permissions are granted for your platform scope.</Typography>}
+        {emptySection(
+          data?.effective ?? null,
+          "No effective permissions are granted for this scope.",
+          (codes: string[]) => (
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+              {[...codes].sort().map((code) => <Chip key={code} label={code} size="small" color="primary" variant="outlined" />)}
+            </Box>
+          ),
+        )}
       </Paper>
 
       {canCreateRoles && (
@@ -221,7 +365,10 @@ export function AccessControlManager() {
         <Table size="small" aria-label="Roles and permissions">
           <TableHead><TableRow><TableCell>Role</TableCell><TableCell>Kind</TableCell><TableCell>State</TableCell><TableCell>Permissions</TableCell></TableRow></TableHead>
           <TableBody>
-            {roles.map((role) => (
+            {data?.roles.status === "error" && (
+              <TableRow><TableCell colSpan={4}><SectionFailure error={data.roles.error} /></TableCell></TableRow>
+            )}
+            {data?.roles.status === "ready" && roles.map((role) => (
               <TableRow key={role.code} hover selected={role.code === selectedCode} onClick={() => setSelectedCode(role.code)} sx={{ cursor: "pointer" }}>
                 <TableCell><strong>{role.name}</strong><br /><Typography variant="caption" color="text.secondary">{role.code}</Typography></TableCell>
                 <TableCell>{role.is_system ? "Standard template" : "Custom"}</TableCell>
@@ -229,7 +376,8 @@ export function AccessControlManager() {
                 <TableCell>{role.permissions.length ? role.permissions.join(", ") : "None"}</TableCell>
               </TableRow>
             ))}
-            {roles.length === 0 && <TableRow><TableCell colSpan={4}><Typography color="text.secondary">No roles are visible to this account.</Typography></TableCell></TableRow>}
+            {data?.roles.status === "ready" && roles.length === 0 && <TableRow><TableCell colSpan={4}><Typography color="text.secondary">No roles are visible to this account.</Typography></TableCell></TableRow>}
+            {!data && <TableRow><TableCell colSpan={4}><Typography color="text.secondary">Loading registered access data…</Typography></TableCell></TableRow>}
           </TableBody>
         </Table>
       </Paper>
@@ -290,32 +438,88 @@ export function AccessControlManager() {
         </Box>
       </Paper>}
 
-      {canViewAssignments && <Paper variant="outlined" sx={{ p: 2.5, overflowX: "auto" }}>
+      <Paper variant="outlined" sx={{ p: 2.5 }}>
+        <Typography variant="h6" sx={{ mb: 1.5 }}>Editor, Reviewer and Viewer</Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+          These rows use the permission codes returned for the registered role templates.
+        </Typography>
+        {data?.roles.status === "error" && <SectionFailure error={data.roles.error} />}
+        {data?.roles.status === "ready" && (
+          <Table size="small" aria-label="Editor reviewer and viewer permissions">
+            <TableHead><TableRow><TableCell>Role</TableCell><TableCell>Registered permissions</TableCell></TableRow></TableHead>
+            <TableBody>
+              {CONTENT_ROLES.map((code) => {
+                const role = roles.find((item) => item.code === code);
+                return (
+                  <TableRow key={code}>
+                    <TableCell>{role?.name ?? code}</TableCell>
+                    <TableCell>{role ? (role.permissions.length ? role.permissions.join(", ") : "None") : "This role was not returned."}</TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        )}
+        {!data && <Typography color="text.secondary">Loading registered access data…</Typography>}
+      </Paper>
+
+      {inspected && (
+        <Paper variant="outlined" sx={{ p: 2.5 }}>
+          <Typography variant="h6" sx={{ mb: 1.5 }}>Effective permissions after the assignment change</Typography>
+          {inspected.status === "error"
+            ? <SectionFailure error={inspected.error} />
+            : inspected.data.permissions.length
+              ? (
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }} aria-label="Inspected effective permissions">
+                  {[...inspected.data.permissions].sort().map((code) => <Chip key={code} label={code} size="small" />)}
+                </Box>
+              )
+              : <Typography color="text.secondary">No effective permissions are granted to this user for the selected scope.</Typography>}
+        </Paper>
+      )}
+
+      <Paper variant="outlined" sx={{ p: 2.5, overflowX: "auto" }}>
         <Typography variant="h6" sx={{ mb: 1.5 }}>User role assignments</Typography>
-        <Table size="small" aria-label="User role assignments">
-          <TableHead><TableRow><TableCell>User</TableCell><TableCell>Role</TableCell><TableCell>Scope</TableCell><TableCell>Expires</TableCell><TableCell>Status</TableCell><TableCell align="right">Action</TableCell></TableRow></TableHead>
-          <TableBody>
-            {assignments.map((assignment) => (
-              <TableRow key={assignment.id}>
-                <TableCell>{assignment.user_name} <Typography component="span" variant="caption" color="text.secondary">(#{assignment.user})</Typography></TableCell>
-                <TableCell>{assignment.role_name}</TableCell>
-                <TableCell>{assignment.scope}{assignment.organization ? ` · org ${assignment.organization}` : ""}{assignment.site ? ` · site ${assignment.site}` : ""}</TableCell>
-                <TableCell>{assignment.expires_at ? new Date(assignment.expires_at).toLocaleString() : "Never"}</TableCell>
-                <TableCell>{assignment.revoked_at ? "Revoked" : "Active"}</TableCell>
-                <TableCell align="right">{canAssignRoles && !assignment.revoked_at && <Button size="small" color="error" disabled={pending} onClick={() => void mutate(() => revokeRoleAssignment(assignment.id), "Role assignment revoked.")}>Revoke</Button>}</TableCell>
-              </TableRow>
-            ))}
-            {assignments.length === 0 && <TableRow><TableCell colSpan={6}><Typography color="text.secondary">No assignments are visible in your authorized scope.</Typography></TableCell></TableRow>}
-          </TableBody>
-        </Table>
-      </Paper>}
+        {data?.assignments.status === "error" && <SectionFailure error={data.assignments.error} />}
+        {data?.assignments.status === "ready" && (
+          <Table size="small" aria-label="User role assignments">
+            <TableHead><TableRow><TableCell>User</TableCell><TableCell>Role</TableCell><TableCell>Scope</TableCell><TableCell>Expires</TableCell><TableCell>Status</TableCell><TableCell align="right">Action</TableCell></TableRow></TableHead>
+            <TableBody>
+              {visibleAssignments.map((assignment) => (
+                <TableRow key={assignment.id}>
+                  <TableCell>{assignment.user_name} <Typography component="span" variant="caption" color="text.secondary">(#{assignment.user})</Typography></TableCell>
+                  <TableCell>{assignment.role_name}</TableCell>
+                  <TableCell>{assignment.scope}{assignment.organization ? ` · org ${assignment.organization}` : ""}{assignment.site ? ` · site ${assignment.site}` : ""}</TableCell>
+                  <TableCell>{assignment.expires_at ? new Date(assignment.expires_at).toLocaleString() : "Never"}</TableCell>
+                  <TableCell>{assignment.revoked_at ? "Revoked" : "Active"}</TableCell>
+                  <TableCell align="right">{canAssignRoles && !assignment.revoked_at && (
+                    <Button
+                      size="small"
+                      color="error"
+                      disabled={pending}
+                      onClick={() => void revokeAndRefresh(assignment)}
+                    >
+                      Revoke
+                    </Button>
+                  )}</TableCell>
+                </TableRow>
+              ))}
+              {visibleAssignments.length === 0 && <TableRow><TableCell colSpan={6}><Typography color="text.secondary">No assignments are visible in the selected scope.</Typography></TableCell></TableRow>}
+            </TableBody>
+          </Table>
+        )}
+        {!data && <Typography color="text.secondary">Loading registered access data…</Typography>}
+      </Paper>
 
       <Paper variant="outlined" sx={{ p: 2.5, overflowX: "auto" }}>
         <Typography variant="h6" sx={{ mb: 1.5 }}>Registered permission catalog</Typography>
         <Table size="small" aria-label="Registered permission catalog">
           <TableHead><TableRow><TableCell>Code</TableCell><TableCell>Name and action</TableCell><TableCell>Module / resource</TableCell><TableCell>Risk</TableCell><TableCell>Delegable</TableCell></TableRow></TableHead>
           <TableBody>
-            {permissions.map((permission) => (
+            {data?.permissions.status === "error" && (
+              <TableRow><TableCell colSpan={5}><SectionFailure error={data.permissions.error} /></TableCell></TableRow>
+            )}
+            {data?.permissions.status === "ready" && permissions.map((permission) => (
               <TableRow key={permission.code}>
                 <TableCell><code>{permission.code}</code></TableCell>
                 <TableCell><strong>{permission.name}</strong><br /><Typography variant="caption" color="text.secondary">{permission.description}</Typography></TableCell>
@@ -324,6 +528,10 @@ export function AccessControlManager() {
                 <TableCell>{permission.delegable ? "Yes" : "No"}</TableCell>
               </TableRow>
             ))}
+            {data?.permissions.status === "ready" && permissions.length === 0 && (
+              <TableRow><TableCell colSpan={5}><Typography color="text.secondary">No permissions are registered.</Typography></TableCell></TableRow>
+            )}
+            {!data && <TableRow><TableCell colSpan={5}><Typography color="text.secondary">Loading registered access data…</Typography></TableCell></TableRow>}
           </TableBody>
         </Table>
       </Paper>

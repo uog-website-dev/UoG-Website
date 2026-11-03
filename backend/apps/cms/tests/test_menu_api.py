@@ -29,10 +29,11 @@ def api(ready, oidc, client):
     call_command("seed_rbac", verbosity=0)
     site, other = ready
     user = get_user_model().objects.create_user(username="menu-admin", email="menu-admin@uog.et")
+    subject = str(uuid4())
     UserRoleAssignment.objects.create(user=user, role=Role.objects.get(code="site-administrator"), scope="SITE", site=site, organization=site.organization_unit)
-    header = oidc.header(sub=str(uuid4()), preferred_username=user.username, email=user.email, realm_access={"roles": ["platform-viewer"]})
+    header = oidc.header(sub=subject, preferred_username=user.username, email=user.email, realm_access={"roles": ["platform-viewer"]})
     assert client.get("/api/me/", **header).status_code == 200
-    return SimpleNamespace(site=site, other=other, user=user, header=header, client=client, base=f"/api/v1/sites/{site.pk}/menus/", oidc=oidc)
+    return SimpleNamespace(site=site, other=other, user=user, subject=subject, header=header, client=client, base=f"/api/v1/sites/{site.pk}/menus/", oidc=oidc)
 
 
 def _menu(api, location="header"):
@@ -187,6 +188,16 @@ def test_cross_site_scope_foreign_parent_and_forged_claims_are_rejected(api):
     assert response.status_code == 400 and response.json()["error"]["details"]["reason"] == "invalid_target"
     unassigned = api.oidc.header(sub=str(uuid4()), preferred_username="menu-forged-admin", email="menu-forged-admin@uog.et", realm_access={"roles": ["platform-admin"]})
     assert api.client.post(api.base, {"name": "Forged", "location": "footer"}, content_type="application/json", **unassigned).status_code == 403
+    elevated = api.oidc.header(sub=api.subject, preferred_username=api.user.username, email=api.user.email, realm_access={"roles": ["platform-admin"]})
+    before = Menu.objects.filter(site=api.other).count()
+    foreign = api.client.post(
+        f"/api/v1/sites/{api.other.pk}/menus/",
+        {"name": "Cross-site claim", "location": "footer"},
+        content_type="application/json",
+        **elevated,
+    )
+    assert foreign.status_code == 403
+    assert Menu.objects.filter(site=api.other).count() == before
     assert api.client.post(api.base, {}, content_type="application/json").status_code == 401
 
 

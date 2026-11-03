@@ -15,7 +15,7 @@ from apps.cms.services.publication_cache import (
     get_public_cache,
     public_cache_key,
 )
-from apps.cms.services.workflow import transition_content
+from apps.cms.tests.support import transition_with_site_role
 from apps.sites.models import Module, SiteDomain
 from apps.sites.services.lifecycle import activate_site
 from apps.sites.services.modules import (
@@ -28,6 +28,20 @@ pytestmark = pytest.mark.django_db
 
 ADMIN_PAGES = "/api/v1/sites/{site_id}/pages/"
 PUBLIC_PAGES = "/api/v1/site-context/pages/"
+
+
+def _grant_database_platform_admin(username="devuser"):
+    from django.core.management import call_command
+    from apps.authorization.models import Role, UserRoleAssignment
+
+    call_command("seed_rbac", verbosity=0)
+    user = get_user_model().objects.get(username=username)
+    UserRoleAssignment.objects.get_or_create(
+        user=user,
+        role=Role.objects.get(code="platform-administrator"),
+        scope="PLATFORM",
+    )
+    return user
 
 
 def _token(oidc, subject, username, roles=("platform-viewer",)):
@@ -68,21 +82,15 @@ def _publish(page, *, title=None):
         page.title = title
         page.updated_by = actor
         page.save()
-    transition_content(
-        page.pk, action="submit", actor=actor, roles={"platform-admin"},
-    )
+    transition_with_site_role(page, "submit", actor)
     reviewer = get_user_model().objects.create_user(
         username=f"reviewer-{page.slug}-{Page.objects.count()}",
     )
-    transition_content(
-        page.pk, action="approve", actor=reviewer, roles={"platform-admin"},
-    )
+    transition_with_site_role(page, "approve", reviewer)
     publisher = get_user_model().objects.create_user(
         username=f"publisher-{page.slug}-{Page.objects.count()}",
     )
-    return transition_content(
-        page.pk, action="publish", actor=publisher, roles={"platform-admin"},
-    )
+    return transition_with_site_role(page, "publish", publisher)
 
 
 def test_admin_pages_are_site_scoped_filterable_and_conditionally_updated(
@@ -92,6 +100,7 @@ def test_admin_pages_are_site_scoped_filterable_and_conditionally_updated(
     _enable_pages_module((site,))
     client.defaults.update(oidc.header())
     client.get("/api/me/")
+    _grant_database_platform_admin()
     page_url = ADMIN_PAGES.format(site_id=site.pk)
     created = client.post(
         page_url,
@@ -380,6 +389,8 @@ def test_page_reparenting_is_same_site_and_keeps_route_history(
     site, other_site = sites
     _enable_pages_module((site, other_site))
     client.defaults.update(oidc.header())
+    client.get("/api/me/")
+    _grant_database_platform_admin()
     parent = Page.objects.create(site=site, title="Parent", slug="parent")
     foreign_parent = Page.objects.create(
         site=other_site, title="Foreign parent", slug="foreign-parent",
@@ -531,9 +542,7 @@ def test_publication_versions_invalidate_public_cache_on_unpublish(
     assert client.get(url, HTTP_HOST=host).status_code == 200
 
     publisher = get_user_model().objects.create_user(username="public-unpublisher")
-    transition_content(
-        page.pk, action="unpublish", actor=publisher, roles={"platform-admin"},
-    )
+    transition_with_site_role(page, "unpublish", publisher)
     assert SitePublicationVersion.objects.get(
         site=site, locale=page.locale,
     ).version == published_version + 1
@@ -613,6 +622,7 @@ def test_disabling_pages_blocks_management_without_deleting_the_page(
     _enable_public_pages((site,))
     client.defaults.update(oidc.header())
     client.get("/api/me/")
+    _grant_database_platform_admin()
     page_url = ADMIN_PAGES.format(site_id=site.pk)
     created = client.post(
         page_url,
@@ -675,6 +685,7 @@ def test_homepage_assignment_publish_and_rejection_stay_on_one_site(
     _enable_public_pages((site, other_site))
     client.defaults.update(oidc.header())
     client.get("/api/me/")
+    _grant_database_platform_admin()
     page_url = ADMIN_PAGES.format(site_id=site.pk)
     created = client.post(
         page_url,

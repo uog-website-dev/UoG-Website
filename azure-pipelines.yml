@@ -4,7 +4,10 @@ trigger:
     include:
       - main
 
-pr: none
+pr:
+  branches:
+    include:
+      - main
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -131,6 +134,7 @@ stages:
       - job: DockerAndArtifacts
         displayName: 'Docker Push and Artifacts'
         dependsOn: BuildAndTest
+        condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
         steps:
           - checkout: self
           

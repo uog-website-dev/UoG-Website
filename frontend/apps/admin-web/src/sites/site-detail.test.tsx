@@ -35,11 +35,16 @@ vi.mock("@/app/sites/actions", () => ({
 }));
 
 vi.mock("@/app/sites/menu-actions", () => ({
-  loadSiteNavigation: vi.fn(async () => ({ ok: true, data: { header: null, footer: null } })),
+  loadSiteNavigation: vi.fn(async () => ({ ok: true, data: { menus: [], inheritance: [] } })),
+  loadMenuTargets: vi.fn(async () => ({
+    ok: true,
+    data: { pages: [], posts: [], pagesAvailable: false, postsAvailable: false },
+  })),
   createSiteMenu: vi.fn(),
   createMenuLink: vi.fn(),
   reorderSiteMenu: vi.fn(),
   setMenuActive: vi.fn(),
+  updateSiteMenu: vi.fn(),
 }));
 
 vi.mock("@/app/sites/page-actions", () => ({

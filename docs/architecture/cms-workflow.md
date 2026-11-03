@@ -7,21 +7,22 @@ edges, audit each accepted status change, and protect the public payload.
 PAGES and POSTS are implemented but globally and per-Site disabled by default.
 The workflow administration API is mounted at
 `/api/v1/cms/sites/`; Page CRUD and public delivery are documented in the
-[Page API contract](../api/cms-pages.md). Requests pass validated
-Keycloak role claims and the authenticated actor into the shared service;
-client-supplied role names are rejected and never used for authorization.
+[Page API contract](../api/cms-pages.md). The authenticated actor is resolved from the Keycloak token. Application
+authority comes from an active database platform-administrator assignment or
+a Site CMS role on the resource's Site. Realm roles, staff flags, and
+client-supplied role names are not authorization sources.
 
 ## HTTP integration
 
 | Method and path | Access | Contract |
 | --- | --- | --- |
-| `GET /api/v1/cms/sites/{site_pk}/content-roles/` | platform-admin token role | List CMS role assignments for this Site |
-| `POST /api/v1/cms/sites/{site_pk}/content-roles/` | platform-admin token role | Assign an active local user AUTHOR, REVIEWER or PUBLISHER |
-| `DELETE /api/v1/cms/sites/{site_pk}/content-roles/{assignment_id}/` | platform-admin token role | Revoke only an assignment owned by the path Site |
-| `POST /api/v1/cms/sites/{site_pk}/content/{content_id}/workflow/` | authenticated token plus required Site CMS role or platform-admin | Apply one workflow action; content is looked up under the path Site |
-| `GET /api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/` | any active Site CMS role or platform-admin | List immutable revisions, newest first; returns the current content ETag |
-| `GET /api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/{revision_number}/` | any active Site CMS role or platform-admin | Inspect one immutable snapshot and its diff metadata |
-| `POST /api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/{revision_number}/restore/` | Site AUTHOR or platform-admin | Restore a prior snapshot as a new DRAFT revision, requiring the current `If-Match` ETag |
+| `GET /api/v1/cms/sites/{site_pk}/content-roles/` | active database platform-administrator assignment | List CMS role assignments for this Site |
+| `POST /api/v1/cms/sites/{site_pk}/content-roles/` | active database platform-administrator assignment | Assign an active local user AUTHOR, REVIEWER or PUBLISHER |
+| `DELETE /api/v1/cms/sites/{site_pk}/content-roles/{assignment_id}/` | active database platform-administrator assignment | Revoke only an assignment owned by the path Site |
+| `POST /api/v1/cms/sites/{site_pk}/content/{content_id}/workflow/` | matching Site CMS role or active database platform-administrator assignment | Apply one workflow action; content is looked up under the path Site |
+| `GET /api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/` | any active Site CMS role or active database platform-administrator assignment | List immutable revisions, newest first; returns the current content ETag |
+| `GET /api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/{revision_number}/` | any active Site CMS role or active database platform-administrator assignment | Inspect one immutable snapshot and its diff metadata |
+| `POST /api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/{revision_number}/restore/` | Site AUTHOR or active database platform-administrator assignment | Restore a prior snapshot as a new DRAFT revision, requiring the current `If-Match` ETag |
 
 The action body accepts only `action` and optional `comment`. The endpoint
 derives its role set from validated bearer-token claims and rejects unknown
@@ -50,10 +51,12 @@ return 428; stale ETags and edits racing a restore return 409.
 | ARCHIVED | — | — | — | No outgoing transition |
 
 All omitted edges are rejected. A user assigned more than one Site role still
-cannot approve or reject content they authored or submitted. `platform-admin`
-is accepted only from validated token claims; `is_staff` and `is_superuser`
-flags do not grant workflow rights. Site-specific roles are represented by
-unique `(site, user, role)` assignments in `SiteContentRoleAssignment`.
+cannot approve or reject content they authored or submitted. An active
+database `platform-administrator` assignment covers the workflow roles.
+Keycloak realm roles, `is_staff`, and `is_superuser` do not grant workflow
+rights. Site-specific roles are represented by unique `(site, user, role)`
+assignments in `SiteContentRoleAssignment`. Inactive, expired, and revoked
+platform assignments do not authorize.
 
 ## Atomicity, audit and repeat requests
 
@@ -78,8 +81,11 @@ retains the original feedback.
 
 Content is locked while IN_REVIEW, APPROVED, PUBLISHED or ARCHIVED. Both model
 validation and database triggers reject changes to the content payload in
-those states. After unpublishing, an authorized editor can revise and restore
-the content to DRAFT for another review cycle.
+those states. Direct edits of a published Page stay rejected. After
+unpublishing, an authorized editor can revise and restore the content to
+DRAFT for another review cycle; that path takes the Page off the public
+site, so it is not the way to prepare a replacement while visitors still
+see the last publication. Use a working draft for that.
 
 Every successful publication writes a `PublishedContentSnapshot` containing
 the complete serving payload and a monotonically increasing per-content
@@ -121,6 +127,49 @@ boundary. Existing content is backfilled as revision 1 during migration,
 using its last-updated timestamp as the baseline revision time.
 Draft content deletion also removes its revision history; any content with a
 PUBLISHED revision or publication snapshot cannot be deleted.
+
+## Working drafts of a published Page
+
+A published Page stays PUBLISHED and locked. Public APIs, navigation and
+Next.js rendering keep serving its latest `PublishedContentSnapshot`, path
+and metadata until a reviewed publication of a working draft commits.
+
+An AUTHOR opens at most one working draft with
+`POST /api/v1/sites/{site_pk}/pages/{id}/working-draft/`. The request requires
+the published Page's current `If-Match` ETag: a missing precondition returns
+428 and a stale ETag returns 409. The response is a normal DRAFT Page copied
+from that serving snapshot. `draft_of` points at the published Page, the
+draft uses an internal `wip-` slug with no parent, and repeating the call
+returns the same open draft. Archived drafts do not count as open. The
+draft is Site-scoped: another Site's identifier returns 404, and a caller
+without the AUTHOR role on this Site is denied.
+
+The AUTHOR edits that draft with the existing Page PATCH. Submit, reject,
+approve, archive and the author/reviewer separation use the existing
+workflow. The author and submitter still cannot approve it.
+
+Publishing an approved working draft does not publish the internal route.
+In one transaction the PUBLISHER copies the draft title, blocks, block
+schema version, metadata, SEO, layout and visibility onto the published
+Page, writes the next immutable snapshot, bumps that Site and locale
+publication version, records `CONTENT_PUBLISHED` for the live Page, and
+archives the working draft. The live Page id, slug, path, parent and
+homepage flag do not change. The database allows that copy only while the
+publication service sets `cms.apply_working_draft` for the transaction, and
+only while the row stays PUBLISHED. Concurrent publishes serialize on the
+draft and the live Page; a second or stale publish fails because the draft
+is no longer APPROVED. If the snapshot cannot be written, or the live Page
+is no longer PUBLISHED, the transaction rolls back and the previous snapshot
+and cache generation stay in place.
+
+Unpublish and archive of the live Page are unchanged. Unpublish keeps the
+snapshot and `published_at` but stops public delivery. A working draft
+cannot be published onto a Page that is not currently published. Archiving
+the working draft discards that copy and leaves the live snapshot. Posts do
+not use `draft_of` and keep the shared publish path.
+
+Existing Pages gain an empty `draft_of`. Published snapshots are not
+rewritten by the migration.
 
 ## Authorization boundary
 

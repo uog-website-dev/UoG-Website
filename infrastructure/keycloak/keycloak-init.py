@@ -51,6 +51,23 @@ API_CLIENT_SCOPE = "uog-api"
 API_AUDIENCE = "backend-api"
 API_SCOPE_CLIENTS = ("public-web", "admin-web", "backend-api")
 
+# Keycloak 26 stores several post-logout URIs in one attribute and splits them
+# on "##". A "+" between URIs is one literal value, not a second entry. "+"
+# alone means "reuse the login redirect URIs", which does not include the
+# signed-out page. These are the approved entries from the realm import;
+# reconciliation must not add a bare "*" wildcard.
+POST_LOGOUT_SEPARATOR = "##"
+APPROVED_POST_LOGOUT_URIS = {
+    "public-web": (
+        "http://localhost:3000/*",
+        "http://localhost/*",
+    ),
+    "admin-web": (
+        "http://localhost:3001/admin/*",
+        "http://localhost/admin/*",
+    ),
+}
+
 # Realm roles owned by the identity provider; the API mirrors them as Django
 # groups and uses them for role-based access control.
 PLATFORM_ROLES = {
@@ -277,6 +294,74 @@ def ensure_realm_roles(token: str) -> None:
         log(f"Realm role '{name}' created.")
 
 
+def post_logout_attribute(uris: tuple[str, ...]) -> str:
+    """Join approved logout URIs with the separator Keycloak 26 actually parses."""
+    if not uris:
+        raise RuntimeError("A client needs at least one approved post-logout URI.")
+    for uri in uris:
+        if uri in {"+", "-", "*"} or POST_LOGOUT_SEPARATOR in uri or "+" in uri:
+            raise RuntimeError(f"Refusing an unsafe post-logout URI entry: {uri!r}")
+        if not uri.startswith("http://localhost") or not uri.endswith("/*"):
+            raise RuntimeError(f"Refusing a post-logout URI outside the approved local patterns: {uri!r}")
+    return POST_LOGOUT_SEPARATOR.join(uris)
+
+
+def ensure_post_logout_uris(token: str) -> None:
+    """Rewrite drifted logout allowlists on clients that already exist.
+
+    Keycloak does not re-import a realm that is already present, so an older
+    installation can keep "+" between URIs after the realm file moved to "##".
+    This updates that one attribute. It does not create clients or users, and
+    it does not log the client representation (that body contains the secret).
+    """
+    for client_id, uris in APPROVED_POST_LOGOUT_URIS.items():
+        desired = post_logout_attribute(uris)
+        summary = find_client(token, client_id)
+        client_url = f"{KC_URL}/admin/realms/{REALM}/clients/{summary['id']}"
+        representation = request(client_url, token=token)
+        attributes = dict(representation.get("attributes") or {})
+        current = attributes.get("post.logout.redirect.uris")
+        if current == desired:
+            log(f"Post-logout redirect URIs already match for client '{client_id}'.")
+            continue
+        attributes["post.logout.redirect.uris"] = desired
+        representation["attributes"] = attributes
+        try:
+            request(client_url, method="PUT", token=token, body=representation)
+        except RuntimeError as exc:
+            # The admin error can echo the submitted client, including its secret.
+            raise RuntimeError(
+                f"Could not reconcile post-logout URIs for client '{client_id}'."
+            ) from exc
+        log(
+            f"Post-logout redirect URIs reconciled for client '{client_id}' "
+            f"({len(uris)} approved entries)."
+        )
+
+
+def self_check_post_logout() -> int:
+    """Check the allowlist builder. Does not contact Keycloak or print secrets."""
+    admin = post_logout_attribute(APPROVED_POST_LOGOUT_URIS["admin-web"])
+    public = post_logout_attribute(APPROVED_POST_LOGOUT_URIS["public-web"])
+    expected = {
+        "admin-web": "http://localhost:3001/admin/*##http://localhost/admin/*",
+        "public-web": "http://localhost:3000/*##http://localhost/*",
+    }
+    if admin != expected["admin-web"] or public != expected["public-web"]:
+        raise RuntimeError("Approved post-logout attributes do not match the realm file.")
+    drifted = "http://localhost:3001/admin/*+http://localhost/admin/*"
+    if drifted == admin or "+" in admin or admin == "*" or public == "*":
+        raise RuntimeError("Post-logout reconciliation would keep a drifted or open allowlist.")
+    for unsafe in (("+",), ("*",), ("-",), ("https://evil.example/*",)):
+        try:
+            post_logout_attribute(unsafe)
+        except RuntimeError:
+            continue
+        raise RuntimeError(f"Unsafe post-logout entry was accepted: {unsafe!r}")
+    log("Post-logout allowlist self-check passed.")
+    return 0
+
+
 def ensure_realm_login_theme(token: str) -> None:
     """Apply the version-controlled login theme to realms imported earlier."""
     realm_url = f"{KC_URL}/admin/realms/{REALM}"
@@ -411,6 +496,32 @@ def smoke_test(token: str) -> None:
     log("Smoke test OK: development user authentication works.")
 
 
+def report_logout() -> int:
+    """Print logout allowlists and counts. Never prints tokens or secrets."""
+    wait_for_keycloak()
+    token = admin_token()
+    user_count = request(f"{KC_URL}/admin/realms/{REALM}/users/count", token=token)
+    log(f"Realm user count: {user_count}")
+    for client_id in ("admin-web", "public-web", "backend-api"):
+        rows = request(
+            f"{KC_URL}/admin/realms/{REALM}/clients?clientId={urllib.parse.quote(client_id)}",
+            token=token,
+        )
+        exact = [row for row in rows or [] if row.get("clientId") == client_id]
+        log(f"Client '{client_id}' matches: {len(exact)}")
+        if len(exact) != 1:
+            continue
+        full = request(
+            f"{KC_URL}/admin/realms/{REALM}/clients/{exact[0]['id']}", token=token
+        )
+        attributes = full.get("attributes") or {}
+        log(
+            f"Client '{client_id}' post-logout URIs: "
+            f"{attributes.get('post.logout.redirect.uris')}"
+        )
+    return 0
+
+
 def main() -> int:
     wait_for_keycloak()
     token = admin_token()
@@ -423,6 +534,7 @@ def main() -> int:
     ensure_realm_login_theme(token)
     user_id = ensure_dev_user(token)
     ensure_dev_user_roles(token, user_id)
+    ensure_post_logout_uris(token)
     smoke_test(token)
     log("Keycloak bootstrap complete.")
     return 0
@@ -430,6 +542,10 @@ def main() -> int:
 
 if __name__ == "__main__":
     try:
+        if "--self-check" in sys.argv:
+            sys.exit(self_check_post_logout())
+        if "--report-logout" in sys.argv:
+            sys.exit(report_logout())
         sys.exit(main())
     except Exception as exc:  # noqa: BLE001
         print(f"ERROR: {exc}", file=sys.stderr, flush=True)

@@ -8,10 +8,10 @@ immutable publication snapshots.
 
 All authoring routes require a validated Keycloak bearer token and an active
 CMS role on the Site named in the path. AUTHOR may create and edit; AUTHOR,
-REVIEWER and PUBLISHER may list and inspect. A platform administrator with an
-active database assignment can perform all actions; the validated legacy
-`platform-admin` token role is also supported. Client-supplied roles are not
-accepted.
+REVIEWER and PUBLISHER may list and inspect. An active database
+platform-administrator assignment can perform those actions on any Site.
+A Keycloak realm role, including `platform-admin`, does not. Client-supplied
+roles are not accepted. Inactive, expired, and revoked grants are denied.
 
 Page authoring, Page workflow and revision routes are also gated on the `PAGES`
 module being enabled for the Site. When it is disabled, those requests are
@@ -33,6 +33,7 @@ AUTHOR, REVIEWER and PUBLISHER role rules apply to both content types.
 | `PATCH /api/v1/sites/{site_pk}/pages/{id}/` | Update a DRAFT or UNPUBLISHED Page; requires `If-Match` |
 | `POST /api/v1/sites/{site_pk}/pages/{id}/workflow/` | Apply a validated workflow action |
 | `GET /api/v1/sites/{site_pk}/pages/{id}/workflow-history/` | Read the private, append-only transition timeline and review comments |
+| `POST /api/v1/sites/{site_pk}/pages/{id}/working-draft/` | Open the one working draft of a published Page. Requires `If-Match`. |
 | `POST /api/v1/sites/{site_pk}/pages/{id}/homepage/` | Make a draft or unpublished Page this Site's homepage |
 
 Create, edit, workflow and homepage assignment require PAGES to be
@@ -65,6 +66,16 @@ Each detail response returns an ETag of the form
 `If-Match`: a missing precondition returns 428 and a stale value returns 409.
 Cross-Site Page IDs return 404. Page route changes use route-history handling,
 and every meaningful update creates a content revision.
+
+`working-draft` is how an AUTHOR prepares a replacement for a published Page.
+The published row stays locked and PUBLISHED. The draft is edited, submitted
+and independently approved through the normal workflow. Publishing that
+draft updates the published Page's serving snapshot in one transaction and
+then archives the draft. Until that publication commits, public delivery
+keeps the previous snapshot. A stale `If-Match`, a second publish, or a
+publish after the live Page was unpublished fails without changing the
+public snapshot. The contract is recorded in
+[cms-workflow](../architecture/cms-workflow.md).
 
 ### Example: create a draft
 

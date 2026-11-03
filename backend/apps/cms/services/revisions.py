@@ -18,7 +18,6 @@ from ..models import (
     ContentStatus,
     Page,
     SiteContent,
-    SiteContentRoleAssignment,
     revision_origin,
 )
 from .pages import change_route, set_as_homepage
@@ -321,15 +320,10 @@ def _content_instance(content_id, *, using):
 
 
 def _authorize(actor, *, site_id, roles, required_roles, using):
-    if not getattr(actor, "is_authenticated", False):
-        raise PermissionDenied("An authenticated user is required.")
-    if "platform-admin" in set(roles or ()):
-        return
-    if SiteContentRoleAssignment.objects.using(using).filter(
-        site_id=site_id,
-        user_id=actor.pk,
-        role__in=required_roles,
-        user__is_active=True,
-    ).exists():
-        return
-    raise PermissionDenied("A CMS role assigned to this Site is required.")
+    # ``roles`` is retained for callers that used to forward bearer claims.
+    # Those claims are not an authorization source.
+    del roles
+    from ..authorization import require_cms_grant
+    require_cms_grant(
+        actor, site_id, required_roles, using=using,
+    )

@@ -72,6 +72,8 @@ def add_common_contract(result, generator, request, public):
                 and "/pages" in path
             ) or path.startswith(("/api/v1/site-context/pages", "/api/v1/site-context/posts")) or path == "/api/v1/site-context/menus/":
                 codes.add("400")
+            if path == "/api/v1/authorization/assignments/users/{user_id}/effective/" and method == "get":
+                codes.add("400")
             if (
                 path.startswith("/api/v1/cms/")
                 and method == "post"
@@ -146,6 +148,8 @@ def add_common_contract(result, generator, request, public):
                     detail = {field: ["This field is required."]} if code == "400" else {"detail": messages[code]}
                     if code == "400" and method == "get" and path == "/api/v1/organizations/":
                         detail = {"status": ['"INVALID" is not a valid choice.']}
+                    if code == "400" and path == "/api/v1/authorization/assignments/users/{user_id}/effective/":
+                        detail = {"scope": ["This scope is not valid."]}
                     responses[code]["content"]["application/json"]["example"] = {
                         "error": {"code": names[code], "message": messages[code], "details": detail},
                         "request_id": "1ea47c51-f2d7-402b-ad9a-4df619d03055",

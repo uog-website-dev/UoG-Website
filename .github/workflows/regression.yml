@@ -1,0 +1,100 @@
+name: Regression
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  backend:
+    name: Backend tests and OpenAPI
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16.15-alpine
+        env:
+          POSTGRES_USER: uog_admin
+          POSTGRES_PASSWORD: ci-postgres-admin
+          POSTGRES_DB: uog_db
+          POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=C --lc-ctype=C"
+          DB_USER: uog_app
+          DB_MIGRATE_USER: uog_migrate
+          DB_APP_PASSWORD: ci-app-role
+          DB_MIGRATE_PASSWORD: ci-migrate-role
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U uog_admin -d uog_db"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Bootstrap PostgreSQL roles
+        run: bash scripts/ci/postgres-service.sh
+        env:
+          POSTGRES_ADMIN_USER: uog_admin
+          POSTGRES_ADMIN_DB: uog_db
+          DB_USER: uog_app
+          DB_MIGRATE_USER: uog_migrate
+
+      - name: Test backend and validate OpenAPI
+        working-directory: backend
+        env:
+          DB_HOST: localhost
+          DB_PORT: "5432"
+          DB_NAME: uog_db
+          DB_USER: uog_app
+          DB_PASSWORD: ci-app-role
+          DB_MIGRATE_USER: uog_migrate
+          DB_MIGRATE_PASSWORD: ci-migrate-role
+          SECRET_KEY: ci-only-secret-key
+          DEBUG: "False"
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements/dev.txt
+          python manage.py check
+          python manage.py collectstatic --noinput
+          pytest --junitxml=backend-test-results.xml
+          python manage.py spectacular --file openapi.yaml --validate --fail-on-warn
+          python -c "import yaml; from pathlib import Path; assert yaml.safe_load(Path('openapi.yaml').read_text()) == yaml.safe_load(Path('../docs/api/openapi.yaml').read_text()), 'Regenerate docs/api/openapi.yaml for the changed API contract'"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-test-results
+          path: backend/backend-test-results.xml
+
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: openapi-schema
+          path: backend/openapi.yaml
+
+  frontend:
+    name: Frontend tests, typecheck and build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Test, typecheck and build
+        working-directory: frontend
+        run: |
+          set -euo pipefail
+          corepack enable
+          corepack prepare pnpm@9.15.9 --activate
+          pnpm install --frozen-lockfile
+          pnpm test
+          pnpm typecheck
+          pnpm build

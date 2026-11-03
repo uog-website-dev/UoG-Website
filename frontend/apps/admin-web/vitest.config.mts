@@ -16,6 +16,9 @@ export default defineConfig({
   },
   test: {
     environment: "jsdom",
+    // MUI dialogs in the Site editors take several seconds under a full
+    // suite. The assertions stay; only the wait budget grows.
+    testTimeout: 20000,
     include: ["src/**/*.test.{ts,tsx}"],
     setupFiles: ["./src/test/setup.ts"],
     server: {

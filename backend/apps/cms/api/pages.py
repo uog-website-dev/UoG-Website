@@ -1,5 +1,5 @@
 """Site-scoped Page authoring and workflow API."""
-from django.core.exceptions import PermissionDenied, ValidationError as DomainValidationError
+from django.core.exceptions import ValidationError as DomainValidationError
 from django.db import IntegrityError, transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
@@ -14,20 +14,20 @@ from rest_framework.viewsets import GenericViewSet
 from uuid import UUID
 
 from apps.accounts.authentication import KeycloakBearerAuthentication
-from apps.authorization.access import is_platform_administrator
 from apps.sites.api.access import Conflict, PreconditionRequired
 from apps.sites.api.serializers import StrictFields
 from apps.sites.models import Site
 
+from ..authorization import require_cms_grant
 from ..models import (
     ContentEditConflict,
     ContentRole,
     ContentWorkflowTransition,
     Page,
-    SiteContentRoleAssignment,
 )
 from ..services.pages import change_route, require_pages_module, set_as_homepage
 from ..services.workflow import transition_content
+from ..services.working_drafts import open_working_draft
 from .serializers import PageSerializer
 from .workflow import WorkflowActionInput, WorkflowStateConflict
 
@@ -136,27 +136,10 @@ class SitePageViewSet(
     def _site(self):
         return get_object_or_404(Site, pk=self.kwargs["site_pk"])
 
-    def _roles(self):
-        claims = self.request.auth
-        roles = getattr(claims, "roles", ())
-        roles = set(roles) if isinstance(roles, (tuple, list, set, frozenset)) else set()
-        # Database assignments are the platform's authorization source. A
-        # platform administrator must not need a duplicate Keycloak role.
-        if is_platform_administrator(self.request.user):
-            roles.add("platform-admin")
-        return roles
-
     def _authorize(self, site, required_roles):
-        if is_platform_administrator(self.request.user) or "platform-admin" in set(self._roles()):
-            return
-        if SiteContentRoleAssignment.objects.filter(
-            site_id=site.pk,
-            user_id=self.request.user.pk,
-            role__in=required_roles,
-            user__is_active=True,
-        ).exists():
-            return
-        raise PermissionDenied("A CMS role assigned to this Site is required.")
+        require_cms_grant(
+            self.request.user, site.pk, required_roles, request=self.request,
+        )
 
     def _page(self):
         site = self._site()
@@ -180,8 +163,10 @@ class SitePageViewSet(
         responses=PageSerializer(many=True),
         description=(
             "List only Pages belonging to this Site. Requires an active "
-            "Site AUTHOR, REVIEWER or PUBLISHER assignment or platform-admin. "
-            "Unknown or repeated query parameters return field-level 400 errors."
+            "Site AUTHOR, REVIEWER or PUBLISHER assignment, or an active "
+            "database platform-administrator assignment. Keycloak realm roles "
+            "do not grant access. Unknown or repeated query parameters return "
+            "field-level 400 errors."
         ),
     )
     def list(self, request, *args, **kwargs):
@@ -223,9 +208,10 @@ class SitePageViewSet(
         request=PageSerializer,
         responses={201: PageSerializer},
         description=(
-            "Create a draft Page in this Site. Requires Site AUTHOR or "
-            "platform-admin. The Site, status, route path and authorship are "
-            "server-controlled."
+            "Create a draft Page in this Site. Requires an active Site AUTHOR "
+            "assignment or an active database platform-administrator "
+            "assignment. Keycloak realm roles do not grant access. The Site, "
+            "status, route path and authorship are server-controlled."
         ),
     )
     def create(self, request, *args, **kwargs):
@@ -256,10 +242,12 @@ class SitePageViewSet(
         request=PageSerializer,
         responses=PageSerializer,
         description=(
-            "Partially update a draft or unpublished Page. Requires Site "
-            "AUTHOR or platform-admin and the current If-Match ETag. Missing "
-            "preconditions return 428; stale edits return 409. Parent changes "
-            "must target this Site and preserve route history for descendants."
+            "Partially update a draft or unpublished Page. Requires an active "
+            "Site AUTHOR assignment or an active database "
+            "platform-administrator assignment, and the current If-Match ETag. "
+            "Keycloak realm roles do not grant access. Missing preconditions "
+            "return 428; stale edits return 409. Parent changes must target "
+            "this Site and preserve route history for descendants."
         ),
     )
     def partial_update(self, request, *args, **kwargs):
@@ -318,7 +306,10 @@ class SitePageViewSet(
         description=(
             "Submit, review, approve, reject, publish, unpublish, archive or "
             "restore this Site-owned Page using the shared CMS state machine. "
-            "Role claims are read only from the validated bearer token."
+            "The action requires the matching Site CMS role, or an active "
+            "database platform-administrator assignment. Keycloak realm roles "
+            "and body-supplied roles do not grant access. An author cannot "
+            "review their own content."
         ),
     )
     @action(detail=True, methods=["post"], url_path="workflow")
@@ -332,7 +323,6 @@ class SitePageViewSet(
                 page.pk,
                 action=payload.validated_data["action"],
                 actor=request.user,
-                roles=self._roles(),
                 comment=payload.validated_data.get("comment", ""),
             )
         except DomainValidationError as error:
@@ -355,7 +345,8 @@ class SitePageViewSet(
         description=(
             "List append-only workflow transitions and reviewer comments for "
             "this Site-owned Page. Requires an active CMS role on this Site "
-            "or platform-admin and an enabled PAGES module."
+            "or an active database platform-administrator assignment, and an "
+            "enabled PAGES module. Keycloak realm roles do not grant access."
         ),
     )
     @action(
@@ -375,15 +366,59 @@ class SitePageViewSet(
 
     @extend_schema(
         tags=["CMS pages"],
+        parameters=[SITE_PARAMETER, PAGE_PARAMETER, IF_MATCH],
+        request=None,
+        responses={200: PageSerializer, 201: PageSerializer},
+        description=(
+            "Open the one working draft of a published Page. The draft is "
+            "copied from the current serving snapshot and edited through the "
+            "normal Page workflow. The published Page stays locked and public "
+            "delivery keeps that snapshot until the draft is independently "
+            "approved and published. Requires an active Site AUTHOR assignment "
+            "or an active database platform-administrator assignment, the "
+            "PAGES module, and the published Page If-Match ETag. Keycloak "
+            "realm roles do not grant access. A missing precondition returns "
+            "428 and a stale ETag returns 409."
+        ),
+    )
+    @action(detail=True, methods=["post"], url_path="working-draft")
+    def working_draft(self, request, *args, **kwargs):
+        site, page = self._page()
+        self._authorize(site, (ContentRole.AUTHOR,))
+        ensure_pages_module_enabled(site.pk)
+        supplied = request.headers.get("If-Match")
+        if not supplied:
+            raise PreconditionRequired()
+        if supplied != page_etag(page):
+            raise PageEditConflict()
+        try:
+            draft, created = open_working_draft(page, actor=request.user)
+        except DomainValidationError as error:
+            detail = (
+                error.message_dict if hasattr(error, "message_dict")
+                else {"non_field_errors": error.messages}
+            )
+            raise serializers.ValidationError(detail) from error
+        draft = get_object_or_404(
+            Page.objects.filter(site_id=site.pk), pk=draft.pk,
+        )
+        response = self._response(draft, status_code=201 if created else 200)
+        if created:
+            response["Location"] = f"/api/v1/sites/{site.pk}/pages/{draft.pk}/"
+        return response
+
+    @extend_schema(
+        tags=["CMS pages"],
         parameters=[SITE_PARAMETER, PAGE_PARAMETER],
         request=None,
         responses=PageSerializer,
         description=(
             "Make this draft or unpublished Page the Site homepage. Any "
             "previous homepage on this Site is cleared in the same "
-            "transaction. Requires Site AUTHOR or platform-admin and an "
-            "enabled PAGES module. The row is not deleted when the module "
-            "is off."
+            "transaction. Requires an active Site AUTHOR assignment or an "
+            "active database platform-administrator assignment, and an "
+            "enabled PAGES module. Keycloak realm roles do not grant access. "
+            "The row is not deleted when the module is off."
         ),
     )
     @action(detail=True, methods=["post"], url_path="homepage")

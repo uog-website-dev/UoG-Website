@@ -133,6 +133,38 @@ describe("SiteMenusPanel", () => {
     expect(JSON.stringify(updateSiteMenu.mock.calls)).not.toContain("22");
   });
 
+  it("treats a missing inheritance field as no delivery policy", async () => {
+    loadSiteNavigation.mockResolvedValue({
+      ok: true,
+      data: { menus: [headerState()] },
+    });
+    renderPanel(11);
+    expect(await screen.findByText(/no inheritance policy/)).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Edit Header" })).toBeTruthy();
+    expect(screen.queryByRole("list", { name: "Inherited menu policy" })).toBeNull();
+  });
+
+  it("ignores malformed inheritance entries without crashing or inventing a policy", async () => {
+    loadSiteNavigation.mockResolvedValue({
+      ok: true,
+      data: {
+        menus: [headerState()],
+        inheritance: [null, "header", { id: 4 }, { id: "policy-2", location: "footer", inherit_from: 9, include_global: false, local_precedence: "override" }],
+      },
+    });
+    renderPanel(11);
+    expect(await screen.findByText(/copies Site 9's own local menu/)).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Edit Header" })).toBeTruthy();
+    expect(screen.queryByText(/no inheritance policy/)).toBeNull();
+  });
+
+  it("states that an empty inheritance list adds no parent menu", async () => {
+    loadSiteNavigation.mockResolvedValue({ ok: true, data: navigation({ inheritance: [] }) });
+    renderPanel(11);
+    expect(await screen.findByText(/does not add a central fragment/)).toBeTruthy();
+    expect(screen.queryByRole("list", { name: "Inherited menu policy" })).toBeNull();
+  });
+
   it("explains central and inherited ownership and does not edit a central menu", async () => {
     loadSiteNavigation.mockResolvedValue({
       ok: true,

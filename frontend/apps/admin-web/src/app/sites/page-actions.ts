@@ -55,6 +55,7 @@ export interface SitePageRecord {
   seo?: Record<string, unknown>;
   layout?: string;
   position?: number;
+  draft_of?: string | null;
   etag?: string;
   available_actions?: SitePageWorkflowAction[];
 }
@@ -205,6 +206,25 @@ export async function createSitePage(
       blocks: input.blocks,
     });
     return withEtag(created.data, created.etag);
+  });
+}
+
+export async function openWorkingDraft(
+  siteId: number,
+  pageId: string,
+  ifMatch: string,
+): Promise<ActionResult<SitePageRecord>> {
+  return attempt(async () => {
+    const api = await client();
+    const opened = await api.postDetailed<PageBody>(
+      sitePagePath(siteId, `${pageId}/working-draft/`),
+      {},
+      { headers: { "If-Match": ifMatch } },
+    );
+    if (opened.data.site !== siteId) {
+      throw new Error("The Page does not belong to this Site.");
+    }
+    return withEtag(opened.data, opened.etag);
   });
 }
 

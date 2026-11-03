@@ -121,6 +121,29 @@ class EffectivePermissionSerializer(serializers.Serializer):
     permissions = serializers.ListField(child=serializers.CharField())
 
 
+class EffectiveScopeQuerySerializer(serializers.Serializer):
+    """Query contract for one validated effective-permission scope."""
+
+    scope = serializers.ChoiceField(choices=["PLATFORM", "ORGANIZATION", "SITE"])
+    organization = serializers.IntegerField(required=False, min_value=1, max_value=9223372036854775807)
+    site = serializers.IntegerField(required=False, min_value=1, max_value=9223372036854775807)
+
+    def validate(self, attrs):
+        scope = attrs["scope"]
+        organization = attrs.get("organization")
+        site = attrs.get("site")
+        if scope == "PLATFORM" and (organization is not None or site is not None):
+            raise serializers.ValidationError({"scope": ["Platform scope cannot include organization or site identifiers."]})
+        if scope == "ORGANIZATION":
+            if organization is None:
+                raise serializers.ValidationError({"organization": ["Organization scope requires an organization identifier."]})
+            if site is not None:
+                raise serializers.ValidationError({"site": ["Organization scope cannot include a site identifier."]})
+        if scope == "SITE" and site is None:
+            raise serializers.ValidationError({"site": ["Site scope requires a site identifier."]})
+        return attrs
+
+
 class AuthorizationAuditSerializer(serializers.ModelSerializer):
     class Meta:
         model = AuthorizationAuditEvent

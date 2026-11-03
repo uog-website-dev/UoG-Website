@@ -37,6 +37,13 @@ BEGIN
            OR NEW.metadata IS DISTINCT FROM OLD.metadata
            OR NEW.blocks IS DISTINCT FROM OLD.blocks
            OR NEW.blocks_version IS DISTINCT FROM OLD.blocks_version
+       )
+       AND NOT (
+           current_setting('cms.apply_working_draft', true) = 'on'
+           AND OLD.status = 'PUBLISHED'
+           AND NEW.status IS NOT DISTINCT FROM OLD.status
+           AND NEW.site_id IS NOT DISTINCT FROM OLD.site_id
+           AND NEW.locale IS NOT DISTINCT FROM OLD.locale
        ) THEN
         RAISE EXCEPTION 'Content is locked in its current workflow state.'
             USING ERRCODE = '23514', CONSTRAINT = 'content_workflow_content_locked';
@@ -83,6 +90,14 @@ BEGIN
            OR NEW.visibility IS DISTINCT FROM OLD.visibility
            OR NEW.position IS DISTINCT FROM OLD.position
            OR NEW.is_homepage IS DISTINCT FROM OLD.is_homepage
+       )
+       AND NOT (
+           current_setting('cms.apply_working_draft', true) = 'on'
+           AND content_status = 'PUBLISHED'
+           AND NEW.parent_id IS NOT DISTINCT FROM OLD.parent_id
+           AND NEW.slug IS NOT DISTINCT FROM OLD.slug
+           AND NEW.path IS NOT DISTINCT FROM OLD.path
+           AND NEW.is_homepage IS NOT DISTINCT FROM OLD.is_homepage
        ) THEN
         RAISE EXCEPTION 'Page content is locked in its current workflow state.'
             USING ERRCODE = '23514', CONSTRAINT = 'page_workflow_content_locked';

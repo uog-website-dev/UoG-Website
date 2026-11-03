@@ -9,7 +9,7 @@ from apps.cms.models import (
     SiteContentRoleAssignment,
 )
 from apps.cms.services.publication_cache import current_publication_version
-from apps.cms.services.workflow import transition_content
+from apps.cms.tests.support import transition_with_site_role
 from apps.sites.models import SiteDomain
 from apps.sites.services.lifecycle import activate_site
 from apps.sites.services.modules import disable_module_for_site, enable_module_for_site
@@ -39,7 +39,7 @@ def _publish(post):
     for action, actor in (
         ("submit", submitter), ("approve", reviewer), ("publish", publisher),
     ):
-        transition_content(post.pk, action=action, actor=actor, roles={"platform-admin"})
+        transition_with_site_role(post, action, actor)
     post.refresh_from_db()
     return post
 
@@ -192,7 +192,7 @@ def test_post_publication_pagination_cache_and_disabled_module(
     site_version = current_publication_version(site.pk, "en-us")
     other_version = current_publication_version(other.pk, "en-us")
     target = Post.objects.get(pk=posts[0].pk)
-    transition_content(target.pk, action="unpublish", actor=_new_user("public-unpublisher"), roles={"platform-admin"})
+    transition_with_site_role(target, "unpublish", _new_user("public-unpublisher"))
     assert current_publication_version(site.pk, "en-us") == site_version + 1
     assert current_publication_version(other.pk, "en-us") == other_version
 

@@ -1,0 +1,23 @@
+{
+  "recorded": "2026-11-03",
+  "principal": "sec001-probe",
+  "identity": "Real Keycloak password grant for client backend-api. Token roles included platform-admin. is_staff was false.",
+  "database_scope": {
+    "platform_administrator_grants": 0,
+    "site_a": "MAIN (id 1) viewer assignment only",
+    "site_b": "INFORMATICS (id 2), no CMS role and no application assignment"
+  },
+  "before": {"site_b_pages": 1},
+  "http": {
+    "GET /api/v1/sites/2/pages/": 403,
+    "POST /api/v1/sites/2/pages/": 403
+  },
+  "after": {"site_b_pages": 1, "slug_sec001-claim-draft": false},
+  "audit": {"CMS_AUTHORIZE DENY for site 2": 2},
+  "cleanup": {
+    "keycloak_user_deleted": 204,
+    "django_user_active": false,
+    "remaining_claim_pages": 0
+  },
+  "accepted": true
+}

@@ -6,7 +6,6 @@ CMS role on the owning Site (or platform administrator), the POSTS module gate,
 page-number pagination, optimistic concurrency through ``If-Match``, and the
 shared validation envelope for domain errors.
 """
-from django.core.exceptions import PermissionDenied
 from django.core.exceptions import ValidationError as DomainValidationError
 from django.db import IntegrityError, transaction
 from django.db.models import ProtectedError, Q
@@ -20,9 +19,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from apps.accounts.authentication import KeycloakBearerAuthentication
-from apps.authorization.access import is_platform_administrator
+from apps.cms.authorization import require_cms_grant
 from apps.authorization.services import record_decision
-from apps.cms.models import ContentRole, ContentStatus, SiteContentRoleAssignment
+from apps.cms.models import ContentRole, ContentStatus
 from apps.sites.models import Site
 
 from .models import Category, Post, Tag
@@ -144,25 +143,10 @@ class SiteContentAdminViewSet(
     def _site(self):
         return get_object_or_404(Site, pk=self.kwargs["site_pk"])
 
-    def _roles(self):
-        claims = self.request.auth
-        roles = getattr(claims, "roles", ())
-        roles = set(roles) if isinstance(roles, (tuple, list, set, frozenset)) else set()
-        if is_platform_administrator(self.request.user):
-            roles.add("platform-admin")
-        return roles
-
     def _authorize(self, site, required_roles):
-        if is_platform_administrator(self.request.user) or "platform-admin" in self._roles():
-            return
-        if SiteContentRoleAssignment.objects.filter(
-            site_id=site.pk,
-            user_id=self.request.user.pk,
-            role__in=required_roles,
-            user__is_active=True,
-        ).exists():
-            return
-        raise PermissionDenied("A CMS role assigned to this Site is required.")
+        require_cms_grant(
+            self.request.user, site.pk, required_roles, request=self.request,
+        )
 
     def _module(self, site):
         """Block administration whenever the POSTS module is off."""
@@ -427,7 +411,9 @@ class PostViewSet(SiteContentAdminViewSet):
         responses=PostSerializer(many=True),
         description=(
             "List only Posts belonging to this Site. Requires an active Site "
-            "AUTHOR, REVIEWER or PUBLISHER assignment or platform-admin, and an "
+            "AUTHOR, REVIEWER or PUBLISHER assignment, or an active database "
+            "platform-administrator assignment. Keycloak realm roles do not "
+            "grant access. Also requires an "
             "enabled POSTS module. Unknown or repeated query parameters return "
             "field-level 400 errors."
         ),
@@ -443,8 +429,9 @@ class PostViewSet(SiteContentAdminViewSet):
         tags=["Posts"], parameters=[SITE_PARAMETER], request=PostSerializer,
         responses={201: PostSerializer},
         description=(
-            "Create a draft Post in this Site. Requires Site AUTHOR or "
-            "platform-admin and an enabled POSTS module. Site, status, "
+            "Create a draft Post in this Site. Requires an active Site AUTHOR "
+            "assignment or an active database platform-administrator "
+            "assignment. Keycloak realm roles do not grant access. Requires an enabled POSTS module. Site, status, "
             "publication timestamp and revision are server-controlled."
         ),
     )
@@ -455,7 +442,9 @@ class PostViewSet(SiteContentAdminViewSet):
         tags=["Posts"], parameters=[SITE_PARAMETER, CONTENT_ID_PARAMETER, IF_MATCH],
         request=PostSerializer, responses=PostSerializer,
         description=(
-            "Partially update a Post. Requires Site AUTHOR or platform-admin, "
+            "Partially update a Post. Requires an active Site AUTHOR assignment "
+            "or an active database platform-administrator assignment. "
+            "Keycloak realm roles do not grant access. Also requires "
             "an enabled POSTS module and the current If-Match ETag. Missing "
             "preconditions return 428; stale edits and duplicate slugs return 409."
         ),
@@ -517,7 +506,9 @@ class TaxonomyViewSet(SiteContentAdminViewSet):
         responses=CategorySerializer(many=True),
         description=(
             "List only taxonomy terms belonging to this Site. Requires an "
-            "active Site CMS role or platform-admin and an enabled POSTS module."
+            "active Site CMS role or an active database platform-administrator "
+            "assignment, and an enabled POSTS module. Keycloak realm roles "
+            "do not grant access."
         ),
     )
     def list(self, request, *args, **kwargs):
@@ -567,7 +558,9 @@ class CategoryViewSet(TaxonomyViewSet):
         responses=CategorySerializer(many=True),
         description=(
             "List only taxonomy terms belonging to this Site. Requires an "
-            "active Site CMS role or platform-admin and an enabled POSTS module."
+            "active Site CMS role or an active database platform-administrator "
+            "assignment, and an enabled POSTS module. Keycloak realm roles "
+            "do not grant access."
         ),
     )
     def list(self, request, *args, **kwargs):
@@ -617,7 +610,9 @@ class TagViewSet(CategoryViewSet):
         responses=TagSerializer(many=True),
         description=(
             "List only tags belonging to this Site. Requires an active Site CMS "
-            "role or platform-admin and an enabled POSTS module."
+            "role or an active database platform-administrator assignment, "
+            "and an enabled POSTS module. Keycloak realm roles do not grant "
+            "access."
         ),
     )
     def list(self, request, *args, **kwargs):

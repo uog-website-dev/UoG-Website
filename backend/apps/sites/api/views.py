@@ -16,6 +16,7 @@ from ..services.configuration import apply_site_configuration
 from ..services.domains import activate_domain, deactivate_domain, designate_primary, domain_write
 from ..services.lifecycle import transition_site
 from ..services.modules import disable_module_for_site, enable_module_for_site
+from ..services.registry import registry_write
 from .access import AdministrationViewSet, Conflict, reject_idempotency, translate_domain_errors
 from .query import (
     LIST_PARAMETERS, DomainQuerySerializer, ModuleQuerySerializer, SiteModuleQuerySerializer,
@@ -215,7 +216,7 @@ class SiteDomainViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Admini
     list=extend_schema(parameters=[OpenApiParameter("module", int), OpenApiParameter("is_enabled", bool), OpenApiParameter("ordering", str, description="module_id, optionally prefixed with '-'."), OpenApiParameter("page", int)], description="Enablement rows for this Site only."),
     retrieve=extend_schema(description="404 when the assignment belongs to another Site."),
     create=extend_schema(description="Enable one shipped, globally enabled module for this Site. A duplicate pair returns 409."),
-    partial_update=extend_schema(parameters=[IF_MATCH], description="Replace this Site's module settings. Enabling uses the enable action."),
+    partial_update=extend_schema(parameters=[IF_MATCH], description="Replace this Site's module settings. The row lock, If-Match check and save commit in one transaction. Enabling uses the enable action."),
 )
 class SiteModuleViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, AdministrationViewSet):
     queryset = SiteModule.objects.select_related("site", "module").order_by("module_id")
@@ -247,7 +248,7 @@ class SiteModuleViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Admini
     def create(self, request, *args, **kwargs):
         reject_idempotency(request)
         site = get_object_or_404(Site, pk=self.kwargs["site_pk"])
-        with translate_domain_errors():
+        with translate_domain_errors(), registry_write():
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             module = serializer.validated_data["module"]
@@ -259,7 +260,7 @@ class SiteModuleViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Admini
         return self.respond(enablement, serializer_class=SiteModuleSerializer, status=201, location=reverse("sites:sitemodule-detail", args=[site.pk, enablement.pk]))
 
     def partial_update(self, request, *args, **kwargs):
-        with translate_domain_errors():
+        with translate_domain_errors(), registry_write():
             enablement = self.lock(request, self.get_queryset(), SiteModuleSerializer)
             serializer = self.get_serializer(enablement, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
@@ -267,17 +268,17 @@ class SiteModuleViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Admini
 
     def _switch(self, request, command):
         """Flip the enablement; the on/off switch itself is never gated."""
-        with translate_domain_errors():
+        with translate_domain_errors(), registry_write():
             enablement = self.lock(request, self.get_queryset(), SiteModuleSerializer)
             EmptyObjectSerializer(data=request.data).is_valid(raise_exception=True)
             return self.respond(command(enablement.site_id, enablement.module_id), serializer_class=SiteModuleSerializer)
 
-    @extend_schema(parameters=[IF_MATCH], request=EMPTY, responses=SiteModuleSerializer)
+    @extend_schema(parameters=[IF_MATCH], request=EMPTY, responses=SiteModuleSerializer, description="Turns a shipped, globally enabled module back on for this Site. The row lock, If-Match check and save commit in one transaction. A planned or globally disabled module stays unavailable.")
     @action(detail=True, methods=["post"])
     def enable(self, request, pk=None, site_pk=None):
         return self._switch(request, enable_module_for_site)
 
-    @extend_schema(parameters=[IF_MATCH], request=EMPTY, responses=SiteModuleSerializer, description="Turns the module off for this Site and keeps its configuration.")
+    @extend_schema(parameters=[IF_MATCH], request=EMPTY, responses=SiteModuleSerializer, description="Turns the module off for this Site and keeps its row and configuration. The row lock, If-Match check and save commit in one transaction. Another Site's enablement is unchanged. Content rows stay; authoring and public delivery for that module stop.")
     @action(detail=True, methods=["post"])
     def disable(self, request, pk=None, site_pk=None):
         return self._switch(request, disable_module_for_site)
@@ -316,7 +317,7 @@ class SiteTemplateViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Admi
         return self.respond(template, serializer_class=SiteTemplateSerializer, status=201, location=reverse("site_templates:sitetemplate-detail", args=[template.pk]))
 
     def partial_update(self, request, *args, **kwargs):
-        with translate_domain_errors():
+        with translate_domain_errors(), registry_write():
             template = self.lock(request, self.get_queryset(), SiteTemplateSerializer)
             serializer = self.get_serializer(template, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
@@ -328,7 +329,7 @@ class SiteTemplateViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Admi
     list=extend_schema(parameters=[*LIST_PARAMETERS, OpenApiParameter("status", str, enum=Module.Status.values), OpenApiParameter("is_enabled", bool)], description="Platform-admin only. Planned modules are listed and are not usable."),
     retrieve=extend_schema(description="Platform-admin only."),
     create=extend_schema(description="Development admin only. Registers a capability. It does not implement one."),
-    partial_update=extend_schema(parameters=[IF_MATCH], description="Development admin only. A planned module cannot be marked implemented or globally enabled."),
+    partial_update=extend_schema(parameters=[IF_MATCH], description="Development admin only. The row lock, If-Match check, validation and save commit in one transaction. A planned or unshipped module cannot be marked implemented or globally enabled. A rejected change leaves the previous row intact."),
 )
 class ModuleViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, AdministrationViewSet):
     queryset = Module.objects.order_by("code")
@@ -356,7 +357,7 @@ class ModuleViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Administra
         return self.respond(module, serializer_class=ModuleSerializer, status=201, location=reverse("platform_modules:module-detail", args=[module.pk]))
 
     def partial_update(self, request, *args, **kwargs):
-        with translate_domain_errors():
+        with translate_domain_errors(), registry_write():
             module = self.lock(request, self.get_queryset(), ModuleSerializer)
             serializer = self.get_serializer(module, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)

@@ -94,7 +94,7 @@ async function attempt<T>(run: () => Promise<T>): Promise<ActionResult<T>> {
   }
 }
 
-function queryString(query: Record<string, string | number | undefined>): string {
+function queryString(query: SitePostListQuery): string {
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(query)) {
     if (value !== undefined && value !== "") params.set(key, String(value));

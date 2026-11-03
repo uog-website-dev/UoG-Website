@@ -172,7 +172,7 @@ def test_rejection_returns_editable_draft_and_keeps_reviewer_comment(sites):
     assert page.review_comment == ""
 
 
-def test_site_roles_are_scoped_and_platform_role_is_explicit(sites):
+def test_site_roles_are_scoped_and_platform_grant_is_a_database_assignment(sites):
     site, other_site = sites
     actor = _user("scoped-author")
     _grant(site, actor, ContentRole.AUTHOR)
@@ -185,10 +185,31 @@ def test_site_roles_are_scoped_and_platform_role_is_explicit(sites):
 
     admin = _user("workflow-platform-admin")
     admin.is_staff = True
-    admin.save(update_fields=("is_staff",))
+    admin.is_superuser = True
+    admin.save(update_fields=("is_staff", "is_superuser"))
     with pytest.raises(PermissionDenied):
         _transition(foreign_page, "submit", admin)
+    with pytest.raises(PermissionDenied):
+        _transition(foreign_page, "submit", admin, roles={"platform-admin"})
+    assert SiteContent.objects.get(pk=foreign_page.pk).status == ContentStatus.DRAFT
+
+    from django.core.management import call_command
+    from django.utils import timezone
+    from apps.authorization.models import Role, UserRoleAssignment
+
+    call_command("seed_rbac", verbosity=0)
+    assignment = UserRoleAssignment.objects.create(
+        user=admin,
+        role=Role.objects.get(code="platform-administrator"),
+        scope="PLATFORM",
+    )
     _transition(foreign_page, "submit", admin, roles={"platform-admin"})
+    assert SiteContent.objects.get(pk=foreign_page.pk).status == ContentStatus.IN_REVIEW
+
+    assignment.revoked_at = timezone.now()
+    assignment.save(update_fields=("revoked_at",))
+    with pytest.raises(PermissionDenied):
+        _transition(foreign_page, "approve", admin, roles={"platform-admin"})
     assert SiteContent.objects.get(pk=foreign_page.pk).status == ContentStatus.IN_REVIEW
 
 

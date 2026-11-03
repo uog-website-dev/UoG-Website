@@ -604,7 +604,21 @@ function SitePostsPanelContent({
               <Typography variant="overline">Private draft preview</Typography>
               {(() => {
                 try {
-                  return <PublicPageView page={{ title: form.title || "Untitled Post", path: `/${form.slug}`, blocks: parsedBlocks(form) }} />;
+                  const seo = parseObject(form.seo, "SEO metadata");
+                  return (
+                    <PublicPageView
+                      page={{
+                        title: form.title || "Untitled Post",
+                        path: `/${form.slug}`,
+                        site: siteId,
+                        blocks: parsedBlocks(form),
+                        seo: {
+                          title: typeof seo.meta_title === "string" ? seo.meta_title : "",
+                          description: typeof seo.meta_description === "string" ? seo.meta_description : "",
+                        },
+                      }}
+                    />
+                  );
                 } catch (cause) {
                   return <Alert severity="error">{cause instanceof Error ? cause.message : "Fix block errors to preview this Post."}</Alert>;
                 }

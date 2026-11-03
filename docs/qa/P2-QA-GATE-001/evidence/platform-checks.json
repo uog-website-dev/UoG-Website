@@ -1,0 +1,14 @@
+{
+  "date": "2026-11-02",
+  "schema_matches_repository": true,
+  "paths": 80,
+  "urls": {
+    "/health/live": 200,
+    "/health/ready": 200,
+    "/api/schema/": 200,
+    "/api/docs/": 200,
+    "/api/redoc/": 200
+  },
+  "debug": true,
+  "development_writes_during_qa": true
+}

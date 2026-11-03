@@ -1,6 +1,6 @@
 """Site-scoped API for CMS role assignments and content workflow actions."""
 from django.contrib.auth import get_user_model
-from django.core.exceptions import PermissionDenied, ValidationError as DomainValidationError
+from django.core.exceptions import ValidationError as DomainValidationError
 from django.db import IntegrityError, transaction
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import OpenApiParameter, PolymorphicProxySerializer, extend_schema
@@ -15,6 +15,7 @@ from apps.accounts.permissions import HasRealmRole
 from apps.api.models import Post
 from apps.api.serializers import PostSerializer
 from apps.authorization.access import reject_disabled_module
+from apps.cms.authorization import require_cms_grant
 from apps.sites.api.serializers import StrictFields
 from apps.sites.models import Site
 
@@ -71,7 +72,6 @@ class ContentRoleAssignmentsView(APIView):
 
     authentication_classes = [KeycloakBearerAuthentication]
     permission_classes = [IsAuthenticated, HasRealmRole]
-    required_roles = {"platform-admin"}
 
     @extend_schema(
         tags=["CMS workflow"],
@@ -79,7 +79,8 @@ class ContentRoleAssignmentsView(APIView):
         responses=ContentRoleAssignmentOutput(many=True),
         description=(
             "List AUTHOR, REVIEWER and PUBLISHER assignments for this Site. "
-            "Requires the validated platform-admin token role."
+            "Requires an active database platform-administrator assignment. "
+            "A Keycloak realm role does not grant this operation."
         ),
     )
     def get(self, request, site_pk):
@@ -96,7 +97,8 @@ class ContentRoleAssignmentsView(APIView):
         responses={201: ContentRoleAssignmentOutput},
         description=(
             "Assign one CMS role to a local platform user on this Site. "
-            "Only a validated platform-admin token may manage assignments."
+            "Requires an active database platform-administrator assignment. "
+            "A Keycloak realm role does not grant this operation."
         ),
     )
     def post(self, request, site_pk):
@@ -129,7 +131,6 @@ class ContentRoleAssignmentDetailView(APIView):
 
     authentication_classes = [KeycloakBearerAuthentication]
     permission_classes = [IsAuthenticated, HasRealmRole]
-    required_roles = {"platform-admin"}
 
     @extend_schema(
         tags=["CMS workflow"],
@@ -167,22 +168,10 @@ def _content_module(content):
     return "PAGES"
 
 
-def _workflow_roles(request):
-    claims = request.auth
-    roles = getattr(claims, "roles", ())
-    if not isinstance(roles, (tuple, list, set, frozenset)):
-        return set()
-    return set(roles)
-
-
 def _require_workflow_reader(request, site):
-    if "platform-admin" in _workflow_roles(request):
-        return
-    if SiteContentRoleAssignment.objects.filter(
-        site_id=site.pk, user_id=request.user.pk, user__is_active=True,
-    ).exists():
-        return
-    raise PermissionDenied("A CMS role assigned to this Site is required.")
+    require_cms_grant(
+        request.user, site.pk, ContentRole.values, request=request,
+    )
 
 
 class ContentWorkflowHistoryView(APIView):
@@ -248,10 +237,12 @@ class ContentWorkflowActionView(APIView):
             "Apply a validated workflow action to a Page or Post owned by the "
             "URL Site. Page transitions require PAGES; Post transitions "
             "require POSTS enabled for that Site. Authorization uses the "
-            "action's Site CMS role assignment or the validated "
-            "platform-admin bearer-token role; body-supplied roles are "
-            "rejected. Publishing records an immutable snapshot, audit event "
-            "and cache generation change. A repeated publish is idempotent."
+            "action's Site CMS role assignment or an active database "
+            "platform-administrator assignment. Keycloak realm roles and "
+            "body-supplied roles do not grant access. An author cannot "
+            "review their own content. Publishing records an immutable "
+            "snapshot, audit event and cache generation change. A repeated "
+            "publish is idempotent."
         ),
     )
     def post(self, request, site_pk, content_id):
@@ -266,20 +257,14 @@ class ContentWorkflowActionView(APIView):
         reject_disabled_module(site.pk, _content_module(content), request=request)
         payload = WorkflowActionInput(data=request.data)
         payload.is_valid(raise_exception=True)
-        claims = request.auth
-        roles = getattr(claims, "roles", ())
-        if not isinstance(roles, (tuple, list, set, frozenset)):
-            roles = ()
-        if "platform-admin" not in set(roles) and not SiteContentRoleAssignment.objects.filter(
-            site_id=site.pk, user_id=request.user.pk, user__is_active=True,
-        ).exists():
-            raise PermissionDenied("A CMS role assigned to this Site is required.")
+        require_cms_grant(
+            request.user, site.pk, ContentRole.values, request=request,
+        )
         try:
             transitioned = transition_content(
                 content.pk,
                 action=payload.validated_data["action"],
                 actor=request.user,
-                roles=roles,
                 comment=payload.validated_data.get("comment", ""),
             )
         except DomainValidationError as error:
