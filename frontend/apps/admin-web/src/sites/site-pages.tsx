@@ -37,6 +37,7 @@ import {
   loadSitePages,
   loadSitePageStatusCounts,
   loadSitePageWorkflowHistory,
+  openWorkingDraft,
   setSiteHomepage,
   transitionSitePage,
   updateSitePage,
@@ -303,6 +304,25 @@ function SitePagesPanelContent({
     }
   }
 
+  async function openPublishedDraft(row: SitePageRecord) {
+    setSaving(true);
+    setDialogError("");
+    try {
+      const current = unwrap(await getSitePage(siteId, row.id));
+      const opened = unwrap(await openWorkingDraft(siteId, row.id, current.etag ?? ""));
+      if (opened.status !== "DRAFT") {
+        toast.success("This Page already has a draft in review. Continue from its workflow actions.");
+        pages.reload();
+        return;
+      }
+      await openEdit(opened);
+    } catch (cause) {
+      toast.error(cause instanceof Error ? cause.message : "The working draft could not be opened.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   async function openEdit(row: SitePageRecord) {
     setSaving(true);
     setDialogError("");
@@ -346,8 +366,8 @@ function SitePagesPanelContent({
       } else if (mode === "edit" && activePage?.etag) {
         unwrap(await updateSitePage(siteId, activePage.id, activePage.etag, {
           title: form.title.trim(),
-          slug: form.slug.trim(),
-          parent: form.parent || null,
+          slug: activePage.draft_of ? activePage.slug : form.slug.trim(),
+          parent: activePage.draft_of ? null : form.parent || null,
           visibility: form.visibility,
           metadata: metadataInput(form),
           seo: jsonObject(form.seo, "SEO"),
@@ -522,6 +542,13 @@ function SitePagesPanelContent({
       actions.push(
         <Button key="edit" size="small" aria-label={`Edit ${row.title}`} disabled={!enabled} onClick={() => void openEdit(row)}>
           Edit
+        </Button>,
+      );
+    }
+    if (canEdit && row.status === "PUBLISHED" && !row.draft_of) {
+      actions.push(
+        <Button key="working-draft" size="small" aria-label={`Edit a draft of ${row.title}`} disabled={!enabled} onClick={() => void openPublishedDraft(row)}>
+          Edit draft
         </Button>,
       );
     }
@@ -751,7 +778,7 @@ function SitePagesPanelContent({
         aria-labelledby="page-editor-title"
       >
         <DialogTitle id="page-editor-title">
-          {mode === "create" ? "Create Page" : "Edit Page"}
+          {mode === "create" ? "Create Page" : activePage?.draft_of ? "Edit draft of published Page" : "Edit Page"}
         </DialogTitle>
         <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, pt: "8px !important" }}>
           {dialogError ? (
@@ -772,15 +799,17 @@ function SitePagesPanelContent({
             label="Slug"
             value={form.slug}
             onChange={(event) => setForm((current) => ({ ...current, slug: event.target.value }))}
-            disabled={!enabled}
+            disabled={!enabled || Boolean(activePage?.draft_of)}
             required
-            helperText="Use lowercase letters, numbers and hyphens."
+            helperText={activePage?.draft_of
+              ? "Publication keeps the live Page route. This draft uses an internal slug."
+              : "Use lowercase letters, numbers and hyphens."}
           />
           <TextField
             select
             label="Parent Page"
             value={form.parent}
-            disabled={!enabled}
+            disabled={!enabled || Boolean(activePage?.draft_of)}
             helperText="Only Pages from this Site are available. Route history is preserved when a Page moves."
             onChange={(event) => setForm((current) => ({ ...current, parent: event.target.value }))}
           >

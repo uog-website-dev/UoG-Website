@@ -81,6 +81,7 @@ class PageSerializer(
         ),
     )
     available_actions = serializers.SerializerMethodField()
+    draft_of = serializers.PrimaryKeyRelatedField(read_only=True)
 
     immutable_on_update = ("id", "site", "locale", "created_by", "created_at")
 
@@ -90,7 +91,7 @@ class PageSerializer(
             "id", "site", "parent", "locale", "title", "slug", "path",
             "layout", "seo", "visibility", "position", "is_homepage",
             "status", "published_at", "blocks", "blocks_version",
-            "revision_number",
+            "revision_number", "draft_of",
             "created_by", "updated_by", "submitted_by", "reviewed_by",
             "review_comment", "metadata", "created_at", "updated_at",
             "available_actions",
@@ -98,7 +99,7 @@ class PageSerializer(
         read_only_fields = (
             "id", "site", "path", "is_homepage", "status", "published_at",
             "blocks_version", "created_by", "updated_by", "submitted_by",
-            "revision_number", "reviewed_by", "review_comment",
+            "revision_number", "draft_of", "reviewed_by", "review_comment",
             "created_at", "updated_at",
         )
 

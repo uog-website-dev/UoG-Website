@@ -27,6 +27,7 @@ from ..models import (
 )
 from ..services.pages import change_route, require_pages_module, set_as_homepage
 from ..services.workflow import transition_content
+from ..services.working_drafts import open_working_draft
 from .serializers import PageSerializer
 from .workflow import WorkflowActionInput, WorkflowStateConflict
 
@@ -362,6 +363,49 @@ class SitePageViewSet(
             PageWorkflowHistorySerializer(history, many=True).data,
             headers={"Cache-Control": "private, no-store"},
         )
+
+    @extend_schema(
+        tags=["CMS pages"],
+        parameters=[SITE_PARAMETER, PAGE_PARAMETER, IF_MATCH],
+        request=None,
+        responses={200: PageSerializer, 201: PageSerializer},
+        description=(
+            "Open the one working draft of a published Page. The draft is "
+            "copied from the current serving snapshot and edited through the "
+            "normal Page workflow. The published Page stays locked and public "
+            "delivery keeps that snapshot until the draft is independently "
+            "approved and published. Requires an active Site AUTHOR assignment "
+            "or an active database platform-administrator assignment, the "
+            "PAGES module, and the published Page If-Match ETag. Keycloak "
+            "realm roles do not grant access. A missing precondition returns "
+            "428 and a stale ETag returns 409."
+        ),
+    )
+    @action(detail=True, methods=["post"], url_path="working-draft")
+    def working_draft(self, request, *args, **kwargs):
+        site, page = self._page()
+        self._authorize(site, (ContentRole.AUTHOR,))
+        ensure_pages_module_enabled(site.pk)
+        supplied = request.headers.get("If-Match")
+        if not supplied:
+            raise PreconditionRequired()
+        if supplied != page_etag(page):
+            raise PageEditConflict()
+        try:
+            draft, created = open_working_draft(page, actor=request.user)
+        except DomainValidationError as error:
+            detail = (
+                error.message_dict if hasattr(error, "message_dict")
+                else {"non_field_errors": error.messages}
+            )
+            raise serializers.ValidationError(detail) from error
+        draft = get_object_or_404(
+            Page.objects.filter(site_id=site.pk), pk=draft.pk,
+        )
+        response = self._response(draft, status_code=201 if created else 200)
+        if created:
+            response["Location"] = f"/api/v1/sites/{site.pk}/pages/{draft.pk}/"
+        return response
 
     @extend_schema(
         tags=["CMS pages"],

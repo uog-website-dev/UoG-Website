@@ -13,7 +13,8 @@ signed commit and fresh gate run. QA-D003's logout allowlist was
 reconciled locally on 3 Nov 2026 and is awaiting that same signed commit
 and fresh gate run. QA-D005's regression and typecheck failures
 were corrected locally on 3 Nov 2026. The fresh suite counts below
-replace the earlier failure counts. A pull request carries the
+replace the earlier failure counts. QA-GAP001's published-page working
+draft was demonstrated locally on 3 Nov 2026. A pull request carries the
 revision CI must run. The other findings remain open. Priority P1 means
 a high-priority release blocker in this assessment; institutional triage may
 raise it. No exception is approved.
@@ -267,19 +268,30 @@ Evidence: [fresh JUnit](evidence/backend-junit-2026-11-03.xml),
 The earlier [backend JUnit](evidence/backend.junit.xml) and
 [typecheck log](evidence/frontend-typecheck.log) remain the historical record.
 
-## QA-GAP001 — P2 / acceptance gap — draft/public coexistence not demonstrated
+## QA-GAP001 — P2 / acceptance gap — draft/public coexistence demonstrated locally
 
-**Case:** T23 (BLOCKED).
+**Case:** T23. Corrected locally on 3 Nov 2026. The earlier blocked result
+remains the historical observation.
 
-Attempting to edit the published Page through the authoring PATCH endpoint
-returned **400**, while the public snapshot retained its previous title. That
-proves rejection/stability, not creation and editing of a new concurrent draft.
-No approved alternative draft-fork API flow was demonstrated. Confirm/document
-the intended workflow or implement it and repeat the test. Do not remove a
-published-content protection rule as a shortcut.
+The first attempt patched a published Page directly. That returned **400**
+and the public snapshot did not change. That rejection stays in place.
 
-Evidence: [live T23 observation](evidence/live-results.json),
-[Page PATCH/public reads](evidence/http-transcript.json).
+The approved contract is a working draft: an AUTHOR opens one DRAFT Page
+linked to the published Page, edits that draft, and a different reviewer and
+publisher release it through the existing workflow. On the running stack,
+`www.uog.local` kept serving `T23 visitors` at publication version 1 while
+the draft title was `T23 visitors revised`. A direct PATCH of the published
+Page returned 400. The author received 403 on approve. After independent
+approval and publication, the same public route served `T23 visitors revised`
+at publication version 2 and the draft was archived. Unpublish then returned
+404 for that route. The temporary reviewer and publisher assignments were
+revoked and those Keycloak accounts were disabled. The probe Page remains
+unpublished on Main Site.
+
+Evidence: [T23 sequence](evidence/t23-working-draft.md),
+[editor screenshot](evidence/t23-working-draft.png).
+The earlier [blocked observation](evidence/live-results.json) is unchanged
+history.
 
 ## Follow-up execution order
 

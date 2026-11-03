@@ -34,6 +34,7 @@ class ContentStatus(models.TextChoices):
 
 
 _workflow_write = ContextVar("cms_workflow_write", default=False)
+_apply_working_draft = ContextVar("cms_apply_working_draft", default=False)
 _revision_origin = ContextVar("cms_revision_origin", default=None)
 
 
@@ -49,6 +50,21 @@ def workflow_write():
         yield
     finally:
         _workflow_write.reset(token)
+
+
+@contextmanager
+def apply_working_draft():
+    """Allow publication to copy an approved draft onto a published Page.
+
+    The flag does not unlock review, archive, route or homepage fields, and
+    it does not change status. The database trigger requires the matching
+    transaction setting ``cms.apply_working_draft``.
+    """
+    token = _apply_working_draft.set(True)
+    try:
+        yield
+    finally:
+        _apply_working_draft.reset(token)
 
 
 @contextmanager
@@ -252,11 +268,18 @@ class SiteContent(models.Model):
                 previous[name] != getattr(self, name)
                 for name in ("locale", "metadata", "blocks", "blocks_version")
             ):
-                raise ValidationError({
-                    "status": "Content is locked while in review, approved, "
-                              "published or archived. Return it to an editable "
-                              "state through the workflow first.",
-                })
+                applying = (
+                    _apply_working_draft.get()
+                    and previous["status"] == ContentStatus.PUBLISHED
+                    and self.status == ContentStatus.PUBLISHED
+                    and previous["locale"] == self.locale
+                )
+                if not applying:
+                    raise ValidationError({
+                        "status": "Content is locked while in review, approved, "
+                                  "published or archived. Return it to an editable "
+                                  "state through the workflow first.",
+                    })
         elif self.status != ContentStatus.DRAFT:
             raise ValidationError({"status": "New content must start as a draft."})
 
@@ -564,6 +587,12 @@ class Page(SiteContent):
                   "one per Site (partial unique index), maintained through "
                   "the set_as_homepage service so replacement is atomic.",
     )
+    draft_of = models.ForeignKey(
+        "self", null=True, blank=True, on_delete=models.PROTECT,
+        related_name="working_drafts",
+        help_text="Published Page this row revises. Empty for every public "
+                  "Page. A working draft is editable while that Page stays live.",
+    )
 
     class Meta:
         ordering = ("position", "id")
@@ -652,10 +681,19 @@ class Page(SiteContent):
                         "visibility", "position", "is_homepage",
                     )
                 ):
-                    raise ValidationError({
-                        "status": "Page content is locked while in review, "
-                                  "approved, published or archived.",
-                    })
+                    applying = (
+                        _apply_working_draft.get()
+                        and current["status"] == ContentStatus.PUBLISHED
+                        and self.status == ContentStatus.PUBLISHED
+                        and previous_page["parent_id"] == self.parent_id
+                        and previous_page["slug"] == self.slug
+                        and previous_page["is_homepage"] == self.is_homepage
+                    )
+                    if not applying:
+                        raise ValidationError({
+                            "status": "Page content is locked while in review, "
+                                      "approved, published or archived.",
+                        })
         if not isinstance(self.seo, dict):
             raise ValidationError({"seo": "SEO metadata must be a JSON object."})
         unknown = sorted(set(self.seo) - set(SEO_KEYS))
@@ -672,12 +710,65 @@ class Page(SiteContent):
                     "seo": f"{key} must be at most {SEO_KEYS[key]} characters.",
                 })
 
+        self._validate_working_draft()
         self._validate_route()
         # Blocks last, after the route is settled (see _validate_blocks):
         # a block rejection must not leave route normalization half-done,
         # and the constraint checks that run after clean read the instance —
         # settled fields, no shadowing noise.
         self._validate_blocks()
+
+    def _validate_working_draft(self):
+        """Keep a working draft tied to one published Page on this Site."""
+        if not self.draft_of_id:
+            return
+        if self.draft_of_id == self.pk:
+            raise ValidationError({
+                "draft_of": "A Page cannot be a working draft of itself.",
+            })
+        if self.parent_id:
+            raise ValidationError({
+                "parent": "A working draft is not part of the public route tree.",
+            })
+        if self.is_homepage:
+            raise ValidationError({
+                "is_homepage": "A working draft cannot be the homepage.",
+            })
+        using = self._state.db or router.db_for_write(type(self), instance=self)
+        target = (
+            type(self).objects.using(using)
+            .filter(pk=self.draft_of_id)
+            .values("site_id", "locale", "status", "draft_of_id")
+            .first()
+        )
+        if target is None:
+            raise ValidationError({
+                "draft_of": "The published Page does not exist.",
+            })
+        if target["draft_of_id"]:
+            raise ValidationError({
+                "draft_of": "A working draft cannot target another working draft.",
+            })
+        if target["site_id"] != self.site_id or target["locale"] != self.locale:
+            raise ValidationError({
+                "draft_of": "A working draft must stay on the published Page's "
+                            "Site and language.",
+            })
+        if not self._state.adding:
+            previous = (
+                type(self).objects.using(using)
+                .filter(pk=self.pk)
+                .values_list("draft_of_id", flat=True)
+                .first()
+            )
+            if previous != self.draft_of_id:
+                raise ValidationError({
+                    "draft_of": "The published Page link is fixed.",
+                })
+        elif target["status"] != ContentStatus.PUBLISHED:
+            raise ValidationError({
+                "draft_of": "A working draft can only be opened for a published Page.",
+            })
 
     def _validate_route(self):
         """Compute and police the page's route within its Site and locale."""

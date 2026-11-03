@@ -13,6 +13,7 @@ const updateSitePage = vi.fn();
 const transitionSitePage = vi.fn();
 const setSiteHomepage = vi.fn();
 const loadSitePageWorkflowHistory = vi.fn();
+const openWorkingDraft = vi.fn();
 
 vi.mock("@/app/sites/page-actions", () => ({
   loadSitePages: (...args: unknown[]) => loadSitePages(...args),
@@ -22,6 +23,7 @@ vi.mock("@/app/sites/page-actions", () => ({
   updateSitePage: (...args: unknown[]) => updateSitePage(...args),
   transitionSitePage: (...args: unknown[]) => transitionSitePage(...args),
   loadSitePageWorkflowHistory: (...args: unknown[]) => loadSitePageWorkflowHistory(...args),
+  openWorkingDraft: (...args: unknown[]) => openWorkingDraft(...args),
   setSiteHomepage: (...args: unknown[]) => setSiteHomepage(...args),
 }));
 
@@ -135,6 +137,7 @@ beforeEach(() => {
   createSitePage.mockResolvedValue({ ok: true, data: draft() });
   transitionSitePage.mockResolvedValue({ ok: true, data: draft({ status: "IN_REVIEW" }) });
   loadSitePageWorkflowHistory.mockResolvedValue({ ok: true, data: [] });
+  openWorkingDraft.mockResolvedValue({ ok: true, data: draft() });
   setSiteHomepage.mockResolvedValue({ ok: true, data: draft({ is_homepage: true }) });
   updateSitePage.mockResolvedValue({ ok: true, data: draft({ title: "Admissions updated" }) });
 });
@@ -444,5 +447,38 @@ describe("SitePagesPanel", () => {
     expect(screen.queryByText("Informatics Admissions")).toBeNull();
     expect(screen.queryByRole("button", { name: "Create page" })).toBeNull();
     expect(screen.queryByRole("button", { name: /^Edit/ })).toBeNull();
+  });
+
+  it("opens a working draft of a published Page and keeps the live route fixed", async () => {
+    const published = draft({
+      id: "live-1",
+      status: "PUBLISHED",
+      title: "Admissions",
+      etag: '"cms-content-live-1-r1"',
+    });
+    const working = draft({
+      id: "draft-1",
+      title: "Admissions",
+      slug: "wip-abc123",
+      path: "/wip-abc123",
+      status: "DRAFT",
+      draft_of: "live-1",
+      etag: '"cms-content-draft-1-r1"',
+    });
+    loadSitePages.mockResolvedValue(pageResult([published]));
+    getSitePage.mockImplementation(async (_site: number, id: string) => ({
+      ok: true,
+      data: id === "draft-1" ? working : published,
+    }));
+    openWorkingDraft.mockResolvedValue({ ok: true, data: working });
+    renderPanel();
+
+    fireEvent.click(await screen.findByRole("button", { name: "Edit a draft of Admissions" }));
+    await waitFor(() => expect(openWorkingDraft).toHaveBeenCalledWith(
+      11, "live-1", '"cms-content-live-1-r1"',
+    ));
+    const dialog = await screen.findByRole("dialog", { name: "Edit draft of published Page" });
+    expect(within(dialog).getByRole("textbox", { name: "Slug" })).toHaveProperty("disabled", true);
+    expect(within(dialog).getByRole("combobox", { name: "Parent Page" }).getAttribute("aria-disabled")).toBe("true");
   });
 });

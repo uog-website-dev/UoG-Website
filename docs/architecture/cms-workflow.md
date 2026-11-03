@@ -81,8 +81,11 @@ retains the original feedback.
 
 Content is locked while IN_REVIEW, APPROVED, PUBLISHED or ARCHIVED. Both model
 validation and database triggers reject changes to the content payload in
-those states. After unpublishing, an authorized editor can revise and restore
-the content to DRAFT for another review cycle.
+those states. Direct edits of a published Page stay rejected. After
+unpublishing, an authorized editor can revise and restore the content to
+DRAFT for another review cycle; that path takes the Page off the public
+site, so it is not the way to prepare a replacement while visitors still
+see the last publication. Use a working draft for that.
 
 Every successful publication writes a `PublishedContentSnapshot` containing
 the complete serving payload and a monotonically increasing per-content
@@ -124,6 +127,49 @@ boundary. Existing content is backfilled as revision 1 during migration,
 using its last-updated timestamp as the baseline revision time.
 Draft content deletion also removes its revision history; any content with a
 PUBLISHED revision or publication snapshot cannot be deleted.
+
+## Working drafts of a published Page
+
+A published Page stays PUBLISHED and locked. Public APIs, navigation and
+Next.js rendering keep serving its latest `PublishedContentSnapshot`, path
+and metadata until a reviewed publication of a working draft commits.
+
+An AUTHOR opens at most one working draft with
+`POST /api/v1/sites/{site_pk}/pages/{id}/working-draft/`. The request requires
+the published Page's current `If-Match` ETag: a missing precondition returns
+428 and a stale ETag returns 409. The response is a normal DRAFT Page copied
+from that serving snapshot. `draft_of` points at the published Page, the
+draft uses an internal `wip-` slug with no parent, and repeating the call
+returns the same open draft. Archived drafts do not count as open. The
+draft is Site-scoped: another Site's identifier returns 404, and a caller
+without the AUTHOR role on this Site is denied.
+
+The AUTHOR edits that draft with the existing Page PATCH. Submit, reject,
+approve, archive and the author/reviewer separation use the existing
+workflow. The author and submitter still cannot approve it.
+
+Publishing an approved working draft does not publish the internal route.
+In one transaction the PUBLISHER copies the draft title, blocks, block
+schema version, metadata, SEO, layout and visibility onto the published
+Page, writes the next immutable snapshot, bumps that Site and locale
+publication version, records `CONTENT_PUBLISHED` for the live Page, and
+archives the working draft. The live Page id, slug, path, parent and
+homepage flag do not change. The database allows that copy only while the
+publication service sets `cms.apply_working_draft` for the transaction, and
+only while the row stays PUBLISHED. Concurrent publishes serialize on the
+draft and the live Page; a second or stale publish fails because the draft
+is no longer APPROVED. If the snapshot cannot be written, or the live Page
+is no longer PUBLISHED, the transaction rolls back and the previous snapshot
+and cache generation stay in place.
+
+Unpublish and archive of the live Page are unchanged. Unpublish keeps the
+snapshot and `published_at` but stops public delivery. A working draft
+cannot be published onto a Page that is not currently published. Archiving
+the working draft discards that copy and leaves the live snapshot. Posts do
+not use `draft_of` and keep the shared publish path.
+
+Existing Pages gain an empty `draft_of`. Published snapshots are not
+rewritten by the migration.
 
 ## Authorization boundary
 

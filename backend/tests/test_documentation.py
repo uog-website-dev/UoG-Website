@@ -71,6 +71,7 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
         "/api/v1/sites/{site_pk}/pages/{id}/workflow/",
         "/api/v1/sites/{site_pk}/pages/{id}/homepage/",
         "/api/v1/sites/{site_pk}/pages/{id}/workflow-history/",
+        "/api/v1/sites/{site_pk}/pages/{id}/working-draft/",
         "/api/v1/sites/{site_pk}/posts/",
         "/api/v1/sites/{site_pk}/posts/{id}/",
         "/api/v1/sites/{site_pk}/categories/",

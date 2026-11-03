@@ -158,6 +158,11 @@ The `revision_number` token detects stale ORM instances; a stale save raises
 `ContentEditConflict`. Revision history is Site-scoped in the API, and a
 restore requires a current `If-Match` ETag and creates a new DRAFT revision.
 Published snapshots and published-status revisions are never edited.
+A published Page is not edited in place. `Page.draft_of` names the published
+Page a working draft will replace. It is empty on every live Page. Opening,
+editing, reviewing and publishing that draft is specified in
+[cms-workflow](cms-workflow.md). Publication writes a new snapshot on the
+same published row; it does not rewrite older snapshots.
 
 Snapshots are capped at 1 MiB. The newest 100 non-published revisions are
 retained, with all PUBLISHED revisions and revisions referenced by a restore

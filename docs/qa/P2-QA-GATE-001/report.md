@@ -62,7 +62,7 @@ evidence in [results.csv](results.csv) and [results.json](results.json).
 | T20 | **PASS** | Draft/review/approval/publication follows workflow. | Two Sites completed submit -> approve -> publish with distinct real Keycloak author, reviewer and publisher identities and explicit Site CMS assignments. | [live-results.json](evidence/live-results.json), [http-transcript.json](evidence/http-transcript.json) |
 | T21 | **PASS** | Unauthorized publication and invalid transitions are rejected. | Ordinary Viewer publish request returned 403; invalid-transition/separation-of-duties regression passed. This limited workflow case does not waive SEC001. | [live-results.json](evidence/live-results.json), [backend.junit.xml](evidence/backend.junit.xml) |
 | T22 | **PASS** | Unpublished Pages are not publicly delivered. | Both draft Page routes returned 404 before publication; draft/hidden/unpublish regression passed. | [live-results.json](evidence/live-results.json), [backend.junit.xml](evidence/backend.junit.xml) |
-| T23 | **BLOCKED** | Published content stays stable while a new draft is edited. | Direct edit of the published Page returned 400 and existing public snapshot stayed stable. No supported concurrent draft-fork workflow was demonstrated; a documented flow is required before this case can pass. | [live-results.json](evidence/live-results.json), [http-transcript.json](evidence/http-transcript.json) · QA-GAP001 |
+| T23 | **PASS** | Published content stays stable while a new draft is edited. | Direct PATCH of the published Page returned 400. A working draft was edited, reviewed by a different person, and published onto the same route. Public delivery stayed on version 1 until publication, then served version 2. Unpublish returned 404. | [t23-working-draft.md](evidence/t23-working-draft.md), [t23-working-draft.png](evidence/t23-working-draft.png) · QA-GAP001 |
 | T24 | **PASS** | Posts support authoring/editing/taxonomy/excerpts. | Editor created categorized/tagged Post with excerpt, published it, and created/edited a separate draft Post over HTTP. | [live-results.json](evidence/live-results.json), [http-transcript.json](evidence/http-transcript.json) |
 | T25 | **PASS** | Post slugs and taxonomies are Site-scoped. | Cross-Site category reference rejected 400; Post/taxonomy slug, uniqueness and ownership regression passed. | [live-results.json](evidence/live-results.json), [backend.junit.xml](evidence/backend.junit.xml) |
 | T26 | **PASS** | Posts use shared CMS publishing. | Post completed shared CMS submit/approve/publish API and persisted as PUBLISHED in SiteContent; no standalone news workflow was substituted. | [live-results.json](evidence/live-results.json), [backend.junit.xml](evidence/backend.junit.xml) |
@@ -93,9 +93,9 @@ Local regression is not remote CI evidence. Azure pipeline run URL/results were
 not provided or retrieved. This package is ready to attach to Azure DevOps,
 but has not been uploaded and the issue must remain open.
 
-T23 needs a supported draft-fork workflow that leaves published content live.
-Rejecting edits to published content is safe; removing that guard is not an
-acceptable shortcut. T38 requires an isolated fresh deployment after blockers
+T23 was demonstrated on 3 November 2026 with a working draft. The published
+Page stayed locked, and public delivery kept the previous snapshot until the
+reviewed publication. T38 requires an isolated fresh deployment after blockers
 are fixed. No existing database volume was reset to simulate a fresh install.
 
 ## Cleanup and retained evidence
