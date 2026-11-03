@@ -37,8 +37,12 @@ def _celery_app():
 
     app = Celery(
         "uog",
-        broker_url=config("CELERY_BROKER_URL"),
-        result_backend=config("CELERY_RESULT_BACKEND"),
+        broker_url=config(
+            "CELERY_BROKER_URL", default="redis://redis-broker:6379/0"
+        ),
+        result_backend=config(
+            "CELERY_RESULT_BACKEND", default="redis://redis-broker:6379/1"
+        ),
         timezone=config("CELERY_TIMEZONE", default="UTC"),
     )
     app.config_from_object("django.conf:settings", namespace="CELERY")
