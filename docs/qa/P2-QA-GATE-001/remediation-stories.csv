@@ -176,6 +176,8 @@ workflow. First identify the approved P0/CMS revision model and supported API
 sequence. If it already exists, document and test it; otherwise implement the
 smallest approved working-copy/publication mechanism.
 
+Local result, 3 Nov 2026: demonstrated. The published Page stays locked, one working draft is edited, and reviewed publication updates that same Page. Evidence is evidence/t23-working-draft.md. Pull request 59. The gate stays No-Go.
+
 Do not make published content freely mutable to satisfy this test, invent a
 parallel CMS/news domain, or treat a blocked test as a passed scenario.","- Technical Lead records the approved draft/publication contract, entry points,
   workflow states and permission mapping before introducing a new data model.

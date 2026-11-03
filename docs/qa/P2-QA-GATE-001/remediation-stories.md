@@ -246,6 +246,12 @@ counts are historical until a new complete run replaces them.
 
 ## P2-HARD-007 — Establish safe draft editing alongside a live publication
 
+**Local result (3 Nov 2026):** Demonstrated. A published Page stays locked.
+`POST .../working-draft/` opens one draft from the serving snapshot, and
+reviewed publication copies it onto that Page. Evidence:
+[T23 sequence](evidence/t23-working-draft.md). Pull request
+https://github.com/uog-website-dev/UoG-Website/pull/59. The gate stays No-Go.
+
 **As a** Site Editor and Publisher,  
 **I want** to edit a new draft while visitors continue seeing the last approved
 publication,  

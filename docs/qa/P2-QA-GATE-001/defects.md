@@ -298,7 +298,7 @@ history.
 1. Fix SEC001 and add signed-token/DB-scope disagreement regressions.
 2. Fix transactional module management and effective-permission route errors.
 3. Reconcile logout configuration; repair access UI and regression/typecheck gates.
-4. Execute T23 with the approved draft workflow and run T38 in an isolated fresh
-   stack. Preserve the current development data rather than wiping its volumes.
+4. T23 was demonstrated on 3 Nov 2026. Run T38 in an isolated fresh stack.
+   Preserve the current development data rather than wiping its volumes.
 5. Re-run all 38 cases without fixture workarounds, link remote CI and defect
    resolutions, then obtain actual QA Lead/Technical Lead/Product Owner decisions.

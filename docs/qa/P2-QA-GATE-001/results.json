@@ -6,9 +6,9 @@
   "technical_recommendation": "NO-GO",
   "formal_signoff": "PENDING - no stakeholder signatures supplied",
   "counts": {
-    "PASS": 27,
+    "PASS": 28,
     "FAIL": 9,
-    "BLOCKED": 2
+    "BLOCKED": 1
   },
   "cases": [
     {
@@ -299,14 +299,14 @@
     },
     {
       "test_id": "T23",
-      "status": "BLOCKED",
+      "status": "PASS",
       "expected": "Published content stays stable while a new draft is edited.",
-      "actual": "Direct edit of the published Page returned 400 and existing public snapshot stayed stable. No supported concurrent draft-fork workflow was demonstrated; a documented flow is required before this case can pass.",
-      "execution_date": "2026-11-02",
-      "tester": "Codex automated QA + artifact review",
-      "environment": "Local Compose / real Django, PostgreSQL, Keycloak, Next.js, headless Edge",
-      "build": "cd704d3f8743dafd65f91ced302a704033977c9a",
-      "evidence": "live-results.json;http-transcript.json",
+      "actual": "Direct PATCH of the published Page returned 400. A working draft was edited, reviewed by a different person, and published onto the same route. Public delivery stayed on version 1 until publication, then served version 2. Unpublish returned 404.",
+      "execution_date": "2026-11-03",
+      "tester": "Local API sequence and admin browser",
+      "environment": "Local Compose / real Django, PostgreSQL, Keycloak, Next.js, admin browser",
+      "build": "ab944d8",
+      "evidence": "t23-working-draft.md;t23-working-draft.png",
       "defects": "QA-GAP001",
       "approved_exception": "None"
     },
