@@ -150,7 +150,8 @@ class TreeQuery(StrictFields, serializers.Serializer):
 class ListQuery(StrictFields, serializers.Serializer):
     page = serializers.IntegerField(required=False, min_value=1)
     page_size = serializers.IntegerField(required=False, min_value=1, max_value=100)
-    is_active = serializers.BooleanField(required=False)
+    is_active = serializers.BooleanField(required=False,
+        help_text="Optional active-state filter. Omit to include both active and inactive records.")
 
 
 class MenuPagination(PageNumberPagination):
@@ -210,7 +211,9 @@ class MenuAPIBase(GenericViewSet):
     def _query(self, cls):
         if any(len(self.request.query_params.getlist(key)) != 1 for key in self.request.query_params):
             raise serializers.ValidationError({"query": "Supply each parameter only once."})
-        value = cls(data=self.request.query_params)
+        # QueryDict is treated as HTML form input by DRF: an omitted checkbox
+        # becomes False. These are optional API filters, so preserve omission.
+        value = cls(data=self.request.query_params.dict())
         value.is_valid(raise_exception=True)
         return value.validated_data
 

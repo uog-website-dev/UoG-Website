@@ -1,5 +1,7 @@
 # Defect register — 2026-11-02
 
+The 3 November 2026 rerun is in [report-2026-11-03.md](report-2026-11-03.md). QA-SEC001, QA-D001, QA-D002, QA-D003, QA-D004, QA-D005 and QA-GAP001 were exercised again on commit `ce66ecd`. That rerun does not replace the reproductions below, and it does not record a stakeholder signature.
+
 Build: `cd704d3f8743dafd65f91ced302a704033977c9a` (`P2-FE-010`).
 All references below are local defect references ready for Azure DevOps entry,
 not fabricated remote issue links. QA-SEC001's realm-role CMS bypass was
@@ -298,7 +300,7 @@ history.
 1. Fix SEC001 and add signed-token/DB-scope disagreement regressions.
 2. Fix transactional module management and effective-permission route errors.
 3. Reconcile logout configuration; repair access UI and regression/typecheck gates.
-4. Execute T23 with the approved draft workflow and run T38 in an isolated fresh
-   stack. Preserve the current development data rather than wiping its volumes.
+4. T23 was demonstrated on 3 Nov 2026. Run T38 in an isolated fresh stack.
+   Preserve the current development data rather than wiping its volumes.
 5. Re-run all 38 cases without fixture workarounds, link remote CI and defect
    resolutions, then obtain actual QA Lead/Technical Lead/Product Owner decisions.

@@ -1,12 +1,15 @@
 # Sprint 1 & Sprint 2 Integrated Acceptance Report
 
+A later execution is recorded in [report-2026-11-03.md](report-2026-11-03.md). The rows below remain the 2 November 2026 assessment and are not relabeled by that rerun.
+
 **Issue:** P2-QA-GATE-001 · **Execution date:** 2026-11-02 (Africa/Nairobi)
 
 **Technical recommendation: NO-GO.** A signed Keycloak realm role bypasses
 database Site authorization for Page administration. This is an automatic
 security-gate failure. No approved exception or stakeholder release approval exists.
 
-**38 cases assessed: 27 PASS, 9 FAIL, 2 BLOCKED.**
+**38 cases assessed: 28 PASS, 9 FAIL, 1 BLOCKED.** T23 was retested
+on 3 November 2026. The other case results are the 2 November gate.
 This does not mean all 38 passed or were fully executed: blocked cases remain
 unaccepted, and a successful subcheck never overrides a failing boundary.
 

@@ -1,0 +1,73 @@
+{
+  "run": "qa6a1a06aa",
+  "build": "ce66ecde0a107479f33aee0e158221b3391e26a5+worktree.f950990477ba",
+  "date": "2026-11-04",
+  "results": [
+    {
+      "id": "T31-0",
+      "label": "Published Page renders for qa6a1a06aa-main.uog.local",
+      "status": "PASS",
+      "actual": "Real Next.js client rendered this hostname’s published backend snapshot without the other Site marker."
+    },
+    {
+      "id": "T31-1",
+      "label": "Published Page renders for qa6a1a06aa-college.uog.local",
+      "status": "PASS",
+      "actual": "Real Next.js client rendered this hostname’s published backend snapshot without the other Site marker."
+    },
+    {
+      "id": "T31-post",
+      "label": "Published Post renders on its Site only",
+      "status": "PASS",
+      "actual": "Own Post marker rendered; foreign hostname did not render it."
+    },
+    {
+      "id": "T30-browser",
+      "label": "Public navigation uses the owning Site Menu",
+      "status": "PASS",
+      "actual": "Rendered QA Home navigation links to the same-Site published Page."
+    },
+    {
+      "id": "T32-mobile",
+      "label": "mobile layout and keyboard navigation",
+      "status": "PASS",
+      "actual": "Viewport 390x844; no horizontal overflow; keyboard control reached navigation."
+    },
+    {
+      "id": "T32-tablet",
+      "label": "tablet layout and keyboard navigation",
+      "status": "PASS",
+      "actual": "Viewport 768x1024; no horizontal overflow; keyboard control reached navigation."
+    },
+    {
+      "id": "T32-desktop",
+      "label": "desktop layout and keyboard navigation",
+      "status": "PASS",
+      "actual": "Viewport 1440x1000; no horizontal overflow; keyboard control reached navigation."
+    },
+    {
+      "id": "T12-browser",
+      "label": "Real Keycloak authorization-code login and Auth.js session",
+      "status": "PASS",
+      "actual": "Actual Keycloak credentials/redirect succeeded; Auth.js session cookies are HTTP-only. No cookie/token values recorded."
+    },
+    {
+      "id": "T13-browser",
+      "label": "IAM access-management UI compiles and loads",
+      "status": "PASS",
+      "actual": "Access screen loaded; API delegation boundary tested independently."
+    },
+    {
+      "id": "T28-browser",
+      "label": "Active and inactive menus remain visible; active menu can be edited",
+      "status": "PASS",
+      "actual": "Activated header and inactive footer rendered together; header rename persisted across a real browser reload and was restored through the same UI."
+    },
+    {
+      "id": "T12-logout",
+      "label": "Keycloak/Auth.js sign-out clears session",
+      "status": "PASS",
+      "actual": "Auth.js session cleared and protected console asks for sign-in again."
+    }
+  ]
+}

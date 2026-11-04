@@ -121,7 +121,7 @@ def test_serialized_shape_matches_the_documented_contract(sites):
 
 
 PAGE_FIELDS = {
-    "id", "site", "parent", "locale", "title", "slug", "path", "layout",
+    "id", "site", "parent", "draft_of", "locale", "title", "slug", "path", "layout",
     "seo", "visibility", "position", "is_homepage", "status",
     "published_at", "created_by", "updated_by", "submitted_by", "reviewed_by",
     "review_comment", "blocks", "blocks_version",

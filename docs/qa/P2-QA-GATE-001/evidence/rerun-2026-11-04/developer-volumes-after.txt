@@ -1,0 +1,12 @@
+uog-digital-platform_fe_admin_node_modules
+uog-digital-platform_fe_api_client_node_modules
+uog-digital-platform_fe_node_modules
+uog-digital-platform_fe_public_node_modules
+uog-digital-platform_fe_types_node_modules
+uog-digital-platform_fe_ui_node_modules
+uog-digital-platform_keycloak_db_data
+uog-digital-platform_minio_data
+uog-digital-platform_pnpm_store
+uog-digital-platform_postgres_data
+uog-digital-platform_redis_broker_data
+uog-digital-platform_redis_cache_data

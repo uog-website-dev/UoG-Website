@@ -246,6 +246,12 @@ counts are historical until a new complete run replaces them.
 
 ## P2-HARD-007 — Establish safe draft editing alongside a live publication
 
+**Local result (3 Nov 2026):** Demonstrated. A published Page stays locked.
+`POST .../working-draft/` opens one draft from the serving snapshot, and
+reviewed publication copies it onto that Page. Evidence:
+[T23 sequence](evidence/t23-working-draft.md). Pull request
+https://github.com/uog-website-dev/UoG-Website/pull/59. The gate stays No-Go.
+
 **As a** Site Editor and Publisher,  
 **I want** to edit a new draft while visitors continue seeing the last approved
 publication,  
@@ -284,6 +290,8 @@ parallel CMS/news domain, or treat a blocked test as a passed scenario.
 isolation/concurrency tests, migration evidence if applicable and linked PR/CI.
 
 ## P2-HARD-008 — Repeat and sign the Sprint 1–2 integrated acceptance gate
+
+**Local result (3 Nov 2026):** All 38 cases were executed again on `ce66ecd`. The fresh project used new volumes and those volumes were removed. The recommendation remains **NO-GO** because the three stakeholder signatures are absent. See [report-2026-11-03.md](report-2026-11-03.md).
 
 **As the** QA Lead, Technical Lead and Product Owner,  
 **I want** the complete acceptance workflow verified on the repaired platform,  

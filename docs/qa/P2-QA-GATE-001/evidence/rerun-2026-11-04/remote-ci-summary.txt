@@ -1,0 +1,18 @@
+Backend tests and OpenAPI	UNKNOWN STEP	2026-11-03T16:26:00.1638591Z  server started
+Backend tests and OpenAPI	UNKNOWN STEP	2026-11-03T16:26:00.1638788Z  CREATE DATABASE
+Backend tests and OpenAPI	UNKNOWN STEP	2026-11-03T16:26:00.1638972Z  
+Backend tests and OpenAPI	UNKNOWN STEP	2026-11-03T16:26:00.1639130Z  
+Backend tests and OpenAPI	UNKNOWN STEP	2026-11-03T16:26:00.1639437Z  /usr/local/bin/docker-entrypoint.sh: ignoring /docker-entrypoint-initdb.d/*
+Backend tests and OpenAPI	UNKNOWN STEP	2026-11-03T16:26:00.1639785Z  
+Backend tests and OpenAPI	UNKNOWN STEP	2026-11-03T16:26:00.1640110Z  waiting for server to shut down....2026-11-03 16:23:50.606 UTC [41] LOG:  received fast shutdown request
+Backend tests and OpenAPI	UNKNOWN STEP	2026-11-03T16:26:00.1640557Z  2026-11-03 16:23:50.607 UTC [41] LOG:  aborting any active transactions
+Backend tests and OpenAPI	UNKNOWN STEP	2026-11-03T16:26:00.1641050Z  2026-11-03 16:23:50.609 UTC [41] LOG:  background worker "logical replication launcher" (PID 47) exited with exit code 1
+Backend tests and OpenAPI	UNKNOWN STEP	2026-11-03T16:26:00.1641508Z  2026-11-03 16:23:50.610 UTC [42] LOG:  shutting down
+Backend tests and OpenAPI	UNKNOWN STEP	2026-11-03T16:26:00.1641849Z  2026-11-03 16:23:50.610 UTC [42] LOG:  checkpoint starting: shutdown immediate
+Backend tests and OpenAPI	UNKNOWN STEP	2026-11-03T16:26:00.1643106Z  2026-11-03 16:23:50.706 UTC [42] LOG:  checkpoint complete: wrote 926 buffers (5.7%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.065 s, sync=0.030 s, total=0.096 s; sync files=301, longest=0.021 s, average=0.001 s; distance=4283 kB, estimate=4283 kB; lsn=0/1925CF8, redo lsn=0/1925CF8
+Backend tests and OpenAPI	UNKNOWN STEP	2026-11-03T16:26:00.1643992Z  2026-11-03 16:23:50.712 UTC [41] LOG:  database system is shut down
+Backend tests and OpenAPI	UNKNOWN STEP	2026-11-03T16:26:00.1644429Z   done
+Backend tests and OpenAPI	UNKNOWN STEP	2026-11-03T16:26:00.1644598Z  server stopped
+Backend tests and OpenAPI	UNKNOWN STEP	2026-11-03T16:26:00.1644774Z  
+Backend tests and OpenAPI	UNKNOWN STEP	2026-11-03T16:26:00.1644984Z  PostgreSQL init process complete; ready for start up.
+Backend tests and OpenAPI	UNKNOWN STEP	2026-11-03T16:26:00.1645251Z  

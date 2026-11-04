@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-04",
+  "disabled_qa_keycloak_users": 6,
+  "revoked_database_grants": 7,
+  "removed_qa_cms_bindings": 6,
+  "secret_files_removed": 2,
+  "restored_global_module_flags": {
+    "10": false,
+    "11": false,
+    "12": false
+  },
+  "admin_web_registered_logout_uris": "http://localhost:3001/admin/*##http://localhost/admin/*",
+  "retained_qa_sites": [
+    {
+      "id": 1,
+      "code": "QA3CA9A2F6_0",
+      "status": "ACTIVE"
+    },
+    {
+      "id": 2,
+      "code": "QA3CA9A2F6_1",
+      "status": "ACTIVE"
+    }
+  ],
+  "retained_qa_organizations": [
+    {
+      "id": 2,
+      "code": "QA3CA9A2F6"
+    }
+  ]
+}
