@@ -92,6 +92,53 @@ def test_menu_crud_duplicate_location_version_conflicts_and_request_id(api, sett
     assert api.client.get(url, **api.header).status_code == 404
 
 
+@pytest.mark.parametrize("inventory", ["menus", "items"])
+def test_inventory_optional_active_filter_preserves_both_states(api, inventory):
+    menu_url = _menu(api)
+    active_item = _item(api, menu_url, "Active item")
+    inactive_item = _item(api, menu_url, "Inactive item", is_active=False)
+    assert _post(api, menu_url + "activate/", {}, _tag(api, menu_url)).status_code == 200
+    if inventory == "menus":
+        inactive_menu = _menu(api, "footer")
+        url = api.base
+        active_id = api.client.get(menu_url, **api.header).json()["id"]
+        inactive_id = api.client.get(inactive_menu, **api.header).json()["id"]
+        ordered_ids = [inactive_id, active_id]  # location, then UUID
+    else:
+        url = menu_url + "items/"
+        active_id = api.client.get(active_item, **api.header).json()["id"]
+        inactive_id = api.client.get(inactive_item, **api.header).json()["id"]
+        ordered_ids = [active_id, inactive_id]  # sort_order, then UUID
+
+    # Real HTTP query strings become QueryDicts, including the empty query.
+    for query, expected in (("", ordered_ids), ("?is_active=true", [active_id]),
+                            ("?is_active=false", [inactive_id])):
+        response = api.client.get(url + query, **api.header)
+        assert response.status_code == 200, response.content
+        assert response.json()["count"] == len(expected)
+        assert [row["id"] for row in response.json()["results"]] == expected
+
+    first_page = api.client.get(url + "?page_size=1", **api.header)
+    assert first_page.status_code == 200 and first_page.json()["count"] == 2
+    assert first_page.json()["results"][0]["id"] == ordered_ids[0]
+    second_page = api.client.get(url + "?page_size=1&page=2", **api.header)
+    assert second_page.status_code == 200
+    assert second_page.json()["results"][0]["id"] == ordered_ids[1]
+
+    for query, field in (("?is_active=invalid", "is_active"), ("?is_active=", "is_active"),
+                         ("?is_active=true&is_active=false", "query"),
+                         ("?is_active=true&is_active=true", "query")):
+        rejected = api.client.get(url + query, **api.header)
+        assert rejected.status_code == 400, rejected.content
+        assert field in rejected.json()["error"]["details"]
+        assert rejected.json()["request_id"]
+
+    # A published menu remains directly editable after appearing in inventory.
+    changed = api.client.patch(menu_url, {"name": "Still manageable"},
+        content_type="application/json", HTTP_IF_MATCH=_tag(api, menu_url), **api.header)
+    assert changed.status_code == 200, changed.content
+
+
 def test_item_crud_move_tree_activation_and_safe_delete_policy(api):
     url = _menu(api)
     first = _item(api, url, "First")
@@ -366,6 +413,10 @@ def test_menu_openapi_contract_is_typed_scoped_and_documents_conflicts():
         assert "412" not in operation["responses"]
         assert any(parameter["name"] == "If-Match" and parameter["required"] for parameter in operation["parameters"])
     assert paths[base+"{id}/tree/"]["get"]["responses"]["200"]["content"]["application/json"]["schema"]["$ref"].endswith("/TreeOutput")
+    for path in (base, base + "{menu_pk}/items/"):
+        active = next(parameter for parameter in paths[path]["get"]["parameters"] if parameter["name"] == "is_active")
+        assert active.get("required", False) is False
+        assert "Omit to include both active and inactive" in active["description"]
 
 
 def test_local_location_edit_cross_site_block_and_central_menu_authority(api, settings):

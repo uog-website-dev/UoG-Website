@@ -1,0 +1,442 @@
+{
+  "state": {
+    "run": "qa8c459b09",
+    "build": "ce66ecde0a107479f33aee0e158221b3391e26a5",
+    "date": "2026-11-04",
+    "objects": {
+      "root_id": 5,
+      "organization_id": 16
+    },
+    "sites": [
+      {
+        "id": 10,
+        "url": "/api/v1/sites/10/",
+        "host": "qa8c459b09-main.uog.local",
+        "code": "QA8C459B09_0",
+        "owner": 5,
+        "domain_id": 13,
+        "alias": "alias-qa8c459b09-main.uog.local",
+        "module_ids": {
+          "PAGES": 21,
+          "POSTS": 23,
+          "MENUS": 25
+        },
+        "page_id": "1551a428-d214-4c2a-a0ff-65f7dc9df9a7",
+        "post_id": "3258a4e5-2a3e-4661-a437-1c623201ce18"
+      },
+      {
+        "id": 11,
+        "url": "/api/v1/sites/11/",
+        "host": "qa8c459b09-college.uog.local",
+        "code": "QA8C459B09_1",
+        "owner": 16,
+        "domain_id": 15,
+        "alias": "alias-qa8c459b09-college.uog.local",
+        "module_ids": {
+          "PAGES": 22,
+          "POSTS": 24,
+          "MENUS": 26
+        },
+        "page_id": "82abd796-e75c-4d67-92d4-b1b66687eaa7"
+      }
+    ],
+    "restore_global_modules": {
+      "11": false
+    },
+    "security_probe": {
+      "actor": "qa8c459b09-viewer",
+      "actor_user_id": 30,
+      "target_site": 11,
+      "database_grants": [
+        {
+          "role__code": "viewer",
+          "scope": "SITE",
+          "organization_id": 5,
+          "site_id": 10
+        }
+      ],
+      "target_site_cms_roles": [],
+      "temporary_realm_role": "platform-admin"
+    },
+    "completed_http_workflow": true,
+    "global_flags_restored_via_api": true
+  },
+  "results": {
+    "T12": [
+      {
+        "pass": true,
+        "actual": "Six dedicated Keycloak users obtained real tokens accepted by /api/me/; browser/session checks are separate."
+      }
+    ],
+    "T03": [
+      {
+        "pass": true,
+        "actual": "Created/edited QA college beneath existing UNIVERSITY root and retrieved descendants over HTTP."
+      }
+    ],
+    "T04": [
+      {
+        "pass": true,
+        "actual": "Self-parent mutation rejected with HTTP 400."
+      },
+      {
+        "pass": true,
+        "actual": "Unauthorized Viewer Organization create rejected: 403."
+      }
+    ],
+    "T06": [
+      {
+        "pass": true,
+        "actual": "Created two Sites with distinct owners and independent identity/theme configuration."
+      }
+    ],
+    "T07": [
+      {
+        "pass": true,
+        "actual": "Both Sites activated; template selection used existing active template."
+      }
+    ],
+    "T08": [
+      {
+        "pass": true,
+        "actual": "Primary domains and aliases created; cross-Site duplicate rejected with 409."
+      }
+    ],
+    "T09": [
+      {
+        "pass": true,
+        "actual": "Host qa8c459b09-main.uog.local resolves to its persisted Site; HTTP 200."
+      },
+      {
+        "pass": true,
+        "actual": "Host qa8c459b09-college.uog.local resolves to its persisted Site; HTTP 200."
+      },
+      {
+        "pass": true,
+        "actual": "Unknown host safely rejected with 404."
+      }
+    ],
+    "T10": [
+      {
+        "pass": true,
+        "actual": "PAGES, POSTS and MENUS independently enabled through the global and per-Site management APIs."
+      }
+    ],
+    "T13": [
+      {
+        "pass": true,
+        "actual": "Platform administrator assigned Site Administrator, Editor, Reviewer, Publisher and Viewer through real protected APIs; CMS roles assigned explicitly."
+      }
+    ],
+    "T14": [
+      {
+        "pass": true,
+        "actual": "Site-only administrator cannot retrieve Site B: 403."
+      },
+      {
+        "pass": true,
+        "actual": "Site Administrator delegates a read-only role at Site 10: HTTP 201 (expected (201,))."
+      },
+      {
+        "pass": true,
+        "actual": "Site Administrator delegates a read-only role at Site 11: HTTP 403 (expected (403, 404))."
+      }
+    ],
+    "T15": [
+      {
+        "pass": true,
+        "actual": "QA-D002: editor effective scoped permission endpoint returned 200."
+      },
+      {
+        "pass": true,
+        "actual": "QA-D002: reviewer effective scoped permission endpoint returned 200."
+      },
+      {
+        "pass": true,
+        "actual": "QA-D002: viewer effective scoped permission endpoint returned 200."
+      }
+    ],
+    "T18": [
+      {
+        "pass": true,
+        "actual": "Editor created and conditionally edited a Site-owned Page; second Site has its own Page with the same slug."
+      }
+    ],
+    "T19": [
+      {
+        "pass": true,
+        "actual": "Invalid structured block type rejected with 400; regression suite covers hierarchy/slugs."
+      }
+    ],
+    "T21": [
+      {
+        "pass": true,
+        "actual": "Viewer publication denied with 403."
+      }
+    ],
+    "T22": [
+      {
+        "pass": true,
+        "actual": "Draft Page on qa8c459b09-main.uog.local is not publicly served (404)."
+      },
+      {
+        "pass": true,
+        "actual": "Draft Page on qa8c459b09-college.uog.local is not publicly served (404)."
+      }
+    ],
+    "T20": [
+      {
+        "pass": true,
+        "actual": "Distinct author/reviewer/publisher completed review and published Page for qa8c459b09-main.uog.local."
+      },
+      {
+        "pass": true,
+        "actual": "Distinct author/reviewer/publisher completed review and published Page for qa8c459b09-college.uog.local."
+      }
+    ],
+    "T24": [
+      {
+        "pass": true,
+        "actual": "Editor created a Post with category, tag and excerpt through the Post API."
+      },
+      {
+        "pass": true,
+        "actual": "A separate draft Post was created and edited over HTTP."
+      }
+    ],
+    "T26": [
+      {
+        "pass": true,
+        "actual": "Post uses the shared SiteContent workflow and persisted PUBLISHED state."
+      }
+    ],
+    "T27": [
+      {
+        "pass": true,
+        "actual": "Published Post appears only in the owning hostname feed."
+      }
+    ],
+    "T28": [
+      {
+        "pass": true,
+        "actual": "Site administrator created and activated a Menu with nested items using Menu-wide If-Match."
+      },
+      {
+        "pass": false,
+        "actual": "Unfiltered menu inventory contains activated menu=False; explicit is_active=true contains it=True."
+      },
+      {
+        "pass": false,
+        "actual": "Unfiltered menu inventory contains activated menu=False; explicit is_active=true contains it=True."
+      },
+      {
+        "pass": false,
+        "actual": "Unfiltered menu inventory contains activated menu=False; explicit is_active=true contains it=True."
+      }
+    ],
+    "T29": [
+      {
+        "pass": true,
+        "actual": "Menu tree/location persisted; regression verifies reorder/depth/cycles."
+      },
+      {
+        "pass": true,
+        "actual": "Live descendant-parent move rejected with typed invalid_tree, HTTP 400."
+      },
+      {
+        "pass": true,
+        "actual": "Simultaneous real HTTP reorder requests with one ETag returned [409, 200]."
+      },
+      {
+        "pass": true,
+        "actual": "Live descendant-parent move rejected with typed invalid_tree, HTTP 400."
+      },
+      {
+        "pass": false,
+        "actual": "Simultaneous real HTTP reorder requests with one ETag returned [200, 200].",
+        "excluded_reason": "Invalid concurrency setup: one request was a no-op retaining its ETag. Replaced by two orders that both change three root items; original observation retained."
+      },
+      {
+        "pass": true,
+        "actual": "Live descendant-parent move rejected with typed invalid_tree, HTTP 400."
+      },
+      {
+        "pass": true,
+        "actual": "Simultaneous real HTTP reorder requests with one ETag returned [409, 200]."
+      }
+    ],
+    "T30": [
+      {
+        "pass": true,
+        "actual": "Published Page link appears in the owning Site's public menu; regression covers missing/draft links."
+      },
+      {
+        "pass": true,
+        "actual": "Real public menu omits an active item's unpublished Page target."
+      }
+    ],
+    "T16": [
+      {
+        "pass": true,
+        "actual": "Site A Editor cannot read Site B Page inventory (403)."
+      },
+      {
+        "pass": true,
+        "actual": "Cross-Site realm-role privilege probe: GET=403, POST=403."
+      }
+    ],
+    "T17": [
+      {
+        "pass": true,
+        "actual": "Malformed record identifier rejected with 404; regression covers expired/tampered JWTs."
+      },
+      {
+        "pass": true,
+        "actual": "Tampered real Keycloak token rejected with 401."
+      },
+      {
+        "pass": true,
+        "actual": "Anonymous write denied with HTTP 401."
+      },
+      {
+        "pass": true,
+        "actual": "Anonymous write denied with HTTP 401."
+      },
+      {
+        "pass": true,
+        "actual": "Anonymous write denied with HTTP 401."
+      }
+    ],
+    "T11": [
+      {
+        "pass": true,
+        "actual": "POSTS disabled: public feed 404, stored content retained. Browser UI check is separate."
+      },
+      {
+        "pass": true,
+        "actual": "Disabled PAGES denies protected inventory: HTTP 403."
+      },
+      {
+        "pass": true,
+        "actual": "Disabled POSTS denies protected inventory: HTTP 403."
+      },
+      {
+        "pass": false,
+        "actual": "Disabled MENUS denies protected inventory: HTTP 200.",
+        "excluded_reason": "Invalid QA assertion: approved Menu policy retains authorized reads while disabled; editing and public delivery must be blocked. Original failure retained for traceability."
+      },
+      {
+        "pass": true,
+        "actual": "Disabled PAGES denies protected inventory: HTTP 403."
+      },
+      {
+        "pass": true,
+        "actual": "Disabled POSTS denies protected inventory: HTTP 403."
+      },
+      {
+        "pass": true,
+        "actual": "Disabled MENUS retains authorized reads (200) and rejects editing with module_disabled (400)."
+      },
+      {
+        "pass": true,
+        "actual": "Disabled PAGES denies protected inventory: HTTP 403."
+      },
+      {
+        "pass": true,
+        "actual": "Disabled POSTS denies protected inventory: HTTP 403."
+      },
+      {
+        "pass": true,
+        "actual": "Disabled MENUS retains authorized reads (200) and rejects editing with module_disabled (400)."
+      }
+    ],
+    "T23": [
+      {
+        "pass": true,
+        "actual": "Direct published PATCH 400; public title stayed True while the draft was edited; author approve 403; reviewed publication status ARCHIVED; public title is now the revision=True."
+      }
+    ],
+    "T25": [
+      {
+        "pass": true,
+        "actual": "Cross-Site taxonomy reference rejected with 400."
+      }
+    ],
+    "T34": [
+      {
+        "pass": true,
+        "actual": "Missing fields return structured HTTP 400 with request correlation ID."
+      }
+    ],
+    "T35": [
+      {
+        "pass": true,
+        "actual": "Real Page authoring sanitized a script payload before persistence."
+      },
+      {
+        "pass": true,
+        "actual": "QA-SEC001: Real Keycloak realm-role-only Site A viewer requested Site B Pages: GET=403, POST=403; no Site B or platform DB assignment exists."
+      },
+      {
+        "pass": true,
+        "actual": "Unsafe script-scheme menu target rejected with 400."
+      }
+    ],
+    "T36": [
+      {
+        "pass": true,
+        "actual": "Shared persisted audit rows with QA Site context: 16."
+      }
+    ],
+    "T33": [
+      {
+        "pass": true,
+        "actual": "Actual /api/schema/ returned 200."
+      },
+      {
+        "pass": true,
+        "actual": "Actual /api/docs/ returned 200."
+      },
+      {
+        "pass": true,
+        "actual": "Actual /api/redoc/ returned 200."
+      },
+      {
+        "pass": true,
+        "actual": "Actual /api/schema/ returned 200."
+      },
+      {
+        "pass": true,
+        "actual": "Actual /api/docs/ returned 200."
+      },
+      {
+        "pass": true,
+        "actual": "Actual /api/redoc/ returned 200."
+      },
+      {
+        "pass": true,
+        "actual": "Actual /api/schema/ returned 200."
+      },
+      {
+        "pass": true,
+        "actual": "Actual /api/docs/ returned 200."
+      },
+      {
+        "pass": true,
+        "actual": "Actual /api/redoc/ returned 200."
+      },
+      {
+        "pass": true,
+        "actual": "Actual /api/schema/ returned 200."
+      },
+      {
+        "pass": true,
+        "actual": "Actual /api/docs/ returned 200."
+      },
+      {
+        "pass": true,
+        "actual": "Actual /api/redoc/ returned 200."
+      }
+    ]
+  }
+}

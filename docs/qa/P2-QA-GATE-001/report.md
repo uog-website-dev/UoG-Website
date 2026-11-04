@@ -1,5 +1,7 @@
 # Sprint 1 & Sprint 2 Integrated Acceptance Report
 
+A later execution is recorded in [report-2026-11-03.md](report-2026-11-03.md). The rows below remain the 2 November 2026 assessment and are not relabeled by that rerun.
+
 **Issue:** P2-QA-GATE-001 · **Execution date:** 2026-11-02 (Africa/Nairobi)
 
 **Technical recommendation: NO-GO.** A signed Keycloak realm role bypasses

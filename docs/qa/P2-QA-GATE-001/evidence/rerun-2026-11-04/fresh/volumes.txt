@@ -1,0 +1,12 @@
+uog-gate-20261104_fe_admin_node_modules
+uog-gate-20261104_fe_api_client_node_modules
+uog-gate-20261104_fe_node_modules
+uog-gate-20261104_fe_public_node_modules
+uog-gate-20261104_fe_types_node_modules
+uog-gate-20261104_fe_ui_node_modules
+uog-gate-20261104_keycloak_db_data
+uog-gate-20261104_minio_data
+uog-gate-20261104_pnpm_store
+uog-gate-20261104_postgres_data
+uog-gate-20261104_redis_broker_data
+uog-gate-20261104_redis_cache_data

@@ -42,6 +42,13 @@ Menu activation does not publish linked Page/Post content.
 
 ## Routes
 
+Menu and item inventories include **both active and inactive records** when
+`is_active` is omitted. Use `?is_active=true` or `?is_active=false` to filter
+explicitly. Invalid/empty boolean values and repeated query parameters return
+the standard HTTP 400 validation envelope with a request ID. Menu ordering is
+by location then UUID; item ordering is by sort order then UUID. Filtering keeps
+the same pagination contract (`page`, `page_size`, maximum 100).
+
 The base below is `/api/v1/sites/{site_id}/menus/`.
 
 | Method | Relative route | Behavior |

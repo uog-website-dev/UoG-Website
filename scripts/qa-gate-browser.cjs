@@ -8,7 +8,7 @@ const { chromium } = require(process.env.UOG_QA_PLAYWRIGHT_ROOT || 'playwright-c
   const state = input.state;
   const actor = input.session?.actors.admin;
   const mode = process.env.UOG_QA_MODE || 'full';
-  const output = path.resolve('docs/qa/P2-QA-GATE-001/evidence');
+  const output = path.resolve(process.env.UOG_QA_OUTPUT || 'docs/qa/P2-QA-GATE-001/evidence');
   fs.mkdirSync(output, { recursive: true });
   const results = [];
   const browser = await chromium.launch({ executablePath: 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', headless: true,
@@ -16,7 +16,7 @@ const { chromium } = require(process.env.UOG_QA_PLAYWRIGHT_ROOT || 'playwright-c
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
   const page = await context.newPage();
   page.setDefaultTimeout(25000);
-  const save = () => fs.writeFileSync(path.join(output, mode === 'full' ? 'browser-results.json' : 'browser-' + mode + '-results.json'), JSON.stringify({ run: state.run, build: state.build, date: '2026-11-02', results }, null, 2));
+  const save = () => fs.writeFileSync(path.join(output, mode === 'full' ? 'browser-results.json' : 'browser-' + mode + '-results.json'), JSON.stringify({ run: state.run, build: state.build, date: state.date, results }, null, 2));
   async function check(id, label, fn) {
     try {
       const detail = await fn();
@@ -42,6 +42,7 @@ const { chromium } = require(process.env.UOG_QA_PLAYWRIGHT_ROOT || 'playwright-c
       });
       return;
     }
+    if (mode !== 'admin') {
     for (let index = 0; index < state.sites.length; index++) {
       const site = state.sites[index];
       await check('T31-' + index, 'Published Page renders for ' + site.host, async () => {
@@ -99,6 +100,7 @@ const { chromium } = require(process.env.UOG_QA_PLAYWRIGHT_ROOT || 'playwright-c
     }
     if (mode === 'public') return;
     await page.setViewportSize({ width: 1440, height: 1000 });
+    }
     await check('T12-browser', 'Real Keycloak authorization-code login and Auth.js session', async () => {
       await page.goto('http://localhost/admin', { waitUntil: 'domcontentloaded', timeout: 60000 });
       await page.getByRole('button', { name: 'Sign in with Keycloak', exact: true }).click();
@@ -115,12 +117,33 @@ const { chromium } = require(process.env.UOG_QA_PLAYWRIGHT_ROOT || 'playwright-c
     });
     await check('T13-browser', 'IAM access-management UI compiles and loads', async () => {
       const response = await page.goto('http://localhost/admin/access', { waitUntil: 'domcontentloaded', timeout: 60000 });
-      await page.waitForTimeout(1500);
+      await page.waitForFunction(() => !document.body.innerText.includes('Loading registered access data…') && !document.body.innerText.includes('Loading registered access data...'), null, { timeout: 60000 });
+      await page.getByText('menu.read', { exact: false }).first().waitFor({ timeout: 60000 });
       const text = await page.locator('body').innerText();
       if (response.status() >= 400 || text.match(/Build Error|Module not found|not exported|No roles are visible|No effective permissions are granted/i)) throw new Error('IAM screen missing granted roles or build failed');
       await page.screenshot({ path: path.join(output, 'admin-access.png'), fullPage: true });
       return 'Access screen loaded; API delegation boundary tested independently.';
     });
+    if (process.env.UOG_QA_MENU_REPAIR === '1') {
+      await check('T28-browser', 'Active and inactive menus remain visible; active menu can be edited', async () => {
+        await page.goto('http://localhost/admin/sites/' + state.sites[0].id, { waitUntil: 'domcontentloaded', timeout: 60000 });
+        const inventory = page.getByRole('list', { name: 'Menus for this Site', exact: true });
+        await inventory.getByText('QA Inactive Footer', { exact: true }).waitFor({ timeout: 60000 });
+        await inventory.getByRole('button', { name: 'Edit QA Header', exact: true }).click();
+        await inventory.getByRole('textbox', { name: /Local menu name/ }).fill('QA Header Verified');
+        await inventory.getByRole('button', { name: 'Save menu', exact: true }).click();
+        await inventory.getByRole('button', { name: 'Edit QA Header Verified', exact: true }).waitFor();
+        await page.reload({ waitUntil: 'domcontentloaded' });
+        await inventory.getByRole('button', { name: 'Edit QA Header Verified', exact: true }).waitFor({ timeout: 60000 });
+        await inventory.getByText('QA Inactive Footer', { exact: true }).waitFor();
+        await inventory.screenshot({ path: path.join(output, 'admin-menus-active-inactive.png'), animations: 'disabled' });
+        await inventory.getByRole('button', { name: 'Edit QA Header Verified', exact: true }).click();
+        await inventory.getByRole('textbox', { name: /Local menu name/ }).fill('QA Header');
+        await inventory.getByRole('button', { name: 'Save menu', exact: true }).click();
+        await inventory.getByRole('button', { name: 'Edit QA Header', exact: true }).waitFor();
+        return 'Activated header and inactive footer rendered together; header rename persisted across a real browser reload and was restored through the same UI.';
+      });
+    }
     await check('T12-logout', 'Keycloak/Auth.js sign-out clears session', async () => {
       await page.goto('http://localhost/admin', { waitUntil: 'domcontentloaded', timeout: 60000 });
       await page.getByRole('button', { name: 'Sign out', exact: true }).click();
@@ -133,5 +156,6 @@ const { chromium } = require(process.env.UOG_QA_PLAYWRIGHT_ROOT || 'playwright-c
   } finally {
     save();
     await browser.close();
+    if (results.some(result => result.status === 'FAIL')) process.exitCode = 1;
   }
 })().catch(error => { console.error('Browser harness failed: ' + error.name); process.exitCode = 1; });

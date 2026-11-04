@@ -1,0 +1,607 @@
+{
+  "run": "qa3ca9a2f6",
+  "events": [
+    {
+      "actor_kind": "USER",
+      "actor_id": "6",
+      "action": "SITE_DOMAIN_CREATED",
+      "entity_type": "sites.sitedomain",
+      "entity_id": "1",
+      "timestamp": "2026-11-04 03:14:14.199430+00:00",
+      "request_id": "56b355f2-b008-4b35-b9f9-c4200244ed1e",
+      "changed_fields": [
+        "hostname",
+        "is_primary",
+        "redirect_to_primary",
+        "site_id",
+        "status"
+      ],
+      "before": null,
+      "after": {
+        "status": "ACTIVE",
+        "site_id": 1,
+        "hostname": "qa3ca9a2f6-main.uog.local",
+        "is_primary": false,
+        "redirect_to_primary": false
+      }
+    },
+    {
+      "actor_kind": "USER",
+      "actor_id": "6",
+      "action": "SITE_DOMAIN_PRIMARY_CHANGED",
+      "entity_type": "sites.sitedomain",
+      "entity_id": "1",
+      "timestamp": "2026-11-04 03:14:14.374940+00:00",
+      "request_id": "4f995286-42a4-4cd3-831b-14d2c81b67db",
+      "changed_fields": [
+        "is_primary"
+      ],
+      "before": {
+        "status": "ACTIVE",
+        "site_id": 1,
+        "hostname": "qa3ca9a2f6-main.uog.local",
+        "is_primary": false,
+        "redirect_to_primary": false
+      },
+      "after": {
+        "status": "ACTIVE",
+        "site_id": 1,
+        "hostname": "qa3ca9a2f6-main.uog.local",
+        "is_primary": true,
+        "redirect_to_primary": false
+      }
+    },
+    {
+      "actor_kind": "USER",
+      "actor_id": "6",
+      "action": "SITE_DOMAIN_CREATED",
+      "entity_type": "sites.sitedomain",
+      "entity_id": "2",
+      "timestamp": "2026-11-04 03:14:14.476127+00:00",
+      "request_id": "edaef33b-14bd-4040-bade-75f43578cbf0",
+      "changed_fields": [
+        "hostname",
+        "is_primary",
+        "redirect_to_primary",
+        "site_id",
+        "status"
+      ],
+      "before": null,
+      "after": {
+        "status": "ACTIVE",
+        "site_id": 1,
+        "hostname": "alias-qa3ca9a2f6-main.uog.local",
+        "is_primary": false,
+        "redirect_to_primary": false
+      }
+    },
+    {
+      "actor_kind": "USER",
+      "actor_id": "2",
+      "action": "CONTENT_SUBMITTED",
+      "entity_type": "cms.sitecontent",
+      "entity_id": "135ab15d-1379-4c46-9d4d-eec8b899e030",
+      "timestamp": "2026-11-04 03:14:20.324419+00:00",
+      "request_id": "defb4ad0-4199-4039-982e-920bf36be2be",
+      "changed_fields": [
+        "status"
+      ],
+      "before": {
+        "status": "DRAFT",
+        "site_id": 1
+      },
+      "after": {
+        "status": "IN_REVIEW",
+        "site_id": 1,
+        "review_comment": ""
+      }
+    },
+    {
+      "actor_kind": "USER",
+      "actor_id": "3",
+      "action": "CONTENT_APPROVED",
+      "entity_type": "cms.sitecontent",
+      "entity_id": "135ab15d-1379-4c46-9d4d-eec8b899e030",
+      "timestamp": "2026-11-04 03:14:20.448022+00:00",
+      "request_id": "72ac0fda-91e5-4693-976c-8be6c14f14dd",
+      "changed_fields": [
+        "status"
+      ],
+      "before": {
+        "status": "IN_REVIEW",
+        "site_id": 1
+      },
+      "after": {
+        "status": "APPROVED",
+        "site_id": 1,
+        "review_comment": ""
+      }
+    },
+    {
+      "actor_kind": "USER",
+      "actor_id": "4",
+      "action": "CONTENT_PUBLISHED",
+      "entity_type": "cms.sitecontent",
+      "entity_id": "135ab15d-1379-4c46-9d4d-eec8b899e030",
+      "timestamp": "2026-11-04 03:14:20.567189+00:00",
+      "request_id": "dad1e406-b384-45af-9b13-69a39f3c0754",
+      "changed_fields": [
+        "status"
+      ],
+      "before": {
+        "status": "APPROVED",
+        "site_id": 1
+      },
+      "after": {
+        "status": "PUBLISHED",
+        "site_id": 1,
+        "review_comment": ""
+      }
+    },
+    {
+      "actor_kind": "USER",
+      "actor_id": "2",
+      "action": "CONTENT_SUBMITTED",
+      "entity_type": "cms.sitecontent",
+      "entity_id": "9f5520c9-87f5-4749-b9e0-094144a98238",
+      "timestamp": "2026-11-04 03:14:21.804737+00:00",
+      "request_id": "3f1d1df4-d188-4131-98ed-caf7ce3a2a8d",
+      "changed_fields": [
+        "status"
+      ],
+      "before": {
+        "status": "DRAFT",
+        "site_id": 1
+      },
+      "after": {
+        "status": "IN_REVIEW",
+        "site_id": 1,
+        "review_comment": ""
+      }
+    },
+    {
+      "actor_kind": "USER",
+      "actor_id": "3",
+      "action": "CONTENT_APPROVED",
+      "entity_type": "cms.sitecontent",
+      "entity_id": "9f5520c9-87f5-4749-b9e0-094144a98238",
+      "timestamp": "2026-11-04 03:14:21.977884+00:00",
+      "request_id": "7b311d22-77fe-45d4-bfc1-d613006b66d1",
+      "changed_fields": [
+        "status"
+      ],
+      "before": {
+        "status": "IN_REVIEW",
+        "site_id": 1
+      },
+      "after": {
+        "status": "APPROVED",
+        "site_id": 1,
+        "review_comment": ""
+      }
+    },
+    {
+      "actor_kind": "USER",
+      "actor_id": "4",
+      "action": "CONTENT_PUBLISHED",
+      "entity_type": "cms.sitecontent",
+      "entity_id": "9f5520c9-87f5-4749-b9e0-094144a98238",
+      "timestamp": "2026-11-04 03:14:22.101903+00:00",
+      "request_id": "99014015-7bf1-4e8d-a178-5037f5c5f971",
+      "changed_fields": [
+        "status"
+      ],
+      "before": {
+        "status": "APPROVED",
+        "site_id": 1
+      },
+      "after": {
+        "status": "PUBLISHED",
+        "site_id": 1,
+        "review_comment": ""
+      }
+    },
+    {
+      "actor_kind": "USER",
+      "actor_id": "1",
+      "action": "MENU_CREATED",
+      "entity_type": "cms.menu",
+      "entity_id": "d72a2f46-5b11-442d-92f2-fbf7c3ce45c3",
+      "timestamp": "2026-11-04 03:14:22.383318+00:00",
+      "request_id": "f4d8504b-004f-40b8-8e52-4c5800257109",
+      "changed_fields": [
+        "id",
+        "is_active",
+        "location",
+        "name",
+        "site_id",
+        "version"
+      ],
+      "before": null,
+      "after": {
+        "id": "d72a2f46-5b11-442d-92f2-fbf7c3ce45c3",
+        "name": "QA Header",
+        "site_id": 1,
+        "version": 1,
+        "location": "header",
+        "is_active": false
+      }
+    },
+    {
+      "actor_kind": "USER",
+      "actor_id": "1",
+      "action": "MENU_ITEM_CREATED",
+      "entity_type": "cms.menu_item",
+      "entity_id": "7f3bc045-d7e9-4f7b-9b31-3c2a006caa7f",
+      "timestamp": "2026-11-04 03:14:22.638167+00:00",
+      "request_id": "af8f6d91-22c5-4d5e-a537-f28ae1615fb5",
+      "changed_fields": [
+        "allow_cross_site",
+        "id",
+        "is_active",
+        "item_type",
+        "label",
+        "menu_id",
+        "page_id",
+        "parent_id",
+        "post_id",
+        "site_id",
+        "sort_order"
+      ],
+      "before": null,
+      "after": {
+        "id": "7f3bc045-d7e9-4f7b-9b31-3c2a006caa7f",
+        "label": "QA Home",
+        "menu_id": "d72a2f46-5b11-442d-92f2-fbf7c3ce45c3",
+        "page_id": "135ab15d-1379-4c46-9d4d-eec8b899e030",
+        "post_id": null,
+        "site_id": 1,
+        "is_active": true,
+        "item_type": "page",
+        "parent_id": null,
+        "sort_order": 0,
+        "allow_cross_site": false
+      }
+    },
+    {
+      "actor_kind": "USER",
+      "actor_id": "1",
+      "action": "MENU_ITEM_CREATED",
+      "entity_type": "cms.menu_item",
+      "entity_id": "5757bec3-db12-489a-8c76-90680d3992e6",
+      "timestamp": "2026-11-04 03:14:22.828640+00:00",
+      "request_id": "66c9dc1e-61fd-4d36-b95d-f65b8f450126",
+      "changed_fields": [
+        "allow_cross_site",
+        "id",
+        "is_active",
+        "item_type",
+        "label",
+        "menu_id",
+        "page_id",
+        "parent_id",
+        "post_id",
+        "site_id",
+        "sort_order"
+      ],
+      "before": null,
+      "after": {
+        "id": "5757bec3-db12-489a-8c76-90680d3992e6",
+        "label": "QA Child",
+        "menu_id": "d72a2f46-5b11-442d-92f2-fbf7c3ce45c3",
+        "page_id": null,
+        "post_id": null,
+        "site_id": 1,
+        "is_active": true,
+        "item_type": "custom",
+        "parent_id": "7f3bc045-d7e9-4f7b-9b31-3c2a006caa7f",
+        "sort_order": 0,
+        "allow_cross_site": false
+      }
+    },
+    {
+      "actor_kind": "USER",
+      "actor_id": "1",
+      "action": "MENU_ACTIVATED",
+      "entity_type": "cms.menu",
+      "entity_id": "d72a2f46-5b11-442d-92f2-fbf7c3ce45c3",
+      "timestamp": "2026-11-04 03:14:23.012780+00:00",
+      "request_id": "ab23ce38-0ad5-45ed-a202-e2ffb6b58beb",
+      "changed_fields": [
+        "is_active",
+        "version"
+      ],
+      "before": {
+        "id": "d72a2f46-5b11-442d-92f2-fbf7c3ce45c3",
+        "name": "QA Header",
+        "site_id": 1,
+        "version": 3,
+        "location": "header",
+        "is_active": false
+      },
+      "after": {
+        "id": "d72a2f46-5b11-442d-92f2-fbf7c3ce45c3",
+        "name": "QA Header",
+        "site_id": 1,
+        "version": 4,
+        "location": "header",
+        "is_active": true
+      }
+    },
+    {
+      "actor_kind": "USER",
+      "actor_id": "2",
+      "action": "CONTENT_SUBMITTED",
+      "entity_type": "cms.sitecontent",
+      "entity_id": "15df00e7-2c94-44f8-96f2-e6cd9da597d4",
+      "timestamp": "2026-11-04 03:14:24.437721+00:00",
+      "request_id": "ed187264-20c5-4293-b17d-29cfe1e5a3a5",
+      "changed_fields": [
+        "status"
+      ],
+      "before": {
+        "status": "DRAFT",
+        "site_id": 1
+      },
+      "after": {
+        "status": "IN_REVIEW",
+        "site_id": 1,
+        "review_comment": ""
+      }
+    },
+    {
+      "actor_kind": "USER",
+      "actor_id": "3",
+      "action": "CONTENT_APPROVED",
+      "entity_type": "cms.sitecontent",
+      "entity_id": "15df00e7-2c94-44f8-96f2-e6cd9da597d4",
+      "timestamp": "2026-11-04 03:14:24.645884+00:00",
+      "request_id": "d9fb3644-db9b-4bba-820d-735c2e839cb5",
+      "changed_fields": [
+        "status"
+      ],
+      "before": {
+        "status": "IN_REVIEW",
+        "site_id": 1
+      },
+      "after": {
+        "status": "APPROVED",
+        "site_id": 1,
+        "review_comment": ""
+      }
+    },
+    {
+      "actor_kind": "USER",
+      "actor_id": "4",
+      "action": "CONTENT_ARCHIVED",
+      "entity_type": "cms.sitecontent",
+      "entity_id": "15df00e7-2c94-44f8-96f2-e6cd9da597d4",
+      "timestamp": "2026-11-04 03:14:24.857907+00:00",
+      "request_id": "3aec27af-4800-4cc7-b2d4-e35315e9e68f",
+      "changed_fields": [
+        "status"
+      ],
+      "before": {
+        "status": "APPROVED",
+        "site_id": 1
+      },
+      "after": {
+        "status": "ARCHIVED",
+        "site_id": 1,
+        "review_comment": ""
+      }
+    },
+    {
+      "actor_kind": "USER",
+      "actor_id": "1",
+      "action": "MENU_ITEM_CREATED",
+      "entity_type": "cms.menu_item",
+      "entity_id": "337ed85b-c645-4ffc-8a43-28665b955917",
+      "timestamp": "2026-11-04 03:14:54.769392+00:00",
+      "request_id": "4e1d1c49-bdbe-4743-81a1-f51cd2725fa7",
+      "changed_fields": [
+        "allow_cross_site",
+        "id",
+        "is_active",
+        "item_type",
+        "label",
+        "menu_id",
+        "page_id",
+        "parent_id",
+        "post_id",
+        "site_id",
+        "sort_order"
+      ],
+      "before": null,
+      "after": {
+        "id": "337ed85b-c645-4ffc-8a43-28665b955917",
+        "label": "QA Draft must be hidden",
+        "menu_id": "d72a2f46-5b11-442d-92f2-fbf7c3ce45c3",
+        "page_id": "17d630e5-7a3b-4988-b274-309273e4bc72",
+        "post_id": null,
+        "site_id": 1,
+        "is_active": true,
+        "item_type": "page",
+        "parent_id": null,
+        "sort_order": 1,
+        "allow_cross_site": false
+      }
+    },
+    {
+      "actor_kind": "USER",
+      "actor_id": "1",
+      "action": "MENU_ITEM_CREATED",
+      "entity_type": "cms.menu_item",
+      "entity_id": "d55f9a65-8f62-4a89-9b7d-e488d4ac893b",
+      "timestamp": "2026-11-04 03:15:18.903748+00:00",
+      "request_id": "496965b2-b86d-447f-ab1a-f2b6f178b44a",
+      "changed_fields": [
+        "allow_cross_site",
+        "id",
+        "is_active",
+        "item_type",
+        "label",
+        "menu_id",
+        "page_id",
+        "parent_id",
+        "post_id",
+        "site_id",
+        "sort_order"
+      ],
+      "before": null,
+      "after": {
+        "id": "d55f9a65-8f62-4a89-9b7d-e488d4ac893b",
+        "label": "QA concurrency sentinel",
+        "menu_id": "d72a2f46-5b11-442d-92f2-fbf7c3ce45c3",
+        "page_id": null,
+        "post_id": null,
+        "site_id": 1,
+        "is_active": false,
+        "item_type": "custom",
+        "parent_id": null,
+        "sort_order": 2,
+        "allow_cross_site": false
+      }
+    },
+    {
+      "actor_kind": "USER",
+      "actor_id": "1",
+      "action": "MENU_ITEM_REORDERED",
+      "entity_type": "cms.menu_item",
+      "entity_id": "7f3bc045-d7e9-4f7b-9b31-3c2a006caa7f",
+      "timestamp": "2026-11-04 03:15:19.259711+00:00",
+      "request_id": "e63234e6-3d28-470d-96b7-be75a37c9efc",
+      "changed_fields": [
+        "sort_order"
+      ],
+      "before": {
+        "id": "7f3bc045-d7e9-4f7b-9b31-3c2a006caa7f",
+        "label": "QA Home",
+        "menu_id": "d72a2f46-5b11-442d-92f2-fbf7c3ce45c3",
+        "page_id": "135ab15d-1379-4c46-9d4d-eec8b899e030",
+        "post_id": null,
+        "site_id": 1,
+        "is_active": true,
+        "item_type": "page",
+        "parent_id": null,
+        "sort_order": 0,
+        "allow_cross_site": false
+      },
+      "after": {
+        "id": "7f3bc045-d7e9-4f7b-9b31-3c2a006caa7f",
+        "label": "QA Home",
+        "menu_id": "d72a2f46-5b11-442d-92f2-fbf7c3ce45c3",
+        "page_id": "135ab15d-1379-4c46-9d4d-eec8b899e030",
+        "post_id": null,
+        "site_id": 1,
+        "is_active": true,
+        "item_type": "page",
+        "parent_id": null,
+        "sort_order": 2,
+        "allow_cross_site": false
+      }
+    },
+    {
+      "actor_kind": "USER",
+      "actor_id": "1",
+      "action": "MENU_ITEM_REORDERED",
+      "entity_type": "cms.menu_item",
+      "entity_id": "337ed85b-c645-4ffc-8a43-28665b955917",
+      "timestamp": "2026-11-04 03:15:19.265044+00:00",
+      "request_id": "e63234e6-3d28-470d-96b7-be75a37c9efc",
+      "changed_fields": [
+        "sort_order"
+      ],
+      "before": {
+        "id": "337ed85b-c645-4ffc-8a43-28665b955917",
+        "label": "QA Draft must be hidden",
+        "menu_id": "d72a2f46-5b11-442d-92f2-fbf7c3ce45c3",
+        "page_id": "17d630e5-7a3b-4988-b274-309273e4bc72",
+        "post_id": null,
+        "site_id": 1,
+        "is_active": true,
+        "item_type": "page",
+        "parent_id": null,
+        "sort_order": 1,
+        "allow_cross_site": false
+      },
+      "after": {
+        "id": "337ed85b-c645-4ffc-8a43-28665b955917",
+        "label": "QA Draft must be hidden",
+        "menu_id": "d72a2f46-5b11-442d-92f2-fbf7c3ce45c3",
+        "page_id": "17d630e5-7a3b-4988-b274-309273e4bc72",
+        "post_id": null,
+        "site_id": 1,
+        "is_active": true,
+        "item_type": "page",
+        "parent_id": null,
+        "sort_order": 0,
+        "allow_cross_site": false
+      }
+    },
+    {
+      "actor_kind": "USER",
+      "actor_id": "1",
+      "action": "MENU_ITEM_REORDERED",
+      "entity_type": "cms.menu_item",
+      "entity_id": "d55f9a65-8f62-4a89-9b7d-e488d4ac893b",
+      "timestamp": "2026-11-04 03:15:19.269277+00:00",
+      "request_id": "e63234e6-3d28-470d-96b7-be75a37c9efc",
+      "changed_fields": [
+        "sort_order"
+      ],
+      "before": {
+        "id": "d55f9a65-8f62-4a89-9b7d-e488d4ac893b",
+        "label": "QA concurrency sentinel",
+        "menu_id": "d72a2f46-5b11-442d-92f2-fbf7c3ce45c3",
+        "page_id": null,
+        "post_id": null,
+        "site_id": 1,
+        "is_active": false,
+        "item_type": "custom",
+        "parent_id": null,
+        "sort_order": 2,
+        "allow_cross_site": false
+      },
+      "after": {
+        "id": "d55f9a65-8f62-4a89-9b7d-e488d4ac893b",
+        "label": "QA concurrency sentinel",
+        "menu_id": "d72a2f46-5b11-442d-92f2-fbf7c3ce45c3",
+        "page_id": null,
+        "post_id": null,
+        "site_id": 1,
+        "is_active": false,
+        "item_type": "custom",
+        "parent_id": null,
+        "sort_order": 1,
+        "allow_cross_site": false
+      }
+    },
+    {
+      "actor_kind": "USER",
+      "actor_id": "1",
+      "action": "MENU_ITEMS_REORDERED",
+      "entity_type": "cms.menu",
+      "entity_id": "d72a2f46-5b11-442d-92f2-fbf7c3ce45c3",
+      "timestamp": "2026-11-04 03:15:19.274872+00:00",
+      "request_id": "e63234e6-3d28-470d-96b7-be75a37c9efc",
+      "changed_fields": [
+        "order"
+      ],
+      "before": {
+        "count": 3,
+        "menu_id": "d72a2f46-5b11-442d-92f2-fbf7c3ce45c3",
+        "site_id": 1,
+        "parent_id": null,
+        "order_sha256": "7a87b4899fe369ff5a1f2fb883727cd3b9d6ecf640d4548fdc04f485876d3077"
+      },
+      "after": {
+        "count": 3,
+        "menu_id": "d72a2f46-5b11-442d-92f2-fbf7c3ce45c3",
+        "site_id": 1,
+        "parent_id": null,
+        "order_sha256": "614e4063ba47a196ad5bbe8bec86f0d106405e3acf78f78717c801215b2955f9"
+      }
+    }
+  ]
+}

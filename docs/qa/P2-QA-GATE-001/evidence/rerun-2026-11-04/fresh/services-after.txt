@@ -1,0 +1,12 @@
+backend healthy
+celery-beat 
+celery-worker healthy
+frontend-admin healthy
+frontend-public healthy
+keycloak healthy
+keycloak-db healthy
+minio healthy
+nginx healthy
+postgres healthy
+redis-broker healthy
+redis-cache healthy

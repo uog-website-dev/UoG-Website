@@ -1,0 +1,1162 @@
+[
+  {
+    "method": "GET",
+    "path": "/api/me/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-siteadmin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/me/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-editor",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/me/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-reviewer",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/me/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-publisher",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/me/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-viewer",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/me/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/authorization/roles/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "devuser",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/authorization/assignments/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "devuser",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/organizations/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/organizations/15/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/v1/organizations/15/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/organizations/5/descendants/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/organizations/15/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/v1/organizations/15/",
+    "host": "localhost",
+    "status": 400,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/site-templates/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/8/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/v1/sites/8/configuration/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/8/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/8/activate/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/8/domains/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/8/domains/9/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/8/domains/9/set-primary/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/8/domains/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/9/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/v1/sites/9/configuration/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/9/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/9/activate/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/9/domains/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/9/domains/11/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/9/domains/11/set-primary/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/9/domains/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/9/domains/",
+    "host": "localhost",
+    "status": 409,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/site-context/",
+    "host": "qa0c23430a-main.uog.local",
+    "status": 200,
+    "actor": "anonymous",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/site-context/",
+    "host": "qa0c23430a-college.uog.local",
+    "status": 200,
+    "actor": "anonymous",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/site-context/",
+    "host": "unknown-qa0c23430a.uog.local",
+    "status": 404,
+    "actor": "anonymous",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/modules/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/8/modules/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/8/modules/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/9/modules/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/9/modules/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/modules/11/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/v1/modules/11/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/8/modules/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/8/modules/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/9/modules/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/9/modules/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/8/modules/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/8/modules/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/9/modules/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/9/modules/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/authorization/roles/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/authorization/assignments/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/authorization/assignments/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/cms/sites/8/content-roles/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/authorization/assignments/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/cms/sites/8/content-roles/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/authorization/assignments/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/cms/sites/8/content-roles/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/authorization/assignments/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/9/",
+    "host": "localhost",
+    "status": 403,
+    "actor": "qa0c23430a-siteadmin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/authorization/assignments/users/21/effective/?scope=SITE&site=8",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/authorization/assignments/users/22/effective/?scope=SITE&site=8",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/authorization/assignments/users/24/effective/?scope=SITE&site=8",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/8/pages/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-editor",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/8/pages/a5f3a2da-fed3-46e7-8243-d24c0bdc12c7/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-editor",
+    "test": null
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/v1/sites/8/pages/a5f3a2da-fed3-46e7-8243-d24c0bdc12c7/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-editor",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/cms/sites/9/content-roles/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/9/pages/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/9/pages/224fab4a-e5a4-4032-a01f-e2d3255db750/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/v1/sites/9/pages/224fab4a-e5a4-4032-a01f-e2d3255db750/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/8/pages/a5f3a2da-fed3-46e7-8243-d24c0bdc12c7/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-editor",
+    "test": null
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/v1/sites/8/pages/a5f3a2da-fed3-46e7-8243-d24c0bdc12c7/",
+    "host": "localhost",
+    "status": 400,
+    "actor": "qa0c23430a-editor",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/cms/sites/8/content/a5f3a2da-fed3-46e7-8243-d24c0bdc12c7/workflow/",
+    "host": "localhost",
+    "status": 403,
+    "actor": "qa0c23430a-viewer",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/site-context/pages/qa-home/",
+    "host": "qa0c23430a-main.uog.local",
+    "status": 404,
+    "actor": "anonymous",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/cms/sites/8/content/a5f3a2da-fed3-46e7-8243-d24c0bdc12c7/workflow/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-editor",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/cms/sites/8/content/a5f3a2da-fed3-46e7-8243-d24c0bdc12c7/workflow/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-reviewer",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/cms/sites/8/content/a5f3a2da-fed3-46e7-8243-d24c0bdc12c7/workflow/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-publisher",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/site-context/pages/qa-home/",
+    "host": "qa0c23430a-main.uog.local",
+    "status": 200,
+    "actor": "anonymous",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/site-context/pages/qa-home/",
+    "host": "qa0c23430a-college.uog.local",
+    "status": 404,
+    "actor": "anonymous",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/cms/sites/9/content-roles/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/cms/sites/9/content-roles/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/cms/sites/9/content/224fab4a-e5a4-4032-a01f-e2d3255db750/workflow/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/cms/sites/9/content/224fab4a-e5a4-4032-a01f-e2d3255db750/workflow/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-reviewer",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/cms/sites/9/content/224fab4a-e5a4-4032-a01f-e2d3255db750/workflow/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-publisher",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/site-context/pages/qa-home/",
+    "host": "qa0c23430a-college.uog.local",
+    "status": 200,
+    "actor": "anonymous",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/8/categories/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-editor",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/8/tags/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-editor",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/8/posts/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-editor",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/cms/sites/8/content/3bdf35ed-7f87-45ef-a0b1-44e43894230a/workflow/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-editor",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/cms/sites/8/content/3bdf35ed-7f87-45ef-a0b1-44e43894230a/workflow/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-reviewer",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/cms/sites/8/content/3bdf35ed-7f87-45ef-a0b1-44e43894230a/workflow/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-publisher",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/site-context/posts/",
+    "host": "qa0c23430a-main.uog.local",
+    "status": 200,
+    "actor": "anonymous",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/site-context/posts/",
+    "host": "qa0c23430a-college.uog.local",
+    "status": 200,
+    "actor": "anonymous",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/8/menus/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-siteadmin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/8/menus/f3747d48-0f37-4f88-8c34-f99b07fc6e1c/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-siteadmin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/8/menus/f3747d48-0f37-4f88-8c34-f99b07fc6e1c/items/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-siteadmin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/8/menus/f3747d48-0f37-4f88-8c34-f99b07fc6e1c/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-siteadmin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/8/menus/f3747d48-0f37-4f88-8c34-f99b07fc6e1c/items/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-siteadmin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/8/menus/f3747d48-0f37-4f88-8c34-f99b07fc6e1c/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-siteadmin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/8/menus/f3747d48-0f37-4f88-8c34-f99b07fc6e1c/activate/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-siteadmin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/8/menus/f3747d48-0f37-4f88-8c34-f99b07fc6e1c/tree/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-siteadmin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/site-context/menus/",
+    "host": "qa0c23430a-main.uog.local",
+    "status": 200,
+    "actor": "anonymous",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/9/pages/",
+    "host": "localhost",
+    "status": 403,
+    "actor": "qa0c23430a-editor",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/8/pages/not-a-uuid/",
+    "host": "localhost",
+    "status": 404,
+    "actor": "qa0c23430a-editor",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/8/modules/17/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/8/modules/17/disable/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/site-context/posts/",
+    "host": "qa0c23430a-main.uog.local",
+    "status": 404,
+    "actor": "anonymous",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/8/modules/17/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/8/modules/17/enable/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/site-context/pages/qa-home/",
+    "host": "qa0c23430a-main.uog.local",
+    "status": 200,
+    "actor": "anonymous",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/8/pages/a5f3a2da-fed3-46e7-8243-d24c0bdc12c7/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-editor",
+    "test": null
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/v1/sites/8/pages/a5f3a2da-fed3-46e7-8243-d24c0bdc12c7/",
+    "host": "localhost",
+    "status": 400,
+    "actor": "qa0c23430a-editor",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/8/pages/a5f3a2da-fed3-46e7-8243-d24c0bdc12c7/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-editor",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/8/pages/a5f3a2da-fed3-46e7-8243-d24c0bdc12c7/working-draft/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-editor",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/8/pages/f03f1b3e-4895-4ffd-ab44-def8a4c63c1c/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-editor",
+    "test": null
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/v1/sites/8/pages/f03f1b3e-4895-4ffd-ab44-def8a4c63c1c/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-editor",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/site-context/pages/qa-home/",
+    "host": "qa0c23430a-main.uog.local",
+    "status": 200,
+    "actor": "anonymous",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/cms/sites/8/content/f03f1b3e-4895-4ffd-ab44-def8a4c63c1c/workflow/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-editor",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/cms/sites/8/content/f03f1b3e-4895-4ffd-ab44-def8a4c63c1c/workflow/",
+    "host": "localhost",
+    "status": 403,
+    "actor": "qa0c23430a-editor",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/cms/sites/8/content/f03f1b3e-4895-4ffd-ab44-def8a4c63c1c/workflow/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-reviewer",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/cms/sites/8/content/f03f1b3e-4895-4ffd-ab44-def8a4c63c1c/workflow/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-publisher",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/site-context/pages/qa-home/",
+    "host": "qa0c23430a-main.uog.local",
+    "status": 200,
+    "actor": "anonymous",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/9/categories/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/8/posts/",
+    "host": "localhost",
+    "status": 400,
+    "actor": "qa0c23430a-editor",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/8/posts/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-editor",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/8/posts/58a56aa3-bea4-4352-bb43-c5b75f60cc64/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-editor",
+    "test": null
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/v1/sites/8/posts/58a56aa3-bea4-4352-bb43-c5b75f60cc64/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-editor",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/8/menus/",
+    "host": "localhost",
+    "status": 400,
+    "actor": "qa0c23430a-siteadmin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/8/pages/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-editor",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/9/pages/",
+    "host": "localhost",
+    "status": 403,
+    "actor": "qa0c23430a-viewer",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/9/pages/",
+    "host": "localhost",
+    "status": 403,
+    "actor": "qa0c23430a-viewer",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/authorization/assignments/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-siteadmin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/authorization/assignments/",
+    "host": "localhost",
+    "status": 403,
+    "actor": "qa0c23430a-siteadmin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/organizations/",
+    "host": "localhost",
+    "status": 403,
+    "actor": "qa0c23430a-viewer",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/8/menus/f3747d48-0f37-4f88-8c34-f99b07fc6e1c/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-siteadmin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/8/menus/f3747d48-0f37-4f88-8c34-f99b07fc6e1c/items/",
+    "host": "localhost",
+    "status": 201,
+    "actor": "qa0c23430a-siteadmin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/site-context/menus/",
+    "host": "qa0c23430a-main.uog.local",
+    "status": 200,
+    "actor": "anonymous",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/8/menus/f3747d48-0f37-4f88-8c34-f99b07fc6e1c/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-siteadmin",
+    "test": null
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/sites/8/menus/f3747d48-0f37-4f88-8c34-f99b07fc6e1c/items/",
+    "host": "localhost",
+    "status": 400,
+    "actor": "qa0c23430a-siteadmin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/me/",
+    "host": null,
+    "status": 401,
+    "actor": null,
+    "test": "tampered real JWT signature"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/organizations/15/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/8/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/sites/9/",
+    "host": "localhost",
+    "status": 200,
+    "actor": "qa0c23430a-admin",
+    "test": null
+  }
+]

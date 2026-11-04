@@ -291,6 +291,8 @@ isolation/concurrency tests, migration evidence if applicable and linked PR/CI.
 
 ## P2-HARD-008 — Repeat and sign the Sprint 1–2 integrated acceptance gate
 
+**Local result (3 Nov 2026):** All 38 cases were executed again on `ce66ecd`. The fresh project used new volumes and those volumes were removed. The recommendation remains **NO-GO** because the three stakeholder signatures are absent. See [report-2026-11-03.md](report-2026-11-03.md).
+
 **As the** QA Lead, Technical Lead and Product Owner,  
 **I want** the complete acceptance workflow verified on the repaired platform,  
 **so that** Sprint 3 starts on an accepted institutional and publishing foundation.

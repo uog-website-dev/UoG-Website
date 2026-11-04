@@ -12237,6 +12237,8 @@ paths:
         name: is_active
         schema:
           type: boolean
+        description: Optional active-state filter. Omit to include both active and
+          inactive records.
       - in: query
         name: page
         schema:
@@ -12563,6 +12565,8 @@ paths:
         name: is_active
         schema:
           type: boolean
+        description: Optional active-state filter. Omit to include both active and
+          inactive records.
       - in: path
         name: menu_pk
         schema:

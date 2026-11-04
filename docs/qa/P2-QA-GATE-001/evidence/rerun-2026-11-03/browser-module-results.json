@@ -1,0 +1,13 @@
+{
+  "run": "qa0c23430a",
+  "build": "ce66ecd",
+  "date": "2026-11-03",
+  "results": [
+    {
+      "id": "T11-browser-menus",
+      "label": "Disabled MENUS removes public navigation",
+      "status": "PASS",
+      "actual": "Real public Next.js Page remains available, while MENUS navigation is absent."
+    }
+  ]
+}

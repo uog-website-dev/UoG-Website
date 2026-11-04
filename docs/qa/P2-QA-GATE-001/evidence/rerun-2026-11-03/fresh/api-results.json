@@ -1,0 +1,284 @@
+{
+  "state": {
+    "run": "qa5efaebfe",
+    "build": "ce66ecd-fresh",
+    "date": "2026-11-03",
+    "objects": {
+      "root_id": 1,
+      "organization_id": 2
+    },
+    "fresh_root_created": true,
+    "sites": [
+      {
+        "id": 1,
+        "url": "/api/v1/sites/1/",
+        "host": "qa5efaebfe-main.uog.local",
+        "code": "QA5EFAEBFE_0",
+        "owner": 1,
+        "domain_id": 1,
+        "alias": "alias-qa5efaebfe-main.uog.local",
+        "module_ids": {
+          "PAGES": 1,
+          "POSTS": 3,
+          "MENUS": 5
+        },
+        "page_id": "6251c151-d0a4-4dd9-b3c7-72adbd8bd4ff",
+        "post_id": "35eda07c-7cba-4a86-90e9-e5817025b427"
+      },
+      {
+        "id": 2,
+        "url": "/api/v1/sites/2/",
+        "host": "qa5efaebfe-college.uog.local",
+        "code": "QA5EFAEBFE_1",
+        "owner": 2,
+        "domain_id": 3,
+        "alias": "alias-qa5efaebfe-college.uog.local",
+        "module_ids": {
+          "PAGES": 2,
+          "POSTS": 4,
+          "MENUS": 6
+        },
+        "page_id": "ca52645b-cd5e-4625-a154-fe101e45a6f3"
+      }
+    ],
+    "restore_global_modules": {
+      "10": false,
+      "11": false,
+      "12": false
+    },
+    "security_probe": {
+      "actor": "qa5efaebfe-viewer",
+      "actor_user_id": 5,
+      "target_site": 2,
+      "database_grants": [
+        {
+          "role__code": "viewer",
+          "scope": "SITE",
+          "organization_id": 1,
+          "site_id": 1
+        }
+      ],
+      "target_site_cms_roles": [],
+      "temporary_realm_role": "platform-admin"
+    },
+    "completed_http_workflow": true
+  },
+  "results": {
+    "T12": [
+      {
+        "pass": true,
+        "actual": "Six dedicated Keycloak users obtained real tokens accepted by /api/me/; browser/session checks are separate."
+      }
+    ],
+    "T03": [
+      {
+        "pass": true,
+        "actual": "Created/edited QA college beneath existing UNIVERSITY root and retrieved descendants over HTTP."
+      }
+    ],
+    "T04": [
+      {
+        "pass": true,
+        "actual": "Self-parent mutation rejected with HTTP 400."
+      }
+    ],
+    "T06": [
+      {
+        "pass": true,
+        "actual": "Created two Sites with distinct owners and independent identity/theme configuration."
+      }
+    ],
+    "T07": [
+      {
+        "pass": true,
+        "actual": "Both Sites activated; template selection used existing active template."
+      }
+    ],
+    "T08": [
+      {
+        "pass": true,
+        "actual": "Primary domains and aliases created; cross-Site duplicate rejected with 409."
+      }
+    ],
+    "T09": [
+      {
+        "pass": true,
+        "actual": "Host qa5efaebfe-main.uog.local resolves to its persisted Site; HTTP 200."
+      },
+      {
+        "pass": true,
+        "actual": "Host qa5efaebfe-college.uog.local resolves to its persisted Site; HTTP 200."
+      },
+      {
+        "pass": true,
+        "actual": "Unknown host safely rejected with 404."
+      }
+    ],
+    "T10": [
+      {
+        "pass": true,
+        "actual": "PAGES, POSTS and MENUS independently enabled through the global and per-Site management APIs."
+      }
+    ],
+    "T13": [
+      {
+        "pass": true,
+        "actual": "Platform administrator assigned Site Administrator, Editor, Reviewer, Publisher and Viewer through real protected APIs; CMS roles assigned explicitly."
+      }
+    ],
+    "T14": [
+      {
+        "pass": true,
+        "actual": "Site-only administrator cannot retrieve Site B: 403."
+      }
+    ],
+    "T15": [
+      {
+        "pass": true,
+        "actual": "QA-D002: editor effective scoped permission endpoint returned 200."
+      },
+      {
+        "pass": true,
+        "actual": "QA-D002: reviewer effective scoped permission endpoint returned 200."
+      },
+      {
+        "pass": true,
+        "actual": "QA-D002: viewer effective scoped permission endpoint returned 200."
+      }
+    ],
+    "T18": [
+      {
+        "pass": true,
+        "actual": "Editor created and conditionally edited a Site-owned Page; second Site has its own Page with the same slug."
+      }
+    ],
+    "T19": [
+      {
+        "pass": true,
+        "actual": "Invalid structured block type rejected with 400; regression suite covers hierarchy/slugs."
+      }
+    ],
+    "T21": [
+      {
+        "pass": true,
+        "actual": "Viewer publication denied with 403."
+      }
+    ],
+    "T22": [
+      {
+        "pass": true,
+        "actual": "Draft Page on qa5efaebfe-main.uog.local is not publicly served (404)."
+      },
+      {
+        "pass": true,
+        "actual": "Draft Page on qa5efaebfe-college.uog.local is not publicly served (404)."
+      }
+    ],
+    "T20": [
+      {
+        "pass": true,
+        "actual": "Distinct author/reviewer/publisher completed review and published Page for qa5efaebfe-main.uog.local."
+      },
+      {
+        "pass": true,
+        "actual": "Distinct author/reviewer/publisher completed review and published Page for qa5efaebfe-college.uog.local."
+      }
+    ],
+    "T24": [
+      {
+        "pass": true,
+        "actual": "Editor created a Post with category, tag and excerpt through the Post API."
+      },
+      {
+        "pass": true,
+        "actual": "A separate draft Post was created and edited over HTTP."
+      }
+    ],
+    "T26": [
+      {
+        "pass": true,
+        "actual": "Post uses the shared SiteContent workflow and persisted PUBLISHED state."
+      }
+    ],
+    "T27": [
+      {
+        "pass": true,
+        "actual": "Published Post appears only in the owning hostname feed."
+      }
+    ],
+    "T28": [
+      {
+        "pass": true,
+        "actual": "Site administrator created and activated a Menu with nested items using Menu-wide If-Match."
+      }
+    ],
+    "T29": [
+      {
+        "pass": true,
+        "actual": "Menu tree/location persisted; regression verifies reorder/depth/cycles."
+      }
+    ],
+    "T30": [
+      {
+        "pass": true,
+        "actual": "Published Page link appears in the owning Site's public menu; regression covers missing/draft links."
+      }
+    ],
+    "T16": [
+      {
+        "pass": true,
+        "actual": "Site A Editor cannot read Site B Page inventory (403)."
+      },
+      {
+        "pass": true,
+        "actual": "Cross-Site realm-role privilege probe: GET=403, POST=403."
+      }
+    ],
+    "T17": [
+      {
+        "pass": true,
+        "actual": "Malformed record identifier rejected with 404; regression covers expired/tampered JWTs."
+      }
+    ],
+    "T11": [
+      {
+        "pass": true,
+        "actual": "POSTS disabled: public feed 404, stored content retained. Browser UI check is separate."
+      }
+    ],
+    "T23": [
+      {
+        "pass": true,
+        "actual": "Direct published PATCH 400; public title stayed True while the draft was edited; author approve 403; reviewed publication status ARCHIVED; public title is now the revision=True."
+      }
+    ],
+    "T25": [
+      {
+        "pass": true,
+        "actual": "Cross-Site taxonomy reference rejected with 400."
+      }
+    ],
+    "T34": [
+      {
+        "pass": true,
+        "actual": "Missing fields return structured HTTP 400 with request correlation ID."
+      }
+    ],
+    "T35": [
+      {
+        "pass": true,
+        "actual": "Real Page authoring sanitized a script payload before persistence."
+      },
+      {
+        "pass": true,
+        "actual": "QA-SEC001: Real Keycloak realm-role-only Site A viewer requested Site B Pages: GET=403, POST=403; no Site B or platform DB assignment exists."
+      }
+    ],
+    "T36": [
+      {
+        "pass": true,
+        "actual": "Shared persisted audit rows with QA Site context: 16."
+      }
+    ]
+  }
+}
