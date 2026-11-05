@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import type { CSSProperties } from "react";
+import { Suspense, type CSSProperties } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
@@ -13,6 +13,7 @@ import { AdminShell } from "@/admin-shell";
 import { auth, siteOrigin } from "@/auth";
 import { signInWithKeycloak, signOutFromSite } from "@/app/actions";
 import { sessionExpiredHref } from "@/session-expiry";
+import { SignInNotice } from "@/sign-in-notice";
 
 import "./globals.css";
 
@@ -63,6 +64,9 @@ export default async function AdminLayout({
                   The administration console is restricted to University of Gondar
                   staff. Sign in with your university account to continue.
                 </Typography>
+                <Suspense fallback={null}>
+                  <SignInNotice />
+                </Suspense>
                 <form action={signInWithKeycloak}>
                   <Button type="submit" variant="contained" size="large" fullWidth>
                     Sign in with Keycloak

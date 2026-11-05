@@ -24,9 +24,12 @@ const redirect = vi.fn((url: string) => {
   throw new Error(`REDIRECT ${url}`);
 });
 
+let searchParams = new URLSearchParams();
+
 vi.mock("next/navigation", () => ({
   usePathname: () => "/",
   useRouter: () => ({ push: vi.fn() }),
+  useSearchParams: () => searchParams,
   redirect: (url: string) => redirect(url),
 }));
 
@@ -46,6 +49,7 @@ async function renderLayout(session: unknown): Promise<string> {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  searchParams = new URLSearchParams();
 });
 
 describe("admin session gate", () => {
@@ -56,6 +60,16 @@ describe("admin session gate", () => {
     expect(html).toContain("Sign in with Keycloak");
     expect(html).not.toContain("protected-subtree");
     expect(html).not.toContain("Sign out");
+    expect(html).not.toContain("Sign-in did not complete");
+  });
+
+  it("explains a failed sign-in callback on the sign-in screen instead of a server error", async () => {
+    searchParams = new URLSearchParams({ error: "Configuration" });
+    const html = await renderLayout(null);
+
+    expect(html).toContain("Sign-in did not complete");
+    expect(html).toContain("Sign in with Keycloak");
+    expect(html).not.toContain("protected-subtree");
   });
 
   it("renders the protected routes and the verified identity when signed in", async () => {
