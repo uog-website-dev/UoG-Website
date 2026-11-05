@@ -200,6 +200,32 @@ describe("createLiveSitesAdapter — listDomainsAll", () => {
     expect(result.count).toBe(0);
   });
 
+  it("overlaps Site reads with at most four in flight and retains complete results", async () => {
+    const template = (await (await respond("/api/v1/sites/?page=1")).json()).results[0];
+    let active = 0, maximum = 0, started = 0;
+    const gates: (() => void)[] = [];
+    const fetchFn = vi.fn(async (url: string) => {
+      if (url === "/api/v1/sites/?page=1") return new Response(JSON.stringify({ count: 9, next: null,
+        results: Array.from({ length: 9 }, (_, index) => ({ ...template, id: index + 1 })) }), { status: 200 });
+      const id = Number(/sites\/(\d+)\//.exec(url)?.[1]);
+      active++; started++; maximum = Math.max(maximum, active);
+      await new Promise<void>((resolve) => gates.push(resolve));
+      active--;
+      return new Response(JSON.stringify({ count: 1, next: null, results: [{ id, site: id,
+        hostname: `site${id}.uog.edu.et`, is_primary: true, status: "ACTIVE", redirect_to_primary: false,
+        created_at: STAMP, updated_at: STAMP }] }), { status: 200 });
+    }) as unknown as typeof fetch;
+    const pending = createLiveSitesAdapter({ baseUrl: "/api", fetchFn }).listDomainsAll();
+    for (const expected of [4, 8, 9]) {
+      await vi.waitFor(() => expect(started).toBe(expected));
+      gates.splice(0).forEach((release) => release());
+    }
+    const result = await pending;
+    expect(maximum).toBe(4);
+    expect(result.count).toBe(9);
+    expect(result.results.map((row) => row.site)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+  });
+
   it("propagates an unauthorized response instead of fabricating rows", async () => {
     const fetchFn = vi.fn(
       async () =>
@@ -376,6 +402,16 @@ describe("createLiveSitesAdapter — domain mutations", () => {
 });
 
 describe("createMockSitesAdapter — domain mutations", () => {
+  it("includes the primary hostname summary in mock Site list and detail responses", async () => {
+    const adapter = createMockSitesAdapter({ latencyMs: 0 });
+    const domains = await adapter.listDomains(1);
+    const primary = domains.results.find((row) => row.is_primary);
+    const expected = primary ? { hostname: primary.hostname, status: primary.status } : null;
+    const detail = await adapter.get(1);
+    const listing = await adapter.list();
+    expect(detail.data.primary_domain).toEqual(expected);
+    expect(listing.results.find((row) => row.id === 1)?.primary_domain).toEqual(expected);
+  });
   it("creates a domain, rejecting a duplicate hostname with 409", async () => {
     const adapter = createMockSitesAdapter(instant);
 

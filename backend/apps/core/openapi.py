@@ -94,6 +94,11 @@ def add_common_contract(result, generator, request, public):
                         },
                     },
                 })
+            if path.startswith("/api/v1/site-modules/"):
+                if method == "get":
+                    codes.update({"400", "404"})
+                if path.endswith("/bulk-apply/"):
+                    codes.update({"409", "503"})
             if path.startswith(("/api/v1/organizations/", "/api/v1/sites/", "/api/v1/site-templates/", "/api/v1/modules/")):
                 hierarchy = path.startswith("/api/v1/organizations/") and path.rstrip("/").split("/")[-1] in {"tree", "children", "ancestors", "descendants", "subtree"}
                 if method == "get" and "{" not in path and not hierarchy:

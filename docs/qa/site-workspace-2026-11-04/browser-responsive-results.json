@@ -1,0 +1,22 @@
+{
+  "run": "qaws7bf27e71",
+  "build": "e42a429d15891ded6710bb7d5739092ae7bdb76c+workspace-working-tree",
+  "results": [
+    {
+      "id": "site-admin-login",
+      "status": "PASS"
+    },
+    {
+      "id": "responsive-keyboard-desktop",
+      "status": "PASS"
+    },
+    {
+      "id": "responsive-keyboard-tablet",
+      "status": "PASS"
+    },
+    {
+      "id": "responsive-keyboard-mobile",
+      "status": "PASS"
+    }
+  ]
+}

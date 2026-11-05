@@ -40,6 +40,10 @@ class SiteModule(models.Model):
             if previous and (previous["module_id"] != self.module_id or previous["site_id"] != self.site_id):
                 raise ValidationError("A Site module assignment cannot be moved.")
         turning_on = self.is_enabled and (previous is None or not previous["is_enabled"])
+        using = self._state.db or router.db_for_write(type(self), instance=self)
+        if turning_on or (previous and previous["is_enabled"] and not self.is_enabled):
+            from ..services.modules import _reject_blocked_switch
+            _reject_blocked_switch(self.site_id, self.module, "ENABLE" if self.is_enabled else "DISABLE", using=using)
         if not turning_on:
             return
         from ..selectors.modules import module_is_usable
@@ -54,6 +58,12 @@ class SiteModule(models.Model):
         return super().full_clean(*args, **kwargs)
 
     def save(self, *args, **kwargs):
+        from apps.organizations.hierarchy_lock import hierarchy_write
+        using = kwargs.get("using") or router.db_for_write(type(self), instance=self)
+        with hierarchy_write(using=using):
+            return self._save(*args, **kwargs)
+
+    def _save(self, *args, **kwargs):
         supplied = self.configuration
         self.full_clean()
         if kwargs.get("update_fields"):

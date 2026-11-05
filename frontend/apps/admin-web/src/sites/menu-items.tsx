@@ -138,12 +138,15 @@ export function MenuItemTree({
   targets = EMPTY_TARGETS,
   enabled,
   onChanged,
+  showAvailability = true,
 }: {
   siteId: number;
   state: MenuLocationState;
   targets?: MenuTargets;
   enabled: boolean;
   onChanged: () => void;
+  /** The menu editor shows this once. Nested trees must not repeat it. */
+  showAvailability?: boolean;
 }) {
   const toast = useToast();
   const dragId = useRef<string | null>(null);
@@ -273,15 +276,54 @@ export function MenuItemTree({
               }}
               sx={{ display: "flex", flexDirection: "column", gap: 0.5, pl: depth * 2 }}
             >
-              <Box sx={{ display: "flex", gap: 1, alignItems: "center", flexWrap: "wrap" }}>
-                <Typography sx={{ minWidth: 120 }}>{item.label}</Typography>
-                <Typography variant="body2" color="text.secondary">{targetText(item, targets)}</Typography>
-                <Button size="small" aria-label={`Move ${item.label} up`} disabled={!enabled || busy || index === 0} onClick={() => shift(item, -1)}>Move up</Button>
-                <Button size="small" aria-label={`Move ${item.label} down`} disabled={!enabled || busy || index === group.length - 1} onClick={() => shift(item, 1)}>Move down</Button>
-                <Button size="small" aria-label={`Nest ${item.label}`} disabled={!enabled || busy || index === 0} onClick={() => nest(item)}>Nest</Button>
-                <Button size="small" aria-label={`Move ${item.label} out`} disabled={!enabled || busy || !item.parent} onClick={() => lift(item)}>Move out</Button>
-                <Button size="small" aria-label={`Edit ${item.label}`} disabled={!enabled || busy} onClick={() => setEditingId(editingId === item.id ? null : item.id)}>Edit</Button>
-                <Button size="small" aria-label={`Remove ${item.label}`} disabled={!enabled || busy || child} onClick={() => void run(() => deleteMenuItem(siteId, state.menu.id, item.id, state.etag))}>Remove</Button>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 1,
+                  p: 1.5,
+                  border: 1,
+                  borderColor: "divider",
+                  borderRadius: 1,
+                  bgcolor: "background.paper",
+                }}
+              >
+                <Box sx={{ minWidth: 0 }}>
+                  <Typography sx={{ fontWeight: 600, overflowWrap: "anywhere" }}>{item.label}</Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ overflowWrap: "anywhere" }}>
+                    {targetText(item, targets)}
+                  </Typography>
+                </Box>
+                <Box
+                  aria-label={`Actions for ${item.label}`}
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: { xs: "1fr", sm: "repeat(3, minmax(0, 1fr))" },
+                    gap: 1.5,
+                  }}
+                >
+                  <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5, minWidth: 0 }}>
+                    <Typography variant="caption" color="text.secondary">Order</Typography>
+                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                      <Button size="small" aria-label={`Move ${item.label} up`} disabled={!enabled || busy || index === 0} onClick={() => shift(item, -1)}>Move up</Button>
+                      <Button size="small" aria-label={`Move ${item.label} down`} disabled={!enabled || busy || index === group.length - 1} onClick={() => shift(item, 1)}>Move down</Button>
+                    </Box>
+                  </Box>
+                  <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5, minWidth: 0 }}>
+                    <Typography variant="caption" color="text.secondary">Structure</Typography>
+                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                      <Button size="small" aria-label={`Nest ${item.label}`} disabled={!enabled || busy || index === 0} onClick={() => nest(item)}>Nest</Button>
+                      <Button size="small" aria-label={`Move ${item.label} out`} disabled={!enabled || busy || !item.parent} onClick={() => lift(item)}>Move out</Button>
+                    </Box>
+                  </Box>
+                  <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5, minWidth: 0 }}>
+                    <Typography variant="caption" color="text.secondary">Item</Typography>
+                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                      <Button size="small" aria-label={`Edit ${item.label}`} disabled={!enabled || busy} onClick={() => setEditingId(editingId === item.id ? null : item.id)}>Edit</Button>
+                      <Button size="small" aria-label={`Remove ${item.label}`} disabled={!enabled || busy || child} onClick={() => void run(() => deleteMenuItem(siteId, state.menu.id, item.id, state.etag))}>Remove</Button>
+                    </Box>
+                  </Box>
+                </Box>
               </Box>
               {child ? (
                 <Typography variant="caption" color="text.secondary">Remove the nested items before removing {item.label}.</Typography>
@@ -312,10 +354,10 @@ export function MenuItemTree({
     <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
       {conflict ? <Alert severity="warning">{conflict}</Alert> : null}
       {notice ? <Alert severity="warning">{notice}</Alert> : null}
-      {!targets.pagesAvailable ? (
+      {showAvailability && !targets.pagesAvailable ? (
         <Alert severity="info">Pages are not available for this Site. Page targets stay blocked.</Alert>
       ) : null}
-      {!targets.postsAvailable ? (
+      {showAvailability && !targets.postsAvailable ? (
         <Alert severity="info">Posts are not available for this Site. Post targets stay blocked.</Alert>
       ) : null}
       {items.length === 0 ? (
@@ -391,8 +433,23 @@ function ItemForm({
     if (!initial) setLabel("");
   }
 
+  const fieldNotice = problem === "Pages are not available for this Site." || problem === "Posts are not available for this Site."
+    ? null
+    : problem;
+
   return (
-    <Box component="form" aria-label={legend} sx={{ display: "flex", gap: 1, flexWrap: "wrap", alignItems: "center" }} onSubmit={submit}>
+    <Box
+      component="form"
+      aria-label={legend}
+      sx={{
+        display: "grid",
+        gridTemplateColumns: { xs: "minmax(0, 1fr)", sm: "repeat(2, minmax(0, 1fr))" },
+        gap: 2,
+        alignItems: "start",
+        "& .MuiFormControl-root": { minWidth: 0, width: "100%" },
+      }}
+      onSubmit={submit}
+    >
       <TextField size="small" label="Item label" value={label} disabled={!enabled} onChange={(event) => setLabel(event.target.value)} required />
       <TextField
         select
@@ -409,13 +466,13 @@ function ItemForm({
         <option value="external">External URL</option>
       </TextField>
       {kind === "page" ? (
-        <TextField select size="small" label="Page" value={page} disabled={!enabled || !targets.pagesAvailable} onChange={(event) => setPage(event.target.value)} slotProps={{ select: { native: true } }}>
+        <TextField select size="small" label="Page" value={page} disabled={!enabled || !targets.pagesAvailable} onChange={(event) => setPage(event.target.value)} slotProps={{ select: { native: true }, inputLabel: { shrink: true } }}>
           <option value="">Choose a Page</option>
           {targets.pages.map((row) => <option key={row.id} value={row.id}>{row.label}</option>)}
         </TextField>
       ) : null}
       {kind === "post" ? (
-        <TextField select size="small" label="Post" value={post} disabled={!enabled || !targets.postsAvailable} onChange={(event) => setPost(event.target.value)} slotProps={{ select: { native: true } }}>
+        <TextField select size="small" label="Post" value={post} disabled={!enabled || !targets.postsAvailable} onChange={(event) => setPost(event.target.value)} slotProps={{ select: { native: true }, inputLabel: { shrink: true } }}>
           <option value="">Choose a Post</option>
           {targets.posts.map((row) => <option key={row.id} value={row.id}>{row.label}</option>)}
         </TextField>
@@ -427,15 +484,17 @@ function ItemForm({
         <TextField size="small" label="External URL" value={target} disabled={!enabled} onChange={(event) => setTarget(event.target.value)} required />
       ) : null}
       {!initial ? (
-        <TextField select size="small" label="Place under" value={parent} disabled={!enabled} onChange={(event) => setParent(event.target.value)} slotProps={{ select: { native: true } }}>
+        <TextField select size="small" label="Place under" value={parent} disabled={!enabled} onChange={(event) => setParent(event.target.value)} slotProps={{ select: { native: true }, inputLabel: { shrink: true } }}>
           <option value="">Top level</option>
           {parents.map((row) => <option key={row.id} value={row.id}>{row.label}</option>)}
         </TextField>
       ) : null}
-      <Button type="submit" variant="contained" disabled={!enabled || !label.trim() || Boolean(problem)}>
+      <Button type="submit" variant="contained" disabled={!enabled || !label.trim() || Boolean(problem)} sx={{ justifySelf: "start" }}>
         {submitLabel}
       </Button>
-      {warning || problem ? <Alert severity="warning">{warning || problem}</Alert> : null}
+      {warning || fieldNotice ? (
+        <Alert severity="warning" sx={{ gridColumn: "1 / -1" }}>{warning || fieldNotice}</Alert>
+      ) : null}
     </Box>
   );
 }

@@ -172,7 +172,7 @@ describe("MenuItemTree", () => {
       target: "",
     };
     renderTree(current, { ...TARGETS, pages: [], pagesAvailable: false });
-    expect(await screen.findByText(/Pages are not available for this Site/)).toBeTruthy();
+    expect(await screen.findAllByText(/Pages are not available for this Site/)).toHaveLength(1);
     expect(screen.getByText("Unavailable Page")).toBeTruthy();
     const form = screen.getByRole("form", { name: "Add to Header" });
     expect(within(form).getByRole("option", { name: "Page" })).toHaveProperty("disabled", true);

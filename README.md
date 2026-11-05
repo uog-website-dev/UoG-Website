@@ -265,6 +265,7 @@ uog-digital-platform/
 * [Page authoring, review and public delivery](docs/development/page-verification.md)
 * [Post authoring, review and public delivery](docs/development/post-verification.md)
 * [Site administration in the shared console](docs/development/site-administration.md)
+* [Central module management, preview/replay and dependency rules](docs/development/central-module-management.md)
 * [Architecture overview](docs/architecture/overview.md)
 * [Version matrix](docs/architecture/version-matrix.md)
 * [Development guide & troubleshooting](docs/development/setup.md)

@@ -1,0 +1,231 @@
+﻿{
+    "generated_utc":  "2026-11-04T21:02:28.1605472Z",
+    "artifacts":  [
+                      {
+                          "sha256":  "7c5afadbe3aa1e0dc52b00cce47aeb9fe5ba14c4cce07a09ec1ebb97c681fac8",
+                          "file":  "api-results.json",
+                          "bytes":  3407
+                      },
+                      {
+                          "sha256":  "0bff437a7a7809de62b65083b2f4ae33eebf1034f5c1856dcf00d8ccb3dcbeb4",
+                          "file":  "backend.junit.xml",
+                          "bytes":  92307
+                      },
+                      {
+                          "sha256":  "b3a77b4a7db44461c8528664fb44469b4396a0851f833a222fd69a236920caf9",
+                          "file":  "backend-focused.junit.xml",
+                          "bytes":  4451
+                      },
+                      {
+                          "sha256":  "f3d04f077a1b80428ce83aff998205346a0f5cfcf981a33d4ed7ee21818ef7cb",
+                          "file":  "backend-focused.log",
+                          "bytes":  2584
+                      },
+                      {
+                          "sha256":  "4391faa2491467a53b1361121957548cc37347eb89aad9a76a6a2385717243ac",
+                          "file":  "backend-full.log",
+                          "bytes":  925
+                      },
+                      {
+                          "sha256":  "221d1f2818c2313dcdf5279168d233315ecaf8e4627e67ecc64026c51f3be65e",
+                          "file":  "browser.log",
+                          "bytes":  169
+                      },
+                      {
+                          "sha256":  "c5dc5855fb4c0a02f978398e12df7457f6baf70fd0fca2913a9210457658cd10",
+                          "file":  "browser-results.json",
+                          "bytes":  596
+                      },
+                      {
+                          "sha256":  "e1dfde3fcd4b31b1d9617e2b9dd4c923542f1d84a257a4d111ab89b1fad62680",
+                          "file":  "central.log",
+                          "bytes":  102
+                      },
+                      {
+                          "sha256":  "c0e289960db43daa27a18d5e1942e1072c3755bebe09cba2c022d496673d07ae",
+                          "file":  "central-initial.log",
+                          "bytes":  450
+                      },
+                      {
+                          "sha256":  "3952769e14fad4b39212ca8fde87f25995c2ae280776427693a237603623acc2",
+                          "file":  "cleanup.json",
+                          "bytes":  177
+                      },
+                      {
+                          "sha256":  "50ee0cc5c11a603c150d46b1ffcbbb0c1551b37f61120ccf201f5023a173f0c2",
+                          "file":  "code-snapshot.json",
+                          "bytes":  130514
+                      },
+                      {
+                          "sha256":  "1d59ea1585ef88b47c8fff7aff1a7deb064e1a5a41c57cc071e8b8dae7afc8ea",
+                          "file":  "collection.log",
+                          "bytes":  1295
+                      },
+                      {
+                          "sha256":  "f32b866506219789afc2a27facf7dd378c26c08909af58bc053a719d815759ad",
+                          "file":  "environment-policy.log",
+                          "bytes":  1409
+                      },
+                      {
+                          "sha256":  "01167cefb25d06a4e8df5d122ccbf53c2eab048f2b729b039fa879026bb45511",
+                          "file":  "environment-policy-final.log",
+                          "bytes":  12
+                      },
+                      {
+                          "sha256":  "18473ce57ca6aa103524138249bff35844548f8a05a34019db6a3d29da8fab5e",
+                          "file":  "frontend-build.log",
+                          "bytes":  6744
+                      },
+                      {
+                          "sha256":  "08d26ced173f4903f58014f37458137302ae7975b536e9efc5415cb2f061ca0c",
+                          "file":  "frontend-focused.log",
+                          "bytes":  2159
+                      },
+                      {
+                          "sha256":  "9b89d5e9ac75c8b6060209a97264303814b1fb416b145709c50554a4d3afb71b",
+                          "file":  "frontend-focused-final.log",
+                          "bytes":  2237
+                      },
+                      {
+                          "sha256":  "bb35b568cdfb997b16e66becf2ae3da7195a2c22c87ccb2b05b1be27b23a9ebd",
+                          "file":  "frontend-full.log",
+                          "bytes":  39120
+                      },
+                      {
+                          "sha256":  "18fb50d5c53cb07908365f51b8e9ef7fc7e3819a386678bbdc711310728c9b21",
+                          "file":  "http-transcript.json",
+                          "bytes":  27314
+                      },
+                      {
+                          "sha256":  "04248c44877e3b549ea2cdb34ab70639d98c8a512d88e22b29c5fce8d9a4d986",
+                          "file":  "image-build.log",
+                          "bytes":  2984
+                      },
+                      {
+                          "sha256":  "254be31340ae8c76c378e4f37ec1ab9d816952cd483549899276a33513662e81",
+                          "file":  "initial-browser.log",
+                          "bytes":  220
+                      },
+                      {
+                          "sha256":  "51017f7c732442c3fcb977714f2ffb623eed70d566abd0423d8918c1b8c2da70",
+                          "file":  "initial-browser-results.json",
+                          "bytes":  695
+                      },
+                      {
+                          "sha256":  "2e064388518cad54995cdcec8c3f8f5595a98ec2809c3590712db7109a9b1c55",
+                          "file":  "initial-responsive-keyboard-desktop.png",
+                          "bytes":  277493
+                      },
+                      {
+                          "sha256":  "545cfecce429019059aeb3d0f8ed66b20263b407968b7bbcbfcc6d11c19e81bb",
+                          "file":  "initial-responsive-keyboard-mobile.png",
+                          "bytes":  105604
+                      },
+                      {
+                          "sha256":  "73382c8ed26618da730426352c13d9e131370b142638f65d09d6fe9a1e1ce981",
+                          "file":  "initial-responsive-keyboard-tablet.png",
+                          "bytes":  169287
+                      },
+                      {
+                          "sha256":  "93e6e2d5be3c054add80c0f19101608803f7ca8a7df1fa41f76bbb9a1f570f4a",
+                          "file":  "migration-check.log",
+                          "bytes":  21
+                      },
+                      {
+                          "sha256":  "c4b77c460c56e63fc169d0d09a663bb2a9424562973fc6a134d1bdd433c3859f",
+                          "file":  "migrations-before.log",
+                          "bytes":  245
+                      },
+                      {
+                          "sha256":  "9359ed65e9889d725addaebc61abc730d74e7f474687356c56d1ad7544d41347",
+                          "file":  "migrations-existing.log",
+                          "bytes":  4856
+                      },
+                      {
+                          "sha256":  "8916e03b352878774abdbd08fa7180520b775f97dc1a3fae495f1cec32811638",
+                          "file":  "migrations-existing-final.log",
+                          "bytes":  216
+                      },
+                      {
+                          "sha256":  "321706e9398a5aebf4e34e497bf8489a190d2107048b0a8c45e2e4b6afcfdb3a",
+                          "file":  "registry.png",
+                          "bytes":  276833
+                      },
+                      {
+                          "sha256":  "09d54125ca832972f75803dbdc3bacea9faf91e116a893beff00f261d5c3476a",
+                          "file":  "report.md",
+                          "bytes":  7506
+                      },
+                      {
+                          "sha256":  "bf719b2377f49e2606f592dc5779104513305604968eb5aadbee11b54ba3fd8e",
+                          "file":  "responsive-keyboard-desktop.png",
+                          "bytes":  263729
+                      },
+                      {
+                          "sha256":  "23aa0a3c017c050d874d7a80c3d4d9761f32108009bc61d6c02e54b5460f933d",
+                          "file":  "responsive-keyboard-mobile.png",
+                          "bytes":  105213
+                      },
+                      {
+                          "sha256":  "1eebfb1343435d2efba99242fca4bcb24a4101308f8f62d7d676a25ea7d09610",
+                          "file":  "responsive-keyboard-tablet.png",
+                          "bytes":  165120
+                      },
+                      {
+                          "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                          "file":  "schema.log",
+                          "bytes":  0
+                      },
+                      {
+                          "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                          "file":  "schema-final.log",
+                          "bytes":  0
+                      },
+                      {
+                          "sha256":  "b5483f85eef2260c5951cfc7300185610a54f3f74e8a5e3bc6974123518e7929",
+                          "file":  "schema-match.log",
+                          "bytes":  59
+                      },
+                      {
+                          "sha256":  "3091e12d957a22039ef783d69df80416965f1b71bb245b5657ace7523b7de2a0",
+                          "file":  "second-browser.log",
+                          "bytes":  184
+                      },
+                      {
+                          "sha256":  "771642b8c6825907e88892b87808b8fc95fd320c2213b97def0cb7fe32ff0b81",
+                          "file":  "second-browser-results.json",
+                          "bytes":  627
+                      },
+                      {
+                          "sha256":  "3f693798dcbfceeca61957529579bbb6e605765483efa4a2608a81c6d89bb5bb",
+                          "file":  "second-selection-preview.png",
+                          "bytes":  263551
+                      },
+                      {
+                          "sha256":  "5f37159e2945abc434aecef15c665c3c2eee1eb66a6c67af79498b12fd58f342",
+                          "file":  "selection-preview.png",
+                          "bytes":  204305
+                      },
+                      {
+                          "sha256":  "47bc600955c4e1902cb56642e70d71402d0093cb80bb8b202557eb836f0bc7de",
+                          "file":  "setup.log",
+                          "bytes":  99
+                      },
+                      {
+                          "sha256":  "e8d270089c55cfa83cfa44c1d79bb89a77941b6ebb00172cdef388437a036097",
+                          "file":  "site-admin-denied.png",
+                          "bytes":  52320
+                      },
+                      {
+                          "sha256":  "1ca6a823fd93e3c7eff627a6280444f0ea173c6a1360a77107b9089b49c407bb",
+                          "file":  "stack-health.log",
+                          "bytes":  276
+                      },
+                      {
+                          "sha256":  "88f2a955a68d2bfc9159c42c65308f87a62b28f1eba000c1622bd34df93914a9",
+                          "file":  "typecheck.log",
+                          "bytes":  1536
+                      }
+                  ],
+    "credential_pattern_scan":  "PASS"
+}

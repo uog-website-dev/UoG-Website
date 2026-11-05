@@ -31,6 +31,8 @@ import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
 import Divider from "@mui/material/Divider";
 import Paper from "@mui/material/Paper";
+import Tab from "@mui/material/Tab";
+import Tabs from "@mui/material/Tabs";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -64,6 +66,7 @@ import { configurationRows, originCaption } from "@/sites/configuration";
 import { SiteDomainsPanel } from "@/sites/site-domains-panel";
 import { SiteMenusPanel } from "@/sites/site-menus";
 import { SitePagesPanel } from "@/sites/site-pages";
+import { SitePostsPanel } from "@/sites/site-posts";
 import { ownerInfoFor, relationLabel } from "@/sites/owner";
 import { siteStatusChip, siteStatusLabel } from "@/sites/validation";
 
@@ -131,6 +134,9 @@ export function SiteDetail({ site, permissions = [], error }: SiteDetailProps) {
   const [pending, setPending] = useState(false);
   const [confirmAction, setConfirmAction] = useState<LifecycleAction | null>(null);
   const [confirmError, setConfirmError] = useState<ApiError | null>(null);
+  const [section, setSection] = useState<
+    "overview" | "settings" | "domains" | "modules" | "access" | "pages" | "posts" | "menus"
+  >("overview");
 
   // Baseline for the inherited/override comparison: the provisioning
   // template's defaults. `null` template means schema factory defaults, so
@@ -287,13 +293,19 @@ export function SiteDetail({ site, permissions = [], error }: SiteDetailProps) {
     assignments.loading || registry.loading
       ? null
       : menusModuleId != null &&
-        (assignments.data?.results ?? []).some((row) => row.module === menusModuleId && row.is_enabled);
+        (assignments.data?.results ?? []).some((row) => row.module === menusModuleId && row.is_enabled && row.is_available !== false);
   const pagesModuleId = registry.data?.results.find((entry) => entry.code === "PAGES")?.id ?? null;
   const pagesEnabled =
     assignments.loading || registry.loading
       ? null
       : pagesModuleId != null &&
-        (assignments.data?.results ?? []).some((row) => row.module === pagesModuleId && row.is_enabled);
+        (assignments.data?.results ?? []).some((row) => row.module === pagesModuleId && row.is_enabled && row.is_available !== false);
+  const postsModuleId = registry.data?.results.find((entry) => entry.code === "POSTS")?.id ?? null;
+  const postsEnabled =
+    assignments.loading || registry.loading
+      ? null
+      : postsModuleId != null &&
+        (assignments.data?.results ?? []).some((row) => row.module === postsModuleId && row.is_enabled && row.is_available !== false);
   const baselineLabel =
     template ? `template ${template.code}` : "the platform defaults";
   const showOrigins = site.template === null || baseline === "ready";
@@ -538,7 +550,26 @@ export function SiteDetail({ site, permissions = [], error }: SiteDetailProps) {
         </Paper>
       </Box>
 
-      <Paper variant="outlined" sx={{ overflow: "hidden", borderRadius: 3 }}>
+      <Tabs
+        value={section}
+        onChange={(_, value: typeof section) => setSection(value)}
+        variant="scrollable"
+        scrollButtons="auto"
+        aria-label="Site detail sections"
+      >
+        <Tab value="overview" label="Overview" />
+        <Tab value="settings" label="Settings" />
+        <Tab value="domains" label="Domains" />
+        <Tab value="modules" label="Modules" />
+        <Tab value="access" label="Access" />
+        <Tab value="pages" label="Pages" />
+        <Tab value="posts" label="Posts" />
+        <Tab value="menus" label="Menus" />
+      </Tabs>
+
+      {section === "overview" ? (
+      <>
+      <Paper component="section" aria-label="Overview" variant="outlined" sx={{ overflow: "hidden", borderRadius: 3 }}>
         <Box sx={{ px: { xs: 2, sm: 3 }, py: 2 }}>
           <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
             Site information
@@ -679,8 +710,10 @@ export function SiteDetail({ site, permissions = [], error }: SiteDetailProps) {
           </Box>
         ) : null}
       </Paper>
+      </>
+      ) : null}
 
-      {/* Domains: full lifecycle management in a dedicated panel. */}
+      {section === "domains" ? (
       <SiteDomainsPanel
         site={site}
         onChanged={() => {
@@ -691,12 +724,50 @@ export function SiteDetail({ site, permissions = [], error }: SiteDetailProps) {
           router.refresh();
         }}
       />
+      ) : null}
 
-      <SiteMenusPanel siteId={site.id} menusEnabled={menusEnabled} permissions={permissions} />
-      <SitePagesPanel siteId={site.id} pagesEnabled={pagesEnabled} permissions={permissions} />
+      {section === "menus" ? (
+      <Box component="section" aria-label="Menus">
+        <SiteMenusPanel siteId={site.id} menusEnabled={menusEnabled} permissions={permissions} />
+      </Box>
+      ) : null}
+      {section === "pages" ? (
+      <Box component="section" aria-label="Pages">
+        <SitePagesPanel
+          siteId={site.id}
+          pagesEnabled={pagesEnabled}
+          permissions={permissions}
+          languages={{
+            defaultLanguage: site.default_language,
+            enabled: site.configuration.language.enabled,
+          }}
+        />
+      </Box>
+      ) : null}
+      {section === "posts" ? (
+      <Box component="section" aria-label="Posts">
+        <SitePostsPanel siteId={site.id} postsEnabled={postsEnabled} permissions={permissions} />
+      </Box>
+      ) : null}
+      {section === "access" ? (
+      <Paper component="section" aria-label="Access" variant="outlined" sx={{ overflow: "hidden", borderRadius: 3 }}>
+        <Box sx={{ px: { xs: 2, sm: 3 }, py: 2, display: "flex", flexDirection: "column", gap: 1.5, alignItems: "flex-start" }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+            Access
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Who can manage this Site is assigned in Access control. A public
+            hostname does not grant that access.
+          </Typography>
+          <Button component={Link} href="/access" variant="outlined">
+            Open access control
+          </Button>
+        </Box>
+      </Paper>
+      ) : null}
 
-      {/* Per-site module enablement, honest about planned capabilities. */}
-      <Paper variant="outlined" sx={{ overflow: "hidden", borderRadius: 3 }}>
+      {section === "modules" ? (
+      <Paper component="section" aria-label="Modules" variant="outlined" sx={{ overflow: "hidden", borderRadius: 3 }}>
         <Box sx={{ px: { xs: 2, sm: 3 }, py: 2 }}>
           <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
             Modules
@@ -773,8 +844,10 @@ export function SiteDetail({ site, permissions = [], error }: SiteDetailProps) {
           )}
         </Box>
       </Paper>
+      ) : null}
 
-      <Paper variant="outlined" sx={{ overflow: "hidden", borderRadius: 3 }}>
+      {section === "settings" ? (
+      <Paper component="section" aria-label="Settings" variant="outlined" sx={{ overflow: "hidden", borderRadius: 3 }}>
         <Box
           sx={{
             px: { xs: 2, sm: 3 },
@@ -880,6 +953,7 @@ export function SiteDetail({ site, permissions = [], error }: SiteDetailProps) {
           </Alert>
         </Box>
       </Paper>
+      ) : null}
 
       <ConfirmDialog
         open={confirmAction !== null}

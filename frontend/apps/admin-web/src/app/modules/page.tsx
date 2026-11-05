@@ -1,12 +1,10 @@
 /**
- * Module registry route — the platform capability catalogue.
+ * Modules route: registry, central Site activation and operation history.
  *
- * Renders the console chrome (breadcrumb + heading) as a server component
- * and hands the data work to `ModuleRegistry`, a client component that reads
- * through a server action so the Keycloak access token never reaches the
- * browser. The screen is read-only by design: registering or editing rows is
- * a backend concern, and per-site enable/disable lives on each site's
- * Modules screen.
+ * Renders the console chrome as a server component and hands the data work
+ * to `ModulesWorkspace`, whose reads and writes go through server actions so
+ * the Keycloak access token never reaches the browser. Registry rows are
+ * edited on the backend only.
  */
 import ExtensionIcon from "@mui/icons-material/Extension";
 import Box from "@mui/material/Box";
@@ -16,10 +14,10 @@ import Typography from "@mui/material/Typography";
 
 import { getEffectivePermissions } from "@/access-control";
 import { Breadcrumb } from "@/breadcrumb";
-import { ModuleRegistry } from "@/modules/module-registry";
+import { ModulesWorkspace } from "@/modules/modules-workspace";
 import { canActivateCentralModules } from "@/sites/site-admin";
 
-export const metadata = { title: "Module registry" };
+export const metadata = { title: "Modules" };
 
 export default async function ModulesPage() {
   const permissions = await getEffectivePermissions();
@@ -76,7 +74,7 @@ export default async function ModulesPage() {
           <Box>
             <Chip
               size="small"
-              label="Capability registry"
+              label="Central module management"
               color="primary"
               variant="outlined"
               sx={{ mb: 1, fontWeight: 600 }}
@@ -84,17 +82,17 @@ export default async function ModulesPage() {
             <Typography variant="h4" component="h1" sx={{ fontWeight: 700 }}>
               Modules
             </Typography>
-            <Typography color="text.secondary" sx={{ mt: 0.5, maxWidth: 680 }}>
-              Every platform capability the registry records, with its status
-              and whether sites may enable it. A registry row is an
-              announcement — only implemented, platform-wide enabled modules
-              can run on a site.
+            <Typography color="text.secondary" sx={{ mt: 0.5, maxWidth: 720 }}>
+              See which capabilities exist and where they run, then enable or
+              disable them for one Site, selected Sites, an Organization or
+              every Site. Each change is previewed, confirmed, applied all at
+              once and recorded in the history.
             </Typography>
           </Box>
         </Paper>
       </Box>
 
-      <ModuleRegistry />
+      <ModulesWorkspace />
     </Box>
   );
 }

@@ -6,9 +6,13 @@ import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { UogFooter, UogHeader, UogThemeProvider, ToastProvider } from "@uog/ui";
 
+import { redirect } from "next/navigation";
+
+import { getAccessToken } from "@/access-token";
 import { AdminShell } from "@/admin-shell";
-import { auth } from "@/auth";
+import { auth, siteOrigin } from "@/auth";
 import { signInWithKeycloak, signOutFromSite } from "@/app/actions";
+import { sessionExpiredHref } from "@/session-expiry";
 
 import "./globals.css";
 
@@ -36,6 +40,10 @@ export default async function AdminLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const session = await auth();
+
+  if (session && !(await getAccessToken())) {
+    redirect(`${siteOrigin}${sessionExpiredHref()}`);
+  }
 
   if (!session) {
     return (
@@ -71,7 +79,7 @@ export default async function AdminLayout({
 
   const actions = (
     <Box component="span" sx={{ display: "flex", gap: 1.5, alignItems: "center" }}>
-      <Box component="span" sx={{ fontSize: 14, opacity: 0.9 }}>
+      <Box component="span" sx={{ fontSize: 14, opacity: 0.9, display: { xs: "none", md: "inline" }, maxWidth: 240, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
         {session.user?.email ?? session.user?.name ?? "signed in"}
       </Box>
       <form action={signOutFromSite} style={{ display: "inline" }}>

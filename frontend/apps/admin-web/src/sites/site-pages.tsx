@@ -1,7 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import Accordion from "@mui/material/Accordion";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import AccordionSummary from "@mui/material/AccordionSummary";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -107,6 +111,11 @@ interface PageFilters {
   status: SitePageStatus | "";
 }
 
+export interface PageLanguages {
+  defaultLanguage: string;
+  enabled: readonly string[];
+}
+
 interface PageForm {
   title: string;
   slug: string;
@@ -114,7 +123,9 @@ interface PageForm {
   locale: string;
   visibility: SitePageRecord["visibility"];
   metadata: string;
-  seo: string;
+  seoTitle: string;
+  seoDescription: string;
+  seoExtra: string;
   blocks: string[];
 }
 
@@ -149,10 +160,35 @@ function authorLabel(author: SitePageRecord["created_by"]): string {
   return author == null ? "—" : `User ${author}`;
 }
 
-function emptyForm(): PageForm {
+function emptyForm(locale = "en"): PageForm {
   return {
-    title: "", slug: "", parent: "", locale: "en", visibility: "PUBLIC",
-    metadata: "{}", seo: "{}", blocks: ['{"type":"paragraph","html":"<p>Applications are open.</p>"}'],
+    title: "", slug: "", parent: "", locale, visibility: "PUBLIC",
+    metadata: "{}", seoTitle: "", seoDescription: "", seoExtra: "{}",
+    blocks: [],
+  };
+}
+
+function slugFromTitle(title: string): string {
+  return title.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
+function formFromRecord(current: SitePageRecord, fallbackLocale: string): PageForm {
+  const seo = { ...(current.seo ?? {}) };
+  const metaTitle = seo.meta_title;
+  const metaDescription = seo.meta_description;
+  delete seo.meta_title;
+  delete seo.meta_description;
+  return {
+    title: current.title,
+    slug: current.slug,
+    parent: current.parent ?? "",
+    locale: current.locale || fallbackLocale,
+    visibility: current.visibility,
+    metadata: JSON.stringify(current.metadata ?? {}, null, 2),
+    seoTitle: typeof metaTitle === "string" ? metaTitle : "",
+    seoDescription: typeof metaDescription === "string" ? metaDescription : "",
+    seoExtra: JSON.stringify(seo, null, 2),
+    blocks: (current.blocks ?? []).map((block) => JSON.stringify(block, null, 2)),
   };
 }
 
@@ -172,15 +208,39 @@ function jsonObject(source: string, label: string): Record<string, unknown> {
   return value as Record<string, unknown>;
 }
 
+function seoInput(form: PageForm): Record<string, unknown> {
+  const seo = jsonObject(form.seoExtra, "Additional SEO");
+  const title = form.seoTitle.trim();
+  const description = form.seoDescription.trim();
+  if (title) seo.meta_title = title;
+  else delete seo.meta_title;
+  if (description) seo.meta_description = description;
+  else delete seo.meta_description;
+  return seo;
+}
+
 function formSyntaxError(form: PageForm): string | null {
   try {
     metadataInput(form);
-    jsonObject(form.seo, "SEO metadata");
+    seoInput(form);
     blockInputs(form);
   } catch (error) {
     return error instanceof Error ? error.message : "Correct the JSON fields before saving.";
   }
   return null;
+}
+
+function localeChoicesFor(languages: PageLanguages | undefined): string[] | null {
+  const enabled = (languages?.enabled ?? []).map((code) => code.trim()).filter(Boolean);
+  const unique = [...new Set(enabled)];
+  return unique.length > 0 ? unique : null;
+}
+
+function defaultLocaleFor(languages: PageLanguages | undefined): string {
+  const choices = localeChoicesFor(languages);
+  const preferred = languages?.defaultLanguage.trim() ?? "";
+  if (choices && preferred && choices.includes(preferred)) return preferred;
+  return choices?.[0] ?? "en";
 }
 
 function orderingForSort(sort: SortState): SitePageListQuery["ordering"] {
@@ -192,10 +252,17 @@ export function SitePagesPanel({
   siteId,
   pagesEnabled,
   permissions = [],
+  languages,
+  startCreate = false,
+  onCreateStarted,
 }: {
   siteId: number;
   pagesEnabled: boolean | null;
   permissions?: readonly string[];
+  languages?: PageLanguages;
+  /** Open the create dialog once, for the dashboard's "Create page" action. */
+  startCreate?: boolean;
+  onCreateStarted?: () => void;
 }) {
   return (
     <SitePagesPanelContent
@@ -203,6 +270,9 @@ export function SitePagesPanel({
       siteId={siteId}
       pagesEnabled={pagesEnabled}
       permissions={permissions}
+      languages={languages}
+      startCreate={startCreate}
+      onCreateStarted={onCreateStarted}
     />
   );
 }
@@ -211,12 +281,20 @@ function SitePagesPanelContent({
   siteId,
   pagesEnabled,
   permissions,
+  languages,
+  startCreate,
+  onCreateStarted,
 }: {
   siteId: number;
   pagesEnabled: boolean | null;
   permissions: readonly string[];
+  languages?: PageLanguages;
+  startCreate: boolean;
+  onCreateStarted?: () => void;
 }) {
   const toast = useToast();
+  const defaultLocale = defaultLocaleFor(languages);
+  const localeChoices = localeChoicesFor(languages);
   const canView = permissions.includes(PERMISSIONS.view);
   const canCreate = permissions.includes(PERMISSIONS.create);
   const canEdit = permissions.includes(PERMISSIONS.update);
@@ -265,6 +343,16 @@ function SitePagesPanelContent({
   const rows = (pages.data?.results ?? []).filter((row) => row.site === siteId);
   const enabled = pagesEnabled === true && !saving && busyPageId === null;
   const activeFilterCount = Number(Boolean(appliedFilters.search)) + Number(Boolean(appliedFilters.status));
+  const createStarted = useRef(false);
+
+  useEffect(() => {
+    if (!startCreate || createStarted.current || pagesEnabled !== true || !canCreate) return;
+    createStarted.current = true;
+    onCreateStarted?.();
+    void openCreate();
+    // openCreate reads current state; this runs once per dashboard request.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [startCreate, pagesEnabled, canCreate]);
 
   function applyFilters() {
     setAppliedFilters({
@@ -283,7 +371,7 @@ function SitePagesPanelContent({
 
   async function openCreate() {
     setActivePage(null);
-    setForm({ ...emptyForm(), title: "Admissions", slug: "admissions" });
+    setForm(emptyForm(defaultLocale));
     setDialogError("");
     setDialogConflict(false);
     setShowDraftPreview(false);
@@ -331,13 +419,7 @@ function SitePagesPanelContent({
     try {
       const current = unwrap(await getSitePage(siteId, row.id));
       setActivePage(current);
-      setForm({
-        title: current.title, slug: current.slug, parent: current.parent ?? "",
-        locale: current.locale || "en", visibility: current.visibility,
-        metadata: JSON.stringify(current.metadata ?? {}, null, 2),
-        seo: JSON.stringify(current.seo ?? {}, null, 2),
-        blocks: (current.blocks ?? []).map((block) => JSON.stringify(block, null, 2)),
-      });
+      setForm(formFromRecord(current, defaultLocale));
       setMode("edit");
     } catch (cause) {
       toast.error(cause instanceof Error ? cause.message : "The Page could not be loaded.");
@@ -360,7 +442,7 @@ function SitePagesPanelContent({
           locale: form.locale.trim(),
           visibility: form.visibility,
           metadata: metadataInput(form),
-          seo: jsonObject(form.seo, "SEO"),
+          seo: seoInput(form),
           blocks: blockInputs(form),
         }));
       } else if (mode === "edit" && activePage?.etag) {
@@ -370,7 +452,7 @@ function SitePagesPanelContent({
           parent: activePage.draft_of ? null : form.parent || null,
           visibility: form.visibility,
           metadata: metadataInput(form),
-          seo: jsonObject(form.seo, "SEO"),
+          seo: seoInput(form),
           blocks: blockInputs(form),
         }));
       } else {
@@ -398,13 +480,7 @@ function SitePagesPanelContent({
     try {
       const current = unwrap(await getSitePage(siteId, activePage.id));
       setActivePage(current);
-      setForm({
-        title: current.title, slug: current.slug, parent: current.parent ?? "",
-        locale: current.locale || "en", visibility: current.visibility,
-        metadata: JSON.stringify(current.metadata ?? {}, null, 2),
-        seo: JSON.stringify(current.seo ?? {}, null, 2),
-        blocks: (current.blocks ?? []).map((block) => JSON.stringify(block, null, 2)),
-      });
+      setForm(formFromRecord(current, defaultLocale));
       setDialogConflict(false);
       setDialogError("");
     } catch (cause) {
@@ -417,14 +493,8 @@ function SitePagesPanelContent({
   function closeEditor() {
     if (saving) return;
     const dirty = mode === "create"
-      ? JSON.stringify(form) !== JSON.stringify({ ...emptyForm(), title: "Admissions", slug: "admissions" })
-      : activePage !== null && JSON.stringify(form) !== JSON.stringify({
-          title: activePage.title, slug: activePage.slug, parent: activePage.parent ?? "",
-          locale: activePage.locale || "en", visibility: activePage.visibility,
-          metadata: JSON.stringify(activePage.metadata ?? {}, null, 2),
-          seo: JSON.stringify(activePage.seo ?? {}, null, 2),
-          blocks: (activePage.blocks ?? []).map((block) => JSON.stringify(block, null, 2)),
-        });
+      ? JSON.stringify(form) !== JSON.stringify(emptyForm(defaultLocale))
+      : activePage !== null && JSON.stringify(form) !== JSON.stringify(formFromRecord(activePage, defaultLocale));
     if (!dirty || window.confirm("Discard your unsaved Page changes?")) setMode(null);
   }
 
@@ -790,7 +860,13 @@ function SitePagesPanelContent({
           <TextField
             label="Title"
             value={form.title}
-            onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
+            onChange={(event) => setForm((current) => ({
+              ...current,
+              title: event.target.value,
+              slug: mode === "create" && current.slug === slugFromTitle(current.title)
+                ? slugFromTitle(event.target.value)
+                : current.slug,
+            }))}
             disabled={!enabled}
             autoFocus
             required
@@ -803,7 +879,9 @@ function SitePagesPanelContent({
             required
             helperText={activePage?.draft_of
               ? "Publication keeps the live Page route. This draft uses an internal slug."
-              : "Use lowercase letters, numbers and hyphens."}
+              : mode === "create"
+                ? "Filled from the title until you edit it. Use lowercase letters, numbers and hyphens."
+                : "Use lowercase letters, numbers and hyphens."}
           />
           <TextField
             select
@@ -818,12 +896,49 @@ function SitePagesPanelContent({
               <MenuItem key={row.id} value={row.id}>{row.title} — {row.path}</MenuItem>
             ))}
           </TextField>
-          <TextField label="Locale" value={form.locale} onChange={(event) => setForm((current) => ({ ...current, locale: event.target.value }))} disabled={mode === "edit"} required helperText={mode === "edit" ? "Locale is fixed when the Page is created." : undefined} />
+          {localeChoices ? (
+            <TextField
+              select
+              label="Locale"
+              value={form.locale}
+              onChange={(event) => setForm((current) => ({ ...current, locale: event.target.value }))}
+              disabled={mode === "edit"}
+              required
+              helperText={mode === "edit"
+                ? "Locale is fixed when the Page is created."
+                : "Choose one of this Site's enabled languages."}
+            >
+              {(localeChoices.includes(form.locale) ? localeChoices : [form.locale, ...localeChoices]).map((code) => (
+                <MenuItem key={code} value={code}>{code}</MenuItem>
+              ))}
+            </TextField>
+          ) : (
+            <TextField label="Locale" value={form.locale} onChange={(event) => setForm((current) => ({ ...current, locale: event.target.value }))} disabled={mode === "edit"} required helperText={mode === "edit" ? "Locale is fixed when the Page is created." : "Use a language this Site enables, such as en-us."} />
+          )}
           <TextField select label="Visibility" value={form.visibility} onChange={(event) => setForm((current) => ({ ...current, visibility: event.target.value as SitePageRecord["visibility"] }))}>
             <MenuItem value="PUBLIC">Public</MenuItem><MenuItem value="UNLISTED">Unlisted</MenuItem><MenuItem value="HIDDEN">Hidden</MenuItem>
           </TextField>
-          <TextField label="Metadata (JSON object)" value={form.metadata} onChange={(event) => setForm((current) => ({ ...current, metadata: event.target.value }))} multiline minRows={3} helperText="Structured page metadata. Invalid JSON is rejected before save." />
-          <TextField label="SEO metadata (JSON object)" value={form.seo} onChange={(event) => setForm((current) => ({ ...current, seo: event.target.value }))} multiline minRows={3} helperText="Page title, description and social preview settings." />
+          <TextField
+            label="SEO title"
+            value={form.seoTitle}
+            onChange={(event) => setForm((current) => ({ ...current, seoTitle: event.target.value }))}
+            helperText="Search result title. Leave blank to use the Page title."
+          />
+          <TextField
+            label="Meta description"
+            value={form.seoDescription}
+            onChange={(event) => setForm((current) => ({ ...current, seoDescription: event.target.value }))}
+            multiline
+            minRows={2}
+            helperText="Short summary shown in search results."
+          />
+          <Accordion disableGutters elevation={0} sx={{ border: 1, borderColor: "divider", "&:before": { display: "none" } }}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>Advanced</AccordionSummary>
+            <AccordionDetails sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <TextField label="Metadata (JSON object)" value={form.metadata} onChange={(event) => setForm((current) => ({ ...current, metadata: event.target.value }))} multiline minRows={3} helperText="Technical page metadata. Leave this as {} for an ordinary Page." />
+              <TextField label="Additional SEO (JSON object)" value={form.seoExtra} onChange={(event) => setForm((current) => ({ ...current, seoExtra: event.target.value }))} multiline minRows={3} helperText="Other search settings. SEO title and description are edited above." />
+            </AccordionDetails>
+          </Accordion>
           <Box component="section" aria-label="Content blocks" sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
             <Typography variant="subtitle2">Content blocks</Typography>
             {form.blocks.map((block, index) => (
@@ -864,7 +979,7 @@ function SitePagesPanelContent({
                         path: activePage?.path ?? `/${form.slug}`,
                         site: siteId,
                         blocks: blockInputs(form),
-                        seo: seoPreview(jsonObject(form.seo, "SEO")),
+                        seo: seoPreview(seoInput(form)),
                       }}
                     />
                   );
@@ -887,7 +1002,7 @@ function SitePagesPanelContent({
               !form.locale.trim() ||
               form.blocks.some((block) => { try { JSON.parse(block); return false; } catch { return true; } }) ||
               (() => { try { metadataInput(form); return false; } catch { return true; } })()
-              || (() => { try { jsonObject(form.seo, "SEO"); return false; } catch { return true; } })()
+              || (() => { try { seoInput(form); return false; } catch { return true; } })()
             }
           >
             {saving ? "Saving…" : mode === "create" ? "Create Page" : "Save changes"}

@@ -261,25 +261,13 @@ export function OrganizationsList() {
   // available, and unit choices come from the flat hierarchy read. If that
   // read fails, only the roots filter degrades — the URL can still carry a
   // parent id, and the backend validates it either way.
-  const [parentChoices, setParentChoices] = useState<FilterOption[]>([
+  const parentTree = useAsync(async () => unwrap(await getOrganizationTree()), []);
+  const parentChoices = useMemo<FilterOption[]>(() => [
     { value: "null", label: "Roots only" },
-  ]);
-  useEffect(() => {
-    let cancelled = false;
-    getOrganizationTree().then((result) => {
-      if (cancelled || !result.ok) return;
-      setParentChoices([
-        { value: "null", label: "Roots only" },
-        ...result.data.results.map((unit) => ({
-          value: String(unit.id),
-          label: `${unit.code} — ${unit.name}`,
-        })),
-      ]);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    ...(parentTree.data?.results ?? []).map((unit) => ({
+      value: String(unit.id), label: `${unit.code} — ${unit.name}`,
+    })),
+  ], [parentTree.data]);
 
   // A shared URL may name a parent the tree no longer (or yet) contains; keep
   // it selectable rather than showing a blank option.

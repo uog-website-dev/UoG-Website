@@ -1,0 +1,176 @@
+﻿{
+    "generated_utc":  "2026-11-04T19:29:53.9792749Z",
+    "artifacts":  [
+                      {
+                          "sha256":  "8d893f41411c0054a43c9d89b608d1443d445808aa3a623de0f875fdbf3af8b5",
+                          "file":  "admin-final.log",
+                          "bytes":  22489
+                      },
+                      {
+                          "sha256":  "0ccce64df010c6851aac54db776560fa8ee407533088337078a777251bb19567",
+                          "file":  "after.json",
+                          "bytes":  1020
+                      },
+                      {
+                          "sha256":  "4ed911392108976e760b746b94712ca970d9c487e097497affef4929f2b4ec96",
+                          "file":  "api-results.json",
+                          "bytes":  3197
+                      },
+                      {
+                          "sha256":  "3f7303307b4852859d093f9a480394992e47bfc4cbd7d2d8ba9ceca61a702e35",
+                          "file":  "async-tests.log",
+                          "bytes":  263
+                      },
+                      {
+                          "sha256":  "370e977a10bdc9bf95ef5de2c04318a82cd4076357fdc271828e718ccbf59b82",
+                          "file":  "async-tests-final.log",
+                          "bytes":  254
+                      },
+                      {
+                          "sha256":  "5e78a1b62d6d1c9f4089f144afe735158fe62a56c53eb0253d8d7986f434c567",
+                          "file":  "backend.junit.xml",
+                          "bytes":  88247
+                      },
+                      {
+                          "sha256":  "4eeaf77c2489a60911cc2a6f1ae983d70717b56177d39ff31c48f314e7457d83",
+                          "file":  "backend.log",
+                          "bytes":  925
+                      },
+                      {
+                          "sha256":  "2ca5eaf78207921f0f18ce3f6f6505e826e352fcf24581bd2704669c97c827f8",
+                          "file":  "backend-focused.log",
+                          "bytes":  184
+                      },
+                      {
+                          "sha256":  "ca5b824df6fece04c91c8253601fa04f4b62bdee63b50f5185a4994de9e9bafa",
+                          "file":  "before.json",
+                          "bytes":  1023
+                      },
+                      {
+                          "sha256":  "3952769e14fad4b39212ca8fde87f25995c2ae280776427693a237603623acc2",
+                          "file":  "cleanup.json",
+                          "bytes":  177
+                      },
+                      {
+                          "sha256":  "96428a200699cb95e7bbaf96f5a08e89f32d5b4fa49105f329e1cfb4689766b7",
+                          "file":  "code-snapshot.json",
+                          "bytes":  125846
+                      },
+                      {
+                          "sha256":  "9e864e89f2d98df3f1a533d0e3b208856cd6d6bc89e6869f281c5a73437c3727",
+                          "file":  "compiler-trial.json",
+                          "bytes":  1023
+                      },
+                      {
+                          "sha256":  "3de4cb53b222466a443338f57826934c6bc4f0cadfad6c51ed1776b6e67d9b3d",
+                          "file":  "domain-tests.log",
+                          "bytes":  260
+                      },
+                      {
+                          "sha256":  "81bdfc18463935c145a39435f7416a26e587cd9014e6d7b1b1908eaca03738dc",
+                          "file":  "final.json",
+                          "bytes":  1514
+                      },
+                      {
+                          "sha256":  "3eddd5206cc140727b5a8b694eb120234953cc878daaf4696b2b3d57f1f45c62",
+                          "file":  "focused.junit.xml",
+                          "bytes":  2108
+                      },
+                      {
+                          "sha256":  "27a13dc1737a5ad53574b10c75ee71b7919998ace604ae38cd332b9f50da7843",
+                          "file":  "frontend.log",
+                          "bytes":  57476
+                      },
+                      {
+                          "sha256":  "315a2d4f15dddeefea14c455c151e9831ee46b4bfb1a7aa966ac15ad02f8b759",
+                          "file":  "frontend-build.log",
+                          "bytes":  6746
+                      },
+                      {
+                          "sha256":  "5c2e829adbebbc4abbaeb892dbb31ab4f113fa069b7da30a5bc08239e719b8bc",
+                          "file":  "http-transcript.json",
+                          "bytes":  27089
+                      },
+                      {
+                          "sha256":  "a9abd4286048cb13ccebfd9bb726434f91da9f69794333d1b213d583ed953e77",
+                          "file":  "image-build.log",
+                          "bytes":  7073
+                      },
+                      {
+                          "sha256":  "122dd8281f41658e1f82e219f31d4f507dedb198ea5c424cd54a2be58a2e171e",
+                          "file":  "list-tests-final.log",
+                          "bytes":  2608
+                      },
+                      {
+                          "sha256":  "93e6e2d5be3c054add80c0f19101608803f7ca8a7df1fa41f76bbb9a1f570f4a",
+                          "file":  "migration-check.log",
+                          "bytes":  21
+                      },
+                      {
+                          "sha256":  "f4afa0b4239b39432f0dcfb78b8b1d2279d9974224c1bcea0bcb27038c282839",
+                          "file":  "posts-recheck.log",
+                          "bytes":  1040
+                      },
+                      {
+                          "sha256":  "7cf359d44a412bb4f0394459657456a0e0c7f10ef6c94f5d66ab747946dbf8f6",
+                          "file":  "report.md",
+                          "bytes":  4353
+                      },
+                      {
+                          "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                          "file":  "schema.log",
+                          "bytes":  0
+                      },
+                      {
+                          "sha256":  "d7505fc2a63e3bbc5fb3412f5c27808d0996f279cb49d0d1df934d3eb4002bde",
+                          "file":  "schema-match.log",
+                          "bytes":  411
+                      },
+                      {
+                          "sha256":  "1249a5f7f11a302fc2ba16a80f9ac6faba798f4d966d355534aaddcfd6ad5f0e",
+                          "file":  "schema-match-final.log",
+                          "bytes":  55
+                      },
+                      {
+                          "sha256":  "c53dd9cae57ca0fa3a8832d3d9223e7d46a4de9939af155b6f1ed5eb297a6351",
+                          "file":  "setup.log",
+                          "bytes":  99
+                      },
+                      {
+                          "sha256":  "1310c92d7e40df560a989a3ac33cf327dd04ad57b2ba916a4013dce68d9d4bc0",
+                          "file":  "sites-tests.log",
+                          "bytes":  690
+                      },
+                      {
+                          "sha256":  "1ca6a823fd93e3c7eff627a6280444f0ea173c6a1360a77107b9089b49c407bb",
+                          "file":  "stack-health.log",
+                          "bytes":  276
+                      },
+                      {
+                          "sha256":  "95a5dc9461bb92b1482371be4422ead872e41e06b300c64a728c4d9becf0c1cd",
+                          "file":  "typecheck.log",
+                          "bytes":  1536
+                      },
+                      {
+                          "sha256":  "4d4358489e8ad74c842f418c94188ec459139610c42cbc4cad1286370686b658",
+                          "file":  "typecheck-complete.log",
+                          "bytes":  1537
+                      },
+                      {
+                          "sha256":  "f7e401dfb85fd833a7e86cc6e426939a753e2e63938b4664ca6a681178cd0f21",
+                          "file":  "typecheck-final.log",
+                          "bytes":  1536
+                      },
+                      {
+                          "sha256":  "d607086f8bb7baad805e4000adbda64c87e0b32fe546571b0721027669bd2747",
+                          "file":  "typecheck-final-pass.log",
+                          "bytes":  1536
+                      },
+                      {
+                          "sha256":  "8e520289584159e446341b08e331acabb279cdd103dc0b6e79e6a83c062bd78a",
+                          "file":  "typecheck-reviewed.log",
+                          "bytes":  2243
+                      }
+                  ],
+    "credential_pattern_scan":  "PASS"
+}

@@ -1,0 +1,2343 @@
+{
+    "label":  "uncommitted central module management audit repair",
+    "files":  [
+                  {
+                      "sha256":  "718ca9eda8e8dd03e60807ba791cc6434066cdd090be6a23efc61f8f5fc244e4",
+                      "path":  "backend/apps/__init__.py"
+                  },
+                  {
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                      "path":  "backend/apps/accounts/__init__.py"
+                  },
+                  {
+                      "sha256":  "f2b588208bdf416a88cee1808c808da80e316d4d8e2fd5dae890c5829ef9a2ca",
+                      "path":  "backend/apps/accounts/admin.py"
+                  },
+                  {
+                      "sha256":  "c8488ea3b5cb4a280d1d387eb1f6fb277156f241f0857f0c36bb294aa57a259e",
+                      "path":  "backend/apps/accounts/apps.py"
+                  },
+                  {
+                      "sha256":  "b80f408d20868352b36e2b96459d48f536fd72c0566ec96c239c2390c889f6eb",
+                      "path":  "backend/apps/accounts/authentication.py"
+                  },
+                  {
+                      "sha256":  "ead1e8f6610443987bf095e7dc31ec6455566be23e8e23caccd2888f94111c31",
+                      "path":  "backend/apps/accounts/config.py"
+                  },
+                  {
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                      "path":  "backend/apps/accounts/migrations/__init__.py"
+                  },
+                  {
+                      "sha256":  "a18210cfa47e8c89ac05d2d3fdfe795b4a536c1c6254422770cc8712c5dcec95",
+                      "path":  "backend/apps/accounts/migrations/0001_initial.py"
+                  },
+                  {
+                      "sha256":  "dfd1329c2483e6c2aa5feac77735aeb9290d37101901df001e13c0205d5cb42b",
+                      "path":  "backend/apps/accounts/models.py"
+                  },
+                  {
+                      "sha256":  "785aae538d484b0338eb38f87efa4643ea56b970a886474a7ef5879753a1fcbc",
+                      "path":  "backend/apps/accounts/oidc.py"
+                  },
+                  {
+                      "sha256":  "4f4c76af10fab87bfde7cf441c9c7cbc897026017e0ad7ef802d75c30cffb520",
+                      "path":  "backend/apps/accounts/permissions.py"
+                  },
+                  {
+                      "sha256":  "5503adfacbf2d37313efebd2d0f45193d8d8ceb29e6e6945818d4b7a07823ba9",
+                      "path":  "backend/apps/accounts/provisioning.py"
+                  },
+                  {
+                      "sha256":  "941fb8e592b7fbe5b2e569ded5c527c88110b87337c07d534d63ea44ff5569ec",
+                      "path":  "backend/apps/accounts/serializers.py"
+                  },
+                  {
+                      "sha256":  "61c578ca1fb524eafcf13ec6d177c369c8f857de706eb4e0aa1540eaf5d9fb58",
+                      "path":  "backend/apps/accounts/urls.py"
+                  },
+                  {
+                      "sha256":  "0193c527b58835802b6e9bdb529df8f5961847cbe21fd98fb13225562fbb4185",
+                      "path":  "backend/apps/accounts/views.py"
+                  },
+                  {
+                      "sha256":  "f8020e344fd41e5169baa6dba30b705b9477f39253927b687d1a3642fcf16366",
+                      "path":  "backend/apps/api/__init__.py"
+                  },
+                  {
+                      "sha256":  "700fd9652228d16a73e2836e6c5f4b34b97647d55fc4b4bcee97b02e67cebdc6",
+                      "path":  "backend/apps/api/admin.py"
+                  },
+                  {
+                      "sha256":  "af4cbad3010f3bea64eb1b093ddb4a6e320b78184b41f44c66df959462bede8f",
+                      "path":  "backend/apps/api/apps.py"
+                  },
+                  {
+                      "sha256":  "d6d43f7c2b8b1dfc3651e1fefcfe6341fbac95330bb51206fc2e977c632c031c",
+                      "path":  "backend/apps/api/migrations/__init__.py"
+                  },
+                  {
+                      "sha256":  "05af10e09d954825dfe18c885acb541664fdf21b9a2b911710a762220d7d59b3",
+                      "path":  "backend/apps/api/migrations/0001_initial.py"
+                  },
+                  {
+                      "sha256":  "3214d45b5c1bea486e8d5332132a77767d2990c993ae3eb3392637fda6c3fa52",
+                      "path":  "backend/apps/api/migrations/0002_page_site.py"
+                  },
+                  {
+                      "sha256":  "009ddc9f7a9f0753b836e6f7ef64aa05c7932b35334653e5aa846fbe4e48ebee",
+                      "path":  "backend/apps/api/migrations/0003_alter_page_is_published.py"
+                  },
+                  {
+                      "sha256":  "7f5b3e47a96335c8461cdf16e586f5c521a0de076c882c686c88d5e6bb9e2564",
+                      "path":  "backend/apps/api/migrations/0004_category_tag_post_category_category_slug_site_uniq_and_more.py"
+                  },
+                  {
+                      "sha256":  "268701ede5d8acc321a1413d4ebc3ae019f78624f98f14b06ff7b05ab6c0048a",
+                      "path":  "backend/apps/api/migrations/0005_post_taxonomy_sitecontent.py"
+                  },
+                  {
+                      "sha256":  "d53887493208f5de1ddc2145b082adeb17528766d9a4945e61fd76e232dbf371",
+                      "path":  "backend/apps/api/models.py"
+                  },
+                  {
+                      "sha256":  "a27b433cee00ecaadc81f9d6c45621c232364dc61dfeb07443be1f9c4b7befa8",
+                      "path":  "backend/apps/api/posts_api.py"
+                  },
+                  {
+                      "sha256":  "917b87b9fc180c20ccfe43022d9b89a6a74ac7f2da331e08eff5e3dc7a9be0b0",
+                      "path":  "backend/apps/api/serializers.py"
+                  },
+                  {
+                      "sha256":  "efed0892e570ba0324e9c925d8d5edf2e11e0cedd805cb3b4fb1a4c4fa9c97e3",
+                      "path":  "backend/apps/api/services.py"
+                  },
+                  {
+                      "sha256":  "ad9aaa69a688557c640ceee3aa3676722967231a8802130db6d861e2bc97ec05",
+                      "path":  "backend/apps/api/taxonomy_sql.py"
+                  },
+                  {
+                      "sha256":  "4d6b1f01382374dad86fd4b39e1108384c4fe4963b0ec0599db352c0ddc7c2a3",
+                      "path":  "backend/apps/api/urls.py"
+                  },
+                  {
+                      "sha256":  "aa2d61c0bb9d257113afb93edd139c8994793a2268e8984ee5db32bed09537e0",
+                      "path":  "backend/apps/api/views.py"
+                  },
+                  {
+                      "sha256":  "3da19a6f21ba1f1c073bb1db0ea7202d8c487c53a846021406dd21770d5b6dfe",
+                      "path":  "backend/apps/audit/__init__.py"
+                  },
+                  {
+                      "sha256":  "94ccfda97c0375dae050803e40b86e3ebfde9864ab42432418f3877e7df0ad3d",
+                      "path":  "backend/apps/audit/admin.py"
+                  },
+                  {
+                      "sha256":  "45effd973c396916abe980b108ae7c0609aac2000f02c9bf74cc508809839b49",
+                      "path":  "backend/apps/audit/apps.py"
+                  },
+                  {
+                      "sha256":  "d9cc3b460390bc46c8676d795d201030eb76e7b4aa2a12bd6a504524d59e7891",
+                      "path":  "backend/apps/audit/context.py"
+                  },
+                  {
+                      "sha256":  "ff0f630236b4ef901ecc87d3fb3fec0bda65e9580a93ccd06d92c5a563cd7c57",
+                      "path":  "backend/apps/audit/middleware.py"
+                  },
+                  {
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                      "path":  "backend/apps/audit/migrations/__init__.py"
+                  },
+                  {
+                      "sha256":  "04d3125b76fb58aad9cc2d32573c0de875813a13670b67b3dc251c7f8bd67deb",
+                      "path":  "backend/apps/audit/migrations/0001_initial.py"
+                  },
+                  {
+                      "sha256":  "88326cf2d6a5d6fe0e42e3235a109fb14dfdcf657363766156779c2fe636a15b",
+                      "path":  "backend/apps/audit/migrations/0002_common_writer.py"
+                  },
+                  {
+                      "sha256":  "3acda79ab00ee2cae14223552a7299483dec3773ad741016f16577149405c8a1",
+                      "path":  "backend/apps/audit/models.py"
+                  },
+                  {
+                      "sha256":  "a9968da5ab481aa16a9722482424a9ffa96f1888c5bcacd350b85dadec328a8d",
+                      "path":  "backend/apps/audit/writer.py"
+                  },
+                  {
+                      "sha256":  "bded753c1f1878f478b4ca4325ac708b32a96c451bfa4be12f6f2a0e5f9ae090",
+                      "path":  "backend/apps/authorization/__init__.py"
+                  },
+                  {
+                      "sha256":  "69018b984984705fd6d5cf71201225515f52ccc54931a6c605f641db49105e55",
+                      "path":  "backend/apps/authorization/access.py"
+                  },
+                  {
+                      "sha256":  "a4292b689139830e34eadec956fec33a4a827ccaa2552a352005f881c3669727",
+                      "path":  "backend/apps/authorization/admin.py"
+                  },
+                  {
+                      "sha256":  "afa375d5b5ef02302b2fb61077b0ebb80050bebeeae8e0dc0f4cfd3e3e0ffb71",
+                      "path":  "backend/apps/authorization/apps.py"
+                  },
+                  {
+                      "sha256":  "2c57308dca600f43e46c89c6698764943dc1cb2f24b81a3fb421582f97b27053",
+                      "path":  "backend/apps/authorization/cache.py"
+                  },
+                  {
+                      "sha256":  "1b6b3acae76e139ce4cbab5d875f3868c1acbd7d6b9c0d6e725772bb06d04778",
+                      "path":  "backend/apps/authorization/catalog.py"
+                  },
+                  {
+                      "sha256":  "691371da18fe5b775ea73b16d325c35ff68948b42f8f961f0cc9fcb755c1f145",
+                      "path":  "backend/apps/authorization/management/__init__.py"
+                  },
+                  {
+                      "sha256":  "d32b54a106b3f0003313b361e50993b80168952b295104634530eb672c2e2cef",
+                      "path":  "backend/apps/authorization/management/commands/__init__.py"
+                  },
+                  {
+                      "sha256":  "a448afd1cfa0e32f08f26ecfcb0a4b47853614729dfae02b1de399d958ebe127",
+                      "path":  "backend/apps/authorization/management/commands/seed_rbac.py"
+                  },
+                  {
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                      "path":  "backend/apps/authorization/migrations/__init__.py"
+                  },
+                  {
+                      "sha256":  "441f2e8af001ad3cc42da384143652f54aece29d83e5601b59547c63ba557435",
+                      "path":  "backend/apps/authorization/migrations/0001_initial.py"
+                  },
+                  {
+                      "sha256":  "6716d15b28968369830e9f9b6bb1062d405b000c1152798d0072420f52cbf800",
+                      "path":  "backend/apps/authorization/migrations/0002_remove_userroleassignment_auth_assignment_live_uniq_and_more.py"
+                  },
+                  {
+                      "sha256":  "9b6772517bc8038cf4fd5734663c9d841120cdd0746ae36d8dbfa8e056d3d23d",
+                      "path":  "backend/apps/authorization/models.py"
+                  },
+                  {
+                      "sha256":  "843872bf95325d040c1e1b50ae06f400fa9482a89a8362a5ba39b28c1e251d74",
+                      "path":  "backend/apps/authorization/permissions.py"
+                  },
+                  {
+                      "sha256":  "553f559447f1b293970835b5511b45521cc8311692d7e00b69b3c4a0d25a17e7",
+                      "path":  "backend/apps/authorization/serializers.py"
+                  },
+                  {
+                      "sha256":  "23fc0140f63cae367c4990a95efffd78d04118d9514a60167d5c8cd6b6bf63be",
+                      "path":  "backend/apps/authorization/services.py"
+                  },
+                  {
+                      "sha256":  "00e8ca839802c3991bef4ecb590abdc5b240d123e111689e4dfe3ce143ddcf44",
+                      "path":  "backend/apps/authorization/urls.py"
+                  },
+                  {
+                      "sha256":  "bfcc3d5831fe84e0431f7187f37059a8235c60b8762693bdcc65ebdfe97df9e3",
+                      "path":  "backend/apps/authorization/views.py"
+                  },
+                  {
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                      "path":  "backend/apps/cms/__init__.py"
+                  },
+                  {
+                      "sha256":  "175f680a45b153f5e2e0fb35ad7fd783768aeda6e803d9db22d7597e06f79cfb",
+                      "path":  "backend/apps/cms/api/__init__.py"
+                  },
+                  {
+                      "sha256":  "a89cad7e507010a093fb907c1f63ee54015e8401ef93dd499a230df21543f6d7",
+                      "path":  "backend/apps/cms/api/menu_delivery.py"
+                  },
+                  {
+                      "sha256":  "6a884b59e119aac78f99431b1e06f97b1ab2da47d7e1c1aaca94a026bcc41a42",
+                      "path":  "backend/apps/cms/api/menus.py"
+                  },
+                  {
+                      "sha256":  "ceb3cf277a4b1248a56776b78c0d5558ee42080927946fc9751b1e1ff57de8f1",
+                      "path":  "backend/apps/cms/api/pages.py"
+                  },
+                  {
+                      "sha256":  "1c40323f2587d940b88b5a9fdeb4a4907b79acb0eb8d84c873818e0c11d783d7",
+                      "path":  "backend/apps/cms/api/public.py"
+                  },
+                  {
+                      "sha256":  "189cfb008cd2cce2fb647d550132e3a128d30f81b4be9a30e37ece8d3314283c",
+                      "path":  "backend/apps/cms/api/revisions.py"
+                  },
+                  {
+                      "sha256":  "c648bcdbf5eb16ef5df6026ffe29cc0010dc7617390153baa67e214ebd623dc7",
+                      "path":  "backend/apps/cms/api/serializers.py"
+                  },
+                  {
+                      "sha256":  "11dadfcb2d963c22be5c23d934ef6236f2fae8bb42522987bc63da848325ee1c",
+                      "path":  "backend/apps/cms/api/urls.py"
+                  },
+                  {
+                      "sha256":  "903fe953058ff7b445eb83b4fc865a26b6c6e682292f61913b69b1b8d511c218",
+                      "path":  "backend/apps/cms/api/workflow.py"
+                  },
+                  {
+                      "sha256":  "6c92d52d60faf3b7a78fa344219d2a44cc5f9b16e7de56d46953cbd386a8c533",
+                      "path":  "backend/apps/cms/apps.py"
+                  },
+                  {
+                      "sha256":  "01ad0c2a685a7dc4a4dfa7c24cb024a946ba26686e4667e3122f753288d1cb40",
+                      "path":  "backend/apps/cms/authorization.py"
+                  },
+                  {
+                      "sha256":  "7195ff319f1b524a918a97affa588ea026d740aa7a090bd2d913136701f411b8",
+                      "path":  "backend/apps/cms/blocks.py"
+                  },
+                  {
+                      "sha256":  "e59346701701850e44234201b8be29151a591e8fef137db0062566ff6b4e29cc",
+                      "path":  "backend/apps/cms/blocks_sql.py"
+                  },
+                  {
+                      "sha256":  "3b5d09ff3d66ec9d3d48c2931decbfec94f080e76a4801add6fa7f9388a0c020",
+                      "path":  "backend/apps/cms/menu_api_sql.py"
+                  },
+                  {
+                      "sha256":  "19ca72e4a27bca5f12933cc097dffa8200ecb20346109aaeadd8e07e603a63c6",
+                      "path":  "backend/apps/cms/menu_cache.py"
+                  },
+                  {
+                      "sha256":  "36d0b340ddba9e125f40f4c49445ee9a85d257b03463be377c5f04748f007e2b",
+                      "path":  "backend/apps/cms/menu_models.py"
+                  },
+                  {
+                      "sha256":  "d0df58c72b58231123c32477f0b1e70ad4eb8944725e359dc97faf532dbe0501",
+                      "path":  "backend/apps/cms/menu_sql.py"
+                  },
+                  {
+                      "sha256":  "2001f96e8ea093191481bbe619068c21b232c1de5b0c5c47c643d05f2517e045",
+                      "path":  "backend/apps/cms/menu_taxonomy_sql.py"
+                  },
+                  {
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                      "path":  "backend/apps/cms/migrations/__init__.py"
+                  },
+                  {
+                      "sha256":  "65a958a04918ff58ccb98df77d80d4d4d700bc4b53983daf4695d8d99041f32d",
+                      "path":  "backend/apps/cms/migrations/0001_initial.py"
+                  },
+                  {
+                      "sha256":  "ff66332fa60a3cdfe5c32f7f670711c028c5e0119f6eadef7fddf4bd4b314858",
+                      "path":  "backend/apps/cms/migrations/0002_page_pageredirect_page_page_parent_idx_and_more.py"
+                  },
+                  {
+                      "sha256":  "68727579e1a5d9183d9d711b94b4929232f40407b07f877f755c5fb4f93c74f0",
+                      "path":  "backend/apps/cms/migrations/0003_sitecontent_blocks_sitecontent_blocks_version_and_more.py"
+                  },
+                  {
+                      "sha256":  "61ea9134dce788d2e7a3ea0149672e5b61c03dc7370028f7277c303ecf3fac2c",
+                      "path":  "backend/apps/cms/migrations/0004_workflow_and_publication_snapshots.py"
+                  },
+                  {
+                      "sha256":  "5aa23d2b96d8859f207ebd84f3b8cd2d3462c883cb87bc3f05595f8081b55eb3",
+                      "path":  "backend/apps/cms/migrations/0005_workflow_contract_constraints.py"
+                  },
+                  {
+                      "sha256":  "50f7ebbf24e0889f8d5016c5c61dd324f8822af76abd32f76126106014740b97",
+                      "path":  "backend/apps/cms/migrations/0006_sitecontent_revision_number_contentrevision.py"
+                  },
+                  {
+                      "sha256":  "79061394c38a27ce7ed92edb6830870e92259269f11dd56b59b6424238880087",
+                      "path":  "backend/apps/cms/migrations/0007_sitepublicationversion_pages_module.py"
+                  },
+                  {
+                      "sha256":  "c8c94988b950e82966d933396fc97457e1f25ee1b4abb6f69ad1ba26448e1cb6",
+                      "path":  "backend/apps/cms/migrations/0008_menu_menuitem.py"
+                  },
+                  {
+                      "sha256":  "77d44cf173ef542f261c4ff27b5c9d34c40a47bebb3be1a170a24bfb99f2b88e",
+                      "path":  "backend/apps/cms/migrations/0009_menu_integrity.py"
+                  },
+                  {
+                      "sha256":  "c0ed40a8a4b04070ba1041669da155b7c37d633fb31ae7380196e722f1639736",
+                      "path":  "backend/apps/cms/migrations/0010_menu_api_contract.py"
+                  },
+                  {
+                      "sha256":  "08039f59dee53e40bf29065b28a8b664a44fc5017c2dbb586915215b8ce85469",
+                      "path":  "backend/apps/cms/migrations/0011_menu_delivery.py"
+                  },
+                  {
+                      "sha256":  "199e8de754c13a420908ac35cf6dbce94ef2e852462188b7b99fe063daec3bfb",
+                      "path":  "backend/apps/cms/migrations/0012_page_working_draft.py"
+                  },
+                  {
+                      "sha256":  "db4a73261642040f074d10dad02212e2e76dbfd6e36cb27942acc3ad184923ce",
+                      "path":  "backend/apps/cms/models.py"
+                  },
+                  {
+                      "sha256":  "d5f29d3193d4507999989b30eba1a7b27ec50795228e04026760df2a81b601cb",
+                      "path":  "backend/apps/cms/page_sql.py"
+                  },
+                  {
+                      "sha256":  "305b1345d359870070185337995288db0a8a3298327df39f1eeff71cd5a8eda0",
+                      "path":  "backend/apps/cms/revision_sql.py"
+                  },
+                  {
+                      "sha256":  "419d644548c7a73a7e4d099d9f7d687ba196782f0ff90fc69ec77be7443c756d",
+                      "path":  "backend/apps/cms/schemas/blocks-v1.schema.json"
+                  },
+                  {
+                      "sha256":  "9bbad9cce251ef33beeca193f5b4dc8959ee14df1082f6271e10283468cb9354",
+                      "path":  "backend/apps/cms/selectors/__init__.py"
+                  },
+                  {
+                      "sha256":  "468251df4a54704f652b06089d7677b73cccee58dc19e20687ca86d5e3005964",
+                      "path":  "backend/apps/cms/selectors/menu_delivery.py"
+                  },
+                  {
+                      "sha256":  "f4c07f50d825eefccc2f4f25d2f9a1a96c9ce9b1a25514205f7bb67cb0808482",
+                      "path":  "backend/apps/cms/selectors/menus.py"
+                  },
+                  {
+                      "sha256":  "a0b4b005e3ff9be60184667fec260d0944fb1b607c3a2faa86e2bcc469095db0",
+                      "path":  "backend/apps/cms/selectors/pages.py"
+                  },
+                  {
+                      "sha256":  "e6306c9374fe2a21d3f4531e060862acd3008d03ae8f22292bf3bb5ad41f9c12",
+                      "path":  "backend/apps/cms/services/__init__.py"
+                  },
+                  {
+                      "sha256":  "3a5a3f11a48ab65108c9d4c0f7258d9d4f91b9fdc0a4e77e8a66f949afe04069",
+                      "path":  "backend/apps/cms/services/menu_delivery.py"
+                  },
+                  {
+                      "sha256":  "e7e30a4939e2cf117c952058698a63d13240f1197d54c4a06718586d45bc507e",
+                      "path":  "backend/apps/cms/services/menus.py"
+                  },
+                  {
+                      "sha256":  "896a22de3cf2fa17df57ad0445d54a081ee6cc953bcb8cbbf202e24eaf2505d1",
+                      "path":  "backend/apps/cms/services/pages.py"
+                  },
+                  {
+                      "sha256":  "e8a20e0d11f8efd2158b2b36e2f49735058fc0066b9bd015764d5dbcef6dd881",
+                      "path":  "backend/apps/cms/services/publication_cache.py"
+                  },
+                  {
+                      "sha256":  "8c2dbdc0fc47ac61e08394ade0b97d29996592dc6784d2b0b7fcdc745fbcff2f",
+                      "path":  "backend/apps/cms/services/revisions.py"
+                  },
+                  {
+                      "sha256":  "78c0b6fb1b5b2973783ef00e142b09057dc399ede5357b70ce6b1d3cd9cf79ae",
+                      "path":  "backend/apps/cms/services/workflow.py"
+                  },
+                  {
+                      "sha256":  "f2a0d240c413c16cdabbb20936c57b061ef845e0b614c3f690120aef22fec5ed",
+                      "path":  "backend/apps/cms/services/working_drafts.py"
+                  },
+                  {
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                      "path":  "backend/apps/cms/tests/__init__.py"
+                  },
+                  {
+                      "sha256":  "d0040c10d3f54525140517220e2720a84f0dd47d65894ec462f0b4940fb4195d",
+                      "path":  "backend/apps/cms/tests/conftest.py"
+                  },
+                  {
+                      "sha256":  "98310260c177ca91f9439790c72449c59feba0b9133d0fdecb68945fcba19716",
+                      "path":  "backend/apps/cms/tests/support.py"
+                  },
+                  {
+                      "sha256":  "e616cdd921b2c9efd8d8b49845ef7c205b1220d821c829b908b6f4b51b6f1e81",
+                      "path":  "backend/apps/cms/tests/test_blocks.py"
+                  },
+                  {
+                      "sha256":  "c66c088ef72b6a14fa2ce2e8a493a046882ad2cc868f7bc156c09bc3946726a0",
+                      "path":  "backend/apps/cms/tests/test_content.py"
+                  },
+                  {
+                      "sha256":  "153a9dca7742a710ded826152dcb42491c41a759cf756a02ec9513b81a7a7966",
+                      "path":  "backend/apps/cms/tests/test_homepage.py"
+                  },
+                  {
+                      "sha256":  "de425aa05977aa248d2ab0b08fd36b7e2ed057d261d52dc120f98ae6ffeb43b6",
+                      "path":  "backend/apps/cms/tests/test_menu_api.py"
+                  },
+                  {
+                      "sha256":  "f08c4541e0e352ef9472f776fedd6a939e57977785c873a3b1497004dc5b4af1",
+                      "path":  "backend/apps/cms/tests/test_menu_delivery.py"
+                  },
+                  {
+                      "sha256":  "b89e4dd056741bdb3ebfecbfb5118c493a8562a29141010e9364490e13229732",
+                      "path":  "backend/apps/cms/tests/test_menu_integrity.py"
+                  },
+                  {
+                      "sha256":  "fbf640f8ec5da673c7c848e71b472f6fbe63b346d4339e58c3f507de03d623db",
+                      "path":  "backend/apps/cms/tests/test_menus.py"
+                  },
+                  {
+                      "sha256":  "d24b6588b82a42de6dc765994805f5ca72cd0d7467d2b6bc3c5a8ea59200d6e3",
+                      "path":  "backend/apps/cms/tests/test_module.py"
+                  },
+                  {
+                      "sha256":  "f21c7874e0bf0add3be7eec8d96f4e6f2781ded05187b233ab0fb80727e5aa54",
+                      "path":  "backend/apps/cms/tests/test_multi_site.py"
+                  },
+                  {
+                      "sha256":  "f5768705bc7deff065ab98b0b831ee8846bb77734b5ddd77e6e74d1989b265e8",
+                      "path":  "backend/apps/cms/tests/test_page_api.py"
+                  },
+                  {
+                      "sha256":  "74cb2fee14dc92c885db609a26e636085c60fd6efb023d19f0f0fae7fb6032b5",
+                      "path":  "backend/apps/cms/tests/test_page_redirects.py"
+                  },
+                  {
+                      "sha256":  "a5cab00981bf52882fcd41921a39d3786c028c9b95e31a6458e0bdad0ee54f09",
+                      "path":  "backend/apps/cms/tests/test_pages.py"
+                  },
+                  {
+                      "sha256":  "25e2b4ff3f117eae7d6fd2fdceeaeaed4bf9b69972caef4eae024184d6e0e638",
+                      "path":  "backend/apps/cms/tests/test_posts_api.py"
+                  },
+                  {
+                      "sha256":  "530f7e4f887bef3ae3bf5fb903098d87194641a6e310dab3f08d95040f08b2a2",
+                      "path":  "backend/apps/cms/tests/test_public_posts.py"
+                  },
+                  {
+                      "sha256":  "cda31cc9ea926a9a1d887ed4812643ad1aaf747023d938ef20e6213afa3afb69",
+                      "path":  "backend/apps/cms/tests/test_public_site_hosts.py"
+                  },
+                  {
+                      "sha256":  "f5f44ecf6301e5bec7fbf9f864426700bc252ba52218744d1f94f2b4a386cf88",
+                      "path":  "backend/apps/cms/tests/test_realm_role_authorization.py"
+                  },
+                  {
+                      "sha256":  "7585443db398035b7dd378ddc29cb214fba853cc3c5b3842ce61b3a921a17d9e",
+                      "path":  "backend/apps/cms/tests/test_revision_api.py"
+                  },
+                  {
+                      "sha256":  "15b87a48c5cd6b9a7b97c5ae1d3aaa177cf33ae4a9d84be15eaf511d42bc3b9f",
+                      "path":  "backend/apps/cms/tests/test_revisions.py"
+                  },
+                  {
+                      "sha256":  "930c849db073e8101160e5ce97a941110bb2659d999ef2edef6387886f6b39a3",
+                      "path":  "backend/apps/cms/tests/test_serializers.py"
+                  },
+                  {
+                      "sha256":  "17a639bc4413ca1567cbf242e5032bb348a6f635a8c06a92afc2f53ccdc01613",
+                      "path":  "backend/apps/cms/tests/test_workflow.py"
+                  },
+                  {
+                      "sha256":  "a3cf184cf24160fd676884ee8754998c9a902c564058d9b0e709a229e68f9d6f",
+                      "path":  "backend/apps/cms/tests/test_workflow_api.py"
+                  },
+                  {
+                      "sha256":  "e6caaff5b1bca145254142eb2232424a6b795be6a86e112059cd8ba6d6331f24",
+                      "path":  "backend/apps/cms/tests/test_working_draft.py"
+                  },
+                  {
+                      "sha256":  "831d52735ab5a8e0fd57b6d4837422290612af50514bdcb0d2b129d28edcdbe9",
+                      "path":  "backend/apps/cms/workflow_actions.py"
+                  },
+                  {
+                      "sha256":  "38e93f53ac289514080b08aa6f0930aa98875c748ef820c95ff85b18c7e3b692",
+                      "path":  "backend/apps/cms/workflow_sql.py"
+                  },
+                  {
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                      "path":  "backend/apps/core/__init__.py"
+                  },
+                  {
+                      "sha256":  "1c54a8bf31713a1754bc244afae730d245b8614508c77c317c5e9948457cb5a6",
+                      "path":  "backend/apps/core/apps.py"
+                  },
+                  {
+                      "sha256":  "e4e92c70cbe68a70761c1ea13107841916ad469d860354b81f5ef81d4cdc6aaf",
+                      "path":  "backend/apps/core/cache.py"
+                  },
+                  {
+                      "sha256":  "5aba0f5c2c6ff99ed6c675a48538427bec71d847af8e6a0836303e3ed49f5525",
+                      "path":  "backend/apps/core/documentation.py"
+                  },
+                  {
+                      "sha256":  "0ebd4bffba9fb625a8e665073955619d47e9e0f4ab03134646cec6677ea3522d",
+                      "path":  "backend/apps/core/errors.py"
+                  },
+                  {
+                      "sha256":  "9be39d187327be988ff02aa481b4dd56f761df27619f0aed1060bbcecd3c2cdb",
+                      "path":  "backend/apps/core/handlers.py"
+                  },
+                  {
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                      "path":  "backend/apps/core/management/__init__.py"
+                  },
+                  {
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                      "path":  "backend/apps/core/management/commands/__init__.py"
+                  },
+                  {
+                      "sha256":  "73cec675de62fade9eca1da59bdaf53e4da46ce19c41f4c4d526871c6b46d577",
+                      "path":  "backend/apps/core/management/commands/init_storage.py"
+                  },
+                  {
+                      "sha256":  "7ca12776f93e8619da8da205c1de6c602cefffce26d1e72298072254a461250c",
+                      "path":  "backend/apps/core/middleware.py"
+                  },
+                  {
+                      "sha256":  "17ce5ac9cb283d49858022a3bcd98d3d8142938c736d13d51fea7d9d2b184b9d",
+                      "path":  "backend/apps/core/openapi.py"
+                  },
+                  {
+                      "sha256":  "6920642b891aedea0dbaae63f62c0133b205e9608b805aa2ccf8c33421d429de",
+                      "path":  "backend/apps/core/permissions.py"
+                  },
+                  {
+                      "sha256":  "97c4150d6ee652ebe8ee2bbc20be1d02c95f86d5deccf1e5d494703ccb3bdc8d",
+                      "path":  "backend/apps/core/tasks.py"
+                  },
+                  {
+                      "sha256":  "d23667f4586de2d1461be924dcc34c6f0ea88c56d6ca2dfb920608c0cf209554",
+                      "path":  "backend/apps/core/urls.py"
+                  },
+                  {
+                      "sha256":  "9a76395e06e0cf7093b4111429e6ca4187cc755bce43d7f58e3902d64039e5f8",
+                      "path":  "backend/apps/core/views.py"
+                  },
+                  {
+                      "sha256":  "ae5aa3df331af4ca413e7f79014e4cd4e185359dbdb6737eff55c9ab6ccb195f",
+                      "path":  "backend/apps/organizations/__init__.py"
+                  },
+                  {
+                      "sha256":  "294c3a01fd4a44e8881f7a8539aafb5d62c58d079e671dec9e6cb55a401ce9ea",
+                      "path":  "backend/apps/organizations/admin/__init__.py"
+                  },
+                  {
+                      "sha256":  "ca2a0aa5e1ee36eb5c5bd4ca26bd42aa5ca74b02fdc384afbdca0095ac594330",
+                      "path":  "backend/apps/organizations/admin/organization_type.py"
+                  },
+                  {
+                      "sha256":  "3a73a61f42f8dc5c45ff92c35ed602b983262de1b40ca8a248832d06bbba72b1",
+                      "path":  "backend/apps/organizations/admin/organization_unit.py"
+                  },
+                  {
+                      "sha256":  "24d2419db2c1d00f1c340d4863a902e5c77c58285541a5bbee5cd366f00f11e7",
+                      "path":  "backend/apps/organizations/api/__init__.py"
+                  },
+                  {
+                      "sha256":  "1da7cb0fed764ae1e8e5fed4abeca88b62104a31eb75adc97672400b3c8bd5af",
+                      "path":  "backend/apps/organizations/api/discovery.py"
+                  },
+                  {
+                      "sha256":  "e15d3fbe1d74ad5ce31e75c274d04fa383af5feeea0149569f4bda20e5a3d1fb",
+                      "path":  "backend/apps/organizations/api/serializers.py"
+                  },
+                  {
+                      "sha256":  "64a09f8a7e6377185a58c2d49f4cce39cd90d4e8a96ac9a1b9369a88a2913bab",
+                      "path":  "backend/apps/organizations/api/urls.py"
+                  },
+                  {
+                      "sha256":  "ab3aa2672a35e2e76ba90a8cc58e43df41f5d48ed0a121e4040fb75ae6acbfb7",
+                      "path":  "backend/apps/organizations/api/views.py"
+                  },
+                  {
+                      "sha256":  "a69c9efcb7a131ce6d446bd7ff5a8ab3ddb63a0e39fc12d1030dde44f9235b30",
+                      "path":  "backend/apps/organizations/apps.py"
+                  },
+                  {
+                      "sha256":  "e6c78d40e84a70456f702673b79e9ee7ef3f935943c3466f5bc598fe73fe94ba",
+                      "path":  "backend/apps/organizations/hierarchy_lock.py"
+                  },
+                  {
+                      "sha256":  "112489347d8609c8543ee54aaf433adc0691c178ff1980aea5b80671ed7343bc",
+                      "path":  "backend/apps/organizations/labels.py"
+                  },
+                  {
+                      "sha256":  "025916748af2c137e9f1b6d6cac56139f1b20229e20e549b203bf0f2190ccbdb",
+                      "path":  "backend/apps/organizations/lifecycle_validation.py"
+                  },
+                  {
+                      "sha256":  "c40091432fef8247fc1a71acb22cf8d871e57dc0d7006bf5ef6997a88591b804",
+                      "path":  "backend/apps/organizations/migrations/__init__.py"
+                  },
+                  {
+                      "sha256":  "d814fab142abd90df5f7b8883e7912d295dbb3a9128337a0d1642dc6a8239e03",
+                      "path":  "backend/apps/organizations/migrations/0001_initial.py"
+                  },
+                  {
+                      "sha256":  "c4fe7aab1de89b59e499b22a0c84e41948e827130e17372c1d1480bbe894c787",
+                      "path":  "backend/apps/organizations/migrations/0002_seed_organization_types.py"
+                  },
+                  {
+                      "sha256":  "bc40c789d97add28e425d681d420ae8128ee00ab9899157b9d8d4910b8ede954",
+                      "path":  "backend/apps/organizations/migrations/0003_organizationunit.py"
+                  },
+                  {
+                      "sha256":  "f833843d149f4aaf561567d28d4e4f979b95887ecfc338ef4291c8c993083833",
+                      "path":  "backend/apps/organizations/migrations/0004_hierarchy_integrity.py"
+                  },
+                  {
+                      "sha256":  "3e35f0f525751c9e49b5b9bc251dc61ff91de44698967f2c277b3c4e54a128d2",
+                      "path":  "backend/apps/organizations/migrations/0005_lifecycle_rules.py"
+                  },
+                  {
+                      "sha256":  "7ee81e2915945446b01e721609aa5b561eb5442d151db806caffa5af1947c4b4",
+                      "path":  "backend/apps/organizations/migrations/0006_audit_events.py"
+                  },
+                  {
+                      "sha256":  "03d1715a36b175ed1e5b3cd8927d85e1182c9107bce8634b26928ab364816984",
+                      "path":  "backend/apps/organizations/models/__init__.py"
+                  },
+                  {
+                      "sha256":  "9b1b7675f9e5f6ebb7c727154e270ac152ab37cc368b42e5ff8b55d02aabde6a",
+                      "path":  "backend/apps/organizations/models/organization_type.py"
+                  },
+                  {
+                      "sha256":  "cbe86da360ff4edc26c55c8e21cb43d1ffaf95a132a39d72f40924aecd2d1c13",
+                      "path":  "backend/apps/organizations/models/organization_unit.py"
+                  },
+                  {
+                      "sha256":  "663c4f7e9e6315f7e157353df7c1910734013e58f77b065490cfc1e41549634a",
+                      "path":  "backend/apps/organizations/models/querysets.py"
+                  },
+                  {
+                      "sha256":  "e05175c4be556acacd589d1e404e3338ae09dcb424b278316d9dd04280e0dbcd",
+                      "path":  "backend/apps/organizations/selectors/__init__.py"
+                  },
+                  {
+                      "sha256":  "ab6a882c941999b44ecc4a5acd7df878c35ae5f012a273a1cc524c1d7b6237cc",
+                      "path":  "backend/apps/organizations/selectors/api_hierarchy.py"
+                  },
+                  {
+                      "sha256":  "f12f6380095205817c5f13c38b7625c3db155b179bab313c10f9753cfc716f09",
+                      "path":  "backend/apps/organizations/selectors/discovery.py"
+                  },
+                  {
+                      "sha256":  "3e5d94a3dc8d6c36d225bd4f0834afef4e86b070ab1d64dd4ee70eed260919cd",
+                      "path":  "backend/apps/organizations/selectors/hierarchy.py"
+                  },
+                  {
+                      "sha256":  "1db337307dc9fdb01372a410a443d18887a7769277957974106fcc5930d5cd52",
+                      "path":  "backend/apps/organizations/services/__init__.py"
+                  },
+                  {
+                      "sha256":  "3a7437cebf51aaa4cf6f096b19dbf09827e7e170a308d8806d3d73b2ca853fca",
+                      "path":  "backend/apps/organizations/services/hierarchy.py"
+                  },
+                  {
+                      "sha256":  "12aa74e96afed56a724bdc9b68d387999f8a1d08ad244b4e9b95d37e52b2234f",
+                      "path":  "backend/apps/organizations/services/lifecycle.py"
+                  },
+                  {
+                      "sha256":  "3e7f2181e6c4cb5bf836c6bff18e232708cb4150a45ea5d6ad84291ddaafac92",
+                      "path":  "backend/apps/organizations/tests/__init__.py"
+                  },
+                  {
+                      "sha256":  "cb09e84e31282fcde5a36ec16bca58e3b54dda79f3d26550791d17f1d7a80fd6",
+                      "path":  "backend/apps/organizations/tests/conftest.py"
+                  },
+                  {
+                      "sha256":  "236f49fb8da36e7c8b851ea3d6f40ea6329ccec7e3f841421626cff6640c53ef",
+                      "path":  "backend/apps/organizations/tests/test_hierarchy.py"
+                  },
+                  {
+                      "sha256":  "17c137d0f88dfa4b57fbb109024626e1fd9c927808d7ceefc59eccf152e032eb",
+                      "path":  "backend/apps/organizations/tests/test_lifecycle.py"
+                  },
+                  {
+                      "sha256":  "01fcc32d7d0584ca86d46ea288a8068ee1846ec20912fef85d7335424cf6486b",
+                      "path":  "backend/apps/organizations/tests/test_module.py"
+                  },
+                  {
+                      "sha256":  "2cafd363113d5bd927f2c51160eb078195aa17c3e045f9913a729bbeee4b8933",
+                      "path":  "backend/apps/organizations/tests/test_organization_types.py"
+                  },
+                  {
+                      "sha256":  "4a16cb25dbbe85dea59859133bbe6e3114d2906c100897b3b89c692ec7d440ce",
+                      "path":  "backend/apps/organizations/tests/test_organization_units.py"
+                  },
+                  {
+                      "sha256":  "e13aa7aba1ac91be9e78bcc3514cb1e6ee8f3dd3397e47c3e056df8c0f245829",
+                      "path":  "backend/apps/sites/__init__.py"
+                  },
+                  {
+                      "sha256":  "54f395098952c717ec21e47df2567c340defee6eda3218172415c3af282b5ee2",
+                      "path":  "backend/apps/sites/admin/__init__.py"
+                  },
+                  {
+                      "sha256":  "7b31dc4974204af5de8a6ad78e8888c360dedf796684fc0edf5d0d4fac8d52d2",
+                      "path":  "backend/apps/sites/admin/module.py"
+                  },
+                  {
+                      "sha256":  "7062f8d9724c70cf1ed77e02995322cb45d65e9d7fd0e823d14e7ea8e7987860",
+                      "path":  "backend/apps/sites/admin/site.py"
+                  },
+                  {
+                      "sha256":  "707e823daa523b1cc53e91bb86a44e22a5f0895ab33464c314d158c2f67e0fd5",
+                      "path":  "backend/apps/sites/admin/site_domain.py"
+                  },
+                  {
+                      "sha256":  "8e3019069947ee225f0e19d39abff582784d71433635b044fa340dbdc89f3864",
+                      "path":  "backend/apps/sites/admin/site_template.py"
+                  },
+                  {
+                      "sha256":  "a91c908b288b4ecbeb130a88cd82c5cf086fce715c4a515853e00df9790a04dd",
+                      "path":  "backend/apps/sites/allowed_hosts.py"
+                  },
+                  {
+                      "sha256":  "19dcf3341aed388f8a5751e5d62895395aabb1dffb5e288651060864b3e8ac43",
+                      "path":  "backend/apps/sites/api/__init__.py"
+                  },
+                  {
+                      "sha256":  "681d2aaffcd6efe708d9aa8c8b843fbc1cb1d6568ea8e618e5cf86b12500b9a6",
+                      "path":  "backend/apps/sites/api/access.py"
+                  },
+                  {
+                      "sha256":  "00ef45a80297d65455f3c11fc034ad5a6c3c9f2c954fe041f963df722e85ff00",
+                      "path":  "backend/apps/sites/api/context.py"
+                  },
+                  {
+                      "sha256":  "bd231c319b36cc5bd05f3e90604498da30fb914499c97c055893c09c4b8f22c9",
+                      "path":  "backend/apps/sites/api/context_urls.py"
+                  },
+                  {
+                      "sha256":  "431b08350ad165e9c0b70b3294280ebce59601ffd99a2bb3c6e69a7cec96647d",
+                      "path":  "backend/apps/sites/api/module_management.py"
+                  },
+                  {
+                      "sha256":  "df69fc5a0563ab3b0cf97b1f12a390416efc717287f6796ed4e60dc536bcbfa8",
+                      "path":  "backend/apps/sites/api/module_urls.py"
+                  },
+                  {
+                      "sha256":  "fd1f1774d67477e2bc04d0c285bd97a5112bf090cfa6a83dd13ad45ab4ea3fbc",
+                      "path":  "backend/apps/sites/api/query.py"
+                  },
+                  {
+                      "sha256":  "e83b59567878e6e551aa5ded57a83be7bf44e8a796d4e323d8ae6d4a464d7801",
+                      "path":  "backend/apps/sites/api/serializers.py"
+                  },
+                  {
+                      "sha256":  "a4aaf3a0396a3dd984beef7c63d37c8cbd37627c688a77b70d6e40308a3882a5",
+                      "path":  "backend/apps/sites/api/site_module_urls.py"
+                  },
+                  {
+                      "sha256":  "032c36f83e8027e3836d257aa08e039b7ddd22c03b56f579f8a16a5ff11cd941",
+                      "path":  "backend/apps/sites/api/template_urls.py"
+                  },
+                  {
+                      "sha256":  "baf8570f34eed029afd9223b0e9491d70572477011e1936eec0c5de1c0c0f392",
+                      "path":  "backend/apps/sites/api/urls.py"
+                  },
+                  {
+                      "sha256":  "7af689a4d55686103ca6fa12e52f068c721ab1dd83f4ed66a858a9310325569e",
+                      "path":  "backend/apps/sites/api/views.py"
+                  },
+                  {
+                      "sha256":  "86f4582dece05c73b5fc8a0400d6b50db869248815c44dd3181a9f545d1f9f64",
+                      "path":  "backend/apps/sites/apps.py"
+                  },
+                  {
+                      "sha256":  "4055933cb7017fa52cfcc2ef01556bd8ba0ed433c7dd84c4fd74cce9d4ed0268",
+                      "path":  "backend/apps/sites/configuration.py"
+                  },
+                  {
+                      "sha256":  "7950d3213bd89ba144be5eb70df91ff600c50a3834463d901ba90df4d9243718",
+                      "path":  "backend/apps/sites/configuration_sql.py"
+                  },
+                  {
+                      "sha256":  "a83192a4a5e6b5344b5a0af74b14fa709777e21c69013ea1f757c20e7d6a19f6",
+                      "path":  "backend/apps/sites/domain_audit_sql.py"
+                  },
+                  {
+                      "sha256":  "c45759f7d22e374f3cc88148b1bb48b3cc5e902ed946fa233ef7baa5ee50c87e",
+                      "path":  "backend/apps/sites/domain_sql.py"
+                  },
+                  {
+                      "sha256":  "4971fc87ec21546c768c4ecfd0b959031addb267e624a68a885a5e011a3d473b",
+                      "path":  "backend/apps/sites/fixtures/uog-foundation.json"
+                  },
+                  {
+                      "sha256":  "2a5f9dab4e07fd3ff4cdd0d95493357b555c3a09104bbd8ff9e1ac878b0f0e01",
+                      "path":  "backend/apps/sites/hostnames.py"
+                  },
+                  {
+                      "sha256":  "0de4ec00b00bfd81f62c3165da4fa603497b328f29aaeef4e558ddc55a6d6f06",
+                      "path":  "backend/apps/sites/middleware.py"
+                  },
+                  {
+                      "sha256":  "77b918a97ddc24d6c09418007c12226c7895146e80a59c86c639888fee0fef85",
+                      "path":  "backend/apps/sites/migration_sql.py"
+                  },
+                  {
+                      "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                      "path":  "backend/apps/sites/migrations/__init__.py"
+                  },
+                  {
+                      "sha256":  "fcd393cefd85cbaa3fc80e69b158c98501c781f631538299db4044e1a013e2f1",
+                      "path":  "backend/apps/sites/migrations/0001_initial.py"
+                  },
+                  {
+                      "sha256":  "2630b71965eb9eb0bdad9a9b342a56b33a169591b5ce499eb5455b6d1a1e4d39",
+                      "path":  "backend/apps/sites/migrations/0002_site_configuration.py"
+                  },
+                  {
+                      "sha256":  "76e814a614d105dfbf16b8d874f0255d12941cbef2828bd4b401e3ddb105ac6c",
+                      "path":  "backend/apps/sites/migrations/0003_sitedomain.py"
+                  },
+                  {
+                      "sha256":  "71597ef6b79bb3c7cb2c2ff1813c0999663426d6dbf380669c671785683cb82e",
+                      "path":  "backend/apps/sites/migrations/0004_sitetemplate.py"
+                  },
+                  {
+                      "sha256":  "94e6f9427804225bd6f9bb9ea12093db14af8c0a0290c6470c6b1b05c0ce4254",
+                      "path":  "backend/apps/sites/migrations/0005_module_registry.py"
+                  },
+                  {
+                      "sha256":  "637bf9d886e5ca9fba398b5cb801121821942e175d8a9b4cee9dc98fb0609698",
+                      "path":  "backend/apps/sites/migrations/0006_sitemodule_settings.py"
+                  },
+                  {
+                      "sha256":  "d4b5dfff4741d34fc625c01bc80a6c41e16670ad403f32463fe922fa5c5ac787",
+                      "path":  "backend/apps/sites/migrations/0007_sitedomain_audit.py"
+                  },
+                  {
+                      "sha256":  "3ae9a7c29468a2c967b01b440369655b84ef59f536d6bbd0d8267c3ee8922806",
+                      "path":  "backend/apps/sites/migrations/0008_module_operations.py"
+                  },
+                  {
+                      "sha256":  "74b61760885e98862a59578ac92200a54733fc17c31f343b309497ad31b13e0d",
+                      "path":  "backend/apps/sites/migrations/0009_module_integrity.py"
+                  },
+                  {
+                      "sha256":  "6736b4e529da22b813639cf0ef7bb473216f09d5b545c71d959bacce88cd1938",
+                      "path":  "backend/apps/sites/models/__init__.py"
+                  },
+                  {
+                      "sha256":  "fcd7d8bd70334079371d64370d0edfa0a64c23733e3d93c0b4c1e1a390e5effe",
+                      "path":  "backend/apps/sites/models/domain_querysets.py"
+                  },
+                  {
+                      "sha256":  "1f7cf184b2759c5d8a845ff2d2f4f00c2cab197add2e6f280b4261c07947133f",
+                      "path":  "backend/apps/sites/models/module.py"
+                  },
+                  {
+                      "sha256":  "3172190ab5aca8143493ef5ca2cf23795e7f9afbc3632b69544c9adbed451d45",
+                      "path":  "backend/apps/sites/models/module_operation.py"
+                  },
+                  {
+                      "sha256":  "ac31f60bbd281863e190e2300f3f0e4f01fc8c04a9c338f49ec022a09b3a66fb",
+                      "path":  "backend/apps/sites/models/querysets.py"
+                  },
+                  {
+                      "sha256":  "a4c26b228864626eb58b94d452e11e3c1a001a181fdf1007b883ba669a9f4b07",
+                      "path":  "backend/apps/sites/models/site.py"
+                  },
+                  {
+                      "sha256":  "b4a876d951fc961c05250aa9c01ee21d25bcc927280ef6350b4cff6c36537b62",
+                      "path":  "backend/apps/sites/models/site_domain.py"
+                  },
+                  {
+                      "sha256":  "b69432b4c88e02e7f639ef54a567ba069da6f8f56ab6909c7cadafbd070cebe1",
+                      "path":  "backend/apps/sites/models/site_module.py"
+                  },
+                  {
+                      "sha256":  "402972da7d6d63b3ff856440dd580e3e5f389cb8b333516c01d501c543a843d9",
+                      "path":  "backend/apps/sites/models/site_template.py"
+                  },
+                  {
+                      "sha256":  "1119696798b908ec8315370f2728347228a74cd9cb2975f5b1eb68e297624a25",
+                      "path":  "backend/apps/sites/module_schema.py"
+                  },
+                  {
+                      "sha256":  "fb30f2deb28de419b80263e51dbf7e49fe3f0de3d7f2081f7f7b03524ed29322",
+                      "path":  "backend/apps/sites/module_sql.py"
+                  },
+                  {
+                      "sha256":  "db23425d55c772c65f085cb596e8f780d7b61a80d2443212085279536e42cec5",
+                      "path":  "backend/apps/sites/selectors/__init__.py"
+                  },
+                  {
+                      "sha256":  "0c7574c43c9291bdf49180e47c7469a0a16d404e0b9cdb6bceaeeae615ad383b",
+                      "path":  "backend/apps/sites/selectors/domains.py"
+                  },
+                  {
+                      "sha256":  "7dbc7d80ffd66ef5c30b418753da173c1614317d98c266a3913508af49a0db69",
+                      "path":  "backend/apps/sites/selectors/modules.py"
+                  },
+                  {
+                      "sha256":  "71a76de3f08d117a603106ea699da0c25033f6b1571bc51bc356e8a1f8e4fb13",
+                      "path":  "backend/apps/sites/services/__init__.py"
+                  },
+                  {
+                      "sha256":  "320bbc17d5e2afc3cd2add9f2f76453397fe2dc7f837026b2b25831fbecff546",
+                      "path":  "backend/apps/sites/services/configuration.py"
+                  },
+                  {
+                      "sha256":  "c8092b14d1a5ac53eefdf2bba37e1c7a2b310d1eb42bd5aa048e482f0a574626",
+                      "path":  "backend/apps/sites/services/domains.py"
+                  },
+                  {
+                      "sha256":  "dac2eac17ff22c2391d477728b6e60eb90e3784b8e3078cfdd05bd2df5a3bb23",
+                      "path":  "backend/apps/sites/services/lifecycle.py"
+                  },
+                  {
+                      "sha256":  "03963a91300bf5af7e2c379f0d0d6025d0abb2f9c6b0c5d4f69ac04d0f832ee0",
+                      "path":  "backend/apps/sites/services/module_bulk.py"
+                  },
+                  {
+                      "sha256":  "42fc785154ec8cefa2b6f6b794036d4dec7e52f4a0343b4a37c3d0ed930b5a84",
+                      "path":  "backend/apps/sites/services/modules.py"
+                  },
+                  {
+                      "sha256":  "fc45b24bf09fb0a25fa670b7028e82e1e45ac6bb7f768830bbc9f5ffad4ac3d5",
+                      "path":  "backend/apps/sites/services/registry.py"
+                  },
+                  {
+                      "sha256":  "b27fe2bea78a32fec5db9b5dc0dc171ff389773ce800d5a90a4bae7853de767f",
+                      "path":  "backend/apps/sites/services/templates.py"
+                  },
+                  {
+                      "sha256":  "cb3c4a97e9a25a96b3189444ce8d02e15bf3a2e02c8718685488f75d37439956",
+                      "path":  "backend/apps/sites/site_module_sql.py"
+                  },
+                  {
+                      "sha256":  "d55a3e5994eb2e96f050ea713f49136e4c07f7e2e8ff519c28a34c830a0c10ec",
+                      "path":  "backend/apps/sites/template_sql.py"
+                  },
+                  {
+                      "sha256":  "ae6ec39b8780800807e00bc0241da8653d88934a8b9543a9eef7dc7b6688421e",
+                      "path":  "backend/apps/sites/tests/__init__.py"
+                  },
+                  {
+                      "sha256":  "296655432732a75bd15cf740c9e6689f77378a49337ff3c87c1e10040a20a399",
+                      "path":  "backend/apps/sites/tests/conftest.py"
+                  },
+                  {
+                      "sha256":  "4e9c1d6401f783259881d655147e7b740a48b3bc348d8428877ba9789da20a7c",
+                      "path":  "backend/apps/sites/tests/test_configuration.py"
+                  },
+                  {
+                      "sha256":  "67cd6936902bc65ff80992afb6cdfe6f0ed8745073bbb23a06ba11a0e332e16b",
+                      "path":  "backend/apps/sites/tests/test_module.py"
+                  },
+                  {
+                      "sha256":  "9ce379b24a1a7bf60fe4a170fefd5f881daff8ec097b0552603960694564e2c4",
+                      "path":  "backend/apps/sites/tests/test_module_registry.py"
+                  },
+                  {
+                      "sha256":  "43b0685fcd7a4cb8c46335b3046920d34bcfcc2472dde038e8a43414a00e8d5a",
+                      "path":  "backend/apps/sites/tests/test_resolution.py"
+                  },
+                  {
+                      "sha256":  "c22c6a8838f0e130635db19f42f15f2119d41cd9fff894849560345da1bd733c",
+                      "path":  "backend/apps/sites/tests/test_site.py"
+                  },
+                  {
+                      "sha256":  "b675c863f050bfb4fbdba5d9e9018f1a14e503ae40bc68330daaf197183d130d",
+                      "path":  "backend/apps/sites/tests/test_site_domain.py"
+                  },
+                  {
+                      "sha256":  "a0e75b57d4b7f56a481815c2e78e6593cf16bf97deab80f22c85257c94f59d8c",
+                      "path":  "backend/apps/sites/tests/test_site_module.py"
+                  },
+                  {
+                      "sha256":  "b13bda281bf19eb12f1bb9c9445c3853827cb44b4a9be1d8251bb6b92390bbaf",
+                      "path":  "backend/apps/sites/tests/test_site_template.py"
+                  },
+                  {
+                      "sha256":  "a938dec63ec30ed045c56f898b70a6c1077f8dbd17ecbca1c5ec8fa46646617a",
+                      "path":  "backend/apps/sites/validation.py"
+                  },
+                  {
+                      "sha256":  "6fff679dfd1d013d66a5fa669b17e0367d99cf9906bf641b19eae0efb27d1ccf",
+                      "path":  "backend/config/__init__.py"
+                  },
+                  {
+                      "sha256":  "e62ed2ed43d91a55178d7acd0f7c54b97a75510a43aa6d3a6559b2d9da5eaa2e",
+                      "path":  "backend/config/asgi.py"
+                  },
+                  {
+                      "sha256":  "70aae2c9c439664d05b564f936f2f13b6e88a918af20d344795bae021fa70a57",
+                      "path":  "backend/config/celery.py"
+                  },
+                  {
+                      "sha256":  "e448cd5490ef63b6409177cf5e606774bdd9ebc0a06b806854d58cb07db32a23",
+                      "path":  "backend/config/settings.py"
+                  },
+                  {
+                      "sha256":  "746484c34a08da79ad428957a2e4540c4e85195a444163260fdca646bd023e38",
+                      "path":  "backend/config/urls.py"
+                  },
+                  {
+                      "sha256":  "0f44c97fb1de5c5b3f3f7439f98061c8ed0f67cf862a3faafec14bb6ed94c45c",
+                      "path":  "backend/config/wsgi.py"
+                  },
+                  {
+                      "sha256":  "390faadf7d13efd78470f338d60af8b71057eb4c8bd0cd22645f5ac8c2838c30",
+                      "path":  "backend/conftest.py"
+                  },
+                  {
+                      "sha256":  "61702e02798311142d38af03297cf2deff57570f797a6baab017f15db4b6706a",
+                      "path":  "backend/debug_blocks.py"
+                  },
+                  {
+                      "sha256":  "9e055a3ca49f173675232d3f61d1feb89f1350708fb25a002f6d3edefeec6db4",
+                      "path":  "backend/manage.py"
+                  },
+                  {
+                      "sha256":  "b6ba657085ea57578d4859fb6148e3684ac42bed1bb65efd725a16d473943871",
+                      "path":  "backend/scripts/benchmark_organization_discovery.py"
+                  },
+                  {
+                      "sha256":  "a4fcc42d650783f505fc37214e376226e491d0fb1ef3fc536f4881aeefad9b39",
+                      "path":  "backend/scripts/benchmark_organization_status.py"
+                  },
+                  {
+                      "sha256":  "9e3cb46528fd957cda5f53cacbffd277bb449e843a1fd3ec577bb1de0709f8de",
+                      "path":  "backend/tests/__init__.py"
+                  },
+                  {
+                      "sha256":  "caa83523f4e88d990c3603732fac964c34d4cc162bcba1d97bbbd9605b43c6d3",
+                      "path":  "backend/tests/conftest.py"
+                  },
+                  {
+                      "sha256":  "dc53579c32d1ae4f72f8ef7263b26fcbe2531198377fa1ad875b1cc47a4e9a12",
+                      "path":  "backend/tests/fixtures/organizations/uog-structure.json"
+                  },
+                  {
+                      "sha256":  "0a2f3b7204fb640cf6056b399faa2f0d5cbc24955fb6060c488caef727d2da65",
+                      "path":  "backend/tests/oidc_helpers.py"
+                  },
+                  {
+                      "sha256":  "befd494e659bb5e9c67efbe06d1f4a7cc7a638cc0adad8a5583977cd58f583de",
+                      "path":  "backend/tests/test_accounts.py"
+                  },
+                  {
+                      "sha256":  "19c1798087be7e5f509894c663ed7ba6eb04e6da21ff221acaf1c66a6ddc9be5",
+                      "path":  "backend/tests/test_api.py"
+                  },
+                  {
+                      "sha256":  "11fd269d4cba78696f01661e3a10349e016d5a268df6c8ff492897633caed56a",
+                      "path":  "backend/tests/test_audit.py"
+                  },
+                  {
+                      "sha256":  "eda8a4ec6f7eec417cc3f4ce00331d257d79a5842fe1dfc13d1e0cf24c14b5c0",
+                      "path":  "backend/tests/test_authorization.py"
+                  },
+                  {
+                      "sha256":  "ad2ee06ddfab7ebe7d387584d7bb85c570c6cc3d7670d1fa4032800f2b26bd31",
+                      "path":  "backend/tests/test_cache.py"
+                  },
+                  {
+                      "sha256":  "1fbd67a19606b4fa04f76945050d47535a1d9ed3d4c0ae6e57b7ec4b457686be",
+                      "path":  "backend/tests/test_central_module_management.py"
+                  },
+                  {
+                      "sha256":  "92e6492055f71d5ac57b246ffb3c731c640c2bb705840d612ed77783129b6547",
+                      "path":  "backend/tests/test_documentation.py"
+                  },
+                  {
+                      "sha256":  "838c7cc379310b753659d70a96f51b877faf4a05e783dd5eda08df6fdfba4695",
+                      "path":  "backend/tests/test_effective_permissions.py"
+                  },
+                  {
+                      "sha256":  "e75d66eb0c09e9c7c28226c6f60f3fc8e943bcc615ff4fb1c94b53ea0e029de9",
+                      "path":  "backend/tests/test_health.py"
+                  },
+                  {
+                      "sha256":  "8e7ae95c1a2ed8764d23854854c71144ee5f0ec768c1091c1119d7ec5f40569a",
+                      "path":  "backend/tests/test_module_management_audit.py"
+                  },
+                  {
+                      "sha256":  "d9ca5f3f4b5d0870dba900b666668b12f11e0486fba708bee692336de9e52bbe",
+                      "path":  "backend/tests/test_module_transactions.py"
+                  },
+                  {
+                      "sha256":  "71c3c016e2b4ceac866cd6a81652521c181106760c248604127c06b4edc13c18",
+                      "path":  "backend/tests/test_oidc.py"
+                  },
+                  {
+                      "sha256":  "3477ce39ac9b470e88464d9f8e3449c73d0849fc9674fa22d59a49152ce58014",
+                      "path":  "backend/tests/test_organization_audit.py"
+                  },
+                  {
+                      "sha256":  "7051617463202e6a414ea51242f76028e2d352519cf19bc23126848fc6657e8d",
+                      "path":  "backend/tests/test_organization_discovery_api.py"
+                  },
+                  {
+                      "sha256":  "4c8d77575dc3613a6b36768d526b74063e3c5e05466f074156234354a60a49d9",
+                      "path":  "backend/tests/test_organization_hierarchy_api.py"
+                  },
+                  {
+                      "sha256":  "52c6df71349df385c89d201a72edc88bc04d41a316a109aa18cb8e77161285c6",
+                      "path":  "backend/tests/test_organization_readiness.py"
+                  },
+                  {
+                      "sha256":  "f34a907a503c993563788b04b3fee05042adcd7baeacab1102f25bbdad2ff615",
+                      "path":  "backend/tests/test_organizations_api.py"
+                  },
+                  {
+                      "sha256":  "8e31987e269d641ad395b6dee071006ea1d3b6418bfc0c94721b836f26ee5065",
+                      "path":  "backend/tests/test_site_foundation.py"
+                  },
+                  {
+                      "sha256":  "5c13fd60e7a51a75b5924dc9bece529f991cb1482da6df5ad53285d7f63bca7b",
+                      "path":  "backend/tests/test_site_module_availability_api.py"
+                  },
+                  {
+                      "sha256":  "922d751d3a55af8f64e0d48240f4e7491a8a28f46cb8d7b6cdce1a3fbe991cea",
+                      "path":  "backend/tests/test_site_navigation_summary.py"
+                  },
+                  {
+                      "sha256":  "1095571b55f11746a753a7979b4d0ebe005f3137b140021c006d37392ad9ae69",
+                      "path":  "backend/tests/test_sites_api.py"
+                  },
+                  {
+                      "sha256":  "6cdf864b28be0b5a65b7ef9510e9d9d30d9c4ee256b56b8c93a3a148372b4408",
+                      "path":  "backend/tests/test_tasks.py"
+                  },
+                  {
+                      "sha256":  "94fc8fe695e0497578b553dc93ec3cd6dadc115c33cab6c4970beb9e174ea720",
+                      "path":  "docs/api/cms-pages.md"
+                  },
+                  {
+                      "sha256":  "87a6d3aa6113ed3213929cd368dd0c033a374079d4a381fe05311d66e1732fd2",
+                      "path":  "docs/api/error-catalog.md"
+                  },
+                  {
+                      "sha256":  "ae1dc2dca96aa4705cc6f3e5b7ad88badfb62a948f6c49dd46a472a9ff8a98aa",
+                      "path":  "docs/api/openapi.yaml"
+                  },
+                  {
+                      "sha256":  "57530d1549dfa35d197cfdf4541a7a307e8e795751d375c282bc2326744829e7",
+                      "path":  "docs/api/organization-audit.md"
+                  },
+                  {
+                      "sha256":  "4de79f6136ba0c06349656de7577c5618691a8de5abc506c5cbb3818cfe95407",
+                      "path":  "docs/api/organization-discovery.md"
+                  },
+                  {
+                      "sha256":  "9232365dfa951db6971d57134d6cace496aa88275b381b4404492f82ad2f02d6",
+                      "path":  "docs/api/organization-hierarchy.md"
+                  },
+                  {
+                      "sha256":  "a7467730b4c4cdbd181991026946f402d05fbe9534f841e606f282e63b0e5d24",
+                      "path":  "docs/api/organizations.md"
+                  },
+                  {
+                      "sha256":  "b3ebe962ce5f42911b34e911b6a6929de1a7f821a782899e2a3229996042703c",
+                      "path":  "docs/api/posts.md"
+                  },
+                  {
+                      "sha256":  "7cf83c31951add534ad04af3236b1215d882d4a3320ed6224b397da77956fa55",
+                      "path":  "docs/api/sites.md"
+                  },
+                  {
+                      "sha256":  "77aa9c81c91d1f35577da271bfa6473aa543992cd62b22f8010ebee8e4c1a0ac",
+                      "path":  "docs/development/admin-navigation-performance.md"
+                  },
+                  {
+                      "sha256":  "8a69e48d24be0dbff57cff301584c25f85b4d93830b6992fc973a4239ece5797",
+                      "path":  "docs/development/api-documentation.md"
+                  },
+                  {
+                      "sha256":  "876ad580ba16830acfb4fd4056df12e6934dcc6019d660f986c9f04b515bbb38",
+                      "path":  "docs/development/central-module-management.md"
+                  },
+                  {
+                      "sha256":  "ba0dec71a143c00ae40fcf0e6d2949e16e50c5679f4570761d1d8280450d8d96",
+                      "path":  "docs/development/domain-management.md"
+                  },
+                  {
+                      "sha256":  "f03046c28662d1841eb5e0cfa4f1da2828b91ba47474bb21c53d1bb26aec38e5",
+                      "path":  "docs/development/evidence/organization-readiness.json"
+                  },
+                  {
+                      "sha256":  "d9a9359caae2f7939006b1b0d0e31d402117ae522290f7080b870e2f8878deec",
+                      "path":  "docs/development/health.md"
+                  },
+                  {
+                      "sha256":  "be8b53fd8ac2e57c2da7e8b2e334023392294b013ee1eb32fd02263e96d53482",
+                      "path":  "docs/development/menu-api.md"
+                  },
+                  {
+                      "sha256":  "4af71763aa858156a79292153b3c3af49190241508b31115b8136c13f9caff0c",
+                      "path":  "docs/development/menu-audit.md"
+                  },
+                  {
+                      "sha256":  "75afc75d907916240319f776e03cecb5ef6df94345df4a963007dbe9a06ec94f",
+                      "path":  "docs/development/menu-delivery.md"
+                  },
+                  {
+                      "sha256":  "0885198a442b08895dc23c54beede9b686036701b8dc296d8fd74b8a3c69df6a",
+                      "path":  "docs/development/menu-navigation.md"
+                  },
+                  {
+                      "sha256":  "700d6ba8360f88191253ec88d2669e6c1098923ee3ad74f4bc6e4059f9d682b8",
+                      "path":  "docs/development/organization-hierarchy.md"
+                  },
+                  {
+                      "sha256":  "e3337c6753a57fa020c9bd2927148080ae2ee3800d4e15944c56c21ce08cf376",
+                      "path":  "docs/development/organization-lifecycle.md"
+                  },
+                  {
+                      "sha256":  "642c757b40a48b79d21794b4e36516d5ec3368290b5bc1f89700aed3cdf523af",
+                      "path":  "docs/development/organization-readiness.md"
+                  },
+                  {
+                      "sha256":  "b244b643518939dd3fbd5bbb1c8559ecc7c269a2e442a5c0e842eabbcefa55be",
+                      "path":  "docs/development/organizations-foundation-audit.md"
+                  },
+                  {
+                      "sha256":  "585e659241d511e12c7d588ef5024d5ac59faedb9c11b770ba6fed44f182c6c5",
+                      "path":  "docs/development/organization-types.md"
+                  },
+                  {
+                      "sha256":  "fef253253f02d4947de6678e051bf18982b4371ebb1950dd419b0a0efc1dc031",
+                      "path":  "docs/development/organization-units.md"
+                  },
+                  {
+                      "sha256":  "e32945e87933f9183f075e7ab2f6293232583f482d7336658579b2642ad423b3",
+                      "path":  "docs/development/page-verification.md"
+                  },
+                  {
+                      "sha256":  "9853fd8a4263820d2e299e0f3fcd85d246eb9ee4ff703083b646f45ffb59750f",
+                      "path":  "docs/development/post-verification.md"
+                  },
+                  {
+                      "sha256":  "8ceb3728a06ef085640cc780db5707625c692398be84002b0eff8e8730ff6043",
+                      "path":  "docs/development/public-site.md"
+                  },
+                  {
+                      "sha256":  "e12d613090384d31032d01eda45acdfd4a9add46c8a0e4210b22aeee3218f87f",
+                      "path":  "docs/development/setup.md"
+                  },
+                  {
+                      "sha256":  "770028b8d770b6f152200285162c71ace1d939f70d46dc67b409d09d46f768fe",
+                      "path":  "docs/development/site-administration.md"
+                  },
+                  {
+                      "sha256":  "db8a33a2f3dede01eabb6e5672575f6cf4f1ac2c7952fcd0c5ad09e5ca5b0bc2",
+                      "path":  "docs/development/site-entity.md"
+                  },
+                  {
+                      "sha256":  "224338122d08e9bd480f23576a9739035cc5878d5b3839dc851ed6c70626c375",
+                      "path":  "docs/development/site-foundation.md"
+                  },
+                  {
+                      "sha256":  "06d9a7b5dc33b2e686feeab2d4ac9431bf08b43b0f125d728e89e5d95c112a20",
+                      "path":  "docs/development/sites-foundation.md"
+                  },
+                  {
+                      "sha256":  "971f2e26b2ada87e6bbe57826226d21eaab9a4b911d6cbcf234ab73ef740da55",
+                      "path":  "docs/development/site-workspaces.md"
+                  },
+                  {
+                      "sha256":  "4c4c54fcd725f7f6af94a0be4cbfdd0ebd2a90bdd30f48f830c2e92dc31375b3",
+                      "path":  "frontend/apps/admin-web/next.config.ts"
+                  },
+                  {
+                      "sha256":  "7f7b072d84f2698f84fcaa4bcc5d215ae0ef10baf160d5355dfdebcfc04f158d",
+                      "path":  "frontend/apps/admin-web/package.json"
+                  },
+                  {
+                      "sha256":  "65ab24e1ccc2f1a7c07f0350eab9b4eb6df5931cd75fa1883389e7e043f4fef0",
+                      "path":  "frontend/apps/admin-web/scripts/dev.mjs"
+                  },
+                  {
+                      "sha256":  "9b50424907878edcd9500bb97109c22d46e2f43fd298e9fe82a340e442830921",
+                      "path":  "frontend/apps/admin-web/src/access/access-screen.test.tsx"
+                  },
+                  {
+                      "sha256":  "7774296514be703f6f6876e334758f83b89cfdf04e4ca4f8331d59d952e0ba21",
+                      "path":  "frontend/apps/admin-web/src/access/access-screen.tsx"
+                  },
+                  {
+                      "sha256":  "1594551cd21a0c8dd4c9454bf0dfa187fa7e008eaa28a1bcc55c75f9747e481b",
+                      "path":  "frontend/apps/admin-web/src/access/assign-dialog.tsx"
+                  },
+                  {
+                      "sha256":  "dfe956b9622f2f02a82d39919b33510d96dd7b605cd8ff9d1285dea0b4d5ea8d",
+                      "path":  "frontend/apps/admin-web/src/access-control.ts"
+                  },
+                  {
+                      "sha256":  "90b7a633ac239da7b2aa61a48d0d89b8ebccce4b4ade626e1810c39e7659862b",
+                      "path":  "frontend/apps/admin-web/src/access-token.test.ts"
+                  },
+                  {
+                      "sha256":  "feb1f89a8ce4f041823f2be4906181ca8f4b5e9bd93a4689750f072767c7e8dd",
+                      "path":  "frontend/apps/admin-web/src/access-token.ts"
+                  },
+                  {
+                      "sha256":  "3f3e1ef47d3a9618f9f7d8f9798da3d5ac64261780659aa236a0488229b9b54e",
+                      "path":  "frontend/apps/admin-web/src/admin-shell.test.tsx"
+                  },
+                  {
+                      "sha256":  "435614155fac8e0c285010341734839f0c132c160b952a92e453065075ac7770",
+                      "path":  "frontend/apps/admin-web/src/admin-shell.tsx"
+                  },
+                  {
+                      "sha256":  "8bc9657e4dd7cef4e46c44f2b16c299008215f44cdca5b17a9b9d28a7c53985f",
+                      "path":  "frontend/apps/admin-web/src/app/access/access-control-manager.test.tsx"
+                  },
+                  {
+                      "sha256":  "e41067e249896c36d53bda48eac10b5a0ef403eb931bb389d5f97d2c2e6d58d7",
+                      "path":  "frontend/apps/admin-web/src/app/access/access-control-manager.tsx"
+                  },
+                  {
+                      "sha256":  "78d22c4b28e00d377dd86a644665b0d6e166e072648a22499baa5e906f5aac24",
+                      "path":  "frontend/apps/admin-web/src/app/access/actions.test.ts"
+                  },
+                  {
+                      "sha256":  "757f210ce7c1ddc6f04e9e29ce0593bf9027ddd28e58ed162764dd1bdf41fa0b",
+                      "path":  "frontend/apps/admin-web/src/app/access/actions.ts"
+                  },
+                  {
+                      "sha256":  "8283244f5f7325e0b93e3df29d6823eb29a0f9320621e67bb7e989d8be3c3265",
+                      "path":  "frontend/apps/admin-web/src/app/access/loading.tsx"
+                  },
+                  {
+                      "sha256":  "bfd122e665a72eccfb700f942c2334941000c16b339dec4fb3e6ff659ce0a221",
+                      "path":  "frontend/apps/admin-web/src/app/access/page.tsx"
+                  },
+                  {
+                      "sha256":  "d456bfd17d14aa5c1713aa09c064f2c8a61ddcb69e82a6e449ac0f4a24f45977",
+                      "path":  "frontend/apps/admin-web/src/app/actions.test.ts"
+                  },
+                  {
+                      "sha256":  "0ca37d5443c024bf724371c9f00a4f79c894c48d5d133ac7b5cf2f9f55ec2527",
+                      "path":  "frontend/apps/admin-web/src/app/actions.ts"
+                  },
+                  {
+                      "sha256":  "dd25d3e49430f8d1c9a2620214167abd8f98a9ae25a8618e726ab56a23298149",
+                      "path":  "frontend/apps/admin-web/src/app/api/access/route.ts"
+                  },
+                  {
+                      "sha256":  "9b2995e318b2b3c805112ee0d8efc0b4c977421b5e433f82612efb8bb86a14c3",
+                      "path":  "frontend/apps/admin-web/src/app/api/auth/[...nextauth]/route.ts"
+                  },
+                  {
+                      "sha256":  "8a3822224835c380485f2e996036bb3c29e25072cdf08dceb7fad3f4995ec5f7",
+                      "path":  "frontend/apps/admin-web/src/app/api/session/expired/route.test.ts"
+                  },
+                  {
+                      "sha256":  "d458c51f2b11e89c3cada6349f224859966cea1b9e5a6cd753d19121e18f3b15",
+                      "path":  "frontend/apps/admin-web/src/app/api/session/expired/route.ts"
+                  },
+                  {
+                      "sha256":  "77d0079ba52a834d5ac633cc9f0191a06460a887cfb8bc377b98976654f4545e",
+                      "path":  "frontend/apps/admin-web/src/app/api/session/route.ts"
+                  },
+                  {
+                      "sha256":  "3f0d7c42187a89e80c775db56d454e0041d88c1e785f737f1b4c94d75826a9a8",
+                      "path":  "frontend/apps/admin-web/src/app/api/workspace/route.test.ts"
+                  },
+                  {
+                      "sha256":  "4cc146c8cf5000bc6046e04f431594879d6f91e2da160802bbb65a10c0718e0a",
+                      "path":  "frontend/apps/admin-web/src/app/api/workspace/route.ts"
+                  },
+                  {
+                      "sha256":  "5c92e3a2b973df7f31360f220492564420d5553b24721f7e4ffd8a69f2e2d763",
+                      "path":  "frontend/apps/admin-web/src/app/domains/loading.tsx"
+                  },
+                  {
+                      "sha256":  "34c8539ecb22eb2fc2774383aa15f357a73f60e32ad7466558c707c8c383f1c7",
+                      "path":  "frontend/apps/admin-web/src/app/domains/page.tsx"
+                  },
+                  {
+                      "sha256":  "58ac920aaa5565fa0f42fbffe7ff25bf775fa34c5fd77e0b4d4d04ddf6767b79",
+                      "path":  "frontend/apps/admin-web/src/app/error.tsx"
+                  },
+                  {
+                      "sha256":  "365729809d1e501b8e801b4fa63829194be9dc04efb9d2d34b7aec9513838e1a",
+                      "path":  "frontend/apps/admin-web/src/app/health-check.tsx"
+                  },
+                  {
+                      "sha256":  "fe2ba94e0b75e30ae19d09b7996523c398219db31696b6513d3638ee5f2a7fe5",
+                      "path":  "frontend/apps/admin-web/src/app/layout.test.tsx"
+                  },
+                  {
+                      "sha256":  "61cef21b58064aea8cd9f6e3460c567bfe4eb1246a946bfc476d946576d96dec",
+                      "path":  "frontend/apps/admin-web/src/app/layout.tsx"
+                  },
+                  {
+                      "sha256":  "21ea70b125d0a620c3b9fdfaeb74602b2a58ae5feebf0b94e1293d1b42fd91d0",
+                      "path":  "frontend/apps/admin-web/src/app/loading.tsx"
+                  },
+                  {
+                      "sha256":  "9e8e439b2c8313ac4beddaa2996802d9f4675489dc7263eb5711b9473a5f3dff",
+                      "path":  "frontend/apps/admin-web/src/app/modules/actions.test.ts"
+                  },
+                  {
+                      "sha256":  "599f4f27c2cf4536077104e0878229abbc001f01522752fca4b4742d9797d21d",
+                      "path":  "frontend/apps/admin-web/src/app/modules/actions.ts"
+                  },
+                  {
+                      "sha256":  "b85d96fd10f35c983b3a5a699abc829a29fe889bbe7fc5433d2072d70ad1ddd5",
+                      "path":  "frontend/apps/admin-web/src/app/modules/loading.tsx"
+                  },
+                  {
+                      "sha256":  "c9e73621c532d07de7179a01260b5385a9b5f7a920b7232c10221e5547a753de",
+                      "path":  "frontend/apps/admin-web/src/app/modules/page.tsx"
+                  },
+                  {
+                      "sha256":  "6dc23d68dac5b343f2ec549b06c483d328fc6cd2a38e2d5729f452b576a82d19",
+                      "path":  "frontend/apps/admin-web/src/app/not-found.tsx"
+                  },
+                  {
+                      "sha256":  "db0ca8cc44fa7fc7d6bb79420a2982a3a62682ded101f330bb041b90bfd787d4",
+                      "path":  "frontend/apps/admin-web/src/app/organizations/[id]/edit/edit-view.tsx"
+                  },
+                  {
+                      "sha256":  "8d9ed2d8bec7172abad1a074bebbbcc2be45056563eeaf738212aebba9cd85d7",
+                      "path":  "frontend/apps/admin-web/src/app/organizations/[id]/edit/page.tsx"
+                  },
+                  {
+                      "sha256":  "01b8efb3295fcc7f23a5f1dd307471d521d5ae9c2ac9240cad2178a6e6c89f88",
+                      "path":  "frontend/apps/admin-web/src/app/organizations/[id]/loading.tsx"
+                  },
+                  {
+                      "sha256":  "a3444509c8203c8b47ad467896b551accb952d7e18f2af6a3383a7368165dc12",
+                      "path":  "frontend/apps/admin-web/src/app/organizations/[id]/organization-detail.test.tsx"
+                  },
+                  {
+                      "sha256":  "cbf1756456643afc090314d80ffed9614a93be16ace0c67a89299167bb5585dc",
+                      "path":  "frontend/apps/admin-web/src/app/organizations/[id]/organization-detail.tsx"
+                  },
+                  {
+                      "sha256":  "c6af14d518a47a497dafa0c4ecc10ac669d4765ea518e60a2607c3997c759b4c",
+                      "path":  "frontend/apps/admin-web/src/app/organizations/[id]/page.tsx"
+                  },
+                  {
+                      "sha256":  "cd7185473df7cacee101a89762e517a085cf0cf02726d3b6eb65041ba7604e93",
+                      "path":  "frontend/apps/admin-web/src/app/organizations/actions.test.ts"
+                  },
+                  {
+                      "sha256":  "e2951be36955dd4a6b67bf45af25a5cb51909f41e816e274b89944858454aeed",
+                      "path":  "frontend/apps/admin-web/src/app/organizations/actions.ts"
+                  },
+                  {
+                      "sha256":  "ae02710a3d49233205fa2085dcdfb969b85792a64c12651a1e934ad77b2d2b0f",
+                      "path":  "frontend/apps/admin-web/src/app/organizations/hierarchy/loading.tsx"
+                  },
+                  {
+                      "sha256":  "4b779393a922d8af81b5110b097e978835e53373eb887dfe9012fe3700daffc2",
+                      "path":  "frontend/apps/admin-web/src/app/organizations/hierarchy/page.tsx"
+                  },
+                  {
+                      "sha256":  "0738ffff7b3aad4d0e3d4334d81441ca9b07559045b581daa624e7d3f70f616f",
+                      "path":  "frontend/apps/admin-web/src/app/organizations/new/page.tsx"
+                  },
+                  {
+                      "sha256":  "fcede38d0bdac1178210fa2f4e15cdda93a6bd51d212db19fff5a8674591f723",
+                      "path":  "frontend/apps/admin-web/src/app/organizations/page.tsx"
+                  },
+                  {
+                      "sha256":  "609bdb5493dab465abe2af8d59220f2c715c9a50c07bce6951bc4eea79f2f09a",
+                      "path":  "frontend/apps/admin-web/src/app/page.tsx"
+                  },
+                  {
+                      "sha256":  "8525f8c773c609faf674ffd37d3306435dcb8266f66e7f38f3358f5c12fb40a7",
+                      "path":  "frontend/apps/admin-web/src/app/sites/[id]/admin/layout.tsx"
+                  },
+                  {
+                      "sha256":  "61422d3a3b26e809988eba777f3ea0f2489be111c4a9b38a1252538844d77358",
+                      "path":  "frontend/apps/admin-web/src/app/sites/[id]/admin/menus/page.tsx"
+                  },
+                  {
+                      "sha256":  "f2315f0edd5e6b1db7dfb42b2a08dd4ec5ee777debe109d8c6df057eaa4b7c7b",
+                      "path":  "frontend/apps/admin-web/src/app/sites/[id]/admin/page.tsx"
+                  },
+                  {
+                      "sha256":  "1024f3e045bb12c1f5c43751d4c6b34c54e0ef7d90756a16433fe9455ed3d794",
+                      "path":  "frontend/apps/admin-web/src/app/sites/[id]/admin/pages/page.tsx"
+                  },
+                  {
+                      "sha256":  "491a2550aa43a2ddd0123d156c89394c8770614b98548f05ea384b1a82c49df6",
+                      "path":  "frontend/apps/admin-web/src/app/sites/[id]/admin/posts/page.tsx"
+                  },
+                  {
+                      "sha256":  "0e5407b4cec34e906fed50935fe7747e23e7cca5cb7ddd3aeae6a21a815590fe",
+                      "path":  "frontend/apps/admin-web/src/app/sites/[id]/edit/edit-view.tsx"
+                  },
+                  {
+                      "sha256":  "33eb9df9e72b5aa253fdf784bb466d7c1842f7870c7627db057e7ba8615f3f4c",
+                      "path":  "frontend/apps/admin-web/src/app/sites/[id]/edit/page.tsx"
+                  },
+                  {
+                      "sha256":  "d0c2b84a2feabefa7f4e4e5b4cc8a3e20f1844ac385b123bbbabd985afcf4cf9",
+                      "path":  "frontend/apps/admin-web/src/app/sites/[id]/loading.tsx"
+                  },
+                  {
+                      "sha256":  "118db51bd896930cd02d834bb7fb01761b22f8981f9da8498c9727f86bb3a141",
+                      "path":  "frontend/apps/admin-web/src/app/sites/[id]/modules/loading.tsx"
+                  },
+                  {
+                      "sha256":  "2a54af2bea27e61cbd319b92ed4307009e4f3d71bda4d563e73ef193b69378f4",
+                      "path":  "frontend/apps/admin-web/src/app/sites/[id]/modules/page.tsx"
+                  },
+                  {
+                      "sha256":  "90dfbf962cabad9d22a35278c21700f05adf35c93a732ed8b2086c78d8cff340",
+                      "path":  "frontend/apps/admin-web/src/app/sites/[id]/page.tsx"
+                  },
+                  {
+                      "sha256":  "76d5153032b052ddb3c90799568c31dc237307a0302dd5ec12f6aee1ea28d0f0",
+                      "path":  "frontend/apps/admin-web/src/app/sites/actions.ts"
+                  },
+                  {
+                      "sha256":  "c946d9677e057528abcb40b50eb93d5720d71c4723cf6ebdaacd0954b17d3915",
+                      "path":  "frontend/apps/admin-web/src/app/sites/menu-actions.ts"
+                  },
+                  {
+                      "sha256":  "0e915d8b9f4aa6bac59fa3af9181bd4693a3db302c865f2caa9cb890a571ee23",
+                      "path":  "frontend/apps/admin-web/src/app/sites/new/page.tsx"
+                  },
+                  {
+                      "sha256":  "f5eaccef98e90e4fa7e5c3f2fda2bde5d9f391c5f24231425a6d12cbdef5f3a3",
+                      "path":  "frontend/apps/admin-web/src/app/sites/page.tsx"
+                  },
+                  {
+                      "sha256":  "5cb1b402e3cb428176b3d8cc79faca130cc0ad75e8f831dfc5703e458e78e5b8",
+                      "path":  "frontend/apps/admin-web/src/app/sites/page-actions.test.ts"
+                  },
+                  {
+                      "sha256":  "bdf1e93b4d93af53873a3652d181e1d4f43ea0fcdebf6dcf35599828f07b9f17",
+                      "path":  "frontend/apps/admin-web/src/app/sites/page-actions.ts"
+                  },
+                  {
+                      "sha256":  "20473a90a7dc16ce2774814c495fe8394c33be3126825492bfe40c412c30fc9e",
+                      "path":  "frontend/apps/admin-web/src/app/sites/post-actions.ts"
+                  },
+                  {
+                      "sha256":  "ed4328a6b0b22b55f8b29df92a4c3e2a167ebebfa620e92a82fcaa0cbc17003a",
+                      "path":  "frontend/apps/admin-web/src/auth.test.ts"
+                  },
+                  {
+                      "sha256":  "f6834bdf265cb61967bb2956047ea06b7968f0b5b665154343e228527326ed4b",
+                      "path":  "frontend/apps/admin-web/src/auth.ts"
+                  },
+                  {
+                      "sha256":  "e9dc283934cc65bf3a9db1199f99a99e582f8131ee97d69ee4d25ad3968ef388",
+                      "path":  "frontend/apps/admin-web/src/base-path.ts"
+                  },
+                  {
+                      "sha256":  "9f840a653ec40945ac181ea305014dd44184ca8bc615aed5049c5421cedfe077",
+                      "path":  "frontend/apps/admin-web/src/breadcrumb.test.tsx"
+                  },
+                  {
+                      "sha256":  "f1603aa2413402ced98197727facf8fc3c02ead54609d7d650631e1fcfc1787c",
+                      "path":  "frontend/apps/admin-web/src/breadcrumb.tsx"
+                  },
+                  {
+                      "sha256":  "1361e551acd420a596e6383523c9717ff826f6ac91ebb9c17ffc273b833bb860",
+                      "path":  "frontend/apps/admin-web/src/domains/domain-form-dialog.test.tsx"
+                  },
+                  {
+                      "sha256":  "0c850792c6b0830215e1770aa99c6bc8e8661f02af69f9499d5a586c62c463c9",
+                      "path":  "frontend/apps/admin-web/src/domains/domain-form-dialog.tsx"
+                  },
+                  {
+                      "sha256":  "8c28bbbca0a9a2dd5b81c3fb261bc679b5939e258d1af054ed7c72008598b7fe",
+                      "path":  "frontend/apps/admin-web/src/domains/domains-list.test.tsx"
+                  },
+                  {
+                      "sha256":  "89c1b8029c3e2efbbc59e6c42113fed9f9954512e51c063c160fe9ff0b91f958",
+                      "path":  "frontend/apps/admin-web/src/domains/domains-list.tsx"
+                  },
+                  {
+                      "sha256":  "dd2432865a624c5ba96a2091cd349ca11b46074b7bdb4c934b783ecc72329149",
+                      "path":  "frontend/apps/admin-web/src/modules/bulk-contract.ts"
+                  },
+                  {
+                      "sha256":  "cf5206f09c0fef27a7a75da99a0a01fd430f673f04148b5e62df418b1e213b1a",
+                      "path":  "frontend/apps/admin-web/src/modules/bulk-operation-dialog.test.tsx"
+                  },
+                  {
+                      "sha256":  "0ec52c127ae7af17f3f55516d011f181608fc8483b508a7671dc9bc374ccaa92",
+                      "path":  "frontend/apps/admin-web/src/modules/bulk-operation-dialog.tsx"
+                  },
+                  {
+                      "sha256":  "c966a25eabdb92451a70858160d8d4adc8c663c2a676a3f00154944ca758bf33",
+                      "path":  "frontend/apps/admin-web/src/modules/module-registry.test.tsx"
+                  },
+                  {
+                      "sha256":  "555030fec66ad344afcbc271b00a798087afc5b60a787de4037e44274cbd20ff",
+                      "path":  "frontend/apps/admin-web/src/modules/module-registry.tsx"
+                  },
+                  {
+                      "sha256":  "5e2c7091cac430f2f14678228c6f66698c04012c5c6a3383fe6967bb98aff03c",
+                      "path":  "frontend/apps/admin-web/src/modules/modules-workspace.tsx"
+                  },
+                  {
+                      "sha256":  "c916d5429ec52b7e61b06c50d383e539989baccc5c88f0c500ef0531caf8ee14",
+                      "path":  "frontend/apps/admin-web/src/modules/operation-history.test.tsx"
+                  },
+                  {
+                      "sha256":  "1eaed94e4dea9e4ccbf7f93a3edd61d46593aa1aea0a9372ae55a8ac5eabda76",
+                      "path":  "frontend/apps/admin-web/src/modules/operation-history.tsx"
+                  },
+                  {
+                      "sha256":  "13d04f6881310f0864eff3166379e86a7c77dd5bf89de797d3f9183107968ef0",
+                      "path":  "frontend/apps/admin-web/src/modules/site-module-management.test.tsx"
+                  },
+                  {
+                      "sha256":  "3f70b8328e9bae6ba075893e229bfc04ad212e779444cc687ddca3dd77d01620",
+                      "path":  "frontend/apps/admin-web/src/modules/site-module-management.tsx"
+                  },
+                  {
+                      "sha256":  "50945aa08812a6d8484c740495f8c5817ba35d21d1776e4a72601db231635e45",
+                      "path":  "frontend/apps/admin-web/src/modules/validation.ts"
+                  },
+                  {
+                      "sha256":  "62a2c8e9d92a70c887b516914f7bf18a15afa27d54beb43d8432a7dec5391ba9",
+                      "path":  "frontend/apps/admin-web/src/navigation.test.ts"
+                  },
+                  {
+                      "sha256":  "70ace388a937f41e1e4dd6a16c489518d01b6c9d85916806b1001dd5d15a36c7",
+                      "path":  "frontend/apps/admin-web/src/navigation.ts"
+                  },
+                  {
+                      "sha256":  "e2a6605c31a25d7d908665dde3d2e7bee516be71560488aade2c5769aea0e169",
+                      "path":  "frontend/apps/admin-web/src/organizations/contract.ts"
+                  },
+                  {
+                      "sha256":  "3090304e385e546d9880e6d2205fd002004f85cad6fcd8da84984573a5e600b2",
+                      "path":  "frontend/apps/admin-web/src/organizations/hierarchy-tree.test.ts"
+                  },
+                  {
+                      "sha256":  "59dfdad4c36b940b51d469d76892a9652901019db231e7baf3c995d1274994f6",
+                      "path":  "frontend/apps/admin-web/src/organizations/hierarchy-tree.ts"
+                  },
+                  {
+                      "sha256":  "7cca245478f98c80fcb3fcf68c5fadeeec009527478fb204036169af6a746a6b",
+                      "path":  "frontend/apps/admin-web/src/organizations/list-query.test.ts"
+                  },
+                  {
+                      "sha256":  "0fdb2df1cee9700776f1d20764bd7201507795e0eeb0e2a1b1a615ac4bc3bb80",
+                      "path":  "frontend/apps/admin-web/src/organizations/list-query.ts"
+                  },
+                  {
+                      "sha256":  "46e8dcf61f9b4c17cce4e778a809d3c61cee5d1237efa404a0f302275a9e91ba",
+                      "path":  "frontend/apps/admin-web/src/organizations/organization-form.test.tsx"
+                  },
+                  {
+                      "sha256":  "3b892125e4b68d2371bb95cdca6b5c03babdaec35c9aafedb54846cc182436be",
+                      "path":  "frontend/apps/admin-web/src/organizations/organization-form.tsx"
+                  },
+                  {
+                      "sha256":  "1b17c1733f229cdea526937ce290ab95b6078be56b43fd9938137fefce1e27bb",
+                      "path":  "frontend/apps/admin-web/src/organizations/organization-hierarchy.test.tsx"
+                  },
+                  {
+                      "sha256":  "8cb54fda06ac05ce1408d27570115f5d14555889fceff93a9dd49a29a217ce9c",
+                      "path":  "frontend/apps/admin-web/src/organizations/organization-hierarchy.tsx"
+                  },
+                  {
+                      "sha256":  "5b3f3839529345518be8f22d7ecbefcf5f279e21feb1015df38149963b5d9437",
+                      "path":  "frontend/apps/admin-web/src/organizations/organizations-list.test.tsx"
+                  },
+                  {
+                      "sha256":  "41ca2cd0f5a41f3c3ca7bb479670f4a3c5a77368681b9f241f722aa2818b7db7",
+                      "path":  "frontend/apps/admin-web/src/organizations/organizations-list.tsx"
+                  },
+                  {
+                      "sha256":  "3cd507c2650a2b39b5ef94d31f3f5361a77ec1e1ed2ac2c8301e0eedc19a547f",
+                      "path":  "frontend/apps/admin-web/src/organizations/validation.test.ts"
+                  },
+                  {
+                      "sha256":  "a4c9c0078c51e4387f7ed16e59b14e3341dff2c32f3250b4a890cb6aa161811e",
+                      "path":  "frontend/apps/admin-web/src/organizations/validation.ts"
+                  },
+                  {
+                      "sha256":  "5f9dc76996491ba4da42e1827a2982492d6bffe6f7d5dceb0c7e34e33aa7bfa8",
+                      "path":  "frontend/apps/admin-web/src/session-expiry.test.ts"
+                  },
+                  {
+                      "sha256":  "99c048f1b2679448265325d24505156db413b53af00766d43d23bfb9c0041851",
+                      "path":  "frontend/apps/admin-web/src/session-expiry.ts"
+                  },
+                  {
+                      "sha256":  "403bedf0ed4c4438b51b8acd539c53e3843b09d04886c5990b1b05a79d4f7df6",
+                      "path":  "frontend/apps/admin-web/src/session-jwt.test.ts"
+                  },
+                  {
+                      "sha256":  "c0d8b48b67555c6befa8704d48a809e6e2dfbb5d26c33072e09100d90d6a8b78",
+                      "path":  "frontend/apps/admin-web/src/session-jwt.ts"
+                  },
+                  {
+                      "sha256":  "1cc6148e0297dc18b024a121a67c570765fa46d3431b98fb680f435ed945cdeb",
+                      "path":  "frontend/apps/admin-web/src/session-watch.test.ts"
+                  },
+                  {
+                      "sha256":  "ba4cc6d36209f637912bd58ffea39fab835c8d4d15444bcac2ba65fac6228a61",
+                      "path":  "frontend/apps/admin-web/src/session-watch.ts"
+                  },
+                  {
+                      "sha256":  "4f663a0f0998068f1670fa87fafe0bc02f8320fd70cc3b5d536f743389fb2e7f",
+                      "path":  "frontend/apps/admin-web/src/sidebar.test.tsx"
+                  },
+                  {
+                      "sha256":  "11db51e15d19c1bec6c98a7f812c87921e61f876f4e9a8289aaeab3c2d412ec6",
+                      "path":  "frontend/apps/admin-web/src/sidebar.tsx"
+                  },
+                  {
+                      "sha256":  "6d4c48160a07fb685bca24fc2f29500ba57b1ae59771169374594bd23cbc48c2",
+                      "path":  "frontend/apps/admin-web/src/sites/configuration.test.ts"
+                  },
+                  {
+                      "sha256":  "f05f3346c5a70823708857770af2c96e4f9e3cdc7c6700845a805bf5b0df9d62",
+                      "path":  "frontend/apps/admin-web/src/sites/configuration.ts"
+                  },
+                  {
+                      "sha256":  "69927943de88ac9a928bf178c48edb468a6d1fe0038fa2f6721efc943a4a9209",
+                      "path":  "frontend/apps/admin-web/src/sites/content-workflow.test.tsx"
+                  },
+                  {
+                      "sha256":  "f830c6ed93672b307a7f36181f3dad8a6b716c4bbc25d5af2802f79cf5b79777",
+                      "path":  "frontend/apps/admin-web/src/sites/content-workflow.tsx"
+                  },
+                  {
+                      "sha256":  "a936d038edbecd1b8118ea212a3e15348779467bbc49845bd7e3e57165b74577",
+                      "path":  "frontend/apps/admin-web/src/sites/list-query.ts"
+                  },
+                  {
+                      "sha256":  "0446f6989e9913dc44866774dc79f2f48e690ea852dcc522ad4c18294c3c7c7b",
+                      "path":  "frontend/apps/admin-web/src/sites/menu-items.test.tsx"
+                  },
+                  {
+                      "sha256":  "3ea12a0fecc91ea959d7fdde079bea72472cbbbef9a7e2d89f13eb208240d9b7",
+                      "path":  "frontend/apps/admin-web/src/sites/menu-items.tsx"
+                  },
+                  {
+                      "sha256":  "147ba9c4e34f3cc8098e7e6d2e3c7b0d06a43740d6afc0cd044ac4c5a56a99e5",
+                      "path":  "frontend/apps/admin-web/src/sites/menu-paths.test.ts"
+                  },
+                  {
+                      "sha256":  "2e5726bafbfcd24b27274fc4bfa6f26a63edb804b291dcd3016b014b48c95121",
+                      "path":  "frontend/apps/admin-web/src/sites/menu-paths.ts"
+                  },
+                  {
+                      "sha256":  "584ded5c5ea7b4a8f0f29c0d0d2c9557314eed66e0c84997115ede0060f3b289",
+                      "path":  "frontend/apps/admin-web/src/sites/module-settings-form.tsx"
+                  },
+                  {
+                      "sha256":  "255cf7d17924358a290cb7c8f7c24ece47946c1ab79258e1640bb4532e815280",
+                      "path":  "frontend/apps/admin-web/src/sites/owner.test.ts"
+                  },
+                  {
+                      "sha256":  "f46d733b0fad617302e718b1223f011c492509cad5124783d25f917e93bfe4ee",
+                      "path":  "frontend/apps/admin-web/src/sites/owner.ts"
+                  },
+                  {
+                      "sha256":  "072473254d96a9371c24f8526ece2fc1dab7e2fe3bd1455a77f03a7468c679ad",
+                      "path":  "frontend/apps/admin-web/src/sites/page-paths.test.ts"
+                  },
+                  {
+                      "sha256":  "9452f2ba9df8bc21a541fcb43711de567fad785f65ba8115b70db846aa168c91",
+                      "path":  "frontend/apps/admin-web/src/sites/page-paths.ts"
+                  },
+                  {
+                      "sha256":  "cfb42d21a666e552c5d8927e363e19367be7da541176c4f3155bbb9ec9e007fc",
+                      "path":  "frontend/apps/admin-web/src/sites/post-paths.test.ts"
+                  },
+                  {
+                      "sha256":  "6a79a6ba60790bf11ba4bbb8e4576ffbbae4693aea0992a0236856be07b092a8",
+                      "path":  "frontend/apps/admin-web/src/sites/post-paths.ts"
+                  },
+                  {
+                      "sha256":  "149d514e82172d5821cf975701b270184ae95e1375851e4e270dbf248b181b27",
+                      "path":  "frontend/apps/admin-web/src/sites/site-admin.test.ts"
+                  },
+                  {
+                      "sha256":  "4c9717411e29129346e2f0141582a8450e5ae1ec847d08d3883ea17138973fae",
+                      "path":  "frontend/apps/admin-web/src/sites/site-admin.ts"
+                  },
+                  {
+                      "sha256":  "41158cdfea4e1b3b88b71029246d93bca1534c8ccae91d363342d397ff180d7e",
+                      "path":  "frontend/apps/admin-web/src/sites/site-admin-frame.test.tsx"
+                  },
+                  {
+                      "sha256":  "712aa57a387a08d3a61e1ecfad60e7d508aa27653921844d61d2b324d058668c",
+                      "path":  "frontend/apps/admin-web/src/sites/site-admin-frame.tsx"
+                  },
+                  {
+                      "sha256":  "8aff438494e39739da8ec0c83ac2593aa20bf58a0fb8fbae113ebbee8bb11429",
+                      "path":  "frontend/apps/admin-web/src/sites/site-dashboard.test.tsx"
+                  },
+                  {
+                      "sha256":  "0001546c9aff5e8fecef34e7afe1978c4258c1088879891ae008e1c9e4b7b24c",
+                      "path":  "frontend/apps/admin-web/src/sites/site-dashboard.tsx"
+                  },
+                  {
+                      "sha256":  "cd3929e925f908d9144a203e8d042f021a3b2db4deb9ce1657781b3a0551ad77",
+                      "path":  "frontend/apps/admin-web/src/sites/site-detail.test.tsx"
+                  },
+                  {
+                      "sha256":  "0f11a323ded0995a7b0ddd90b27f60def3865e04d07992c2650ae461800a07b6",
+                      "path":  "frontend/apps/admin-web/src/sites/site-detail.tsx"
+                  },
+                  {
+                      "sha256":  "355c19b4049d92fcd98fae1990d7f4420f93f7cf399468ca68a8049b5b1f1a1f",
+                      "path":  "frontend/apps/admin-web/src/sites/site-domains-panel.test.tsx"
+                  },
+                  {
+                      "sha256":  "eb1560ff77a7efa226084d35289c10f3048606b67b23a11f35deb5086b432121",
+                      "path":  "frontend/apps/admin-web/src/sites/site-domains-panel.tsx"
+                  },
+                  {
+                      "sha256":  "667634003b39b068fd6e64167e9a6a5554808a2205ea8d808e607b50a7e00ea1",
+                      "path":  "frontend/apps/admin-web/src/sites/site-form.test.tsx"
+                  },
+                  {
+                      "sha256":  "b48a44eaa14c8db74abe6ad033ecacf6df3819a04dde2a2e0b1d67e4497a217a",
+                      "path":  "frontend/apps/admin-web/src/sites/site-form.tsx"
+                  },
+                  {
+                      "sha256":  "fc4e0c1cd322d635b5a301eebf5885c5201cef529396901902ca7bfea1ae8732",
+                      "path":  "frontend/apps/admin-web/src/sites/site-menus.test.tsx"
+                  },
+                  {
+                      "sha256":  "a6459d20fcda514ac7d186df8c67e06ec73f3b877db28dfc9cc5b3e94cf365a5",
+                      "path":  "frontend/apps/admin-web/src/sites/site-menus.tsx"
+                  },
+                  {
+                      "sha256":  "76dd08ec9072a7f30ba43268c0fd31c318db73bb4d09cc04f72b1a9c01b9c4d5",
+                      "path":  "frontend/apps/admin-web/src/sites/site-modules.test.tsx"
+                  },
+                  {
+                      "sha256":  "e8efeb2973f9eb08317f47c84fd651813f05d546547af668dedbc63cd619d5c7",
+                      "path":  "frontend/apps/admin-web/src/sites/site-modules.tsx"
+                  },
+                  {
+                      "sha256":  "2744a18f7166114318c916fb6c761ac4130d00b42d374af18af898c337cf1f16",
+                      "path":  "frontend/apps/admin-web/src/sites/site-pages.test.tsx"
+                  },
+                  {
+                      "sha256":  "7cd8346e3502297f491707a99d417afe8976fc917d78095d06f2925dece2baf1",
+                      "path":  "frontend/apps/admin-web/src/sites/site-pages.tsx"
+                  },
+                  {
+                      "sha256":  "483c8ffbb169262ce1d7e97dd6c8a30655668fb46505e498ff789bf285f13b19",
+                      "path":  "frontend/apps/admin-web/src/sites/site-posts.test.tsx"
+                  },
+                  {
+                      "sha256":  "eea8529fb8ddd1413db4a837f46dfc73fe090c82c528c1399214926d4d9bf04d",
+                      "path":  "frontend/apps/admin-web/src/sites/site-posts.tsx"
+                  },
+                  {
+                      "sha256":  "b72b9bb1f6a7632cad109dd21d94276689aef6265381302ec019a13f006d646c",
+                      "path":  "frontend/apps/admin-web/src/sites/sites-list.test.tsx"
+                  },
+                  {
+                      "sha256":  "00212d0495378b52388a6ac71d5a7c0f350b1ed7f2244ee93a687c27d6447e7d",
+                      "path":  "frontend/apps/admin-web/src/sites/sites-list.tsx"
+                  },
+                  {
+                      "sha256":  "200226d7ecf71129d75d1d9dc411d2dde4c8faa0aafa543d573c9892a8715193",
+                      "path":  "frontend/apps/admin-web/src/sites/validation.ts"
+                  },
+                  {
+                      "sha256":  "d82108219e5da06b44a17cee85f7593c004b62315d4fb4a9de4a6b13aa8a8767",
+                      "path":  "frontend/apps/admin-web/src/test/setup.ts"
+                  },
+                  {
+                      "sha256":  "dff53f64c37928f4bc4c05354ab85e4676bf45a447df9974a92d54c1b61908de",
+                      "path":  "frontend/apps/admin-web/src/workspace.ts"
+                  },
+                  {
+                      "sha256":  "663fadb45c02a2329ec10636c80b2c31f819bbf239080c5f5ba4777f4e505362",
+                      "path":  "frontend/apps/admin-web/tsconfig.json"
+                  },
+                  {
+                      "sha256":  "6abe7cfe48e331f00d3d507619bf1f0310a8661d067352a6933710731dd4c841",
+                      "path":  "frontend/apps/public-web/next.config.ts"
+                  },
+                  {
+                      "sha256":  "31ef7fdaf6f1dddfa241abf31d7839887cae137234b78adc4e80957ad7e99223",
+                      "path":  "frontend/apps/public-web/package.json"
+                  },
+                  {
+                      "sha256":  "912506fafd99254b897040e70f3c2cf6ee1c4e938201b64841caa7e013bd91df",
+                      "path":  "frontend/apps/public-web/src/app/[...path]/page.tsx"
+                  },
+                  {
+                      "sha256":  "256556356c2a1a358064c1e4216238b614300e17ffff375a2cb5a1672efb9c9f",
+                      "path":  "frontend/apps/public-web/src/app/actions.ts"
+                  },
+                  {
+                      "sha256":  "c3e8185d66af3fe7019dd236a463365cce7e1e8dcaea2a7c3b8f0b103e930ce4",
+                      "path":  "frontend/apps/public-web/src/app/api/auth/[...nextauth]/route.ts"
+                  },
+                  {
+                      "sha256":  "9e57f5ea4f6cbee236831f8d4120f28fd44fa5d28ccbebda36480488e160435f",
+                      "path":  "frontend/apps/public-web/src/app/layout.tsx"
+                  },
+                  {
+                      "sha256":  "ea0e8a2251ba414de944471c2d658da5b2a1b9f6d9807d1fb0b6cc3055c4d4cf",
+                      "path":  "frontend/apps/public-web/src/app/not-found.tsx"
+                  },
+                  {
+                      "sha256":  "4bd0f73edcc436dd4835cf0e09c4f38d80959df3ef8c704951420871ad78d944",
+                      "path":  "frontend/apps/public-web/src/app/page.tsx"
+                  },
+                  {
+                      "sha256":  "a173d7bf2b560da425b1818e304f52a879718f4eb2e2cc860e50a0797c599cc1",
+                      "path":  "frontend/apps/public-web/src/app/posts/[slug]/page.tsx"
+                  },
+                  {
+                      "sha256":  "aec728b9b5e87365fe1870e60a6e722fda98b6de3bc0eaad2aec097d6c430a16",
+                      "path":  "frontend/apps/public-web/src/app/posts/page.tsx"
+                  },
+                  {
+                      "sha256":  "105ba788c31a4697d15e98716949b4536816d3a167d5517e5e1ba65c84cea226",
+                      "path":  "frontend/apps/public-web/src/auth.ts"
+                  },
+                  {
+                      "sha256":  "8b2e5071b55fc2717d6195e8d121c82ed3856093a459c9d60bacea86f59a3a8e",
+                      "path":  "frontend/apps/public-web/src/public-menus.tsx"
+                  },
+                  {
+                      "sha256":  "856c135a7d84b2f32da9d80a65ca336a1d36ba54c8405010dfe46aa54c7e3300",
+                      "path":  "frontend/apps/public-web/src/public-page.tsx"
+                  },
+                  {
+                      "sha256":  "47deb1f6cfe4a574d2912fc264180231553b601a6d8a6793a75fba66bf2a6c44",
+                      "path":  "frontend/apps/public-web/src/public-posts.tsx"
+                  },
+                  {
+                      "sha256":  "99deba6f8db92a8799745ae91ab1aaaac029067413888b9f5ee3a67a1b683f69",
+                      "path":  "frontend/apps/public-web/src/public-site.tsx"
+                  },
+                  {
+                      "sha256":  "663fadb45c02a2329ec10636c80b2c31f819bbf239080c5f5ba4777f4e505362",
+                      "path":  "frontend/apps/public-web/tsconfig.json"
+                  },
+                  {
+                      "sha256":  "9923846312040bbc44774d3043fd7093e722e58ffc9abda26bc478d4715fb697",
+                      "path":  "frontend/package.json"
+                  },
+                  {
+                      "sha256":  "4fdc99a2c3e1a15f9bf8ab9bcd7eab3883c6db66eacd688e9e05e73fca3bfedd",
+                      "path":  "frontend/packages/api-client/package.json"
+                  },
+                  {
+                      "sha256":  "61fe45700eb2accaf5fd222678ab6f91bc341f0b889cf182e11d36a9d4641043",
+                      "path":  "frontend/packages/api-client/src/adapters/adapters.test.ts"
+                  },
+                  {
+                      "sha256":  "7516fddecdcc7e08f4b61162d17ed0cb848a3e6a4287e717f11f89c367b29e50",
+                      "path":  "frontend/packages/api-client/src/adapters/factory.ts"
+                  },
+                  {
+                      "sha256":  "5626adb0df816c23a6de4706ede28ee233c0a735c8d7530663367f38c1e66412",
+                      "path":  "frontend/packages/api-client/src/adapters/iam.test.ts"
+                  },
+                  {
+                      "sha256":  "f37e22bef5695e4b0322bccd705fa4bc30e4a948475c51185b365f29a9b496c5",
+                      "path":  "frontend/packages/api-client/src/adapters/iam.ts"
+                  },
+                  {
+                      "sha256":  "1cee1524ebb0406b69149c2e3744624e38b619b8969241ec654544bd0eeadf3a",
+                      "path":  "frontend/packages/api-client/src/adapters/mode.ts"
+                  },
+                  {
+                      "sha256":  "7c4295f04752adbf0d30ed1ffc3dcd751c486524d88df5b265c26e6b17448e71",
+                      "path":  "frontend/packages/api-client/src/adapters/organizations.ts"
+                  },
+                  {
+                      "sha256":  "d1981f623db48bf32c87f3d6ef0fe025f37a2cbb75b7ec35b1954eb037ae7f41",
+                      "path":  "frontend/packages/api-client/src/adapters/sites.ts"
+                  },
+                  {
+                      "sha256":  "03f7de8ef7feaa2f29e7a7ccb091ed17c70869e0878c96d7661d28ff755c7dea",
+                      "path":  "frontend/packages/api-client/src/adapters/sites-domains.test.ts"
+                  },
+                  {
+                      "sha256":  "54bd9b1fc942376309ff6bd957a178e2b9c98937b625c3de1933d285e51f0274",
+                      "path":  "frontend/packages/api-client/src/adapters/sites-modules.test.ts"
+                  },
+                  {
+                      "sha256":  "4de06be7ab0f13a1835611ccb5efaeaf2e2218ccff2da68fedcf706fa04e57cd",
+                      "path":  "frontend/packages/api-client/src/client.ts"
+                  },
+                  {
+                      "sha256":  "d3d166edd517c5b0caaa46aa6de7f59a97a1ca6a976252920d683c5a3f0539d1",
+                      "path":  "frontend/packages/api-client/src/errors.test.ts"
+                  },
+                  {
+                      "sha256":  "0b2ccc080cac67bfa902f1a5df22c869e9e66ac24a706e0b70e3e70beeb174a8",
+                      "path":  "frontend/packages/api-client/src/errors.ts"
+                  },
+                  {
+                      "sha256":  "af11baa3e847841d722ccd36e9c81d7405f9a1d270b190f1dac98370e7e11691",
+                      "path":  "frontend/packages/api-client/src/fixtures/iam.ts"
+                  },
+                  {
+                      "sha256":  "f09f6a79b5a5d6c8f0291a82967e1c9f0c73011578d3f2100363b8758ea74c8a",
+                      "path":  "frontend/packages/api-client/src/fixtures/organizations.ts"
+                  },
+                  {
+                      "sha256":  "88f86a6774c5e1a02882bcaedd0a75abc038b7dd8510cf030dab8c40069436b7",
+                      "path":  "frontend/packages/api-client/src/fixtures/sites.ts"
+                  },
+                  {
+                      "sha256":  "d421412b703789304a429a7352ec032684e83d4ee3ddec6e5f99ffa501490620",
+                      "path":  "frontend/packages/api-client/src/hostname.test.ts"
+                  },
+                  {
+                      "sha256":  "869cafcab62f296a1bfda2c311bd380f089c6785b3c07049fadf6520cb3168e0",
+                      "path":  "frontend/packages/api-client/src/hostname.ts"
+                  },
+                  {
+                      "sha256":  "5a88e622d64a3ec993d48dfda006613757a214cccd3d83050afdd4cef5073ea8",
+                      "path":  "frontend/packages/api-client/src/index.test.ts"
+                  },
+                  {
+                      "sha256":  "903b2eba1ba8fdb5e49662071d640aa127f1f7702dd0e5edd524864c608e4701",
+                      "path":  "frontend/packages/api-client/src/index.ts"
+                  },
+                  {
+                      "sha256":  "d7cf16a63cd068660da614b138f3ea2c7c4437c7535502b01493544169c6f4ad",
+                      "path":  "frontend/packages/api-client/src/query.ts"
+                  },
+                  {
+                      "sha256":  "c81473da493163eed5c641ac2780d26cf98d3b62798aa40a6de2d5e71634470c",
+                      "path":  "frontend/packages/api-client/src/sites-configuration.ts"
+                  },
+                  {
+                      "sha256":  "11daebc73343c227276736cc7e1d2216a747b9f769ae5dd056dae93788aba91a",
+                      "path":  "frontend/packages/api-client/tsconfig.json"
+                  },
+                  {
+                      "sha256":  "c4a4c1c44b4453b9e7765743fc02878785392ed648d36c10527094bfe206dd09",
+                      "path":  "frontend/packages/config/package.json"
+                  },
+                  {
+                      "sha256":  "50877fa5d78715c59f197a0b8b4e434911ddfe1681ad7d211583e89167706c6e",
+                      "path":  "frontend/packages/config/tsconfig/base.json"
+                  },
+                  {
+                      "sha256":  "6de6d1c34b119452cdb503a9691390cd628865d69a8ae9649c23bdd3a6d7912d",
+                      "path":  "frontend/packages/config/tsconfig/nextjs.json"
+                  },
+                  {
+                      "sha256":  "391bc5bb8b0e593fc5f4409bcaac14bd72617a3eec707c2228d763c81e3f561b",
+                      "path":  "frontend/packages/types/package.json"
+                  },
+                  {
+                      "sha256":  "167371b25106c82d4e109bb37e0a9c3894f1dc0c1f4a22210f5a132bf735d368",
+                      "path":  "frontend/packages/types/src/index.ts"
+                  },
+                  {
+                      "sha256":  "11daebc73343c227276736cc7e1d2216a747b9f769ae5dd056dae93788aba91a",
+                      "path":  "frontend/packages/types/tsconfig.json"
+                  },
+                  {
+                      "sha256":  "0f25e23e4bb83b0e44dafc4c5d6c8ebe56baf893557c7ef45f11e4139bc0ecd6",
+                      "path":  "frontend/packages/ui/package.json"
+                  },
+                  {
+                      "sha256":  "7a6db3edbb0fb7f14bfddaa3ac4c8ef2ed07484458010362e322123154ee441b",
+                      "path":  "frontend/packages/ui/src/async-states.tsx"
+                  },
+                  {
+                      "sha256":  "bbb63ba0f07b8dfd56b61cb9f729b7761c6ddbc1fb5b847aa99fe77eb54f01bb",
+                      "path":  "frontend/packages/ui/src/confirm-dialog.test.tsx"
+                  },
+                  {
+                      "sha256":  "8ce0179b1cb99aa53be4bb8b91a83f525a7f31be23e09788e1dc86caad6b3891",
+                      "path":  "frontend/packages/ui/src/confirm-dialog.tsx"
+                  },
+                  {
+                      "sha256":  "1f529e8efcdd87bbbd7a29d9d0126eabcdeb411d717ce19575e3601a5746acbb",
+                      "path":  "frontend/packages/ui/src/data-table.test.tsx"
+                  },
+                  {
+                      "sha256":  "861af87186ccda4ce13b555e4b1e0eb817f666b3e607274d05845c97dc883b48",
+                      "path":  "frontend/packages/ui/src/data-table.tsx"
+                  },
+                  {
+                      "sha256":  "936aefb526bf9126242f566323be3d54659ce3a5656833260fdd22c3b7ea717e",
+                      "path":  "frontend/packages/ui/src/filter-controls.test.tsx"
+                  },
+                  {
+                      "sha256":  "7cb611b080773d04e82b240c7ccfcc0ece8eec912f03b7190405ee437d9d619d",
+                      "path":  "frontend/packages/ui/src/filter-controls.tsx"
+                  },
+                  {
+                      "sha256":  "c8df43113cdd30245b58212ef4bcaee3c8a6c808f2b01272b2ff993b79cf1a83",
+                      "path":  "frontend/packages/ui/src/form-fields.test.tsx"
+                  },
+                  {
+                      "sha256":  "35e2fa57a75fe73eac80043ad17274e2e9eba242cd5536016db99c9d1c95c39f",
+                      "path":  "frontend/packages/ui/src/form-fields.tsx"
+                  },
+                  {
+                      "sha256":  "dac1495f6bef12b003347e58f82940011dd788e87861a36c692b7db4e673d24d",
+                      "path":  "frontend/packages/ui/src/index.ts"
+                  },
+                  {
+                      "sha256":  "858df1652230271b3e94b900c214fbe5fe9c7bf572bb6ce1515887f3491cd27a",
+                      "path":  "frontend/packages/ui/src/pagination.test.tsx"
+                  },
+                  {
+                      "sha256":  "d1c47e5414d3242c8566d8f3bf162b7f9eed777102fe0ebfd4fbbb6fc892a6d3",
+                      "path":  "frontend/packages/ui/src/pagination.tsx"
+                  },
+                  {
+                      "sha256":  "ee874ec8fdf778b68d08f7fb2f2f49724f30a54595cea323651871011071674c",
+                      "path":  "frontend/packages/ui/src/public-page.test.tsx"
+                  },
+                  {
+                      "sha256":  "591695977d263a9829275fe6db3dfec47a74e52382a7bde87eaae63a5c87da02",
+                      "path":  "frontend/packages/ui/src/public-page.tsx"
+                  },
+                  {
+                      "sha256":  "d0a32c831cd395ca637101036583f933147e2d1bb85880ddd8072e8c91386340",
+                      "path":  "frontend/packages/ui/src/public-post.test.tsx"
+                  },
+                  {
+                      "sha256":  "c7812725edd9becc8b745bfd1abbba982f40ac1fbf139eba6fa551f17c8b5725",
+                      "path":  "frontend/packages/ui/src/public-post.tsx"
+                  },
+                  {
+                      "sha256":  "8ebda226409856916e8dda55299284fa4c0405f77b62b9873f16c8362757ceef",
+                      "path":  "frontend/packages/ui/src/public-site.test.tsx"
+                  },
+                  {
+                      "sha256":  "e4292c18e8bd3545f590fafa9a15a4095f1034fd954bed8c36e44a7bf83ee122",
+                      "path":  "frontend/packages/ui/src/public-site.ts"
+                  },
+                  {
+                      "sha256":  "91546b975b6894fd93dd370d6e6212bb825d895a5da6fc78733c9417bee98c25",
+                      "path":  "frontend/packages/ui/src/public-site-frame.tsx"
+                  },
+                  {
+                      "sha256":  "61e58f9ee166c7d66fd4433963bed3fd14518285ebbcd5a17e8fcd946edcc8f9",
+                      "path":  "frontend/packages/ui/src/site-navigation.test.tsx"
+                  },
+                  {
+                      "sha256":  "15a120ceff09864fa59f3a0ca8050bbb17488de0f61213b145fb34e781a043cc",
+                      "path":  "frontend/packages/ui/src/site-navigation.tsx"
+                  },
+                  {
+                      "sha256":  "784e2b142af5875161c55fd1cc78dd3a0d005acdede9763f04b7472951be1295",
+                      "path":  "frontend/packages/ui/src/test/setup.ts"
+                  },
+                  {
+                      "sha256":  "e9f0ea8aecac7e0a2cda2e7502b15f94b9499ea1f88c99096c1e268fde746906",
+                      "path":  "frontend/packages/ui/src/theme.test.ts"
+                  },
+                  {
+                      "sha256":  "1359cded8ca639a2710d68a782974c98f0fcf2f89fc8971c6143748e582e51eb",
+                      "path":  "frontend/packages/ui/src/theme.ts"
+                  },
+                  {
+                      "sha256":  "ae204b3b1aa7dd859620cfd5fb9053bb45be8884759a5c958f3c80532592aea3",
+                      "path":  "frontend/packages/ui/src/toast.test.tsx"
+                  },
+                  {
+                      "sha256":  "4778b0894fd17dee2a55f5bb21b59f720f5841a5f457ae1ec08727aea63e6d81",
+                      "path":  "frontend/packages/ui/src/toast.tsx"
+                  },
+                  {
+                      "sha256":  "0782e64ef0acc6f4310449930a79d27772242b5385ff3338a417736cb6fdd4ae",
+                      "path":  "frontend/packages/ui/src/UogShell.tsx"
+                  },
+                  {
+                      "sha256":  "dfe815595af33e89d03262036df2ba01f3a77e02564c2168a6600252df822ab6",
+                      "path":  "frontend/packages/ui/src/UogThemeProvider.tsx"
+                  },
+                  {
+                      "sha256":  "0a6d8d52cc5912f0187c3b36922d6d062a715b75b30d1c6b6954e30e38611d87",
+                      "path":  "frontend/packages/ui/src/useAsync.test.tsx"
+                  },
+                  {
+                      "sha256":  "0eb2d989c1d7a1276b9b2e942cce9eca88c51422c33f4e36693092c3bdc7ef2f",
+                      "path":  "frontend/packages/ui/src/useAsync.ts"
+                  },
+                  {
+                      "sha256":  "221bcbe5ab5c429f1e55bfd72814e04b620bd853c9fcecde9e223461a08a0cdb",
+                      "path":  "frontend/packages/ui/tsconfig.json"
+                  },
+                  {
+                      "sha256":  "c58421d96f4d30540daa627a4be11d2afc2d06ec2d860bcabafd49427d15b0cb",
+                      "path":  "frontend/pnpm-lock.yaml"
+                  },
+                  {
+                      "sha256":  "08d75840c97ab0e72d1d9b5b84a17e47a2e06cb159a5fbec5ee0a6a56682dad7",
+                      "path":  "frontend/pnpm-workspace.yaml"
+                  },
+                  {
+                      "sha256":  "3702afbc813bb6ecf609d7541412c4eb8f2e2ddaf816e2aad19dc2abb4cdecc4",
+                      "path":  "frontend/scripts/isolated-production-build.mjs"
+                  },
+                  {
+                      "sha256":  "2299576ad047f0d64490f19e65f37eeb3f2fd7c47a4b03433839cc504095f7ea",
+                      "path":  "frontend/turbo.json"
+                  },
+                  {
+                      "sha256":  "19e8d176ee568eb5ddc9e01d6f2c4fcc69456fa8150016dc1954b000cf4741cd",
+                      "path":  "scripts/dev-api-token.py"
+                  },
+                  {
+                      "sha256":  "51631937ec4f63cc65d7fdc63c1ca1693a792877f5eaef01ea341d00a4e45cec",
+                      "path":  "scripts/qa-gate-backend.py"
+                  },
+                  {
+                      "sha256":  "9ec509b1f8f90dad254ce2a4a61fb04ad822cd472892ca2daf9b017c1b99bf91",
+                      "path":  "scripts/qa-gate-browser.cjs"
+                  },
+                  {
+                      "sha256":  "f10dca0bc2b8bd7857fa1102fbe4a650605d8242eefe39b4013ebe1ee4759d26",
+                      "path":  "scripts/qa-gate-cleanup.py"
+                  },
+                  {
+                      "sha256":  "5de72d7022b7f331fa1f898a860f6d1b2601e0d92794c7fccbb2c41ebba68a69",
+                      "path":  "scripts/qa-gate-expiry.py"
+                  },
+                  {
+                      "sha256":  "b7f8106301ed68f44c39665eafc42d4065a56fc83d012718a1a527928e49a2bb",
+                      "path":  "scripts/qa-gate-final-report.py"
+                  },
+                  {
+                      "sha256":  "cb37a18b9b9f72d92f28220183b3fd737da2ea4190676d30f18e348a63389213",
+                      "path":  "scripts/qa-gate-persistence.py"
+                  },
+                  {
+                      "sha256":  "33004ba02b763db43ce53f2e95db235ecb528e9f74707c5add626cc5653d4670",
+                      "path":  "scripts/qa-gate-probes.py"
+                  },
+                  {
+                      "sha256":  "80dfa33350e8c371b59a31e1be70e677c4765375acfedc71893afdd75d49ef1c",
+                      "path":  "scripts/qa-gate-report.py"
+                  },
+                  {
+                      "sha256":  "1bef3ecc115f134d695256f0fadb0024e6be22c8c4763adf6d0c7282c2c13ce2",
+                      "path":  "scripts/qa-gate-rerun.py"
+                  },
+                  {
+                      "sha256":  "2a745764395e5d004c8af171766355941ef28ec7622a1508b33e0bad7d5f9854",
+                      "path":  "scripts/qa-gate-wait.py"
+                  },
+                  {
+                      "sha256":  "42d16f9c3f2f0ad625a8fdcb7d7650afa1ff1200badd687e80145914c6d8caf4",
+                      "path":  "scripts/qa-menu-repair-report.py"
+                  },
+                  {
+                      "sha256":  "b5a60714452190ef0ecdbbe2195d3c733771326bcb0252c4c05c45eed3f2621b",
+                      "path":  "scripts/qa-module-management-browser.cjs"
+                  },
+                  {
+                      "sha256":  "d5cbe61dc49ee2578d4119807c42d7a703b9f13c9503b67df3227ef4f03e8cc2",
+                      "path":  "scripts/qa-navigation-performance.cjs"
+                  },
+                  {
+                      "sha256":  "506d6219829db2e073b2f8e28cca0ea8fef5cc5528709b9071c308a559b6552e",
+                      "path":  "scripts/qa-workspace.py"
+                  },
+                  {
+                      "sha256":  "14d2574c64d31e33a3025406f784d5ed9d2946ae5000feef6fd964ef04d2d730",
+                      "path":  "scripts/qa-workspace-browser.cjs"
+                  },
+                  {
+                      "sha256":  "e2e82cd36756e6aa324645679f10e33e7d934586125d013883ebc1168697fbb6",
+                      "path":  "scripts/validate-organization-keycloak.py"
+                  }
+              ],
+    "head":  "e42a429d15891ded6710bb7d5739092ae7bdb76c",
+    "captured_utc":  "2026-11-04T21:01:44.6961993Z"
+}

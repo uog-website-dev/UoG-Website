@@ -1,0 +1,144 @@
+{
+  "run": "qawsac6faeae",
+  "build": "e42a429d15891ded6710bb7d5739092ae7bdb76c+module-management-audit",
+  "date": "2026-11-04",
+  "site": {
+    "id": 12,
+    "code": "QA6A1A06AA_0",
+    "name": "QA University qa6a1a06aa",
+    "short_name": "",
+    "organization_unit": 5,
+    "default_language": "en-us",
+    "status": "ACTIVE",
+    "is_main": false,
+    "template": 5,
+    "configuration": {
+      "behavior": {
+        "show_search": false,
+        "show_language_switcher": false
+      },
+      "identity": {
+        "logo_ref": null,
+        "favicon_ref": null,
+        "display_name": "QA University qa6a1a06aa"
+      },
+      "language": {
+        "enabled": [
+          "en-us"
+        ]
+      },
+      "navigation": {
+        "items": []
+      },
+      "presentation": {
+        "theme": "institutional"
+      },
+      "schema_version": 1
+    },
+    "primary_domain": {
+      "hostname": "qa6a1a06aa-main.uog.local",
+      "status": "ACTIVE"
+    },
+    "created_at": "2026-11-04T04:03:44.769794Z",
+    "updated_at": "2026-11-04T04:03:45.278785Z"
+  },
+  "other": {
+    "id": 13,
+    "code": "QA6A1A06AA_1",
+    "name": "QA College qa6a1a06aa",
+    "short_name": "",
+    "organization_unit": 17,
+    "default_language": "en-us",
+    "status": "ACTIVE",
+    "is_main": false,
+    "template": 5,
+    "configuration": {
+      "behavior": {
+        "show_search": false,
+        "show_language_switcher": false
+      },
+      "identity": {
+        "logo_ref": null,
+        "favicon_ref": null,
+        "display_name": "QA College qa6a1a06aa"
+      },
+      "language": {
+        "enabled": [
+          "en-us"
+        ]
+      },
+      "navigation": {
+        "items": []
+      },
+      "presentation": {
+        "theme": "high-contrast"
+      },
+      "schema_version": 1
+    },
+    "primary_domain": {
+      "hostname": "qa6a1a06aa-college.uog.local",
+      "status": "ACTIVE"
+    },
+    "created_at": "2026-11-04T04:03:45.926568Z",
+    "updated_at": "2026-11-04T04:03:46.461000Z"
+  },
+  "title": "Workspace QA qawsac6faeae",
+  "slug": "workspace-qawsac6faeae",
+  "modules": [
+    {
+      "id": 27,
+      "site": 12,
+      "module": 10,
+      "module_code": "PAGES",
+      "is_enabled": true,
+      "is_available": true,
+      "configuration": {},
+      "created_at": "2026-11-04T04:03:47.859951Z",
+      "updated_at": "2026-11-04T04:04:34.134729Z"
+    },
+    {
+      "id": 29,
+      "site": 12,
+      "module": 11,
+      "module_code": "POSTS",
+      "is_enabled": true,
+      "is_available": false,
+      "configuration": {},
+      "created_at": "2026-11-04T04:03:48.582836Z",
+      "updated_at": "2026-11-04T04:04:34.695570Z"
+    },
+    {
+      "id": 31,
+      "site": 12,
+      "module": 12,
+      "module_code": "MENUS",
+      "is_enabled": true,
+      "is_available": true,
+      "configuration": {},
+      "created_at": "2026-11-04T04:03:49.002665Z",
+      "updated_at": "2026-11-04T04:07:30.671223Z"
+    }
+  ],
+  "expected_page_counts": {
+    "DRAFT": 1,
+    "IN_REVIEW": 0,
+    "APPROVED": 0,
+    "PUBLISHED": 2,
+    "UNPUBLISHED": 0,
+    "ARCHIVED": 1
+  },
+  "expected_menus": {
+    "Local menus": 2,
+    "Active": 1,
+    "Menu items": 4
+  },
+  "cross_site_denied": true,
+  "cleanup": {
+    "disabled_accounts": 4,
+    "revoked_grants": 4,
+    "removed_cms_bindings": 3,
+    "private_session_removed": true,
+    "module_switches_changed": false,
+    "developer_volumes_changed": false
+  }
+}

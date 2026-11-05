@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { PaginatedResponse, Site, SiteDomain } from "@uog/types";
@@ -45,6 +45,17 @@ vi.mock("@/app/sites/menu-actions", () => ({
   reorderSiteMenu: vi.fn(),
   setMenuActive: vi.fn(),
   updateSiteMenu: vi.fn(),
+}));
+
+vi.mock("@/app/sites/post-actions", () => ({
+  loadSitePosts: vi.fn(async () => ({ ok: true, data: { count: 0, next: null, previous: null, results: [] } })),
+  loadSiteTaxonomy: vi.fn(async () => ({ ok: true, data: [] })),
+  loadSitePostWorkflowHistory: vi.fn(async () => ({ ok: true, data: [] })),
+  getSitePost: vi.fn(),
+  createSitePost: vi.fn(),
+  updateSitePost: vi.fn(),
+  transitionSitePost: vi.fn(),
+  createSiteTaxonomy: vi.fn(),
 }));
 
 vi.mock("@/app/sites/page-actions", () => ({
@@ -238,10 +249,10 @@ describe("SiteDetail — domains", () => {
     });
 
     renderDetail({ site: site() });
+    fireEvent.click(screen.getByRole("tab", { name: "Domains" }));
 
-    // The primary hostname now appears in the hero profile and the panel.
-    expect((await screen.findAllByText("www.uog.edu.et")).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText("uog.edu.et")).toBeTruthy();
+    expect(await screen.findByText("uog.edu.et")).toBeTruthy();
+    expect(screen.getAllByText("www.uog.edu.et").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("Primary")).toBeTruthy();
     expect(screen.getByText("Alias")).toBeTruthy();
     expect(
@@ -251,6 +262,7 @@ describe("SiteDetail — domains", () => {
 
   it("states when no hostnames are registered", async () => {
     renderDetail({ site: site() });
+    fireEvent.click(screen.getByRole("tab", { name: "Domains" }));
 
     expect(
       await screen.findByText("No hostnames are registered for this site yet."),
@@ -270,6 +282,7 @@ describe("SiteDetail — domains", () => {
     });
 
     renderDetail({ site: site() });
+    fireEvent.click(screen.getByRole("tab", { name: "Domains" }));
 
     expect(
       await screen.findByText(/domain list could not be loaded/i),
@@ -282,6 +295,7 @@ describe("SiteDetail — domains", () => {
 describe("SiteDetail — modules", () => {
   it("says no modules are enabled and does not present planned capabilities as features", async () => {
     renderDetail({ site: site() });
+    fireEvent.click(screen.getByRole("tab", { name: "Modules" }));
 
     expect(await screen.findByText(/No modules are enabled for this site/i)).toBeTruthy();
     expect(screen.getByText(/planned capabilities only/i)).toBeTruthy();
@@ -329,11 +343,9 @@ describe("SiteDetail — modules", () => {
     });
 
     renderDetail({ site: site() });
+    fireEvent.click(screen.getByRole("tab", { name: "Modules" }));
 
-    // Scope to the Modules panel: the settings section also renders the word
-    // "Disabled" for behavior flags.
-    const modulesPanel = screen.getByText("Modules").parentElement
-      ?.parentElement as HTMLElement;
+    const modulesPanel = screen.getByRole("region", { name: "Modules" });
 
     expect(await within(modulesPanel).findByText("NEWS — News")).toBeTruthy();
     expect(within(modulesPanel).getByText("Enabled")).toBeTruthy();
@@ -359,6 +371,7 @@ describe("SiteDetail — modules", () => {
     });
 
     renderDetail({ site: site() });
+    fireEvent.click(screen.getByRole("tab", { name: "Modules" }));
 
     expect(
       await screen.findByText(/module assignments could not be loaded/i),
@@ -387,11 +400,11 @@ describe("SiteDetail — primary domain", () => {
     });
 
     renderDetail({ site: site() });
+    fireEvent.click(screen.getByRole("tab", { name: "Domains" }));
 
-    // The hostname appears in the hero profile and in the Domains panel.
-    expect(
-      (await screen.findAllByText("www.uog.edu.et")).length,
-    ).toBeGreaterThanOrEqual(2);
+    await waitFor(() => {
+      expect(screen.getAllByText("www.uog.edu.et").length).toBeGreaterThanOrEqual(2);
+    });
     // Shown in the hero profile, not only in the Domains panel below.
     expect(screen.getByText("Primary domain")).toBeTruthy();
     expect(

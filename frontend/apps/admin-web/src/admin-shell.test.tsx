@@ -1,8 +1,25 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+beforeEach(() => {
+  vi.stubGlobal("fetch", vi.fn(async () => ({
+    ok: true,
+    json: async () => ({
+      platformPermissions: ["platform.dashboard.view", "platform.organizations.view", "sites.view"],
+      sites: [],
+      sitesError: null,
+      site: null,
+    }),
+  })));
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 vi.mock("next/navigation", () => ({
   usePathname: () => "/",
+  useRouter: () => ({ push: vi.fn() }),
 }));
 
 vi.mock("next/link", () => ({
@@ -72,7 +89,7 @@ describe("AdminShell", () => {
     expect(
       drawer.getByRole("navigation", { name: "Admin sections" }),
     ).toBeTruthy();
-    expect(drawer.getByRole("link", { name: /Organizations/ })).toBeTruthy();
+    expect(await drawer.findByRole("link", { name: /Organizations/ })).toBeTruthy();
     expect(
       // The toggle lives in the app root, which the open Modal aria-hides.
       screen

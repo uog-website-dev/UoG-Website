@@ -1,0 +1,34 @@
+{
+  "run": "qawsac6faeae",
+  "build": "e42a429d15891ded6710bb7d5739092ae7bdb76c+module-management-audit",
+  "date": "2026-11-04T20:54:36.004Z",
+  "results": [
+    {
+      "id": "registry",
+      "status": "PASS"
+    },
+    {
+      "id": "selection-preview",
+      "status": "PASS"
+    },
+    {
+      "id": "responsive-keyboard-desktop",
+      "status": "FAIL",
+      "error": "AssertionError"
+    },
+    {
+      "id": "responsive-keyboard-tablet",
+      "status": "FAIL",
+      "error": "AssertionError"
+    },
+    {
+      "id": "responsive-keyboard-mobile",
+      "status": "FAIL",
+      "error": "AssertionError"
+    },
+    {
+      "id": "site-admin-denied",
+      "status": "PASS"
+    }
+  ]
+}

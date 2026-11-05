@@ -1,0 +1,10 @@
+backend running healthy
+frontend-admin running healthy
+frontend-public running healthy
+keycloak running healthy
+keycloak-db running healthy
+minio running healthy
+nginx running healthy
+postgres running healthy
+redis-broker running healthy
+redis-cache running healthy

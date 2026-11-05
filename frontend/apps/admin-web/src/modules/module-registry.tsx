@@ -1,25 +1,27 @@
 "use client";
 
 /**
- * Platform module registry: the read-only catalogue of capabilities.
+ * Platform module registry: the catalogue of capabilities and where they run.
  *
- * Reads go through the `listPlatformModules` server action, so the Keycloak
- * access token stays server-side. This screen is deliberately read-only —
- * enable/disable happens per Site on `/sites/{id}/modules`, because a
- * registry row only says a capability *exists as a record*, never that it
- * works or that any particular site runs it.
+ * Three separate facts are shown per module and never merged:
+ *   - implementation status (Available, Planned, Deprecated, Implemented
+ *     but disabled), from the registry plus the shipped implementation list;
+ *   - platform availability, the global switch;
+ *   - Site activation, counted from SiteModule rows by the backend.
  *
- * Availability is spelled out for every state: only an IMPLEMENTED module
- * that is switched on platform-wide can be enabled for a site (and the
- * backend still re-checks the capability is shipped); PLANNED modules —
- * including the seeded CMS, staff directory and events rows — cannot be
- * enabled anywhere, and saying so is the whole point of this screen.
+ * Reads go through server actions, so the Keycloak access token stays
+ * server-side. Registry rows are edited on the backend only; enabling a
+ * module for Sites happens on the Site modules tab.
  */
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import {
@@ -34,15 +36,15 @@ import { SITES_PAGE_SIZE } from "@uog/api-client";
 import type { PaginatedResponse, PlatformModule } from "@uog/types";
 import type { TableColumn } from "@uog/ui";
 
+import { listModuleActivationSummary } from "@/app/modules/actions";
 import { listPlatformModules } from "@/app/sites/actions";
+import { implementationLabel } from "@/modules/bulk-contract";
+import type { ImplementationStatus, ModuleActivationSummary } from "@/modules/bulk-contract";
 import { unwrap } from "@/organizations/contract";
 import {
   MODULE_STATUS_OPTIONS,
   availabilityMessage,
-  isModuleAvailable,
-  moduleAvailabilityChip,
   moduleSchemaProperties,
-  moduleStatusChip,
 } from "@/modules/validation";
 
 interface Filters {
@@ -50,10 +52,18 @@ interface Filters {
   status: string;
 }
 
-export function ModuleRegistry() {
+/** Without the summary (e.g. it failed to load) derive what the row alone says. */
+function fallbackImplementation(module: PlatformModule): ImplementationStatus {
+  if (module.status === "PLANNED") return "PLANNED";
+  if (module.status === "DEPRECATED") return "DEPRECATED";
+  return module.is_enabled ? "AVAILABLE" : "IMPLEMENTED_DISABLED";
+}
+
+export function ModuleRegistry({ refreshKey = 0 }: { refreshKey?: number } = {}) {
   const [filters, setFilters] = useState<Filters>({ search: "", status: "" });
   const [draft, setDraft] = useState<Filters>({ search: "", status: "" });
   const [page, setPage] = useState(1);
+  const [details, setDetails] = useState<PlatformModule | null>(null);
 
   const registry = useAsync<PaginatedResponse<PlatformModule>>(
     async () =>
@@ -68,11 +78,21 @@ export function ModuleRegistry() {
       ),
     [filters.search, filters.status, page],
   );
+  const summary = useAsync<ModuleActivationSummary[]>(
+    async () => unwrap(await listModuleActivationSummary()),
+    [refreshKey],
+  );
+  const byCode = useMemo(
+    () => new Map((summary.data ?? []).map((row) => [row.code, row])),
+    [summary.data],
+  );
 
   const activeCount =
     (filters.search ? 1 : 0) + (filters.status ? 1 : 0);
   const modules = registry.data?.results ?? [];
   const filtered = activeCount > 0;
+  const count = (value: number | undefined) =>
+    summary.loading ? "…" : value === undefined ? "—" : String(value);
 
   const columns: TableColumn<PlatformModule>[] = [
     {
@@ -87,59 +107,90 @@ export function ModuleRegistry() {
     { field: "name", header: "Name", render: (row) => row.name },
     {
       field: "status",
-      header: "Registry status",
+      header: "Status",
       render: (row) => {
-        const chip = moduleStatusChip(row);
-        return (
-          <Chip size="small" variant="outlined" color={chip.color} label={chip.label} />
+        const chip = implementationLabel(
+          byCode.get(row.code)?.implementation_status ?? fallbackImplementation(row),
         );
-      },
-    },
-    {
-      field: "availability",
-      header: "For sites",
-      render: (row) => {
-        const chip = moduleAvailabilityChip(row);
-        return (
-          <Chip size="small" variant="filled" color={chip.color} label={chip.label} />
-        );
+        return <Chip size="small" variant="outlined" color={chip.color} label={chip.label} />;
       },
     },
     {
       field: "is_enabled",
-      header: "Platform switch",
-      render: (row) => (row.is_enabled ? "On" : "Off"),
+      header: "Platform availability",
+      render: (row) => (
+        <Chip
+          size="small"
+          variant={row.is_enabled ? "filled" : "outlined"}
+          color={row.is_enabled ? "success" : "default"}
+          label={row.is_enabled ? "On" : "Off"}
+        />
+      ),
     },
     {
-      field: "settings",
-      header: "Settings",
+      field: "enabled_sites",
+      header: "Sites enabled",
+      align: "right",
+      render: (row) => count(byCode.get(row.code)?.enabled_sites),
+    },
+    {
+      field: "eligible_sites",
+      header: "Eligible Sites",
+      align: "right",
+      render: (row) => count(byCode.get(row.code)?.eligible_sites),
+    },
+    {
+      field: "requires",
+      header: "Depends on",
       render: (row) => {
-        const properties = moduleSchemaProperties(row);
-        if (properties === null) return "Schema unapproved";
-        return properties.length === 0
-          ? "None"
-          : `${properties.length} propert${properties.length === 1 ? "y" : "ies"}`;
+        const requires = byCode.get(row.code)?.requires;
+        if (!requires) return count(undefined);
+        return requires.length === 0 ? "None" : requires.join(", ");
       },
     },
+    {
+      field: "description",
+      header: "Description",
+      render: (row) => (
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ maxWidth: 320, whiteSpace: "normal" }}
+        >
+          {row.description || "—"}
+        </Typography>
+      ),
+    },
   ];
+
+  const detailSummary = details ? byCode.get(details.code) : undefined;
+  const detailProperties = details ? moduleSchemaProperties(details) : null;
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
       <Alert severity="info" variant="outlined">
         <Typography variant="body2" sx={{ fontWeight: 700 }}>
-          A registry row is a capability announcement, not a working feature.
+          Implementation, platform availability and Site activation are separate.
         </Typography>
         <Typography variant="body2">
-          <strong>Available</strong> = implemented and switched on
-          platform-wide, so a site may enable it (the server still verifies
-          the capability is shipped). <strong>Planned</strong> = registered
-          but not implemented — it cannot be enabled on any site.{" "}
-          <strong>Deprecated</strong> = retired, not newly enableable.
-          Implemented-but-off rows cannot be enabled until the platform switch
-          is on. The switch and statuses are managed on the backend; this
-          console only reads them.
+          <strong>Available</strong> means implemented, shipped and switched
+          on platform-wide, so Sites may enable it. <strong>Planned</strong>{" "}
+          modules are registered but not implemented and cannot be enabled
+          anywhere. <strong>Deprecated</strong> modules cannot be newly
+          enabled. <strong>Implemented but disabled</strong> modules wait for
+          the platform switch. Statuses and the switch are managed on the
+          backend; Site activation is managed on the Site modules tab.
         </Typography>
       </Alert>
+
+      {summary.error ? (
+        <Alert
+          severity="warning"
+          action={<Button color="inherit" size="small" onClick={() => summary.reload()}>Retry</Button>}
+        >
+          Site counts and dependencies could not be loaded. {summary.error.message}
+        </Alert>
+      ) : null}
 
       <FilterBar
         label="Module filters"
@@ -159,11 +210,11 @@ export function ModuleRegistry() {
           label="Search"
           value={draft.search}
           onChange={(value) => setDraft((previous) => ({ ...previous, search: value }))}
-          placeholder="CMS, analytics…"
+          placeholder="Posts, menus…"
           hint="Name or code substring."
         />
         <SelectFilter
-          label="Status"
+          label="Registry status"
           value={draft.status}
           options={MODULE_STATUS_OPTIONS.filter((option) => option.value !== "").map(
             (option) => ({ value: option.value as string, label: option.label }),
@@ -176,74 +227,66 @@ export function ModuleRegistry() {
 
       <Paper variant="outlined" sx={{ overflow: "hidden", borderRadius: 3 }}>
         <Box sx={{ px: { xs: 2, sm: 3 }, py: 2 }}>
-          <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+          <Typography variant="subtitle1" component="h2" sx={{ fontWeight: 700 }}>
             Registered capabilities
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            The platform module registry exactly as the API reports it. To
-            enable or disable a module for a specific site, open that
-            site&apos;s Modules screen.
+            The platform module registry as the API reports it, with how many
+            Sites run each module and how many could.
           </Typography>
         </Box>
-        <DataTable
-          caption="Platform module registry"
-          columns={columns}
-          rows={modules}
-          getRowKey={(row) => row.id}
-          loading={registry.loading}
-          error={registry.error}
-          onRetry={() => registry.reload()}
-          emptyState={
-            filtered ? (
-              <Box
-                sx={{
-                  display: "grid",
-                  justifyItems: "center",
-                  gap: 1.5,
-                  py: 6,
-                  px: 3,
-                  textAlign: "center",
-                }}
+        <Box sx={{ overflowX: "auto" }}>
+          <DataTable
+            caption="Platform module registry"
+            columns={columns}
+            rows={modules}
+            getRowKey={(row) => row.id}
+            loading={registry.loading}
+            error={registry.error}
+            onRetry={() => registry.reload()}
+            renderActions={(row) => (
+              <Button
+                size="small"
+                onClick={() => setDetails(row)}
+                aria-label={`Details for ${row.code}`}
               >
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  No modules match these filters
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Clear the filters to see the whole registry.
-                </Typography>
-                <Button
-                  variant="outlined"
-                  onClick={() => {
-                    setDraft({ search: "", status: "" });
-                    setFilters({ search: "", status: "" });
-                    setPage(1);
-                  }}
-                >
-                  Clear filters
-                </Button>
-              </Box>
-            ) : (
-              <Box
-                sx={{
-                  display: "grid",
-                  justifyItems: "center",
-                  gap: 1.5,
-                  py: 6,
-                  px: 3,
-                  textAlign: "center",
-                }}
-              >
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  No modules registered
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  The platform module registry is empty, so no capability can
-                  be enabled on any site.
-                </Typography>
-              </Box>
-            )
-          }
-        />
+                Details
+              </Button>
+            )}
+            emptyState={
+              filtered ? (
+                <Box sx={{ display: "grid", justifyItems: "center", gap: 1.5, py: 6, px: 3, textAlign: "center" }}>
+                  <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                    No modules match these filters
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Clear the filters to see the whole registry.
+                  </Typography>
+                  <Button
+                    variant="outlined"
+                    onClick={() => {
+                      setDraft({ search: "", status: "" });
+                      setFilters({ search: "", status: "" });
+                      setPage(1);
+                    }}
+                  >
+                    Clear filters
+                  </Button>
+                </Box>
+              ) : (
+                <Box sx={{ display: "grid", justifyItems: "center", gap: 1.5, py: 6, px: 3, textAlign: "center" }}>
+                  <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                    No modules registered
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    The platform module registry is empty, so no capability can
+                    be enabled on any site.
+                  </Typography>
+                </Box>
+              )
+            }
+          />
+        </Box>
         {registry.data && registry.data.count > modules.length ? (
           <Pagination
             page={page}
@@ -255,29 +298,56 @@ export function ModuleRegistry() {
         ) : null}
       </Paper>
 
-      {modules.length > 0 ? (
-        <Paper variant="outlined" sx={{ borderRadius: 3, p: { xs: 2, sm: 3 } }}>
-          <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>
-            Availability detail
-          </Typography>
-          <Box
-            component="ul"
-            sx={{ m: 0, pl: 2, display: "flex", flexDirection: "column", gap: 0.75 }}
-          >
-            {modules.map((module) => (
-              <li key={module.id}>
-                <Typography variant="body2" color="text.secondary">
-                  <Box component="span" sx={{ fontFamily: "monospace", fontWeight: 700 }}>
-                    {module.code}
-                  </Box>
-                  {": "}
-                  {availabilityMessage(module)}
-                </Typography>
-              </li>
-            ))}
-          </Box>
-        </Paper>
-      ) : null}
+      <Dialog open={details !== null} onClose={() => setDetails(null)} fullWidth maxWidth="sm" aria-labelledby="module-details-title">
+        {details ? (
+          <>
+            <DialogTitle id="module-details-title">
+              {details.name}{" "}
+              <Box component="span" sx={{ fontFamily: "monospace", color: "text.secondary", fontSize: "0.9em" }}>
+                {details.code}
+              </Box>
+            </DialogTitle>
+            <DialogContent dividers>
+              <Box component="dl" sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "180px 1fr" }, columnGap: 2, rowGap: 1, m: 0, "& dt": { fontWeight: 700 }, "& dd": { m: 0 } }}>
+                <dt>Status</dt>
+                <dd>{implementationLabel(detailSummary?.implementation_status ?? fallbackImplementation(details)).label}</dd>
+                <dt>Registry status</dt>
+                <dd>{details.status}</dd>
+                <dt>Shipped in this deployment</dt>
+                <dd>{detailSummary ? (detailSummary.is_shipped ? "Yes" : "No") : "—"}</dd>
+                <dt>Platform availability</dt>
+                <dd>{details.is_enabled ? "On" : "Off"}</dd>
+                <dt>Sites enabled</dt>
+                <dd>{detailSummary ? `${detailSummary.enabled_sites} of ${detailSummary.total_sites}` : "—"}</dd>
+                <dt>Sites with it turned off</dt>
+                <dd>{detailSummary ? detailSummary.disabled_sites : "—"}</dd>
+                <dt>Eligible Sites</dt>
+                <dd>{detailSummary ? detailSummary.eligible_sites : "—"}</dd>
+                <dt>Depends on</dt>
+                <dd>{detailSummary ? detailSummary.requires.join(", ") || "None" : "—"}</dd>
+                <dt>Required by</dt>
+                <dd>{detailSummary ? detailSummary.required_by.join(", ") || "None" : "—"}</dd>
+                <dt>Site settings</dt>
+                <dd>
+                  {detailProperties === null
+                    ? "Schema unapproved"
+                    : detailProperties.length === 0
+                      ? "None"
+                      : detailProperties.map((property) => `${property.label}${property.required ? " (required)" : ""}`).join(", ")}
+                </dd>
+                <dt>Description</dt>
+                <dd>{details.description || "—"}</dd>
+              </Box>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                {availabilityMessage(details)}
+              </Typography>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setDetails(null)}>Close</Button>
+            </DialogActions>
+          </>
+        ) : null}
+      </Dialog>
     </Box>
   );
 }

@@ -8,6 +8,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/auth", () => ({
   auth: vi.fn(),
+  siteOrigin: "http://localhost",
+}));
+
+vi.mock("@/access-token", () => ({
+  getAccessToken: vi.fn(async () => "access-token"),
 }));
 
 vi.mock("@/app/actions", () => ({
@@ -15,6 +20,17 @@ vi.mock("@/app/actions", () => ({
   signOutFromSite: vi.fn(),
 }));
 
+const redirect = vi.fn((url: string) => {
+  throw new Error(`REDIRECT ${url}`);
+});
+
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/",
+  useRouter: () => ({ push: vi.fn() }),
+  redirect: (url: string) => redirect(url),
+}));
+
+import { getAccessToken } from "@/access-token";
 import { auth } from "@/auth";
 
 import AdminLayout from "./layout";
@@ -51,6 +67,13 @@ describe("admin session gate", () => {
     expect(html).toContain("devuser@uog.et");
     expect(html).toContain("Sign out");
     expect(html).not.toContain("Sign in required");
+  });
+
+  it("sends an expired session to sign out and sign in again instead of rendering the console", async () => {
+    vi.mocked(getAccessToken).mockResolvedValueOnce(null);
+    await expect(renderLayout({ user: { email: "devuser@uog.et" } })).rejects.toThrow(
+      "REDIRECT http://localhost/admin/api/session/expired",
+    );
   });
 
   it("falls back to the session name when no email claim is present", async () => {

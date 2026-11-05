@@ -53,7 +53,10 @@ def test_template_relationship_is_a_nullable_provenance_link():
     field = Site._meta.get_field("template")
     assert field.null and field.blank
     assert field.remote_field.on_delete is django_models.PROTECT
-    assert {model.__name__ for model in apps.get_app_config("sites").get_models()} == {"Module", "Site", "SiteDomain", "SiteModule", "SiteTemplate"}
+    assert {model.__name__ for model in apps.get_app_config("sites").get_models()} == {
+        "Module", "ModuleDependency", "Site", "SiteDomain", "SiteModule",
+        "SiteModuleOperation", "SiteModuleOperationChange", "SiteTemplate",
+    }
 
 
 def test_global_code_uniqueness_normalization_and_immutability(site, owners):
