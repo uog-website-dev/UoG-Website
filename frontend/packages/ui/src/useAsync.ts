@@ -46,6 +46,7 @@ export function useAsync<T>(
   const [data, setDataState] = useState<T | null>(null);
   const [error, setError] = useState<ApiError | null>(null);
   const [reloadToken, setReloadToken] = useState(0);
+  const pendingRef = useRef<{ keys: readonly unknown[]; promise: Promise<T> } | null>(null);
 
   const fetcherRef = useRef(fetcher);
   fetcherRef.current = fetcher;
@@ -57,8 +58,21 @@ export function useAsync<T>(
     setStatus("loading");
     setError(null);
 
-    fetcherRef
-      .current()
+    // StrictMode replays mount effects in development. Reuse only this
+    // component's matching in-flight read, never completed data or another
+    // component/user's response. Reloads and changed filters start fresh reads.
+    const keys = [...deps, reloadToken];
+    let pending = pendingRef.current;
+    if (!pending || pending.keys.length !== keys.length || !pending.keys.every((key, index) => Object.is(key, keys[index]))) {
+      let promise: Promise<T>;
+      try { promise = Promise.resolve(fetcherRef.current()); }
+      catch (cause) { promise = Promise.reject(cause); }
+      pending = { keys, promise };
+      pendingRef.current = pending;
+      const clear = () => { if (pendingRef.current?.promise === promise) pendingRef.current = null; };
+      void promise.then(clear, clear);
+    }
+    pending.promise
       .then((result) => {
         if (cancelled) return;
         setDataState(result);

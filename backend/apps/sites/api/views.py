@@ -1,7 +1,7 @@
 """Restricted Site administration API. Production writes await scoped IAM/RBAC."""
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
-from django.db.models import Q
+from django.db.models import Prefetch, Q
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import mixins
 from rest_framework.decorators import action
@@ -15,9 +15,11 @@ from ..models import Module, Site, SiteDomain, SiteModule, SiteTemplate
 from ..services.configuration import apply_site_configuration
 from ..services.domains import activate_domain, deactivate_domain, designate_primary, domain_write
 from ..services.lifecycle import transition_site
+from ..services.module_bulk import activation_summary
 from ..services.modules import disable_module_for_site, enable_module_for_site
 from ..services.registry import registry_write
 from .access import AdministrationViewSet, Conflict, reject_idempotency, translate_domain_errors
+from .module_management import ActivationSummarySerializer
 from .query import (
     LIST_PARAMETERS, DomainQuerySerializer, ModuleQuerySerializer, SiteModuleQuerySerializer,
     SiteQuerySerializer, TemplateQuerySerializer, apply_filters,
@@ -50,7 +52,9 @@ def _list(view, serializer, specs, default):
     partial_update=extend_schema(parameters=[IF_MATCH], description="Requires sites.update in this Site scope and the existing development-only write gate."),
 )
 class SiteViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, AdministrationViewSet):
-    queryset = Site.objects.select_related("organization_unit", "template").order_by("code")
+    queryset = Site.objects.select_related("organization_unit", "template").prefetch_related(
+        Prefetch("domains", queryset=SiteDomain.objects.filter(is_primary=True), to_attr="primary_domain_rows"),
+    ).order_by("code")
     serializer_class = SiteSerializer
 
     def get_queryset(self):
@@ -271,7 +275,8 @@ class SiteModuleViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Admini
         with translate_domain_errors(), registry_write():
             enablement = self.lock(request, self.get_queryset(), SiteModuleSerializer)
             EmptyObjectSerializer(data=request.data).is_valid(raise_exception=True)
-            return self.respond(command(enablement.site_id, enablement.module_id), serializer_class=SiteModuleSerializer)
+            updated = command(enablement.site_id, enablement.module_id)
+            return self.respond(updated, serializer_class=SiteModuleSerializer)
 
     @extend_schema(parameters=[IF_MATCH], request=EMPTY, responses=SiteModuleSerializer, description="Turns a shipped, globally enabled module back on for this Site. The row lock, If-Match check and save commit in one transaction. A planned or globally disabled module stays unavailable.")
     @action(detail=True, methods=["post"])
@@ -337,10 +342,23 @@ class ModuleViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Administra
     permission_by_action = {
         "list": "platform.sites.manage_registry", "retrieve": "platform.sites.manage_registry",
         "create": "platform.sites.manage_registry", "partial_update": "platform.sites.manage_registry",
+        "activation_summary": "platform.sites.manage_registry",
     }
 
     def get_serializer_class(self):
         return ModuleUpdateSerializer if self.action == "partial_update" else ModuleSerializer
+
+    @extend_schema(
+        responses=ActivationSummarySerializer(many=True),
+        description=(
+            "Platform admin only. One row per registry module: implementation status (AVAILABLE, PLANNED, DEPRECATED or "
+            "IMPLEMENTED_DISABLED), platform availability, Sites enabled and disabled, eligible Sites, and dependencies. "
+            "Counts are read from SiteModule; nothing is stored twice."
+        ),
+    )
+    @action(detail=False, methods=["get"], url_path="activation-summary")
+    def activation_summary(self, request):
+        return Response(activation_summary())
 
     def list(self, request, *args, **kwargs):
         return _list(self, ModuleQuerySerializer, (("code", "name", "status", "created_at", "updated_at"), (("code", "code"), ("status", "status"), ("is_enabled", "is_enabled"))), "code")

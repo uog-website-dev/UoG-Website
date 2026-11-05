@@ -1,0 +1,76 @@
+{
+  "samples": [
+    {
+      "pass": 0,
+      "section": "Organizations",
+      "heading_ms": 2026,
+      "rows_ms": 2805,
+      "complete_ms": 2805,
+      "server_action_posts": 2
+    },
+    {
+      "pass": 0,
+      "section": "Sites",
+      "heading_ms": 1158,
+      "rows_ms": 1634,
+      "complete_ms": 1742,
+      "server_action_posts": 2
+    },
+    {
+      "pass": 0,
+      "section": "Domains",
+      "heading_ms": 1428,
+      "rows_ms": 2178,
+      "complete_ms": 2178,
+      "server_action_posts": 2
+    },
+    {
+      "pass": 1,
+      "section": "Organizations",
+      "heading_ms": 1178,
+      "rows_ms": 1588,
+      "complete_ms": 1588,
+      "server_action_posts": 3
+    },
+    {
+      "pass": 1,
+      "section": "Sites",
+      "heading_ms": 594,
+      "rows_ms": 1199,
+      "complete_ms": 1385,
+      "server_action_posts": 2
+    },
+    {
+      "pass": 1,
+      "section": "Domains",
+      "heading_ms": 421,
+      "rows_ms": 1276,
+      "complete_ms": 1276,
+      "server_action_posts": 2
+    },
+    {
+      "pass": 2,
+      "section": "Organizations",
+      "heading_ms": 801,
+      "rows_ms": 1279,
+      "complete_ms": 1279,
+      "server_action_posts": 3
+    },
+    {
+      "pass": 2,
+      "section": "Sites",
+      "heading_ms": 1309,
+      "rows_ms": 1418,
+      "complete_ms": 1540,
+      "server_action_posts": 2
+    },
+    {
+      "pass": 2,
+      "section": "Domains",
+      "heading_ms": 314,
+      "rows_ms": 1103,
+      "complete_ms": 1103,
+      "server_action_posts": 2
+    }
+  ]
+}

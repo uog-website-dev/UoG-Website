@@ -1,0 +1,1220 @@
+[
+  {
+    "path": "/api/me/",
+    "method": "GET",
+    "actor": "qaws7bf27e71-platform",
+    "status": 200,
+    "body": null,
+    "response": {
+      "username": "qaws7bf27e71-platform",
+      "email": "qaws7bf27e71-platform@example.invalid",
+      "name": "QA platform",
+      "roles": [
+        "offline_access",
+        "default-roles-uog",
+        "uma_authorization"
+      ],
+      "is_staff": false,
+      "client_id": "backend-api",
+      "scopes": [
+        "openid",
+        "email",
+        "profile"
+      ],
+      "expires_at": 1793814994
+    },
+    "request_id": "cfd12fd9-d6bc-426a-8e3d-97ca745e6a13"
+  },
+  {
+    "path": "/api/me/",
+    "method": "GET",
+    "actor": "qaws7bf27e71-siteadmin",
+    "status": 200,
+    "body": null,
+    "response": {
+      "username": "qaws7bf27e71-siteadmin",
+      "email": "qaws7bf27e71-siteadmin@example.invalid",
+      "name": "QA siteadmin",
+      "roles": [
+        "offline_access",
+        "default-roles-uog",
+        "uma_authorization"
+      ],
+      "is_staff": false,
+      "client_id": "backend-api",
+      "scopes": [
+        "openid",
+        "email",
+        "profile"
+      ],
+      "expires_at": 1793814994
+    },
+    "request_id": "b98287ba-f430-4dfa-92f4-cca3e10a0564"
+  },
+  {
+    "path": "/api/me/",
+    "method": "GET",
+    "actor": "qaws7bf27e71-reviewer",
+    "status": 200,
+    "body": null,
+    "response": {
+      "username": "qaws7bf27e71-reviewer",
+      "email": "qaws7bf27e71-reviewer@example.invalid",
+      "name": "QA reviewer",
+      "roles": [
+        "offline_access",
+        "default-roles-uog",
+        "uma_authorization"
+      ],
+      "is_staff": false,
+      "client_id": "backend-api",
+      "scopes": [
+        "openid",
+        "email",
+        "profile"
+      ],
+      "expires_at": 1793814995
+    },
+    "request_id": "694c92ce-ddf5-4e5d-9ab0-693c7554b9f1"
+  },
+  {
+    "path": "/api/me/",
+    "method": "GET",
+    "actor": "qaws7bf27e71-publisher",
+    "status": 200,
+    "body": null,
+    "response": {
+      "username": "qaws7bf27e71-publisher",
+      "email": "qaws7bf27e71-publisher@example.invalid",
+      "name": "QA publisher",
+      "roles": [
+        "offline_access",
+        "default-roles-uog",
+        "uma_authorization"
+      ],
+      "is_staff": false,
+      "client_id": "backend-api",
+      "scopes": [
+        "openid",
+        "email",
+        "profile"
+      ],
+      "expires_at": 1793814995
+    },
+    "request_id": "52af7639-dec9-498a-8d90-f00817d94afd"
+  },
+  {
+    "path": "/api/v1/authorization/roles/",
+    "method": "GET",
+    "actor": "devuser",
+    "status": 200,
+    "body": null,
+    "response": {
+      "count": 7,
+      "next": null,
+      "previous": null,
+      "results": [
+        {
+          "id": 4,
+          "code": "editor",
+          "name": "Editor",
+          "description": "Create and edit content; cannot approve or publish.",
+          "is_system": true,
+          "is_active": true,
+          "permissions": [
+            "content.menus.view",
+            "content.pages.create",
+            "content.pages.update",
+            "content.pages.view",
+            "content.posts.create",
+            "content.posts.update",
+            "content.posts.view",
+            "menu.read",
+            "menu.write"
+          ],
+          "created_at": "2026-10-29T17:38:57.302726Z",
+          "updated_at": "2026-11-04T04:44:16.936337Z"
+        },
+        {
+          "id": 2,
+          "code": "organization-administrator",
+          "name": "Organization Administrator",
+          "description": "Organization-scoped administration; does not grant cross-organization authority.",
+          "is_system": true,
+          "is_active": true,
+          "permissions": [
+            "content.menus.manage",
+            "content.menus.view",
+            "content.pages.create",
+            "content.pages.delete",
+            "content.pages.publish",
+            "content.pages.update",
+            "content.pages.view",
+            "content.posts.create",
+            "content.posts.delete",
+            "content.posts.publish",
+            "content.posts.update",
+            "content.posts.view",
+            "menu.publish",
+            "menu.read",
+            "menu.write",
+            "platform.dashboard.view",
+            "platform.organizations.update",
+            "platform.organizations.view",
+            "platform.roles.view",
+            "platform.users.assign_roles",
+            "platform.users.view",
+            "sites.create",
+            "sites.update",
+            "sites.view"
+          ],
+          "created_at": "2026-10-29T17:38:57.271405Z",
+          "updated_at": "2026-11-04T04:44:16.913065Z"
+        },
+        {
+          "id": 1,
+          "code": "platform-administrator",
+          "name": "Platform Administrator",
+          "description": "Narrow platform-wide governance and audit authority.",
+          "is_system": true,
+          "is_active": true,
+          "permissions": [
+            "audit.logs.export",
+            "audit.logs.view",
+            "content.menus.manage",
+            "content.menus.view",
+            "content.pages.create",
+            "content.pages.delete",
+            "content.pages.publish",
+            "content.pages.update",
+            "content.pages.view",
+            "content.posts.create",
+            "content.posts.delete",
+            "content.posts.publish",
+            "content.posts.update",
+            "content.posts.view",
+            "menu.publish",
+            "menu.read",
+            "menu.write",
+            "platform.dashboard.view",
+            "platform.organizations.create",
+            "platform.organizations.update",
+            "platform.organizations.view",
+            "platform.roles.assign_permissions",
+            "platform.roles.create",
+            "platform.roles.update",
+            "platform.roles.view",
+            "platform.sites.manage_registry",
+            "platform.users.assign_roles",
+            "platform.users.view",
+            "sites.create",
+            "sites.update",
+            "sites.view"
+          ],
+          "created_at": "2026-10-29T17:38:57.224653Z",
+          "updated_at": "2026-11-04T04:44:16.890191Z"
+        },
+        {
+          "id": 6,
+          "code": "publisher",
+          "name": "Publisher",
+          "description": "Publish content only where the workflow allows it.",
+          "is_system": true,
+          "is_active": true,
+          "permissions": [
+            "content.pages.publish",
+            "content.pages.view",
+            "content.posts.publish",
+            "content.posts.view",
+            "menu.publish",
+            "menu.read"
+          ],
+          "created_at": "2026-10-29T17:38:57.350815Z",
+          "updated_at": "2026-11-04T04:44:16.965385Z"
+        },
+        {
+          "id": 5,
+          "code": "reviewer",
+          "name": "Reviewer",
+          "description": "Read current content. Approval uses a Site CMS reviewer assignment.",
+          "is_system": true,
+          "is_active": true,
+          "permissions": [
+            "content.pages.view",
+            "content.posts.view",
+            "menu.read"
+          ],
+          "created_at": "2026-10-29T17:38:57.330865Z",
+          "updated_at": "2026-11-04T04:44:16.956632Z"
+        },
+        {
+          "id": 3,
+          "code": "site-administrator",
+          "name": "Site Administrator",
+          "description": "Site-scoped administration; does not grant other-site authority.",
+          "is_system": true,
+          "is_active": true,
+          "permissions": [
+            "content.menus.manage",
+            "content.menus.view",
+            "content.pages.create",
+            "content.pages.delete",
+            "content.pages.publish",
+            "content.pages.update",
+            "content.pages.view",
+            "content.posts.create",
+            "content.posts.delete",
+            "content.posts.publish",
+            "content.posts.update",
+            "content.posts.view",
+            "menu.publish",
+            "menu.read",
+            "menu.write",
+            "platform.dashboard.view",
+            "platform.users.assign_roles",
+            "platform.users.view",
+            "sites.update",
+            "sites.view"
+          ],
+          "created_at": "2026-10-29T17:38:57.287160Z",
+          "updated_at": "2026-11-04T04:44:16.924263Z"
+        },
+        {
+          "id": 7,
+          "code": "viewer",
+          "name": "Viewer",
+          "description": "Read explicitly granted resources only.",
+          "is_system": true,
+          "is_active": true,
+          "permissions": [
+            "content.menus.view",
+            "content.pages.view",
+            "content.posts.view",
+            "menu.read",
+            "platform.dashboard.view",
+            "platform.organizations.view",
+            "platform.roles.view",
+            "platform.users.view",
+            "sites.view"
+          ],
+          "created_at": "2026-10-29T17:38:57.383835Z",
+          "updated_at": "2026-11-04T04:44:16.984473Z"
+        }
+      ]
+    },
+    "request_id": "db217e4a-d51d-41a2-8b09-a1577b4a8014"
+  },
+  {
+    "path": "/api/v1/authorization/assignments/",
+    "method": "POST",
+    "actor": "devuser",
+    "status": 201,
+    "body": {
+      "user": 39,
+      "role": 1,
+      "scope": "PLATFORM"
+    },
+    "response": {
+      "id": 33,
+      "user": 39,
+      "user_name": "qaws7bf27e71-platform",
+      "role": 1,
+      "role_name": "Platform Administrator",
+      "scope": "PLATFORM",
+      "organization": null,
+      "site": null,
+      "assigned_by": 1,
+      "assigned_at": "2026-11-04T17:51:35.469995Z",
+      "expires_at": null,
+      "revoked_at": null,
+      "revoked_by": null
+    },
+    "request_id": "9c40c93e-2465-4714-abc0-24bdcf797af2"
+  },
+  {
+    "path": "/api/v1/sites/12/",
+    "method": "GET",
+    "actor": "qaws7bf27e71-platform",
+    "status": 200,
+    "body": null,
+    "response": {
+      "id": 12,
+      "code": "QA6A1A06AA_0",
+      "name": "QA University qa6a1a06aa",
+      "short_name": "",
+      "organization_unit": 5,
+      "default_language": "en-us",
+      "status": "ACTIVE",
+      "is_main": false,
+      "template": 5,
+      "configuration": {
+        "behavior": {
+          "show_search": false,
+          "show_language_switcher": false
+        },
+        "identity": {
+          "logo_ref": null,
+          "favicon_ref": null,
+          "display_name": "QA University qa6a1a06aa"
+        },
+        "language": {
+          "enabled": [
+            "en-us"
+          ]
+        },
+        "navigation": {
+          "items": []
+        },
+        "presentation": {
+          "theme": "institutional"
+        },
+        "schema_version": 1
+      },
+      "created_at": "2026-11-04T04:03:44.769794Z",
+      "updated_at": "2026-11-04T04:03:45.278785Z"
+    },
+    "request_id": "cf02966b-4030-4dc2-9b16-51d1b029a9ac"
+  },
+  {
+    "path": "/api/v1/sites/13/",
+    "method": "GET",
+    "actor": "qaws7bf27e71-platform",
+    "status": 200,
+    "body": null,
+    "response": {
+      "id": 13,
+      "code": "QA6A1A06AA_1",
+      "name": "QA College qa6a1a06aa",
+      "short_name": "",
+      "organization_unit": 17,
+      "default_language": "en-us",
+      "status": "ACTIVE",
+      "is_main": false,
+      "template": 5,
+      "configuration": {
+        "behavior": {
+          "show_search": false,
+          "show_language_switcher": false
+        },
+        "identity": {
+          "logo_ref": null,
+          "favicon_ref": null,
+          "display_name": "QA College qa6a1a06aa"
+        },
+        "language": {
+          "enabled": [
+            "en-us"
+          ]
+        },
+        "navigation": {
+          "items": []
+        },
+        "presentation": {
+          "theme": "high-contrast"
+        },
+        "schema_version": 1
+      },
+      "created_at": "2026-11-04T04:03:45.926568Z",
+      "updated_at": "2026-11-04T04:03:46.461000Z"
+    },
+    "request_id": "ffca876c-8cf6-4afa-b3e7-9ae68d62359f"
+  },
+  {
+    "path": "/api/v1/authorization/assignments/",
+    "method": "POST",
+    "actor": "qaws7bf27e71-platform",
+    "status": 201,
+    "body": {
+      "user": 40,
+      "role": 3,
+      "scope": "SITE",
+      "site": 12,
+      "organization": 5
+    },
+    "response": {
+      "id": 34,
+      "user": 40,
+      "user_name": "qaws7bf27e71-siteadmin",
+      "role": 3,
+      "role_name": "Site Administrator",
+      "scope": "SITE",
+      "organization": 5,
+      "site": 12,
+      "assigned_by": 39,
+      "assigned_at": "2026-11-04T17:51:35.743654Z",
+      "expires_at": null,
+      "revoked_at": null,
+      "revoked_by": null
+    },
+    "request_id": "d9018bd6-1b3f-4330-86fa-e30254d501b3"
+  },
+  {
+    "path": "/api/v1/cms/sites/12/content-roles/",
+    "method": "POST",
+    "actor": "qaws7bf27e71-platform",
+    "status": 201,
+    "body": {
+      "user_id": 40,
+      "role": "AUTHOR"
+    },
+    "response": {
+      "id": 29,
+      "site": 12,
+      "user_id": 40,
+      "role": "AUTHOR",
+      "created_at": "2026-11-04T17:51:35.865704Z"
+    },
+    "request_id": "f19cc4c1-1b1b-4412-9522-08ad90bbc326"
+  },
+  {
+    "path": "/api/v1/authorization/assignments/",
+    "method": "POST",
+    "actor": "qaws7bf27e71-platform",
+    "status": 201,
+    "body": {
+      "user": 41,
+      "role": 5,
+      "scope": "SITE",
+      "site": 12,
+      "organization": 5
+    },
+    "response": {
+      "id": 35,
+      "user": 41,
+      "user_name": "qaws7bf27e71-reviewer",
+      "role": 5,
+      "role_name": "Reviewer",
+      "scope": "SITE",
+      "organization": 5,
+      "site": 12,
+      "assigned_by": 39,
+      "assigned_at": "2026-11-04T17:51:35.904895Z",
+      "expires_at": null,
+      "revoked_at": null,
+      "revoked_by": null
+    },
+    "request_id": "0aac4af0-c59e-4a31-9582-c28c1fffc986"
+  },
+  {
+    "path": "/api/v1/cms/sites/12/content-roles/",
+    "method": "POST",
+    "actor": "qaws7bf27e71-platform",
+    "status": 201,
+    "body": {
+      "user_id": 41,
+      "role": "REVIEWER"
+    },
+    "response": {
+      "id": 30,
+      "site": 12,
+      "user_id": 41,
+      "role": "REVIEWER",
+      "created_at": "2026-11-04T17:51:35.982578Z"
+    },
+    "request_id": "96353114-5a8b-4541-8dbf-eb6db0654b05"
+  },
+  {
+    "path": "/api/v1/authorization/assignments/",
+    "method": "POST",
+    "actor": "qaws7bf27e71-platform",
+    "status": 201,
+    "body": {
+      "user": 42,
+      "role": 6,
+      "scope": "SITE",
+      "site": 12,
+      "organization": 5
+    },
+    "response": {
+      "id": 36,
+      "user": 42,
+      "user_name": "qaws7bf27e71-publisher",
+      "role": 6,
+      "role_name": "Publisher",
+      "scope": "SITE",
+      "organization": 5,
+      "site": 12,
+      "assigned_by": 39,
+      "assigned_at": "2026-11-04T17:51:36.096641Z",
+      "expires_at": null,
+      "revoked_at": null,
+      "revoked_by": null
+    },
+    "request_id": "ca8f5a7f-29fb-42ce-88ce-a2c2810f318e"
+  },
+  {
+    "path": "/api/v1/cms/sites/12/content-roles/",
+    "method": "POST",
+    "actor": "qaws7bf27e71-platform",
+    "status": 201,
+    "body": {
+      "user_id": 42,
+      "role": "PUBLISHER"
+    },
+    "response": {
+      "id": 31,
+      "site": 12,
+      "user_id": 42,
+      "role": "PUBLISHER",
+      "created_at": "2026-11-04T17:51:36.198489Z"
+    },
+    "request_id": "3ec03707-b959-4638-8737-c8233d83f87f"
+  },
+  {
+    "path": "/api/v1/sites/12/modules/",
+    "method": "GET",
+    "actor": "qaws7bf27e71-siteadmin",
+    "status": 200,
+    "body": null,
+    "response": {
+      "count": 3,
+      "next": null,
+      "previous": null,
+      "results": [
+        {
+          "id": 27,
+          "site": 12,
+          "module": 10,
+          "module_code": "PAGES",
+          "is_enabled": true,
+          "is_available": true,
+          "configuration": {},
+          "created_at": "2026-11-04T04:03:47.859951Z",
+          "updated_at": "2026-11-04T04:04:34.134729Z"
+        },
+        {
+          "id": 29,
+          "site": 12,
+          "module": 11,
+          "module_code": "POSTS",
+          "is_enabled": true,
+          "is_available": false,
+          "configuration": {},
+          "created_at": "2026-11-04T04:03:48.582836Z",
+          "updated_at": "2026-11-04T04:04:34.695570Z"
+        },
+        {
+          "id": 31,
+          "site": 12,
+          "module": 12,
+          "module_code": "MENUS",
+          "is_enabled": true,
+          "is_available": true,
+          "configuration": {},
+          "created_at": "2026-11-04T04:03:49.002665Z",
+          "updated_at": "2026-11-04T04:07:30.671223Z"
+        }
+      ]
+    },
+    "request_id": "0e21be12-605e-4efb-bffc-0b2acad14338"
+  },
+  {
+    "path": "/api/v1/sites/12/pages/?status=DRAFT&page_size=1",
+    "method": "GET",
+    "actor": "qaws7bf27e71-siteadmin",
+    "status": 200,
+    "body": null,
+    "response": {
+      "count": 1,
+      "next": null,
+      "previous": null,
+      "results": [
+        {
+          "id": "002491b6-759a-47b5-a249-39b40923a55b",
+          "site": 12,
+          "parent": null,
+          "locale": "en-us",
+          "title": "QA sanitization",
+          "slug": "qa-sanitize",
+          "path": "/qa-sanitize",
+          "layout": "",
+          "seo": {},
+          "visibility": "PUBLIC",
+          "position": 0,
+          "is_homepage": false,
+          "status": "DRAFT",
+          "published_at": null,
+          "blocks": [
+            {
+              "html": "<p>Safe QA text</p>",
+              "type": "paragraph"
+            }
+          ],
+          "blocks_version": "1",
+          "revision_number": 1,
+          "draft_of": null,
+          "created_by": 33,
+          "updated_by": 33,
+          "submitted_by": null,
+          "reviewed_by": null,
+          "review_comment": "",
+          "metadata": {},
+          "created_at": "2026-11-04T04:04:05.635177Z",
+          "updated_at": "2026-11-04T04:04:05.635194Z",
+          "available_actions": [
+            "submit"
+          ]
+        }
+      ]
+    },
+    "request_id": "26db18fb-3add-411c-b037-f4969b42579a"
+  },
+  {
+    "path": "/api/v1/sites/12/pages/?status=IN_REVIEW&page_size=1",
+    "method": "GET",
+    "actor": "qaws7bf27e71-siteadmin",
+    "status": 200,
+    "body": null,
+    "response": {
+      "count": 0,
+      "next": null,
+      "previous": null,
+      "results": []
+    },
+    "request_id": "cb2c0239-cc4f-4a44-a28e-ab8a2c0abe4d"
+  },
+  {
+    "path": "/api/v1/sites/12/pages/?status=APPROVED&page_size=1",
+    "method": "GET",
+    "actor": "qaws7bf27e71-siteadmin",
+    "status": 200,
+    "body": null,
+    "response": {
+      "count": 0,
+      "next": null,
+      "previous": null,
+      "results": []
+    },
+    "request_id": "bb41af2f-4537-45f1-9b26-d5fea58c5de0"
+  },
+  {
+    "path": "/api/v1/sites/12/pages/?status=PUBLISHED&page_size=1",
+    "method": "GET",
+    "actor": "qaws7bf27e71-siteadmin",
+    "status": 200,
+    "body": null,
+    "response": {
+      "count": 1,
+      "next": null,
+      "previous": null,
+      "results": [
+        {
+          "id": "b51901a6-2715-439a-91bd-151e7ff04ed4",
+          "site": 12,
+          "parent": null,
+          "locale": "en-us",
+          "title": "QA revised qa6a1a06aa",
+          "slug": "qa-home",
+          "path": "/qa-home",
+          "layout": "",
+          "seo": {
+            "meta_title": "QA Published Main qa6a1a06aa"
+          },
+          "visibility": "PUBLIC",
+          "position": 0,
+          "is_homepage": false,
+          "status": "PUBLISHED",
+          "published_at": "2026-11-04T04:03:55.557697Z",
+          "blocks": [
+            {
+              "html": "<p>QA MAIN PUBLIC MARKER qa6a1a06aa</p>",
+              "type": "paragraph"
+            }
+          ],
+          "blocks_version": "1",
+          "revision_number": 6,
+          "draft_of": null,
+          "created_by": 33,
+          "updated_by": 35,
+          "submitted_by": 33,
+          "reviewed_by": 34,
+          "review_comment": "",
+          "metadata": {},
+          "created_at": "2026-11-04T04:03:53.675226Z",
+          "updated_at": "2026-11-04T04:04:04.334746Z",
+          "available_actions": []
+        }
+      ]
+    },
+    "request_id": "80e7896a-635e-4b1a-8477-7df7200a6d3a"
+  },
+  {
+    "path": "/api/v1/sites/12/pages/?status=UNPUBLISHED&page_size=1",
+    "method": "GET",
+    "actor": "qaws7bf27e71-siteadmin",
+    "status": 200,
+    "body": null,
+    "response": {
+      "count": 0,
+      "next": null,
+      "previous": null,
+      "results": []
+    },
+    "request_id": "260dbb37-f3d3-45fc-a91c-3718e439ca0d"
+  },
+  {
+    "path": "/api/v1/sites/12/pages/?status=ARCHIVED&page_size=1",
+    "method": "GET",
+    "actor": "qaws7bf27e71-siteadmin",
+    "status": 200,
+    "body": null,
+    "response": {
+      "count": 1,
+      "next": null,
+      "previous": null,
+      "results": [
+        {
+          "id": "6c148338-92e9-431a-be35-468a95bcb053",
+          "site": 12,
+          "parent": null,
+          "locale": "en-us",
+          "title": "QA revised qa6a1a06aa",
+          "slug": "wip-fb094326688e",
+          "path": "/wip-fb094326688e",
+          "layout": "",
+          "seo": {
+            "meta_title": "QA Published Main qa6a1a06aa"
+          },
+          "visibility": "PUBLIC",
+          "position": 0,
+          "is_homepage": false,
+          "status": "ARCHIVED",
+          "published_at": null,
+          "blocks": [
+            {
+              "html": "<p>QA MAIN PUBLIC MARKER qa6a1a06aa</p>",
+              "type": "paragraph"
+            }
+          ],
+          "blocks_version": "1",
+          "revision_number": 5,
+          "draft_of": "b51901a6-2715-439a-91bd-151e7ff04ed4",
+          "created_by": 33,
+          "updated_by": 35,
+          "submitted_by": 33,
+          "reviewed_by": 34,
+          "review_comment": "",
+          "metadata": {},
+          "created_at": "2026-11-04T04:04:03.038873Z",
+          "updated_at": "2026-11-04T04:04:04.455245Z",
+          "available_actions": []
+        }
+      ]
+    },
+    "request_id": "c17324bc-0bfe-4bfc-958b-d752db82fa48"
+  },
+  {
+    "path": "/api/v1/sites/12/menus/",
+    "method": "GET",
+    "actor": "qaws7bf27e71-siteadmin",
+    "status": 200,
+    "body": null,
+    "response": {
+      "count": 2,
+      "next": null,
+      "previous": null,
+      "results": [
+        {
+          "id": "07b91b8e-4e10-4cd0-bd00-a91b15b4b8fa",
+          "site": 12,
+          "location": "footer",
+          "name": "QA Inactive Footer",
+          "is_active": false,
+          "is_global": false,
+          "version": 1,
+          "created_at": "2026-11-04T04:04:29.948269Z",
+          "updated_at": "2026-11-04T04:04:29.948298Z"
+        },
+        {
+          "id": "67d9ce36-1ac8-4894-8e52-99634da7ed30",
+          "site": 12,
+          "location": "header",
+          "name": "QA Header",
+          "is_active": true,
+          "is_global": false,
+          "version": 11,
+          "created_at": "2026-11-04T04:03:59.970823Z",
+          "updated_at": "2026-11-04T04:06:53.157781Z"
+        }
+      ]
+    },
+    "request_id": "8edd2dd5-c2e8-4843-8861-2402a1389b5d"
+  },
+  {
+    "path": "/api/v1/sites/12/menus/07b91b8e-4e10-4cd0-bd00-a91b15b4b8fa/tree/",
+    "method": "GET",
+    "actor": "qaws7bf27e71-siteadmin",
+    "status": 200,
+    "body": null,
+    "response": {
+      "menu": {
+        "id": "07b91b8e-4e10-4cd0-bd00-a91b15b4b8fa",
+        "site": 12,
+        "location": "footer",
+        "name": "QA Inactive Footer",
+        "is_active": false,
+        "is_global": false,
+        "version": 1,
+        "created_at": "2026-11-04T04:04:29.948269Z",
+        "updated_at": "2026-11-04T04:04:29.948298Z"
+      },
+      "include_inactive": true,
+      "items": []
+    },
+    "request_id": "4d57d7e5-14b1-4c8b-9bf0-2da2ce34a011"
+  },
+  {
+    "path": "/api/v1/sites/12/menus/67d9ce36-1ac8-4894-8e52-99634da7ed30/tree/",
+    "method": "GET",
+    "actor": "qaws7bf27e71-siteadmin",
+    "status": 200,
+    "body": null,
+    "response": {
+      "menu": {
+        "id": "67d9ce36-1ac8-4894-8e52-99634da7ed30",
+        "site": 12,
+        "location": "header",
+        "name": "QA Header",
+        "is_active": true,
+        "is_global": false,
+        "version": 11,
+        "created_at": "2026-11-04T04:03:59.970823Z",
+        "updated_at": "2026-11-04T04:06:53.157781Z"
+      },
+      "include_inactive": true,
+      "items": [
+        {
+          "id": "803d9d0e-7402-417f-b30f-c94753e5930f",
+          "menu": "67d9ce36-1ac8-4894-8e52-99634da7ed30",
+          "site": 12,
+          "label": "QA Draft must be hidden",
+          "item_type": "page",
+          "page": "002491b6-759a-47b5-a249-39b40923a55b",
+          "post": null,
+          "target": "",
+          "parent": null,
+          "sort_order": 0,
+          "is_active": true,
+          "allow_cross_site": false,
+          "created_at": "2026-11-04T04:04:19.340242Z",
+          "updated_at": "2026-11-04T04:04:33.423201Z"
+        },
+        {
+          "id": "4f2bc27d-d804-4d85-9a98-9f926ac75cc9",
+          "menu": "67d9ce36-1ac8-4894-8e52-99634da7ed30",
+          "site": 12,
+          "label": "QA Inactive item",
+          "item_type": "custom",
+          "page": null,
+          "post": null,
+          "target": "/qa-home",
+          "parent": null,
+          "sort_order": 1,
+          "is_active": false,
+          "allow_cross_site": false,
+          "created_at": "2026-11-04T04:04:30.724233Z",
+          "updated_at": "2026-11-04T04:04:33.423203Z"
+        },
+        {
+          "id": "5654fd8f-c8e8-4a36-9d27-f233bfe56db1",
+          "menu": "67d9ce36-1ac8-4894-8e52-99634da7ed30",
+          "site": 12,
+          "label": "QA Home",
+          "item_type": "page",
+          "page": "b51901a6-2715-439a-91bd-151e7ff04ed4",
+          "post": null,
+          "target": "",
+          "parent": null,
+          "sort_order": 2,
+          "is_active": true,
+          "allow_cross_site": false,
+          "created_at": "2026-11-04T04:04:00.389445Z",
+          "updated_at": "2026-11-04T04:04:33.423191Z"
+        },
+        {
+          "id": "1e6f727a-e39a-4b98-82e4-e0fcde7c0f28",
+          "menu": "67d9ce36-1ac8-4894-8e52-99634da7ed30",
+          "site": 12,
+          "label": "QA Child",
+          "item_type": "custom",
+          "page": null,
+          "post": null,
+          "target": "/qa-home",
+          "parent": "5654fd8f-c8e8-4a36-9d27-f233bfe56db1",
+          "sort_order": 0,
+          "is_active": true,
+          "allow_cross_site": false,
+          "created_at": "2026-11-04T04:04:00.840549Z",
+          "updated_at": "2026-11-04T04:04:00.840568Z"
+        }
+      ]
+    },
+    "request_id": "8116380c-2578-4cf0-b3c4-4787fb78a886"
+  },
+  {
+    "path": "/api/v1/sites/13/pages/",
+    "method": "GET",
+    "actor": "qaws7bf27e71-siteadmin",
+    "status": 403,
+    "body": null,
+    "response": {
+      "error": {
+        "code": "permission_denied",
+        "message": "You do not have permission to perform this action.",
+        "details": {
+          "detail": "A CMS role assigned to this Site is required."
+        }
+      },
+      "request_id": "ebd9c1c4-fccb-402c-aec8-56afa81e4bcd"
+    },
+    "request_id": "ebd9c1c4-fccb-402c-aec8-56afa81e4bcd"
+  },
+  {
+    "path": "/api/v1/sites/12/pages/?search=workspace-qaws7bf27e71",
+    "method": "GET",
+    "actor": "qaws7bf27e71-siteadmin",
+    "status": 200,
+    "body": null,
+    "response": {
+      "count": 1,
+      "next": null,
+      "previous": null,
+      "results": [
+        {
+          "id": "40ae5205-849b-428d-a412-1d0279512360",
+          "site": 12,
+          "parent": null,
+          "locale": "en-us",
+          "title": "Workspace QA qaws7bf27e71",
+          "slug": "workspace-qaws7bf27e71",
+          "path": "/workspace-qaws7bf27e71",
+          "layout": "",
+          "seo": {},
+          "visibility": "PUBLIC",
+          "position": 0,
+          "is_homepage": false,
+          "status": "DRAFT",
+          "published_at": null,
+          "blocks": [
+            {
+              "html": "<p>Workspace QA publishing check</p>",
+              "type": "paragraph"
+            }
+          ],
+          "blocks_version": "1",
+          "revision_number": 1,
+          "draft_of": null,
+          "created_by": 40,
+          "updated_by": 40,
+          "submitted_by": null,
+          "reviewed_by": null,
+          "review_comment": "",
+          "metadata": {},
+          "created_at": "2026-11-04T17:59:10.936974Z",
+          "updated_at": "2026-11-04T17:59:10.937095Z",
+          "available_actions": [
+            "submit"
+          ]
+        }
+      ]
+    },
+    "request_id": "f4c9af8e-f03d-4e7d-ba89-c4d3f7125484"
+  },
+  {
+    "path": "/api/v1/cms/sites/12/content/40ae5205-849b-428d-a412-1d0279512360/workflow/",
+    "method": "POST",
+    "actor": "qaws7bf27e71-siteadmin",
+    "status": 200,
+    "body": {
+      "action": "submit"
+    },
+    "response": {
+      "id": "40ae5205-849b-428d-a412-1d0279512360",
+      "site": 12,
+      "parent": null,
+      "locale": "en-us",
+      "title": "Workspace QA qaws7bf27e71",
+      "slug": "workspace-qaws7bf27e71",
+      "path": "/workspace-qaws7bf27e71",
+      "layout": "",
+      "seo": {},
+      "visibility": "PUBLIC",
+      "position": 0,
+      "is_homepage": false,
+      "status": "IN_REVIEW",
+      "published_at": null,
+      "blocks": [
+        {
+          "html": "<p>Workspace QA publishing check</p>",
+          "type": "paragraph"
+        }
+      ],
+      "blocks_version": "1",
+      "revision_number": 2,
+      "draft_of": null,
+      "created_by": 40,
+      "updated_by": 40,
+      "submitted_by": 40,
+      "reviewed_by": null,
+      "review_comment": "",
+      "metadata": {},
+      "created_at": "2026-11-04T17:59:10.936974Z",
+      "updated_at": "2026-11-04T18:04:03.298712Z",
+      "available_actions": []
+    },
+    "request_id": "50a702ee-4479-43bd-9f44-93b35b76506a"
+  },
+  {
+    "path": "/api/v1/cms/sites/12/content/40ae5205-849b-428d-a412-1d0279512360/workflow/",
+    "method": "POST",
+    "actor": "qaws7bf27e71-reviewer",
+    "status": 200,
+    "body": {
+      "action": "approve"
+    },
+    "response": {
+      "id": "40ae5205-849b-428d-a412-1d0279512360",
+      "site": 12,
+      "parent": null,
+      "locale": "en-us",
+      "title": "Workspace QA qaws7bf27e71",
+      "slug": "workspace-qaws7bf27e71",
+      "path": "/workspace-qaws7bf27e71",
+      "layout": "",
+      "seo": {},
+      "visibility": "PUBLIC",
+      "position": 0,
+      "is_homepage": false,
+      "status": "APPROVED",
+      "published_at": null,
+      "blocks": [
+        {
+          "html": "<p>Workspace QA publishing check</p>",
+          "type": "paragraph"
+        }
+      ],
+      "blocks_version": "1",
+      "revision_number": 3,
+      "draft_of": null,
+      "created_by": 40,
+      "updated_by": 41,
+      "submitted_by": 40,
+      "reviewed_by": 41,
+      "review_comment": "",
+      "metadata": {},
+      "created_at": "2026-11-04T17:59:10.936974Z",
+      "updated_at": "2026-11-04T18:04:03.437564Z",
+      "available_actions": []
+    },
+    "request_id": "83487407-958d-41c1-bac1-e075bff2d719"
+  },
+  {
+    "path": "/api/v1/cms/sites/12/content/40ae5205-849b-428d-a412-1d0279512360/workflow/",
+    "method": "POST",
+    "actor": "qaws7bf27e71-publisher",
+    "status": 200,
+    "body": {
+      "action": "publish"
+    },
+    "response": {
+      "id": "40ae5205-849b-428d-a412-1d0279512360",
+      "site": 12,
+      "parent": null,
+      "locale": "en-us",
+      "title": "Workspace QA qaws7bf27e71",
+      "slug": "workspace-qaws7bf27e71",
+      "path": "/workspace-qaws7bf27e71",
+      "layout": "",
+      "seo": {},
+      "visibility": "PUBLIC",
+      "position": 0,
+      "is_homepage": false,
+      "status": "PUBLISHED",
+      "published_at": "2026-11-04T18:04:03.542130Z",
+      "blocks": [
+        {
+          "html": "<p>Workspace QA publishing check</p>",
+          "type": "paragraph"
+        }
+      ],
+      "blocks_version": "1",
+      "revision_number": 4,
+      "draft_of": null,
+      "created_by": 40,
+      "updated_by": 42,
+      "submitted_by": 40,
+      "reviewed_by": 41,
+      "review_comment": "",
+      "metadata": {},
+      "created_at": "2026-11-04T17:59:10.936974Z",
+      "updated_at": "2026-11-04T18:04:03.554831Z",
+      "available_actions": []
+    },
+    "request_id": "a351d8cc-f714-47e3-96e6-e160bc22a072"
+  },
+  {
+    "path": "/api/v1/sites/12/domains/",
+    "method": "GET",
+    "actor": "qaws7bf27e71-platform",
+    "status": 200,
+    "body": null,
+    "response": {
+      "count": 2,
+      "next": null,
+      "previous": null,
+      "results": [
+        {
+          "id": 18,
+          "site": 12,
+          "hostname": "alias-qa6a1a06aa-main.uog.local",
+          "is_primary": false,
+          "redirect_to_primary": false,
+          "status": "ACTIVE",
+          "created_at": "2026-11-04T04:03:45.774350Z",
+          "updated_at": "2026-11-04T04:03:45.774378Z"
+        },
+        {
+          "id": 17,
+          "site": 12,
+          "hostname": "qa6a1a06aa-main.uog.local",
+          "is_primary": true,
+          "redirect_to_primary": false,
+          "status": "ACTIVE",
+          "created_at": "2026-11-04T04:03:45.410886Z",
+          "updated_at": "2026-11-04T04:03:45.681813Z"
+        }
+      ]
+    },
+    "request_id": "018582c7-57ce-43b0-8e21-49f32bdcfad2"
+  },
+  {
+    "path": "/api/v1/site-context/pages/workspace-qaws7bf27e71/",
+    "host": "qa6a1a06aa-main.uog.local",
+    "status": 200,
+    "response": {
+      "id": "40ae5205-849b-428d-a412-1d0279512360",
+      "site": 12,
+      "parent": null,
+      "locale": "en-us",
+      "status": "PUBLISHED",
+      "published_at": "2026-11-04T18:04:03.573011Z",
+      "publication_version": 1,
+      "title": "Workspace QA qaws7bf27e71",
+      "slug": "workspace-qaws7bf27e71",
+      "path": "/workspace-qaws7bf27e71",
+      "layout": "",
+      "seo": {},
+      "visibility": "PUBLIC",
+      "position": 0,
+      "is_homepage": false,
+      "blocks": [
+        {
+          "html": "<p>Workspace QA publishing check</p>",
+          "type": "paragraph"
+        }
+      ],
+      "blocks_version": "1",
+      "metadata": {}
+    }
+  }
+]

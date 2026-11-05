@@ -464,14 +464,27 @@ export function createLiveSitesAdapter(options: {
           ? [await client.get<Site>(`${SITES_PATH}${query.site}/`)]
           : await collect<Site>(SITES_PATH);
 
-      const records: DomainRecord[] = [];
-      for (const site of sites) {
-        const domains = await collect<SiteDomain>(`${SITES_PATH}${site.id}/domains/`);
-        for (const domain of domains) {
-          records.push(toDomainRecord(domain, site));
+      // Independent Site reads can overlap. Bound concurrency so a large
+      // directory cannot flood Django, and retain Site order regardless of
+      // which response finishes first. Pagination within each Site is serial.
+      const records: DomainRecord[][] = new Array(sites.length);
+      let nextSite = 0;
+      let failed = false;
+      await Promise.all(Array.from({ length: Math.min(4, sites.length) }, async () => {
+        while (!failed) {
+          const index = nextSite++;
+          if (index >= sites.length) return;
+          const site = sites[index]!;
+          try {
+            const domains = await collect<SiteDomain>(`${SITES_PATH}${site.id}/domains/`);
+            records[index] = domains.map((domain) => toDomainRecord(domain, site));
+          } catch (error) {
+            failed = true;
+            throw error;
+          }
         }
-      }
-      return queryDomainRecords(records, query);
+      }));
+      return queryDomainRecords(records.flat(), query);
     },
     async getDomain(siteId, id) {
       return toEtagged(
@@ -762,8 +775,13 @@ export function createMockSitesAdapter(options?: {
     }
   };
 
+  const siteData = (site: Site): Site => {
+    const primary = domains.find((domain) => domain.site === site.id && domain.is_primary);
+    return { ...site, configuration: structuredCloneSafe(site.configuration),
+      primary_domain: primary ? { hostname: primary.hostname, status: primary.status } : null };
+  };
   const respond = (site: Site, requestId: string): ETaggedResponse<Site> => ({
-    data: { ...site, configuration: structuredCloneSafe(site.configuration) },
+    data: siteData(site),
     etag: etagFor(site),
     requestId,
   });
@@ -917,11 +935,21 @@ export function createMockSitesAdapter(options?: {
     }
   };
 
+  const assignmentData = (row: SiteModuleAssignment): SiteModuleAssignment => {
+    const module = modules.find((entry) => entry.id === row.module);
+    return {
+      ...row,
+      module_code: module?.code ?? row.module_code,
+      is_available: row.is_enabled && module != null && moduleIsUsable(module),
+      configuration: { ...row.configuration },
+    };
+  };
+
   const respondAssignment = (
     row: SiteModuleAssignment,
     requestId: string,
   ): ETaggedResponse<SiteModuleAssignment> => ({
-    data: { ...row, configuration: { ...row.configuration } },
+    data: assignmentData(row),
     etag: assignmentEtag(row),
     requestId,
   });
@@ -1114,10 +1142,7 @@ export function createMockSitesAdapter(options?: {
         count,
         next: hasNext ? `?page=${page + 1}` : null,
         previous: page > 1 ? `?page=${page - 1}` : null,
-        results: pageResults.map((site) => ({
-          ...site,
-          configuration: structuredCloneSafe(site.configuration),
-        })),
+        results: pageResults.map(siteData),
       } satisfies PaginatedResponse<Site>;
     },
 
@@ -1338,7 +1363,7 @@ export function createMockSitesAdapter(options?: {
     async listModuleAssignments(siteId, query = {}) {
       await wait();
       require(siteId);
-      let results = assignments.filter((row) => row.site === siteId);
+      let results = assignments.filter((row) => row.site === siteId).map(assignmentData);
       if (query.module !== undefined) {
         results = results.filter((row) => row.module === query.module);
       }

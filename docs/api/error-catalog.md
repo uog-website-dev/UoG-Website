@@ -38,3 +38,27 @@ before SQL return 400; residual database conflicts return 409. Successful
 responses use normal resource/pagination bodies, without an error envelope.
 
 [OpenAPI snapshot](openapi.yaml) · [Organization contract](organizations.md) · [Site contract](sites.md)
+
+## Central module operations
+
+Bulk operation errors use the same envelope. `error.details.reason` provides
+the operation-specific reason; it is distinct from the top-level error code.
+
+| HTTP | Reason | Client action |
+| --- | --- | --- |
+| 400 | `invalid_preview` | Token is invalid or belongs to another actor. Request a new preview. |
+| 400 | `reason_required`, `confirmation_required` | Complete high-impact confirmation. |
+| 400 | `module_not_found`, `unknown_sites`, `unknown_organization`, `scope_too_large`, `modules_required`, `too_many_modules`, `invalid_scope` | Correct or narrow the requested scope/modules. |
+| 409 | `stale_preview` | Versions, targets, eligibility, settings or dependencies changed. Nothing committed; refresh and review. |
+| 409 | `preview_expired` | An uncommitted preview expired. Generate a new preview. |
+| 409 | `idempotency_key_reused` | The key already identifies a different request. Reconcile the operation history. |
+
+Preview blocker codes include `module_planned`, `module_deprecated`,
+`module_not_shipped`, `module_platform_disabled`, `configuration_required`,
+`configuration_invalid`, `site_archived`, `missing_dependency` and `required_by`.
+These explain skipped pairs and are not successful activation states.
+
+Successful apply returns 201; replay of a committed operation returns 200 with
+`replayed: true`, including after preview expiry. On an uncertain network/server
+failure, retry the exact original body and `Idempotency-Key`. This replay contract
+applies only to central bulk apply; other resource creation contracts are unchanged.

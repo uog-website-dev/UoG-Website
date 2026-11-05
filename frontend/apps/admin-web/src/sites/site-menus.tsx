@@ -159,7 +159,17 @@ function LocalMenuEditor({
         </Button>
       ) : null}
       {editing ? (
-        <Box component="form" sx={{ display: "flex", gap: 1, flexWrap: "wrap", alignItems: "center" }} onSubmit={save}>
+        <Box
+          component="form"
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "minmax(0, 1fr)", sm: "repeat(2, minmax(0, 1fr))" },
+            gap: 2,
+            alignItems: "start",
+            "& .MuiFormControl-root": { minWidth: 0, width: "100%" },
+          }}
+          onSubmit={save}
+        >
           <TextField size="small" label="Local menu name" value={name} disabled={!structural || busy} onChange={(event) => setName(event.target.value)} required />
           <TextField
             select
@@ -176,7 +186,7 @@ function LocalMenuEditor({
               </option>
             ))}
           </TextField>
-          <Button type="submit" variant="contained" disabled={!structural || busy || !name.trim()}>Save menu</Button>
+          <Button type="submit" variant="contained" disabled={!structural || busy || !name.trim()} sx={{ justifySelf: "start" }}>Save menu</Button>
         </Box>
       ) : null}
       {menu.is_active && canWrite && !canPublish ? (
@@ -184,7 +194,14 @@ function LocalMenuEditor({
           This menu is active. Changing it also needs menu publish permission.
         </Typography>
       ) : null}
-      <MenuItemTree siteId={siteId} state={state} targets={targets} enabled={structural} onChanged={onChanged} />
+      <MenuItemTree
+        siteId={siteId}
+        state={state}
+        targets={targets}
+        enabled={structural}
+        onChanged={onChanged}
+        showAvailability={false}
+      />
     </Box>
   );
 }
@@ -237,6 +254,12 @@ export function SiteMenusPanel({
           <Alert severity="warning">
             The MENUS module is off for this Site. Existing menus stay in place, changes are blocked, and the public website does not serve navigation.
           </Alert>
+        ) : null}
+        {targetState.data && !targetState.data.pagesAvailable ? (
+          <Alert severity="info">Pages are not available for this Site. Page targets stay blocked.</Alert>
+        ) : null}
+        {targetState.data && !targetState.data.postsAvailable ? (
+          <Alert severity="info">Posts are not available for this Site. Post targets stay blocked.</Alert>
         ) : null}
         {!canWrite && !canPublish ? (
           <Alert severity="info">
@@ -302,7 +325,16 @@ export function SiteMenusPanel({
               </Typography>
             ) : null}
             {canWrite && openPlaces.length > 0 ? (
-              <Box component="form" sx={{ display: "flex", gap: 1, flexWrap: "wrap", alignItems: "center" }} onSubmit={(event) => {
+              <Box
+                component="form"
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: { xs: "minmax(0, 1fr)", sm: "repeat(2, minmax(0, 1fr))" },
+                  gap: 2,
+                  alignItems: "start",
+                  "& .MuiFormControl-root": { minWidth: 0, width: "100%" },
+                }}
+                onSubmit={(event) => {
                 event.preventDefault();
                 setBusy(true);
                 void createSiteMenu(siteId, selectedLocation, name)
@@ -332,7 +364,7 @@ export function SiteMenusPanel({
                     </option>
                   ))}
                 </TextField>
-                <Button type="submit" variant="contained" disabled={!moduleOn || busy || !name.trim()}>Create menu</Button>
+                <Button type="submit" variant="contained" disabled={!moduleOn || busy || !name.trim()} sx={{ justifySelf: "start" }}>Create menu</Button>
               </Box>
             ) : null}
           </>

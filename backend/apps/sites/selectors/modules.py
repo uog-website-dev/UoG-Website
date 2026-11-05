@@ -35,7 +35,25 @@ def usable_modules(*, using=DEFAULT_DB_ALIAS):
 
 def enabled_modules_for_site(site_id, *, using=DEFAULT_DB_ALIAS):
     """Modules this Site has turned on that are still implemented and globally enabled."""
-    return usable_modules(using=using).filter(site_modules__site_id=site_id, site_modules__is_enabled=True)
+    # Follow transitive dependencies too: a global switch can make a retained
+    # assignment unavailable without changing or deleting its Site state.
+    dependencies_ready = RawSQL("""
+        NOT EXISTS (
+            WITH RECURSIVE required(id) AS (
+                SELECT requires_id FROM sites_moduledependency WHERE module_id = sites_module.id
+                UNION
+                SELECT d.requires_id FROM sites_moduledependency d JOIN required r ON d.module_id = r.id
+            )
+            SELECT 1 FROM required r JOIN sites_module m ON m.id = r.id
+            WHERE m.status <> 'IMPLEMENTED' OR NOT m.is_enabled
+               OR NOT EXISTS (SELECT 1 FROM sites_module_implementation WHERE code = m.code)
+               OR NOT EXISTS (SELECT 1 FROM sites_sitemodule sm
+                   WHERE sm.site_id = %s AND sm.module_id = m.id AND sm.is_enabled)
+        )
+    """, [site_id], output_field=BooleanField())
+    return usable_modules(using=using).filter(site_modules__site_id=site_id, site_modules__is_enabled=True).annotate(
+        dependencies_ready=dependencies_ready,
+    ).filter(dependencies_ready=True)
 
 
 def available_module_codes(site_id, *, using=DEFAULT_DB_ALIAS):

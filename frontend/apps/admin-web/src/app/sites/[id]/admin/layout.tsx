@@ -9,6 +9,7 @@
 import { notFound } from "next/navigation";
 
 import { getEffectivePermissions } from "@/access-control";
+import { getOrganization } from "@/app/organizations/actions";
 import {
   getSite,
   listAllSites,
@@ -34,42 +35,34 @@ export default async function SiteAdminLayout({ children, params }: SiteAdminLay
     notFound();
   }
 
-  const [siteResult, siteList] = await Promise.all([
-    getSite(numericId),
-    listAllSites(),
-  ]);
-  const choices = accessibleSiteOptions(
-    (siteList.ok ? siteList.data : []).map((site) => ({
-      id: site.id,
-      name: site.name,
-      code: site.code,
-      status: site.status,
-    })),
-  );
-
+  const siteResult = await getSite(numericId);
   if (!siteResult.ok) {
+    const siteList = await listAllSites();
+    const choices = accessibleSiteOptions(
+      (siteList.ok ? siteList.data : []).map((site) => ({ id: site.id, name: site.name })),
+    );
     return <SiteAdminDenied sites={choices} />;
   }
 
   const site = siteResult.data.data;
-  const [assignments, permissions] = await Promise.all([
+  const [assignments, permissions, organization] = await Promise.all([
     listSiteModuleAssignments(site.id),
     getEffectivePermissions(site.id),
+    getOrganization(site.organization_unit),
   ]);
-  const current = {
-    id: site.id,
-    name: site.name,
-    code: site.code,
-    status: site.status,
-  };
-  const options = choices.some((choice) => choice.id === site.id)
-    ? choices
-    : [current, ...choices];
 
   return (
     <SiteAdminFrame
-      site={current}
-      sites={options}
+      site={{
+        id: site.id,
+        name: site.name,
+        code: site.code,
+        status: site.status,
+        organizationId: site.organization_unit,
+        organizationName: organization.ok ? organization.data.data.name : null,
+        defaultLanguage: site.default_language,
+        enabledLanguages: site.configuration.language.enabled,
+      }}
       enabledModuleCodes={assignments.ok ? enabledModuleCodes(assignments.data.results, site.id) : []}
       permissions={permissions}
     >

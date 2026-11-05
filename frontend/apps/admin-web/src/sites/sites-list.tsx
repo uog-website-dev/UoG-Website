@@ -47,7 +47,6 @@ import {
 } from "@uog/ui";
 import type { FilterOption, SortState } from "@uog/ui";
 import type {
-  Organization,
   PaginatedResponse,
   Site,
   SiteListQuery,
@@ -63,7 +62,6 @@ import {
 } from "@/app/sites/actions";
 import { getOrganizationTree } from "@/app/organizations/actions";
 import { deserializeApiError, unwrap } from "@/organizations/contract";
-import type { ActionResult } from "@/organizations/contract";
 import { ownerInfoFor, relationLabel } from "@/sites/owner";
 import type { ApiError } from "@uog/api-client";
 import {
@@ -118,13 +116,18 @@ const ACTION_LABELS: Record<LifecycleAction, string> = {
 /**
  * Primary hostname for one row's site.
  *
- * Domains are only readable per site (the API has no cross-site domain
- * list), so each cell reads its own site's hostnames — a page of 20 rows
- * costs 20 small GETs, which the admin console accepts for accuracy. A
- * failed read shows "Unavailable" rather than an empty cell, so missing
- * data is never mistaken for "no domain".
+ * Current Site responses include the primary-domain summary in the list
+ * query. Older API responses fall back to the per-Site endpoint; failed
+ * reads remain distinct from a Site that genuinely has no primary domain.
  */
-function PrimaryDomainCell({ siteId }: { siteId: number }) {
+function PrimaryDomainCell({ siteId, primaryDomain }: { siteId: number; primaryDomain: Site["primary_domain"] }) {
+  if (primaryDomain !== undefined) {
+    return primaryDomain ? <PrimaryDomainLabel primary={primaryDomain} /> : <Typography variant="body2" color="text.secondary">No primary domain</Typography>;
+  }
+  return <LegacyPrimaryDomainCell siteId={siteId} />;
+}
+
+function LegacyPrimaryDomainCell({ siteId }: { siteId: number }) {
   const domains = useAsync(
     async () => unwrap(await listSiteDomains(siteId)),
     [siteId],
@@ -160,6 +163,10 @@ function PrimaryDomainCell({ siteId }: { siteId: number }) {
     );
   }
 
+  return <PrimaryDomainLabel primary={primary} />;
+}
+
+function PrimaryDomainLabel({ primary }: { primary: NonNullable<Site["primary_domain"]> }) {
   return (
     <Box component="span" sx={{ display: "flex", flexDirection: "column" }}>
       <Typography variant="body2" sx={{ fontFamily: "monospace" }}>
@@ -328,17 +335,8 @@ export function SitesList() {
   // Owner choices for the filter, plus the full unit list the rows use to
   // label each site's owner organization. If the hierarchy read fails, rows
   // degrade to "Unit #id" with an unknown relation — never a guess.
-  const [units, setUnits] = useState<Organization[]>([]);
-  useEffect(() => {
-    let cancelled = false;
-    getOrganizationTree().then((result: ActionResult<{ results: Organization[] }>) => {
-      if (cancelled || !result.ok) return;
-      setUnits(result.data.results);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const ownerTree = useAsync(async () => unwrap(await getOrganizationTree()), []);
+  const units = useMemo(() => ownerTree.data?.results ?? [], [ownerTree.data]);
 
   const ownerChoices = useMemo<FilterOption[]>(
     () =>
@@ -467,7 +465,7 @@ export function SitesList() {
     {
       field: "primary_domain",
       header: "Primary domain",
-      render: (row: Site) => <PrimaryDomainCell siteId={row.id} />,
+      render: (row: Site) => <PrimaryDomainCell siteId={row.id} primaryDomain={row.primary_domain} />,
     },
     {
       field: "status",

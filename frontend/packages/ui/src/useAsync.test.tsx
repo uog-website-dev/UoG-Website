@@ -1,4 +1,5 @@
 import { render, screen, waitFor } from "@testing-library/react";
+import { StrictMode } from "react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
@@ -36,6 +37,40 @@ function AsyncHarness({
 }
 
 describe("useAsync", () => {
+  it("shares a StrictMode mount read but still performs fresh reloads", async () => {
+    const fetcher = vi.fn().mockResolvedValue({ results: ["a"] });
+    render(<StrictMode><AsyncHarness fetcher={fetcher} /></StrictMode>);
+    await waitFor(() => expect(screen.getByTestId("status").textContent).toBe("success"));
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    await userEvent.click(screen.getByRole("button", { name: "reload" }));
+    await waitFor(() => expect(fetcher).toHaveBeenCalledTimes(2));
+  });
+
+  it("does not share responses between separate component instances", async () => {
+    const fetcher = vi.fn().mockResolvedValueOnce({ results: ["a"] }).mockResolvedValueOnce({ results: ["b", "c"] });
+    render(<StrictMode><AsyncHarness fetcher={fetcher} /><AsyncHarness fetcher={fetcher} /></StrictMode>);
+    await waitFor(() => expect(screen.getAllByTestId("status").map((node) => node.textContent)).toEqual(["success", "success"]));
+    expect(fetcher).toHaveBeenCalledTimes(2);
+    expect(screen.getAllByTestId("count").map((node) => node.textContent)).toEqual(["1", "2"]);
+  });
+
+  it("starts a fresh read when scope changes and ignores the old response", async () => {
+    let resolveOld!: (value: Payload) => void;
+    const fetcher = vi.fn().mockImplementationOnce(() => new Promise<Payload>((resolve) => { resolveOld = resolve; }))
+      .mockResolvedValueOnce({ results: ["new scope"] });
+    function Scoped({ scope }: { scope: number }) {
+      const state = useAsync<Payload>(() => fetcher(scope), [scope]);
+      return <span data-testid="scoped-count">{state.data?.results.length ?? -1}</span>;
+    }
+    const view = render(<Scoped scope={1} />);
+    await waitFor(() => expect(fetcher).toHaveBeenCalledWith(1));
+    view.rerender(<Scoped scope={2} />);
+    await waitFor(() => expect(screen.getByTestId("scoped-count").textContent).toBe("1"));
+    resolveOld({ results: ["old", "old"] });
+    await waitFor(() => expect(fetcher).toHaveBeenCalledTimes(2));
+    expect(screen.getByTestId("scoped-count").textContent).toBe("1");
+  });
+
   it("transitions loading -> success and exposes the data", async () => {
     const fetcher = vi.fn().mockResolvedValue({ results: ["a", "b"] });
     render(<AsyncHarness fetcher={fetcher} />);

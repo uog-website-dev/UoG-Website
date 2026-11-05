@@ -4888,6 +4888,138 @@ paths:
               schema:
                 type: string
                 format: uuid
+  /api/v1/modules/activation-summary/:
+    get:
+      operationId: v1_modules_activation_summary_list
+      description: 'Platform admin only. One row per registry module: implementation
+        status (AVAILABLE, PLANNED, DEPRECATED or IMPLEMENTED_DISABLED), platform
+        availability, Sites enabled and disabled, eligible Sites, and dependencies.
+        Counts are read from SiteModule; nothing is stored twice.'
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Modules
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedActivationSummaryList'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          description: Invalid body, malformed input, or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    title:
+                    - This field is required.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
   /api/v1/organizations/:
     get:
       operationId: v1_organizations_list
@@ -7485,6 +7617,802 @@ paths:
               description: Immutable publication snapshot version for this resource.
               schema:
                 type: string
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          description: Invalid body, malformed input, or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    title:
+                    - This field is required.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/site-modules/:
+    get:
+      operationId: v1_site_modules_list
+      description: Platform admin only. Sites with each module's activation state,
+        read from SiteModule. Modules absent from `modules` are NOT_ASSIGNED.
+      parameters:
+      - in: query
+        name: activation
+        schema:
+          type: string
+          enum:
+          - DISABLED
+          - ENABLED
+          - NOT_ASSIGNED
+      - in: query
+        name: include_descendants
+        schema:
+          type: boolean
+        description: With organization, include Sites of descendant Organizations.
+      - in: query
+        name: module
+        schema:
+          type: string
+        description: Module code; required with activation.
+      - in: query
+        name: organization
+        schema:
+          type: integer
+        description: Owning Organization.
+      - in: query
+        name: page
+        schema:
+          type: integer
+        description: Page number. Page size is 20.
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Site code or name substring.
+      - in: query
+        name: site
+        schema:
+          type: integer
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - ACTIVE
+          - ARCHIVED
+          - DRAFT
+          - SUSPENDED
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Module management
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSiteActivationList'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          description: Invalid body, malformed input, or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    title:
+                    - This field is required.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/site-modules/bulk-apply/:
+    post:
+      operationId: v1_site_modules_bulk_apply_create
+      description: Platform admin only, behind the development write gate. Recomputes
+        the plan under row locks and commits every expected change, its history rows
+        and audit events in one transaction, or nothing. Blocked pairs are skipped.
+        A plan that differs from the preview returns 409 stale_preview. High-impact
+        operations need a reason and confirmation equal to the preview's confirmation_phrase.
+        Content is never deleted.
+      parameters:
+      - in: header
+        name: Idempotency-Key
+        schema:
+          type: string
+          format: uuid
+        description: Client-generated UUID for this confirmed operation. Repeating
+          it returns the committed result; reusing it for a different request returns
+          409.
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Module management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplyRequestRequest'
+        required: true
+      security:
+      - keycloakBearer: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplyResponse'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplyResponse'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '409':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              examples:
+                StalePreview:
+                  value:
+                    error:
+                      code: conflict
+                      message: The request conflicts with the current resource state.
+                      details:
+                        reason: stale_preview
+                        message: Sites or modules changed after the preview. Review
+                          the new preview before applying.
+                        summary: {}
+                    request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+                  summary: Stale preview
+          description: Stale or expired preview, or a reused Idempotency-Key. Nothing
+            changed.
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          description: Invalid body, malformed input, or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    title:
+                    - This field is required.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '415':
+          description: Unsupported request content type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '503':
+          description: Audit persistence failed; the entire mutation was rolled back.
+            No SQL details are exposed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/site-modules/bulk-preview/:
+    post:
+      operationId: v1_site_modules_bulk_preview_create
+      description: Platform admin only. Computes, without writing, which Site-module
+        pairs would change, which are already in the requested state, and which are
+        blocked and why. Enable requires a module that is implemented, shipped, enabled
+        platform-wide and not deprecated, a non-archived Site, and satisfied dependencies.
+        Disable is blocked while an enabled module on the Site depends on the module.
+        Returns a signed preview_token for bulk-apply.
+      tags:
+      - Module management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreviewRequestRequest'
+            examples:
+              EnablePostsForTwoSites:
+                value:
+                  action: ENABLE
+                  modules:
+                  - POSTS
+                  scope:
+                    type: SELECTED
+                    site_ids:
+                    - 2
+                    - 3
+                summary: Enable Posts for two Sites
+              DisableMenusForAnOrganizationAndItsDescendants:
+                value:
+                  action: DISABLE
+                  modules:
+                  - MENUS
+                  scope:
+                    type: ORGANIZATION
+                    organization: 6
+                    include_descendants: true
+                summary: Disable Menus for an Organization and its descendants
+        required: true
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreviewResponse'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    title:
+                    - This field is required.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          description: Invalid scope, unknown module or Site.
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '415':
+          description: Unsupported request content type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+      parameters:
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+  /api/v1/site-modules/operations/:
+    get:
+      operationId: v1_site_modules_operations_list
+      description: Platform admin only. Newest first. Operation history is append-only.
+      parameters:
+      - in: query
+        name: action
+        schema:
+          type: string
+          enum:
+          - DISABLE
+          - ENABLE
+      - in: query
+        name: module
+        schema:
+          type: string
+        description: Operations that included this module code.
+      - in: query
+        name: page
+        schema:
+          type: integer
+        description: Page number. Page size is 20.
+      - in: query
+        name: site
+        schema:
+          type: integer
+        description: Operations that changed this Site.
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Module management
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedOperationList'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          description: Invalid body, malformed input, or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    title:
+                    - This field is required.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/site-modules/operations/{id}/:
+    get:
+      operationId: v1_site_modules_operations_retrieve
+      description: Platform admin only. Includes every Site-module change with previous
+        and new state.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this site module operation.
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Module management
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperationDetail'
+          description: ''
+          headers:
             X-Request-ID:
               description: Correlation ID for this request.
               schema:
@@ -19261,24 +20189,72 @@ paths:
                 format: uuid
 components:
   schemas:
-    ActionEnum:
+    ActivationEnum:
       enum:
-      - submit
-      - approve
-      - reject
-      - publish
-      - unpublish
-      - archive
-      - restore
+      - ENABLED
+      - DISABLED
+      - NOT_ASSIGNED
       type: string
       description: |-
-        * `submit` - submit
-        * `approve` - approve
-        * `reject` - reject
-        * `publish` - publish
-        * `unpublish` - unpublish
-        * `archive` - archive
-        * `restore` - restore
+        * `ENABLED` - ENABLED
+        * `DISABLED` - DISABLED
+        * `NOT_ASSIGNED` - NOT_ASSIGNED
+    ActivationSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        code:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/ModuleStatusEnum'
+        implementation_status:
+          $ref: '#/components/schemas/ImplementationStatusEnum'
+        is_shipped:
+          type: boolean
+        platform_enabled:
+          type: boolean
+        enabled_sites:
+          type: integer
+        disabled_sites:
+          type: integer
+        eligible_sites:
+          type: integer
+          description: Non-archived Sites that can use the module now. Zero when the
+            module is unavailable.
+        total_sites:
+          type: integer
+        requires:
+          type: array
+          items:
+            type: string
+        required_by:
+          type: array
+          items:
+            type: string
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - code
+      - description
+      - disabled_sites
+      - eligible_sites
+      - enabled_sites
+      - id
+      - implementation_status
+      - is_shipped
+      - name
+      - platform_enabled
+      - required_by
+      - requires
+      - status
+      - total_sites
+      - updated_at
     ActiveInactiveStatusEnum:
       enum:
       - ACTIVE
@@ -19306,6 +20282,35 @@ components:
       - published_pages
       - requested_by
       - users
+    ApplyRequestRequest:
+      type: object
+      properties:
+        preview_token:
+          type: string
+          minLength: 1
+          maxLength: 8192
+        reason:
+          type: string
+          default: ''
+          maxLength: 500
+        confirmation:
+          type: string
+          default: ''
+          maxLength: 20
+      required:
+      - preview_token
+    ApplyResponse:
+      type: object
+      properties:
+        replayed:
+          type: boolean
+          description: True when this Idempotency-Key already committed; nothing changed
+            again.
+        operation:
+          $ref: '#/components/schemas/OperationDetail'
+      required:
+      - operation
+      - replayed
     Assignment:
       type: object
       properties:
@@ -19433,7 +20438,7 @@ components:
           readOnly: true
         outcome:
           allOf:
-          - $ref: '#/components/schemas/OutcomeEnum'
+          - $ref: '#/components/schemas/AuthorizationAuditOutcomeEnum'
           readOnly: true
         permission_code:
           type: string
@@ -19486,6 +20491,51 @@ components:
       - scope
       - site_id
       - subject_user_id
+    AuthorizationAuditOutcomeEnum:
+      enum:
+      - ALLOW
+      - DENY
+      - CHANGE
+      type: string
+      description: |-
+        * `ALLOW` - Allow
+        * `DENY` - Deny
+        * `CHANGE` - Change
+    BlockedReason:
+      type: object
+      properties:
+        code:
+          type: string
+        count:
+          type: integer
+        message:
+          type: string
+      required:
+      - code
+      - count
+      - message
+    Change:
+      type: object
+      properties:
+        site:
+          type: integer
+        site_code:
+          type: string
+        site_name:
+          type: string
+        module:
+          type: string
+        previous_state:
+          $ref: '#/components/schemas/SiteModuleStateEnum'
+        new_state:
+          $ref: '#/components/schemas/SiteModuleStateEnum'
+      required:
+      - module
+      - new_state
+      - previous_state
+      - site
+      - site_code
+      - site_name
     ContentRevisionDetail:
       type: object
       properties:
@@ -19695,6 +20745,18 @@ components:
       - roles
       - scopes
       - username
+    ImplementationStatusEnum:
+      enum:
+      - AVAILABLE
+      - PLANNED
+      - DEPRECATED
+      - IMPLEMENTED_DISABLED
+      type: string
+      description: |-
+        * `AVAILABLE` - AVAILABLE
+        * `PLANNED` - PLANNED
+        * `DEPRECATED` - DEPRECATED
+        * `IMPLEMENTED_DISABLED` - IMPLEMENTED_DISABLED
     InheritanceInputRequest:
       type: object
       properties:
@@ -19999,6 +21061,19 @@ components:
       - id
       - name
       - updated_at
+    ModuleRef:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        implementation_status:
+          $ref: '#/components/schemas/ImplementationStatusEnum'
+      required:
+      - code
+      - implementation_status
+      - name
     ModuleRequest:
       type: object
       properties:
@@ -20092,6 +21167,119 @@ components:
       required:
       - parent
       - position
+    Operation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        action:
+          $ref: '#/components/schemas/SiteModuleActionEnum'
+        module_codes: {}
+        scope_type:
+          $ref: '#/components/schemas/SiteModuleScopeEnum'
+        scope: {}
+        reason:
+          type: string
+          maxLength: 500
+        actor:
+          type: object
+          additionalProperties: {}
+          readOnly: true
+        request_id:
+          type: string
+          format: uuid
+          nullable: true
+        matched_count:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        changed_site_count:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        unchanged_count:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        blocked_count:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        change_count:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action
+      - actor
+      - created_at
+      - id
+      - scope_type
+    OperationDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        action:
+          $ref: '#/components/schemas/SiteModuleActionEnum'
+        module_codes: {}
+        scope_type:
+          $ref: '#/components/schemas/SiteModuleScopeEnum'
+        scope: {}
+        reason:
+          type: string
+          maxLength: 500
+        actor:
+          type: object
+          additionalProperties: {}
+          readOnly: true
+        request_id:
+          type: string
+          format: uuid
+          nullable: true
+        matched_count:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        changed_site_count:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        unchanged_count:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        blocked_count:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        change_count:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        changes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Change'
+      required:
+      - action
+      - actor
+      - changes
+      - created_at
+      - id
+      - scope_type
     Organization:
       type: object
       properties:
@@ -20159,6 +21347,16 @@ components:
       required:
       - count
       - results
+    OrganizationRef:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+      - id
+      - name
     OrganizationRequest:
       type: object
       properties:
@@ -20255,16 +21453,6 @@ components:
       - organization_type
       - status
       - updated_at
-    OutcomeEnum:
-      enum:
-      - ALLOW
-      - DENY
-      - CHANGE
-      type: string
-      description: |-
-        * `ALLOW` - Allow
-        * `DENY` - Deny
-        * `CHANGE` - Change
     Page:
       type: object
       properties:
@@ -20360,6 +21548,29 @@ components:
       - from_status
       - id
       - to_status
+    PaginatedActivationSummaryList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActivationSummary'
     PaginatedAssignmentList:
       type: object
       required:
@@ -20521,6 +21732,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Module'
+    PaginatedOperationList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Operation'
     PaginatedOrganizationList:
       type: object
       required:
@@ -20659,6 +21893,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Role'
+    PaginatedSiteActivationList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SiteActivation'
     PaginatedSiteDomainList:
       type: object
       required:
@@ -20774,6 +22031,37 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SiteTemplate'
+    Pair:
+      type: object
+      properties:
+        code:
+          type: string
+        previous_state:
+          $ref: '#/components/schemas/SiteModuleStateEnum'
+        new_state:
+          $ref: '#/components/schemas/SiteModuleStateEnum'
+        outcome:
+          $ref: '#/components/schemas/PairOutcomeEnum'
+        reasons:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reason'
+      required:
+      - code
+      - new_state
+      - outcome
+      - previous_state
+      - reasons
+    PairOutcomeEnum:
+      enum:
+      - CHANGE
+      - UNCHANGED
+      - BLOCKED
+      type: string
+      description: |-
+        * `CHANGE` - CHANGE
+        * `UNCHANGED` - UNCHANGED
+        * `BLOCKED` - BLOCKED
     PatchedItemPatchRequest:
       type: object
       properties:
@@ -21743,6 +23031,117 @@ components:
       required:
       - code
       - name
+    PreviewRequestRequest:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/SiteModuleActionEnum'
+        modules:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 64
+          maxItems: 20
+          minItems: 1
+        scope:
+          $ref: '#/components/schemas/ScopeRequest'
+      required:
+      - action
+      - modules
+      - scope
+    PreviewResponse:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/SiteModuleActionEnum'
+        modules:
+          type: array
+          items:
+            $ref: '#/components/schemas/ModuleRef'
+        scope: {}
+        summary:
+          $ref: '#/components/schemas/Summary'
+        dependency_warnings:
+          type: array
+          items:
+            $ref: '#/components/schemas/Warning'
+        high_impact:
+          type: boolean
+          description: When true, apply requires a reason and confirmation equal to
+            confirmation_phrase.
+        confirmation_phrase:
+          type: string
+        sites:
+          type: array
+          items:
+            $ref: '#/components/schemas/PreviewSite'
+        preview_token:
+          type: string
+          description: Signed plan fingerprint. Send it to bulk-apply unchanged.
+        expires_in:
+          type: integer
+          description: Seconds until the preview token expires.
+      required:
+      - action
+      - confirmation_phrase
+      - dependency_warnings
+      - expires_in
+      - high_impact
+      - modules
+      - preview_token
+      - scope
+      - sites
+      - summary
+    PreviewSite:
+      type: object
+      properties:
+        id:
+          type: integer
+        code:
+          type: string
+        name:
+          type: string
+        status:
+          $ref: '#/components/schemas/SiteStatusEnum'
+        organization:
+          $ref: '#/components/schemas/OrganizationRef'
+        outcome:
+          $ref: '#/components/schemas/PreviewSiteOutcomeEnum'
+        modules:
+          type: array
+          items:
+            $ref: '#/components/schemas/Pair'
+      required:
+      - code
+      - id
+      - modules
+      - name
+      - organization
+      - outcome
+      - status
+    PreviewSiteOutcomeEnum:
+      enum:
+      - CHANGE
+      - UNCHANGED
+      - BLOCKED
+      - PARTIAL
+      type: string
+      description: |-
+        * `CHANGE` - CHANGE
+        * `UNCHANGED` - UNCHANGED
+        * `BLOCKED` - BLOCKED
+        * `PARTIAL` - PARTIAL
+    PrimaryDomainSummary:
+      type: object
+      properties:
+        hostname:
+          type: string
+        status:
+          $ref: '#/components/schemas/ActiveInactiveStatusEnum'
+      required:
+      - hostname
+      - status
     PublicConfiguration:
       type: object
       properties:
@@ -22003,6 +23402,19 @@ components:
       - PUBLISHED
       type: string
       description: '* `PUBLISHED` - PUBLISHED'
+    Reason:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        module:
+          type: string
+          description: The related module for dependency reasons.
+      required:
+      - code
+      - message
     ReorderInputRequest:
       type: object
       properties:
@@ -22127,6 +23539,50 @@ components:
         * `PLATFORM` - Platform
         * `ORGANIZATION` - Organization
         * `SITE` - Site
+    ScopeFilterRequest:
+      type: object
+      properties:
+        search:
+          type: string
+          maxLength: 255
+        status:
+          $ref: '#/components/schemas/SiteStatusEnum'
+        organization:
+          type: integer
+          minimum: 1
+        include_descendants:
+          type: boolean
+          default: false
+        site:
+          type: integer
+          minimum: 1
+        module:
+          type: string
+          minLength: 1
+          maxLength: 64
+        activation:
+          $ref: '#/components/schemas/ActivationEnum'
+    ScopeRequest:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/SiteModuleScopeEnum'
+        site_ids:
+          type: array
+          items:
+            type: integer
+            minimum: 1
+          maxItems: 1000
+        organization:
+          type: integer
+          minimum: 1
+        include_descendants:
+          type: boolean
+          default: false
+        filters:
+          $ref: '#/components/schemas/ScopeFilterRequest'
+      required:
+      - type
     Site:
       type: object
       properties:
@@ -22166,6 +23622,13 @@ components:
           readOnly: true
           description: Versioned allowlisted settings. Empty objects receive schema
             version 1 defaults.
+        primary_domain:
+          allOf:
+          - $ref: '#/components/schemas/PrimaryDomainSummary'
+          nullable: true
+          readOnly: true
+          description: Current primary hostname, or null. Included to avoid a hostname
+            request for every Site row.
         created_at:
           type: string
           format: date-time
@@ -22181,8 +23644,40 @@ components:
       - id
       - name
       - organization_unit
+      - primary_domain
       - status
       - updated_at
+    SiteActivation:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        code:
+          type: string
+          description: Globally unique, normalized to uppercase and immutable after
+            creation.
+          pattern: ^[A-Z][A-Z0-9_-]{0,63}$
+          maxLength: 64
+        name:
+          type: string
+          maxLength: 255
+        status:
+          $ref: '#/components/schemas/SiteStatusEnum'
+        organization:
+          type: object
+          additionalProperties: {}
+          readOnly: true
+        modules:
+          type: object
+          additionalProperties: {}
+          readOnly: true
+      required:
+      - code
+      - id
+      - modules
+      - name
+      - organization
     SiteContent:
       type: object
       description: Read-only identity/scope fields; writable content editables.
@@ -22351,6 +23846,13 @@ components:
           nullable: true
           description: Template whose defaults were copied at provisioning. Later
             template edits do not change this Site.
+        primary_domain:
+          allOf:
+          - $ref: '#/components/schemas/PrimaryDomainSummary'
+          nullable: true
+          readOnly: true
+          description: Current primary hostname, or null. Included to avoid a hostname
+            request for every Site row.
         created_at:
           type: string
           format: date-time
@@ -22365,6 +23867,7 @@ components:
       - id
       - name
       - organization_unit
+      - primary_domain
       - status
       - updated_at
     SiteCreateRequest:
@@ -22508,6 +24011,11 @@ components:
         is_enabled:
           type: boolean
           readOnly: true
+        is_available:
+          type: boolean
+          readOnly: true
+          description: 'Effective availability: enabled for this Site, globally enabled,
+            implemented and shipped.'
         configuration: {}
         created_at:
           type: string
@@ -22520,11 +24028,20 @@ components:
       required:
       - created_at
       - id
+      - is_available
       - is_enabled
       - module
       - module_code
       - site
       - updated_at
+    SiteModuleActionEnum:
+      enum:
+      - ENABLE
+      - DISABLE
+      type: string
+      description: |-
+        * `ENABLE` - Enable
+        * `DISABLE` - Disable
     SiteModuleRequest:
       type: object
       properties:
@@ -22533,6 +24050,30 @@ components:
         configuration: {}
       required:
       - module
+    SiteModuleScopeEnum:
+      enum:
+      - SITE
+      - SELECTED
+      - ALL
+      - FILTER
+      - ORGANIZATION
+      type: string
+      description: |-
+        * `SITE` - Individual Site
+        * `SELECTED` - Selected Sites
+        * `ALL` - All Sites
+        * `FILTER` - All matching Sites
+        * `ORGANIZATION` - Organization
+    SiteModuleStateEnum:
+      enum:
+      - NOT_ASSIGNED
+      - ENABLED
+      - DISABLED
+      type: string
+      description: |-
+        * `NOT_ASSIGNED` - Not assigned
+        * `ENABLED` - Enabled
+        * `DISABLED` - Disabled
     SitePage:
       type: object
       description: |-
@@ -22953,6 +24494,13 @@ components:
           readOnly: true
           description: Versioned allowlisted settings. Empty objects receive schema
             version 1 defaults.
+        primary_domain:
+          allOf:
+          - $ref: '#/components/schemas/PrimaryDomainSummary'
+          nullable: true
+          readOnly: true
+          description: Current primary hostname, or null. Included to avoid a hostname
+            request for every Site row.
         created_at:
           type: string
           format: date-time
@@ -22968,6 +24516,7 @@ components:
       - id
       - name
       - organization_unit
+      - primary_domain
       - status
       - updated_at
     SourceEnum:
@@ -22980,6 +24529,40 @@ components:
         * `global` - global
         * `inherited` - inherited
         * `local` - local
+    Summary:
+      type: object
+      properties:
+        matched_sites:
+          type: integer
+        eligible_sites:
+          type: integer
+          description: Sites with at least one expected change.
+        already_in_state_sites:
+          type: integer
+        blocked_sites:
+          type: integer
+          description: Sites with at least one blocked module. Their blocked modules
+            are skipped.
+        expected_changes:
+          type: integer
+          description: Site-module pairs that apply will change.
+        unchanged_pairs:
+          type: integer
+        blocked_pairs:
+          type: integer
+        blocked_reasons:
+          type: array
+          items:
+            $ref: '#/components/schemas/BlockedReason'
+      required:
+      - already_in_state_sites
+      - blocked_pairs
+      - blocked_reasons
+      - blocked_sites
+      - eligible_sites
+      - expected_changes
+      - matched_sites
+      - unchanged_pairs
     TreeOutput:
       type: object
       properties:
@@ -23006,11 +24589,39 @@ components:
         * `PUBLIC` - Public
         * `UNLISTED` - Unlisted
         * `HIDDEN` - Hidden
+    Warning:
+      type: object
+      properties:
+        module:
+          type: string
+        message:
+          type: string
+      required:
+      - message
+      - module
+    WorkflowActionInputActionEnum:
+      enum:
+      - submit
+      - approve
+      - reject
+      - publish
+      - unpublish
+      - archive
+      - restore
+      type: string
+      description: |-
+        * `submit` - submit
+        * `approve` - approve
+        * `reject` - reject
+        * `publish` - publish
+        * `unpublish` - unpublish
+        * `archive` - archive
+        * `restore` - restore
     WorkflowActionInputRequest:
       type: object
       properties:
         action:
-          $ref: '#/components/schemas/ActionEnum'
+          $ref: '#/components/schemas/WorkflowActionInputActionEnum'
         comment:
           type: string
           default: ''
@@ -23114,6 +24725,9 @@ tags:
 - name: Modules
   description: Platform capability registry. Planned modules cannot be enabled for
     a Site.
+- name: Module management
+  description: 'Platform-admin activation of modules across Sites: previewed, confirmed,
+    all-or-nothing bulk operations with dependency checks, operation history and audit.'
 - name: Menu links
   description: Site menu-link administration authorized by scoped application permissions.
 - name: Posts

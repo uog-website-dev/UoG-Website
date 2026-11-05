@@ -163,6 +163,8 @@ export interface Site {
   default_language: string;
   status: SiteStatus;
   is_main: boolean;
+  /** Read-only routing summary; null means no primary domain. Optional for older APIs. */
+  primary_domain?: { hostname: string; status: SiteDomainStatus } | null;
   template: number | null;
   configuration: SiteConfiguration;
   created_at: string;
@@ -281,6 +283,8 @@ export interface SiteModuleAssignment {
   site: number;
   module: number;
   module_code?: string;
+  /** Backend-computed global/shipped/Site availability; is_enabled is the local switch. */
+  is_available?: boolean;
   is_enabled: boolean;
   configuration: Record<string, unknown>;
   created_at: string;

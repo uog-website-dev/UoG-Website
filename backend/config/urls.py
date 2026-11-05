@@ -22,6 +22,7 @@ urlpatterns = [
     path("api/v1/site-context/", include("apps.sites.api.context_urls")),
     path("api/v1/site-templates/", include("apps.sites.api.template_urls")),
     path("api/v1/modules/", include("apps.sites.api.module_urls")),
+    path("api/v1/site-modules/", include("apps.sites.api.site_module_urls")),
     # Health endpoints (documented in docs/development/health.md)
     path("health/", include("apps.core.urls")),
     # Legacy liveness URL kept for backward compatibility

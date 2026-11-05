@@ -1,0 +1,12 @@
+﻿case,status,date,tester,build,evidence
+site-admin-login,PASS,2026-11-04,Codex real Edge QA,e42a429d15891ded6710bb7d5739092ae7bdb76c+workspace-working-tree,browser-responsive-results.json
+authorized-workspace-choices,PASS,2026-11-04,Codex real Edge QA,e42a429d15891ded6710bb7d5739092ae7bdb76c+workspace-working-tree,browser-functional-results.json
+site-identity-and-effective-navigation,PASS,2026-11-04,Codex real Edge QA,e42a429d15891ded6710bb7d5739092ae7bdb76c+workspace-working-tree,browser-functional-results.json
+api-driven-dashboard,PASS,2026-11-04,Codex real Edge QA,e42a429d15891ded6710bb7d5739092ae7bdb76c+workspace-working-tree,browser-functional-results.json
+create-page-quick-action,PASS,2026-11-04,Codex real Edge QA,e42a429d15891ded6710bb7d5739092ae7bdb76c+workspace-working-tree,browser-functional-results.json
+workspace-preserved-and-dashboard-refreshed,PASS,2026-11-04,Codex real Edge QA,e42a429d15891ded6710bb7d5739092ae7bdb76c+workspace-working-tree,browser-functional-results.json
+responsive-keyboard-desktop,PASS,2026-11-04,Codex real Edge QA,e42a429d15891ded6710bb7d5739092ae7bdb76c+workspace-working-tree,browser-responsive-results.json
+responsive-keyboard-tablet,PASS,2026-11-04,Codex real Edge QA,e42a429d15891ded6710bb7d5739092ae7bdb76c+workspace-working-tree,browser-responsive-results.json
+responsive-keyboard-mobile,PASS,2026-11-04,Codex real Edge QA,e42a429d15891ded6710bb7d5739092ae7bdb76c+workspace-working-tree,browser-responsive-results.json
+platform-admin-login,PASS,2026-11-04,Codex real Edge QA,e42a429d15891ded6710bb7d5739092ae7bdb76c+workspace-working-tree,browser-functional-results.json
+platform-and-site-switching,PASS,2026-11-04,Codex real Edge QA,e42a429d15891ded6710bb7d5739092ae7bdb76c+workspace-working-tree,browser-functional-results.json

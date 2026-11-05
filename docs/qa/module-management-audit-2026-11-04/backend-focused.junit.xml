@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="17" time="59.220" timestamp="2026-11-04T20:47:28.406426+00:00" hostname="85c1468f72d6"><testcase classname="tests.test_module_management_audit" name="test_completed_operation_replays_after_preview_expiry_without_duplicate_changes" time="10.094" /><testcase classname="tests.test_module_management_audit" name="test_preview_binds_versions_and_dependencies_even_if_eligibility_is_unchanged[site]" time="2.421"><failure message="django.core.exceptions.ValidationError: {'status': ['This Site lifecycle transition is not allowed.']}">tests/test_module_management_audit.py:44: in test_preview_binds_versions_and_dependencies_even_if_eligibility_is_unchanged
+    world.sites.informatics.save()
+apps/sites/models/site.py:86: in save
+    self.full_clean()
+apps/sites/models/site.py:79: in full_clean
+    return super().full_clean(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/site-packages/django/db/models/base.py:1651: in full_clean
+    raise ValidationError(errors)
+E   django.core.exceptions.ValidationError: {'status': ['This Site lifecycle transition is not allowed.']}</failure></testcase><testcase classname="tests.test_module_management_audit" name="test_preview_binds_versions_and_dependencies_even_if_eligibility_is_unchanged[dependency]" time="3.467" /><testcase classname="tests.test_module_management_audit" name="test_preview_binds_versions_and_dependencies_even_if_eligibility_is_unchanged[schema]" time="2.812" /><testcase classname="tests.test_module_management_audit" name="test_invalid_retained_settings_are_blocked_in_preview" time="3.004" /><testcase classname="tests.test_module_management_audit" name="test_dependency_cycles_are_rejected_by_model_and_database" time="2.807" /><testcase classname="tests.test_module_management_audit" name="test_database_rejects_bypassed_dependency_and_archived_switches" time="3.333" /><testcase classname="tests.test_module_management_audit" name="test_simultaneous_individual_switches_cannot_break_dependency" time="2.318" /><testcase classname="tests.test_module_management_audit" name="test_global_dependency_switch_removes_effective_availability_without_destroying_state" time="2.234" /><testcase classname="tests.test_module_management_audit" name="test_domain_service_audits_switches_once_and_refuses_site_admin_bulk_access" time="2.360" /><testcase classname="tests.test_module_management_audit" name="test_invalid_requests_and_scope_fields_are_rejected_and_audited_without_raw_payload" time="3.374" /><testcase classname="tests.test_module_transactions" name="test_autocommit_is_on_for_this_module" time="1.874" /><testcase classname="tests.test_module_transactions" name="test_global_and_site_module_changes_commit_and_isolate_sites" time="4.054" /><testcase classname="tests.test_module_transactions" name="test_stale_module_etag_does_not_overwrite_the_committed_row" time="2.404" /><testcase classname="tests.test_module_transactions" name="test_concurrent_module_updates_keep_one_winner" time="2.513" /><testcase classname="tests.test_module_transactions" name="test_audit_context_failure_rolls_the_module_change_back" time="3.056"><failure message="AttributeError: 'module' object at apps.sites.services.registry has no attribute 'database_audit_context'">/usr/local/lib/python3.12/site-packages/_pytest/monkeypatch.py:90: in annotated_getattr
+    obj = getattr(obj, name)
+          ^^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'apps.sites.services.registry' has no attribute 'database_audit_context'
+
+The above exception was the direct cause of the following exception:
+tests/test_module_transactions.py:357: in test_audit_context_failure_rolls_the_module_change_back
+    monkeypatch.setattr("apps.sites.services.registry.database_audit_context", fail_after_the_write)
+/usr/local/lib/python3.12/site-packages/_pytest/monkeypatch.py:104: in derive_importpath
+    annotated_getattr(target, attr, ann=module)
+/usr/local/lib/python3.12/site-packages/_pytest/monkeypatch.py:92: in annotated_getattr
+    raise AttributeError(
+E   AttributeError: 'module' object at apps.sites.services.registry has no attribute 'database_audit_context'</failure></testcase><testcase classname="tests.test_module_transactions" name="test_template_patch_uses_the_same_autocommit_boundary" time="4.075" /></testsuite></testsuites>

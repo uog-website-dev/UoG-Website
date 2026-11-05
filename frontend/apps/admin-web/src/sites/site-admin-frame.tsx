@@ -3,20 +3,22 @@
 /**
  * Administration chrome for one Site inside the shared console.
  *
- * The Site selector only offers the sites the caller already loaded for
- * this user. Changing the Site opens that Site's dashboard, and the
- * workspace remounts so a draft form cannot follow the user.
+ * Section navigation and the workspace selector live in the console rail,
+ * so this frame only keeps the active Site visible: name, status, code and
+ * owning organization. The workspace remounts per Site so a draft form
+ * cannot follow the user to another Site.
  */
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext } from "react";
 import type { ReactNode } from "react";
-import CloseIcon from "@mui/icons-material/Close";
-import MenuIcon from "@mui/icons-material/Menu";
+import BusinessIcon from "@mui/icons-material/Business";
+import LanguageRoundedIcon from "@mui/icons-material/LanguageRounded";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Drawer from "@mui/material/Drawer";
-import IconButton from "@mui/material/IconButton";
+import Chip from "@mui/material/Chip";
+import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
+import type { SiteStatus } from "@uog/types";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -31,12 +33,18 @@ import {
   visibleSiteSections,
 } from "@/sites/site-admin";
 import type { SectionDecision, SiteAccessInput, SiteSection } from "@/sites/site-admin";
+import { siteStatusChip } from "@/sites/validation";
 
 export interface SiteAdminSite {
   id: number;
   name: string;
   code: string;
-  status: string;
+  status: SiteStatus;
+  /** `null` when this account cannot read the owning organization. */
+  organizationName?: string | null;
+  organizationId?: number;
+  defaultLanguage?: string;
+  enabledLanguages?: readonly string[];
 }
 
 interface SiteAdminValue extends SiteAccessInput {
@@ -53,147 +61,92 @@ export function useSiteAdmin(): SiteAdminValue {
   return value;
 }
 
-function SectionLinks({
-  siteId,
-  sections,
-  currentPath,
-  onNavigate,
-}: {
-  siteId: number;
-  sections: SiteSection[];
-  currentPath: string;
-  onNavigate?: () => void;
-}) {
-  return (
-    <Box component="ul" sx={{ listStyle: "none", m: 0, p: 0, display: "flex", flexDirection: "column", gap: 0.5 }}>
-      {sections.map((section) => {
-        const href = siteAdminHref(siteId, section.segment);
-        const active = currentPath === href;
-        return (
-          <Box component="li" key={section.key}>
-            <Link
-              href={href}
-              aria-current={active ? "page" : undefined}
-              onClick={onNavigate}
-            >
-              {section.label}
-            </Link>
-          </Box>
-        );
-      })}
-    </Box>
-  );
+function organizationLabel(site: SiteAdminSite): string {
+  if (site.organizationName) return site.organizationName;
+  if (site.organizationId != null) return `Organization unit #${site.organizationId}`;
+  return "Organization unavailable";
 }
 
 export function SiteAdminFrame({
   site,
-  sites,
   enabledModuleCodes,
   permissions,
   children,
 }: SiteAdminValue & {
-  sites: SiteAdminSite[];
   children: ReactNode;
 }) {
-  const router = useRouter();
   const pathname = usePathname();
   const currentPath = normalizeAdminPathname(pathname);
-  const [menuOpen, setMenuOpen] = useState(false);
   const access = { enabledModuleCodes, permissions };
   const sections = visibleSiteSections(access);
-  const current = sections.find((section) => section.segment && currentPath === siteAdminHref(site.id, section.segment));
+  const current = sections.find(
+    (section) => section.segment && currentPath.startsWith(siteAdminHref(site.id, section.segment)),
+  );
   const value = { site, enabledModuleCodes, permissions };
+  const chip = siteStatusChip(site.status);
 
   return (
     <SiteAdminContext.Provider value={value}>
-    <Box key={site.id} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-      <Breadcrumb
-        items={[
-          { label: "Home", href: "/" },
-          { label: "Sites", href: "/sites" },
-          { label: site.name, href: `/sites/${site.id}` },
-          { label: current?.label ?? "Administration" },
-        ]}
-      />
-      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, alignItems: "center", justifyContent: "space-between" }}>
-        <Box>
-          <Typography variant="overline" color="primary.main">Site administration</Typography>
-          <Typography variant="h4" component="h1">{site.name}</Typography>
-          <Typography variant="body2" color="text.secondary">{site.code} · {site.status}</Typography>
-        </Box>
-        <Box>
-          <Typography component="label" htmlFor="site-admin-selector" sx={{ display: "block", fontSize: 12, mb: 0.5 }}>
-            Site
-          </Typography>
-          <select
-            id="site-admin-selector"
-            aria-label="Site"
-            value={String(site.id)}
-            onChange={(event) => {
-              const next = Number(event.target.value);
-              if (next !== site.id) router.push(siteSwitchHref(next));
-            }}
-            style={{ minWidth: 220, minHeight: 40, font: "inherit" }}
-          >
-            {sites.map((choice) => (
-              <option key={choice.id} value={choice.id}>{choice.name}</option>
-            ))}
-          </select>
-        </Box>
-      </Box>
-      <Box sx={{ display: "flex", gap: 2, alignItems: "flex-start" }}>
-        <Box
-          component="nav"
-          aria-label="Site sections"
-          sx={{ display: { xs: "none", md: "block" }, minWidth: 180 }}
-        >
-          <SectionLinks siteId={site.id} sections={sections} currentPath={currentPath} />
-        </Box>
-        <Button
+    <Box key={site.id} sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+      <Box sx={{ position: "sticky", top: 0, zIndex: 10, bgcolor: "grey.50", pb: 1 }}>
+        <Breadcrumb
+          items={[
+            { label: "Home", href: "/" },
+            { label: site.name, href: siteAdminHref(site.id) },
+            { label: current?.label ?? "Dashboard" },
+          ]}
+        />
+        <Paper
+          component="section"
+          aria-label="Active Site"
           variant="outlined"
-          startIcon={<MenuIcon />}
-          aria-expanded={menuOpen}
-          aria-controls="site-admin-menu"
-          onClick={() => setMenuOpen(true)}
-          sx={{ display: { xs: "inline-flex", md: "none" } }}
+          sx={{
+            p: { xs: 2, sm: 3 },
+            borderRadius: 3,
+            borderLeft: 4,
+            borderLeftColor: "secondary.main",
+            display: "flex",
+            flexDirection: "column",
+            gap: 1,
+          }}
         >
-          Open site menu
-        </Button>
-        <Box sx={{ flex: 1, minWidth: 0 }}>{children}</Box>
+          <Typography variant="overline" color="primary.main" sx={{ fontWeight: 700, letterSpacing: 1.1 }}>
+            Site administration
+          </Typography>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap" }}>
+            <Typography variant="h4" component="h1" sx={{ fontWeight: 800, overflowWrap: "anywhere" }}>
+              {site.name}
+            </Typography>
+            {chip ? <Chip size="small" variant="outlined" color={chip.color} label={chip.label} /> : null}
+          </Box>
+          <Box sx={{ display: "flex", gap: { xs: 1, sm: 3 }, flexWrap: "wrap", color: "text.secondary" }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+              <LanguageRoundedIcon sx={{ fontSize: 18 }} aria-hidden="true" />
+              <Typography variant="body2" sx={{ fontFamily: "monospace" }}>{site.code}</Typography>
+            </Box>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+              <BusinessIcon sx={{ fontSize: 18 }} aria-hidden="true" />
+              <Typography variant="body2">{organizationLabel(site)}</Typography>
+            </Box>
+          </Box>
+        </Paper>
       </Box>
+      <Box sx={{ minWidth: 0 }}>{children}</Box>
       {canActivateCentralModules(permissions) ? (
-        <Link href="/modules">Central module registry</Link>
+        <Button component={Link} href="/modules" size="small" sx={{ alignSelf: "flex-start" }}>
+          Central module registry
+        </Button>
       ) : (
         <Typography variant="body2" color="text.secondary">
           Central module activation stays in platform administration.
         </Typography>
       )}
-      <Drawer anchor="left" open={menuOpen} onClose={() => setMenuOpen(false)}>
-        <Box
-          id="site-admin-menu"
-          sx={{ width: 280, p: 2 }}
-          role="presentation"
-          onKeyDown={(event) => {
-            if (event.key === "Escape") setMenuOpen(false);
-          }}
-        >
-          <IconButton aria-label="Close site menu" onClick={() => setMenuOpen(false)}>
-            <CloseIcon />
-          </IconButton>
-          <SectionLinks
-            siteId={site.id}
-            sections={sections}
-            currentPath={currentPath}
-            onNavigate={() => setMenuOpen(false)}
-          />
-        </Box>
-      </Drawer>
     </Box>
     </SiteAdminContext.Provider>
   );
 }
 
-export function SiteAdminDenied({ sites }: { sites: SiteAdminSite[] }) {
+export function SiteAdminDenied({ sites }: { sites: Pick<SiteAdminSite, "id" | "name">[] }) {
   const router = useRouter();
   return (
     <Alert severity="warning" sx={{ display: "flex", flexDirection: "column", gap: 1 }}>

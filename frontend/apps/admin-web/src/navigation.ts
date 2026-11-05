@@ -32,6 +32,7 @@ export const adminNavItems: AdminNavItem[] = [
     href: "/",
     description: "Console overview",
     icon: DashboardIcon,
+    requiresAny: ["platform.dashboard.view"],
   },
   {
     key: "organizations",
@@ -39,6 +40,7 @@ export const adminNavItems: AdminNavItem[] = [
     href: "/organizations",
     description: "Institutional structure",
     icon: BusinessIcon,
+    requiresAny: ["platform.organizations.view"],
   },
   {
     key: "sites",
@@ -46,6 +48,7 @@ export const adminNavItems: AdminNavItem[] = [
     href: "/sites",
     description: "Managed websites",
     icon: WebIcon,
+    requiresAny: ["sites.view"],
   },
   {
     key: "domains",
@@ -53,6 +56,7 @@ export const adminNavItems: AdminNavItem[] = [
     href: "/domains",
     description: "Website addresses",
     icon: LanguageIcon,
+    requiresAny: ["sites.view"],
   },
   {
     key: "modules",
@@ -71,6 +75,28 @@ export const adminNavItems: AdminNavItem[] = [
     requiresAny: ["platform.roles.view", "platform.roles.create", "platform.roles.update", "platform.roles.assign_permissions", "platform.users.view", "platform.users.assign_roles", "audit.logs.view"],
   },
 ];
+
+/**
+ * Platform entries for a scope-less permission set. Django reports only
+ * platform-scoped grants without a Site, so a Site-only account gets none.
+ */
+export function visiblePlatformNavItems(platformPermissions: readonly string[]): AdminNavItem[] {
+  return adminNavItems.filter(
+    (item) => !item.requiresAny || item.requiresAny.some((code) => platformPermissions.includes(code)),
+  );
+}
+
+export function hasPlatformWorkspace(platformPermissions: readonly string[]): boolean {
+  return visiblePlatformNavItems(platformPermissions).length > 0;
+}
+
+/** The Site whose administration workspace a path belongs to, if any. */
+export function siteWorkspaceId(path: string): number | null {
+  const match = /^\/sites\/([1-9]\d*)\/admin(?:\/|$)/.exec(path);
+  if (!match) return null;
+  const id = Number(match[1]);
+  return Number.isSafeInteger(id) ? id : null;
+}
 
 /**
  * `usePathname()` may report the path with or without the Next.js `basePath`

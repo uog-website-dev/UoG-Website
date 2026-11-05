@@ -1,14 +1,19 @@
 import type { Metadata } from "next";
-import type { CSSProperties } from "react";
+import { Suspense, type CSSProperties } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { UogFooter, UogHeader, UogThemeProvider, ToastProvider } from "@uog/ui";
 
+import { redirect } from "next/navigation";
+
+import { getAccessToken } from "@/access-token";
 import { AdminShell } from "@/admin-shell";
-import { auth } from "@/auth";
+import { auth, siteOrigin } from "@/auth";
 import { signInWithKeycloak, signOutFromSite } from "@/app/actions";
+import { sessionExpiredHref } from "@/session-expiry";
+import { SignInNotice } from "@/sign-in-notice";
 
 import "./globals.css";
 
@@ -37,6 +42,10 @@ export default async function AdminLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   const session = await auth();
 
+  if (session && !(await getAccessToken())) {
+    redirect(`${siteOrigin}${sessionExpiredHref()}`);
+  }
+
   if (!session) {
     return (
       <html lang="en" suppressHydrationWarning>
@@ -55,6 +64,9 @@ export default async function AdminLayout({
                   The administration console is restricted to University of Gondar
                   staff. Sign in with your university account to continue.
                 </Typography>
+                <Suspense fallback={null}>
+                  <SignInNotice />
+                </Suspense>
                 <form action={signInWithKeycloak}>
                   <Button type="submit" variant="contained" size="large" fullWidth>
                     Sign in with Keycloak
@@ -71,7 +83,7 @@ export default async function AdminLayout({
 
   const actions = (
     <Box component="span" sx={{ display: "flex", gap: 1.5, alignItems: "center" }}>
-      <Box component="span" sx={{ fontSize: 14, opacity: 0.9 }}>
+      <Box component="span" sx={{ fontSize: 14, opacity: 0.9, display: { xs: "none", md: "inline" }, maxWidth: 240, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
         {session.user?.email ?? session.user?.name ?? "signed in"}
       </Box>
       <form action={signOutFromSite} style={{ display: "inline" }}>

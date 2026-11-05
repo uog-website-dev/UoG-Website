@@ -269,6 +269,16 @@ describe("SitesList — owner and topology", () => {
 });
 
 describe("SitesList — primary domain", () => {
+  it("renders summaries from the Site page without per-row server actions", async () => {
+    listSites.mockResolvedValue({ ok: true, data: page([
+      site({ primary_domain: { hostname: "www.uog.edu.et", status: "ACTIVE" } }),
+      site({ id: 2, code: "COLLEGE", name: "College", primary_domain: null }),
+    ]) });
+    renderList();
+    expect(await screen.findByText("www.uog.edu.et")).toBeTruthy();
+    expect(screen.getByText("No primary domain")).toBeTruthy();
+    expect(listSiteDomains).not.toHaveBeenCalled();
+  });
   it("shows the primary hostname for a row's site", async () => {
     listSites.mockResolvedValue({
       ok: true,

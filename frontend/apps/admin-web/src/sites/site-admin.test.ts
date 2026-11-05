@@ -47,6 +47,14 @@ describe("site administration matrix", () => {
     ], 11)).toEqual(["MENUS"]);
   });
 
+  it("hides globally disabled or unshipped modules even when the Site switch is on", () => {
+    expect(enabledModuleCodes([
+      { site: 11, is_enabled: true, is_available: false, module_code: "POSTS" },
+      { site: 11, is_enabled: true, is_available: true, module_code: "PAGES" },
+      { site: 11, is_enabled: false, is_available: false, module_code: "MENUS" },
+    ], 11)).toEqual(["PAGES"]);
+  });
+
   it("lists each accessible Site once and drops an invalid id", () => {
     expect(accessibleSiteOptions([
       { id: 11, name: "Informatics" },

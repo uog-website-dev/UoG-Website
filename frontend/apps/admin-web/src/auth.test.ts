@@ -195,6 +195,7 @@ describe("OIDC authorization-code sign-in", () => {
     expect(response.headers.get("location") ?? "").not.toBe(
       "http://localhost/admin",
     );
+    expect(response.headers.get("location")).toBe("http://localhost/admin?error=Configuration");
   });
 
   it("reports no identity while the session cookie is absent", async () => {

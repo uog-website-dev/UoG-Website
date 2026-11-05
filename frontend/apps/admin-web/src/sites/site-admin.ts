@@ -109,11 +109,11 @@ export function accessibleSiteOptions<T extends { id: number }>(sites: readonly 
 }
 
 export function enabledModuleCodes(
-  rows: readonly { site: number; is_enabled: boolean; module_code?: string }[],
+  rows: readonly { site: number; is_enabled: boolean; is_available?: boolean; module_code?: string }[],
   siteId: number,
 ): string[] {
   return rows
-    .filter((row) => row.site === siteId && row.is_enabled && typeof row.module_code === "string" && row.module_code.length > 0)
+    .filter((row) => row.site === siteId && row.is_enabled && row.is_available !== false && typeof row.module_code === "string" && row.module_code.length > 0)
     .map((row) => row.module_code as string);
 }
 

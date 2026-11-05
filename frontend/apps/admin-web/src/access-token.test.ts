@@ -12,12 +12,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/session-jwt", () => ({
   getSessionToken: vi.fn(),
+  writeSessionToken: vi.fn(async () => undefined),
 }));
 
-import { getAccessToken } from "@/access-token";
-import { getSessionToken } from "@/session-jwt";
+import { clearRefreshedAccessTokens, getAccessToken, getSessionState } from "@/access-token";
+import { getSessionToken, writeSessionToken } from "@/session-jwt";
 
 const session = vi.mocked(getSessionToken);
+const persist = vi.mocked(writeSessionToken);
 const fetchMock = vi.fn();
 
 const TOKEN_URL = "https://idp.test/realms/uog/protocol/openid-connect/token";
@@ -35,6 +37,8 @@ function sessionToken(overrides: Record<string, unknown> = {}) {
 }
 
 beforeEach(() => {
+  clearRefreshedAccessTokens();
+  persist.mockClear();
   vi.stubGlobal("fetch", fetchMock);
   vi.stubEnv("KEYCLOAK_TOKEN_URL", TOKEN_URL);
   vi.stubEnv("KEYCLOAK_CLIENT_ID", "admin-web");
@@ -97,6 +101,43 @@ describe("access token expiry and refresh", () => {
     expect(body.get("client_secret")).toBe("admin-web-test-secret");
     // The already-expired access token is never replayed to the token endpoint.
     expect(body.get("access_token")).toBeNull();
+    expect(persist).toHaveBeenCalledWith(
+      expect.objectContaining({
+        accessToken: "fresh-token",
+        refreshToken: "refresh-token-1",
+      }),
+    );
+  });
+
+  it("reuses one exchange when several callers still hold the retired refresh token", async () => {
+    session.mockResolvedValue(sessionToken({ accessTokenExpires: now() - 60 }));
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          access_token: "fresh-token",
+          refresh_token: "refresh-token-2",
+          expires_in: 300,
+          id_token: "id-token-2",
+        }),
+        { headers: { "content-type": "application/json" } },
+      ),
+    );
+
+    const [first, second] = await Promise.all([getAccessToken(), getAccessToken()]);
+
+    expect(first).toBe("fresh-token");
+    expect(second).toBe("fresh-token");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(persist).toHaveBeenCalledWith(
+      expect.objectContaining({
+        accessToken: "fresh-token",
+        refreshToken: "refresh-token-2",
+        idToken: "id-token-2",
+      }),
+    );
+
+    await expect(getAccessToken()).resolves.toBe("fresh-token");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
   it("fails closed when the token endpoint rejects the refresh", async () => {
@@ -129,6 +170,40 @@ describe("access token expiry and refresh", () => {
     session.mockResolvedValue(sessionToken({ accessTokenExpires: now() - 60 }));
 
     await expect(getAccessToken()).resolves.toBeNull();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+});
+
+function jwtWithExp(exp: number): string {
+  const payload = Buffer.from(JSON.stringify({ exp })).toString("base64url");
+  return `header.${payload}.signature`;
+}
+
+describe("session state check", () => {
+  it("is anonymous without a session and active with a live access token", async () => {
+    session.mockResolvedValue(null);
+    await expect(getSessionState()).resolves.toBe("anonymous");
+
+    session.mockResolvedValue(sessionToken());
+    await expect(getSessionState()).resolves.toBe("active");
+  });
+
+  it("stays active while the refresh token is still valid, without refreshing", async () => {
+    session.mockResolvedValue(
+      sessionToken({ accessTokenExpires: now() - 60, refreshToken: jwtWithExp(now() + 600) }),
+    );
+    await expect(getSessionState()).resolves.toBe("active");
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("is expired once the refresh token has expired or is missing", async () => {
+    session.mockResolvedValue(
+      sessionToken({ accessTokenExpires: now() - 60, refreshToken: jwtWithExp(now() - 1) }),
+    );
+    await expect(getSessionState()).resolves.toBe("expired");
+
+    session.mockResolvedValue(sessionToken({ accessTokenExpires: now() - 60, refreshToken: null }));
+    await expect(getSessionState()).resolves.toBe("expired");
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });

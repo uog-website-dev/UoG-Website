@@ -89,6 +89,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       ...(userinfoUrl ? { userinfo: { url: userinfoUrl } } : {}),
     }),
   ],
+  // A failed callback (for example an expired state cookie) lands on the
+  // console's sign-in screen with `?error=` instead of Auth.js's 500 page.
+  pages: {
+    error: APP_BASE_PATH,
+  },
   session: {
     strategy: "jwt",
   },

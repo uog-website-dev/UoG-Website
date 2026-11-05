@@ -25,7 +25,10 @@ def test_site_packages_import_and_application_loads():
 
 
 def test_site_domain_does_not_duplicate_organization_or_invent_future_entities():
-    assert {model.__name__ for model in apps.get_app_config("sites").get_models()} == {"Module", "Site", "SiteDomain", "SiteModule", "SiteTemplate"}
+    assert {model.__name__ for model in apps.get_app_config("sites").get_models()} == {
+        "Module", "ModuleDependency", "Site", "SiteDomain", "SiteModule", "SiteModuleOperation",
+        "SiteModuleOperationChange", "SiteTemplate",
+    }
     assert {model.__name__ for model in apps.get_app_config("organizations").get_models()} == {
         "OrganizationType", "OrganizationUnit",
     }

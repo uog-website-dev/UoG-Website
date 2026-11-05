@@ -4,9 +4,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { PaginatedResponse, PlatformModule } from "@uog/types";
 
 const listPlatformModules = vi.fn();
+const listModuleActivationSummary = vi.fn();
 
 vi.mock("@/app/sites/actions", () => ({
   listPlatformModules: (...args: unknown[]) => listPlatformModules(...args),
+}));
+vi.mock("@/app/modules/actions", () => ({
+  listModuleActivationSummary: (...args: unknown[]) => listModuleActivationSummary(...args),
 }));
 
 import { ModuleRegistry } from "./module-registry";
@@ -60,41 +64,81 @@ function failure(message: string) {
   };
 }
 
+function summaryRow(code: string, partial: Record<string, unknown> = {}) {
+  return {
+    id: 1, code, name: code, description: "", status: "IMPLEMENTED",
+    implementation_status: "AVAILABLE", is_shipped: true, platform_enabled: true,
+    enabled_sites: 0, disabled_sites: 0, eligible_sites: 0, total_sites: 4,
+    requires: [], required_by: [], updated_at: STAMP, ...partial,
+  };
+}
+
 beforeEach(() => {
   vi.clearAllMocks();
   listPlatformModules.mockResolvedValue(
     ok({ count: 2, next: null, previous: null, results: [moduleFixture(), IMPLEMENTED] }),
   );
+  listModuleActivationSummary.mockResolvedValue({
+    ok: true,
+    data: [
+      summaryRow("CMS", { status: "PLANNED", implementation_status: "PLANNED", platform_enabled: false }),
+      summaryRow("EVENTS", { enabled_sites: 3, disabled_sites: 1, eligible_sites: 4, requires: ["PAGES"] }),
+    ],
+  });
 });
 
 describe("ModuleRegistry", () => {
-  it("renders each capability with honest status and availability chips", async () => {
+  it("keeps implementation status, platform availability and Site activation separate", async () => {
     render(<ModuleRegistry />);
 
-    // "CMS" also appears in the availability detail list, so scope to the
-    // table rows below rather than a single text match.
-    await screen.findAllByText("CMS");
-    expect(screen.getAllByText("EVENTS").length).toBeGreaterThan(0);
+    await screen.findByText("CMS");
+    await waitFor(() => expect(listModuleActivationSummary).toHaveBeenCalled());
 
-    // Planned: unavailable, spelled out. Implemented+on: available.
     const rows = screen.getAllByRole("row");
     const plannedRow = rows.find((row) => row.textContent?.includes("CMS"));
     const implementedRow = rows.find((row) =>
       row.textContent?.includes("EVENTS"),
     );
 
+    await waitFor(() => expect(implementedRow?.textContent).toContain("PAGES"));
     expect(plannedRow?.textContent).toContain("Planned");
-    expect(plannedRow?.textContent).toContain("Unavailable");
     expect(plannedRow?.textContent).toContain("Off");
-    expect(implementedRow?.textContent).toContain("Implemented");
     expect(implementedRow?.textContent).toContain("Available");
     expect(implementedRow?.textContent).toContain("On");
-    expect(implementedRow?.textContent).toContain("1 property");
+    expect(implementedRow?.textContent).toContain("3");
+    expect(implementedRow?.textContent).toContain("4");
+  });
 
-    // The per-row availability messages repeat the rule for each module.
-    expect(
-      screen.getAllByText(/registry row is not a working feature/i).length,
-    ).toBeGreaterThan(0);
+  it("labels an implemented module that is switched off platform-wide", async () => {
+    listPlatformModules.mockResolvedValue(
+      ok({ count: 1, next: null, previous: null, results: [{ ...IMPLEMENTED, is_enabled: false }] }),
+    );
+    listModuleActivationSummary.mockResolvedValue({
+      ok: true,
+      data: [summaryRow("EVENTS", { implementation_status: "IMPLEMENTED_DISABLED", platform_enabled: false })],
+    });
+    render(<ModuleRegistry />);
+    expect(await screen.findByText("Implemented but disabled")).toBeTruthy();
+  });
+
+  it("opens a details view with counts, dependencies and settings", async () => {
+    render(<ModuleRegistry />);
+    await screen.findByText("EVENTS");
+    await waitFor(() => expect(screen.getAllByRole("row").some((row) => row.textContent?.includes("PAGES"))).toBe(true));
+    fireEvent.click(screen.getByRole("button", { name: "Details for EVENTS" }));
+
+    const dialog = await screen.findByRole("dialog");
+    expect(dialog.textContent).toContain("3 of 4");
+    expect(dialog.textContent).toContain("PAGES");
+    expect(dialog.textContent).toContain("Page size (required)");
+    expect(dialog.textContent).toContain("Available: implemented and enabled platform-wide");
+  });
+
+  it("still lists the registry when the activation summary fails", async () => {
+    listModuleActivationSummary.mockResolvedValue(failure("Summary down."));
+    render(<ModuleRegistry />);
+    expect(await screen.findByText(/Site counts and dependencies could not be loaded/)).toBeTruthy();
+    expect(screen.getByText("EVENTS")).toBeTruthy();
   });
 
   it("applies the search filter against the documented contract", async () => {

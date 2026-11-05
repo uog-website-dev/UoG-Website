@@ -480,6 +480,9 @@ SPECTACULAR_SETTINGS = {
         "ActiveInactiveStatusEnum": "apps.sites.models.SiteDomain.Status",
         "ModuleStatusEnum": "apps.sites.models.Module.Status",
         "ContentStatusEnum": "apps.cms.models.ContentStatus",
+        "SiteModuleActionEnum": "apps.sites.models.SiteModuleOperation.Action",
+        "SiteModuleScopeEnum": "apps.sites.models.SiteModuleOperation.ScopeType",
+        "SiteModuleStateEnum": "apps.sites.models.SiteModuleOperationChange.State",
     },
     "POSTPROCESSING_HOOKS": [
         "drf_spectacular.hooks.postprocess_schema_enums",
@@ -495,6 +498,7 @@ SPECTACULAR_SETTINGS = {
         {"name": "Domains", "description": "Hostnames for one Site, including an atomic primary-domain switch."},
         {"name": "Site templates", "description": "Approved starting configurations. Applying one does not rewrite existing Sites."},
         {"name": "Modules", "description": "Platform capability registry. Planned modules cannot be enabled for a Site."},
+        {"name": "Module management", "description": "Platform-admin activation of modules across Sites: previewed, confirmed, all-or-nothing bulk operations with dependency checks, operation history and audit."},
         {"name": "Menu links", "description": "Site menu-link administration authorized by scoped application permissions."},
         {"name": "Posts", "description": "Site-scoped post authoring, category and tag administration. Requires a Site CMS authoring role and the POSTS module enabled for the Site."},
         {"name": "Menus", "description": "Site-scoped menu and item administration, atomic tree operations, inheritance policy and menu-wide ETag concurrency. Permissions: menu.read, menu.write and menu.publish. Inheritance does not grant parent-menu management."},

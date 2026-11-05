@@ -2,9 +2,49 @@ import { describe, expect, it } from "vitest";
 
 import {
   adminNavItems,
+  hasPlatformWorkspace,
   isNavItemActive,
   normalizeAdminPathname,
+  siteWorkspaceId,
+  visiblePlatformNavItems,
 } from "@/navigation";
+import { workspaceHref, workspaceValue } from "@/workspace";
+
+describe("platform workspace visibility", () => {
+  it("gates every platform entry on a platform-scoped permission", () => {
+    expect(adminNavItems.every((item) => (item.requiresAny ?? []).length > 0)).toBe(true);
+    expect(visiblePlatformNavItems([])).toEqual([]);
+    expect(hasPlatformWorkspace([])).toBe(false);
+  });
+
+  it("shows only the entries a platform permission covers", () => {
+    const keys = visiblePlatformNavItems(["platform.organizations.view"]).map((item) => item.key);
+    expect(keys).toEqual(["organizations"]);
+    expect(hasPlatformWorkspace(["platform.organizations.view"])).toBe(true);
+  });
+
+  it("ignores content permissions that do not open a platform screen", () => {
+    expect(hasPlatformWorkspace(["content.pages.view", "menu.read"])).toBe(false);
+  });
+});
+
+describe("workspace paths", () => {
+  it("finds the Site workspace from a Site administration path only", () => {
+    expect(siteWorkspaceId("/sites/2/admin")).toBe(2);
+    expect(siteWorkspaceId("/sites/2/admin/pages")).toBe(2);
+    expect(siteWorkspaceId("/sites/2")).toBeNull();
+    expect(siteWorkspaceId("/sites/0/admin")).toBeNull();
+    expect(siteWorkspaceId("/sites/2/administer")).toBeNull();
+  });
+
+  it("maps selector values to their dashboards", () => {
+    expect(workspaceValue(null)).toBe("platform");
+    expect(workspaceValue(7)).toBe("site:7");
+    expect(workspaceHref("platform")).toBe("/");
+    expect(workspaceHref("site:7")).toBe("/sites/7/admin");
+    expect(workspaceHref("site:abc")).toBeNull();
+  });
+});
 
 describe("adminNavItems", () => {
   it("exposes the Organizations, Sites, Domains, Modules and permission-gated Access control entries", () => {

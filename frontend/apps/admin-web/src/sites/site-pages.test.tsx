@@ -114,10 +114,6 @@ function siteWorkspace(site: SiteAdminSite, permissions: readonly string[]) {
     <ToastProvider>
       <SiteAdminFrame
         site={site}
-        sites={[
-          { id: 11, name: "Informatics", code: "INFORMATICS", status: "ACTIVE" },
-          { id: 22, name: "Medicine", code: "MEDICINE", status: "ACTIVE" },
-        ]}
         enabledModuleCodes={["PAGES"]}
         permissions={[...permissions]}
       >
@@ -286,6 +282,67 @@ describe("SitePagesPanel", () => {
     expect(loadSitePageWorkflowHistory).toHaveBeenCalledWith(11, "page-1");
   });
 
+  it("defaults a new Page to the Site language", async () => {
+    render(
+      <ToastProvider>
+        <SitePagesPanel
+          siteId={11}
+          pagesEnabled
+          permissions={ALL_PERMISSIONS}
+          languages={{ defaultLanguage: "en-us", enabled: ["en-us", "am"] }}
+        />
+      </ToastProvider>,
+    );
+    await screen.findByRole("table", { name: "Pages for this Site" });
+    fireEvent.click(screen.getByRole("button", { name: "Create page" }));
+    expect(screen.getByRole("combobox", { name: "Locale" }).textContent).toContain("en-us");
+    fireEvent.change(screen.getByRole("textbox", { name: "Title" }), { target: { value: "Library hours" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create Page" }));
+    await waitFor(() => expect(createSitePage).toHaveBeenCalledWith(
+      11,
+      expect.objectContaining({ locale: "en-us", seo: {}, metadata: {} }),
+    ));
+  });
+
+  it("opens the create dialog once for the dashboard quick action", async () => {
+    const started = vi.fn();
+    render(
+      <ToastProvider>
+        <SitePagesPanel siteId={11} pagesEnabled permissions={ALL_PERMISSIONS} startCreate onCreateStarted={started} />
+      </ToastProvider>,
+    );
+    expect(await screen.findByRole("dialog", { name: "Create Page" })).toBeTruthy();
+    expect(started).toHaveBeenCalledTimes(1);
+  });
+
+  it("starts a new Page blank and fills the slug from the title until it is edited", async () => {
+    renderPanel();
+    await screen.findByRole("table", { name: "Pages for this Site" });
+    fireEvent.click(screen.getByRole("button", { name: "Create page" }));
+    const title = screen.getByRole("textbox", { name: "Title" });
+    const slug = screen.getByRole("textbox", { name: "Slug" });
+    expect(title).toHaveProperty("value", "");
+    expect(slug).toHaveProperty("value", "");
+    expect(screen.queryByRole("textbox", { name: "Block 1 JSON" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Create Page" })).toHaveProperty("disabled", true);
+
+    fireEvent.change(title, { target: { value: "Graduate Admissions 2027" } });
+    expect(slug).toHaveProperty("value", "graduate-admissions-2027");
+    fireEvent.change(slug, { target: { value: "grad-admissions" } });
+    fireEvent.change(title, { target: { value: "Graduate Admissions" } });
+    expect(slug).toHaveProperty("value", "grad-admissions");
+  });
+
+  it("ignores the create request without create permission", async () => {
+    render(
+      <ToastProvider>
+        <SitePagesPanel siteId={11} pagesEnabled permissions={["content.pages.view"]} startCreate />
+      </ToastProvider>,
+    );
+    await screen.findByRole("table", { name: "Pages for this Site" });
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
   it("creates and edits only with the matching permission and current ETag", async () => {
     renderPanel();
     await screen.findByRole("table", { name: "Pages for this Site" });
@@ -303,7 +360,7 @@ describe("SitePagesPanel", () => {
       visibility: "PUBLIC",
       metadata: {},
       seo: {},
-      blocks: [{ type: "paragraph", html: "<p>Applications are open.</p>" }],
+      blocks: [],
     }));
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
 
@@ -342,6 +399,7 @@ describe("SitePagesPanel", () => {
   it("previews private draft content and blocks malformed block JSON", async () => {
     renderPanel();
     fireEvent.click(await screen.findByRole("button", { name: "Create page" }));
+    fireEvent.click(screen.getByRole("button", { name: "Add paragraph block" }));
     fireEvent.click(screen.getByRole("button", { name: "Preview draft" }));
     expect(screen.getByText("Private draft preview")).toBeTruthy();
     expect(screen.queryByRole("script")).toBeNull();
@@ -432,11 +490,6 @@ describe("SitePagesPanel", () => {
     };
     const view = render(siteWorkspace(informatics, ALL_PERMISSIONS));
     await screen.findByText("Informatics Admissions");
-
-    fireEvent.change(screen.getByRole("combobox", { name: "Site" }), {
-      target: { value: "22" },
-    });
-    expect(push).toHaveBeenCalledWith("/sites/22/admin");
 
     view.rerender(siteWorkspace(medicine, ["content.pages.view"]));
     await screen.findByText("Medicine Admissions");

@@ -55,6 +55,15 @@ function assignmentFixture(
 }
 
 describe("createMockSitesAdapter — module enablement", () => {
+  it("reports globally disabled assignments as unavailable without changing their local switch", async () => {
+    const adapter = createMockSitesAdapter({ ...instant,
+      seedModules: [moduleFixture({ is_enabled: false })], seedModuleAssignments: [assignmentFixture()],
+    });
+    const rows = await adapter.listModuleAssignments(1);
+    expect(rows.results[0]).toMatchObject({ is_enabled: true, is_available: false, module_code: "EVENTS" });
+    const detail = await adapter.getModuleAssignment(1, 1);
+    expect(detail.data.is_available).toBe(false);
+  });
   it("enables a usable module for a site and stores its settings", async () => {
     const adapter = createMockSitesAdapter({
       ...instant,

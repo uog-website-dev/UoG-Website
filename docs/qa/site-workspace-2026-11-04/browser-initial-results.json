@@ -1,0 +1,57 @@
+{
+  "run": "qaws7bf27e71",
+  "build": "e42a429d15891ded6710bb7d5739092ae7bdb76c+workspace-working-tree",
+  "results": [
+    {
+      "id": "site-admin-login",
+      "status": "PASS"
+    },
+    {
+      "id": "authorized-workspace-choices",
+      "status": "PASS"
+    },
+    {
+      "id": "site-identity-and-effective-navigation",
+      "status": "FAIL",
+      "actual": "Error: browser assertion failed; see screenshot"
+    },
+    {
+      "id": "api-driven-dashboard",
+      "status": "FAIL",
+      "actual": "Error: browser assertion failed; see screenshot"
+    },
+    {
+      "id": "create-page-quick-action",
+      "status": "FAIL",
+      "actual": "TimeoutError: browser assertion failed; see screenshot"
+    },
+    {
+      "id": "workspace-preserved-and-dashboard-refreshed",
+      "status": "FAIL",
+      "actual": "TimeoutError: browser assertion failed; see screenshot"
+    },
+    {
+      "id": "responsive-keyboard-desktop",
+      "status": "FAIL",
+      "actual": "TimeoutError: browser assertion failed; see screenshot"
+    },
+    {
+      "id": "responsive-keyboard-tablet",
+      "status": "FAIL",
+      "actual": "TimeoutError: browser assertion failed; see screenshot"
+    },
+    {
+      "id": "responsive-keyboard-mobile",
+      "status": "FAIL",
+      "actual": "TimeoutError: browser assertion failed; see screenshot"
+    },
+    {
+      "id": "platform-admin-login",
+      "status": "PASS"
+    },
+    {
+      "id": "platform-and-site-switching",
+      "status": "PASS"
+    }
+  ]
+}

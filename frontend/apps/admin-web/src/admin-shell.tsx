@@ -24,6 +24,7 @@ import IconButton from "@mui/material/IconButton";
 import { UogFooter, UogHeader } from "@uog/ui";
 import type { ReactNode } from "react";
 
+import { useSessionWatch } from "@/session-watch";
 import { DesktopSidebar, MobileNavDrawer } from "@/sidebar";
 
 /** Visually hidden until focused — first tab stop on every page. */
@@ -54,6 +55,7 @@ export function AdminShell({
   children: ReactNode;
 }) {
   const [navOpen, setNavOpen] = useState(false);
+  useSessionWatch();
 
   return (
     <Box

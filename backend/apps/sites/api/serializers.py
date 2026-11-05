@@ -1,5 +1,6 @@
 """Explicit Site administration fields. Status changes use lifecycle actions."""
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field
 
 from ..models import Module, Site, SiteDomain, SiteModule, SiteTemplate
 
@@ -18,14 +19,29 @@ class StrictFields:
         return super().to_internal_value(data)
 
 
+class PrimaryDomainSummarySerializer(serializers.Serializer):
+    hostname = serializers.CharField()
+    status = serializers.ChoiceField(choices=SiteDomain.Status.choices)
+
+
 class SiteSerializer(StrictFields, serializers.ModelSerializer):
+    primary_domain = serializers.SerializerMethodField(help_text="Current primary hostname, or null. Included to avoid a hostname request for every Site row.")
+
+    @extend_schema_field(PrimaryDomainSummarySerializer(allow_null=True))
+    def get_primary_domain(self, obj):
+        domains = getattr(obj, "primary_domain_rows", None)
+        primary = domains[0] if domains else None
+        if domains is None:
+            primary = obj.domains.filter(is_primary=True).first()
+        return {"hostname": primary.hostname, "status": primary.status} if primary else None
+
     class Meta:
         model = Site
         fields = (
             "id", "code", "name", "short_name", "organization_unit", "default_language",
-            "status", "is_main", "template", "configuration", "created_at", "updated_at",
+            "status", "is_main", "template", "configuration", "primary_domain", "created_at", "updated_at",
         )
-        read_only_fields = ("id", "status", "configuration", "created_at", "updated_at")
+        read_only_fields = ("id", "status", "configuration", "primary_domain", "created_at", "updated_at")
         extra_kwargs = {"code": {"validators": []}, "template": {"allow_null": True, "required": False}}
 
     def validate_code(self, value):
@@ -117,11 +133,22 @@ class ModuleUpdateSerializer(ModuleSerializer):
 
 class SiteModuleSerializer(StrictFields, serializers.ModelSerializer):
     module_code = serializers.CharField(source="module.code", read_only=True)
+    is_available = serializers.SerializerMethodField(help_text="Effective availability: enabled for this Site, globally enabled, implemented and shipped.")
+
+    def get_is_available(self, obj) -> bool:
+        from ..selectors.modules import available_module_codes
+
+        # A paginated Site inventory shares this context: one availability
+        # query for the whole Site, rather than one query for every row.
+        available = self.context.setdefault("module_availability", {})
+        if obj.site_id not in available:
+            available[obj.site_id] = available_module_codes(obj.site_id, using=obj._state.db)
+        return obj.module.code in available[obj.site_id]
 
     class Meta:
         model = SiteModule
-        fields = ("id", "site", "module", "module_code", "is_enabled", "configuration", "created_at", "updated_at")
-        read_only_fields = ("id", "site", "module_code", "is_enabled", "created_at", "updated_at")
+        fields = ("id", "site", "module", "module_code", "is_enabled", "is_available", "configuration", "created_at", "updated_at")
+        read_only_fields = ("id", "site", "module_code", "is_enabled", "is_available", "created_at", "updated_at")
 
 
 class EmptyObjectSerializer(serializers.Serializer):

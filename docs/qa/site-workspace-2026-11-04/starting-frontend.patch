@@ -1,0 +1,3059 @@
+diff --git a/frontend/apps/admin-web/next.config.ts b/frontend/apps/admin-web/next.config.ts
+index a37ef3d..aaf8eed 100644
+--- a/frontend/apps/admin-web/next.config.ts
++++ b/frontend/apps/admin-web/next.config.ts
+@@ -5,6 +5,13 @@ import { APP_BASE_PATH } from "./src/base-path";
+ const nextConfig: NextConfig = {
+   // The admin console is served under /admin by the nginx reverse proxy.
+   basePath: APP_BASE_PATH,
++  // Dev compiles each screen the first time it is opened. The default cache
++  // keeps only a couple of those screens, so moving between menus compiles
++  // them again. Hold the console's screens for the session.
++  onDemandEntries: {
++    maxInactiveAge: 60 * 60 * 1000,
++    pagesBufferLength: 20,
++  },
+   // Serve /admin/ as well as /admin. Without this Next.js answers /admin/
+   // with a redirect to /admin, which nginx would answer with a redirect back
+   // to /admin/ — an endless loop.
+diff --git a/frontend/apps/admin-web/src/access-nav.tsx b/frontend/apps/admin-web/src/access-nav.tsx
+deleted file mode 100644
+index 8947c4e..0000000
+--- a/frontend/apps/admin-web/src/access-nav.tsx
++++ /dev/null
+@@ -1,38 +0,0 @@
+-"use client";
+-
+-import { useEffect, useState } from "react";
+-
+-import type { AdminNavItem } from "@/navigation";
+-
+-export function AccessNav({
+-  items,
+-  children,
+-}: {
+-  items: AdminNavItem[];
+-  children: (visibleItems: AdminNavItem[]) => React.ReactNode;
+-}) {
+-  const [permissions, setPermissions] = useState<string[] | null>(null);
+-
+-  useEffect(() => {
+-    let active = true;
+-    void fetch("/admin/api/access/", { cache: "no-store" })
+-      .then((response) => (response.ok ? response.json() : { permissions: [] }))
+-      .then((payload: { permissions?: unknown }) => {
+-        if (!active) return;
+-        const granted = Array.isArray(payload.permissions)
+-          ? payload.permissions.filter((item): item is string => typeof item === "string")
+-          : [];
+-        setPermissions(granted);
+-      })
+-      .catch(() => active && setPermissions([]));
+-    return () => {
+-      active = false;
+-    };
+-  }, []);
+-
+-  const visibleItems = permissions === null
+-    ? items.filter((item) => !item.requiresAny)
+-    : items.filter((item) => !item.requiresAny || item.requiresAny.some((code) => permissions.includes(code)));
+-
+-  return children(visibleItems);
+-}
+diff --git a/frontend/apps/admin-web/src/access-token.test.ts b/frontend/apps/admin-web/src/access-token.test.ts
+index d4d4222..35743e3 100644
+--- a/frontend/apps/admin-web/src/access-token.test.ts
++++ b/frontend/apps/admin-web/src/access-token.test.ts
+@@ -12,12 +12,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+ 
+ vi.mock("@/session-jwt", () => ({
+   getSessionToken: vi.fn(),
++  writeSessionToken: vi.fn(async () => undefined),
+ }));
+ 
+-import { getAccessToken } from "@/access-token";
+-import { getSessionToken } from "@/session-jwt";
++import { clearRefreshedAccessTokens, getAccessToken, getSessionState } from "@/access-token";
++import { getSessionToken, writeSessionToken } from "@/session-jwt";
+ 
+ const session = vi.mocked(getSessionToken);
++const persist = vi.mocked(writeSessionToken);
+ const fetchMock = vi.fn();
+ 
+ const TOKEN_URL = "https://idp.test/realms/uog/protocol/openid-connect/token";
+@@ -35,6 +37,8 @@ function sessionToken(overrides: Record<string, unknown> = {}) {
+ }
+ 
+ beforeEach(() => {
++  clearRefreshedAccessTokens();
++  persist.mockClear();
+   vi.stubGlobal("fetch", fetchMock);
+   vi.stubEnv("KEYCLOAK_TOKEN_URL", TOKEN_URL);
+   vi.stubEnv("KEYCLOAK_CLIENT_ID", "admin-web");
+@@ -97,6 +101,43 @@ describe("access token expiry and refresh", () => {
+     expect(body.get("client_secret")).toBe("admin-web-test-secret");
+     // The already-expired access token is never replayed to the token endpoint.
+     expect(body.get("access_token")).toBeNull();
++    expect(persist).toHaveBeenCalledWith(
++      expect.objectContaining({
++        accessToken: "fresh-token",
++        refreshToken: "refresh-token-1",
++      }),
++    );
++  });
++
++  it("reuses one exchange when several callers still hold the retired refresh token", async () => {
++    session.mockResolvedValue(sessionToken({ accessTokenExpires: now() - 60 }));
++    fetchMock.mockResolvedValue(
++      new Response(
++        JSON.stringify({
++          access_token: "fresh-token",
++          refresh_token: "refresh-token-2",
++          expires_in: 300,
++          id_token: "id-token-2",
++        }),
++        { headers: { "content-type": "application/json" } },
++      ),
++    );
++
++    const [first, second] = await Promise.all([getAccessToken(), getAccessToken()]);
++
++    expect(first).toBe("fresh-token");
++    expect(second).toBe("fresh-token");
++    expect(fetchMock).toHaveBeenCalledTimes(1);
++    expect(persist).toHaveBeenCalledWith(
++      expect.objectContaining({
++        accessToken: "fresh-token",
++        refreshToken: "refresh-token-2",
++        idToken: "id-token-2",
++      }),
++    );
++
++    await expect(getAccessToken()).resolves.toBe("fresh-token");
++    expect(fetchMock).toHaveBeenCalledTimes(1);
+   });
+ 
+   it("fails closed when the token endpoint rejects the refresh", async () => {
+@@ -132,3 +173,37 @@ describe("access token expiry and refresh", () => {
+     expect(fetchMock).not.toHaveBeenCalled();
+   });
+ });
++
++function jwtWithExp(exp: number): string {
++  const payload = Buffer.from(JSON.stringify({ exp })).toString("base64url");
++  return `header.${payload}.signature`;
++}
++
++describe("session state check", () => {
++  it("is anonymous without a session and active with a live access token", async () => {
++    session.mockResolvedValue(null);
++    await expect(getSessionState()).resolves.toBe("anonymous");
++
++    session.mockResolvedValue(sessionToken());
++    await expect(getSessionState()).resolves.toBe("active");
++  });
++
++  it("stays active while the refresh token is still valid, without refreshing", async () => {
++    session.mockResolvedValue(
++      sessionToken({ accessTokenExpires: now() - 60, refreshToken: jwtWithExp(now() + 600) }),
++    );
++    await expect(getSessionState()).resolves.toBe("active");
++    expect(fetchMock).not.toHaveBeenCalled();
++  });
++
++  it("is expired once the refresh token has expired or is missing", async () => {
++    session.mockResolvedValue(
++      sessionToken({ accessTokenExpires: now() - 60, refreshToken: jwtWithExp(now() - 1) }),
++    );
++    await expect(getSessionState()).resolves.toBe("expired");
++
++    session.mockResolvedValue(sessionToken({ accessTokenExpires: now() - 60, refreshToken: null }));
++    await expect(getSessionState()).resolves.toBe("expired");
++    expect(fetchMock).not.toHaveBeenCalled();
++  });
++});
+diff --git a/frontend/apps/admin-web/src/access-token.ts b/frontend/apps/admin-web/src/access-token.ts
+index 33458ef..e4ea348 100644
+--- a/frontend/apps/admin-web/src/access-token.ts
++++ b/frontend/apps/admin-web/src/access-token.ts
+@@ -8,18 +8,44 @@
+  *
+  * Keycloak access tokens live 5 minutes (realm `accessTokenLifespan`), so an
+  * expired token is exchanged for a fresh one through the realm's token
+- * endpoint using the refresh token from the same session. Refreshing is best
+- * effort: on failure `null` is returned, the API call goes out without an
+- * `Authorization` header and the endpoint answers 401 (the UI then asks the
+- * administrator to sign in again).
++ * endpoint using the refresh token from the same session. The replacement
++ * access token and refresh token are written back into the session cookie.
++ * One exchange is shared by every caller that still holds the retired refresh
++ * token, so parallel reads cannot rotate it more than once. On failure
++ * `null` is returned, the API call goes out without an Authorization header
++ * and the endpoint answers 401 (the UI then asks the administrator to sign
++ * in again).
+  */
+-import { getSessionToken } from "@/session-jwt";
++import type { JWT } from "next-auth/jwt";
++
++import { getSessionToken, writeSessionToken } from "@/session-jwt";
+ 
+ /** Seconds of margin before the stored token counts as expired. */
+ const EXPIRY_SKEW_SECONDS = 15;
+ 
+ interface TokenEndpointResponse {
+   access_token?: string;
++  expires_in?: number;
++  refresh_token?: string;
++  id_token?: string;
++}
++
++interface RefreshedTokens {
++  accessToken: string;
++  refreshToken: string;
++  expiresAt: number;
++  idToken: string | null;
++}
++
++/** Successful exchanges, keyed by the refresh token that produced them. */
++const refreshedByRefreshToken = new Map<string, RefreshedTokens>();
++/** In-flight exchanges, so concurrent callers rotate a refresh token once. */
++const refreshInFlight = new Map<string, Promise<RefreshedTokens | null>>();
++
++/** Drop remembered exchanges. Tests use this so cases do not share a token. */
++export function clearRefreshedAccessTokens(): void {
++  refreshedByRefreshToken.clear();
++  refreshInFlight.clear();
+ }
+ 
+ /**
+@@ -75,6 +101,29 @@ export async function getSessionClaims(): Promise<SessionClaims> {
+   return { roles, username };
+ }
+ 
++export type SessionState = "active" | "expired" | "anonymous";
++
++/**
++ * Whether the session can still reach the API, decided from the stored token
++ * expiry times without contacting Keycloak. A check must not refresh tokens:
++ * that would reset the realm's SSO idle timeout for an unattended tab.
++ */
++export async function getSessionState(): Promise<SessionState> {
++  const token = await getSessionToken();
++  if (!token) return "anonymous";
++  if (typeof token.accessToken !== "string") return "expired";
++
++  const now = Math.floor(Date.now() / 1000);
++  const accessExpires =
++    typeof token.accessTokenExpires === "number" ? token.accessTokenExpires : 0;
++  if (accessExpires - EXPIRY_SKEW_SECONDS > now) return "active";
++
++  if (typeof token.refreshToken !== "string") return "expired";
++  const refreshExpires = decodeJwtPayload(token.refreshToken)?.exp;
++  if (typeof refreshExpires !== "number") return "active";
++  return refreshExpires - EXPIRY_SKEW_SECONDS > now ? "active" : "expired";
++}
++
+ /**
+  * The access token of the signed-in user, or `null` when nobody is signed in
+  * (or no usable token can be obtained).
+@@ -95,15 +144,50 @@ export async function getAccessToken(): Promise<string | null> {
+ 
+   const refreshToken =
+     typeof token.refreshToken === "string" ? token.refreshToken : null;
+-  return refreshAccessToken(refreshToken);
++  if (!refreshToken) return null;
++
++  const refreshed = await exchangeRefreshToken(refreshToken);
++  if (!refreshed) return null;
++
++  await writeSessionToken(sessionWithTokens(token, refreshed));
++  return refreshed.accessToken;
+ }
+ 
+-/** Exchange the session's refresh token for a fresh access token. */
+-async function refreshAccessToken(
+-  refreshToken: string | null,
+-): Promise<string | null> {
+-  if (!refreshToken) return null;
++function sessionWithTokens(token: JWT, refreshed: RefreshedTokens): JWT {
++  return {
++    ...token,
++    accessToken: refreshed.accessToken,
++    accessTokenExpires: refreshed.expiresAt,
++    refreshToken: refreshed.refreshToken,
++    idToken: refreshed.idToken ?? token.idToken,
++  };
++}
++
++/**
++ * One Keycloak refresh for this refresh token, including callers that arrive
++ * while that refresh is already running.
++ */
++function exchangeRefreshToken(refreshToken: string): Promise<RefreshedTokens | null> {
++  const remembered = refreshedByRefreshToken.get(refreshToken);
++  if (remembered) return Promise.resolve(remembered);
+ 
++  const current = refreshInFlight.get(refreshToken);
++  if (current) return current;
++
++  const pending = requestRefresh(refreshToken)
++    .then((refreshed) => {
++      if (refreshed) refreshedByRefreshToken.set(refreshToken, refreshed);
++      return refreshed;
++    })
++    .finally(() => {
++      refreshInFlight.delete(refreshToken);
++    });
++  refreshInFlight.set(refreshToken, pending);
++  return pending;
++}
++
++/** Exchange the session's refresh token for a fresh access token. */
++async function requestRefresh(refreshToken: string): Promise<RefreshedTokens | null> {
+   const endpoint =
+     process.env.KEYCLOAK_TOKEN_URL ??
+     "http://keycloak:8080/realms/uog/protocol/openid-connect/token";
+@@ -125,7 +209,14 @@ async function refreshAccessToken(
+     });
+     if (!response.ok) return null;
+     const payload = (await response.json()) as TokenEndpointResponse;
+-    return payload.access_token ?? null;
++    if (!payload.access_token) return null;
++    const expiresIn = typeof payload.expires_in === "number" ? payload.expires_in : 300;
++    return {
++      accessToken: payload.access_token,
++      refreshToken: payload.refresh_token || refreshToken,
++      expiresAt: Math.floor(Date.now() / 1000) + expiresIn,
++      idToken: typeof payload.id_token === "string" ? payload.id_token : null,
++    };
+   } catch {
+     // Identity provider unreachable — treat as "no usable token".
+     return null;
+diff --git a/frontend/apps/admin-web/src/admin-shell.test.tsx b/frontend/apps/admin-web/src/admin-shell.test.tsx
+index 8d3e893..756cb83 100644
+--- a/frontend/apps/admin-web/src/admin-shell.test.tsx
++++ b/frontend/apps/admin-web/src/admin-shell.test.tsx
+@@ -1,8 +1,25 @@
+ import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+-import { describe, expect, it, vi } from "vitest";
++import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
++
++beforeEach(() => {
++  vi.stubGlobal("fetch", vi.fn(async () => ({
++    ok: true,
++    json: async () => ({
++      platformPermissions: ["platform.dashboard.view", "platform.organizations.view", "sites.view"],
++      sites: [],
++      sitesError: null,
++      site: null,
++    }),
++  })));
++});
++
++afterEach(() => {
++  vi.unstubAllGlobals();
++});
+ 
+ vi.mock("next/navigation", () => ({
+   usePathname: () => "/",
++  useRouter: () => ({ push: vi.fn() }),
+ }));
+ 
+ vi.mock("next/link", () => ({
+@@ -72,7 +89,7 @@ describe("AdminShell", () => {
+     expect(
+       drawer.getByRole("navigation", { name: "Admin sections" }),
+     ).toBeTruthy();
+-    expect(drawer.getByRole("link", { name: /Organizations/ })).toBeTruthy();
++    expect(await drawer.findByRole("link", { name: /Organizations/ })).toBeTruthy();
+     expect(
+       // The toggle lives in the app root, which the open Modal aria-hides.
+       screen
+diff --git a/frontend/apps/admin-web/src/admin-shell.tsx b/frontend/apps/admin-web/src/admin-shell.tsx
+index c844fd1..c6dd30f 100644
+--- a/frontend/apps/admin-web/src/admin-shell.tsx
++++ b/frontend/apps/admin-web/src/admin-shell.tsx
+@@ -24,6 +24,7 @@ import IconButton from "@mui/material/IconButton";
+ import { UogFooter, UogHeader } from "@uog/ui";
+ import type { ReactNode } from "react";
+ 
++import { useSessionWatch } from "@/session-watch";
+ import { DesktopSidebar, MobileNavDrawer } from "@/sidebar";
+ 
+ /** Visually hidden until focused — first tab stop on every page. */
+@@ -54,6 +55,7 @@ export function AdminShell({
+   children: ReactNode;
+ }) {
+   const [navOpen, setNavOpen] = useState(false);
++  useSessionWatch();
+ 
+   return (
+     <Box
+diff --git a/frontend/apps/admin-web/src/app/layout.test.tsx b/frontend/apps/admin-web/src/app/layout.test.tsx
+index c4a3270..8ac6350 100644
+--- a/frontend/apps/admin-web/src/app/layout.test.tsx
++++ b/frontend/apps/admin-web/src/app/layout.test.tsx
+@@ -8,6 +8,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
+ 
+ vi.mock("@/auth", () => ({
+   auth: vi.fn(),
++  siteOrigin: "http://localhost",
++}));
++
++vi.mock("@/access-token", () => ({
++  getAccessToken: vi.fn(async () => "access-token"),
+ }));
+ 
+ vi.mock("@/app/actions", () => ({
+@@ -15,6 +20,17 @@ vi.mock("@/app/actions", () => ({
+   signOutFromSite: vi.fn(),
+ }));
+ 
++const redirect = vi.fn((url: string) => {
++  throw new Error(`REDIRECT ${url}`);
++});
++
++vi.mock("next/navigation", () => ({
++  usePathname: () => "/",
++  useRouter: () => ({ push: vi.fn() }),
++  redirect: (url: string) => redirect(url),
++}));
++
++import { getAccessToken } from "@/access-token";
+ import { auth } from "@/auth";
+ 
+ import AdminLayout from "./layout";
+@@ -53,6 +69,13 @@ describe("admin session gate", () => {
+     expect(html).not.toContain("Sign in required");
+   });
+ 
++  it("sends an expired session to sign out and sign in again instead of rendering the console", async () => {
++    vi.mocked(getAccessToken).mockResolvedValueOnce(null);
++    await expect(renderLayout({ user: { email: "devuser@uog.et" } })).rejects.toThrow(
++      "REDIRECT http://localhost/admin/api/session/expired",
++    );
++  });
++
+   it("falls back to the session name when no email claim is present", async () => {
+     const html = await renderLayout({
+       user: { name: "Development User", email: null },
+diff --git a/frontend/apps/admin-web/src/app/layout.tsx b/frontend/apps/admin-web/src/app/layout.tsx
+index a42651e..18d4eb1 100644
+--- a/frontend/apps/admin-web/src/app/layout.tsx
++++ b/frontend/apps/admin-web/src/app/layout.tsx
+@@ -6,9 +6,13 @@ import Paper from "@mui/material/Paper";
+ import Typography from "@mui/material/Typography";
+ import { UogFooter, UogHeader, UogThemeProvider, ToastProvider } from "@uog/ui";
+ 
++import { redirect } from "next/navigation";
++
++import { getAccessToken } from "@/access-token";
+ import { AdminShell } from "@/admin-shell";
+-import { auth } from "@/auth";
++import { auth, siteOrigin } from "@/auth";
+ import { signInWithKeycloak, signOutFromSite } from "@/app/actions";
++import { sessionExpiredHref } from "@/session-expiry";
+ 
+ import "./globals.css";
+ 
+@@ -37,6 +41,10 @@ export default async function AdminLayout({
+ }: Readonly<{ children: React.ReactNode }>) {
+   const session = await auth();
+ 
++  if (session && !(await getAccessToken())) {
++    redirect(`${siteOrigin}${sessionExpiredHref()}`);
++  }
++
+   if (!session) {
+     return (
+       <html lang="en" suppressHydrationWarning>
+diff --git a/frontend/apps/admin-web/src/app/loading.tsx b/frontend/apps/admin-web/src/app/loading.tsx
+index 39ec0fb..1006e9e 100644
+--- a/frontend/apps/admin-web/src/app/loading.tsx
++++ b/frontend/apps/admin-web/src/app/loading.tsx
+@@ -1,43 +1,31 @@
+ /**
+- * Route-level loading state.
+- *
+- * Rendered inside the application shell while a server component under this
+- * segment is still streaming — the header, navigation and breadcrumb-less
+- * chrome stay interactive.
++ * Shown the moment a menu item is chosen, before that screen's code and data
++ * arrive. Without this boundary the previous screen stays in place for the
++ * whole wait, so a click feels frozen.
+  */
+ import Box from "@mui/material/Box";
+-import Skeleton from "@mui/material/Skeleton";
++import CircularProgress from "@mui/material/CircularProgress";
++import Typography from "@mui/material/Typography";
+ 
+-export default function AdminLoading() {
++export default function Loading() {
+   return (
+     <Box
+       role="status"
+-      aria-label="Loading page"
+-      sx={{ display: "flex", flexDirection: "column", gap: 3 }}
++      aria-live="polite"
++      aria-busy="true"
++      sx={{
++        display: "flex",
++        flexDirection: "column",
++        alignItems: "center",
++        justifyContent: "center",
++        gap: 2,
++        minHeight: 320,
++      }}
+     >
+-      <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+-        <Skeleton width={160} height={20} />
+-        <Skeleton width={280} height={40} />
+-        <Skeleton width={380} height={24} />
+-      </Box>
+-
+-      <Skeleton variant="rounded" height={56} />
+-
+-      <Box
+-        sx={{
+-          display: "grid",
+-          gap: 2,
+-          gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", md: "repeat(3, 1fr)" },
+-        }}
+-      >
+-        {[0, 1, 2].map((index) => (
+-          <Skeleton key={index} variant="rounded" height={140} />
+-        ))}
+-      </Box>
+-
+-      <Skeleton variant="rounded" height={120} />
+-
+-      <span className="sr-only">Loading…</span>
++      <CircularProgress size={36} />
++      <Typography variant="body2" color="text.secondary">
++        Opening…
++      </Typography>
+     </Box>
+   );
+ }
+diff --git a/frontend/apps/admin-web/src/app/page.tsx b/frontend/apps/admin-web/src/app/page.tsx
+index e771878..3f75b38 100644
+--- a/frontend/apps/admin-web/src/app/page.tsx
++++ b/frontend/apps/admin-web/src/app/page.tsx
+@@ -20,7 +20,12 @@ import Link from "@mui/material/Link";
+ import Typography from "@mui/material/Typography";
+ import NextLink from "next/link";
+ 
++import { getEffectivePermissions } from "@/access-control";
++import { listAllSites } from "@/app/sites/actions";
+ import { Breadcrumb } from "@/breadcrumb";
++import { hasPlatformWorkspace } from "@/navigation";
++import { siteAdminHref } from "@/sites/site-admin";
++import { siteStatusChip } from "@/sites/validation";
+ import HealthCheck from "./health-check";
+ 
+ const sections = [
+@@ -30,6 +35,7 @@ const sections = [
+     description:
+       "University colleges, institutes and departments — the institutional tree every site belongs to.",
+     icon: BusinessIcon,
++    requiresAny: ["platform.organizations.view"],
+   },
+   {
+     title: "Sites",
+@@ -37,6 +43,7 @@ const sections = [
+     description:
+       "Public websites and microsites managed by the platform, including domains and publishing state.",
+     icon: WebIcon,
++    requiresAny: ["sites.view"],
+   },
+   {
+     title: "Modules",
+@@ -44,10 +51,75 @@ const sections = [
+     description:
+       "Platform capability registry — what each site may enable, and on what terms.",
+     icon: ExtensionIcon,
++    requiresAny: ["platform.sites.manage_registry"],
+   },
+ ];
+ 
+-export default function AdminDashboard() {
++function SiteWorkspaceChooser({ sites }: { sites: Awaited<ReturnType<typeof listAllSites>> }) {
++  return (
++    <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
++      <Box>
++        <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Workspaces" }]} />
++        <Typography variant="h4" component="h1" sx={{ fontWeight: 700 }}>
++          Your Site workspaces
++        </Typography>
++        <Typography color="text.secondary" sx={{ mt: 0.5 }}>
++          Choose a Site to manage its content. Platform administration is not
++          assigned to this account.
++        </Typography>
++      </Box>
++      {!sites.ok ? (
++        <Alert severity="error" variant="outlined">
++          Your Sites could not be loaded: {sites.error.message}
++        </Alert>
++      ) : sites.data.length === 0 ? (
++        <Alert severity="info" variant="outlined" role="status">
++          No Site is assigned to this account yet. Ask a platform administrator for a Site role.
++        </Alert>
++      ) : (
++        <Box
++          component="ul"
++          aria-label="Site workspaces"
++          sx={{ listStyle: "none", m: 0, p: 0, display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", md: "repeat(3, 1fr)" } }}
++        >
++          {sites.data.map((site) => {
++            const chip = siteStatusChip(site.status);
++            return (
++              <Card component="li" key={site.id} variant="outlined">
++                <CardActionArea component={NextLink} href={siteAdminHref(site.id)} sx={{ p: 2.5, height: "100%" }}>
++                  <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap", mb: 0.5 }}>
++                    <Typography variant="h6" sx={{ fontWeight: 700 }}>{site.name}</Typography>
++                    {chip ? <Chip size="small" variant="outlined" color={chip.color} label={chip.label} /> : null}
++                  </Box>
++                  <Typography variant="body2" color="text.secondary" sx={{ fontFamily: "monospace" }}>
++                    {site.code}
++                  </Typography>
++                </CardActionArea>
++              </Card>
++            );
++          })}
++        </Box>
++      )}
++    </Box>
++  );
++}
++
++export default async function AdminDashboard() {
++  const [platformPermissions, sites] = await Promise.all([getEffectivePermissions(), listAllSites()]);
++  if (!sites.ok && sites.error.status === 401) {
++    return (
++      <Alert severity="warning" variant="outlined" role="alert">
++        <Typography component="h1" variant="h6" sx={{ fontWeight: 700 }}>Sign-in required</Typography>
++        Your session has expired or you are not signed in. Sign out and sign in again to continue.
++      </Alert>
++    );
++  }
++  if (!hasPlatformWorkspace(platformPermissions)) {
++    return <SiteWorkspaceChooser sites={sites} />;
++  }
++  const visibleSections = sections.filter((section) =>
++    section.requiresAny.some((code) => platformPermissions.includes(code)),
++  );
+   return (
+     <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+       <Box>
+@@ -88,7 +160,7 @@ export default function AdminDashboard() {
+             gridTemplateColumns: { xs: "1fr", sm: "repeat(3, 1fr)" },
+           }}
+         >
+-          {sections.map((section) => {
++          {visibleSections.map((section) => {
+             const Icon = section.icon;
+             return (
+               <Card key={section.title} variant="outlined" sx={{ height: "100%" }}>
+diff --git a/frontend/apps/admin-web/src/app/sites/[id]/admin/layout.tsx b/frontend/apps/admin-web/src/app/sites/[id]/admin/layout.tsx
+index c6fa5d0..602582d 100644
+--- a/frontend/apps/admin-web/src/app/sites/[id]/admin/layout.tsx
++++ b/frontend/apps/admin-web/src/app/sites/[id]/admin/layout.tsx
+@@ -9,6 +9,7 @@
+ import { notFound } from "next/navigation";
+ 
+ import { getEffectivePermissions } from "@/access-control";
++import { getOrganization } from "@/app/organizations/actions";
+ import {
+   getSite,
+   listAllSites,
+@@ -34,42 +35,34 @@ export default async function SiteAdminLayout({ children, params }: SiteAdminLay
+     notFound();
+   }
+ 
+-  const [siteResult, siteList] = await Promise.all([
+-    getSite(numericId),
+-    listAllSites(),
+-  ]);
+-  const choices = accessibleSiteOptions(
+-    (siteList.ok ? siteList.data : []).map((site) => ({
+-      id: site.id,
+-      name: site.name,
+-      code: site.code,
+-      status: site.status,
+-    })),
+-  );
+-
++  const siteResult = await getSite(numericId);
+   if (!siteResult.ok) {
++    const siteList = await listAllSites();
++    const choices = accessibleSiteOptions(
++      (siteList.ok ? siteList.data : []).map((site) => ({ id: site.id, name: site.name })),
++    );
+     return <SiteAdminDenied sites={choices} />;
+   }
+ 
+   const site = siteResult.data.data;
+-  const [assignments, permissions] = await Promise.all([
++  const [assignments, permissions, organization] = await Promise.all([
+     listSiteModuleAssignments(site.id),
+     getEffectivePermissions(site.id),
++    getOrganization(site.organization_unit),
+   ]);
+-  const current = {
+-    id: site.id,
+-    name: site.name,
+-    code: site.code,
+-    status: site.status,
+-  };
+-  const options = choices.some((choice) => choice.id === site.id)
+-    ? choices
+-    : [current, ...choices];
+ 
+   return (
+     <SiteAdminFrame
+-      site={current}
+-      sites={options}
++      site={{
++        id: site.id,
++        name: site.name,
++        code: site.code,
++        status: site.status,
++        organizationId: site.organization_unit,
++        organizationName: organization.ok ? organization.data.data.name : null,
++        defaultLanguage: site.default_language,
++        enabledLanguages: site.configuration.language.enabled,
++      }}
+       enabledModuleCodes={assignments.ok ? enabledModuleCodes(assignments.data.results, site.id) : []}
+       permissions={permissions}
+     >
+diff --git a/frontend/apps/admin-web/src/app/sites/[id]/admin/page.tsx b/frontend/apps/admin-web/src/app/sites/[id]/admin/page.tsx
+index ab3dfc3..f624e2f 100644
+--- a/frontend/apps/admin-web/src/app/sites/[id]/admin/page.tsx
++++ b/frontend/apps/admin-web/src/app/sites/[id]/admin/page.tsx
+@@ -1,34 +1,7 @@
+ "use client";
+ 
+-import Box from "@mui/material/Box";
+-import Typography from "@mui/material/Typography";
+-import Link from "next/link";
+-
+-import { siteAdminHref, visibleSiteSections } from "@/sites/site-admin";
+-import { useSiteAdmin } from "@/sites/site-admin-frame";
++import { SiteDashboard } from "@/sites/site-dashboard";
+ 
+ export default function SiteAdminHomePage() {
+-  const admin = useSiteAdmin();
+-  const sections = visibleSiteSections(admin).filter((section) => section.key !== "dashboard");
+-
+-  return (
+-    <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+-      <Typography variant="h6" component="h2">Available sections</Typography>
+-      <Typography variant="body2" color="text.secondary">
+-        These are the content areas enabled for {admin.site.name}. Platform
+-        module activation is not managed here.
+-      </Typography>
+-      {sections.length === 0 ? (
+-        <Typography role="status">No content modules are available for this Site.</Typography>
+-      ) : (
+-        <Box component="ul" sx={{ m: 0, pl: 2.5 }}>
+-          {sections.map((section) => (
+-            <li key={section.key}>
+-              <Link href={siteAdminHref(admin.site.id, section.segment)}>{section.label}</Link>
+-            </li>
+-          ))}
+-        </Box>
+-      )}
+-    </Box>
+-  );
++  return <SiteDashboard />;
+ }
+diff --git a/frontend/apps/admin-web/src/app/sites/[id]/admin/pages/page.tsx b/frontend/apps/admin-web/src/app/sites/[id]/admin/pages/page.tsx
+index c187003..ba50075 100644
+--- a/frontend/apps/admin-web/src/app/sites/[id]/admin/pages/page.tsx
++++ b/frontend/apps/admin-web/src/app/sites/[id]/admin/pages/page.tsx
+@@ -1,13 +1,26 @@
+ "use client";
+ 
++import { useSearchParams } from "next/navigation";
++
+ import { SitePagesPanel } from "@/sites/site-pages";
+ import { SiteSection, useSiteAdmin } from "@/sites/site-admin-frame";
+ 
+ export default function SitePagesAdminPage() {
+   const { site, permissions } = useSiteAdmin();
++  const startCreate = useSearchParams().get("create") === "1";
+   return (
+     <SiteSection sectionKey="pages">
+-      <SitePagesPanel siteId={site.id} pagesEnabled permissions={permissions} />
++      <SitePagesPanel
++        siteId={site.id}
++        pagesEnabled
++        permissions={permissions}
++        languages={site.defaultLanguage ? {
++          defaultLanguage: site.defaultLanguage,
++          enabled: site.enabledLanguages ?? [site.defaultLanguage],
++        } : undefined}
++        startCreate={startCreate}
++        onCreateStarted={() => window.history.replaceState(null, "", window.location.pathname)}
++      />
+     </SiteSection>
+   );
+ }
+diff --git a/frontend/apps/admin-web/src/navigation.test.ts b/frontend/apps/admin-web/src/navigation.test.ts
+index 3693396..0528bf8 100644
+--- a/frontend/apps/admin-web/src/navigation.test.ts
++++ b/frontend/apps/admin-web/src/navigation.test.ts
+@@ -2,9 +2,49 @@ import { describe, expect, it } from "vitest";
+ 
+ import {
+   adminNavItems,
++  hasPlatformWorkspace,
+   isNavItemActive,
+   normalizeAdminPathname,
++  siteWorkspaceId,
++  visiblePlatformNavItems,
+ } from "@/navigation";
++import { workspaceHref, workspaceValue } from "@/workspace";
++
++describe("platform workspace visibility", () => {
++  it("gates every platform entry on a platform-scoped permission", () => {
++    expect(adminNavItems.every((item) => (item.requiresAny ?? []).length > 0)).toBe(true);
++    expect(visiblePlatformNavItems([])).toEqual([]);
++    expect(hasPlatformWorkspace([])).toBe(false);
++  });
++
++  it("shows only the entries a platform permission covers", () => {
++    const keys = visiblePlatformNavItems(["platform.organizations.view"]).map((item) => item.key);
++    expect(keys).toEqual(["organizations"]);
++    expect(hasPlatformWorkspace(["platform.organizations.view"])).toBe(true);
++  });
++
++  it("ignores content permissions that do not open a platform screen", () => {
++    expect(hasPlatformWorkspace(["content.pages.view", "menu.read"])).toBe(false);
++  });
++});
++
++describe("workspace paths", () => {
++  it("finds the Site workspace from a Site administration path only", () => {
++    expect(siteWorkspaceId("/sites/2/admin")).toBe(2);
++    expect(siteWorkspaceId("/sites/2/admin/pages")).toBe(2);
++    expect(siteWorkspaceId("/sites/2")).toBeNull();
++    expect(siteWorkspaceId("/sites/0/admin")).toBeNull();
++    expect(siteWorkspaceId("/sites/2/administer")).toBeNull();
++  });
++
++  it("maps selector values to their dashboards", () => {
++    expect(workspaceValue(null)).toBe("platform");
++    expect(workspaceValue(7)).toBe("site:7");
++    expect(workspaceHref("platform")).toBe("/");
++    expect(workspaceHref("site:7")).toBe("/sites/7/admin");
++    expect(workspaceHref("site:abc")).toBeNull();
++  });
++});
+ 
+ describe("adminNavItems", () => {
+   it("exposes the Organizations, Sites, Domains, Modules and permission-gated Access control entries", () => {
+diff --git a/frontend/apps/admin-web/src/navigation.ts b/frontend/apps/admin-web/src/navigation.ts
+index ecdb6bf..eefa01b 100644
+--- a/frontend/apps/admin-web/src/navigation.ts
++++ b/frontend/apps/admin-web/src/navigation.ts
+@@ -32,6 +32,7 @@ export const adminNavItems: AdminNavItem[] = [
+     href: "/",
+     description: "Console overview",
+     icon: DashboardIcon,
++    requiresAny: ["platform.dashboard.view"],
+   },
+   {
+     key: "organizations",
+@@ -39,6 +40,7 @@ export const adminNavItems: AdminNavItem[] = [
+     href: "/organizations",
+     description: "Institutional structure",
+     icon: BusinessIcon,
++    requiresAny: ["platform.organizations.view"],
+   },
+   {
+     key: "sites",
+@@ -46,6 +48,7 @@ export const adminNavItems: AdminNavItem[] = [
+     href: "/sites",
+     description: "Managed websites",
+     icon: WebIcon,
++    requiresAny: ["sites.view"],
+   },
+   {
+     key: "domains",
+@@ -53,6 +56,7 @@ export const adminNavItems: AdminNavItem[] = [
+     href: "/domains",
+     description: "Website addresses",
+     icon: LanguageIcon,
++    requiresAny: ["sites.view"],
+   },
+   {
+     key: "modules",
+@@ -72,6 +76,28 @@ export const adminNavItems: AdminNavItem[] = [
+   },
+ ];
+ 
++/**
++ * Platform entries for a scope-less permission set. Django reports only
++ * platform-scoped grants without a Site, so a Site-only account gets none.
++ */
++export function visiblePlatformNavItems(platformPermissions: readonly string[]): AdminNavItem[] {
++  return adminNavItems.filter(
++    (item) => !item.requiresAny || item.requiresAny.some((code) => platformPermissions.includes(code)),
++  );
++}
++
++export function hasPlatformWorkspace(platformPermissions: readonly string[]): boolean {
++  return visiblePlatformNavItems(platformPermissions).length > 0;
++}
++
++/** The Site whose administration workspace a path belongs to, if any. */
++export function siteWorkspaceId(path: string): number | null {
++  const match = /^\/sites\/([1-9]\d*)\/admin(?:\/|$)/.exec(path);
++  if (!match) return null;
++  const id = Number(match[1]);
++  return Number.isSafeInteger(id) ? id : null;
++}
++
+ /**
+  * `usePathname()` may report the path with or without the Next.js `basePath`
+  * depending on the call site — normalise both to an app-relative path so
+diff --git a/frontend/apps/admin-web/src/session-jwt.ts b/frontend/apps/admin-web/src/session-jwt.ts
+index 8b20459..d80759a 100644
+--- a/frontend/apps/admin-web/src/session-jwt.ts
++++ b/frontend/apps/admin-web/src/session-jwt.ts
+@@ -7,7 +7,8 @@
+  * callback in `auth.ts` (Keycloak access/refresh/id tokens).
+  */
+ import { cookies, headers } from "next/headers";
+-import { getToken } from "next-auth/jwt";
++import { encode, getToken } from "next-auth/jwt";
++import type { JWT } from "next-auth/jwt";
+ 
+ export async function getSessionToken() {
+   const secret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET;
+@@ -16,7 +17,11 @@ export async function getSessionToken() {
+   // Auth.js switches to the `__Secure-` cookie — and salts the session JWT
+   // with that name — on https origins, so decode whichever one is present.
+   const cookieStore = await cookies();
+-  const secure = cookieStore.has("__Secure-authjs.session-token");
++  const secure =
++    cookieStore.has("__Secure-authjs.session-token") ||
++    cookieStore
++      .getAll()
++      .some((cookie) => cookie.name.startsWith("__Secure-authjs.session-token."));
+ 
+   return getToken({
+     req: { headers: await headers() },
+@@ -24,3 +29,58 @@ export async function getSessionToken() {
+     secureCookie: secure,
+   });
+ }
++
++/** Auth.js splits a session cookie that would exceed the browser's limit. */
++const SESSION_COOKIE_CHUNK = 4096 - 160;
++
++/**
++ * Replace the session cookie with an updated JWT.
++ *
++ * A Keycloak refresh returns a new access token and, when rotation is on, a
++ * new refresh token. Leaving the previous cookie in place makes the next
++ * request present a token Keycloak has already retired, so the console still
++ * shows the signed-in header while every API call is refused.
++ *
++ * Cookie writes are only allowed from a Server Action or Route Handler. A
++ * caller in a Server Component still receives the fresh token for this
++ * request; the write is skipped rather than failing that render.
++ */
++export async function writeSessionToken(token: JWT): Promise<void> {
++  const secret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET;
++  if (!secret) return;
++
++  try {
++    const jar = await cookies();
++    const secure =
++      jar.has("__Secure-authjs.session-token") ||
++      jar.getAll().some((cookie) => cookie.name.startsWith("__Secure-authjs.session-token."));
++    const name = secure ? "__Secure-authjs.session-token" : "authjs.session-token";
++    const value = await encode({ token, secret, salt: name });
++    const chunks: { name: string; value: string }[] = [];
++    if (value.length <= SESSION_COOKIE_CHUNK) {
++      chunks.push({ name, value });
++    } else {
++      const count = Math.ceil(value.length / SESSION_COOKIE_CHUNK);
++      for (let index = 0; index < count; index += 1) {
++        chunks.push({
++          name: `${name}.${index}`,
++          value: value.slice(index * SESSION_COOKIE_CHUNK, (index + 1) * SESSION_COOKIE_CHUNK),
++        });
++      }
++    }
++
++    const options = { httpOnly: true, sameSite: "lax" as const, path: "/", secure };
++    const nextNames = new Set(chunks.map((chunk) => chunk.name));
++    for (const existing of jar.getAll()) {
++      const replaced =
++        existing.name === name || existing.name.startsWith(`${name}.`);
++      if (replaced && !nextNames.has(existing.name)) {
++        jar.set(existing.name, "", { ...options, maxAge: 0 });
++      }
++    }
++    for (const chunk of chunks) jar.set(chunk.name, chunk.value, options);
++  } catch {
++    // Server Components cannot set cookies. The fresh token is still used
++    // for this request, and the next Server Action writes the cookie.
++  }
++}
+diff --git a/frontend/apps/admin-web/src/sidebar.test.tsx b/frontend/apps/admin-web/src/sidebar.test.tsx
+index 7b1e9ad..4784e66 100644
+--- a/frontend/apps/admin-web/src/sidebar.test.tsx
++++ b/frontend/apps/admin-web/src/sidebar.test.tsx
+@@ -1,10 +1,14 @@
+-import { render, screen } from "@testing-library/react";
+-import { describe, expect, it, vi } from "vitest";
++import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
++import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
++
++import type { WorkspacePayload } from "@/workspace";
+ 
+ const pathname = vi.fn(() => "/");
++const push = vi.fn();
+ 
+ vi.mock("next/navigation", () => ({
+   usePathname: () => pathname(),
++  useRouter: () => ({ push }),
+ }));
+ 
+ vi.mock("next/link", () => ({
+@@ -19,51 +23,144 @@ vi.mock("next/link", () => ({
+   ),
+ }));
+ 
++const signInAgainIfExpired = vi.fn(async () => true);
++vi.mock("@/session-watch", () => ({ signInAgainIfExpired: () => signInAgainIfExpired() }));
++
+ import { DesktopSidebar } from "@/sidebar";
+ 
+-describe("DesktopSidebar", () => {
+-  it("renders Dashboard, Organizations and Sites as base-path-relative links", () => {
++const SITES = [
++  { id: 2, name: "Informatics", code: "INFORMATICS", status: "ACTIVE" as const },
++  { id: 3, name: "Medicine", code: "MEDICINE", status: "ACTIVE" as const },
++];
++
++const PLATFORM_ADMIN: string[] = [
++  "platform.dashboard.view",
++  "platform.organizations.view",
++  "sites.view",
++  "platform.sites.manage_registry",
++  "platform.roles.view",
++];
++
++let payload: WorkspacePayload;
++let fetchMock: ReturnType<typeof vi.fn>;
++
++function respond(next: Partial<WorkspacePayload>) {
++  payload = { platformPermissions: [], sites: SITES, sitesError: null, site: null, ...next };
++}
++
++beforeEach(() => {
++  pathname.mockReturnValue("/");
++  push.mockReset();
++  respond({ platformPermissions: PLATFORM_ADMIN });
++  fetchMock = vi.fn(async () => ({ ok: true, json: async () => payload }));
++  vi.stubGlobal("fetch", fetchMock);
++});
++
++afterEach(() => {
++  vi.unstubAllGlobals();
++});
++
++function linkNamed(label: string) {
++  return screen.queryAllByRole("link").find((link) => link.textContent?.includes(label));
++}
++
++describe("DesktopSidebar — platform workspace", () => {
++  it("renders platform sections as base-path-relative links for a platform administrator", async () => {
+     render(<DesktopSidebar />);
+ 
+-    const nav = screen.getByRole("navigation", { name: "Admin sections" });
+-    expect(nav).toBeTruthy();
++    const nav = await screen.findByRole("navigation", { name: "Admin sections" });
++    await within(nav).findByText("Organizations");
+     expect(screen.getByText("UoG Administration")).toBeTruthy();
+-    expect(screen.getByText("Workspace")).toBeTruthy();
+     expect(screen.getByText("Admin workspace")).toBeTruthy();
+-    expect(screen.queryByText(/Shell preview/)).toBeNull();
++    expect(linkNamed("Dashboard")?.getAttribute("href")).toBe("/");
++    expect(linkNamed("Organizations")?.getAttribute("href")).toBe("/organizations");
++    expect(linkNamed("Sites")?.getAttribute("href")).toBe("/sites");
++    expect(linkNamed("Modules")?.getAttribute("href")).toBe("/modules");
++    expect(fetchMock).toHaveBeenCalledWith("/admin/api/workspace/", { cache: "no-store" });
++  });
++
++  it("marks the current section with aria-current, with or without the base path", async () => {
++    pathname.mockReturnValue("/admin/organizations");
++    render(<DesktopSidebar />);
++    await screen.findByText("Organizations");
++    expect(linkNamed("Organizations")?.getAttribute("aria-current")).toBe("page");
++    expect(linkNamed("Sites")?.getAttribute("aria-current")).toBeNull();
++  });
+ 
+-    const links = screen.getAllByRole("link");
+-    const byText = (label: string) =>
+-      links.find((link) => link.textContent?.includes(label));
++  it("hides platform navigation from a Site-only account and offers its Sites", async () => {
++    respond({ platformPermissions: [] });
++    render(<DesktopSidebar />);
+ 
+-    expect(byText("Dashboard")?.getAttribute("href")).toBe("/");
+-    expect(byText("Organizations")?.getAttribute("href")).toBe("/organizations");
+-    expect(byText("Sites")?.getAttribute("href")).toBe("/sites");
++    expect(await screen.findByText(/Platform administration is not assigned/)).toBeTruthy();
++    for (const label of ["Dashboard", "Organizations", "Sites", "Domains", "Modules", "Access control"]) {
++      expect(linkNamed(label)).toBeUndefined();
++    }
++    const selector = screen.getByRole("combobox", { name: "Workspace" });
++    const options = Array.from(selector.querySelectorAll("option:not([disabled])")).map((row) => row.textContent);
++    expect(options).toEqual(["Informatics", "Medicine"]);
+   });
+ 
+-  it("marks the current section with aria-current", () => {
+-    pathname.mockReturnValue("/organizations");
++  it("switches to a Site workspace from the keyboard-operable selector", async () => {
+     render(<DesktopSidebar />);
++    const selector = await screen.findByRole("combobox", { name: "Workspace" });
++    await waitFor(() => expect(selector).toHaveProperty("disabled", false));
++    expect(selector).toHaveProperty("value", "platform");
++    fireEvent.change(selector, { target: { value: "site:3" } });
++    expect(push).toHaveBeenCalledWith("/sites/3/admin");
++  });
+ 
+-    const organizations = screen
+-      .getAllByRole("link")
+-      .find((link) => link.textContent?.includes("Organizations"));
++  it("reports a failed workspace read instead of an empty menu", async () => {
++    fetchMock.mockResolvedValueOnce({ ok: false, status: 500, json: async () => ({}) });
++    render(<DesktopSidebar />);
++    expect(await screen.findByText(/Navigation could not be loaded/)).toBeTruthy();
++  });
+ 
+-    expect(organizations?.getAttribute("aria-current")).toBe("page");
++  it("tells a signed-out user to sign in again instead of hiding navigation silently", async () => {
++    fetchMock.mockResolvedValueOnce({ ok: false, status: 401, json: async () => ({}) });
++    render(<DesktopSidebar />);
++    expect(await screen.findByText(/Your session has expired/)).toBeTruthy();
++    expect(screen.queryByText(/Platform administration is not assigned/)).toBeNull();
++    expect(signInAgainIfExpired).toHaveBeenCalledTimes(1);
++  });
+ 
+-    const sites = screen
+-      .getAllByRole("link")
+-      .find((link) => link.textContent?.includes("Sites"));
+-    expect(sites?.getAttribute("aria-current")).toBeNull();
++  it("does not start a new sign-in for other failures", async () => {
++    signInAgainIfExpired.mockClear();
++    fetchMock.mockResolvedValueOnce({ ok: false, status: 500, json: async () => ({}) });
++    render(<DesktopSidebar />);
++    expect(await screen.findByText(/Navigation could not be loaded/)).toBeTruthy();
++    expect(signInAgainIfExpired).not.toHaveBeenCalled();
+   });
++});
+ 
+-  it("matches the active section even when the pathname includes the base path", () => {
+-    pathname.mockReturnValue("/admin/sites");
++describe("DesktopSidebar — Site workspace", () => {
++  it("shows the active Site and only its enabled, authorized sections", async () => {
++    pathname.mockReturnValue("/sites/2/admin/pages");
++    respond({
++      platformPermissions: [],
++      site: { id: 2, enabledModuleCodes: ["PAGES", "MENUS"], permissions: ["content.pages.view"] },
++    });
+     render(<DesktopSidebar />);
+ 
+-    const sites = screen
+-      .getAllByRole("link")
+-      .find((link) => link.textContent?.includes("Sites"));
+-    expect(sites?.getAttribute("aria-current")).toBe("page");
++    const nav = await screen.findByRole("navigation", { name: "Site sections" });
++    expect(await within(nav).findByText("Informatics")).toBeTruthy();
++    expect(within(nav).getByText("Active")).toBeTruthy();
++    const pages = within(nav).getAllByRole("link").find((link) => link.textContent?.includes("Pages"));
++    expect(pages?.getAttribute("href")).toBe("/sites/2/admin/pages");
++    expect(pages?.getAttribute("aria-current")).toBe("page");
++    expect(within(nav).getAllByRole("link").find((link) => link.textContent?.includes("Dashboard"))?.getAttribute("href"))
++      .toBe("/sites/2/admin");
++    // MENUS is enabled but menu.read was not granted; POSTS is not enabled.
++    expect(within(nav).queryAllByRole("link").some((link) => link.textContent?.includes("Menus"))).toBe(false);
++    expect(within(nav).queryAllByRole("link").some((link) => link.textContent?.includes("Posts"))).toBe(false);
++    expect(screen.getByRole("combobox", { name: "Workspace" })).toHaveProperty("value", "site:2");
++    expect(fetchMock).toHaveBeenCalledWith("/admin/api/workspace/?site=2", { cache: "no-store" });
++  });
++
++  it("does not render sections for a Site outside the authorized list", async () => {
++    pathname.mockReturnValue("/sites/99/admin");
++    respond({ platformPermissions: [], site: null });
++    render(<DesktopSidebar />);
++    expect(await screen.findByText("This Site is not available to your account.")).toBeTruthy();
++    expect(linkNamed("Pages")).toBeUndefined();
+   });
+ });
+diff --git a/frontend/apps/admin-web/src/sidebar.tsx b/frontend/apps/admin-web/src/sidebar.tsx
+index d156ff9..fc6ffef 100644
+--- a/frontend/apps/admin-web/src/sidebar.tsx
++++ b/frontend/apps/admin-web/src/sidebar.tsx
+@@ -5,26 +5,66 @@
+  *
+  * `SidebarNav` is the single source of truth for the navigation list and is
+  * rendered twice: as a persistent desktop rail and inside the mobile drawer.
+- * Links use `next/link` so the Next.js `basePath` (`/admin`) is applied —
+- * plain `<a>` tags would escape the console.
++ * It adapts to the current workspace: Platform Administration shows the
++ * platform sections this account holds platform-scoped permissions for, and
++ * a Site workspace shows that Site's sections for its enabled modules and
++ * Site-scoped permissions. Links use `next/link` so the Next.js `basePath`
++ * (`/admin`) is applied — plain `<a>` tags would escape the console.
+  */
+ import CloseIcon from "@mui/icons-material/Close";
+ import AccountBalanceRoundedIcon from "@mui/icons-material/AccountBalanceRounded";
++import AccountTreeIcon from "@mui/icons-material/AccountTree";
++import ArticleIcon from "@mui/icons-material/Article";
++import DashboardIcon from "@mui/icons-material/Dashboard";
++import DescriptionIcon from "@mui/icons-material/Description";
++import type { SvgIconComponent } from "@mui/icons-material";
++import Alert from "@mui/material/Alert";
+ import Box from "@mui/material/Box";
++import Chip from "@mui/material/Chip";
+ import Drawer from "@mui/material/Drawer";
+ import IconButton from "@mui/material/IconButton";
+ import ListItemButton from "@mui/material/ListItemButton";
+ import ListItemIcon from "@mui/material/ListItemIcon";
+ import ListItemText from "@mui/material/ListItemText";
++import TextField from "@mui/material/TextField";
+ import Typography from "@mui/material/Typography";
+-import { usePathname } from "next/navigation";
++import { usePathname, useRouter } from "next/navigation";
+ import Link from "next/link";
+ 
+-import { adminNavItems, isNavItemActive, normalizeAdminPathname } from "@/navigation";
+-import { AccessNav } from "@/access-nav";
++import {
++  hasPlatformWorkspace,
++  isNavItemActive,
++  normalizeAdminPathname,
++  siteWorkspaceId,
++  visiblePlatformNavItems,
++} from "@/navigation";
++import { siteAdminHref, visibleSiteSections } from "@/sites/site-admin";
++import type { SiteSection } from "@/sites/site-admin";
++import { siteStatusChip } from "@/sites/validation";
++import {
++  PLATFORM_WORKSPACE,
++  useWorkspace,
++  workspaceHref,
++  workspaceValue,
++} from "@/workspace";
++import type { WorkspaceState } from "@/workspace";
+ 
+ const DRAWER_WIDTH = 296;
+ 
++const SITE_SECTION_ICONS: Record<SiteSection["key"], SvgIconComponent> = {
++  dashboard: DashboardIcon,
++  pages: DescriptionIcon,
++  posts: ArticleIcon,
++  menus: AccountTreeIcon,
++};
++
++const SITE_SECTION_DESCRIPTIONS: Record<SiteSection["key"], string> = {
++  dashboard: "Site content overview",
++  pages: "Site pages and workflow",
++  posts: "News and announcements",
++  menus: "Header and footer navigation",
++};
++
+ function SidebarBrand() {
+   return (
+     <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+@@ -56,93 +96,269 @@ function SidebarBrand() {
+   );
+ }
+ 
++function NavItem({
++  href,
++  label,
++  description,
++  icon: Icon,
++  active,
++  onNavigate,
++}: {
++  href: string;
++  label: string;
++  description: string;
++  icon: SvgIconComponent;
++  active: boolean;
++  onNavigate?: () => void;
++}) {
++  return (
++    <ListItemButton
++      component={Link}
++      href={href}
++      selected={active}
++      onClick={onNavigate}
++      aria-current={active ? "page" : undefined}
++      sx={{
++        position: "relative",
++        minHeight: 58,
++        borderRadius: 2.5,
++        px: 1.25,
++        py: 0.75,
++        color: active ? "common.white" : "text.primary",
++        transition: "background-color 150ms ease, transform 150ms ease",
++        "&:hover": {
++          backgroundColor: active ? "primary.dark" : "action.hover",
++          transform: "translateX(2px)",
++        },
++        "&.Mui-selected": {
++          backgroundColor: "primary.main",
++          boxShadow: "0 5px 14px rgba(0, 51, 102, 0.16)",
++        },
++        "&.Mui-selected:hover": {
++          backgroundColor: "primary.dark",
++        },
++      }}
++    >
++      <ListItemIcon
++        sx={{
++          minWidth: 42,
++          color: active ? "primary.main" : "text.secondary",
++          "& > .MuiSvgIcon-root": {
++            display: "grid",
++            placeItems: "center",
++            boxSizing: "content-box",
++            width: 20,
++            height: 20,
++            p: 0.75,
++            borderRadius: 1.75,
++            backgroundColor: active ? "common.white" : "action.hover",
++          },
++        }}
++      >
++        <Icon fontSize="small" />
++      </ListItemIcon>
++      <ListItemText
++        primary={label}
++        secondary={description}
++        primaryTypographyProps={{
++          fontWeight: active ? 700 : 600,
++          fontSize: 14,
++          color: active ? "common.white" : "text.primary",
++        }}
++        secondaryTypographyProps={{
++          fontSize: 11.5,
++          color: active ? "rgba(255,255,255,0.76)" : "text.secondary",
++        }}
++      />
++    </ListItemButton>
++  );
++}
++
++function WorkspaceSwitcher({
++  state,
++  siteId,
++  onNavigate,
++}: {
++  state: WorkspaceState;
++  siteId: number | null;
++  onNavigate?: () => void;
++}) {
++  const router = useRouter();
++  const data = state.status === "ready" ? state.data : null;
++  const platform = data ? hasPlatformWorkspace(data.platformPermissions) : false;
++  const sites = data?.sites ?? [];
++  const value = workspaceValue(siteId);
++  const known = (value === PLATFORM_WORKSPACE && platform) || sites.some((row) => workspaceValue(row.id) === value);
++
++  return (
++    <TextField
++      select
++      fullWidth
++      size="small"
++      label="Workspace"
++      value={known ? value : ""}
++      disabled={!data}
++      onChange={(event) => {
++        const href = workspaceHref(event.target.value);
++        if (!href || event.target.value === value) return;
++        onNavigate?.();
++        router.push(href);
++      }}
++      slotProps={{ select: { native: true }, inputLabel: { shrink: true } }}
++      helperText={state.status === "loading" ? "Loading workspaces…" : undefined}
++    >
++      {!known ? <option value="" disabled>Choose a workspace</option> : null}
++      {platform ? <option value={PLATFORM_WORKSPACE}>Platform administration</option> : null}
++      {sites.length > 0 ? (
++        <optgroup label="Sites">
++          {sites.map((row) => (
++            <option key={row.id} value={workspaceValue(row.id)}>{row.name}</option>
++          ))}
++        </optgroup>
++      ) : null}
++    </TextField>
++  );
++}
++
+ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
+   const pathname = usePathname();
+   const currentPath = normalizeAdminPathname(pathname);
++  const siteId = siteWorkspaceId(currentPath);
++  const state = useWorkspace(siteId);
+ 
+   return (
+-    <AccessNav items={adminNavItems}>
+-      {(visibleItems) => (
+-        <Box
+-          component="nav"
+-          aria-label="Admin sections"
+-          sx={{ display: "flex", flexDirection: "column", gap: 0.75, px: 1.5, py: 1 }}
+-        >
+-          <Typography
+-            variant="overline"
+-            sx={{ px: 1.25, pb: 0.5, color: "text.secondary", fontWeight: 700, letterSpacing: 1.1 }}
+-          >
+-            Workspace
+-          </Typography>
+-          {visibleItems.map((item) => {
+-        const active = isNavItemActive(item, currentPath);
+-        const Icon = item.icon;
++    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
++      <Box sx={{ px: 2.75 }}>
++        <WorkspaceSwitcher state={state} siteId={siteId} onNavigate={onNavigate} />
++      </Box>
++      {siteId == null ? (
++        <PlatformNav state={state} currentPath={currentPath} onNavigate={onNavigate} />
++      ) : (
++        <SiteNav state={state} siteId={siteId} currentPath={currentPath} onNavigate={onNavigate} />
++      )}
++    </Box>
++  );
++}
++
++function NavStatus({ state }: { state: WorkspaceState }) {
++  if (state.status === "loading") {
++    return (
++      <Typography role="status" variant="body2" color="text.secondary" sx={{ px: 1.25 }}>
++        Loading navigation…
++      </Typography>
++    );
++  }
++  return (
++    <Alert severity="warning" variant="outlined" sx={{ mx: 0.5 }}>
++      {state.status === "error" && state.signedOut
++        ? "Your session has expired. Sign out and sign in again."
++        : "Navigation could not be loaded. Reload the page to try again."}
++    </Alert>
++  );
++}
++
++function PlatformNav({
++  state,
++  currentPath,
++  onNavigate,
++}: {
++  state: WorkspaceState;
++  currentPath: string;
++  onNavigate?: () => void;
++}) {
++  const items = state.status === "ready" ? visiblePlatformNavItems(state.data.platformPermissions) : [];
++  return (
++    <Box
++      component="nav"
++      aria-label="Admin sections"
++      sx={{ display: "flex", flexDirection: "column", gap: 0.75, px: 1.5 }}
++    >
++      <Typography
++        variant="overline"
++        sx={{ px: 1.25, pb: 0.5, color: "text.secondary", fontWeight: 700, letterSpacing: 1.1 }}
++      >
++        Platform administration
++      </Typography>
++      {state.status !== "ready" ? <NavStatus state={state} /> : null}
++      {state.status === "ready" && items.length === 0 ? (
++        <Typography variant="body2" color="text.secondary" sx={{ px: 1.25 }}>
++          {state.data.sites.length > 0
++            ? "Platform administration is not assigned to this account. Choose a Site workspace above."
++            : "No administration workspace is assigned to this account."}
++        </Typography>
++      ) : null}
++      {items.map((item) => (
++        <NavItem
++          key={item.key}
++          href={item.href}
++          label={item.label}
++          description={item.description}
++          icon={item.icon}
++          active={isNavItemActive(item, currentPath)}
++          onNavigate={onNavigate}
++        />
++      ))}
++    </Box>
++  );
++}
++
++function SiteNav({
++  state,
++  siteId,
++  currentPath,
++  onNavigate,
++}: {
++  state: WorkspaceState;
++  siteId: number;
++  currentPath: string;
++  onNavigate?: () => void;
++}) {
++  const data = state.status === "ready" ? state.data : null;
++  const site = data?.sites.find((row) => row.id === siteId) ?? null;
++  const access = data?.site;
++  const sections = access ? visibleSiteSections(access) : [];
++  const chip = site ? siteStatusChip(site.status) : null;
++
++  return (
++    <Box
++      component="nav"
++      aria-label="Site sections"
++      sx={{ display: "flex", flexDirection: "column", gap: 0.75, px: 1.5 }}
++    >
++      <Typography
++        variant="overline"
++        sx={{ px: 1.25, pb: 0.5, color: "text.secondary", fontWeight: 700, letterSpacing: 1.1 }}
++      >
++        Site administration
++      </Typography>
++      {state.status !== "ready" ? <NavStatus state={state} /> : null}
++      {data && (!site || !access) ? (
++        <Typography variant="body2" color="text.secondary" sx={{ px: 1.25 }}>
++          This Site is not available to your account.
++        </Typography>
++      ) : null}
++      {site && chip ? (
++        <Box sx={{ px: 1.25, pb: 0.5, display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
++          <Typography variant="body2" sx={{ fontWeight: 700, overflowWrap: "anywhere" }}>{site.name}</Typography>
++          <Chip size="small" variant="outlined" color={chip.color} label={chip.label} />
++        </Box>
++      ) : null}
++      {site && access ? sections.map((section) => {
++        const href = siteAdminHref(siteId, section.segment);
++        const active = section.segment ? currentPath === href || currentPath.startsWith(`${href}/`) : currentPath === href;
+         return (
+-          <ListItemButton
+-            key={item.key}
+-            component={Link}
+-            href={item.href}
+-            selected={active}
+-            onClick={onNavigate}
+-            aria-current={active ? "page" : undefined}
+-            sx={{
+-              position: "relative",
+-              minHeight: 58,
+-              borderRadius: 2.5,
+-              px: 1.25,
+-              py: 0.75,
+-              color: active ? "common.white" : "text.primary",
+-              transition: "background-color 150ms ease, transform 150ms ease",
+-              "&:hover": {
+-                backgroundColor: active ? "primary.dark" : "action.hover",
+-                transform: "translateX(2px)",
+-              },
+-              "&.Mui-selected": {
+-                backgroundColor: "primary.main",
+-                boxShadow: "0 5px 14px rgba(0, 51, 102, 0.16)",
+-              },
+-              "&.Mui-selected:hover": {
+-                backgroundColor: "primary.dark",
+-              },
+-            }}
+-          >
+-            <ListItemIcon
+-              sx={{
+-                minWidth: 42,
+-                color: active ? "primary.main" : "text.secondary",
+-                "& > .MuiSvgIcon-root": {
+-                  display: "grid",
+-                  placeItems: "center",
+-                  boxSizing: "content-box",
+-                  width: 20,
+-                  height: 20,
+-                  p: 0.75,
+-                  borderRadius: 1.75,
+-                  backgroundColor: active ? "common.white" : "action.hover",
+-                },
+-              }}
+-            >
+-              <Icon fontSize="small" />
+-            </ListItemIcon>
+-            <ListItemText
+-              primary={item.label}
+-              secondary={item.description}
+-              primaryTypographyProps={{
+-                fontWeight: active ? 700 : 600,
+-                fontSize: 14,
+-                color: active ? "common.white" : "text.primary",
+-              }}
+-              secondaryTypographyProps={{
+-                fontSize: 11.5,
+-                color: active ? "rgba(255,255,255,0.76)" : "text.secondary",
+-              }}
+-            />
+-          </ListItemButton>
++          <NavItem
++            key={section.key}
++            href={href}
++            label={section.label}
++            description={SITE_SECTION_DESCRIPTIONS[section.key]}
++            icon={SITE_SECTION_ICONS[section.key]}
++            active={active}
++            onNavigate={onNavigate}
++          />
+         );
+-          })}
+-        </Box>
+-      )}
+-    </AccessNav>
++      }) : null}
++    </Box>
+   );
+ }
+ 
+@@ -220,7 +436,7 @@ export function DesktopSidebar() {
+   );
+ }
+ 
+-/** Slide-in navigation for mobile — rendered inside the layout's drawer. */
++/** Slide-in navigation for mobile and tablet — rendered inside the layout's drawer. */
+ export function MobileNavDrawer({
+   open,
+   onClose,
+@@ -236,6 +452,7 @@ export function MobileNavDrawer({
+       PaperProps={{
+         sx: {
+           width: DRAWER_WIDTH,
++          maxWidth: "100vw",
+           bgcolor: "#f8fafc",
+         },
+       }}
+diff --git a/frontend/apps/admin-web/src/sites/menu-items.test.tsx b/frontend/apps/admin-web/src/sites/menu-items.test.tsx
+index 7d41d10..58320fb 100644
+--- a/frontend/apps/admin-web/src/sites/menu-items.test.tsx
++++ b/frontend/apps/admin-web/src/sites/menu-items.test.tsx
+@@ -172,7 +172,7 @@ describe("MenuItemTree", () => {
+       target: "",
+     };
+     renderTree(current, { ...TARGETS, pages: [], pagesAvailable: false });
+-    expect(await screen.findByText(/Pages are not available for this Site/)).toBeTruthy();
++    expect(await screen.findAllByText(/Pages are not available for this Site/)).toHaveLength(1);
+     expect(screen.getByText("Unavailable Page")).toBeTruthy();
+     const form = screen.getByRole("form", { name: "Add to Header" });
+     expect(within(form).getByRole("option", { name: "Page" })).toHaveProperty("disabled", true);
+diff --git a/frontend/apps/admin-web/src/sites/menu-items.tsx b/frontend/apps/admin-web/src/sites/menu-items.tsx
+index 355311f..881307e 100644
+--- a/frontend/apps/admin-web/src/sites/menu-items.tsx
++++ b/frontend/apps/admin-web/src/sites/menu-items.tsx
+@@ -138,12 +138,15 @@ export function MenuItemTree({
+   targets = EMPTY_TARGETS,
+   enabled,
+   onChanged,
++  showAvailability = true,
+ }: {
+   siteId: number;
+   state: MenuLocationState;
+   targets?: MenuTargets;
+   enabled: boolean;
+   onChanged: () => void;
++  /** The menu editor shows this once. Nested trees must not repeat it. */
++  showAvailability?: boolean;
+ }) {
+   const toast = useToast();
+   const dragId = useRef<string | null>(null);
+@@ -273,15 +276,54 @@ export function MenuItemTree({
+               }}
+               sx={{ display: "flex", flexDirection: "column", gap: 0.5, pl: depth * 2 }}
+             >
+-              <Box sx={{ display: "flex", gap: 1, alignItems: "center", flexWrap: "wrap" }}>
+-                <Typography sx={{ minWidth: 120 }}>{item.label}</Typography>
+-                <Typography variant="body2" color="text.secondary">{targetText(item, targets)}</Typography>
+-                <Button size="small" aria-label={`Move ${item.label} up`} disabled={!enabled || busy || index === 0} onClick={() => shift(item, -1)}>Move up</Button>
+-                <Button size="small" aria-label={`Move ${item.label} down`} disabled={!enabled || busy || index === group.length - 1} onClick={() => shift(item, 1)}>Move down</Button>
+-                <Button size="small" aria-label={`Nest ${item.label}`} disabled={!enabled || busy || index === 0} onClick={() => nest(item)}>Nest</Button>
+-                <Button size="small" aria-label={`Move ${item.label} out`} disabled={!enabled || busy || !item.parent} onClick={() => lift(item)}>Move out</Button>
+-                <Button size="small" aria-label={`Edit ${item.label}`} disabled={!enabled || busy} onClick={() => setEditingId(editingId === item.id ? null : item.id)}>Edit</Button>
+-                <Button size="small" aria-label={`Remove ${item.label}`} disabled={!enabled || busy || child} onClick={() => void run(() => deleteMenuItem(siteId, state.menu.id, item.id, state.etag))}>Remove</Button>
++              <Box
++                sx={{
++                  display: "flex",
++                  flexDirection: "column",
++                  gap: 1,
++                  p: 1.5,
++                  border: 1,
++                  borderColor: "divider",
++                  borderRadius: 1,
++                  bgcolor: "background.paper",
++                }}
++              >
++                <Box sx={{ minWidth: 0 }}>
++                  <Typography sx={{ fontWeight: 600, overflowWrap: "anywhere" }}>{item.label}</Typography>
++                  <Typography variant="body2" color="text.secondary" sx={{ overflowWrap: "anywhere" }}>
++                    {targetText(item, targets)}
++                  </Typography>
++                </Box>
++                <Box
++                  aria-label={`Actions for ${item.label}`}
++                  sx={{
++                    display: "grid",
++                    gridTemplateColumns: { xs: "1fr", sm: "repeat(3, minmax(0, 1fr))" },
++                    gap: 1.5,
++                  }}
++                >
++                  <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5, minWidth: 0 }}>
++                    <Typography variant="caption" color="text.secondary">Order</Typography>
++                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
++                      <Button size="small" aria-label={`Move ${item.label} up`} disabled={!enabled || busy || index === 0} onClick={() => shift(item, -1)}>Move up</Button>
++                      <Button size="small" aria-label={`Move ${item.label} down`} disabled={!enabled || busy || index === group.length - 1} onClick={() => shift(item, 1)}>Move down</Button>
++                    </Box>
++                  </Box>
++                  <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5, minWidth: 0 }}>
++                    <Typography variant="caption" color="text.secondary">Structure</Typography>
++                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
++                      <Button size="small" aria-label={`Nest ${item.label}`} disabled={!enabled || busy || index === 0} onClick={() => nest(item)}>Nest</Button>
++                      <Button size="small" aria-label={`Move ${item.label} out`} disabled={!enabled || busy || !item.parent} onClick={() => lift(item)}>Move out</Button>
++                    </Box>
++                  </Box>
++                  <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5, minWidth: 0 }}>
++                    <Typography variant="caption" color="text.secondary">Item</Typography>
++                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
++                      <Button size="small" aria-label={`Edit ${item.label}`} disabled={!enabled || busy} onClick={() => setEditingId(editingId === item.id ? null : item.id)}>Edit</Button>
++                      <Button size="small" aria-label={`Remove ${item.label}`} disabled={!enabled || busy || child} onClick={() => void run(() => deleteMenuItem(siteId, state.menu.id, item.id, state.etag))}>Remove</Button>
++                    </Box>
++                  </Box>
++                </Box>
+               </Box>
+               {child ? (
+                 <Typography variant="caption" color="text.secondary">Remove the nested items before removing {item.label}.</Typography>
+@@ -312,10 +354,10 @@ export function MenuItemTree({
+     <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+       {conflict ? <Alert severity="warning">{conflict}</Alert> : null}
+       {notice ? <Alert severity="warning">{notice}</Alert> : null}
+-      {!targets.pagesAvailable ? (
++      {showAvailability && !targets.pagesAvailable ? (
+         <Alert severity="info">Pages are not available for this Site. Page targets stay blocked.</Alert>
+       ) : null}
+-      {!targets.postsAvailable ? (
++      {showAvailability && !targets.postsAvailable ? (
+         <Alert severity="info">Posts are not available for this Site. Post targets stay blocked.</Alert>
+       ) : null}
+       {items.length === 0 ? (
+@@ -391,8 +433,23 @@ function ItemForm({
+     if (!initial) setLabel("");
+   }
+ 
++  const fieldNotice = problem === "Pages are not available for this Site." || problem === "Posts are not available for this Site."
++    ? null
++    : problem;
++
+   return (
+-    <Box component="form" aria-label={legend} sx={{ display: "flex", gap: 1, flexWrap: "wrap", alignItems: "center" }} onSubmit={submit}>
++    <Box
++      component="form"
++      aria-label={legend}
++      sx={{
++        display: "grid",
++        gridTemplateColumns: { xs: "minmax(0, 1fr)", sm: "repeat(2, minmax(0, 1fr))" },
++        gap: 2,
++        alignItems: "start",
++        "& .MuiFormControl-root": { minWidth: 0, width: "100%" },
++      }}
++      onSubmit={submit}
++    >
+       <TextField size="small" label="Item label" value={label} disabled={!enabled} onChange={(event) => setLabel(event.target.value)} required />
+       <TextField
+         select
+@@ -409,13 +466,13 @@ function ItemForm({
+         <option value="external">External URL</option>
+       </TextField>
+       {kind === "page" ? (
+-        <TextField select size="small" label="Page" value={page} disabled={!enabled || !targets.pagesAvailable} onChange={(event) => setPage(event.target.value)} slotProps={{ select: { native: true } }}>
++        <TextField select size="small" label="Page" value={page} disabled={!enabled || !targets.pagesAvailable} onChange={(event) => setPage(event.target.value)} slotProps={{ select: { native: true }, inputLabel: { shrink: true } }}>
+           <option value="">Choose a Page</option>
+           {targets.pages.map((row) => <option key={row.id} value={row.id}>{row.label}</option>)}
+         </TextField>
+       ) : null}
+       {kind === "post" ? (
+-        <TextField select size="small" label="Post" value={post} disabled={!enabled || !targets.postsAvailable} onChange={(event) => setPost(event.target.value)} slotProps={{ select: { native: true } }}>
++        <TextField select size="small" label="Post" value={post} disabled={!enabled || !targets.postsAvailable} onChange={(event) => setPost(event.target.value)} slotProps={{ select: { native: true }, inputLabel: { shrink: true } }}>
+           <option value="">Choose a Post</option>
+           {targets.posts.map((row) => <option key={row.id} value={row.id}>{row.label}</option>)}
+         </TextField>
+@@ -427,15 +484,17 @@ function ItemForm({
+         <TextField size="small" label="External URL" value={target} disabled={!enabled} onChange={(event) => setTarget(event.target.value)} required />
+       ) : null}
+       {!initial ? (
+-        <TextField select size="small" label="Place under" value={parent} disabled={!enabled} onChange={(event) => setParent(event.target.value)} slotProps={{ select: { native: true } }}>
++        <TextField select size="small" label="Place under" value={parent} disabled={!enabled} onChange={(event) => setParent(event.target.value)} slotProps={{ select: { native: true }, inputLabel: { shrink: true } }}>
+           <option value="">Top level</option>
+           {parents.map((row) => <option key={row.id} value={row.id}>{row.label}</option>)}
+         </TextField>
+       ) : null}
+-      <Button type="submit" variant="contained" disabled={!enabled || !label.trim() || Boolean(problem)}>
++      <Button type="submit" variant="contained" disabled={!enabled || !label.trim() || Boolean(problem)} sx={{ justifySelf: "start" }}>
+         {submitLabel}
+       </Button>
+-      {warning || problem ? <Alert severity="warning">{warning || problem}</Alert> : null}
++      {warning || fieldNotice ? (
++        <Alert severity="warning" sx={{ gridColumn: "1 / -1" }}>{warning || fieldNotice}</Alert>
++      ) : null}
+     </Box>
+   );
+ }
+diff --git a/frontend/apps/admin-web/src/sites/site-admin-frame.test.tsx b/frontend/apps/admin-web/src/sites/site-admin-frame.test.tsx
+index cb959e1..ca9c75b 100644
+--- a/frontend/apps/admin-web/src/sites/site-admin-frame.test.tsx
++++ b/frontend/apps/admin-web/src/sites/site-admin-frame.test.tsx
+@@ -1,4 +1,4 @@
+-import { fireEvent, render, screen } from "@testing-library/react";
++import { fireEvent, render, screen, within } from "@testing-library/react";
+ import { beforeEach, describe, expect, it, vi } from "vitest";
+ 
+ const push = vi.fn();
+@@ -19,11 +19,18 @@ vi.mock("next/link", () => ({
+   ),
+ }));
+ 
+-import { SiteAdminFrame, SiteSection } from "./site-admin-frame";
++import { SiteAdminDenied, SiteAdminFrame, SiteSection } from "./site-admin-frame";
+ import type { SiteAdminSite } from "./site-admin-frame";
+ 
+-const informatics: SiteAdminSite = { id: 11, name: "Informatics", code: "INFORMATICS", status: "ACTIVE" };
+-const medicine: SiteAdminSite = { id: 22, name: "Medicine", code: "MEDICINE", status: "ACTIVE" };
++const informatics: SiteAdminSite = {
++  id: 11,
++  name: "Informatics",
++  code: "INFORMATICS",
++  status: "ACTIVE",
++  organizationId: 4,
++  organizationName: "College of Informatics",
++};
++const medicine: SiteAdminSite = { id: 22, name: "Medicine", code: "MEDICINE", status: "SUSPENDED", organizationId: 9 };
+ 
+ function renderFrame(
+   access: { enabledModuleCodes: string[]; permissions: string[] },
+@@ -31,12 +38,7 @@ function renderFrame(
+   children: React.ReactNode = <p>Workspace</p>,
+ ) {
+   return render(
+-    <SiteAdminFrame
+-      site={site}
+-      sites={[informatics, medicine]}
+-      enabledModuleCodes={access.enabledModuleCodes}
+-      permissions={access.permissions}
+-    >
++    <SiteAdminFrame site={site} enabledModuleCodes={access.enabledModuleCodes} permissions={access.permissions}>
+       {children}
+     </SiteAdminFrame>,
+   );
+@@ -48,56 +50,50 @@ beforeEach(() => {
+ });
+ 
+ describe("SiteAdminFrame", () => {
+-  it("lists only the supplied Sites and the sections this account may open", () => {
+-    renderFrame({
+-      enabledModuleCodes: ["PAGES"],
+-      permissions: ["content.pages.view"],
+-    });
+-    const selector = screen.getByRole("combobox", { name: "Site" });
+-    const labels = Array.from(selector.querySelectorAll("option")).map((option) => option.textContent);
+-    expect(labels).toEqual(["Informatics", "Medicine"]);
+-    expect(screen.getByRole("link", { name: "Pages" }).getAttribute("href")).toBe("/sites/11/admin/pages");
+-    expect(screen.queryByRole("link", { name: "Posts" })).toBeNull();
+-    expect(screen.queryByRole("link", { name: "Menus" })).toBeNull();
+-    expect(screen.queryByRole("link", { name: "Central module registry" })).toBeNull();
++  it("keeps the active Site name, status, code and organization visible", () => {
++    renderFrame({ enabledModuleCodes: ["PAGES"], permissions: ["content.pages.view"] });
++    const header = screen.getByRole("region", { name: "Active Site" });
++    expect(within(header).getByRole("heading", { level: 1, name: "Informatics" })).toBeTruthy();
++    expect(within(header).getByText("Active")).toBeTruthy();
++    expect(within(header).getByText("INFORMATICS")).toBeTruthy();
++    expect(within(header).getByText("College of Informatics")).toBeTruthy();
+     expect(screen.getByText(/Central module activation stays in platform administration/)).toBeTruthy();
+-    expect(screen.getByRole("heading", { level: 1, name: "Informatics" })).toBeTruthy();
++    expect(screen.queryByRole("link", { name: "Central module registry" })).toBeNull();
++  });
++
++  it("names the organization by id when this account cannot read it", () => {
++    renderFrame({ enabledModuleCodes: [], permissions: [] }, medicine);
++    expect(screen.getByText("Organization unit #9")).toBeTruthy();
++    expect(screen.getByText("Suspended")).toBeTruthy();
++  });
++
++  it("shows the current section in the breadcrumb", () => {
++    pathname.mockReturnValue("/sites/11/admin/pages");
++    renderFrame({ enabledModuleCodes: ["PAGES"], permissions: ["content.pages.view"] });
++    const crumbs = screen.getByRole("navigation", { name: "Breadcrumb" });
++    expect(within(crumbs).getByText("Pages")).toBeTruthy();
++    expect(within(crumbs).getByRole("link", { name: "Informatics" }).getAttribute("href")).toBe("/sites/11/admin");
+   });
+ 
+   it("shows the central registry only when that permission was delegated", () => {
+-    renderFrame({
+-      enabledModuleCodes: [],
+-      permissions: ["platform.sites.manage_registry"],
+-    });
++    renderFrame({ enabledModuleCodes: [], permissions: ["platform.sites.manage_registry"] });
+     expect(screen.getByRole("link", { name: "Central module registry" }).getAttribute("href")).toBe("/modules");
+   });
+ 
+-  it("switches to the other Site's dashboard and drops the previous draft", () => {
++  it("remounts per Site so a draft does not follow the user", () => {
+     const view = renderFrame(
+       { enabledModuleCodes: ["PAGES"], permissions: ["content.pages.view"] },
+       informatics,
+       <input aria-label="Draft title" />,
+     );
+-    fireEvent.change(screen.getByRole("textbox", { name: "Draft title" }), {
+-      target: { value: "Secret draft" },
+-    });
+-    fireEvent.change(screen.getByRole("combobox", { name: "Site" }), {
+-      target: { value: "22" },
+-    });
+-    expect(push).toHaveBeenCalledWith("/sites/22/admin");
++    fireEvent.change(screen.getByRole("textbox", { name: "Draft title" }), { target: { value: "Secret draft" } });
+     view.rerender(
+-      <SiteAdminFrame
+-        site={medicine}
+-        sites={[informatics, medicine]}
+-        enabledModuleCodes={["PAGES"]}
+-        permissions={["content.pages.view"]}
+-      >
++      <SiteAdminFrame site={medicine} enabledModuleCodes={["PAGES"]} permissions={["content.pages.view"]}>
+         <input aria-label="Draft title" />
+       </SiteAdminFrame>,
+     );
+     expect(screen.getByRole("textbox", { name: "Draft title" })).toHaveProperty("value", "");
+     expect(screen.getByRole("heading", { level: 1, name: "Medicine" })).toBeTruthy();
+-    expect(screen.getByRole("link", { name: "Pages" }).getAttribute("href")).toBe("/sites/22/admin/pages");
+   });
+ 
+   it("blocks a direct section when the module or permission is missing", () => {
+@@ -120,20 +116,20 @@ describe("SiteAdminFrame", () => {
+     expect(screen.queryByRole("button", { name: "Create Post" })).toBeNull();
+   });
+ 
+-  it("opens the site menu from the keyboard and closes it with Escape", () => {
+-    renderFrame({
+-      enabledModuleCodes: ["MENUS"],
+-      permissions: ["menu.read"],
+-    });
+-    const open = screen.getByRole("button", { name: "Open site menu" });
+-    open.focus();
+-    expect(document.activeElement).toBe(open);
+-    fireEvent.keyDown(open, { key: "Enter" });
+-    fireEvent.click(open);
+-    expect(open.getAttribute("aria-expanded")).toBe("true");
+-    const menu = document.getElementById("site-admin-menu");
+-    expect(menu).toBeTruthy();
+-    fireEvent.keyDown(menu as HTMLElement, { key: "Escape", code: "Escape" });
+-    expect(open.getAttribute("aria-expanded")).toBe("false");
++  it("blocks a section the account has no permission for", () => {
++    renderFrame(
++      { enabledModuleCodes: ["MENUS"], permissions: [] },
++      informatics,
++      <SiteSection sectionKey="menus"><button type="button">Create menu</button></SiteSection>,
++    );
++    expect(screen.getByText(/You do not have permission to open Menus/)).toBeTruthy();
++  });
++});
++
++describe("SiteAdminDenied", () => {
++  it("offers only the supplied authorized Sites", () => {
++    render(<SiteAdminDenied sites={[{ id: 22, name: "Medicine" }]} />);
++    fireEvent.change(screen.getByRole("combobox", { name: "Site" }), { target: { value: "22" } });
++    expect(push).toHaveBeenCalledWith("/sites/22/admin");
+   });
+ });
+diff --git a/frontend/apps/admin-web/src/sites/site-admin-frame.tsx b/frontend/apps/admin-web/src/sites/site-admin-frame.tsx
+index e80c7cf..64a4d7f 100644
+--- a/frontend/apps/admin-web/src/sites/site-admin-frame.tsx
++++ b/frontend/apps/admin-web/src/sites/site-admin-frame.tsx
+@@ -3,20 +3,22 @@
+ /**
+  * Administration chrome for one Site inside the shared console.
+  *
+- * The Site selector only offers the sites the caller already loaded for
+- * this user. Changing the Site opens that Site's dashboard, and the
+- * workspace remounts so a draft form cannot follow the user.
++ * Section navigation and the workspace selector live in the console rail,
++ * so this frame only keeps the active Site visible: name, status, code and
++ * owning organization. The workspace remounts per Site so a draft form
++ * cannot follow the user to another Site.
+  */
+-import { createContext, useContext, useState } from "react";
++import { createContext, useContext } from "react";
+ import type { ReactNode } from "react";
+-import CloseIcon from "@mui/icons-material/Close";
+-import MenuIcon from "@mui/icons-material/Menu";
++import BusinessIcon from "@mui/icons-material/Business";
++import LanguageRoundedIcon from "@mui/icons-material/LanguageRounded";
+ import Alert from "@mui/material/Alert";
+ import Box from "@mui/material/Box";
+ import Button from "@mui/material/Button";
+-import Drawer from "@mui/material/Drawer";
+-import IconButton from "@mui/material/IconButton";
++import Chip from "@mui/material/Chip";
++import Paper from "@mui/material/Paper";
+ import Typography from "@mui/material/Typography";
++import type { SiteStatus } from "@uog/types";
+ import Link from "next/link";
+ import { usePathname, useRouter } from "next/navigation";
+ 
+@@ -31,12 +33,18 @@ import {
+   visibleSiteSections,
+ } from "@/sites/site-admin";
+ import type { SectionDecision, SiteAccessInput, SiteSection } from "@/sites/site-admin";
++import { siteStatusChip } from "@/sites/validation";
+ 
+ export interface SiteAdminSite {
+   id: number;
+   name: string;
+   code: string;
+-  status: string;
++  status: SiteStatus;
++  /** `null` when this account cannot read the owning organization. */
++  organizationName?: string | null;
++  organizationId?: number;
++  defaultLanguage?: string;
++  enabledLanguages?: readonly string[];
+ }
+ 
+ interface SiteAdminValue extends SiteAccessInput {
+@@ -53,147 +61,92 @@ export function useSiteAdmin(): SiteAdminValue {
+   return value;
+ }
+ 
+-function SectionLinks({
+-  siteId,
+-  sections,
+-  currentPath,
+-  onNavigate,
+-}: {
+-  siteId: number;
+-  sections: SiteSection[];
+-  currentPath: string;
+-  onNavigate?: () => void;
+-}) {
+-  return (
+-    <Box component="ul" sx={{ listStyle: "none", m: 0, p: 0, display: "flex", flexDirection: "column", gap: 0.5 }}>
+-      {sections.map((section) => {
+-        const href = siteAdminHref(siteId, section.segment);
+-        const active = currentPath === href;
+-        return (
+-          <Box component="li" key={section.key}>
+-            <Link
+-              href={href}
+-              aria-current={active ? "page" : undefined}
+-              onClick={onNavigate}
+-            >
+-              {section.label}
+-            </Link>
+-          </Box>
+-        );
+-      })}
+-    </Box>
+-  );
++function organizationLabel(site: SiteAdminSite): string {
++  if (site.organizationName) return site.organizationName;
++  if (site.organizationId != null) return `Organization unit #${site.organizationId}`;
++  return "Organization unavailable";
+ }
+ 
+ export function SiteAdminFrame({
+   site,
+-  sites,
+   enabledModuleCodes,
+   permissions,
+   children,
+ }: SiteAdminValue & {
+-  sites: SiteAdminSite[];
+   children: ReactNode;
+ }) {
+-  const router = useRouter();
+   const pathname = usePathname();
+   const currentPath = normalizeAdminPathname(pathname);
+-  const [menuOpen, setMenuOpen] = useState(false);
+   const access = { enabledModuleCodes, permissions };
+   const sections = visibleSiteSections(access);
+-  const current = sections.find((section) => section.segment && currentPath === siteAdminHref(site.id, section.segment));
++  const current = sections.find(
++    (section) => section.segment && currentPath.startsWith(siteAdminHref(site.id, section.segment)),
++  );
+   const value = { site, enabledModuleCodes, permissions };
++  const chip = siteStatusChip(site.status);
+ 
+   return (
+     <SiteAdminContext.Provider value={value}>
+-    <Box key={site.id} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+-      <Breadcrumb
+-        items={[
+-          { label: "Home", href: "/" },
+-          { label: "Sites", href: "/sites" },
+-          { label: site.name, href: `/sites/${site.id}` },
+-          { label: current?.label ?? "Administration" },
+-        ]}
+-      />
+-      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, alignItems: "center", justifyContent: "space-between" }}>
+-        <Box>
+-          <Typography variant="overline" color="primary.main">Site administration</Typography>
+-          <Typography variant="h4" component="h1">{site.name}</Typography>
+-          <Typography variant="body2" color="text.secondary">{site.code} · {site.status}</Typography>
+-        </Box>
+-        <Box>
+-          <Typography component="label" htmlFor="site-admin-selector" sx={{ display: "block", fontSize: 12, mb: 0.5 }}>
+-            Site
+-          </Typography>
+-          <select
+-            id="site-admin-selector"
+-            aria-label="Site"
+-            value={String(site.id)}
+-            onChange={(event) => {
+-              const next = Number(event.target.value);
+-              if (next !== site.id) router.push(siteSwitchHref(next));
+-            }}
+-            style={{ minWidth: 220, minHeight: 40, font: "inherit" }}
+-          >
+-            {sites.map((choice) => (
+-              <option key={choice.id} value={choice.id}>{choice.name}</option>
+-            ))}
+-          </select>
+-        </Box>
+-      </Box>
+-      <Box sx={{ display: "flex", gap: 2, alignItems: "flex-start" }}>
+-        <Box
+-          component="nav"
+-          aria-label="Site sections"
+-          sx={{ display: { xs: "none", md: "block" }, minWidth: 180 }}
+-        >
+-          <SectionLinks siteId={site.id} sections={sections} currentPath={currentPath} />
+-        </Box>
+-        <Button
++    <Box key={site.id} sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
++      <Box>
++        <Breadcrumb
++          items={[
++            { label: "Home", href: "/" },
++            { label: site.name, href: siteAdminHref(site.id) },
++            { label: current?.label ?? "Dashboard" },
++          ]}
++        />
++        <Paper
++          component="section"
++          aria-label="Active Site"
+           variant="outlined"
+-          startIcon={<MenuIcon />}
+-          aria-expanded={menuOpen}
+-          aria-controls="site-admin-menu"
+-          onClick={() => setMenuOpen(true)}
+-          sx={{ display: { xs: "inline-flex", md: "none" } }}
++          sx={{
++            p: { xs: 2, sm: 3 },
++            borderRadius: 3,
++            borderLeft: 4,
++            borderLeftColor: "secondary.main",
++            display: "flex",
++            flexDirection: "column",
++            gap: 1,
++          }}
+         >
+-          Open site menu
+-        </Button>
+-        <Box sx={{ flex: 1, minWidth: 0 }}>{children}</Box>
++          <Typography variant="overline" color="primary.main" sx={{ fontWeight: 700, letterSpacing: 1.1 }}>
++            Site administration
++          </Typography>
++          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap" }}>
++            <Typography variant="h4" component="h1" sx={{ fontWeight: 800, overflowWrap: "anywhere" }}>
++              {site.name}
++            </Typography>
++            {chip ? <Chip size="small" variant="outlined" color={chip.color} label={chip.label} /> : null}
++          </Box>
++          <Box sx={{ display: "flex", gap: { xs: 1, sm: 3 }, flexWrap: "wrap", color: "text.secondary" }}>
++            <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
++              <LanguageRoundedIcon sx={{ fontSize: 18 }} aria-hidden="true" />
++              <Typography variant="body2" sx={{ fontFamily: "monospace" }}>{site.code}</Typography>
++            </Box>
++            <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
++              <BusinessIcon sx={{ fontSize: 18 }} aria-hidden="true" />
++              <Typography variant="body2">{organizationLabel(site)}</Typography>
++            </Box>
++          </Box>
++        </Paper>
+       </Box>
++      <Box sx={{ minWidth: 0 }}>{children}</Box>
+       {canActivateCentralModules(permissions) ? (
+-        <Link href="/modules">Central module registry</Link>
++        <Button component={Link} href="/modules" size="small" sx={{ alignSelf: "flex-start" }}>
++          Central module registry
++        </Button>
+       ) : (
+         <Typography variant="body2" color="text.secondary">
+           Central module activation stays in platform administration.
+         </Typography>
+       )}
+-      <Drawer anchor="left" open={menuOpen} onClose={() => setMenuOpen(false)}>
+-        <Box
+-          id="site-admin-menu"
+-          sx={{ width: 280, p: 2 }}
+-          role="presentation"
+-          onKeyDown={(event) => {
+-            if (event.key === "Escape") setMenuOpen(false);
+-          }}
+-        >
+-          <IconButton aria-label="Close site menu" onClick={() => setMenuOpen(false)}>
+-            <CloseIcon />
+-          </IconButton>
+-          <SectionLinks
+-            siteId={site.id}
+-            sections={sections}
+-            currentPath={currentPath}
+-            onNavigate={() => setMenuOpen(false)}
+-          />
+-        </Box>
+-      </Drawer>
+     </Box>
+     </SiteAdminContext.Provider>
+   );
+ }
+ 
+-export function SiteAdminDenied({ sites }: { sites: SiteAdminSite[] }) {
++export function SiteAdminDenied({ sites }: { sites: Pick<SiteAdminSite, "id" | "name">[] }) {
+   const router = useRouter();
+   return (
+     <Alert severity="warning" sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+diff --git a/frontend/apps/admin-web/src/sites/site-detail.test.tsx b/frontend/apps/admin-web/src/sites/site-detail.test.tsx
+index 9bf897e..85d43dd 100644
+--- a/frontend/apps/admin-web/src/sites/site-detail.test.tsx
++++ b/frontend/apps/admin-web/src/sites/site-detail.test.tsx
+@@ -1,4 +1,4 @@
+-import { render, screen, waitFor, within } from "@testing-library/react";
++import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+ import { beforeEach, describe, expect, it, vi } from "vitest";
+ 
+ import type { PaginatedResponse, Site, SiteDomain } from "@uog/types";
+@@ -47,6 +47,17 @@ vi.mock("@/app/sites/menu-actions", () => ({
+   updateSiteMenu: vi.fn(),
+ }));
+ 
++vi.mock("@/app/sites/post-actions", () => ({
++  loadSitePosts: vi.fn(async () => ({ ok: true, data: { count: 0, next: null, previous: null, results: [] } })),
++  loadSiteTaxonomy: vi.fn(async () => ({ ok: true, data: [] })),
++  loadSitePostWorkflowHistory: vi.fn(async () => ({ ok: true, data: [] })),
++  getSitePost: vi.fn(),
++  createSitePost: vi.fn(),
++  updateSitePost: vi.fn(),
++  transitionSitePost: vi.fn(),
++  createSiteTaxonomy: vi.fn(),
++}));
++
+ vi.mock("@/app/sites/page-actions", () => ({
+   loadSitePages: vi.fn(async () => ({ ok: true, data: [] })),
+   createSitePage: vi.fn(),
+@@ -238,10 +249,10 @@ describe("SiteDetail — domains", () => {
+     });
+ 
+     renderDetail({ site: site() });
++    fireEvent.click(screen.getByRole("tab", { name: "Domains" }));
+ 
+-    // The primary hostname now appears in the hero profile and the panel.
+-    expect((await screen.findAllByText("www.uog.edu.et")).length).toBeGreaterThanOrEqual(1);
+-    expect(screen.getByText("uog.edu.et")).toBeTruthy();
++    expect(await screen.findByText("uog.edu.et")).toBeTruthy();
++    expect(screen.getAllByText("www.uog.edu.et").length).toBeGreaterThanOrEqual(1);
+     expect(screen.getByText("Primary")).toBeTruthy();
+     expect(screen.getByText("Alias")).toBeTruthy();
+     expect(
+@@ -251,6 +262,7 @@ describe("SiteDetail — domains", () => {
+ 
+   it("states when no hostnames are registered", async () => {
+     renderDetail({ site: site() });
++    fireEvent.click(screen.getByRole("tab", { name: "Domains" }));
+ 
+     expect(
+       await screen.findByText("No hostnames are registered for this site yet."),
+@@ -270,6 +282,7 @@ describe("SiteDetail — domains", () => {
+     });
+ 
+     renderDetail({ site: site() });
++    fireEvent.click(screen.getByRole("tab", { name: "Domains" }));
+ 
+     expect(
+       await screen.findByText(/domain list could not be loaded/i),
+@@ -282,6 +295,7 @@ describe("SiteDetail — domains", () => {
+ describe("SiteDetail — modules", () => {
+   it("says no modules are enabled and does not present planned capabilities as features", async () => {
+     renderDetail({ site: site() });
++    fireEvent.click(screen.getByRole("tab", { name: "Modules" }));
+ 
+     expect(await screen.findByText(/No modules are enabled for this site/i)).toBeTruthy();
+     expect(screen.getByText(/planned capabilities only/i)).toBeTruthy();
+@@ -329,11 +343,9 @@ describe("SiteDetail — modules", () => {
+     });
+ 
+     renderDetail({ site: site() });
++    fireEvent.click(screen.getByRole("tab", { name: "Modules" }));
+ 
+-    // Scope to the Modules panel: the settings section also renders the word
+-    // "Disabled" for behavior flags.
+-    const modulesPanel = screen.getByText("Modules").parentElement
+-      ?.parentElement as HTMLElement;
++    const modulesPanel = screen.getByRole("region", { name: "Modules" });
+ 
+     expect(await within(modulesPanel).findByText("NEWS — News")).toBeTruthy();
+     expect(within(modulesPanel).getByText("Enabled")).toBeTruthy();
+@@ -359,6 +371,7 @@ describe("SiteDetail — modules", () => {
+     });
+ 
+     renderDetail({ site: site() });
++    fireEvent.click(screen.getByRole("tab", { name: "Modules" }));
+ 
+     expect(
+       await screen.findByText(/module assignments could not be loaded/i),
+@@ -387,11 +400,11 @@ describe("SiteDetail — primary domain", () => {
+     });
+ 
+     renderDetail({ site: site() });
++    fireEvent.click(screen.getByRole("tab", { name: "Domains" }));
+ 
+-    // The hostname appears in the hero profile and in the Domains panel.
+-    expect(
+-      (await screen.findAllByText("www.uog.edu.et")).length,
+-    ).toBeGreaterThanOrEqual(2);
++    await waitFor(() => {
++      expect(screen.getAllByText("www.uog.edu.et").length).toBeGreaterThanOrEqual(2);
++    });
+     // Shown in the hero profile, not only in the Domains panel below.
+     expect(screen.getByText("Primary domain")).toBeTruthy();
+     expect(
+diff --git a/frontend/apps/admin-web/src/sites/site-detail.tsx b/frontend/apps/admin-web/src/sites/site-detail.tsx
+index 7a38669..fd2a59d 100644
+--- a/frontend/apps/admin-web/src/sites/site-detail.tsx
++++ b/frontend/apps/admin-web/src/sites/site-detail.tsx
+@@ -31,6 +31,8 @@ import Button from "@mui/material/Button";
+ import Chip from "@mui/material/Chip";
+ import Divider from "@mui/material/Divider";
+ import Paper from "@mui/material/Paper";
++import Tab from "@mui/material/Tab";
++import Tabs from "@mui/material/Tabs";
+ import Typography from "@mui/material/Typography";
+ import Link from "next/link";
+ import { useRouter } from "next/navigation";
+@@ -64,6 +66,7 @@ import { configurationRows, originCaption } from "@/sites/configuration";
+ import { SiteDomainsPanel } from "@/sites/site-domains-panel";
+ import { SiteMenusPanel } from "@/sites/site-menus";
+ import { SitePagesPanel } from "@/sites/site-pages";
++import { SitePostsPanel } from "@/sites/site-posts";
+ import { ownerInfoFor, relationLabel } from "@/sites/owner";
+ import { siteStatusChip, siteStatusLabel } from "@/sites/validation";
+ 
+@@ -131,6 +134,9 @@ export function SiteDetail({ site, permissions = [], error }: SiteDetailProps) {
+   const [pending, setPending] = useState(false);
+   const [confirmAction, setConfirmAction] = useState<LifecycleAction | null>(null);
+   const [confirmError, setConfirmError] = useState<ApiError | null>(null);
++  const [section, setSection] = useState<
++    "overview" | "settings" | "domains" | "modules" | "access" | "pages" | "posts" | "menus"
++  >("overview");
+ 
+   // Baseline for the inherited/override comparison: the provisioning
+   // template's defaults. `null` template means schema factory defaults, so
+@@ -294,6 +300,12 @@ export function SiteDetail({ site, permissions = [], error }: SiteDetailProps) {
+       ? null
+       : pagesModuleId != null &&
+         (assignments.data?.results ?? []).some((row) => row.module === pagesModuleId && row.is_enabled);
++  const postsModuleId = registry.data?.results.find((entry) => entry.code === "POSTS")?.id ?? null;
++  const postsEnabled =
++    assignments.loading || registry.loading
++      ? null
++      : postsModuleId != null &&
++        (assignments.data?.results ?? []).some((row) => row.module === postsModuleId && row.is_enabled);
+   const baselineLabel =
+     template ? `template ${template.code}` : "the platform defaults";
+   const showOrigins = site.template === null || baseline === "ready";
+@@ -538,7 +550,26 @@ export function SiteDetail({ site, permissions = [], error }: SiteDetailProps) {
+         </Paper>
+       </Box>
+ 
+-      <Paper variant="outlined" sx={{ overflow: "hidden", borderRadius: 3 }}>
++      <Tabs
++        value={section}
++        onChange={(_, value: typeof section) => setSection(value)}
++        variant="scrollable"
++        scrollButtons="auto"
++        aria-label="Site detail sections"
++      >
++        <Tab value="overview" label="Overview" />
++        <Tab value="settings" label="Settings" />
++        <Tab value="domains" label="Domains" />
++        <Tab value="modules" label="Modules" />
++        <Tab value="access" label="Access" />
++        <Tab value="pages" label="Pages" />
++        <Tab value="posts" label="Posts" />
++        <Tab value="menus" label="Menus" />
++      </Tabs>
++
++      {section === "overview" ? (
++      <>
++      <Paper component="section" aria-label="Overview" variant="outlined" sx={{ overflow: "hidden", borderRadius: 3 }}>
+         <Box sx={{ px: { xs: 2, sm: 3 }, py: 2 }}>
+           <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+             Site information
+@@ -679,8 +710,10 @@ export function SiteDetail({ site, permissions = [], error }: SiteDetailProps) {
+           </Box>
+         ) : null}
+       </Paper>
++      </>
++      ) : null}
+ 
+-      {/* Domains: full lifecycle management in a dedicated panel. */}
++      {section === "domains" ? (
+       <SiteDomainsPanel
+         site={site}
+         onChanged={() => {
+@@ -691,12 +724,50 @@ export function SiteDetail({ site, permissions = [], error }: SiteDetailProps) {
+           router.refresh();
+         }}
+       />
++      ) : null}
+ 
+-      <SiteMenusPanel siteId={site.id} menusEnabled={menusEnabled} permissions={permissions} />
+-      <SitePagesPanel siteId={site.id} pagesEnabled={pagesEnabled} permissions={permissions} />
++      {section === "menus" ? (
++      <Box component="section" aria-label="Menus">
++        <SiteMenusPanel siteId={site.id} menusEnabled={menusEnabled} permissions={permissions} />
++      </Box>
++      ) : null}
++      {section === "pages" ? (
++      <Box component="section" aria-label="Pages">
++        <SitePagesPanel
++          siteId={site.id}
++          pagesEnabled={pagesEnabled}
++          permissions={permissions}
++          languages={{
++            defaultLanguage: site.default_language,
++            enabled: site.configuration.language.enabled,
++          }}
++        />
++      </Box>
++      ) : null}
++      {section === "posts" ? (
++      <Box component="section" aria-label="Posts">
++        <SitePostsPanel siteId={site.id} postsEnabled={postsEnabled} permissions={permissions} />
++      </Box>
++      ) : null}
++      {section === "access" ? (
++      <Paper component="section" aria-label="Access" variant="outlined" sx={{ overflow: "hidden", borderRadius: 3 }}>
++        <Box sx={{ px: { xs: 2, sm: 3 }, py: 2, display: "flex", flexDirection: "column", gap: 1.5, alignItems: "flex-start" }}>
++          <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
++            Access
++          </Typography>
++          <Typography variant="body2" color="text.secondary">
++            Who can manage this Site is assigned in Access control. A public
++            hostname does not grant that access.
++          </Typography>
++          <Button component={Link} href="/access" variant="outlined">
++            Open access control
++          </Button>
++        </Box>
++      </Paper>
++      ) : null}
+ 
+-      {/* Per-site module enablement, honest about planned capabilities. */}
+-      <Paper variant="outlined" sx={{ overflow: "hidden", borderRadius: 3 }}>
++      {section === "modules" ? (
++      <Paper component="section" aria-label="Modules" variant="outlined" sx={{ overflow: "hidden", borderRadius: 3 }}>
+         <Box sx={{ px: { xs: 2, sm: 3 }, py: 2 }}>
+           <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+             Modules
+@@ -773,8 +844,10 @@ export function SiteDetail({ site, permissions = [], error }: SiteDetailProps) {
+           )}
+         </Box>
+       </Paper>
++      ) : null}
+ 
+-      <Paper variant="outlined" sx={{ overflow: "hidden", borderRadius: 3 }}>
++      {section === "settings" ? (
++      <Paper component="section" aria-label="Settings" variant="outlined" sx={{ overflow: "hidden", borderRadius: 3 }}>
+         <Box
+           sx={{
+             px: { xs: 2, sm: 3 },
+@@ -880,6 +953,7 @@ export function SiteDetail({ site, permissions = [], error }: SiteDetailProps) {
+           </Alert>
+         </Box>
+       </Paper>
++      ) : null}
+ 
+       <ConfirmDialog
+         open={confirmAction !== null}
+diff --git a/frontend/apps/admin-web/src/sites/site-menus.tsx b/frontend/apps/admin-web/src/sites/site-menus.tsx
+index 92a47bd..3e8c9a9 100644
+--- a/frontend/apps/admin-web/src/sites/site-menus.tsx
++++ b/frontend/apps/admin-web/src/sites/site-menus.tsx
+@@ -159,7 +159,17 @@ function LocalMenuEditor({
+         </Button>
+       ) : null}
+       {editing ? (
+-        <Box component="form" sx={{ display: "flex", gap: 1, flexWrap: "wrap", alignItems: "center" }} onSubmit={save}>
++        <Box
++          component="form"
++          sx={{
++            display: "grid",
++            gridTemplateColumns: { xs: "minmax(0, 1fr)", sm: "repeat(2, minmax(0, 1fr))" },
++            gap: 2,
++            alignItems: "start",
++            "& .MuiFormControl-root": { minWidth: 0, width: "100%" },
++          }}
++          onSubmit={save}
++        >
+           <TextField size="small" label="Local menu name" value={name} disabled={!structural || busy} onChange={(event) => setName(event.target.value)} required />
+           <TextField
+             select
+@@ -176,7 +186,7 @@ function LocalMenuEditor({
+               </option>
+             ))}
+           </TextField>
+-          <Button type="submit" variant="contained" disabled={!structural || busy || !name.trim()}>Save menu</Button>
++          <Button type="submit" variant="contained" disabled={!structural || busy || !name.trim()} sx={{ justifySelf: "start" }}>Save menu</Button>
+         </Box>
+       ) : null}
+       {menu.is_active && canWrite && !canPublish ? (
+@@ -184,7 +194,14 @@ function LocalMenuEditor({
+           This menu is active. Changing it also needs menu publish permission.
+         </Typography>
+       ) : null}
+-      <MenuItemTree siteId={siteId} state={state} targets={targets} enabled={structural} onChanged={onChanged} />
++      <MenuItemTree
++        siteId={siteId}
++        state={state}
++        targets={targets}
++        enabled={structural}
++        onChanged={onChanged}
++        showAvailability={false}
++      />
+     </Box>
+   );
+ }
+@@ -238,6 +255,12 @@ export function SiteMenusPanel({
+             The MENUS module is off for this Site. Existing menus stay in place, changes are blocked, and the public website does not serve navigation.
+           </Alert>
+         ) : null}
++        {targetState.data && !targetState.data.pagesAvailable ? (
++          <Alert severity="info">Pages are not available for this Site. Page targets stay blocked.</Alert>
++        ) : null}
++        {targetState.data && !targetState.data.postsAvailable ? (
++          <Alert severity="info">Posts are not available for this Site. Post targets stay blocked.</Alert>
++        ) : null}
+         {!canWrite && !canPublish ? (
+           <Alert severity="info">
+             You can view menus for this Site. Creating or editing a local menu needs menu write permission. Publishing needs menu publish permission.
+@@ -302,7 +325,16 @@ export function SiteMenusPanel({
+               </Typography>
+             ) : null}
+             {canWrite && openPlaces.length > 0 ? (
+-              <Box component="form" sx={{ display: "flex", gap: 1, flexWrap: "wrap", alignItems: "center" }} onSubmit={(event) => {
++              <Box
++                component="form"
++                sx={{
++                  display: "grid",
++                  gridTemplateColumns: { xs: "minmax(0, 1fr)", sm: "repeat(2, minmax(0, 1fr))" },
++                  gap: 2,
++                  alignItems: "start",
++                  "& .MuiFormControl-root": { minWidth: 0, width: "100%" },
++                }}
++                onSubmit={(event) => {
+                 event.preventDefault();
+                 setBusy(true);
+                 void createSiteMenu(siteId, selectedLocation, name)
+@@ -332,7 +364,7 @@ export function SiteMenusPanel({
+                     </option>
+                   ))}
+                 </TextField>
+-                <Button type="submit" variant="contained" disabled={!moduleOn || busy || !name.trim()}>Create menu</Button>
++                <Button type="submit" variant="contained" disabled={!moduleOn || busy || !name.trim()} sx={{ justifySelf: "start" }}>Create menu</Button>
+               </Box>
+             ) : null}
+           </>
+diff --git a/frontend/apps/admin-web/src/sites/site-pages.test.tsx b/frontend/apps/admin-web/src/sites/site-pages.test.tsx
+index db3d6fa..bf10068 100644
+--- a/frontend/apps/admin-web/src/sites/site-pages.test.tsx
++++ b/frontend/apps/admin-web/src/sites/site-pages.test.tsx
+@@ -114,10 +114,6 @@ function siteWorkspace(site: SiteAdminSite, permissions: readonly string[]) {
+     <ToastProvider>
+       <SiteAdminFrame
+         site={site}
+-        sites={[
+-          { id: 11, name: "Informatics", code: "INFORMATICS", status: "ACTIVE" },
+-          { id: 22, name: "Medicine", code: "MEDICINE", status: "ACTIVE" },
+-        ]}
+         enabledModuleCodes={["PAGES"]}
+         permissions={[...permissions]}
+       >
+@@ -286,6 +282,67 @@ describe("SitePagesPanel", () => {
+     expect(loadSitePageWorkflowHistory).toHaveBeenCalledWith(11, "page-1");
+   });
+ 
++  it("defaults a new Page to the Site language", async () => {
++    render(
++      <ToastProvider>
++        <SitePagesPanel
++          siteId={11}
++          pagesEnabled
++          permissions={ALL_PERMISSIONS}
++          languages={{ defaultLanguage: "en-us", enabled: ["en-us", "am"] }}
++        />
++      </ToastProvider>,
++    );
++    await screen.findByRole("table", { name: "Pages for this Site" });
++    fireEvent.click(screen.getByRole("button", { name: "Create page" }));
++    expect(screen.getByRole("combobox", { name: "Locale" }).textContent).toContain("en-us");
++    fireEvent.change(screen.getByRole("textbox", { name: "Title" }), { target: { value: "Library hours" } });
++    fireEvent.click(screen.getByRole("button", { name: "Create Page" }));
++    await waitFor(() => expect(createSitePage).toHaveBeenCalledWith(
++      11,
++      expect.objectContaining({ locale: "en-us", seo: {}, metadata: {} }),
++    ));
++  });
++
++  it("opens the create dialog once for the dashboard quick action", async () => {
++    const started = vi.fn();
++    render(
++      <ToastProvider>
++        <SitePagesPanel siteId={11} pagesEnabled permissions={ALL_PERMISSIONS} startCreate onCreateStarted={started} />
++      </ToastProvider>,
++    );
++    expect(await screen.findByRole("dialog", { name: "Create Page" })).toBeTruthy();
++    expect(started).toHaveBeenCalledTimes(1);
++  });
++
++  it("starts a new Page blank and fills the slug from the title until it is edited", async () => {
++    renderPanel();
++    await screen.findByRole("table", { name: "Pages for this Site" });
++    fireEvent.click(screen.getByRole("button", { name: "Create page" }));
++    const title = screen.getByRole("textbox", { name: "Title" });
++    const slug = screen.getByRole("textbox", { name: "Slug" });
++    expect(title).toHaveProperty("value", "");
++    expect(slug).toHaveProperty("value", "");
++    expect(screen.queryByRole("textbox", { name: "Block 1 JSON" })).toBeNull();
++    expect(screen.getByRole("button", { name: "Create Page" })).toHaveProperty("disabled", true);
++
++    fireEvent.change(title, { target: { value: "Graduate Admissions 2027" } });
++    expect(slug).toHaveProperty("value", "graduate-admissions-2027");
++    fireEvent.change(slug, { target: { value: "grad-admissions" } });
++    fireEvent.change(title, { target: { value: "Graduate Admissions" } });
++    expect(slug).toHaveProperty("value", "grad-admissions");
++  });
++
++  it("ignores the create request without create permission", async () => {
++    render(
++      <ToastProvider>
++        <SitePagesPanel siteId={11} pagesEnabled permissions={["content.pages.view"]} startCreate />
++      </ToastProvider>,
++    );
++    await screen.findByRole("table", { name: "Pages for this Site" });
++    expect(screen.queryByRole("dialog")).toBeNull();
++  });
++
+   it("creates and edits only with the matching permission and current ETag", async () => {
+     renderPanel();
+     await screen.findByRole("table", { name: "Pages for this Site" });
+@@ -303,7 +360,7 @@ describe("SitePagesPanel", () => {
+       visibility: "PUBLIC",
+       metadata: {},
+       seo: {},
+-      blocks: [{ type: "paragraph", html: "<p>Applications are open.</p>" }],
++      blocks: [],
+     }));
+     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+ 
+@@ -342,6 +399,7 @@ describe("SitePagesPanel", () => {
+   it("previews private draft content and blocks malformed block JSON", async () => {
+     renderPanel();
+     fireEvent.click(await screen.findByRole("button", { name: "Create page" }));
++    fireEvent.click(screen.getByRole("button", { name: "Add paragraph block" }));
+     fireEvent.click(screen.getByRole("button", { name: "Preview draft" }));
+     expect(screen.getByText("Private draft preview")).toBeTruthy();
+     expect(screen.queryByRole("script")).toBeNull();
+@@ -433,11 +491,6 @@ describe("SitePagesPanel", () => {
+     const view = render(siteWorkspace(informatics, ALL_PERMISSIONS));
+     await screen.findByText("Informatics Admissions");
+ 
+-    fireEvent.change(screen.getByRole("combobox", { name: "Site" }), {
+-      target: { value: "22" },
+-    });
+-    expect(push).toHaveBeenCalledWith("/sites/22/admin");
+-
+     view.rerender(siteWorkspace(medicine, ["content.pages.view"]));
+     await screen.findByText("Medicine Admissions");
+     await waitFor(() => expect(loadSitePages).toHaveBeenLastCalledWith(
+diff --git a/frontend/apps/admin-web/src/sites/site-pages.tsx b/frontend/apps/admin-web/src/sites/site-pages.tsx
+index be54d28..b2f7b94 100644
+--- a/frontend/apps/admin-web/src/sites/site-pages.tsx
++++ b/frontend/apps/admin-web/src/sites/site-pages.tsx
+@@ -1,7 +1,11 @@
+ "use client";
+ 
+-import { useState } from "react";
++import { useEffect, useRef, useState } from "react";
+ import AddIcon from "@mui/icons-material/Add";
++import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
++import Accordion from "@mui/material/Accordion";
++import AccordionDetails from "@mui/material/AccordionDetails";
++import AccordionSummary from "@mui/material/AccordionSummary";
+ import Alert from "@mui/material/Alert";
+ import Box from "@mui/material/Box";
+ import Button from "@mui/material/Button";
+@@ -107,6 +111,11 @@ interface PageFilters {
+   status: SitePageStatus | "";
+ }
+ 
++export interface PageLanguages {
++  defaultLanguage: string;
++  enabled: readonly string[];
++}
++
+ interface PageForm {
+   title: string;
+   slug: string;
+@@ -114,7 +123,9 @@ interface PageForm {
+   locale: string;
+   visibility: SitePageRecord["visibility"];
+   metadata: string;
+-  seo: string;
++  seoTitle: string;
++  seoDescription: string;
++  seoExtra: string;
+   blocks: string[];
+ }
+ 
+@@ -149,10 +160,35 @@ function authorLabel(author: SitePageRecord["created_by"]): string {
+   return author == null ? "—" : `User ${author}`;
+ }
+ 
+-function emptyForm(): PageForm {
++function emptyForm(locale = "en"): PageForm {
++  return {
++    title: "", slug: "", parent: "", locale, visibility: "PUBLIC",
++    metadata: "{}", seoTitle: "", seoDescription: "", seoExtra: "{}",
++    blocks: [],
++  };
++}
++
++function slugFromTitle(title: string): string {
++  return title.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
++}
++
++function formFromRecord(current: SitePageRecord, fallbackLocale: string): PageForm {
++  const seo = { ...(current.seo ?? {}) };
++  const metaTitle = seo.meta_title;
++  const metaDescription = seo.meta_description;
++  delete seo.meta_title;
++  delete seo.meta_description;
+   return {
+-    title: "", slug: "", parent: "", locale: "en", visibility: "PUBLIC",
+-    metadata: "{}", seo: "{}", blocks: ['{"type":"paragraph","html":"<p>Applications are open.</p>"}'],
++    title: current.title,
++    slug: current.slug,
++    parent: current.parent ?? "",
++    locale: current.locale || fallbackLocale,
++    visibility: current.visibility,
++    metadata: JSON.stringify(current.metadata ?? {}, null, 2),
++    seoTitle: typeof metaTitle === "string" ? metaTitle : "",
++    seoDescription: typeof metaDescription === "string" ? metaDescription : "",
++    seoExtra: JSON.stringify(seo, null, 2),
++    blocks: (current.blocks ?? []).map((block) => JSON.stringify(block, null, 2)),
+   };
+ }
+ 
+@@ -172,10 +208,21 @@ function jsonObject(source: string, label: string): Record<string, unknown> {
+   return value as Record<string, unknown>;
+ }
+ 
++function seoInput(form: PageForm): Record<string, unknown> {
++  const seo = jsonObject(form.seoExtra, "Additional SEO");
++  const title = form.seoTitle.trim();
++  const description = form.seoDescription.trim();
++  if (title) seo.meta_title = title;
++  else delete seo.meta_title;
++  if (description) seo.meta_description = description;
++  else delete seo.meta_description;
++  return seo;
++}
++
+ function formSyntaxError(form: PageForm): string | null {
+   try {
+     metadataInput(form);
+-    jsonObject(form.seo, "SEO metadata");
++    seoInput(form);
+     blockInputs(form);
+   } catch (error) {
+     return error instanceof Error ? error.message : "Correct the JSON fields before saving.";
+@@ -183,6 +230,19 @@ function formSyntaxError(form: PageForm): string | null {
+   return null;
+ }
+ 
++function localeChoicesFor(languages: PageLanguages | undefined): string[] | null {
++  const enabled = (languages?.enabled ?? []).map((code) => code.trim()).filter(Boolean);
++  const unique = [...new Set(enabled)];
++  return unique.length > 0 ? unique : null;
++}
++
++function defaultLocaleFor(languages: PageLanguages | undefined): string {
++  const choices = localeChoicesFor(languages);
++  const preferred = languages?.defaultLanguage.trim() ?? "";
++  if (choices && preferred && choices.includes(preferred)) return preferred;
++  return choices?.[0] ?? "en";
++}
++
+ function orderingForSort(sort: SortState): SitePageListQuery["ordering"] {
+   if (sort.field === "title") return sort.direction === "desc" ? "-title" : "title";
+   return sort.direction === "desc" ? "-updated_at" : "updated_at";
+@@ -192,10 +252,17 @@ export function SitePagesPanel({
+   siteId,
+   pagesEnabled,
+   permissions = [],
++  languages,
++  startCreate = false,
++  onCreateStarted,
+ }: {
+   siteId: number;
+   pagesEnabled: boolean | null;
+   permissions?: readonly string[];
++  languages?: PageLanguages;
++  /** Open the create dialog once, for the dashboard's "Create page" action. */
++  startCreate?: boolean;
++  onCreateStarted?: () => void;
+ }) {
+   return (
+     <SitePagesPanelContent
+@@ -203,6 +270,9 @@ export function SitePagesPanel({
+       siteId={siteId}
+       pagesEnabled={pagesEnabled}
+       permissions={permissions}
++      languages={languages}
++      startCreate={startCreate}
++      onCreateStarted={onCreateStarted}
+     />
+   );
+ }
+@@ -211,12 +281,20 @@ function SitePagesPanelContent({
+   siteId,
+   pagesEnabled,
+   permissions,
++  languages,
++  startCreate,
++  onCreateStarted,
+ }: {
+   siteId: number;
+   pagesEnabled: boolean | null;
+   permissions: readonly string[];
++  languages?: PageLanguages;
++  startCreate: boolean;
++  onCreateStarted?: () => void;
+ }) {
+   const toast = useToast();
++  const defaultLocale = defaultLocaleFor(languages);
++  const localeChoices = localeChoicesFor(languages);
+   const canView = permissions.includes(PERMISSIONS.view);
+   const canCreate = permissions.includes(PERMISSIONS.create);
+   const canEdit = permissions.includes(PERMISSIONS.update);
+@@ -265,6 +343,16 @@ function SitePagesPanelContent({
+   const rows = (pages.data?.results ?? []).filter((row) => row.site === siteId);
+   const enabled = pagesEnabled === true && !saving && busyPageId === null;
+   const activeFilterCount = Number(Boolean(appliedFilters.search)) + Number(Boolean(appliedFilters.status));
++  const createStarted = useRef(false);
++
++  useEffect(() => {
++    if (!startCreate || createStarted.current || pagesEnabled !== true || !canCreate) return;
++    createStarted.current = true;
++    onCreateStarted?.();
++    void openCreate();
++    // openCreate reads current state; this runs once per dashboard request.
++    // eslint-disable-next-line react-hooks/exhaustive-deps
++  }, [startCreate, pagesEnabled, canCreate]);
+ 
+   function applyFilters() {
+     setAppliedFilters({
+@@ -283,7 +371,7 @@ function SitePagesPanelContent({
+ 
+   async function openCreate() {
+     setActivePage(null);
+-    setForm({ ...emptyForm(), title: "Admissions", slug: "admissions" });
++    setForm(emptyForm(defaultLocale));
+     setDialogError("");
+     setDialogConflict(false);
+     setShowDraftPreview(false);
+@@ -331,13 +419,7 @@ function SitePagesPanelContent({
+     try {
+       const current = unwrap(await getSitePage(siteId, row.id));
+       setActivePage(current);
+-      setForm({
+-        title: current.title, slug: current.slug, parent: current.parent ?? "",
+-        locale: current.locale || "en", visibility: current.visibility,
+-        metadata: JSON.stringify(current.metadata ?? {}, null, 2),
+-        seo: JSON.stringify(current.seo ?? {}, null, 2),
+-        blocks: (current.blocks ?? []).map((block) => JSON.stringify(block, null, 2)),
+-      });
++      setForm(formFromRecord(current, defaultLocale));
+       setMode("edit");
+     } catch (cause) {
+       toast.error(cause instanceof Error ? cause.message : "The Page could not be loaded.");
+@@ -360,7 +442,7 @@ function SitePagesPanelContent({
+           locale: form.locale.trim(),
+           visibility: form.visibility,
+           metadata: metadataInput(form),
+-          seo: jsonObject(form.seo, "SEO"),
++          seo: seoInput(form),
+           blocks: blockInputs(form),
+         }));
+       } else if (mode === "edit" && activePage?.etag) {
+@@ -370,7 +452,7 @@ function SitePagesPanelContent({
+           parent: activePage.draft_of ? null : form.parent || null,
+           visibility: form.visibility,
+           metadata: metadataInput(form),
+-          seo: jsonObject(form.seo, "SEO"),
++          seo: seoInput(form),
+           blocks: blockInputs(form),
+         }));
+       } else {
+@@ -398,13 +480,7 @@ function SitePagesPanelContent({
+     try {
+       const current = unwrap(await getSitePage(siteId, activePage.id));
+       setActivePage(current);
+-      setForm({
+-        title: current.title, slug: current.slug, parent: current.parent ?? "",
+-        locale: current.locale || "en", visibility: current.visibility,
+-        metadata: JSON.stringify(current.metadata ?? {}, null, 2),
+-        seo: JSON.stringify(current.seo ?? {}, null, 2),
+-        blocks: (current.blocks ?? []).map((block) => JSON.stringify(block, null, 2)),
+-      });
++      setForm(formFromRecord(current, defaultLocale));
+       setDialogConflict(false);
+       setDialogError("");
+     } catch (cause) {
+@@ -417,14 +493,8 @@ function SitePagesPanelContent({
+   function closeEditor() {
+     if (saving) return;
+     const dirty = mode === "create"
+-      ? JSON.stringify(form) !== JSON.stringify({ ...emptyForm(), title: "Admissions", slug: "admissions" })
+-      : activePage !== null && JSON.stringify(form) !== JSON.stringify({
+-          title: activePage.title, slug: activePage.slug, parent: activePage.parent ?? "",
+-          locale: activePage.locale || "en", visibility: activePage.visibility,
+-          metadata: JSON.stringify(activePage.metadata ?? {}, null, 2),
+-          seo: JSON.stringify(activePage.seo ?? {}, null, 2),
+-          blocks: (activePage.blocks ?? []).map((block) => JSON.stringify(block, null, 2)),
+-        });
++      ? JSON.stringify(form) !== JSON.stringify(emptyForm(defaultLocale))
++      : activePage !== null && JSON.stringify(form) !== JSON.stringify(formFromRecord(activePage, defaultLocale));
+     if (!dirty || window.confirm("Discard your unsaved Page changes?")) setMode(null);
+   }
+ 
+@@ -790,7 +860,13 @@ function SitePagesPanelContent({
+           <TextField
+             label="Title"
+             value={form.title}
+-            onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
++            onChange={(event) => setForm((current) => ({
++              ...current,
++              title: event.target.value,
++              slug: mode === "create" && current.slug === slugFromTitle(current.title)
++                ? slugFromTitle(event.target.value)
++                : current.slug,
++            }))}
+             disabled={!enabled}
+             autoFocus
+             required
+@@ -803,7 +879,9 @@ function SitePagesPanelContent({
+             required
+             helperText={activePage?.draft_of
+               ? "Publication keeps the live Page route. This draft uses an internal slug."
+-              : "Use lowercase letters, numbers and hyphens."}
++              : mode === "create"
++                ? "Filled from the title until you edit it. Use lowercase letters, numbers and hyphens."
++                : "Use lowercase letters, numbers and hyphens."}
+           />
+           <TextField
+             select
+@@ -818,12 +896,49 @@ function SitePagesPanelContent({
+               <MenuItem key={row.id} value={row.id}>{row.title} — {row.path}</MenuItem>
+             ))}
+           </TextField>
+-          <TextField label="Locale" value={form.locale} onChange={(event) => setForm((current) => ({ ...current, locale: event.target.value }))} disabled={mode === "edit"} required helperText={mode === "edit" ? "Locale is fixed when the Page is created." : undefined} />
++          {localeChoices ? (
++            <TextField
++              select
++              label="Locale"
++              value={form.locale}
++              onChange={(event) => setForm((current) => ({ ...current, locale: event.target.value }))}
++              disabled={mode === "edit"}
++              required
++              helperText={mode === "edit"
++                ? "Locale is fixed when the Page is created."
++                : "Choose one of this Site's enabled languages."}
++            >
++              {(localeChoices.includes(form.locale) ? localeChoices : [form.locale, ...localeChoices]).map((code) => (
++                <MenuItem key={code} value={code}>{code}</MenuItem>
++              ))}
++            </TextField>
++          ) : (
++            <TextField label="Locale" value={form.locale} onChange={(event) => setForm((current) => ({ ...current, locale: event.target.value }))} disabled={mode === "edit"} required helperText={mode === "edit" ? "Locale is fixed when the Page is created." : "Use a language this Site enables, such as en-us."} />
++          )}
+           <TextField select label="Visibility" value={form.visibility} onChange={(event) => setForm((current) => ({ ...current, visibility: event.target.value as SitePageRecord["visibility"] }))}>
+             <MenuItem value="PUBLIC">Public</MenuItem><MenuItem value="UNLISTED">Unlisted</MenuItem><MenuItem value="HIDDEN">Hidden</MenuItem>
+           </TextField>
+-          <TextField label="Metadata (JSON object)" value={form.metadata} onChange={(event) => setForm((current) => ({ ...current, metadata: event.target.value }))} multiline minRows={3} helperText="Structured page metadata. Invalid JSON is rejected before save." />
+-          <TextField label="SEO metadata (JSON object)" value={form.seo} onChange={(event) => setForm((current) => ({ ...current, seo: event.target.value }))} multiline minRows={3} helperText="Page title, description and social preview settings." />
++          <TextField
++            label="SEO title"
++            value={form.seoTitle}
++            onChange={(event) => setForm((current) => ({ ...current, seoTitle: event.target.value }))}
++            helperText="Search result title. Leave blank to use the Page title."
++          />
++          <TextField
++            label="Meta description"
++            value={form.seoDescription}
++            onChange={(event) => setForm((current) => ({ ...current, seoDescription: event.target.value }))}
++            multiline
++            minRows={2}
++            helperText="Short summary shown in search results."
++          />
++          <Accordion disableGutters elevation={0} sx={{ border: 1, borderColor: "divider", "&:before": { display: "none" } }}>
++            <AccordionSummary expandIcon={<ExpandMoreIcon />}>Advanced</AccordionSummary>
++            <AccordionDetails sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
++              <TextField label="Metadata (JSON object)" value={form.metadata} onChange={(event) => setForm((current) => ({ ...current, metadata: event.target.value }))} multiline minRows={3} helperText="Technical page metadata. Leave this as {} for an ordinary Page." />
++              <TextField label="Additional SEO (JSON object)" value={form.seoExtra} onChange={(event) => setForm((current) => ({ ...current, seoExtra: event.target.value }))} multiline minRows={3} helperText="Other search settings. SEO title and description are edited above." />
++            </AccordionDetails>
++          </Accordion>
+           <Box component="section" aria-label="Content blocks" sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+             <Typography variant="subtitle2">Content blocks</Typography>
+             {form.blocks.map((block, index) => (
+@@ -864,7 +979,7 @@ function SitePagesPanelContent({
+                         path: activePage?.path ?? `/${form.slug}`,
+                         site: siteId,
+                         blocks: blockInputs(form),
+-                        seo: seoPreview(jsonObject(form.seo, "SEO")),
++                        seo: seoPreview(seoInput(form)),
+                       }}
+                     />
+                   );
+@@ -887,7 +1002,7 @@ function SitePagesPanelContent({
+               !form.locale.trim() ||
+               form.blocks.some((block) => { try { JSON.parse(block); return false; } catch { return true; } }) ||
+               (() => { try { metadataInput(form); return false; } catch { return true; } })()
+-              || (() => { try { jsonObject(form.seo, "SEO"); return false; } catch { return true; } })()
++              || (() => { try { seoInput(form); return false; } catch { return true; } })()
+             }
+           >
+             {saving ? "Saving…" : mode === "create" ? "Create Page" : "Save changes"}

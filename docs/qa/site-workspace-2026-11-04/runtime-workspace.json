@@ -1,0 +1,41 @@
+{
+  "platformPermissions": [],
+  "sites": [
+    {
+      "id": 12,
+      "name": "QA University qa6a1a06aa",
+      "code": "QA6A1A06AA_0",
+      "status": "ACTIVE"
+    }
+  ],
+  "sitesError": null,
+  "site": {
+    "id": 12,
+    "permissions": [
+      "content.menus.manage",
+      "content.menus.view",
+      "content.pages.create",
+      "content.pages.delete",
+      "content.pages.publish",
+      "content.pages.update",
+      "content.pages.view",
+      "content.posts.create",
+      "content.posts.delete",
+      "content.posts.publish",
+      "content.posts.update",
+      "content.posts.view",
+      "menu.publish",
+      "menu.read",
+      "menu.write",
+      "platform.dashboard.view",
+      "platform.users.assign_roles",
+      "platform.users.view",
+      "sites.update",
+      "sites.view"
+    ],
+    "enabledModuleCodes": [
+      "PAGES",
+      "MENUS"
+    ]
+  }
+}
