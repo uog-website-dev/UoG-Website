@@ -15,6 +15,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import AccountBalanceRoundedIcon from "@mui/icons-material/AccountBalanceRounded";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import ArticleIcon from "@mui/icons-material/Article";
+import GroupIcon from "@mui/icons-material/Group";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import DescriptionIcon from "@mui/icons-material/Description";
 import type { SvgIconComponent } from "@mui/icons-material";
@@ -56,6 +57,7 @@ const SITE_SECTION_ICONS: Record<SiteSection["key"], SvgIconComponent> = {
   pages: DescriptionIcon,
   posts: ArticleIcon,
   menus: AccountTreeIcon,
+  users: GroupIcon,
 };
 
 const SITE_SECTION_DESCRIPTIONS: Record<SiteSection["key"], string> = {
@@ -63,6 +65,7 @@ const SITE_SECTION_DESCRIPTIONS: Record<SiteSection["key"], string> = {
   pages: "Site pages and workflow",
   posts: "News and announcements",
   menus: "Header and footer navigation",
+  users: "Site members and roles",
 };
 
 function SidebarBrand() {
