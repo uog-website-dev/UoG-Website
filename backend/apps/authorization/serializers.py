@@ -106,11 +106,40 @@ class AssignmentCreateSerializer(serializers.Serializer):
 
 class AssignmentSerializer(serializers.ModelSerializer):
     user_name = serializers.CharField(source="user.username", read_only=True)
+    user_email = serializers.EmailField(source="user.email", read_only=True)
+    user_first_name = serializers.CharField(source="user.first_name", read_only=True)
+    user_last_name = serializers.CharField(source="user.last_name", read_only=True)
     role_name = serializers.CharField(source="role.name", read_only=True)
 
     class Meta:
         model = UserRoleAssignment
-        fields = ("id", "user", "user_name", "role", "role_name", "scope", "organization", "site", "assigned_by", "assigned_at", "expires_at", "revoked_at", "revoked_by")
+        fields = ("id", "user", "user_name", "user_email", "user_first_name", "user_last_name", "role", "role_name", "scope", "organization", "site", "assigned_by", "assigned_at", "expires_at", "revoked_at", "revoked_by")
+        read_only_fields = fields
+
+
+class SiteDirectoryUserSerializer(serializers.Serializer):
+    user = serializers.IntegerField()
+    user_name = serializers.CharField()
+    user_email = serializers.EmailField(allow_blank=True)
+    user_first_name = serializers.CharField(allow_blank=True)
+    user_last_name = serializers.CharField(allow_blank=True)
+    assignments = AssignmentSerializer(many=True)
+
+
+class SiteIdentitySearchSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    username = serializers.CharField()
+    email = serializers.EmailField(allow_blank=True)
+    first_name = serializers.CharField(allow_blank=True)
+    last_name = serializers.CharField(allow_blank=True)
+    assigned_role_ids = serializers.ListField(child=serializers.IntegerField())
+
+
+class SiteAssignableRoleSerializer(RoleSerializer):
+    assignable = serializers.BooleanField()
+
+    class Meta(RoleSerializer.Meta):
+        fields = (*RoleSerializer.Meta.fields, "assignable")
         read_only_fields = fields
 
 

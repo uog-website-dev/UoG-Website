@@ -10,9 +10,9 @@
 export const CENTRAL_MODULE_PERMISSION = "platform.sites.manage_registry";
 
 export interface SiteSection {
-  key: "dashboard" | "pages" | "posts" | "menus";
+  key: "dashboard" | "pages" | "posts" | "menus" | "users";
   label: string;
-  segment: "" | "pages" | "posts" | "menus";
+  segment: "" | "pages" | "posts" | "menus" | "users";
   module: "PAGES" | "POSTS" | "MENUS" | null;
   permissions: readonly string[];
 }
@@ -50,6 +50,13 @@ export const SITE_SECTIONS: readonly SiteSection[] = [
     ],
   },
   {
+    key: "users",
+    label: "Users",
+    segment: "users",
+    module: null,
+    permissions: ["platform.users.view"],
+  },
+  {
     key: "menus",
     label: "Menus",
     segment: "menus",
@@ -73,7 +80,10 @@ export function sectionByKey(key: SiteSection["key"]): SiteSection {
 
 /** Pages, Posts and Menus need both an enabled Site module and a permission. */
 export function sectionDecision(section: SiteSection, access: SiteAccessInput): SectionDecision {
-  if (section.module == null) return "visible";
+  if (section.key === "dashboard") return "visible";
+  if (section.module == null) {
+    return section.permissions.some((code) => access.permissions.includes(code)) ? "visible" : "permission_denied";
+  }
   if (!access.enabledModuleCodes.includes(section.module)) return "module_disabled";
   if (!section.permissions.some((code) => access.permissions.includes(code))) {
     return "permission_denied";

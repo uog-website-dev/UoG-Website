@@ -188,3 +188,50 @@ def test_role_administrator_cannot_modify_system_templates_or_grant_self(actor):
         "user": user.pk, "role": Role.objects.get(code="viewer").pk, "scope": "PLATFORM",
     }, content_type="application/json")
     assert self_assignment.status_code == 403
+
+
+def test_site_user_directory_and_identity_search_are_site_scoped(actor):
+    client, admin = actor
+    call_command("seed_rbac", verbosity=0)
+    root, college = organization_tree()
+    other_college = OrganizationUnit.objects.create(code="OTHER-COLLEGE-2", name="Other", organization_type=college.organization_type, parent=root)
+    site = Site.objects.create(code="IAM-SITE", name="IAM Site", organization_unit=college)
+    other_site = Site.objects.create(code="IAM-OTHER", name="Other Site", organization_unit=other_college)
+    admin_role = Role.objects.get(code="site-administrator")
+    grant(admin, admin_role, UserRoleAssignment.Scope.SITE, organization=college, site=site)
+    target = User.objects.create_user(username="site-target", email="target@uog.edu.et", first_name="Site", last_name="Target")
+    other_target = User.objects.create_user(username="other-target", email="other@uog.edu.et")
+    grant(target, Role.objects.get(code="reviewer"), UserRoleAssignment.Scope.SITE, organization=college, site=site)
+    grant(other_target, Role.objects.get(code="reviewer"), UserRoleAssignment.Scope.SITE, organization=other_college, site=other_site)
+
+    listing = client.get(f"/api/v1/authorization/assignments/site-users/?site={site.pk}")
+    assert listing.status_code == 200, listing.content
+    assert {row["user"] for row in listing.json()["results"]} == {admin.pk, target.pk}
+    target_row = next(row for row in listing.json()["results"] if row["user"] == target.pk)
+    assert target_row["user_email"] == target.email
+    assert target_row["assignments"][0]["role_name"] == "Reviewer"
+    search = client.get(f"/api/v1/authorization/assignments/site-user-search/?site={site.pk}&search=other-target")
+    assert search.status_code == 200
+    assert [row["id"] for row in search.json()] == [other_target.pk]
+    existing_search = client.get(f"/api/v1/authorization/assignments/site-user-search/?site={site.pk}&search=site-target")
+    assert existing_search.json()[0]["assigned_role_ids"] == [Role.objects.get(code="reviewer").pk]
+    assert client.get(f"/api/v1/authorization/assignments/site-users/?site={other_site.pk}").status_code == 403
+    roles = client.get(f"/api/v1/authorization/assignments/site-roles/?site={site.pk}")
+    assert roles.status_code == 200
+    role_options = {role["code"]: role for role in roles.json()}
+    assert role_options["reviewer"]["assignable"] is True
+    assert role_options["site-administrator"]["assignable"] is False
+
+
+def test_last_active_site_administrator_cannot_be_revoked(actor):
+    client, platform_admin = actor
+    call_command("seed_rbac", verbosity=0)
+    _root, college = organization_tree()
+    site = Site.objects.create(code="LAST-ADMIN", name="Last Admin", organization_unit=college)
+    target = User.objects.create_user(username="last-site-admin")
+    grant(platform_admin, Role.objects.get(code="platform-administrator"))
+    last_admin = grant(target, Role.objects.get(code="site-administrator"), UserRoleAssignment.Scope.SITE, organization=college, site=site)
+    response = client.post(f"/api/v1/authorization/assignments/{last_admin.pk}/revoke/", {}, content_type="application/json")
+    assert response.status_code == 403
+    last_admin.refresh_from_db()
+    assert last_admin.revoked_at is None

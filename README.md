@@ -108,9 +108,11 @@ persisted across Swagger reloads.
 Production documentation is disabled by default (`API_DOCS_ENABLED=False`).
 If explicitly enabled with `DEBUG=False`, all documentation views require
 an active staff identity. Organization APIs are at `/api/v1/organizations/`;
-all operations require a verified `platform-admin` bearer token. Writes
-additionally require `DEBUG=True` and `ORGANIZATIONS_DEV_WRITES_ENABLED=True`
-(default False); production writes remain disabled pending scoped IAM/RBAC.
+all operations require a verified `platform-admin` bearer token. The local
+development Compose setup enables writes by default with
+`ORGANIZATIONS_DEV_WRITES_ENABLED=True`; set it to `False` to close the gate.
+Writes also require `DEBUG=True`, and production writes remain disabled pending
+scoped IAM/RBAC.
 PATCH and lifecycle actions require the current detail ETag in `If-Match`.
 See the [Organization API contract](docs/api/organizations.md),
 [hierarchy navigation and limits](docs/api/organization-hierarchy.md),

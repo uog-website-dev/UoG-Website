@@ -31,6 +31,9 @@ from .serializers import (
     PermissionSerializer,
     PermissionSetSerializer,
     RoleSerializer,
+    SiteAssignableRoleSerializer,
+    SiteDirectoryUserSerializer,
+    SiteIdentitySearchSerializer,
 )
 from .services import effective_permissions, permission_granted, record_decision
 
@@ -150,20 +153,123 @@ class AssignmentViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Authoriz
         "list": "platform.users.view", "create": "platform.users.assign_roles",
         "revoke": "platform.users.assign_roles", "scope": "platform.users.assign_roles",
         "effective": "platform.users.view",
+        "site_users": "platform.users.view", "site_user_search": "platform.users.view",
+        "site_roles": "platform.users.view",
     }
 
     def get_queryset(self):
-        permission_code = "platform.users.view" if self.action in {"list", "effective"} else "platform.users.assign_roles"
+        permission_code = "platform.users.view" if self.action in {"list", "effective", "site_users", "site_user_search", "site_roles"} else "platform.users.assign_roles"
         allowed = authorized_assignment_ids(self.request.user, permission_code)
         query = UserRoleAssignment.objects.select_related("user", "role", "organization", "site", "assigned_by", "revoked_by")
         if allowed is None:
             return query
         if not allowed:
             return query.none()
-        return query.filter(pk__in=allowed)
+        query = query if allowed is None else query.filter(pk__in=allowed)
+        site_value = self.request.query_params.get("site")
+        if site_value is not None:
+            if not site_value.isdecimal() or int(site_value) < 1:
+                raise serializers.ValidationError({"site": ["Supply a positive Site id."]})
+            site_id = int(site_value)
+            from apps.sites.models import Site
+            site = get_object_or_404(Site.objects.only("pk", "organization_unit_id"), pk=site_id)
+            if not permission_granted(self.request.user, "platform.users.view", organization_id=site.organization_unit_id, site_id=site.pk, request=self.request):
+                raise PermissionDenied("You cannot view users for this Site.")
+            query = query.filter(scope=UserRoleAssignment.Scope.SITE, site_id=site_id, revoked_at__isnull=True)
+        if self.request.query_params.get("role"):
+            role_filter = self.request.query_params["role"]
+            query = query.filter(role_id=int(role_filter)) if role_filter.isdecimal() else query.filter(role__code=role_filter)
+        if self.request.query_params.get("search"):
+            term = self.request.query_params["search"].strip()[:120]
+            query = query.filter(Q(user__username__icontains=term) | Q(user__email__icontains=term) | Q(user__first_name__icontains=term) | Q(user__last_name__icontains=term))
+        return query
 
     def get_serializer_class(self):
         return AssignmentCreateSerializer if self.action == "create" else AssignmentSerializer
+
+    @extend_schema(parameters=[
+        OpenApiParameter("site", int, required=True, description="Site id. Results are limited to active assignments in this Site."),
+        OpenApiParameter("search", str), OpenApiParameter("role", str),
+        OpenApiParameter("ordering", str, enum=["name", "-name", "assigned_at", "-assigned_at"]),
+        OpenApiParameter("page", int),
+    ], responses=SiteDirectoryUserSerializer(many=True), description="Site-scoped user directory. Requires platform.users.view in the selected Site; each result contains the user's active Site role assignments.")
+    @action(detail=False, methods=["get"], url_path="site-users", permission_classes=[IsAuthenticated, ManagementPermission])
+    def site_users(self, request):
+        """Browsable site-scoped assignments; never returns other Site memberships."""
+        site_value = request.query_params.get("site")
+        if not site_value or not site_value.isdecimal() or int(site_value) < 1:
+            raise serializers.ValidationError({"site": ["A positive Site id is required."]})
+        site_id = int(site_value)
+        from apps.sites.models import Site
+        site = get_object_or_404(Site.objects.only("pk", "organization_unit_id"), pk=site_id)
+        if not permission_granted(request.user, "platform.users.view", organization_id=site.organization_unit_id, site_id=site.pk, request=request):
+            raise PermissionDenied("You cannot view users for this Site.")
+        query = self.filter_queryset(self.get_queryset().filter(scope=UserRoleAssignment.Scope.SITE, site_id=site_id, revoked_at__isnull=True).filter(Q(expires_at__isnull=True) | Q(expires_at__gt=timezone.now())))
+        ordering = request.query_params.get("ordering", "name")
+        order_fields = {"name": ("user__last_name", "user__first_name", "user__username", "role_id"), "-name": ("-user__last_name", "-user__first_name", "-user__username", "role_id"), "assigned_at": ("assigned_at", "pk"), "-assigned_at": ("-assigned_at", "pk")}
+        if ordering not in order_fields:
+            raise serializers.ValidationError({"ordering": ["Choose name or assigned_at, optionally prefixed with '-'."]})
+        query = query.order_by(*order_fields[ordering])
+        people = {}
+        for assignment in query:
+            person = people.setdefault(assignment.user_id, {
+                "user": assignment.user_id,
+                "user_name": assignment.user.get_username(),
+                "user_email": assignment.user.email,
+                "user_first_name": assignment.user.first_name,
+                "user_last_name": assignment.user.last_name,
+                "assignments": [],
+            })
+            person["assignments"].append(AssignmentSerializer(assignment).data)
+        directory = list(people.values())
+        page = self.paginate_queryset(directory)
+        return self.get_paginated_response(page) if page is not None else Response(directory)
+
+    @extend_schema(parameters=[OpenApiParameter("site", int, required=True), OpenApiParameter("search", str)], responses=SiteIdentitySearchSerializer(many=True), description="Search existing platform identities. Results include active roles already assigned in this Site so the interface can prevent duplicate grants. Requires platform.users.view in that Site.")
+    @action(detail=False, methods=["get"], url_path="site-user-search")
+    def site_user_search(self, request):
+        site_value = request.query_params.get("site")
+        term = request.query_params.get("search", "").strip()[:120]
+        if not site_value or not site_value.isdecimal() or int(site_value) < 1:
+            raise serializers.ValidationError({"site": ["A positive Site id is required."]})
+        from apps.sites.models import Site
+        site = get_object_or_404(Site, pk=int(site_value))
+        if not permission_granted(request.user, "platform.users.view", organization_id=site.organization_unit_id, site_id=site.pk, request=request):
+            raise PermissionDenied("You cannot search users for this Site.")
+        user_model = get_user_model()
+        matches = user_model.objects.filter(is_active=True)
+        if term:
+            matches = matches.filter(Q(username__icontains=term) | Q(email__icontains=term) | Q(first_name__icontains=term) | Q(last_name__icontains=term))
+        matches = list(matches.order_by("last_name", "first_name", "username")[:20])
+        assigned = {}
+        for user_id, role_id in UserRoleAssignment.objects.filter(
+            scope=UserRoleAssignment.Scope.SITE, site=site, revoked_at__isnull=True,
+        ).filter(Q(expires_at__isnull=True) | Q(expires_at__gt=timezone.now())).values_list("user_id", "role_id"):
+            assigned.setdefault(user_id, []).append(role_id)
+        result = [{"id": user.pk, "username": user.get_username(), "email": user.email, "first_name": user.first_name, "last_name": user.last_name, "assigned_role_ids": assigned.get(user.pk, [])} for user in matches]
+        return Response(SiteIdentitySearchSerializer(result, many=True).data)
+
+    @extend_schema(parameters=[OpenApiParameter("site", int, required=True)], responses=SiteAssignableRoleSerializer(many=True), description="Returns active roles and whether the caller can assign each one within the selected Site, based on delegated permissions.")
+    @action(detail=False, methods=["get"], url_path="site-roles")
+    def site_roles(self, request):
+        site_value = request.query_params.get("site")
+        if not site_value or not site_value.isdecimal() or int(site_value) < 1:
+            raise serializers.ValidationError({"site": ["A positive Site id is required."]})
+        from apps.sites.models import Site
+        site = get_object_or_404(Site.objects.only("pk", "organization_unit_id"), pk=int(site_value))
+        if not permission_granted(request.user, "platform.users.view", organization_id=site.organization_unit_id, site_id=site.pk, request=request):
+            raise PermissionDenied("You cannot view roles for this Site.")
+        roles = Role.objects.filter(is_active=True).prefetch_related("permission_links__permission").order_by("name")
+        platform_admin = is_platform_administrator(request.user)
+        result = RoleSerializer(roles, many=True).data
+        for role, item in zip(roles, result):
+            codes = role.permission_links.filter(permission__is_active=True, permission__is_system=True).values_list("permission__code", flat=True)
+            item["assignable"] = platform_admin or all(
+                capability_for(code) and capability_for(code).delegable
+                and permission_granted(request.user, code, organization_id=site.organization_unit_id, site_id=site.pk, audit=False)
+                for code in codes
+            )
+        return Response(result)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -213,7 +319,7 @@ class AssignmentViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Authoriz
                     assigned_by=request.user, expires_at=values.get("expires_at"),
                 )
                 record_decision(user=request.user, action="ROLE_ASSIGNED", outcome="CHANGE", assignment=assignment,
-                                details={"assignment_id": assignment.pk}, request=request)
+                                details={"assignment_id": assignment.pk, "before": {"roles": []}, "after": {"roles": [role.code]}}, request=request)
         except IntegrityError as exc:
             raise serializers.ValidationError({"assignment": ["An active assignment with this role and scope already exists."]}) from exc
         return Response(AssignmentSerializer(assignment).data, status=201)
@@ -226,11 +332,20 @@ class AssignmentViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Authoriz
         if assignment.revoked_at is not None:
             return Response(AssignmentSerializer(assignment).data)
         with transaction.atomic():
+            if assignment.scope == UserRoleAssignment.Scope.SITE and assignment.role.code == "site-administrator" and assignment.site_id:
+                from apps.sites.models import Site
+                get_object_or_404(Site.objects.select_for_update(), pk=assignment.site_id)
+                active_admins = UserRoleAssignment.objects.filter(
+                    scope=UserRoleAssignment.Scope.SITE, site_id=assignment.site_id,
+                    role__code="site-administrator", role__is_active=True, revoked_at__isnull=True,
+                ).filter(Q(expires_at__isnull=True) | Q(expires_at__gt=timezone.now())).count()
+                if active_admins <= 1:
+                    raise PermissionDenied("The last active Site Administrator assignment cannot be revoked.")
             assignment.revoked_at = timezone.now()
             assignment.revoked_by = request.user
             assignment.save(update_fields=["revoked_at", "revoked_by"])
             record_decision(user=request.user, action="ROLE_REVOKED", outcome="CHANGE", assignment=assignment,
-                            details={"assignment_id": assignment.pk}, request=request)
+                            details={"assignment_id": assignment.pk, "before": {"roles": [assignment.role.code]}, "after": {"roles": []}}, request=request)
         return Response(AssignmentSerializer(assignment).data)
 
     @action(detail=True, methods=["patch"], url_path="scope")
@@ -276,6 +391,21 @@ class AssignmentViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Authoriz
                 raise PermissionDenied("You lack authority over the requested assignment scope.")
         before = {"scope": assignment.scope, "organization": assignment.organization_id, "site": assignment.site_id}
         with transaction.atomic():
+            leaving_site = (
+                assignment.role.code == "site-administrator"
+                and assignment.scope == UserRoleAssignment.Scope.SITE
+                and (values["scope"] != UserRoleAssignment.Scope.SITE or values.get("site").pk != assignment.site_id
+                     or (values.get("expires_at") is not None and values["expires_at"] <= timezone.now()))
+            )
+            if leaving_site:
+                from apps.sites.models import Site
+                get_object_or_404(Site.objects.select_for_update(), pk=assignment.site_id)
+                active_admins = UserRoleAssignment.objects.filter(
+                    scope=UserRoleAssignment.Scope.SITE, site_id=assignment.site_id,
+                    role__code="site-administrator", role__is_active=True, revoked_at__isnull=True,
+                ).filter(Q(expires_at__isnull=True) | Q(expires_at__gt=timezone.now())).count()
+                if active_admins <= 1:
+                    raise PermissionDenied("The last active Site Administrator assignment cannot be moved or expired.")
             assignment.scope = values["scope"]
             assignment.organization = values.get("organization")
             assignment.site = values.get("site")

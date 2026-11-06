@@ -10,6 +10,7 @@ import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import AddIcon from "@mui/icons-material/Add";
 import ArticleIcon from "@mui/icons-material/Article";
 import DescriptionIcon from "@mui/icons-material/Description";
+import GroupIcon from "@mui/icons-material/Group";
 import type { SvgIconComponent } from "@mui/icons-material";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
@@ -24,6 +25,7 @@ import { useAsync } from "@uog/ui";
 import { loadSiteNavigation } from "@/app/sites/menu-actions";
 import { loadSitePageStatusCounts } from "@/app/sites/page-actions";
 import { loadSitePosts } from "@/app/sites/post-actions";
+import { getSiteUsers } from "@/app/sites/user-actions";
 import type { SitePostStatus } from "@/app/sites/post-actions";
 import { unwrap } from "@/organizations/contract";
 import { SITE_SECTIONS, sectionDecision, siteAdminHref } from "@/sites/site-admin";
@@ -71,6 +73,11 @@ async function menuSummary(siteId: number): Promise<Metric[]> {
   ];
 }
 
+async function userSummary(siteId: number): Promise<Metric[]> {
+  const directory = await getSiteUsers(siteId, "", 1);
+  return [{ label: "Assigned users", value: directory.count }];
+}
+
 const SUMMARIES: Record<Exclude<SiteSection["key"], "dashboard">, {
   icon: SvgIconComponent;
   title: string;
@@ -80,6 +87,7 @@ const SUMMARIES: Record<Exclude<SiteSection["key"], "dashboard">, {
   pages: { icon: DescriptionIcon, title: "Pages", empty: "This Site has no Pages yet.", load: pageSummary },
   posts: { icon: ArticleIcon, title: "Posts", empty: "This Site has no Posts yet.", load: postSummary },
   menus: { icon: AccountTreeIcon, title: "Menus", empty: "This Site has no local menus yet.", load: menuSummary },
+  users: { icon: GroupIcon, title: "Users", empty: "No users are assigned to this Site yet.", load: userSummary },
 };
 
 function SummaryCard({
