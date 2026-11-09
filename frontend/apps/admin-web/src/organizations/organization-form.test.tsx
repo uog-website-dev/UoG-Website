@@ -150,7 +150,7 @@ describe("OrganizationForm — create", () => {
     expect(push).not.toHaveBeenCalled();
   });
 
-  it("surfaces denied writes (403) as an explicit environment message", async () => {
+  it("explains a closed development write gate", async () => {
     createOrganization.mockResolvedValue({
       ok: false,
       error: {
@@ -171,10 +171,23 @@ describe("OrganizationForm — create", () => {
     await waitFor(() => {
       const alerts = screen.getAllByRole("alert");
       expect(
-        alerts.some((alert) => /not enabled in this environment/i.test(alert.textContent ?? "")),
+        alerts.some((alert) => /development-mode writes to be enabled/i.test(alert.textContent ?? "")),
       ).toBe(true);
     });
     expect(push).not.toHaveBeenCalled();
+  });
+
+  it("distinguishes a missing permission from a closed development write gate", async () => {
+    createOrganization.mockResolvedValue({
+      ok: false,
+      error: { status: 403, code: "permission_denied", message: "You do not have permission to perform this action.", details: null, requestId: "req-denied" },
+    });
+    renderForm();
+    fireEvent.change(screen.getByLabelText(/Code/i), { target: { value: "X1" } });
+    fireEvent.change(screen.getByLabelText(/^Name/i), { target: { value: "N" } });
+    await pickOption(/Organization type/i, "College");
+    fireEvent.click(screen.getByRole("button", { name: /Create organization/i }));
+    expect(await screen.findByText(/does not have permission to make this organization change/i)).toBeTruthy();
   });
 
   it("shows invalid JSON metadata before any request is made", async () => {

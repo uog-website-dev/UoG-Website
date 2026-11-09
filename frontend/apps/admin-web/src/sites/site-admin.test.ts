@@ -24,6 +24,11 @@ describe("site administration matrix", () => {
     ]);
   });
 
+  it("shows the Users section without a content module when site user access is granted", () => {
+    expect(visibleSiteSections({ enabledModuleCodes: [], permissions: ["platform.users.view"] }).map((section) => section.key)).toEqual(["dashboard", "users"]);
+    expect(sectionDecision(sectionByKey("users"), { enabledModuleCodes: [], permissions: [] })).toBe("permission_denied");
+  });
+
   it("hides a section when the Site module is off", () => {
     expect(sectionDecision(sectionByKey("pages"), {
       enabledModuleCodes: ["MENUS"],
