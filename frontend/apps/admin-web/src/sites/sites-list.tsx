@@ -63,6 +63,7 @@ import {
 import { getOrganizationTree } from "@/app/organizations/actions";
 import { deserializeApiError, unwrap } from "@/organizations/contract";
 import { ownerInfoFor, relationLabel } from "@/sites/owner";
+import { ViewPublicSite } from "@/sites/view-public-site";
 import type { ApiError } from "@uog/api-client";
 import {
   draftFromQuery,
@@ -597,6 +598,7 @@ export function SitesList() {
               const actions = availableActions(row.status);
               return (
                 <Box sx={{ display: "flex", gap: 0.5, justifyContent: "flex-end", alignItems: "center" }}>
+                  <ViewPublicSite siteName={row.name} siteStatus={row.status} primaryDomain={row.primary_domain} compact />
                   <Tooltip title={`View ${row.name}`}>
                     <IconButton
                       component={Link}

@@ -12,7 +12,7 @@
  *   - 400 field errors   -> attached to the offending field, plus a summary
  *   - 409 conflict       -> duplicate code / cycle / lifecycle clash
  *   - 412 / 428          -> concurrent edit; ask the user to reload
- *   - 403 permission     -> writes are not enabled in this environment
+ *   - 403                -> distinguish a closed development gate from a permission denial
  *
  * The access token never reaches this component: submit calls a server action
  * that reads it from the Auth.js session server-side.
@@ -67,7 +67,9 @@ interface OrganizationFormProps {
 function describeFailure(payload: ApiErrorPayload): string {
   switch (payload.status) {
     case 403:
-      return "Writing organizations is not enabled in this environment. The platform requires development-mode writes to be switched on before these changes are accepted.";
+      return /organization writes require development mode and explicit opt-in/i.test(payload.message)
+        ? "Writing organizations is not enabled in this environment. The local development setup requires development-mode writes to be enabled before these changes are accepted."
+        : "Your account does not have permission to make this organization change. Ask a platform administrator to review your access.";
     case 409:
       return "This change conflicts with the current organization state — the code may already exist, or the hierarchy/lifecycle rules forbid it. Reload to see the latest data, then adjust your change.";
     case 412:

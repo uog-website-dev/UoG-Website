@@ -67,6 +67,7 @@ import { SiteDomainsPanel } from "@/sites/site-domains-panel";
 import { SiteMenusPanel } from "@/sites/site-menus";
 import { SitePagesPanel } from "@/sites/site-pages";
 import { SitePostsPanel } from "@/sites/site-posts";
+import { ViewPublicSite } from "@/sites/view-public-site";
 import { ownerInfoFor, relationLabel } from "@/sites/owner";
 import { siteStatusChip, siteStatusLabel } from "@/sites/validation";
 
@@ -516,6 +517,7 @@ export function SiteDetail({ site, permissions = [], error }: SiteDetailProps) {
               </Box>
             </Box>
             <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+              <ViewPublicSite siteName={site.name} siteStatus={site.status} primaryDomain={site.primary_domain} />
               <Button component={Link} href="/sites" startIcon={<ArrowBackIcon />} variant="outlined">
                 Directory
               </Button>
