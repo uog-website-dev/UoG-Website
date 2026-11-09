@@ -201,7 +201,7 @@ describe("SiteForm — create", () => {
       error: {
         status: 403,
         code: "permission_denied",
-        message: "Development writes are off.",
+        message: "Administration writes require development mode and explicit opt-in.",
         details: null,
         requestId: "req-403",
       },

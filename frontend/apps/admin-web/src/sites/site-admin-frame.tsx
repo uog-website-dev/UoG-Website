@@ -34,6 +34,7 @@ import {
 } from "@/sites/site-admin";
 import type { SectionDecision, SiteAccessInput, SiteSection } from "@/sites/site-admin";
 import { siteStatusChip } from "@/sites/validation";
+import { ViewPublicSite } from "@/sites/view-public-site";
 
 export interface SiteAdminSite {
   id: number;
@@ -45,6 +46,7 @@ export interface SiteAdminSite {
   organizationId?: number;
   defaultLanguage?: string;
   enabledLanguages?: readonly string[];
+  primaryDomain?: { hostname: string; status: "ACTIVE" | "INACTIVE" } | null;
 }
 
 interface SiteAdminValue extends SiteAccessInput {
@@ -129,6 +131,11 @@ export function SiteAdminFrame({
               <Typography variant="body2">{organizationLabel(site)}</Typography>
             </Box>
           </Box>
+          <ViewPublicSite
+            siteName={site.name}
+            siteStatus={site.status}
+            primaryDomain={site.primaryDomain}
+          />
         </Paper>
       </Box>
       <Box sx={{ minWidth: 0 }}>{children}</Box>

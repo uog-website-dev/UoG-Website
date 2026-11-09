@@ -12,7 +12,7 @@
  *   - 400 field errors   -> attached to the offending field, plus a summary
  *   - 409 conflict       -> duplicate code / cycle / lifecycle clash
  *   - 412 / 428          -> concurrent edit; ask the user to reload
- *   - 403                -> distinguish a closed development gate from a denied role
+ *   - 403                -> distinguish a closed development gate from a permission denial
  *
  * The access token never reaches this component: submit calls a server action
  * that reads it from the Auth.js session server-side.

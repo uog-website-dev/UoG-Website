@@ -93,8 +93,24 @@ resolves no Site. It never guesses.
 
 ### Configured development hostnames
 
-The Sites foundation seed (apps/sites/fixtures/uog-foundation.json) creates
-one primary hostname per Site:
+The Sites foundation acceptance fixture
+(`backend/apps/sites/fixtures/uog-foundation.json`) describes representative
+development hostnames; it is not automatically loaded into the application
+database. The acceptance test provisions these records inside its test
+database. A local development database must provision and activate each Site,
+then add and designate its active primary domain through the Sites and Domains
+API or Admin Console before public routing can use these hostnames:
+
+For a representative local setup, run:
+
+```bash
+docker compose exec backend python manage.py seed_public_demo
+```
+
+This command is development-only (`DEBUG=True`), uses the fixture and active
+templates, creates MAIN/INFORMATICS/MEDICINE/RESEARCH with PAGES/POSTS/MENUS
+enabled, and leaves existing Sites untouched. It does not run automatically
+at container startup.
 
 | Hostname | Site |
 | --- | --- |
@@ -137,8 +153,23 @@ curl -si -H "Host: informatics.uog.local" -H "X-Forwarded-Host: medicine.uog.loc
      http://localhost/api/v1/site-context/                                       # 200 — Site INFORMATICS
 ```
 
-Browsers resolve `.local` via mDNS; for browser-based checks add the names
-to the machine's hosts file, or exercise them with `curl`/scripts as above.
+The `.local` suffix may be resolved through mDNS on some systems. For reliable
+browser access on Windows, run Notepad as Administrator and add the following
+entries to `C:\Windows\System32\drivers\etc\hosts` (on Linux/macOS,
+edit `/etc/hosts` with administrator privileges):
+
+```text
+127.0.0.1 www.uog.local informatics.uog.local medicine.uog.local research.uog.local
+```
+
+These are example foundation fixture hostnames. Before using **View Public
+Website**, confirm each Site's active primary hostname in **Sites →
+Site details → Domains**; the Admin action reads that API field and does not
+assume the fixture values. The MAIN Site uses its own configured primary
+hostname exactly like the college and research Sites. Save the hosts file,
+then run `ipconfig /flushdns` in Windows Terminal. Nginx already accepts
+`*.uog.local` and forwards the original `Host` to the public app and API; all
+requests still resolve through the database Domain/Site registry.
 
 ## 4. Site-scoped access and authorisation
 

@@ -13,7 +13,7 @@
  *   - 400 field errors   -> attached to the offending field, plus a summary
  *   - 409 conflict       -> duplicate code / topology clash
  *   - 412 / 428          -> concurrent edit; ask the user to reload
- *   - 403 permission     -> writes are not enabled in this environment
+ *   - 403                -> distinguish a closed development gate from a permission denial
  *
  * Save order on edit matters: the configuration merge runs *before* the
  * detail PATCH so a newly chosen default language is already present in the
@@ -83,7 +83,9 @@ interface SiteFormProps {
 function describeFailure(payload: ApiErrorPayload): string {
   switch (payload.status) {
     case 403:
-      return "Writing sites is not enabled in this environment. The platform requires development-mode writes to be switched on before these changes are accepted.";
+      return /administration writes require development mode and explicit opt-in/i.test(payload.message)
+        ? "Writing sites is not enabled in this environment. The local development setup requires development-mode writes to be enabled before these changes are accepted."
+        : "Your account does not have permission to make this Site change. Check your Site and organization access.";
     case 409:
       return "This change conflicts with the current site state — the code may already exist, or the ownership/topology rules forbid it. Reload to see the latest data, then adjust your change.";
     case 412:
