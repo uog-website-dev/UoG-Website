@@ -1,8 +1,7 @@
 """Central module management: Site activation matrix, bulk preview/apply, history.
 
 Every endpoint requires platform.sites.manage_registry (platform scope only).
-Preview reads state and writes nothing, so it is open while the development
-write gate is closed. Apply is a write and keeps that gate.
+Central operations use explicit platform authorization in every environment.
 """
 import uuid
 
@@ -73,7 +72,7 @@ class ScopeFilterSerializer(StrictFields, SiteFilterSerializer):
 
 class ScopeSerializer(StrictFields, serializers.Serializer):
     type = serializers.ChoiceField(choices=Scope.choices)
-    site_ids = serializers.ListField(child=serializers.IntegerField(min_value=1), required=False, max_length=module_bulk.MAX_SITES_PER_OPERATION)
+    site_ids = serializers.ListField(child=serializers.IntegerField(min_value=1), required=False)
     organization = serializers.IntegerField(required=False, min_value=1)
     include_descendants = serializers.BooleanField(required=False, default=False)
     filters = ScopeFilterSerializer(required=False)
@@ -112,7 +111,9 @@ class PreviewRequestSerializer(StrictFields, serializers.Serializer):
 
 
 class ApplyRequestSerializer(StrictFields, serializers.Serializer):
-    preview_token = serializers.CharField(max_length=8192)
+    # Selected scopes carry their explicit Site IDs in the signed token; do not
+    # impose a smaller size ceiling than Django's request-body limit.
+    preview_token = serializers.CharField()
     reason = serializers.CharField(required=False, allow_blank=True, max_length=500, default="")
     confirmation = serializers.CharField(required=False, allow_blank=True, max_length=20, default="")
 
@@ -297,14 +298,10 @@ IDEMPOTENCY_KEY = OpenApiParameter(
 
 
 class CentralAccess(AdministrationViewSet):
+    permission_classes = [IsAuthenticated, ManagementPermission]
     permission_by_action = {
         "list": PERMISSION, "retrieve": PERMISSION, "bulk_preview": PERMISSION, "bulk_apply": PERMISSION,
     }
-
-    def get_permissions(self):
-        if self.action == "bulk_preview":
-            return [IsAuthenticated(), ManagementPermission()]
-        return super().get_permissions()
 
     def handle_exception(self, exc):
         response = super().handle_exception(exc)
@@ -381,7 +378,7 @@ class SiteModuleManagementViewSet(mixins.ListModelMixin, CentralAccess):
         },
         examples=[EXAMPLE_STALE],
         description=(
-            "Platform admin only, behind the development write gate. Recomputes the plan under row locks and commits every "
+            "Platform admin only. Recomputes the plan under row locks and commits every "
             "expected change, its history rows and audit events in one transaction, or nothing. Blocked pairs are skipped. "
             "A plan that differs from the preview returns 409 stale_preview. High-impact operations need a reason and "
             "confirmation equal to the preview's confirmation_phrase. Content is never deleted."

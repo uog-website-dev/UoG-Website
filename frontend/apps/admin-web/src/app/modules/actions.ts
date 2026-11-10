@@ -4,7 +4,7 @@
  * Central module management reads and the confirmed bulk operation.
  *
  * The access token stays server-side. Django enforces the platform-admin
- * permission, eligibility, the development write gate and the stale-preview
+ * permission, eligibility and the stale-preview
  * check; their answers are returned verbatim as clone-safe results.
  */
 import { createApiClient } from "@uog/api-client";

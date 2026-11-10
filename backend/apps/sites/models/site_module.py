@@ -52,7 +52,14 @@ class SiteModule(models.Model):
             raise ValidationError({"module": "A disabled or unimplemented module cannot be enabled for a Site."})
 
     def full_clean(self, *args, **kwargs):
-        if self.module_id:
+        # Schema evolution must not prevent deactivation of retained data.
+        # Inserts, activation and settings edits still validate the schema.
+        using = self._state.db or router.db_for_write(type(self), instance=self)
+        retained_disable = not self.is_enabled and self.pk and type(self).objects.using(using).filter(
+            pk=self.pk, site_id=self.site_id, module_id=self.module_id,
+            configuration=self.configuration,
+        ).exists()
+        if self.module_id and not retained_disable:
             schema = self.module.configuration_schema
             self.configuration = normalize_site_module_configuration(schema, self.configuration)
         return super().full_clean(*args, **kwargs)

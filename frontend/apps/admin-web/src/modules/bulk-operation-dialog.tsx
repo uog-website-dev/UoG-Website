@@ -78,7 +78,7 @@ export function describeApplyError(error: ApiErrorPayload): { title: string; mes
   if (error.status === 403) {
     return {
       title: "Not allowed",
-      message: `${detail ?? "You do not have permission to change modules centrally, or administration writes are turned off in this environment."} Nothing was changed.`,
+      message: `${detail ?? "You do not have permission to change modules centrally."} Nothing was changed.`,
       retry: "none",
     };
   }

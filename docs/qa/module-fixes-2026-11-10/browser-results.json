@@ -1,0 +1,37 @@
+{
+  "run": "cmmqa2a33b0d7",
+  "results": [
+    {
+      "name": "enable-selected-sites",
+      "status": "PASS"
+    },
+    {
+      "name": "site-navigation-and-unselected-isolation",
+      "status": "PASS"
+    },
+    {
+      "name": "create-and-submit-post",
+      "status": "PASS"
+    },
+    {
+      "name": "approve-and-publish-as-distinct-users",
+      "status": "PASS"
+    },
+    {
+      "name": "disable-and-enforce",
+      "status": "PASS"
+    },
+    {
+      "name": "restore-retained-publication",
+      "status": "PASS"
+    },
+    {
+      "name": "audit-history",
+      "status": "PASS"
+    },
+    {
+      "name": "site-admin-central-access-denied",
+      "status": "PASS"
+    }
+  ]
+}
