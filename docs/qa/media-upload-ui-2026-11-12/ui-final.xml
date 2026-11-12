@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="27" failures="0" errors="0" time="17.064312134">
+    <testsuite name="src/sites/media-library.test.tsx" timestamp="2026-11-12T03:05:16.297Z" hostname="086c5ea3ae9d" tests="22" failures="0" errors="0" skipped="0" time="14.899553589">
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; excludes processing images then picks the worker-completed identity on refresh" time="0.600611618">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; shows processing state in the library and preserves the retry key after transfer failure" time="1.144026927">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; keeps the selected file after a failed upload and never invents a ready row" time="0.504305787">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; never offers upload to a read-only account" time="0.089996994">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; applies filename search before paging and resets to the first page" time="0.351245077">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; loads scoped details and saves only persisted alt text" time="0.970349922">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; shows readonly metadata without a save control" time="0.448797169">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; sends the selected status and type filters to the server" time="0.538019075">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; shows scoped thumbnails and disables a broken preview until retry" time="0.301236666">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; reports terminal image processing without offering selection" time="0.314267021">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; blocks deletion for a live reference and confirms unused removal" time="1.814753505">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; keeps the library card and metadata after a delete conflict" time="1.15933511">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; preserves edited alt text after a recoverable save failure" time="0.769057092">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; keeps a Gallery-referenced asset, saves alt text, and reloads persisted details" time="1.622372646">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; keeps deletion disabled if the reference inventory cannot be verified" time="0.501617327">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Site-isolated media browsing &gt; ignores a delayed Informatics search after switching to Medicine and resets all query state" time="0.358548118">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Site-isolated media browsing &gt; uses responsive grid columns and keeps list layout usable" time="0.31846365">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Site-isolated media browsing &gt; offers recovery for empty search and transport failure" time="0.639556676">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Site-isolated media browsing &gt; supports keyboard pagination and grid/list controls" time="0.65397475">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Quiet processing updates and previews &gt; refreshes a processing image without a loading flash and updates its open details preview" time="0.776736359">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Quiet processing updates and previews &gt; does not continuously poll a completed catalog" time="0.103085031">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="renames and categorizes an asset without changing its original filename" time="0.914196948">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/media-upload-panel.test.tsx" timestamp="2026-11-12T03:05:16.322Z" hostname="086c5ea3ae9d" tests="5" failures="0" errors="0" skipped="0" time="2.164758545">
+        <testcase classname="src/sites/media-upload-panel.test.tsx" name="Media upload queue &gt; drops multiple files and persists each file&apos;s name, categories and alt text" time="0.95026476">
+        </testcase>
+        <testcase classname="src/sites/media-upload-panel.test.tsx" name="Media upload queue &gt; retries metadata without resending stored bytes" time="0.330833971">
+        </testcase>
+        <testcase classname="src/sites/media-upload-panel.test.tsx" name="Media upload queue &gt; rejects oversized and unsupported files before sending and keeps valid peers" time="0.451639248">
+        </testcase>
+        <testcase classname="src/sites/media-upload-panel.test.tsx" name="Media upload queue &gt; bounds concurrent uploads to two and aborts pending requests on Site change" time="0.320509903">
+        </testcase>
+        <testcase classname="src/sites/media-upload-panel.test.tsx" name="releases local preview URLs and replaces unreadable local images with a safe placeholder" time="0.10757121">
+        </testcase>
+    </testsuite>
+</testsuites>

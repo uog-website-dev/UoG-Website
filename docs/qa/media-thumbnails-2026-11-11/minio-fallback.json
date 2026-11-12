@@ -1,0 +1,15 @@
+{
+  "duplicate_deliveries": 2,
+  "durable_attempts": 1,
+  "derivative_records": 2,
+  "variants": [
+    "thumbnail",
+    "display"
+  ],
+  "format": "image/webp",
+  "anonymous_storage_status": 403,
+  "stored_response": 200,
+  "missing_thumbnail_response": 200,
+  "fallback": "original-regenerated",
+  "cache_control": "private, no-store"
+}

@@ -142,6 +142,45 @@ def test_autocommit_is_on_for_this_module(admin):
     assert connections["default"].in_atomic_block is False
 
 
+def test_platform_switch_works_in_production_without_opening_catalogue_edits(admin, settings, oidc):
+    _registry()
+    settings.DEBUG = False
+    settings.ORGANIZATIONS_DEV_WRITES_ENABLED = False
+    module = _module("PAGES")
+    path = f"{MODULES}{module.pk}/"
+    original = admin.get(path)
+    enabled = admin.patch(path, {"is_enabled": True}, content_type="application/json", HTTP_IF_MATCH=_etag(original))
+    assert enabled.status_code == 200, enabled.content
+    module.refresh_from_db()
+    assert module.is_enabled is True
+    assert not SiteModule.objects.filter(module=module).exists()
+
+    stale = admin.patch(path, {"is_enabled": False}, content_type="application/json", HTTP_IF_MATCH=_etag(original))
+    assert stale.status_code == 412
+    missing = admin.patch(path, {"is_enabled": False}, content_type="application/json")
+    assert missing.status_code == 428
+    blocked = admin.patch(path, {"is_enabled": False, "name": "Changed"}, content_type="application/json", HTTP_IF_MATCH=_etag(enabled))
+    assert blocked.status_code == 403
+    module.refresh_from_db()
+    assert module.is_enabled is True and module.name == "Pages"
+
+    foreign = Client()
+    foreign.defaults.update(oidc.header(sub="10000000-0000-4000-8000-000000000001", preferred_username="no-module-grant"))
+    denied = foreign.patch(path, {"is_enabled": False}, content_type="application/json", HTTP_IF_MATCH=_etag(enabled))
+    assert denied.status_code == 403
+    assert Client().patch(path, {"is_enabled": False}, content_type="application/json").status_code == 401
+
+    disabled = admin.patch(path, {"is_enabled": False}, content_type="application/json", HTTP_IF_MATCH=_etag(enabled))
+    assert disabled.status_code == 200, disabled.content
+    module.refresh_from_db()
+    assert module.is_enabled is False
+    planned_path = f"{MODULES}{_module('EVENTS').pk}/"
+    planned = admin.get(planned_path)
+    rejected = admin.patch(planned_path, {"is_enabled": True}, content_type="application/json", HTTP_IF_MATCH=_etag(planned))
+    assert rejected.status_code == 400, rejected.content
+    assert _module("EVENTS").is_enabled is False
+
+
 def test_global_and_site_module_changes_commit_and_isolate_sites(admin):
     assert transaction.get_autocommit() is True
     _registry()

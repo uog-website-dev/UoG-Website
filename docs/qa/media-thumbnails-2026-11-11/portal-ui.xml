@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="92" failures="0" errors="0" time="3.721400629">
+    <testsuite name="src/confirm-dialog.test.tsx" timestamp="2026-11-11T17:04:48.785Z" hostname="ee3e3eb7f70f" tests="7" failures="0" errors="0" skipped="0" time="0.380971256">
+        <testcase classname="src/confirm-dialog.test.tsx" name="ConfirmDialog &gt; exposes the title and description via aria wiring" time="0.152542877">
+        </testcase>
+        <testcase classname="src/confirm-dialog.test.tsx" name="ConfirmDialog &gt; confirms via the confirm button" time="0.078511596">
+        </testcase>
+        <testcase classname="src/confirm-dialog.test.tsx" name="ConfirmDialog &gt; cancels via the cancel button without confirming" time="0.041902719">
+        </testcase>
+        <testcase classname="src/confirm-dialog.test.tsx" name="ConfirmDialog &gt; cancels when Escape is pressed" time="0.017359492">
+        </testcase>
+        <testcase classname="src/confirm-dialog.test.tsx" name="ConfirmDialog &gt; blocks interaction while pending and disables both buttons" time="0.026457763">
+        </testcase>
+        <testcase classname="src/confirm-dialog.test.tsx" name="ConfirmDialog &gt; renders a failure inline without dismissing the dialog" time="0.023215022">
+        </testcase>
+        <testcase classname="src/confirm-dialog.test.tsx" name="ConfirmDialog &gt; renders destructive actions with the error colour" time="0.038269307">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/data-table.test.tsx" timestamp="2026-11-11T17:04:48.790Z" hostname="ee3e3eb7f70f" tests="15" failures="0" errors="0" skipped="0" time="0.418474736">
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; renders the caption as the accessible table name" time="0.084879729">
+        </testcase>
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; renders column headers as column-scoped header cells" time="0.019897176">
+        </testcase>
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; renders one row per record" time="0.028357463">
+        </testcase>
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; shows the empty state when there are no rows" time="0.016840367">
+        </testcase>
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; renders a custom empty state when supplied" time="0.008060316">
+        </testcase>
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; shows skeleton rows while loading instead of data" time="0.021493107">
+        </testcase>
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; renders the error state with the correlation id when an error is set" time="0.026624843">
+        </testcase>
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; offers a retry action that fires on click" time="0.070809582">
+        </testcase>
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; labels row actions with the row&apos;s identity" time="0.022115661">
+        </testcase>
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; sortable headers &gt; exposes aria-sort reflecting the active sort" time="0.02217984">
+        </testcase>
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; sortable headers &gt; marks a non-active sortable column as none" time="0.009170016">
+        </testcase>
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; sortable headers &gt; omits aria-sort for non-sortable columns" time="0.010239714">
+        </testcase>
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; sortable headers &gt; toggles asc -&gt; desc when an active column is activated" time="0.032915638">
+        </testcase>
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; sortable headers &gt; starts at asc when a new column is activated" time="0.028079346">
+        </testcase>
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; sortable headers &gt; is operable with the keyboard (Enter on the header button)" time="0.014602618">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/filter-controls.test.tsx" timestamp="2026-11-11T17:04:48.795Z" hostname="ee3e3eb7f70f" tests="9" failures="0" errors="0" skipped="0" time="0.563193133">
+        <testcase classname="src/filter-controls.test.tsx" name="FilterBar &gt; renders as a labelled search landmark" time="0.178559917">
+        </testcase>
+        <testcase classname="src/filter-controls.test.tsx" name="FilterBar &gt; labels every field so screen readers announce them" time="0.028621587">
+        </testcase>
+        <testcase classname="src/filter-controls.test.tsx" name="FilterBar &gt; submits the filters when Apply is pressed" time="0.070861095">
+        </testcase>
+        <testcase classname="src/filter-controls.test.tsx" name="FilterBar &gt; submits the filters when Enter is pressed in a field" time="0.097457759">
+        </testcase>
+        <testcase classname="src/filter-controls.test.tsx" name="FilterBar &gt; resets the filters when Reset is pressed" time="0.037305327">
+        </testcase>
+        <testcase classname="src/filter-controls.test.tsx" name="FilterBar &gt; shows the active filter count" time="0.004733934">
+        </testcase>
+        <testcase classname="src/filter-controls.test.tsx" name="SelectFilter &gt; renders as a labelled combobox" time="0.016179482">
+        </testcase>
+        <testcase classname="src/filter-controls.test.tsx" name="SelectFilter &gt; offers an explicit All option when includeAll is set" time="0.072133079">
+        </testcase>
+        <testcase classname="src/filter-controls.test.tsx" name="SelectFilter &gt; omits the All option when includeAll is false" time="0.05504228">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/form-fields.test.tsx" timestamp="2026-11-11T17:04:48.797Z" hostname="ee3e3eb7f70f" tests="10" failures="0" errors="0" skipped="0" time="0.239832914">
+        <testcase classname="src/form-fields.test.tsx" name="fieldErrorsFrom &gt; flattens per-field messages into a single string per field" time="0.006578085">
+        </testcase>
+        <testcase classname="src/form-fields.test.tsx" name="fieldErrorsFrom &gt; returns an empty map when there are no per-field details" time="0.000870253">
+        </testcase>
+        <testcase classname="src/form-fields.test.tsx" name="fieldErrorsFrom &gt; returns an empty map for null/undefined" time="0.000535941">
+        </testcase>
+        <testcase classname="src/form-fields.test.tsx" name="FormField &gt; binds the label to the input" time="0.065693243">
+        </testcase>
+        <testcase classname="src/form-fields.test.tsx" name="FormField &gt; marks the input invalid and wires aria-describedby when errored" time="0.010656956">
+        </testcase>
+        <testcase classname="src/form-fields.test.tsx" name="FormField &gt; does not mark a valid field invalid" time="0.016804055">
+        </testcase>
+        <testcase classname="src/form-fields.test.tsx" name="FormField &gt; calls onChange with the typed value" time="0.090081541">
+        </testcase>
+        <testcase classname="src/form-fields.test.tsx" name="FormErrorSummary &gt; renders nothing when there are no errors" time="0.001490324">
+        </testcase>
+        <testcase classname="src/form-fields.test.tsx" name="FormErrorSummary &gt; announces itself as an alert and lists every field" time="0.024597508">
+        </testcase>
+        <testcase classname="src/form-fields.test.tsx" name="FormErrorSummary &gt; links each error to its input when ids are supplied" time="0.020094057">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/pagination.test.tsx" timestamp="2026-11-11T17:04:48.800Z" hostname="ee3e3eb7f70f" tests="10" failures="0" errors="0" skipped="0" time="0.293970767">
+        <testcase classname="src/pagination.test.tsx" name="paginationSummary &gt; describes a middle range" time="0.001545367">
+        </testcase>
+        <testcase classname="src/pagination.test.tsx" name="paginationSummary &gt; clamps the last page to the total" time="0.000286314">
+        </testcase>
+        <testcase classname="src/pagination.test.tsx" name="paginationSummary &gt; reports an empty result set" time="0.000154068">
+        </testcase>
+        <testcase classname="src/pagination.test.tsx" name="Pagination &gt; is a labelled navigation landmark" time="0.10316778">
+        </testcase>
+        <testcase classname="src/pagination.test.tsx" name="Pagination &gt; announces the current range" time="0.010367403">
+        </testcase>
+        <testcase classname="src/pagination.test.tsx" name="Pagination &gt; disables Previous on the first page" time="0.031165365">
+        </testcase>
+        <testcase classname="src/pagination.test.tsx" name="Pagination &gt; disables Next on the last page" time="0.013776711">
+        </testcase>
+        <testcase classname="src/pagination.test.tsx" name="Pagination &gt; moves to the next page on click" time="0.057523835">
+        </testcase>
+        <testcase classname="src/pagination.test.tsx" name="Pagination &gt; moves to the previous page on click" time="0.051502685">
+        </testcase>
+        <testcase classname="src/pagination.test.tsx" name="Pagination &gt; disables both controls when the parent marks the block disabled" time="0.022429776">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/public-page.test.tsx" timestamp="2026-11-11T17:04:48.803Z" hostname="ee3e3eb7f70f" tests="8" failures="0" errors="0" skipped="0" time="0.236441876">
+        <testcase classname="src/public-page.test.tsx" name="pageFromResponse &gt; reads one published page and ignores a disabled module" time="0.002257307">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="paragraphParts &gt; drops script and javascript targets" time="0.002913659">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="PublicPageView &gt; renders the published page and does not mount unsafe markup" time="0.135178627">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="PublicPageView &gt; lets a keyboard user reach a safe link" time="0.041498015">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="PublicPageView &gt; states that a missing or unpublished page is not shown" time="0.012773701">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="Published media derivatives &gt; uses Host-scoped responsive variants and falls back to alt text on failure" time="0.024989979">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="Published media derivatives &gt; does not construct a public URL for a foreign Site reference" time="0.00298236">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="Published media derivatives &gt; resets a failed image when the asset or Site changes" time="0.0114836">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/public-post.test.tsx" timestamp="2026-11-11T17:04:48.808Z" hostname="ee3e3eb7f70f" tests="3" failures="0" errors="0" skipped="0" time="0.191928266">
+        <testcase classname="src/public-post.test.tsx" name="postsFromResponse &gt; keeps published posts and drops drafts, foreign markup slugs and a disabled module" time="0.005634146">
+        </testcase>
+        <testcase classname="src/public-post.test.tsx" name="PublicPostFeed and PublicPostDetail &gt; renders a stacked feed link and a detail body without script or javascript targets" time="0.176808377">
+        </testcase>
+        <testcase classname="src/public-post.test.tsx" name="PublicPostFeed and PublicPostDetail &gt; shows nothing for a missing feed or detail" time="0.006464493">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/public-site.test.tsx" timestamp="2026-11-11T17:04:48.809Z" hostname="ee3e3eb7f70f" tests="4" failures="0" errors="0" skipped="0" time="0.155947145">
+        <testcase classname="src/public-site.test.tsx" name="siteFromContext &gt; keeps three hostnames distinct and drops a failed context" time="0.003453249">
+        </testcase>
+        <testcase classname="src/public-site.test.tsx" name="public page policy &gt; rejects another Site, a draft, a bad path and a foreign redirect" time="0.002411217">
+        </testcase>
+        <testcase classname="src/public-site.test.tsx" name="public page policy &gt; revalidates on every read within the public cache SLA" time="0.000305267">
+        </testcase>
+        <testcase classname="src/public-site.test.tsx" name="PublicSiteFrame &gt; renders one Site and hides posts when that module is off" time="0.147714703">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/site-navigation.test.tsx" timestamp="2026-11-11T17:04:48.811Z" hostname="ee3e3eb7f70f" tests="7" failures="0" errors="0" skipped="0" time="0.730380693">
+        <testcase classname="src/site-navigation.test.tsx" name="safeMenuHref &gt; keeps same-site paths and http(s) URLs" time="0.002257828">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="safeMenuHref &gt; rejects scriptable, protocol-relative and credentialed targets" time="0.000419577">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="menusFromResponse &gt; reads only the resolved Site header and footer" time="0.000903599">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="menusFromResponse &gt; treats a disabled module as an empty menu" time="0.00037278">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="PublicMenuFrame &gt; shows this Site&apos;s header and footer and does not link unsafe URLs" time="0.140492002">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="PublicMenuFrame &gt; opens the mobile header from the keyboard and closes it with Escape" time="0.35488331">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="PublicMenuFrame &gt; closes the mobile header from its close button" time="0.22940597">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/theme.test.ts" timestamp="2026-11-11T17:04:48.813Z" hostname="ee3e3eb7f70f" tests="3" failures="0" errors="0" skipped="0" time="0.006731342">
+        <testcase classname="src/theme.test.ts" name="uogTheme &gt; uses the UoG navy as the primary brand colour" time="0.003430071">
+        </testcase>
+        <testcase classname="src/theme.test.ts" name="uogTheme &gt; uses the UoG gold as the secondary accent" time="0.00046027">
+        </testcase>
+        <testcase classname="src/theme.test.ts" name="uogTheme &gt; renders on a light background" time="0.000247775">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/toast.test.tsx" timestamp="2026-11-11T17:04:48.814Z" hostname="ee3e3eb7f70f" tests="5" failures="0" errors="0" skipped="0" time="0.308041103">
+        <testcase classname="src/toast.test.tsx" name="useToast &gt; throws when used outside a provider" time="0.016735572">
+        </testcase>
+        <testcase classname="src/toast.test.tsx" name="useToast &gt; shows a success toast that can be dismissed" time="0.17883409">
+        </testcase>
+        <testcase classname="src/toast.test.tsx" name="useToast &gt; shows an error toast" time="0.026843339">
+        </testcase>
+        <testcase classname="src/toast.test.tsx" name="useToast &gt; replaces the current toast when a new one is shown" time="0.052403581">
+        </testcase>
+        <testcase classname="src/toast.test.tsx" name="useToast &gt; auto-dismisses after the configured duration" time="0.030701257">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/useAsync.test.tsx" timestamp="2026-11-11T17:04:48.815Z" hostname="ee3e3eb7f70f" tests="11" failures="0" errors="0" skipped="0" time="0.195487398">
+        <testcase classname="src/useAsync.test.tsx" name="useAsync &gt; shares a StrictMode mount read but still performs fresh reloads" time="0.112188488">
+        </testcase>
+        <testcase classname="src/useAsync.test.tsx" name="useAsync &gt; does not share responses between separate component instances" time="0.008017876">
+        </testcase>
+        <testcase classname="src/useAsync.test.tsx" name="useAsync &gt; starts a fresh read when scope changes and ignores the old response" time="0.006800956">
+        </testcase>
+        <testcase classname="src/useAsync.test.tsx" name="useAsync &gt; transitions loading -&gt; success and exposes the data" time="0.004500007">
+        </testcase>
+        <testcase classname="src/useAsync.test.tsx" name="useAsync &gt; transitions to error and surfaces the structured message" time="0.0048329">
+        </testcase>
+        <testcase classname="src/useAsync.test.tsx" name="useAsync &gt; normalises a non-ApiError rejection into the shared error shape" time="0.007512191">
+        </testcase>
+        <testcase classname="src/useAsync.test.tsx" name="useAsync &gt; reports empty only when the success payload matches isEmpty" time="0.003723771">
+        </testcase>
+        <testcase classname="src/useAsync.test.tsx" name="useAsync &gt; does not report empty when the payload has items" time="0.003713208">
+        </testcase>
+        <testcase classname="src/useAsync.test.tsx" name="useAsync &gt; defaults empty to false when no isEmpty predicate is given" time="0.003815241">
+        </testcase>
+        <testcase classname="src/useAsync.test.tsx" name="useAsync &gt; re-runs the fetcher when reload is triggered" time="0.018849306">
+        </testcase>
+        <testcase classname="src/useAsync.test.tsx" name="useAsync &gt; clears a previous error when a reload succeeds" time="0.018463264">
+        </testcase>
+    </testsuite>
+</testsuites>

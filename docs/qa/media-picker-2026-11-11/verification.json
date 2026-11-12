@@ -1,0 +1,40 @@
+{
+  "story": "P3-FE-MEDIA picker — Content Editor selects eligible Site asset",
+  "date": "2026-11-11",
+  "consumers": [
+    "frontend/apps/admin-web/src/sites/site-pages.tsx",
+    "frontend/apps/admin-web/src/sites/content-media-builder.tsx"
+  ],
+  "implementation": [
+    "frontend/apps/admin-web/src/sites/media-picker.tsx",
+    "frontend/apps/admin-web/src/sites/site-image-field.tsx",
+    "frontend/apps/admin-web/src/sites/content-media-builder.tsx"
+  ],
+  "suites": {
+    "admin_picker_and_pages": {
+      "passed": 27,
+      "failed": 0,
+      "junit": "picker.xml"
+    },
+    "backend_eligibility": {
+      "passed": 1,
+      "failed": 0,
+      "junit": "backend-eligibility.xml"
+    }
+  },
+  "acceptance": {
+    "cms_and_builder_ready_same_site": "pass",
+    "escape_cancel_restores_focus": "pass",
+    "slider_targets_one_slide_and_restores_focus": "pass",
+    "ineligible_before_save_keeps_draft": "pass",
+    "slider_reorder_refs_follow_entries": "pass"
+  },
+  "accessibility": {
+    "dialog_label": "Choose a ready image",
+    "focus_return": "returnFocusRef after Escape/cancel/confirm",
+    "alt_labels": "per-field aria-label + helper guidance"
+  },
+  "waivers": [
+    "Full Keycloak/Admin/worker browser E2E unavailable in this checkout (same as adjacent media packs)."
+  ]
+}

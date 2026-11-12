@@ -1,0 +1,264 @@
+{
+  "table": "media_mediaasset",
+  "constraints_and_indexes": {
+    "media_asset_checksum": {
+      "columns": [
+        "checksum"
+      ],
+      "primary_key": false,
+      "unique": false,
+      "foreign_key": null,
+      "check": true,
+      "index": false,
+      "definition": null,
+      "options": null
+    },
+    "media_asset_dimensions": {
+      "columns": [
+        "height",
+        "width"
+      ],
+      "primary_key": false,
+      "unique": false,
+      "foreign_key": null,
+      "check": true,
+      "index": false,
+      "definition": null,
+      "options": null
+    },
+    "media_asset_filename": {
+      "columns": [
+        "original_filename"
+      ],
+      "primary_key": false,
+      "unique": false,
+      "foreign_key": null,
+      "check": true,
+      "index": false,
+      "definition": null,
+      "options": null
+    },
+    "media_asset_mime": {
+      "columns": [
+        "detected_mime"
+      ],
+      "primary_key": false,
+      "unique": false,
+      "foreign_key": null,
+      "check": true,
+      "index": false,
+      "definition": null,
+      "options": null
+    },
+    "media_asset_status": {
+      "columns": [
+        "status"
+      ],
+      "primary_key": false,
+      "unique": false,
+      "foreign_key": null,
+      "check": true,
+      "index": false,
+      "definition": null,
+      "options": null
+    },
+    "media_mediaasset_byte_count_check": {
+      "columns": [
+        "byte_count"
+      ],
+      "primary_key": false,
+      "unique": false,
+      "foreign_key": null,
+      "check": true,
+      "index": false,
+      "definition": null,
+      "options": null
+    },
+    "media_mediaasset_created_by_id_f43664aa_fk_auth_user_id": {
+      "columns": [
+        "created_by_id"
+      ],
+      "primary_key": false,
+      "unique": false,
+      "foreign_key": [
+        "auth_user",
+        "id"
+      ],
+      "check": false,
+      "index": false,
+      "definition": null,
+      "options": null
+    },
+    "media_mediaasset_height_check": {
+      "columns": [
+        "height"
+      ],
+      "primary_key": false,
+      "unique": false,
+      "foreign_key": null,
+      "check": true,
+      "index": false,
+      "definition": null,
+      "options": null
+    },
+    "media_mediaasset_pkey": {
+      "columns": [
+        "id"
+      ],
+      "primary_key": true,
+      "unique": true,
+      "foreign_key": null,
+      "check": false,
+      "index": false,
+      "definition": null,
+      "options": null
+    },
+    "media_mediaasset_site_id_811ca9e7_fk_sites_site_id": {
+      "columns": [
+        "site_id"
+      ],
+      "primary_key": false,
+      "unique": false,
+      "foreign_key": [
+        "sites_site",
+        "id"
+      ],
+      "check": false,
+      "index": false,
+      "definition": null,
+      "options": null
+    },
+    "media_mediaasset_storage_reference_key": {
+      "columns": [
+        "storage_reference"
+      ],
+      "primary_key": false,
+      "unique": true,
+      "foreign_key": null,
+      "check": false,
+      "index": false,
+      "definition": null,
+      "options": null
+    },
+    "media_mediaasset_updated_by_id_bf68f66d_fk_auth_user_id": {
+      "columns": [
+        "updated_by_id"
+      ],
+      "primary_key": false,
+      "unique": false,
+      "foreign_key": [
+        "auth_user",
+        "id"
+      ],
+      "check": false,
+      "index": false,
+      "definition": null,
+      "options": null
+    },
+    "media_mediaasset_width_check": {
+      "columns": [
+        "width"
+      ],
+      "primary_key": false,
+      "unique": false,
+      "foreign_key": null,
+      "check": true,
+      "index": false,
+      "definition": null,
+      "options": null
+    },
+    "media_mediaasset_created_by_id_f43664aa": {
+      "columns": [
+        "created_by_id"
+      ],
+      "orders": [
+        "ASC"
+      ],
+      "primary_key": false,
+      "unique": false,
+      "foreign_key": null,
+      "check": false,
+      "index": true,
+      "type": "idx",
+      "definition": null,
+      "options": null
+    },
+    "media_mediaasset_site_id_811ca9e7": {
+      "columns": [
+        "site_id"
+      ],
+      "orders": [
+        "ASC"
+      ],
+      "primary_key": false,
+      "unique": false,
+      "foreign_key": null,
+      "check": false,
+      "index": true,
+      "type": "idx",
+      "definition": null,
+      "options": null
+    },
+    "media_mediaasset_storage_reference_8685827c_like": {
+      "columns": [
+        "storage_reference"
+      ],
+      "orders": [
+        "ASC"
+      ],
+      "primary_key": false,
+      "unique": false,
+      "foreign_key": null,
+      "check": false,
+      "index": true,
+      "type": "idx",
+      "definition": null,
+      "options": null
+    },
+    "media_mediaasset_updated_by_id_bf68f66d": {
+      "columns": [
+        "updated_by_id"
+      ],
+      "orders": [
+        "ASC"
+      ],
+      "primary_key": false,
+      "unique": false,
+      "foreign_key": null,
+      "check": false,
+      "index": true,
+      "type": "idx",
+      "definition": null,
+      "options": null
+    },
+    "media_site_status_idx": {
+      "columns": [
+        "site_id",
+        "status",
+        "created_at"
+      ],
+      "orders": [
+        "ASC",
+        "ASC",
+        "DESC"
+      ],
+      "primary_key": false,
+      "unique": false,
+      "foreign_key": null,
+      "check": false,
+      "index": true,
+      "type": "idx",
+      "definition": null,
+      "options": null
+    }
+  },
+  "default_ordering": [
+    "-created_at",
+    "id"
+  ],
+  "filename_ordering": [
+    "original_filename",
+    "id"
+  ],
+  "index_note": "media_site_status_idx scopes Site/status/created_at. UUID tie-breaks and filename search may require an additional sort/filter; no new index/migration."
+}

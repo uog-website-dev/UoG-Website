@@ -10,8 +10,8 @@
  *   - Site activation, counted from SiteModule rows by the backend.
  *
  * Reads go through server actions, so the Keycloak access token stays
- * server-side. Registry rows are edited on the backend only; enabling a
- * module for Sites happens on the Site modules tab.
+ * server-side. The platform switch uses a conditional backend update;
+ * enabling a module for Sites happens on the Site modules tab.
  */
 import { useMemo, useState } from "react";
 import Alert from "@mui/material/Alert";
@@ -24,6 +24,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
+import Switch from "@mui/material/Switch";
 import {
   DataTable,
   FilterBar,
@@ -36,7 +37,7 @@ import { SITES_PAGE_SIZE } from "@uog/api-client";
 import type { PaginatedResponse, PlatformModule } from "@uog/types";
 import type { TableColumn } from "@uog/ui";
 
-import { listModuleActivationSummary } from "@/app/modules/actions";
+import { listModuleActivationSummary, setPlatformModuleAvailability } from "@/app/modules/actions";
 import { listPlatformModules } from "@/app/sites/actions";
 import { implementationLabel } from "@/modules/bulk-contract";
 import type { ImplementationStatus, ModuleActivationSummary } from "@/modules/bulk-contract";
@@ -59,11 +60,34 @@ function fallbackImplementation(module: PlatformModule): ImplementationStatus {
   return module.is_enabled ? "AVAILABLE" : "IMPLEMENTED_DISABLED";
 }
 
-export function ModuleRegistry({ refreshKey = 0 }: { refreshKey?: number } = {}) {
+export function ModuleRegistry({ refreshKey = 0, onChanged }: { refreshKey?: number; onChanged?: () => void } = {}) {
   const [filters, setFilters] = useState<Filters>({ search: "", status: "" });
   const [draft, setDraft] = useState<Filters>({ search: "", status: "" });
   const [page, setPage] = useState(1);
   const [details, setDetails] = useState<PlatformModule | null>(null);
+  const [pending, setPending] = useState<PlatformModule | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [writeError, setWriteError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+
+  const changeAvailability = async () => {
+    if (!pending || saving) return;
+    setSaving(true);
+    setWriteError(null);
+    try {
+      const updated = unwrap(await setPlatformModuleAvailability(pending.id, !pending.is_enabled, pending.updated_at));
+      setNotice(`${updated.name} ${updated.is_enabled ? "enabled" : "disabled"} platform-wide.`);
+      setPending(null);
+      setDetails(null);
+      registry.reload();
+      summary.reload();
+      onChanged?.();
+    } catch (cause) {
+      setWriteError(cause instanceof Error ? cause.message : "The module could not be changed.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const registry = useAsync<PaginatedResponse<PlatformModule>>(
     async () =>
@@ -76,7 +100,7 @@ export function ModuleRegistry({ refreshKey = 0 }: { refreshKey?: number } = {})
           page,
         }),
       ),
-    [filters.search, filters.status, page],
+    [filters.search, filters.status, page, refreshKey],
   );
   const summary = useAsync<ModuleActivationSummary[]>(
     async () => unwrap(await listModuleActivationSummary()),
@@ -119,12 +143,15 @@ export function ModuleRegistry({ refreshKey = 0 }: { refreshKey?: number } = {})
       field: "is_enabled",
       header: "Platform availability",
       render: (row) => (
-        <Chip
-          size="small"
-          variant={row.is_enabled ? "filled" : "outlined"}
-          color={row.is_enabled ? "success" : "default"}
-          label={row.is_enabled ? "On" : "Off"}
-        />
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Switch
+            checked={row.is_enabled}
+            disabled={saving || (!row.is_enabled && (row.status !== "IMPLEMENTED" || !byCode.get(row.code)?.is_shipped))}
+            inputProps={{ "aria-label": `Platform availability for ${row.code}` }}
+            onChange={() => { setPending(row); setWriteError(null); setNotice(null); }}
+          />
+          <Typography variant="body2">{row.is_enabled ? "On" : "Off"}</Typography>
+        </Box>
       ),
     },
     {
@@ -178,10 +205,28 @@ export function ModuleRegistry({ refreshKey = 0 }: { refreshKey?: number } = {})
           modules are registered but not implemented and cannot be enabled
           anywhere. <strong>Deprecated</strong> modules cannot be newly
           enabled. <strong>Implemented but disabled</strong> modules wait for
-          the platform switch. Statuses and the switch are managed on the
-          backend; Site activation is managed on the Site modules tab.
+          the platform switch. Use Platform availability below to enable or
+          disable a shipped module. Site activation is managed on the Site modules tab.
         </Typography>
       </Alert>
+
+      {notice ? <Alert severity="success">{notice}</Alert> : null}
+
+      <Dialog open={pending !== null} onClose={() => { if (!saving) setPending(null); }} aria-labelledby="module-switch-title">
+        <DialogTitle id="module-switch-title">{pending?.is_enabled ? "Disable" : "Enable"} {pending?.name} platform-wide?</DialogTitle>
+        <DialogContent>
+          <Typography>
+            {pending?.is_enabled
+              ? "This makes the module unavailable across all Sites. Existing Site assignments, settings and content are preserved."
+              : "This allows Sites to activate the module. Existing Site assignments become effective again; unassigned Sites remain unchanged."}
+          </Typography>
+          {writeError ? <Alert severity="error" sx={{ mt: 2 }}>{writeError}</Alert> : null}
+        </DialogContent>
+        <DialogActions>
+          <Button disabled={saving} onClick={() => setPending(null)}>Cancel</Button>
+          <Button disabled={saving} onClick={() => void changeAvailability()}>{saving ? "Saving…" : pending?.is_enabled ? "Disable module" : "Enable module"}</Button>
+        </DialogActions>
+      </Dialog>
 
       {summary.error ? (
         <Alert

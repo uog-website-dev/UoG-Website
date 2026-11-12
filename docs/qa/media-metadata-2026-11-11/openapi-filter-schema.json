@@ -1,0 +1,291 @@
+{
+  "list_parameters": [
+    {
+      "in": "query",
+      "name": "content_type",
+      "schema": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 127,
+        "pattern": "^[a-z0-9.+-]+/[a-z0-9.+-]+$"
+      },
+      "description": "Exact detected MIME, never a filename extension or client upload header."
+    },
+    {
+      "in": "query",
+      "name": "ordering",
+      "schema": {
+        "enum": [
+          "created_at",
+          "-created_at",
+          "original_filename",
+          "-original_filename"
+        ],
+        "type": "string",
+        "default": "-created_at",
+        "minLength": 1
+      },
+      "description": "Always followed by ascending asset UUID as a stable tie-breaker.\n\n* `created_at` - created_at\n* `-created_at` - -created_at\n* `original_filename` - original_filename\n* `-original_filename` - -original_filename"
+    },
+    {
+      "in": "query",
+      "name": "page",
+      "schema": {
+        "type": "integer",
+        "minimum": 1,
+        "default": 1
+      }
+    },
+    {
+      "in": "query",
+      "name": "page_size",
+      "schema": {
+        "type": "integer",
+        "maximum": 100,
+        "minimum": 1,
+        "default": 20
+      }
+    },
+    {
+      "in": "query",
+      "name": "ready_images",
+      "schema": {
+        "type": "boolean",
+        "default": false
+      },
+      "description": "READY PNG/JPEG/WebP only, filtered before pagination. Shared by Image, Slider and Gallery pickers."
+    },
+    {
+      "in": "query",
+      "name": "search",
+      "schema": {
+        "type": "string",
+        "maxLength": 255
+      },
+      "description": "Case-insensitive literal filename substring."
+    },
+    {
+      "in": "path",
+      "name": "site_pk",
+      "schema": {
+        "type": "integer"
+      },
+      "required": true
+    },
+    {
+      "in": "query",
+      "name": "status",
+      "schema": {
+        "enum": [
+          "PENDING",
+          "READY",
+          "REJECTED",
+          "ARCHIVED"
+        ],
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "* `PENDING` - Pending\n* `READY` - Ready\n* `REJECTED` - Rejected\n* `ARCHIVED` - Archived"
+    },
+    {
+      "in": "query",
+      "name": "type",
+      "schema": {
+        "enum": [
+          "image",
+          "document"
+        ],
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "image: image/*; document: PDF or plain text.\n\n* `image` - image\n* `document` - document"
+    },
+    {
+      "name": "X-Request-ID",
+      "in": "header",
+      "required": false,
+      "description": "Optional UUID correlation ID. Invalid values are replaced.",
+      "schema": {
+        "type": "string",
+        "format": "uuid"
+      }
+    }
+  ],
+  "list_response": {
+    "$ref": "#/components/schemas/PaginatedAssetList"
+  },
+  "detail_response": {
+    "$ref": "#/components/schemas/Asset"
+  },
+  "metadata_patch": {
+    "$ref": "#/components/schemas/PatchedMetadataInputRequest"
+  },
+  "components": {
+    "PaginatedAssetList": {
+      "type": "object",
+      "required": [
+        "count",
+        "results"
+      ],
+      "properties": {
+        "count": {
+          "type": "integer",
+          "example": 123
+        },
+        "next": {
+          "type": "string",
+          "nullable": true,
+          "format": "uri",
+          "example": "http://api.example.org/accounts/?page=4"
+        },
+        "previous": {
+          "type": "string",
+          "nullable": true,
+          "format": "uri",
+          "example": "http://api.example.org/accounts/?page=2"
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/Asset"
+          }
+        }
+      }
+    },
+    "Asset": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "readOnly": true
+        },
+        "site": {
+          "type": "integer",
+          "readOnly": true
+        },
+        "processing_state": {
+          "type": "string",
+          "readOnly": true
+        },
+        "content_type": {
+          "type": "string",
+          "readOnly": true
+        },
+        "thumbnail_status": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/ThumbnailStatusEnum"
+            }
+          ],
+          "readOnly": true
+        },
+        "original_filename": {
+          "type": "string",
+          "readOnly": true
+        },
+        "detected_mime": {
+          "type": "string",
+          "readOnly": true
+        },
+        "byte_count": {
+          "type": "integer",
+          "readOnly": true
+        },
+        "checksum": {
+          "type": "string",
+          "readOnly": true,
+          "description": "SHA-256 of the object bytes."
+        },
+        "status": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/MediaAssetStatusEnum"
+            }
+          ],
+          "readOnly": true
+        },
+        "width": {
+          "type": "integer",
+          "readOnly": true,
+          "nullable": true
+        },
+        "height": {
+          "type": "integer",
+          "readOnly": true,
+          "nullable": true
+        },
+        "alt_text": {
+          "type": "string",
+          "readOnly": true
+        },
+        "created_by": {
+          "type": "integer",
+          "readOnly": true
+        },
+        "updated_by": {
+          "type": "integer",
+          "readOnly": true
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        }
+      },
+      "required": [
+        "alt_text",
+        "byte_count",
+        "checksum",
+        "content_type",
+        "created_at",
+        "created_by",
+        "detected_mime",
+        "height",
+        "id",
+        "original_filename",
+        "processing_state",
+        "site",
+        "status",
+        "thumbnail_status",
+        "updated_at",
+        "updated_by",
+        "width"
+      ]
+    },
+    "ThumbnailStatusEnum": {
+      "type": "string",
+      "enum": [
+        "NOT_GENERATED",
+        "NOT_APPLICABLE"
+      ]
+    },
+    "MediaAssetStatusEnum": {
+      "enum": [
+        "PENDING",
+        "READY",
+        "REJECTED",
+        "ARCHIVED"
+      ],
+      "type": "string",
+      "description": "* `PENDING` - Pending\n* `READY` - Ready\n* `REJECTED` - Rejected\n* `ARCHIVED` - Archived"
+    },
+    "PatchedMetadataInputRequest": {
+      "type": "object",
+      "properties": {
+        "alt_text": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "status": {
+          "$ref": "#/components/schemas/MediaAssetStatusEnum"
+        }
+      }
+    }
+  }
+}

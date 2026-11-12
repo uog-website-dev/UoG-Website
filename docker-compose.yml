@@ -47,6 +47,15 @@ x-backend-environment: &backend-environment
   MINIO_ENDPOINT: http://minio:9000
   MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-uog_minio_admin}
   MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minio_dev_secret_change_me}
+  MEDIA_PROCESSING_MAX_ATTEMPTS: ${MEDIA_PROCESSING_MAX_ATTEMPTS:-3}
+  MEDIA_PROCESSING_RETRY_SECONDS: ${MEDIA_PROCESSING_RETRY_SECONDS:-10}
+  MEDIA_PROCESSING_LEASE_SECONDS: ${MEDIA_PROCESSING_LEASE_SECONDS:-90}
+  MEDIA_DERIVATIVE_MAX_BYTES: ${MEDIA_DERIVATIVE_MAX_BYTES:-8388608}
+  MEDIA_UPLOAD_MAX_BYTES: ${MEDIA_UPLOAD_MAX_BYTES:-20971520}
+  MEDIA_PDF_MAX_BYTES: ${MEDIA_PDF_MAX_BYTES:-20971520}
+  MEDIA_TEXT_MAX_BYTES: ${MEDIA_TEXT_MAX_BYTES:-5242880}
+  MEDIA_IMAGE_MAX_PIXELS: ${MEDIA_IMAGE_MAX_PIXELS:-40000000}
+  MEDIA_UPLOAD_LEASE_SECONDS: ${MEDIA_UPLOAD_LEASE_SECONDS:-900}
   MINIO_BUCKET: platform-private
   CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:3001,http://localhost}
 
@@ -282,6 +291,7 @@ services:
   # ---------------------------------------------------------------------------
   celery-worker:
     <<: *backend-image
+    restart: unless-stopped
     container_name: uog-celery-worker
     environment:
       <<: *backend-environment
@@ -307,6 +317,7 @@ services:
 
   celery-beat:
     <<: *backend-image
+    restart: unless-stopped
     container_name: uog-celery-beat
     environment:
       <<: *backend-environment

@@ -24,6 +24,8 @@ redis==5.2.1
 # Object storage (MinIO, S3-compatible)
 django-storages[s3]==1.14.6
 boto3==1.35.84
+Pillow==13.0.0
+pypdf==7.0.1
 
 # OIDC access-token validation (Keycloak-issued RS256 tokens)
 PyJWT[crypto]==2.15.1

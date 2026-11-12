@@ -1,0 +1,154 @@
+﻿{
+  "backend_full": {
+    "suites": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "2",
+        "tests": "699",
+        "time": "463.046",
+        "timestamp": "2026-11-10T18:01:50.558794+00:00",
+        "hostname": "a53272ab84d9"
+      }
+    ],
+    "media_tests": [
+      {
+        "name": "test_stored_bytes_define_metadata_and_duplicate_object_is_a_database_conflict",
+        "passed": true
+      },
+      {
+        "name": "test_two_site_selectors_updates_and_reassignment_never_expose_foreign_metadata",
+        "passed": true
+      },
+      {
+        "name": "test_orm_bulk_and_raw_updates_cannot_reassign_identity[site_id-0]",
+        "passed": true
+      },
+      {
+        "name": "test_orm_bulk_and_raw_updates_cannot_reassign_identity[storage_reference-changed]",
+        "passed": true
+      },
+      {
+        "name": "test_orm_bulk_and_raw_updates_cannot_reassign_identity[checksum-0000000000000000000000000000000000000000000000000000000000000000]",
+        "passed": true
+      },
+      {
+        "name": "test_orm_bulk_and_raw_updates_cannot_reassign_identity[created_by_id-0]",
+        "passed": true
+      },
+      {
+        "name": "test_lifecycle_and_audit_are_actor_site_bound_and_atomic",
+        "passed": true
+      },
+      {
+        "name": "test_http_catalog_is_site_scoped_rejects_ownership_and_module_bypasses",
+        "passed": true
+      },
+      {
+        "name": "test_rejected_status_is_terminal_and_archived_sites_are_frozen",
+        "passed": true
+      },
+      {
+        "name": "test_concurrent_registration_commits_one_identity_and_one_audit",
+        "passed": true
+      },
+      {
+        "name": "test_audit_failure_rolls_back_metadata_and_preserves_asset",
+        "passed": true
+      },
+      {
+        "name": "test_slider_gallery_and_repeater_placements_share_one_asset_and_detach_independently",
+        "passed": true
+      },
+      {
+        "name": "test_reference_database_rejects_foreign_page_and_asset",
+        "passed": true
+      },
+      {
+        "name": "test_upgrade_from_pre_media_sprint_two_preserves_page_and_revision",
+        "passed": true
+      }
+    ]
+  },
+  "media_and_revisions": {
+    "suites": [
+      {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "19",
+        "time": "35.949",
+        "timestamp": "2026-11-10T18:13:55.138370+00:00",
+        "hostname": "a53272ab84d9"
+      }
+    ],
+    "media_tests": [
+      {
+        "name": "test_image_detection_and_stream_limit_do_not_depend_on_filename",
+        "passed": true
+      },
+      {
+        "name": "test_stored_bytes_define_metadata_and_duplicate_object_is_a_database_conflict",
+        "passed": true
+      },
+      {
+        "name": "test_two_site_selectors_updates_and_reassignment_never_expose_foreign_metadata",
+        "passed": true
+      },
+      {
+        "name": "test_orm_bulk_and_raw_updates_cannot_reassign_identity[site_id-0]",
+        "passed": true
+      },
+      {
+        "name": "test_orm_bulk_and_raw_updates_cannot_reassign_identity[storage_reference-changed]",
+        "passed": true
+      },
+      {
+        "name": "test_orm_bulk_and_raw_updates_cannot_reassign_identity[checksum-0000000000000000000000000000000000000000000000000000000000000000]",
+        "passed": true
+      },
+      {
+        "name": "test_orm_bulk_and_raw_updates_cannot_reassign_identity[created_by_id-0]",
+        "passed": true
+      },
+      {
+        "name": "test_lifecycle_and_audit_are_actor_site_bound_and_atomic",
+        "passed": true
+      },
+      {
+        "name": "test_http_catalog_is_site_scoped_rejects_ownership_and_module_bypasses",
+        "passed": true
+      },
+      {
+        "name": "test_rejected_status_is_terminal_and_archived_sites_are_frozen",
+        "passed": true
+      },
+      {
+        "name": "test_http_placements_use_revision_ids_from_the_scoped_revision_api",
+        "passed": true
+      },
+      {
+        "name": "test_concurrent_registration_commits_one_identity_and_one_audit",
+        "passed": true
+      },
+      {
+        "name": "test_audit_failure_rolls_back_metadata_and_preserves_asset",
+        "passed": true
+      },
+      {
+        "name": "test_slider_gallery_and_repeater_placements_share_one_asset_and_detach_independently",
+        "passed": true
+      },
+      {
+        "name": "test_reference_database_rejects_foreign_page_and_asset",
+        "passed": true
+      },
+      {
+        "name": "test_upgrade_from_pre_media_sprint_two_preserves_page_and_revision",
+        "passed": true
+      }
+    ]
+  }
+}

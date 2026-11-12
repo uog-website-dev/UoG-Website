@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="5" failures="0" errors="0" time="0.385877561">
+    <testsuite name="src/app/sites/[id]/media-upload/route.test.ts" timestamp="2026-11-11T16:18:40.652Z" hostname="ee3e3eb7f70f" tests="2" failures="0" errors="0" skipped="0" time="0.011183288">
+        <testcase classname="src/app/sites/[id]/media-upload/route.test.ts" name="private upload proxy &gt; rejects cross-origin and anonymous requests before forwarding bytes" time="0.00715704">
+        </testcase>
+        <testcase classname="src/app/sites/[id]/media-upload/route.test.ts" name="private upload proxy &gt; streams to the scoped backend with server credentials and preserves retry identity" time="0.002917874">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/media-library.test.tsx" timestamp="2026-11-11T16:18:40.657Z" hostname="ee3e3eb7f70f" tests="3" failures="0" errors="0" skipped="0" time="0.374694273">
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; excludes processing images then picks the worker-completed identity on refresh" time="0.234787751">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; shows processing state in the library and preserves the retry key after transfer failure" time="0.117932739">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; never offers upload to a read-only account" time="0.019354971">
+        </testcase>
+    </testsuite>
+</testsuites>

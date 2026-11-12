@@ -1,0 +1,14 @@
+{
+  "manual": {
+    "deletion": "won",
+    "linking": "blocked",
+    "deleted": true,
+    "references": 0
+  },
+  "draft": {
+    "deletion": "blocked",
+    "linking": "won",
+    "deleted": false,
+    "references": 1
+  }
+}

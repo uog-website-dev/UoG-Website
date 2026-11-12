@@ -1673,6 +1673,336 @@ paths:
               schema:
                 type: string
                 format: uuid
+  /api/v1/authorization/assignments/site-roles/:
+    get:
+      operationId: v1_authorization_assignments_site_roles_list
+      description: Returns active roles and whether the caller can assign each one
+        within the selected Site, based on delegated permissions.
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: site
+        schema:
+          type: integer
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Authorization
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSiteAssignableRoleList'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/authorization/assignments/site-user-search/:
+    get:
+      operationId: v1_authorization_assignments_site_user_search_list
+      description: Search existing platform identities. Results include active roles
+        already assigned in this Site so the interface can prevent duplicate grants.
+        Requires platform.users.view in that Site.
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: search
+        schema:
+          type: string
+      - in: query
+        name: site
+        schema:
+          type: integer
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Authorization
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSiteIdentitySearchList'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/authorization/assignments/site-users/:
+    get:
+      operationId: v1_authorization_assignments_site_users_list
+      description: Site-scoped user directory. Requires platform.users.view in the
+        selected Site; each result contains the user's active Site role assignments.
+      parameters:
+      - in: query
+        name: ordering
+        schema:
+          type: string
+          enum:
+          - -assigned_at
+          - -name
+          - assigned_at
+          - name
+      - in: query
+        name: page
+        schema:
+          type: integer
+      - in: query
+        name: role
+        schema:
+          type: string
+      - in: query
+        name: search
+        schema:
+          type: string
+      - in: query
+        name: site
+        schema:
+          type: integer
+        description: Site id. Results are limited to active assignments in this Site.
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Authorization
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSiteDirectoryUserList'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
   /api/v1/authorization/assignments/users/{user_id}/effective/:
     get:
       operationId: v1_authorization_assignments_users_effective_retrieve
@@ -4544,8 +4874,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -4680,10 +5010,10 @@ paths:
                 format: uuid
     patch:
       operationId: v1_modules_partial_update
-      description: Development admin only. The row lock, If-Match check, validation
-        and save commit in one transaction. A planned or unshipped module cannot be
-        marked implemented or globally enabled. A rejected change leaves the previous
-        row intact.
+      description: Platform admins may change is_enabled alone in production. Other
+        registry edits require the development write gate. The row lock, If-Match
+        check, validation and save commit in one transaction. Planned or unshipped
+        modules cannot be globally enabled.
       parameters:
       - in: header
         name: If-Match
@@ -4876,8 +5206,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -5351,8 +5681,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -5684,8 +6014,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -6020,8 +6350,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -6356,8 +6686,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -6920,6 +7250,146 @@ paths:
                 format: uuid
         '406':
           description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/site-context/media/{asset_id}/:
+    get:
+      operationId: v1_site_context_media_retrieve
+      description: Host-resolved Site only, effective MEDIA/PAGES and a current published
+        visible Page reference required. READY images only. Missing derivatives regenerate
+        bounded WebP from verified private original; missing/invalid original is 404.
+        No public original or storage keys. No-store, Vary Host.
+      parameters:
+      - in: path
+        name: asset_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - webp
+      - in: query
+        name: variant
+        schema:
+          type: string
+          enum:
+          - display
+          - thumbnail
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Media
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            image/webp:
+              schema:
+                type: string
+                format: binary
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '503':
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -8068,8 +8538,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -8808,8 +9278,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -9138,8 +9608,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -9453,8 +9923,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -9783,8 +10253,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -9992,8 +10462,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -10201,8 +10671,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -10409,8 +10879,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -10618,8 +11088,1802 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/sites/{site_pk}/asset-references/:
+    get:
+      operationId: v1_sites_asset_references_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Media
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedReferenceList'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+    post:
+      operationId: v1_sites_asset_references_create
+      description: Attach a ready owned asset to an owned Page revision, node, field
+        and optional repeater item. Requires media management and Page update permissions.
+        A slot holds one asset; separate slots may reuse it.
+      parameters:
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Media
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReferenceInputRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReferenceInputRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReferenceInputRequest'
+        required: true
+      security:
+      - keycloakBearer: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reference'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          description: Invalid body, malformed input, or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    title:
+                    - This field is required.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '409':
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '415':
+          description: Unsupported request content type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '503':
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/sites/{site_pk}/asset-references/{reference_id}/:
+    delete:
+      operationId: v1_sites_asset_references_destroy
+      description: Remove only this placement index entry. Retains the asset and other
+        placements. Does not edit immutable Page revision snapshots.
+      parameters:
+      - in: path
+        name: reference_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Media
+      security:
+      - keycloakBearer: []
+      responses:
+        '204':
+          description: No response body
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          description: Invalid body, malformed input, or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    title:
+                    - This field is required.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '409':
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '503':
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/sites/{site_pk}/assets/:
+    get:
+      operationId: v1_sites_assets_list
+      description: Requires Site media permission and enabled MEDIA. Every filter
+        is applied inside the owning Site before pagination. Default page size 20,
+        max 100; default order -created_at,id. Literal case-insensitive media-name
+        or original-filename search. Unknown/repeated filters and contradictory ready-image
+        filters return 400. Image/Slider/Gallery controls must use ready_images=true.
+      parameters:
+      - in: query
+        name: content_type
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 127
+          pattern: ^[a-z0-9.+-]+/[a-z0-9.+-]+$
+        description: Exact detected MIME, never a filename extension or client upload
+          header.
+      - in: query
+        name: ordering
+        schema:
+          enum:
+          - created_at
+          - -created_at
+          - original_filename
+          - -original_filename
+          type: string
+          default: -created_at
+          minLength: 1
+        description: |-
+          Always followed by ascending asset UUID as a stable tie-breaker.
+
+          * `created_at` - created_at
+          * `-created_at` - -created_at
+          * `original_filename` - original_filename
+          * `-original_filename` - -original_filename
+      - in: query
+        name: page
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - in: query
+        name: page_size
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          default: 20
+      - in: query
+        name: ready_images
+        schema:
+          type: boolean
+          default: false
+        description: READY PNG/JPEG/WebP only, filtered before pagination. Shared
+          by Image, Slider and Gallery pickers.
+      - in: query
+        name: search
+        schema:
+          type: string
+          maxLength: 255
+        description: Case-insensitive literal media-name or original-filename substring.
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        required: true
+      - in: query
+        name: status
+        schema:
+          enum:
+          - PENDING
+          - READY
+          - REJECTED
+          - ARCHIVED
+          type: string
+          minLength: 1
+        description: |-
+          * `PENDING` - Pending
+          * `READY` - Ready
+          * `REJECTED` - Rejected
+          * `ARCHIVED` - Archived
+      - in: query
+        name: type
+        schema:
+          enum:
+          - image
+          - document
+          type: string
+          minLength: 1
+        description: |-
+          image: image/*; document: PDF or plain text.
+
+          * `image` - image
+          * `document` - document
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Media
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAssetList'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/sites/{site_pk}/assets/{asset_id}/:
+    get:
+      operationId: v1_sites_assets_retrieve
+      parameters:
+      - in: path
+        name: asset_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Media
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+    patch:
+      operationId: v1_sites_assets_partial_update
+      description: Only display_name/categories/alt_text/status are editable. Uploaded
+        PENDING assets are worker-controlled; trusted legacy PENDING assets may become
+        READY or REJECTED; READY may become ARCHIVED; ARCHIVED may become READY. REJECTED
+        is terminal. Identity and ownership cannot change.
+      parameters:
+      - in: path
+        name: asset_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Media
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedMetadataInputRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedMetadataInputRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedMetadataInputRequest'
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          description: Invalid body, malformed input, or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    title:
+                    - This field is required.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '409':
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '415':
+          description: Unsupported request content type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '503':
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+    delete:
+      operationId: v1_sites_assets_destroy
+      description: Accept removal only when no draft, live publication or explicit
+        placement references remain. Serializes with linking, immediately hides the
+        asset and queues idempotent post-commit object cleanup. Retains an immutable
+        identity tombstone; repeat DELETE returns the same cleanup job.
+      parameters:
+      - in: path
+        name: asset_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Media
+      security:
+      - keycloakBearer: []
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deletion'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          description: Invalid body, malformed input, or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    title:
+                    - This field is required.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '409':
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '503':
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/sites/{site_pk}/assets/{asset_id}/deletion/:
+    get:
+      operationId: v1_sites_assets_deletion_retrieve
+      description: Site media-delete permission required. Returns the durable cleanup
+        state of an accepted deletion, without object keys.
+      parameters:
+      - in: path
+        name: asset_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Media
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deletion'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/sites/{site_pk}/assets/{asset_id}/image/:
+    get:
+      operationId: v1_sites_assets_image_retrieve
+      description: Private Site media view permission required. READY images only.
+        Missing derivative revalidates and re-encodes the private original; original
+        bytes/keys are never returned.
+      parameters:
+      - in: path
+        name: asset_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - webp
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        required: true
+      - in: query
+        name: variant
+        schema:
+          type: string
+          enum:
+          - display
+          - thumbnail
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Media
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            image/webp:
+              schema:
+                type: string
+                format: binary
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '503':
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/sites/{site_pk}/assets/{asset_id}/references/:
+    get:
+      operationId: v1_sites_assets_references_retrieve
+      description: Current draft/publication inventory plus explicit placement references.
+        Every entry is Site-owned. Automatic sets are revision-maintained; only MANUAL
+        placements are detached through the reference API.
+      parameters:
+      - in: path
+        name: asset_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Media
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inventory'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/sites/{site_pk}/assets/upload/:
+    post:
+      operationId: v1_sites_assets_upload_create
+      description: Raw bounded file stream. Requires Site content.media.upload and
+        effective MEDIA before reading bytes. Byte detection overrides Content-Type.
+        PNG/JPEG/WebP, passive PDF and UTF-8 plain text only. Returns id, status and
+        processing_state; PENDING/PROCESSING is never selectable. Replays return the
+        same asset. No object paths or public URLs are accepted or returned.
+      parameters:
+      - in: header
+        name: Content-Length
+        schema:
+          type: integer
+        description: Exact file byte length. The stream is also bounded independently
+          while reading.
+        required: true
+      - in: header
+        name: Idempotency-Key
+        schema:
+          type: string
+        description: Client-generated UUID, retained across retries of this logical
+          upload.
+        required: true
+      - in: query
+        name: filename
+        schema:
+          type: string
+        description: Original filename only; object keys are allocated server-side.
+        required: true
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Media
+      requestBody:
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      security:
+      - keycloakBearer: []
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          description: Invalid body, malformed input, or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    title:
+                    - This field is required.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '409':
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '413':
+          description: Upload exceeds configured byte limits.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '415':
+          description: Unsupported request content type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '503':
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/sites/{site_pk}/assets/upload-policy/:
+    get:
+      operationId: v1_sites_assets_upload_policy_retrieve
+      description: Authorized Site upload types, byte and image pixel limits.
+      parameters:
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Media
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
           content:
             application/json:
               schema:
@@ -10977,8 +13241,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -11316,8 +13580,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -11768,8 +14032,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -12099,8 +14363,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -12313,8 +14577,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -12527,8 +14791,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -12742,8 +15006,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -13471,8 +15735,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -13826,8 +16090,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -14167,8 +16431,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -14362,8 +16626,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -14580,8 +16844,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -14909,8 +17173,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -15092,8 +17356,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -15296,8 +17560,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -15499,8 +17763,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -15711,8 +17975,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -16175,8 +18439,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -16507,8 +18771,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -16725,8 +18989,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -16942,8 +19206,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -17342,8 +19606,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -17708,8 +19972,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -17916,8 +20180,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -18136,8 +20400,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -18511,8 +20775,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -18915,8 +21179,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -19258,8 +21522,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -19726,8 +21990,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -20065,8 +22329,8 @@ paths:
                 type: string
                 format: uuid
         '503':
-          description: Audit persistence failed; the entire mutation was rolled back.
-            No SQL details are exposed.
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
           content:
             application/json:
               schema:
@@ -20310,6 +22574,106 @@ components:
       required:
       - operation
       - replayed
+    Asset:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        site:
+          type: integer
+          readOnly: true
+        processing_state:
+          type: string
+          readOnly: true
+        content_type:
+          type: string
+          readOnly: true
+        thumbnail_status:
+          allOf:
+          - $ref: '#/components/schemas/ThumbnailStatusEnum'
+          readOnly: true
+        thumbnail_url:
+          type: string
+          nullable: true
+          readOnly: true
+        processing_attempts:
+          type: integer
+          readOnly: true
+        processing_error_code:
+          type: string
+          readOnly: true
+        original_filename:
+          type: string
+          readOnly: true
+        display_name:
+          type: string
+          readOnly: true
+        categories:
+          readOnly: true
+        detected_mime:
+          type: string
+          readOnly: true
+        byte_count:
+          type: integer
+          readOnly: true
+        checksum:
+          type: string
+          readOnly: true
+          description: SHA-256 of the object bytes.
+        status:
+          allOf:
+          - $ref: '#/components/schemas/MediaAssetStatusEnum'
+          readOnly: true
+        width:
+          type: integer
+          readOnly: true
+          nullable: true
+        height:
+          type: integer
+          readOnly: true
+          nullable: true
+        alt_text:
+          type: string
+          readOnly: true
+        created_by:
+          type: integer
+          readOnly: true
+        updated_by:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - alt_text
+      - byte_count
+      - categories
+      - checksum
+      - content_type
+      - created_at
+      - created_by
+      - detected_mime
+      - display_name
+      - height
+      - id
+      - original_filename
+      - processing_attempts
+      - processing_error_code
+      - processing_state
+      - site
+      - status
+      - thumbnail_status
+      - thumbnail_url
+      - updated_at
+      - updated_by
+      - width
     Assignment:
       type: object
       properties:
@@ -20322,6 +22686,16 @@ components:
         user_name:
           type: string
           readOnly: true
+        user_email:
+          type: string
+          format: email
+          readOnly: true
+        user_first_name:
+          type: string
+          readOnly: true
+        user_last_name:
+          type: string
+          readOnly: true
         role:
           type: integer
           readOnly: true
@@ -20330,7 +22704,7 @@ components:
           readOnly: true
         scope:
           allOf:
-          - $ref: '#/components/schemas/ScopeEnum'
+          - $ref: '#/components/schemas/AssignmentScopeEnum'
           readOnly: true
         organization:
           type: integer
@@ -20375,6 +22749,9 @@ components:
       - scope
       - site
       - user
+      - user_email
+      - user_first_name
+      - user_last_name
       - user_name
     AssignmentCreate:
       type: object
@@ -20384,7 +22761,7 @@ components:
         role:
           type: integer
         scope:
-          $ref: '#/components/schemas/ScopeEnum'
+          $ref: '#/components/schemas/AssignmentScopeEnum'
         organization:
           type: integer
           nullable: true
@@ -20407,7 +22784,7 @@ components:
         role:
           type: integer
         scope:
-          $ref: '#/components/schemas/ScopeEnum'
+          $ref: '#/components/schemas/AssignmentScopeEnum'
         organization:
           type: integer
           nullable: true
@@ -20422,6 +22799,16 @@ components:
       - role
       - scope
       - user
+    AssignmentScopeEnum:
+      enum:
+      - PLATFORM
+      - ORGANIZATION
+      - SITE
+      type: string
+      description: |-
+        * `PLATFORM` - Platform
+        * `ORGANIZATION` - Organization
+        * `SITE` - Site
     AuthorizationAudit:
       type: object
       properties:
@@ -20538,6 +22925,9 @@ components:
     ContentRevisionDetail:
       type: object
       properties:
+        id:
+          type: integer
+          readOnly: true
         revision_number:
           type: integer
           readOnly: true
@@ -20567,6 +22957,7 @@ components:
       - content_hash
       - created_at
       - editor
+      - id
       - restored_from_revision
       - revision_number
       - snapshot
@@ -20574,6 +22965,9 @@ components:
     ContentRevisionList:
       type: object
       properties:
+        id:
+          type: integer
+          readOnly: true
         revision_number:
           type: integer
           readOnly: true
@@ -20602,6 +22996,7 @@ components:
       - content_hash
       - created_at
       - editor
+      - id
       - restored_from_revision
       - revision_number
       - status
@@ -20680,6 +23075,29 @@ components:
         * `PUBLISHED` - Published
         * `UNPUBLISHED` - Unpublished
         * `ARCHIVED` - Archived
+    Deletion:
+      type: object
+      properties:
+        asset_id:
+          type: string
+          format: uuid
+          readOnly: true
+        state:
+          allOf:
+          - $ref: '#/components/schemas/StateEnum'
+          readOnly: true
+        attempts:
+          type: integer
+          readOnly: true
+        deleted_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - asset_id
+      - attempts
+      - deleted_at
+      - state
     DomainDeactivateRequest:
       type: object
       properties:
@@ -20813,6 +23231,21 @@ components:
       - location
       - site
       - updated_at
+    Inventory:
+      type: object
+      properties:
+        asset_id:
+          type: string
+          format: uuid
+          readOnly: true
+        references:
+          type: array
+          items:
+            $ref: '#/components/schemas/Usage'
+          readOnly: true
+      required:
+      - asset_id
+      - references
     ItemInputRequest:
       type: object
       properties:
@@ -20959,6 +23392,28 @@ components:
         * `sidebar` - sidebar
         * `primary` - primary
         * `secondary` - secondary
+    MediaAssetStatusEnum:
+      enum:
+      - PENDING
+      - READY
+      - REJECTED
+      - ARCHIVED
+      type: string
+      description: |-
+        * `PENDING` - Pending
+        * `READY` - Ready
+        * `REJECTED` - Rejected
+        * `ARCHIVED` - Archived
+    MediaUsageScopeEnum:
+      enum:
+      - DRAFT
+      - PUBLIC
+      - MANUAL
+      type: string
+      description: |-
+        * `DRAFT` - DRAFT
+        * `PUBLIC` - PUBLIC
+        * `MANUAL` - MANUAL
     MenuInputRequest:
       type: object
       properties:
@@ -21570,6 +24025,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ActivationSummary'
+    PaginatedAssetList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Asset'
     PaginatedAssignmentList:
       type: object
       required:
@@ -21869,6 +24347,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PostTag'
+    PaginatedReferenceList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reference'
     PaginatedRoleList:
       type: object
       required:
@@ -21915,6 +24416,52 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SiteActivation'
+    PaginatedSiteAssignableRoleList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SiteAssignableRole'
+    PaginatedSiteDirectoryUserList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SiteDirectoryUser'
     PaginatedSiteDomainList:
       type: object
       required:
@@ -21938,6 +24485,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SiteDomain'
+    PaginatedSiteIdentitySearchList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SiteIdentitySearch'
     PaginatedSiteList:
       type: object
       required:
@@ -22096,6 +24666,25 @@ components:
           $ref: '#/components/schemas/LocationEnum'
         is_global:
           type: boolean
+    PatchedMetadataInputRequest:
+      type: object
+      properties:
+        display_name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        categories:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 64
+          maxItems: 10
+        alt_text:
+          type: string
+          maxLength: 1000
+        status:
+          $ref: '#/components/schemas/MediaAssetStatusEnum'
     PatchedModuleUpdateRequest:
       type: object
       properties:
@@ -23414,6 +26003,76 @@ components:
       required:
       - code
       - message
+    Reference:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        site:
+          type: integer
+          readOnly: true
+        asset:
+          type: string
+          format: uuid
+          readOnly: true
+        page_revision:
+          type: integer
+          readOnly: true
+        node_id:
+          type: string
+          readOnly: true
+        field_path:
+          type: string
+          readOnly: true
+        repeater_item_id:
+          type: string
+          readOnly: true
+          default: ''
+        created_by:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - asset
+      - created_at
+      - created_by
+      - field_path
+      - id
+      - node_id
+      - page_revision
+      - repeater_item_id
+      - site
+    ReferenceInputRequest:
+      type: object
+      properties:
+        asset_id:
+          type: string
+          format: uuid
+        page_revision_id:
+          type: integer
+          minimum: 1
+        node_id:
+          type: string
+          minLength: 1
+          maxLength: 128
+        field_path:
+          type: string
+          minLength: 1
+          maxLength: 256
+        repeater_item_id:
+          type: string
+          default: ''
+          maxLength: 128
+      required:
+      - asset_id
+      - field_path
+      - node_id
+      - page_revision_id
     ReorderInputRequest:
       type: object
       properties:
@@ -23528,16 +26187,6 @@ components:
       required:
       - code
       - name
-    ScopeEnum:
-      enum:
-      - PLATFORM
-      - ORGANIZATION
-      - SITE
-      type: string
-      description: |-
-        * `PLATFORM` - Platform
-        * `ORGANIZATION` - Organization
-        * `SITE` - Site
     ScopeFilterRequest:
       type: object
       properties:
@@ -23676,6 +26325,53 @@ components:
       - modules
       - name
       - organization
+    SiteAssignableRole:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        code:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        is_system:
+          type: boolean
+          readOnly: true
+        is_active:
+          type: boolean
+          readOnly: true
+        permissions:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        assignable:
+          type: boolean
+      required:
+      - assignable
+      - code
+      - created_at
+      - description
+      - id
+      - is_active
+      - is_system
+      - name
+      - permissions
+      - updated_at
     SiteContent:
       type: object
       description: Read-only identity/scope fields; writable content editables.
@@ -23905,6 +26601,34 @@ components:
       - code
       - name
       - organization_unit
+    SiteDirectoryUser:
+      type: object
+      properties:
+        user:
+          type: integer
+        user_name:
+          type: string
+        user_email:
+          oneOf:
+          - type: string
+            format: email
+          - type: string
+            maxLength: 0
+        user_first_name:
+          type: string
+        user_last_name:
+          type: string
+        assignments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Assignment'
+      required:
+      - assignments
+      - user
+      - user_email
+      - user_first_name
+      - user_last_name
+      - user_name
     SiteDomain:
       type: object
       properties:
@@ -23992,6 +26716,34 @@ components:
       - is_primary
       - site
       - updated_at
+    SiteIdentitySearch:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        email:
+          oneOf:
+          - type: string
+            format: email
+          - type: string
+            maxLength: 0
+        first_name:
+          type: string
+        last_name:
+          type: string
+        assigned_role_ids:
+          type: array
+          items:
+            type: integer
+      required:
+      - assigned_role_ids
+      - email
+      - first_name
+      - id
+      - last_name
+      - username
     SiteModule:
       type: object
       properties:
@@ -24527,6 +27279,16 @@ components:
         * `global` - global
         * `inherited` - inherited
         * `local` - local
+    StateEnum:
+      enum:
+      - QUEUED
+      - RETRY
+      - DONE
+      type: string
+      description: |-
+        * `QUEUED` - QUEUED
+        * `RETRY` - RETRY
+        * `DONE` - DONE
     Summary:
       type: object
       properties:
@@ -24561,6 +27323,15 @@ components:
       - expected_changes
       - matched_sites
       - unchanged_pairs
+    ThumbnailStatusEnum:
+      type: string
+      enum:
+      - NOT_GENERATED
+      - NOT_APPLICABLE
+      - PROCESSING
+      - READY
+      - FAILED
+      - UNAVAILABLE
     TreeOutput:
       type: object
       properties:
@@ -24577,6 +27348,49 @@ components:
       - include_inactive
       - items
       - menu
+    Usage:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        scope:
+          allOf:
+          - $ref: '#/components/schemas/MediaUsageScopeEnum'
+          readOnly: true
+        page_id:
+          type: string
+          format: uuid
+          readOnly: true
+        revision_id:
+          type: integer
+          readOnly: true
+        publication_id:
+          type: integer
+          readOnly: true
+          nullable: true
+        node_id:
+          type: string
+          readOnly: true
+        field_path:
+          type: string
+          readOnly: true
+        repeater_item_id:
+          type: string
+          readOnly: true
+        detachable:
+          type: boolean
+          readOnly: true
+      required:
+      - detachable
+      - field_path
+      - id
+      - node_id
+      - page_id
+      - publication_id
+      - repeater_item_id
+      - revision_id
+      - scope
     VisibilityEnum:
       enum:
       - PUBLIC

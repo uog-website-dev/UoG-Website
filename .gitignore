@@ -47,6 +47,10 @@ coverage/
 # Django and local process output
 staticfiles/
 media/
+!frontend/apps/admin-web/src/app/sites/*/admin/media/
+!frontend/apps/admin-web/src/app/sites/*/admin/media/page.tsx
+!frontend/apps/admin-web/src/app/sites/*/media/
+!frontend/apps/admin-web/src/app/sites/*/media/**
 test_media/
 db.sqlite3
 db.sqlite3-journal

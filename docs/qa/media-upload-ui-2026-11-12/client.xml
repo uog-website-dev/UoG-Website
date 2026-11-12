@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="5" failures="0" errors="0" time="0.073012717">
+    <testsuite name="src/adapters/media.test.ts" timestamp="2026-11-12T03:05:19.016Z" hostname="086c5ea3ae9d" tests="5" failures="0" errors="0" skipped="0" time="0.073012717">
+        <testcase classname="src/adapters/media.test.ts" name="Site media typed client &gt; encodes literal filename filters and keeps page and status/type scope" time="0.053768396">
+        </testcase>
+        <testcase classname="src/adapters/media.test.ts" name="Site media typed client &gt; uses the ready-image contract for every picker and returns persisted accessibility metadata" time="0.001355541">
+        </testcase>
+        <testcase classname="src/adapters/media.test.ts" name="Site media typed client &gt; gets scoped details and patches only allowed metadata without pretending ETags exist" time="0.002963724">
+        </testcase>
+        <testcase classname="src/adapters/media.test.ts" name="uses scoped reference, removal and cleanup-status routes without storage paths" time="0.007391129">
+        </testcase>
+        <testcase classname="src/adapters/media.test.ts" name="sends editable media names and category labels through the scoped metadata route" time="0.003501024">
+        </testcase>
+    </testsuite>
+</testsuites>

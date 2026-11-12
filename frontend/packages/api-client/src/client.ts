@@ -67,6 +67,10 @@ export interface ApiClient {
     body?: unknown,
     init?: RequestInit,
   ): Promise<ApiResult<T>>;
+  /** Non-conditional DELETE for guarded asynchronous removals. */
+  delete<T>(path: string): Promise<T>;
+  /** Non-conditional PATCH for endpoints whose contract does not use ETags. */
+  patch<T>(path: string, body: unknown): Promise<T>;
   /** PATCH with a required `If-Match` precondition (conditional update). */
   patchDetailed<T>(
     path: string,
@@ -208,6 +212,9 @@ export function createApiClient(options: ApiClientOptions): ApiClient {
           ...(init?.headers ?? {}),
         },
       }),
+    delete: <T>(path: string) => request<T>(path, { method: "DELETE" }).then((result) => result.data),
+    patch: <T>(path: string, body: unknown) =>
+      request<T>(path, { method: "PATCH", body: JSON.stringify(body), headers: { "Content-Type": "application/json" } }).then((result) => result.data),
     patchDetailed: <T>(
       path: string,
       body: unknown,

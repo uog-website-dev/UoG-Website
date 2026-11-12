@@ -98,7 +98,7 @@ def test_platform_administrator_policy_is_the_approved_capability_set(world):
     assert body["organization"] is None and body["site"] is None
     assert set(body["permissions"]) == set(PLATFORM_ADMIN)
     assert "content.pages.approve" not in body["permissions"]
-    assert "content.media.upload" not in body["permissions"]
+    assert "content.media.upload" in body["permissions"]
     site_body = _codes(_effective(world.client, world.admin.pk, scope="SITE", site=world.site.pk))
     assert set(site_body["permissions"]) == set(PLATFORM_ADMIN)
 

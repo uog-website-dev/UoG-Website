@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="9" failures="0" errors="0" time="0.259535119">
+    <testsuite name="src/public-page.test.tsx" timestamp="2026-11-12T02:04:31.873Z" hostname="086c5ea3ae9d" tests="9" failures="0" errors="0" skipped="0" time="0.259535119">
+        <testcase classname="src/public-page.test.tsx" name="pageFromResponse &gt; reads one published page and ignores a disabled module" time="0.003277183">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="paragraphParts &gt; drops script and javascript targets" time="0.003409765">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="PublicPageView &gt; renders the published page and does not mount unsafe markup" time="0.12466094">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="PublicPageView &gt; lets a keyboard user reach a safe link" time="0.032748104">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="PublicPageView &gt; states that a missing or unpublished page is not shown" time="0.009945836">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="Published media derivatives &gt; uses Host-scoped responsive variants and falls back to alt text on failure" time="0.022197111">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="Published media derivatives &gt; does not construct a public URL for a foreign Site reference" time="0.003204754">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="Published media derivatives &gt; resets a failed image when the asset or Site changes" time="0.011384034">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="renders nested Slider and Gallery uses independently for the same asset" time="0.043330039">
+        </testcase>
+    </testsuite>
+</testsuites>

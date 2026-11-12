@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="19" failures="0" errors="0" time="4.567097352">
+    <testsuite name="src/sites/media-library.test.tsx" timestamp="2026-11-11T19:00:43.238Z" hostname="ee3e3eb7f70f" tests="19" failures="0" errors="0" skipped="0" time="4.567097352">
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; excludes processing images then picks the worker-completed identity on refresh" time="0.311742682">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; shows processing state in the library and preserves the retry key after transfer failure" time="0.342416947">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; keeps the selected file after a failed upload and never invents a ready row" time="0.174397665">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; never offers upload to a read-only account" time="0.070058038">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; applies filename search before paging and resets to the first page" time="0.237456531">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; loads scoped details and saves only persisted alt text" time="0.315765507">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; shows readonly metadata without a save control" time="0.180399547">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; sends the selected status and type filters to the server" time="0.202005038">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; shows scoped thumbnails and disables a broken preview until retry" time="0.082848153">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; reports terminal image processing without offering selection" time="0.069135236">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; blocks deletion for a live reference and confirms unused removal" time="0.506283366">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; keeps the library card and metadata after a delete conflict" time="0.472309534">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; preserves edited alt text after a recoverable save failure" time="0.230209063">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; keeps a Gallery-referenced asset, saves alt text, and reloads persisted details" time="0.441399862">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; keeps deletion disabled if the reference inventory cannot be verified" time="0.127708706">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Site-isolated media browsing &gt; ignores a delayed Informatics search after switching to Medicine and resets all query state" time="0.084875324">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Site-isolated media browsing &gt; uses responsive grid columns and keeps list layout usable" time="0.080773986">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Site-isolated media browsing &gt; offers recovery for empty search and transport failure" time="0.265512227">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Site-isolated media browsing &gt; supports keyboard pagination and grid/list controls" time="0.369874995">
+        </testcase>
+    </testsuite>
+</testsuites>

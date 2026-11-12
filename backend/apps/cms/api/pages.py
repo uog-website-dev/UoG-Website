@@ -1,4 +1,5 @@
 """Site-scoped Page authoring and workflow API."""
+from apps.organizations.hierarchy_lock import hierarchy_write
 from django.core.exceptions import ValidationError as DomainValidationError
 from django.db import IntegrityError, transaction
 from django.db.models import Q
@@ -224,7 +225,7 @@ class SitePageViewSet(
         )
         serializer.is_valid(raise_exception=True)
         try:
-            with transaction.atomic():
+            with hierarchy_write():
                 page = serializer.save(
                     site=site,
                     created_by=request.user,
@@ -258,7 +259,7 @@ class SitePageViewSet(
             raise PreconditionRequired()
         ensure_pages_module_enabled(site.pk)
         try:
-            with transaction.atomic():
+            with hierarchy_write():
                 page = get_object_or_404(
                     self.get_queryset().select_for_update(of=("self",)),
                     pk=self.kwargs["pk"],
@@ -427,7 +428,7 @@ class SitePageViewSet(
         self._authorize(site, (ContentRole.AUTHOR,))
         ensure_pages_module_enabled(site.pk)
         try:
-            with transaction.atomic():
+            with hierarchy_write():
                 page = set_as_homepage(page, actor=request.user)
         except DomainValidationError as error:
             detail = (

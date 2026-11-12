@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="160" failures="0" errors="0" time="1.192308165">
+    <testsuite name="src/adapters/adapters.test.ts" timestamp="2026-11-11T16:09:11.166Z" hostname="ee3e3eb7f70f" tests="59" failures="0" errors="0" skipped="0" time="0.122059875">
+        <testcase classname="src/adapters/adapters.test.ts" name="resolveApiMode &gt; defaults to live in production" time="0.003840918">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="resolveApiMode &gt; defaults to mock in development" time="0.000460515">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="resolveApiMode &gt; honours an explicit live mode in any environment" time="0.000303794">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="resolveApiMode &gt; refuses mock in a production build (no fabricated responses)" time="0.001475816">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="resolveApiMode &gt; allows mock in development" time="0.000489302">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="resolveApiMode &gt; rejects an unknown mode value instead of guessing" time="0.000516551">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="resolveApiMode &gt; treats blank and whitespace values as unset" time="0.000494042">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="factory &gt; builds the live Organizations adapter when mode is live" time="0.046228026">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="factory &gt; builds the Sites adapter and talks to the API in live mode" time="0.002470829">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createLiveSitesAdapter &gt; sends the request to the configured base URL and path" time="0.005781998">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createLiveSitesAdapter &gt; captures the strong ETag from a detail response" time="0.001216447">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createLiveSitesAdapter &gt; sends If-Match on a conditional update and on lifecycle actions" time="0.002074524">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createLiveSitesAdapter &gt; reads domains, site modules and the registry under the documented paths" time="0.00299097">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockOrganizationsAdapter &gt; returns the paginated envelope with a fixed page size" time="0.013003825">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockOrganizationsAdapter &gt; filters by search across name and code" time="0.000321186">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockOrganizationsAdapter &gt; filters by status" time="0.000292952">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockOrganizationsAdapter &gt; filters roots with parent=null" time="0.000392743">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockOrganizationsAdapter &gt; orders by the requested field, descending" time="0.000444777">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockOrganizationsAdapter &gt; returns a strong ETag on detail" time="0.000478115">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockOrganizationsAdapter &gt; 404s for an unknown id" time="0.001601099">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockOrganizationsAdapter &gt; rejects a stale ETag on update with 412" time="0.001127906">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockOrganizationsAdapter &gt; rejects a duplicate code on create with 409" time="0.000944315">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockOrganizationsAdapter &gt; normalises a created code to uppercase" time="0.000506118">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockOrganizationsAdapter &gt; transitions status through deactivate and archive" time="0.000391543">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockOrganizationsAdapter &gt; does not leak fixture objects between calls" time="0.000156226">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockSitesAdapter &gt; paginates the site fixtures" time="0.001967521">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockSitesAdapter &gt; filters by status" time="0.000355547">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockSitesAdapter &gt; filters by owning organization unit and can return several sites per owner" time="0.000504482">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockSitesAdapter &gt; 404s for an unknown id" time="0.000500025">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockSitesAdapter &gt; creates a site in DRAFT with a normalized code" time="0.001722712">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockSitesAdapter &gt; rejects a duplicate code on create with 409" time="0.000684751">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockSitesAdapter &gt; refuses a main site that is not owned by the UNIVERSITY root" time="0.000447883">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockSitesAdapter &gt; refuses a new site on an inactive owner" time="0.000488952">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockSitesAdapter &gt; rejects a stale ETag on update with 412" time="0.000969874">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockSitesAdapter &gt; transitions through the lifecycle matrix" time="0.000858731">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockSitesAdapter &gt; refuses a lifecycle transition the matrix forbids" time="0.00122923">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockSitesAdapter &gt; merges an allowlisted configuration change" time="0.000995509">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockSitesAdapter &gt; refuses configuration that stores secrets or unknown keys" time="0.000817438">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockSitesAdapter &gt; does not leak fixture objects between calls" time="0.000298161">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockSitesAdapter &gt; lists a site&apos;s hostnames, ordered and filterable" time="0.000889961">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockSitesAdapter &gt; returns an empty domain page for a site with none, and 404s an unknown site" time="0.000547901">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockSitesAdapter &gt; lists per-site module assignments and the planned registry honestly" time="0.00072688">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createMockSitesAdapter &gt; 404s module assignments for an unknown site" time="0.000266921">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="organizationListQueryString &gt; drops undefined, null and blank values" time="0.000188444">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="organizationListQueryString &gt; encodes present filters" time="0.000342914">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="organizationListQueryString &gt; passes the literal &apos;null&apos; parent through for roots" time="0.000361403">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="organizationListQueryString &gt; stringifies a numeric parent" time="0.000154556">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="fixture contract conformance &gt; every organization fixture carries exactly the documented DTO fields" time="0.000262194">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="fixture contract conformance &gt; organization fixtures use the documented status values" time="0.001331634">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="fixture contract conformance &gt; organization timestamps are ISO-8601 strings" time="0.000403171">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="fixture contract conformance &gt; organization parent references resolve within the fixture set" time="0.000509083">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="fixture contract conformance &gt; site fixtures carry exactly the documented SiteSerializer fields" time="0.000682525">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="fixture contract conformance &gt; site fixtures use the documented status values" time="0.000730609">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="fixture contract conformance &gt; site fixture configurations are schema-version-1 documents" time="0.000816643">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="fixture contract conformance &gt; site fixture owners and templates resolve within the fixture set" time="0.00034983">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createLiveOrganizationsAdapter &gt; sends the request to the configured base URL and path" time="0.002524411">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createLiveOrganizationsAdapter &gt; propagates the backend&apos;s structured 400 for a bad filter" time="0.003491697">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createLiveOrganizationsAdapter &gt; captures the strong ETag from a detail response" time="0.000887387">
+        </testcase>
+        <testcase classname="src/adapters/adapters.test.ts" name="createLiveOrganizationsAdapter &gt; sends If-Match on a conditional update" time="0.001102175">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/adapters/iam.test.ts" timestamp="2026-11-11T16:09:11.203Z" hostname="ee3e3eb7f70f" tests="30" failures="0" errors="0" skipped="0" time="0.303877712">
+        <testcase classname="src/adapters/iam.test.ts" name="grantableRoles &gt; gives a platform administrator every role" time="0.006583913">
+        </testcase>
+        <testcase classname="src/adapters/iam.test.ts" name="grantableRoles &gt; never lets an editor grant the platform administrator role" time="0.003364502">
+        </testcase>
+        <testcase classname="src/adapters/iam.test.ts" name="grantableRoles &gt; gives a read-only viewer no assignable roles at all" time="0.000655375">
+        </testcase>
+        <testcase classname="src/adapters/iam.test.ts" name="mock adapter — caller authority &gt; offers a platform administrator the platform scope and every site/organization" time="0.004419117">
+        </testcase>
+        <testcase classname="src/adapters/iam.test.ts" name="mock adapter — caller authority &gt; limits a site-scoped administrator to their own scope and grantable roles" time="0.002333942">
+        </testcase>
+        <testcase classname="src/adapters/iam.test.ts" name="mock adapter — caller authority &gt; reports a viewer as read-only" time="0.00182272">
+        </testcase>
+        <testcase classname="src/adapters/iam.test.ts" name="mock adapter — user search &gt; finds users by a case-insensitive substring of username, email or name" time="0.005257152">
+        </testcase>
+        <testcase classname="src/adapters/iam.test.ts" name="mock adapter — user search &gt; returns every user for an empty search and reports the total count" time="0.001795702">
+        </testcase>
+        <testcase classname="src/adapters/iam.test.ts" name="mock adapter — user search &gt; answers with an empty page when nothing matches" time="0.002510349">
+        </testcase>
+        <testcase classname="src/adapters/iam.test.ts" name="mock adapter — create assignment &gt; grants a role within a managed scope and lists it afterwards" time="0.020096363">
+        </testcase>
+        <testcase classname="src/adapters/iam.test.ts" name="mock adapter — create assignment &gt; records an audit entry for every grant" time="0.005100654">
+        </testcase>
+        <testcase classname="src/adapters/iam.test.ts" name="mock adapter — create assignment &gt; rejects a duplicate grant with 409 conflict" time="0.003913513">
+        </testcase>
+        <testcase classname="src/adapters/iam.test.ts" name="mock adapter — create assignment &gt; denies an unknown user with 404" time="0.002049863">
+        </testcase>
+        <testcase classname="src/adapters/iam.test.ts" name="mock adapter — create assignment &gt; requires a scope id for a site or organization scope (400 field error)" time="0.002875943">
+        </testcase>
+        <testcase classname="src/adapters/iam.test.ts" name="mock adapter — create assignment &gt; denies a site-scoped administrator who tries to grant platform-admin" time="0.001984066">
+        </testcase>
+        <testcase classname="src/adapters/iam.test.ts" name="mock adapter — create assignment &gt; denies a site-scoped administrator acting outside their scope" time="0.001855721">
+        </testcase>
+        <testcase classname="src/adapters/iam.test.ts" name="mock adapter — revoke assignment &gt; removes the grant against the current ETag and records the audit entry" time="0.006420545">
+        </testcase>
+        <testcase classname="src/adapters/iam.test.ts" name="mock adapter — revoke assignment &gt; refuses a stale ETag with 412 instead of revoking blindly" time="0.003638045">
+        </testcase>
+        <testcase classname="src/adapters/iam.test.ts" name="mock adapter — revoke assignment &gt; denies a revocation outside the caller&apos;s managed scope" time="0.002233437">
+        </testcase>
+        <testcase classname="src/adapters/iam.test.ts" name="mock adapter — revoke assignment &gt; answers 404 for an assignment that does not exist" time="0.002059374">
+        </testcase>
+        <testcase classname="src/adapters/iam.test.ts" name="mock adapter — effective permissions and audit &gt; reports the backend-shaped summary for a known user" time="0.002660229">
+        </testcase>
+        <testcase classname="src/adapters/iam.test.ts" name="mock adapter — effective permissions and audit &gt; answers 404 for an unknown subject" time="0.010285614">
+        </testcase>
+        <testcase classname="src/adapters/iam.test.ts" name="mock adapter — effective permissions and audit &gt; serves the append-only audit trail newest first" time="0.003575136">
+        </testcase>
+        <testcase classname="src/adapters/iam.test.ts" name="live adapter &gt; converts a missing collection endpoint into an explicit 501 (no fabricated data)" time="0.170246125">
+        </testcase>
+        <testcase classname="src/adapters/iam.test.ts" name="live adapter &gt; keeps a real detail 404 as 404 (unknown user, once the API ships)" time="0.00309091">
+        </testcase>
+        <testcase classname="src/adapters/iam.test.ts" name="live adapter &gt; passes backend permission denials through verbatim (403)" time="0.003444558">
+        </testcase>
+        <testcase classname="src/adapters/iam.test.ts" name="live adapter &gt; sends the access token as a header only, and revokes conditionally" time="0.00568762">
+        </testcase>
+        <testcase classname="src/adapters/iam.test.ts" name="live adapter &gt; never places the token in the URL or the error message" time="0.003801748">
+        </testcase>
+        <testcase classname="src/adapters/iam.test.ts" name="createIamAdapter factory &gt; builds the live adapter in live mode, without fixture data" time="0.007536312">
+        </testcase>
+        <testcase classname="src/adapters/iam.test.ts" name="createIamAdapter factory &gt; builds the mock adapter in mock mode with the caller&apos;s roles" time="0.003464262">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/adapters/sites-domains.test.ts" timestamp="2026-11-11T16:09:11.221Z" hostname="ee3e3eb7f70f" tests="27" failures="0" errors="0" skipped="0" time="0.414429726">
+        <testcase classname="src/adapters/sites-domains.test.ts" name="createMockSitesAdapter — listDomainsAll &gt; joins every fixture domain with its site context" time="0.022822119">
+        </testcase>
+        <testcase classname="src/adapters/sites-domains.test.ts" name="createMockSitesAdapter — listDomainsAll &gt; searches across hostname, site code and site name" time="0.002033072">
+        </testcase>
+        <testcase classname="src/adapters/sites-domains.test.ts" name="createMockSitesAdapter — listDomainsAll &gt; filters by site, domain type and status" time="0.001734061">
+        </testcase>
+        <testcase classname="src/adapters/sites-domains.test.ts" name="createMockSitesAdapter — listDomainsAll &gt; 404s an unknown site filter, like a detail read" time="0.005225995">
+        </testcase>
+        <testcase classname="src/adapters/sites-domains.test.ts" name="createMockSitesAdapter — listDomainsAll &gt; orders the composed rows, descending and by site code" time="0.001223805">
+        </testcase>
+        <testcase classname="src/adapters/sites-domains.test.ts" name="createMockSitesAdapter — listDomainsAll &gt; produces the standard pagination envelope" time="0.000722974">
+        </testcase>
+        <testcase classname="src/adapters/sites-domains.test.ts" name="createLiveSitesAdapter — listDomainsAll &gt; composes the listing from the sites list and per-site domain endpoints" time="0.126260367">
+        </testcase>
+        <testcase classname="src/adapters/sites-domains.test.ts" name="createLiveSitesAdapter — listDomainsAll &gt; fetches only the filtered site when a site is given" time="0.003271073">
+        </testcase>
+        <testcase classname="src/adapters/sites-domains.test.ts" name="createLiveSitesAdapter — listDomainsAll &gt; overlaps Site reads with at most four in flight and retains complete results" time="0.171341024">
+        </testcase>
+        <testcase classname="src/adapters/sites-domains.test.ts" name="createLiveSitesAdapter — listDomainsAll &gt; propagates an unauthorized response instead of fabricating rows" time="0.007962241">
+        </testcase>
+        <testcase classname="src/adapters/sites-domains.test.ts" name="createLiveSitesAdapter — domain mutations &gt; POSTs a create to the per-site domain endpoint with the typed body" time="0.004428889">
+        </testcase>
+        <testcase classname="src/adapters/sites-domains.test.ts" name="createLiveSitesAdapter — domain mutations &gt; surfaces a duplicate hostname as the backend&apos;s structured 409" time="0.005486976">
+        </testcase>
+        <testcase classname="src/adapters/sites-domains.test.ts" name="createLiveSitesAdapter — domain mutations &gt; sends If-Match on status updates, activate and make-primary" time="0.007592293">
+        </testcase>
+        <testcase classname="src/adapters/sites-domains.test.ts" name="createLiveSitesAdapter — domain mutations &gt; POSTs deactivate with an empty body and If-Match" time="0.002598233">
+        </testcase>
+        <testcase classname="src/adapters/sites-domains.test.ts" name="createLiveSitesAdapter — domain mutations &gt; POSTs deactivate with the replacement id when supplied" time="0.004361102">
+        </testcase>
+        <testcase classname="src/adapters/sites-domains.test.ts" name="createLiveSitesAdapter — domain mutations &gt; propagates 412 on a stale precondition instead of double-applying" time="0.004387016">
+        </testcase>
+        <testcase classname="src/adapters/sites-domains.test.ts" name="createMockSitesAdapter — domain mutations &gt; includes the primary hostname summary in mock Site list and detail responses" time="0.003815028">
+        </testcase>
+        <testcase classname="src/adapters/sites-domains.test.ts" name="createMockSitesAdapter — domain mutations &gt; creates a domain, rejecting a duplicate hostname with 409" time="0.005388269">
+        </testcase>
+        <testcase classname="src/adapters/sites-domains.test.ts" name="createMockSitesAdapter — domain mutations &gt; 404s an unknown site, like any detail read" time="0.012452221">
+        </testcase>
+        <testcase classname="src/adapters/sites-domains.test.ts" name="createMockSitesAdapter — domain mutations &gt; enforces If-Match on update, then applies the status change" time="0.001983286">
+        </testcase>
+        <testcase classname="src/adapters/sites-domains.test.ts" name="createMockSitesAdapter — domain mutations &gt; keeps exactly one primary per site across make-primary calls" time="0.004377261">
+        </testcase>
+        <testcase classname="src/adapters/sites-domains.test.ts" name="createMockSitesAdapter — primary deactivation &gt; rejects deactivating the active primary without a replacement" time="0.002023861">
+        </testcase>
+        <testcase classname="src/adapters/sites-domains.test.ts" name="createMockSitesAdapter — primary deactivation &gt; rejects a replacement that is inactive or on another site" time="0.00154267">
+        </testcase>
+        <testcase classname="src/adapters/sites-domains.test.ts" name="createMockSitesAdapter — primary deactivation &gt; switches primary and deactivates in one change when a valid replacement is given" time="0.000738411">
+        </testcase>
+        <testcase classname="src/adapters/sites-domains.test.ts" name="createMockSitesAdapter — primary deactivation &gt; rejects a replacement for an alias deactivation" time="0.000541284">
+        </testcase>
+        <testcase classname="src/adapters/sites-domains.test.ts" name="createMockSitesAdapter — primary deactivation &gt; deactivates an alias with no payload" time="0.00066158">
+        </testcase>
+        <testcase classname="src/adapters/sites-domains.test.ts" name="createMockSitesAdapter — primary deactivation &gt; returns an already-inactive domain unchanged, without needing a replacement" time="0.000770758">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/adapters/sites-modules.test.ts" timestamp="2026-11-11T16:09:11.235Z" hostname="ee3e3eb7f70f" tests="15" failures="0" errors="0" skipped="0" time="0.153603822">
+        <testcase classname="src/adapters/sites-modules.test.ts" name="createMockSitesAdapter — module enablement &gt; reports globally disabled assignments as unavailable without changing their local switch" time="0.020998853">
+        </testcase>
+        <testcase classname="src/adapters/sites-modules.test.ts" name="createMockSitesAdapter — module enablement &gt; enables a usable module for a site and stores its settings" time="0.005868297">
+        </testcase>
+        <testcase classname="src/adapters/sites-modules.test.ts" name="createMockSitesAdapter — module enablement &gt; refuses a PLANNED module with the backend&apos;s usability message" time="0.005838881">
+        </testcase>
+        <testcase classname="src/adapters/sites-modules.test.ts" name="createMockSitesAdapter — module enablement &gt; refuses an implemented module that is switched off platform-wide" time="0.001797642">
+        </testcase>
+        <testcase classname="src/adapters/sites-modules.test.ts" name="createMockSitesAdapter — module enablement &gt; returns 409 for a duplicate site/module pair" time="0.000649911">
+        </testcase>
+        <testcase classname="src/adapters/sites-modules.test.ts" name="createMockSitesAdapter — module enablement &gt; 400s an unknown module id instead of guessing one" time="0.000729127">
+        </testcase>
+        <testcase classname="src/adapters/sites-modules.test.ts" name="createMockSitesAdapter — module enablement &gt; 404s an unknown site before any module check" time="0.000581344">
+        </testcase>
+        <testcase classname="src/adapters/sites-modules.test.ts" name="createMockSitesAdapter — module enablement &gt; validates settings against the module&apos;s approved schema" time="0.001346436">
+        </testcase>
+        <testcase classname="src/adapters/sites-modules.test.ts" name="createMockSitesAdapter — module enablement &gt; disable keeps the row and configuration; re-enable restores them" time="0.002413074">
+        </testcase>
+        <testcase classname="src/adapters/sites-modules.test.ts" name="createMockSitesAdapter — module enablement &gt; refuses to re-enable an assignment whose module is no longer usable" time="0.006747784">
+        </testcase>
+        <testcase classname="src/adapters/sites-modules.test.ts" name="createMockSitesAdapter — module enablement &gt; PATCH replaces settings wholesale without touching enablement" time="0.002533936">
+        </testcase>
+        <testcase classname="src/adapters/sites-modules.test.ts" name="createMockSitesAdapter — module enablement &gt; rejects a stale ETag on every conditional module write with 412" time="0.001116083">
+        </testcase>
+        <testcase classname="src/adapters/sites-modules.test.ts" name="createMockSitesAdapter — module enablement &gt; 404s an assignment id under another site or an unknown id" time="0.000649096">
+        </testcase>
+        <testcase classname="src/adapters/sites-modules.test.ts" name="createLiveSitesAdapter — module endpoints &gt; sends create, enable, disable and PATCH to the documented paths" time="0.088083942">
+        </testcase>
+        <testcase classname="src/adapters/sites-modules.test.ts" name="createLiveSitesAdapter — module endpoints &gt; reads an assignment&apos;s ETag and filters assignments by module id" time="0.003283474">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/errors.test.ts" timestamp="2026-11-11T16:09:11.243Z" hostname="ee3e3eb7f70f" tests="16" failures="0" errors="0" skipped="0" time="0.09875284">
+        <testcase classname="src/errors.test.ts" name="apiErrorFromResponse &gt; parses the backend&apos;s structured error envelope" time="0.079900295">
+        </testcase>
+        <testcase classname="src/errors.test.ts" name="apiErrorFromResponse &gt; extracts per-field validation errors for form rendering" time="0.002269194">
+        </testcase>
+        <testcase classname="src/errors.test.ts" name="apiErrorFromResponse &gt; returns null fieldErrors for non-validation failures" time="0.001610172">
+        </testcase>
+        <testcase classname="src/errors.test.ts" name="apiErrorFromResponse &gt; flags 401 responses as auth errors" time="0.001584816">
+        </testcase>
+        <testcase classname="src/errors.test.ts" name="apiErrorFromResponse &gt; falls back to the status code when the body is not the envelope" time="0.003034995">
+        </testcase>
+        <testcase classname="src/errors.test.ts" name="apiErrorFromResponse &gt; treats an unknown backend code as api_error but keeps the message" time="0.001107935">
+        </testcase>
+        <testcase classname="src/errors.test.ts" name="codeForStatus &gt; maps the documented backend statuses to codes" time="0.000492635">
+        </testcase>
+        <testcase classname="src/errors.test.ts" name="redactCredentials &gt; strips bearer tokens from a string" time="0.000528649">
+        </testcase>
+        <testcase classname="src/errors.test.ts" name="redactCredentials &gt; strips token query parameters" time="0.001183322">
+        </testcase>
+        <testcase classname="src/errors.test.ts" name="redactCredentials &gt; recurses into nested structures" time="0.000661978">
+        </testcase>
+        <testcase classname="src/errors.test.ts" name="redactCredentials &gt; leaves unrelated strings untouched" time="0.000393366">
+        </testcase>
+        <testcase classname="src/errors.test.ts" name="ApiError.fromUnknown &gt; passes an ApiError through unchanged" time="0.00039042">
+        </testcase>
+        <testcase classname="src/errors.test.ts" name="ApiError.fromUnknown &gt; wraps a plain Error without leaking its type" time="0.000363549">
+        </testcase>
+        <testcase classname="src/errors.test.ts" name="ApiError.fromUnknown &gt; wraps a non-Error rejection" time="0.000268147">
+        </testcase>
+        <testcase classname="src/errors.test.ts" name="ApiError credential safety &gt; redacts a bearer token that reaches the message" time="0.000258631">
+        </testcase>
+        <testcase classname="src/errors.test.ts" name="ApiError credential safety &gt; redacts a token that reaches the details" time="0.00046104">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/hostname.test.ts" timestamp="2026-11-11T16:09:11.252Z" hostname="ee3e3eb7f70f" tests="8" failures="0" errors="0" skipped="0" time="0.019253635">
+        <testcase classname="src/hostname.test.ts" name="normalizeHostname &gt; accepts and canonicalizes a plain hostname" time="0.004166022">
+        </testcase>
+        <testcase classname="src/hostname.test.ts" name="normalizeHostname &gt; strips a trailing dot and default ports" time="0.001028533">
+        </testcase>
+        <testcase classname="src/hostname.test.ts" name="normalizeHostname &gt; rejects a required-but-empty value" time="0.000305783">
+        </testcase>
+        <testcase classname="src/hostname.test.ts" name="normalizeHostname &gt; rejects protocol prefixes, paths, query strings and fragments" time="0.000884648">
+        </testcase>
+        <testcase classname="src/hostname.test.ts" name="normalizeHostname &gt; rejects non-default ports" time="0.000336685">
+        </testcase>
+        <testcase classname="src/hostname.test.ts" name="normalizeHostname &gt; rejects single labels, bad labels and over-long names" time="0.000636313">
+        </testcase>
+        <testcase classname="src/hostname.test.ts" name="normalizeHostname &gt; punycodes internationalized labels" time="0.005488399">
+        </testcase>
+        <testcase classname="src/hostname.test.ts" name="normalizeHostname &gt; reports non-string input as required instead of crashing" time="0.000439922">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/index.test.ts" timestamp="2026-11-11T16:09:11.256Z" hostname="ee3e3eb7f70f" tests="5" failures="0" errors="0" skipped="0" time="0.080330555">
+        <testcase classname="src/index.test.ts" name="createApiClient &gt; performs GET requests against the configured base URL" time="0.066382333">
+        </testcase>
+        <testcase classname="src/index.test.ts" name="createApiClient &gt; sends the access token as a Bearer header when configured" time="0.002017954">
+        </testcase>
+        <testcase classname="src/index.test.ts" name="createApiClient &gt; omits the Authorization header when no token is configured" time="0.001424783">
+        </testcase>
+        <testcase classname="src/index.test.ts" name="createApiClient &gt; serialises POST bodies as JSON" time="0.001757898">
+        </testcase>
+        <testcase classname="src/index.test.ts" name="createApiClient &gt; throws ApiError with the HTTP status on failures" time="0.005579764">
+        </testcase>
+    </testsuite>
+</testsuites>

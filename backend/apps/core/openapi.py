@@ -45,7 +45,8 @@ def add_common_contract(result, generator, request, public):
         "412": "If-Match does not match the current strong ETag. Retrieve and reconcile changes.",
         "428": "If-Match header is required for this mutation.",
         "415": "Unsupported request content type.",
-        "503": "Audit persistence failed; the entire mutation was rolled back. No SQL details are exposed.",
+        "413": "Upload exceeds configured byte limits.",
+        "503": "Required storage or audit infrastructure is unavailable. Failed mutations are rolled back; no provider or SQL details are exposed.",
     }
     for path, item in result.get("paths", {}).items():
         for method, operation in item.items():
@@ -99,7 +100,14 @@ def add_common_contract(result, generator, request, public):
                     codes.update({"400", "404"})
                 if path.endswith("/bulk-apply/"):
                     codes.update({"409", "503"})
-            if path.startswith(("/api/v1/organizations/", "/api/v1/sites/", "/api/v1/site-templates/", "/api/v1/modules/")):
+            if path.startswith("/api/v1/site-context/media/") or ("/assets/" in path and path.endswith("/image/")):
+                codes.add("503")
+            media_api = path.startswith("/api/v1/sites/") and any(segment in path for segment in ("/assets/", "/asset-references/"))
+            if media_api and path.endswith("/assets/upload/"):
+                codes.update({"413", "503"})
+            if media_api and method in {"post", "patch", "delete"}:
+                codes.update({"400", "409", "503"})
+            if not media_api and path.startswith(("/api/v1/organizations/", "/api/v1/sites/", "/api/v1/site-templates/", "/api/v1/modules/")):
                 hierarchy = path.startswith("/api/v1/organizations/") and path.rstrip("/").split("/")[-1] in {"tree", "children", "ancestors", "descendants", "subtree"}
                 if method == "get" and "{" not in path and not hierarchy:
                     codes.update({"400", "404"})

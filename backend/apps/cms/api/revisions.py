@@ -48,7 +48,7 @@ class ContentRevisionListSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContentRevision
         fields = (
-            "revision_number", "editor", "status", "changed_fields",
+            "id", "revision_number", "editor", "status", "changed_fields",
             "content_hash", "restored_from_revision", "created_at",
         )
         read_only_fields = fields

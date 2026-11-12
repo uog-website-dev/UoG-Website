@@ -27,6 +27,7 @@ export type ApiErrorCode =
   | "precondition_required"
   | "unsupported_media_type"
   | "throttled"
+  | "upload_too_large"
   | "service_unavailable"
   | "not_implemented"
   | "api_error"
@@ -220,6 +221,7 @@ function isKnownCode(code: unknown): code is ApiErrorCode {
       "precondition_required",
       "unsupported_media_type",
       "throttled",
+      "upload_too_large",
       "service_unavailable",
       "api_error",
     ].includes(code)
@@ -243,6 +245,8 @@ export function codeForStatus(status: number): ApiErrorCode {
       return "not_acceptable";
     case 409:
       return "conflict";
+    case 413:
+      return "upload_too_large";
     case 412:
       return "precondition_failed";
     case 415:

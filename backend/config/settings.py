@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     # Site-scoped content primitives shared by Pages/Posts (P2-CMS-001).
     # Registry codes only; no content endpoints ship with this boundary.
     "apps.cms",
+    "apps.media",
 ]
 
 # Backstop for the test runner: when pytest imports a test module that itself
@@ -247,6 +248,9 @@ SPECTACULAR_SETTINGS = {
     "COMPONENT_SPLIT_REQUEST": True,
     "ENUM_NAME_OVERRIDES": {
         "ContentStatusEnum": "apps.cms.models.ContentStatus",
+        "MediaAssetStatusEnum": "apps.media.models.MediaAsset.Status",
+        "MediaUsageScopeEnum": ["DRAFT", "PUBLIC", "MANUAL"],
+        "AssignmentScopeEnum": "apps.authorization.models.UserRoleAssignment.Scope",
         "PublishedContentStatusEnum": ["PUBLISHED"],
         "OrganizationStatusEnum": "apps.organizations.models.OrganizationUnit.Status",
         "SiteStatusEnum": "apps.sites.models.Site.Status",
@@ -371,6 +375,13 @@ CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_ACKS_LATE = True
 CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 CELERY_TASK_DEFAULT_RETRY_DELAY = 10
+
+# Upload policy is independent of the legacy catalog's object inspection cap.
+MEDIA_UPLOAD_MAX_BYTES = config("MEDIA_UPLOAD_MAX_BYTES", default=20 * 1024 * 1024, cast=int)
+MEDIA_PDF_MAX_BYTES = config("MEDIA_PDF_MAX_BYTES", default=20 * 1024 * 1024, cast=int)
+MEDIA_TEXT_MAX_BYTES = config("MEDIA_TEXT_MAX_BYTES", default=5 * 1024 * 1024, cast=int)
+MEDIA_IMAGE_MAX_PIXELS = config("MEDIA_IMAGE_MAX_PIXELS", default=40_000_000, cast=int)
+MEDIA_UPLOAD_LEASE_SECONDS = config("MEDIA_UPLOAD_LEASE_SECONDS", default=900, cast=int)
 # Task failures and retries are logged centrally (apps.core.apps handlers).
 
 # ---------------------------------------------------------------------------
@@ -475,6 +486,9 @@ SPECTACULAR_SETTINGS = {
     "ENUM_NAME_OVERRIDES": {
         "ContentStatusEnum": "apps.cms.models.ContentStatus",
         "PublishedContentStatusEnum": ["PUBLISHED"],
+        "MediaAssetStatusEnum": "apps.media.models.MediaAsset.Status",
+        "MediaUsageScopeEnum": ["DRAFT", "PUBLIC", "MANUAL"],
+        "AssignmentScopeEnum": "apps.authorization.models.UserRoleAssignment.Scope",
         "OrganizationStatusEnum": "apps.organizations.models.OrganizationUnit.Status",
         "SiteStatusEnum": "apps.sites.models.Site.Status",
         "ActiveInactiveStatusEnum": "apps.sites.models.SiteDomain.Status",
@@ -517,3 +531,12 @@ if False:
     # to serve the same backend schema under a public Site path, both views and
     # their URL entries must be removed from config/urls.py as well.
     pass
+
+# Versioned image derivative policy; originals remain private.
+MEDIA_PROCESSING_MAX_ATTEMPTS = config("MEDIA_PROCESSING_MAX_ATTEMPTS", default=3, cast=int)
+MEDIA_PROCESSING_RETRY_SECONDS = config("MEDIA_PROCESSING_RETRY_SECONDS", default=10, cast=int)
+MEDIA_PROCESSING_LEASE_SECONDS = config("MEDIA_PROCESSING_LEASE_SECONDS", default=90, cast=int)
+MEDIA_DERIVATIVE_MAX_BYTES = config("MEDIA_DERIVATIVE_MAX_BYTES", default=8 * 1024 * 1024, cast=int)
+
+# Recover worker connections when Redis is still starting after a host restart.
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True

@@ -21,17 +21,28 @@ export type SitePageStatus =
   | "UNPUBLISHED"
   | "ARCHIVED";
 
+export interface SitePageMediaItem {
+  id: string;
+  asset_id: string;
+  alt: string;
+  caption?: string;
+}
+
 export interface SitePageBlock {
   type: string;
+  id?: string;
   text?: string;
   html?: string;
   level?: number;
   label?: string;
   href?: string;
   alt?: string;
+  ref?: string;
   items?: string[];
   style?: string;
   heading?: string;
+  slides?: SitePageMediaItem[];
+  images?: SitePageMediaItem[];
   children?: SitePageBlock[];
 }
 export interface SitePageRecord {

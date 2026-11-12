@@ -22,7 +22,8 @@ Run `python manage.py seed_rbac` after migrations and on every backend startup. 
 | `sites.view`, `sites.create`, `sites.update` | site / view, create, update | Includes scoped domains, per-site modules and lifecycle operations. |
 | `content.pages.view`, `.create`, `.update`, `.delete`, `.publish` | page / view, create, update, delete, publish | Page creates default unpublished; publishing is a separate permission. Site ownership is optional for legacy platform-wide pages. |
 | `content.pages.submit_review`, `content.pages.approve` | page workflow / submit, approve | Registered but not executable: no review state machine exists yet. |
-| `content.posts.*`, `content.menus.*`, `content.media.*` | post, menu, media operations | Registered for reviewed future capabilities, currently non-executable because those models/routes are absent. |
+| `content.posts.*`, `content.menus.*` | post, menu operations | Posts and menus are executable through Site CMS APIs; some catalog codes remain legacy aliases (see menu permission notes in the catalog). |
+| `content.media.view`, `.upload`, `.delete` | Site-owned media catalog / view, manage, archive | Executable under `/api/v1/sites/{site_pk}/assets/` and `asset-references/` when the MEDIA module is platform-available and Site-enabled. Upload covers catalog registration and placement management; delete means archive. |
 | `audit.logs.view`, `audit.logs.export` | authorization audit / view, export | Audit listing is implemented; a separate export operation is not. |
 
 `content.pages.publish` currently toggles the existing `is_published` field. There is no page revision, submit/review/approval state machine or requirement that a page be reviewed before publishing. Those workflow actions therefore remain unavailable rather than being represented by a misleading role grant.
@@ -41,7 +42,8 @@ Run `python manage.py seed_rbac` after migrations and on every backend startup. 
 | Site view/create/update | ✓ / ✓ / ✓ | ✓ / ✓ / ✓ | ✓ / — / ✓ | — | — | — | view |
 | Page view/create/update | ✓ | ✓ | ✓ | ✓ | view | view | view |
 | Page delete/publish | ✓ / ✓ | ✓ / ✓ | ✓ / ✓ | — / — | — / — | — / ✓ | — / — |
-| Review, posts, menus, media | — | — | — | — | — | — | — |
+| Media view/upload/delete | ✓ / ✓ / ✓ | — | ✓ / ✓ / ✓ | ✓ / ✓ / — | — | — | — |
+| Review, posts, menus | — | — | — | — | — | — | — |
 | Audit view/export | ✓ / ✓ | — / — | — / — | — / — | — / — | — / — | — / — |
 
 Organization Administrator assignments are organization scoped and Site Administrator assignments site scoped. Other standard roles accept the supported explicit scope. Standard templates cannot be edited via the API; create a custom role to vary a template. Custom roles can be created/renamed/disabled and assigned registered capabilities, subject to non-escalating delegation rules. Platform-wide administration grants are not delegable.
@@ -65,12 +67,14 @@ Organization Administrator assignments are organization scoped and Site Administ
 | `/api/v1/site-templates/`, `/api/v1/modules/` | `platform.sites.manage_registry` | Platform-only registry actions; legacy development write gate remains on writes. |
 | `GET /api/pages/`, detail, `/home/` | public published content | Unpublished pages are excluded; no read query scope currently exists in the legacy endpoint. |
 | Page create/update/delete | `content.pages.create`, `.update`, `.delete` | Unscoped for legacy pages, otherwise resolved Site scope. Publishing is checked separately when `is_published` is supplied. |
+| `/api/v1/sites/{site_pk}/assets/`, `assets/{id}/` | `content.media.view`, `.upload`, `.delete` | Site scope; MEDIA module must be available. Registration catalogs an already stored object; archive uses `.delete`. |
+| `/api/v1/sites/{site_pk}/asset-references/` | `content.media.upload` + `content.pages.update` | Attach/detach Page revision placements; list/view also requires `content.media.view`. |
 | `/api/v1/site-context/` | public routing context | Reports the Site chosen by Host; is not an authorization decision. |
 
 `GET /api/schema/`, `/api/docs/`, and `/api/redoc/` follow the existing documentation policy and are not management data endpoints. Every protected capability check and every role/assignment configuration mutation is recorded in the append-only authorization audit model. API authorization responses are private/no-store.
 
 ## Module prerequisites and limitations
 
-The existing Site API still has a development-only write gate in addition to RBAC. Therefore valid scoped permissions do not yet enable production Site or Organization mutations: removing that operational freeze requires a separately approved deployment/readiness change. The backend has no Post, Menu, Media, Review workflow, content revision, or audit export endpoint; those catalog entries do not create phantom access. Public Site resolution continues to use the request Host, but the current Pages model has only optional Site ownership and page URLs are not Site-namespaced.
+The existing Site API still has a development-only write gate in addition to RBAC. Therefore valid scoped permissions do not yet enable production Site or Organization mutations: removing that operational freeze requires a separately approved deployment/readiness change. Site-owned media APIs are executable when MEDIA is enabled; review-workflow and audit-export catalog entries remain non-executable. Public Site resolution continues to use the request Host. See [media-assets.md](media-assets.md) for asset identity and placement rules.
 
 Authorization administration APIs are documented in generated OpenAPI. No Azure DevOps Issue/PR links or test evidence attachments are created by this repository change; attach them in the project backlog/PR workflow after review.

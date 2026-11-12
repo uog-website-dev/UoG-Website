@@ -48,7 +48,7 @@ def _registry():
         "name": "Events", "description": "Planned.", "status": Module.Status.PLANNED,
         "is_enabled": False, "configuration_schema": empty_module_schema(),
     })
-    Module.objects.exclude(code__in=["PAGES", "POSTS", "MENUS"]).update(status=Module.Status.PLANNED, is_enabled=False)
+    Module.objects.exclude(code__in=["PAGES", "POSTS", "MENUS", "MEDIA"]).update(status=Module.Status.PLANNED, is_enabled=False)
     Module.objects.filter(code="POSTS").update(is_enabled=False)
     Module.objects.filter(code__in=["PAGES", "MENUS"]).update(status=Module.Status.IMPLEMENTED, is_enabled=True)
 

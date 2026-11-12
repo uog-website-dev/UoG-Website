@@ -71,11 +71,11 @@ every block at most **12288** bytes serialized, the whole list at most
   backslashes, no `..` traversal, no empty or doubled path segments,
   at most 512 characters. A reference into *another* Site's scope is
   rejected, so content cannot address another Site's namespace. The
-  current CMS boundary has no media registry or upload API; it authorizes
-  the namespace (shared or owning Site) but cannot prove that the referenced
-  object exists. The planned MEDIA capability must provide object-level
-  authorization and existence checks before any content-serving endpoint
-  resolves these references.
+  current CMS block validator authorizes the namespace (shared or owning Site)
+  but does not prove that the referenced object exists. Site-owned
+  `MediaAsset` catalog registration and Page revision placement references
+  live under `apps.media` (see [media-assets.md](media-assets.md)); content
+  blocks may still carry legacy image strings until builders rewrite them.
 - `alt`: required honest alternative text, 1–255 characters, plain text.
 - `caption`: optional, 1–400 characters, plain text.
 
@@ -110,9 +110,30 @@ every block at most **12288** bytes serialized, the whole list at most
 ```
 
 - `heading`: optional, 1–400 characters, plain text.
-- `children`: 1–100 **non-container** blocks of the types above (sections
-  cannot nest sections), so nesting depth is structurally bounded to two
-  levels without a depth search.
+- `children`: 1?100 supported blocks, including nested sections. Maximum
+  section depth is five; total block and serialized-byte limits still apply.
+
+### `"slider"` and `"gallery"`
+
+```json
+{"type":"slider","id":"hero","slides":[{"id":"slide-1","asset_id":"00000000-0000-4000-8000-000000000001","alt":"Campus"}]}
+{"type":"gallery","id":"photos","images":[{"id":"photo-1","asset_id":"00000000-0000-4000-8000-000000000001","alt":"Campus"}]}
+```
+
+These additive version-1 types require stable node IDs and stable item IDs.
+`slides`/`images` accept 0?50 entries; every entry names a ready Site-owned image
+UUID, required alt text (1?255 characters) and optional caption (1?400).
+All blocks may carry an `id` (1?128 letters, digits, `.`, `_`, `:`, `-`,
+starting with a letter or digit). Explicit node IDs are unique across the entire
+document; item IDs are unique inside each repeater. Preserve IDs when reordering
+or editing. New Image picker insertions also receive stable IDs. Legacy blocks
+without IDs remain readable and receive deterministic revision-local path IDs
+in the usage inventory. The structured JSON editor exposes these contracts;
+Slider controls and Gallery figures use the same scoped public image endpoint.
+
+Current Page draft/publication sets are maintained transactionally by revision
+triggers. See [delivery and removal](media-removal.md) for reference granularity,
+publication retention and deletion serialization.
 
 ## Validation errors are field-level
 
@@ -144,7 +165,7 @@ writer (ORM, raw SQL, future import tools):
 
 - a `blocks` value that is not a JSON array (`content_blocks_array`),
 - any element that is not an object, lacks `type`, or whose `type` is not
-  one of the six registered strings (`content_blocks_element_type`),
+  one of the eight registered strings (`content_blocks_element_type`),
 - any element above 12288 serialized bytes (`content_blocks_item_size`),
 - more than 100 top-level blocks (`content_blocks_count`),
 - a list above 262144 serialized bytes (`content_blocks_total_size`).

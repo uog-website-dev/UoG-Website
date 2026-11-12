@@ -93,6 +93,14 @@ List filters: `hostname`, `status`, `is_primary`, `ordering`
 
 ## Templates and modules
 
+Platform administrators with `platform.sites.manage_registry` may PATCH
+`/api/v1/modules/{id}/` with only `{"is_enabled": true}` or
+`{"is_enabled": false}` in production. This requires the current strong
+`If-Match` ETag and retains shipped-module validation and transactional auditing.
+Other registry fields remain subject to the development write gate. The Admin
+Module management registry exposes this operation as a confirmed availability
+switch; Site assignments and stored content are preserved.
+
 Template and module lists accept `search`, `code`, `status`, `ordering`, and
 `page`. Modules also accept `is_enabled`. New templates default to
 `INACTIVE`. Codes are immutable after create. Editing a template does not

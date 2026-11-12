@@ -11,9 +11,11 @@ from apps.cms.api.public import (
 )
 
 from .context import SiteContextView
+from apps.media.delivery import PublicMediaImage
 
 app_name = "site_context"
 urlpatterns = [
+    path("media/<uuid:asset_id>/", PublicMediaImage.as_view(), name="public-media-image"),
     path("", SiteContextView.as_view(), name="site-context"),
     path("menus/", PublicMenusView.as_view(), name="public-menus"),
     path("pages/", PublicPageListView.as_view(), name="public-page-list"),

@@ -1,0 +1,68 @@
+{
+  "date": "2026-11-11",
+  "suites": {
+    "admin.xml": {
+      "tests": 397,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "api-client.xml": {
+      "tests": 160,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "backend-focused.xml": {
+      "tests": 38,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "backend-full.xml": {
+      "tests": 713,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 3
+    },
+    "library-picker-proxy.xml": {
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "minio-integration.xml": {
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "portal-ui.xml": {
+      "tests": 89,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "checks": {
+    "openapi_validation": "passed",
+    "django_check": "passed",
+    "migration_drift": "none",
+    "typechecks": "all workspace packages passed",
+    "nginx_configuration": "passed",
+    "compose_configuration": "passed",
+    "media_migrations": [
+      "0004",
+      "0005"
+    ],
+    "celery_registered": [
+      "media.process_asset",
+      "media.reconcile_uploads"
+    ]
+  },
+  "scope_notes": [
+    "Full suites preceded final targeted hardening; final focused results are authoritative for those changes.",
+    "Worker integration invokes the production task entry point against PostgreSQL and the private object adapter; it does not claim a distributed-broker end-to-end test.",
+    "Advanced Slider/Gallery widgets and public renditions are absent; shared placement lifecycle, Page picker and current portal regressions are covered."
+  ]
+}

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="2" failures="0" errors="0" time="0.808714341">
+    <testsuite name="src/sites/media-audit-repro.test.tsx" timestamp="2026-11-12T02:03:44.472Z" hostname="086c5ea3ae9d" tests="2" failures="0" errors="0" skipped="0" time="0.808714341">
+        <testcase classname="src/sites/media-audit-repro.test.tsx" name="audit: a pending confirmation still applies after Escape" time="0.803495178">
+        </testcase>
+        <testcase classname="src/sites/media-audit-repro.test.tsx" name="audit: editing an Image through the typed editor strips its caption" time="0.001894101">
+        </testcase>
+    </testsuite>
+</testsuites>

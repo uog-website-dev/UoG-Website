@@ -1,6 +1,7 @@
 """Open one working draft for a published Page without taking it offline."""
 from uuid import uuid4
 
+from apps.organizations.hierarchy_lock import hierarchy_write
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, router, transaction
 
@@ -14,7 +15,7 @@ def open_working_draft(page, *, actor, using=None):
     non-archived draft. The caller has already checked the Page ETag.
     """
     using = using or router.db_for_write(Page)
-    with transaction.atomic(using=using):
+    with hierarchy_write(using=using):
         live = (
             Page.objects.using(using)
             .select_for_update()

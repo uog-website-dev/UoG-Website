@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const { api, createApiClient } = vi.hoisted(() => {
-  const api = { get: vi.fn(), post: vi.fn() };
+  const api = { get: vi.fn(), post: vi.fn(), getDetailed: vi.fn(), patchDetailed: vi.fn() };
   return { api, createApiClient: vi.fn(() => api) };
 });
 
@@ -11,13 +11,28 @@ vi.mock("@uog/api-client", async (importOriginal) => ({
 }));
 vi.mock("@/access-token", () => ({ getAccessToken: vi.fn(async () => "server-token") }));
 
-import { applyModuleOperation, listModuleOperations, listSiteModuleActivation, previewModuleOperation } from "./actions";
+import { applyModuleOperation, listModuleOperations, listSiteModuleActivation, previewModuleOperation, setPlatformModuleAvailability } from "./actions";
 
 beforeEach(() => {
   vi.clearAllMocks();
 });
 
 describe("module management actions", () => {
+  it("changes only platform availability with the current ETag", async () => {
+    api.getDetailed.mockResolvedValue({ data: { updated_at: "v1" }, etag: '"etag1"' });
+    api.patchDetailed.mockResolvedValue({ data: { is_enabled: true } });
+    expect(await setPlatformModuleAvailability(4, true, "v1")).toEqual({ ok: true, data: { is_enabled: true } });
+    expect(api.patchDetailed).toHaveBeenCalledWith("/v1/modules/4/", { is_enabled: true }, { ifMatch: '"etag1"' });
+  });
+
+  it("rejects a changed registry row or missing ETag without writing", async () => {
+    api.getDetailed.mockResolvedValue({ data: { updated_at: "v2" }, etag: '"etag2"' });
+    expect(await setPlatformModuleAvailability(4, true, "v1")).toMatchObject({ ok: false });
+    api.getDetailed.mockResolvedValue({ data: { updated_at: "v1" }, etag: null });
+    expect(await setPlatformModuleAvailability(4, true, "v1")).toMatchObject({ ok: false });
+    expect(api.patchDetailed).not.toHaveBeenCalled();
+  });
+
   it("lists Site activation with only the supplied filters", async () => {
     api.get.mockResolvedValue({ count: 0, next: null, previous: null, results: [] });
     await listSiteModuleActivation({ organization: 6, include_descendants: false, module: "POSTS", activation: "ENABLED", page: 2 });

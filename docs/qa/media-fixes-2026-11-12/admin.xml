@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="33" failures="0" errors="0" time="18.126919931">
+    <testsuite name="src/sites/media-library.test.tsx" timestamp="2026-11-12T02:26:13.118Z" hostname="086c5ea3ae9d" tests="21" failures="0" errors="0" skipped="0" time="9.753632906">
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; excludes processing images then picks the worker-completed identity on refresh" time="0.725144276">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; shows processing state in the library and preserves the retry key after transfer failure" time="0.584452716">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; keeps the selected file after a failed upload and never invents a ready row" time="0.436561071">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; never offers upload to a read-only account" time="0.144726355">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; applies filename search before paging and resets to the first page" time="0.665905766">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; loads scoped details and saves only persisted alt text" time="1.092469904">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; shows readonly metadata without a save control" time="0.398358361">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; sends the selected status and type filters to the server" time="0.736581423">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; shows scoped thumbnails and disables a broken preview until retry" time="0.218638771">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; reports terminal image processing without offering selection" time="0.152352949">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; blocks deletion for a live reference and confirms unused removal" time="0.712593687">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; keeps the library card and metadata after a delete conflict" time="0.763591632">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; preserves edited alt text after a recoverable save failure" time="0.500228628">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; keeps a Gallery-referenced asset, saves alt text, and reloads persisted details" time="0.797820988">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; keeps deletion disabled if the reference inventory cannot be verified" time="0.252595477">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Site-isolated media browsing &gt; ignores a delayed Informatics search after switching to Medicine and resets all query state" time="0.229883227">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Site-isolated media browsing &gt; uses responsive grid columns and keeps list layout usable" time="0.164948702">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Site-isolated media browsing &gt; offers recovery for empty search and transport failure" time="0.408492984">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Site-isolated media browsing &gt; supports keyboard pagination and grid/list controls" time="0.282766083">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Quiet processing updates and previews &gt; refreshes a processing image without a loading flash and updates its open details preview" time="0.3470371">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Quiet processing updates and previews &gt; does not continuously poll a completed catalog" time="0.134184726">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/media-picker-save.test.tsx" timestamp="2026-11-12T02:26:13.146Z" hostname="086c5ea3ae9d" tests="1" failures="0" errors="0" skipped="0" time="3.414563475">
+        <testcase classname="src/sites/media-picker-save.test.tsx" name="CMS media picker save integration &gt; keeps the draft image selection when save finds the asset ineligible" time="3.410922796">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/media-picker.test.tsx" timestamp="2026-11-12T02:26:13.148Z" hostname="086c5ea3ae9d" tests="11" failures="0" errors="0" skipped="0" time="4.95872355">
+        <testcase classname="src/sites/media-picker.test.tsx" name="MediaPickerDialog &gt; filters, selects a ready Site asset and returns a stable asset ID payload" time="1.117357811">
+        </testcase>
+        <testcase classname="src/sites/media-picker.test.tsx" name="MediaPickerDialog &gt; Escape cancels without change and returns focus to the invoking control" time="0.202557853">
+        </testcase>
+        <testcase classname="src/sites/media-picker.test.tsx" name="MediaPickerDialog &gt; keeps the draft selection when confirm finds the asset ineligible" time="0.41392239">
+        </testcase>
+        <testcase classname="src/sites/media-picker.test.tsx" name="SiteImageField and repeater builder &gt; changes only the targeted Slider slide and restores focus after picking" time="1.087201469">
+        </testcase>
+        <testcase classname="src/sites/media-picker.test.tsx" name="SiteImageField and repeater builder &gt; keeps separate slide references after reorder and reopen" time="0.799758451">
+        </testcase>
+        <testcase classname="src/sites/media-picker.test.tsx" name="SiteImageField and repeater builder &gt; shows an eligibility error on the field while preserving the draft selection" time="0.07606443">
+        </testcase>
+        <testcase classname="src/sites/media-picker.test.tsx" name="Media picker audit regressions &gt; ignores pending confirmation after cancel" time="0.239740232">
+        </testcase>
+        <testcase classname="src/sites/media-picker.test.tsx" name="Media picker audit regressions &gt; ignores pending confirmation after site" time="0.34696758">
+        </testcase>
+        <testcase classname="src/sites/media-picker.test.tsx" name="Media picker audit regressions &gt; ignores pending confirmation after unmount" time="0.201533728">
+        </testcase>
+        <testcase classname="src/sites/media-picker.test.tsx" name="Media picker audit regressions &gt; reports a rejected confirmation request and allows retry" time="0.425172697">
+        </testcase>
+        <testcase classname="src/sites/media-picker.test.tsx" name="Media picker audit regressions &gt; retains the caption when editing an existing Image" time="0.044660137">
+        </testcase>
+    </testsuite>
+</testsuites>

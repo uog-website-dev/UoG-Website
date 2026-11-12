@@ -44,3 +44,20 @@ a Site. Approved schema documents do not by themselves make a module usable.
 
 Provisioning a Site does not enable modules. The registry is administered at
 `/api/v1/modules/`. See the [Site API contract](../api/sites.md).
+
+## Platform availability control
+
+In Module management → Registry, the Platform availability switch reads the
+stored `is_enabled` value, including modules disabled by default such as MEDIA.
+Only shipped, IMPLEMENTED modules can be switched on. Each change requires
+confirmation and `platform.sites.manage_registry`; changing `is_enabled` alone
+is permitted in production. Other registry edits retain the development gate.
+The server action verifies the displayed row version, then PATCHes with its
+strong ETag. A concurrent change returns 412 without overwriting it. Successful
+changes use the existing transaction and audit triggers and refresh the registry
+and Site activation summaries.
+
+Turning a module off makes it unavailable across Sites while preserving Site
+assignments, configuration and content. Turning it back on restores effective
+availability for existing enabled assignments; it creates no new assignments.
+Database defaults are unchanged by this control.

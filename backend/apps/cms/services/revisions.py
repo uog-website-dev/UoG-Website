@@ -3,6 +3,7 @@ import hashlib
 import json
 from contextlib import contextmanager
 
+from apps.organizations.hierarchy_lock import hierarchy_write
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import connections, router, transaction
 
@@ -102,7 +103,7 @@ def content_revision_delete(*, using):
 
 @contextmanager
 def _database_flag(using, setting):
-    with transaction.atomic(using=using):
+    with hierarchy_write(using=using):
         with connections[using].cursor() as cursor:
             cursor.execute("SELECT current_setting(%s, true)", [setting])
             previous = cursor.fetchone()[0] or ""
@@ -142,11 +143,16 @@ def create_content_revision(
                 if restored_from is not None else None
             ),
         )
-    _prune_revisions(content.pk, using=using)
+    _prune_revisions(
+        content.pk,
+        using=using,
+        actor=content.updated_by or content.created_by,
+        site_id=content.site_id,
+    )
     return revision
 
 
-def _prune_revisions(content_id, *, using):
+def _prune_revisions(content_id, *, using, actor=None, site_id=None):
     restored_revisions = (
         ContentRevision.objects.using(using)
         .filter(content_id=content_id)
@@ -164,6 +170,23 @@ def _prune_revisions(content_id, *, using):
     obsolete_ids = list(candidates)
     if not obsolete_ids:
         return
+    # Media placement indexes must leave through the guarded detach path
+    # before revision rows are removed; CASCADE would bypass media.asset_write.
+    from apps.media.services import detach_references_for_revisions
+
+    if site_id is None:
+        site_id = (
+            ContentRevision.objects.using(using)
+            .filter(pk=obsolete_ids[0])
+            .values_list("site_id", flat=True)
+            .get()
+        )
+    detach_references_for_revisions(
+        site_id=site_id,
+        revision_ids=obsolete_ids,
+        actor=actor,
+        using=using,
+    )
     with _database_flag(using, "cms.revision_retention"):
         ContentRevision.objects.using(using).filter(
             pk__in=obsolete_ids,
@@ -186,7 +209,7 @@ def restore_content_revision(
     if not getattr(actor, "is_authenticated", False):
         raise PermissionDenied("An authenticated user is required.")
     using = using or router.db_for_write(SiteContent)
-    with transaction.atomic(using=using):
+    with hierarchy_write(using=using):
         content = (
             SiteContent.objects.using(using)
             .select_for_update()

@@ -6,9 +6,11 @@ from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema
 from rest_framework import mixins
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from apps.authorization.access import authorized_site_ids, authorized_organization_ids
+from apps.authorization.permissions import ManagementPermission
 from apps.organizations.hierarchy_lock import hierarchy_write
 
 from ..models import Module, Site, SiteDomain, SiteModule, SiteTemplate
@@ -334,11 +336,23 @@ class SiteTemplateViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Admi
     list=extend_schema(parameters=[*LIST_PARAMETERS, OpenApiParameter("status", str, enum=Module.Status.values), OpenApiParameter("is_enabled", bool)], description="Platform-admin only. Planned modules are listed and are not usable."),
     retrieve=extend_schema(description="Platform-admin only."),
     create=extend_schema(description="Development admin only. Registers a capability. It does not implement one."),
-    partial_update=extend_schema(parameters=[IF_MATCH], description="Development admin only. The row lock, If-Match check, validation and save commit in one transaction. A planned or unshipped module cannot be marked implemented or globally enabled. A rejected change leaves the previous row intact."),
+    partial_update=extend_schema(parameters=[IF_MATCH], description="Platform admins may change is_enabled alone in production. Other registry edits require the development write gate. The row lock, If-Match check, validation and save commit in one transaction. Planned or unshipped modules cannot be globally enabled."),
 )
 class ModuleViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, AdministrationViewSet):
     queryset = Module.objects.order_by("code")
     serializer_class = ModuleSerializer
+
+    def get_permissions(self):
+        # The operational switch is available in production; catalogue/schema
+        # edits keep their existing development-only restriction.
+        if (
+            self.action == "partial_update"
+            and isinstance(self.request.data, dict)
+            and set(self.request.data) == {"is_enabled"}
+        ):
+            return [IsAuthenticated(), ManagementPermission()]
+        return super().get_permissions()
+
     permission_by_action = {
         "list": "platform.sites.manage_registry", "retrieve": "platform.sites.manage_registry",
         "create": "platform.sites.manage_registry", "partial_update": "platform.sites.manage_registry",
