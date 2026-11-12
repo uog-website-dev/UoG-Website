@@ -381,13 +381,17 @@ def test_site_admins_and_anonymous_callers_cannot_use_central_management(world, 
     assert AuditEvent.objects.filter(action="SITE_MODULE_BULK_REJECTED", after__reason="permission_denied").exists()
 
 
-def test_write_gate_keeps_apply_closed_while_preview_stays_readable(world, settings):
+def test_central_apply_uses_platform_permission_in_production(world, settings):
     _enable_posts_globally()
+    settings.DEBUG = False
     settings.ORGANIZATIONS_DEV_WRITES_ENABLED = False
     body = _preview(world.admin, "ENABLE", ["POSTS"], _selected(world.sites.informatics))
     assert body["summary"]["expected_changes"] == 1
-    _apply(world.admin, body["preview_token"], status=403)
-    assert _state(world.sites.informatics, "POSTS") is None
+    _apply(world.admin, body["preview_token"])
+    assert _state(world.sites.informatics, "POSTS") is True
+    _preview(world.site_admin, "DISABLE", ["POSTS"], _selected(world.sites.informatics), status=403)
+    _apply(world.site_admin, body["preview_token"], status=403)
+    assert _state(world.sites.informatics, "POSTS") is True
 
 
 # End to end ---------------------------------------------------------------------------------

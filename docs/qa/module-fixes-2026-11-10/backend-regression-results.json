@@ -1,0 +1,34 @@
+﻿{
+  "tests": 689,
+  "failures": [
+    {
+      "file": "apps.sites.tests.test_module_registry",
+      "test": "test_seeded_capabilities_are_not_advertised_as_usable"
+    },
+    {
+      "file": "apps.sites.tests.test_module_registry",
+      "test": "test_only_a_shipped_enabled_module_can_be_newly_enabled"
+    },
+    {
+      "file": "apps.cms.tests.test_menus",
+      "test": "test_menu_migration_ships_the_module_without_enabling_it"
+    },
+    {
+      "file": "apps.cms.tests.test_module",
+      "test": "test_content_modules_are_shipped_but_disabled_by_default"
+    },
+    {
+      "file": "apps.cms.tests.test_menu_integrity",
+      "test": "test_menu_migrations_reverse_and_reapply"
+    },
+    {
+      "file": "tests.test_documentation",
+      "test": "test_schema_validates_without_warnings_and_describes_live_contract"
+    },
+    {
+      "file": "apps.sites.tests.test_module",
+      "test": "test_domain_foundations_do_not_import_each_other"
+    }
+  ],
+  "skipped": 2
+}

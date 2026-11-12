@@ -15,9 +15,9 @@ psycopg[binary]==3.3.6
 gunicorn==23.0.0
 
 # Cache / message broker
+# Pin kombu below 5.7: 5.7+ requires redis-py>=6.1, which conflicts with
+# celery 5.4's redis extra (<6) and our redis==5.2.1 pin.
 celery[redis]==5.4.0
-# Celery 5.4 pulls kombu 5.7 by default; that release breaks redis==5.2.1
-# connection startup in this stack. Pin the last known-good kombu.
 kombu==5.6.2
 redis==5.2.1
 

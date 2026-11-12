@@ -141,7 +141,7 @@ describe("BulkOperationDialog", () => {
   });
 
   it("explains a permission denial and does not offer a retry", async () => {
-    applyModuleOperation.mockResolvedValue(failure(403, { detail: "Administration writes require development mode and explicit opt-in." }));
+    applyModuleOperation.mockResolvedValue(failure(403, { detail: "Platform module management permission is required." }));
     renderDialog();
     fireEvent.click(await screen.findByRole("button", { name: "Enable on 2 Sites" }));
     expect(await screen.findByText("Not allowed")).toBeTruthy();

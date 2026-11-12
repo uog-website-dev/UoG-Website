@@ -16,6 +16,8 @@ export default defineConfig({
   },
   test: {
     environment: "jsdom",
+    // Keep async UI assertions responsive on shared development/CI machines.
+    maxWorkers: 2,
     // MUI dialogs in the Site editors take several seconds under a full
     // suite. The assertions stay; only the wait budget grows.
     testTimeout: 20000,
