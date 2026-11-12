@@ -1,9 +1,11 @@
 """One application serves representative Sites from configuration, not from code."""
+import io
 import json
 from pathlib import Path
 
 import pytest
 from django.conf import settings
+from django.core.management import CommandError, call_command, get_commands
 from django.db import connection
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
@@ -40,6 +42,26 @@ def test_application_code_does_not_name_institutional_hostnames():
             if "uog.local" in text or "uog.edu.et" in text:
                 hits.append(str(path.relative_to(BACKEND)))
     assert hits == []
+
+
+def test_public_demo_command_is_discoverable_idempotent_and_development_only(admin, settings):
+    assert get_commands()["seed_public_demo"] == "apps.core"
+    _create_organizations(admin)
+    output = io.StringIO()
+    call_command("seed_public_demo", stdout=output)
+    document = json.loads(FOUNDATION.read_text(encoding="utf-8"))
+    expected_codes = {entry["code"] for entry in document["sites"]}
+    before = dict(Site.objects.values_list("code", "pk"))
+    assert set(before) == expected_codes
+    assert not Site.objects.exclude(status=Site.Status.ACTIVE).exists()
+    for site in Site.objects.all():
+        assert set(site.site_modules.filter(is_enabled=True).values_list("module__code", flat=True)) == {"PAGES", "POSTS", "MENUS"}
+        assert site.domains.filter(is_primary=True, status="ACTIVE").count() == 1
+    call_command("seed_public_demo", stdout=output)
+    assert dict(Site.objects.values_list("code", "pk")) == before
+    settings.DEBUG = False
+    with pytest.raises(CommandError, match="development-only"):
+        call_command("seed_public_demo", stdout=output)
 
 
 def test_representative_foundation_resolves_each_site_from_data(admin):

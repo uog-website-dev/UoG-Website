@@ -1,0 +1,86 @@
+{
+  "date": "2026-11-11",
+  "suites": {
+    "admin.xml": {
+      "tests": 405,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "backend-focused.xml": {
+      "tests": 33,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    "backend-full.xml": {
+      "tests": 746,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 2
+    },
+    "client.xml": {
+      "tests": 163,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "library-proxy.xml": {
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "minio-integration.xml": {
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "portal-ui.xml": {
+      "tests": 92,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "policy": {
+    "format": "image/webp",
+    "version": "webp-v1",
+    "thumbnail_long_edge": 320,
+    "display_long_edge": 1280,
+    "quality": 82,
+    "method": 4,
+    "max_attempts_default": 3,
+    "retry_delays_seconds_default": [
+      10,
+      20
+    ],
+    "lease_seconds_default": 90,
+    "soft_time_limit_seconds": 45,
+    "hard_time_limit_seconds": 60,
+    "max_encoded_bytes_default": 8388608
+  },
+  "checks": {
+    "django_check": "passed",
+    "openapi_validation": "passed with --validate --fail-on-warn",
+    "migration_drift": "none",
+    "migrations_applied": [
+      "0006",
+      "0007",
+      "0008"
+    ],
+    "worker_tasks": [
+      "media.process_asset",
+      "media.reconcile_uploads"
+    ],
+    "workspace_typechecks": "all five package checks passed",
+    "compose_validation": "passed",
+    "diff_check": "passed"
+  },
+  "scope_notes": [
+    "Full backend run enabled both real MinIO tests. Final focused run covers subsequent strict WebP negotiation, nested publication lookup and explicit Celery result handling.",
+    "Retry integration uses real Celery eager retry execution plus PostgreSQL; no distributed-broker crash test is claimed.",
+    "Advanced Slider/Gallery widgets remain absent; shared picker/reference and current Page/portal regressions are covered."
+  ]
+}

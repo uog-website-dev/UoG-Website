@@ -1,0 +1,59 @@
+{
+  "date": "2026-11-11",
+  "suites": {
+    "admin.xml": {
+      "tests": 401,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "api-client.xml": {
+      "tests": 163,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "api-regressions.xml": {
+      "tests": 17,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "backend-integration.xml": {
+      "tests": 50,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    "fixture-rehearsal.xml": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "library.xml": {
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "portal-ui.xml": {
+      "tests": 89,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "checks": {
+    "django_check": "passed",
+    "migration_drift": "none; no migration required",
+    "openapi_validation": "passed with --validate --fail-on-warn",
+    "workspace_typecheck": "all five package checks passed",
+    "diff_check": "passed"
+  },
+  "scope_notes": [
+    "No new thumbnail pipeline or public media URLs. Image thumbnails report NOT_GENERATED.",
+    "Advanced Slider/Gallery widgets remain absent; the shared ready-image query, Page picker, placement lifecycle and current portal UI are covered.",
+    "Pagination guarantees deterministic boundaries for an unchanged dataset."
+  ]
+}

@@ -16,11 +16,16 @@ gunicorn==23.0.0
 
 # Cache / message broker
 celery[redis]==5.4.0
+# Celery 5.4 pulls kombu 5.7 by default; that release breaks redis==5.2.1
+# connection startup in this stack. Pin the last known-good kombu.
+kombu==5.6.2
 redis==5.2.1
 
 # Object storage (MinIO, S3-compatible)
 django-storages[s3]==1.14.6
 boto3==1.35.84
+Pillow==13.0.0
+pypdf==7.0.1
 
 # OIDC access-token validation (Keycloak-issued RS256 tokens)
 PyJWT[crypto]==2.15.1

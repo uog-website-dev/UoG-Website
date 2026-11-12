@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="25" failures="0" errors="0" time="3.122300085">
+    <testsuite name="src/sites/media-library.test.tsx" timestamp="2026-11-11T18:50:05.119Z" hostname="ee3e3eb7f70f" tests="15" failures="0" errors="0" skipped="0" time="3.112519949">
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; excludes processing images then picks the worker-completed identity on refresh" time="0.286974414">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; shows processing state in the library and preserves the retry key after transfer failure" time="0.336284135">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; never offers upload to a read-only account" time="0.068028336">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; applies filename search before paging and resets to the first page" time="0.240944118">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; loads scoped details and saves only persisted alt text" time="0.299547318">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; shows readonly metadata without a save control" time="0.219678078">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; sends the selected status and type filters to the server" time="0.266205877">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; shows scoped thumbnails and disables a broken preview until retry" time="0.07714635">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; reports terminal image processing without offering selection" time="0.072339348">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; blocks deletion for a live reference and confirms unused removal" time="0.418992261">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; keeps deletion disabled if the reference inventory cannot be verified" time="0.190282304">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Site-isolated media browsing &gt; ignores a delayed Informatics search after switching to Medicine and resets all query state" time="0.130435895">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Site-isolated media browsing &gt; uses responsive grid columns and keeps list layout usable" time="0.075616537">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Site-isolated media browsing &gt; offers recovery for empty search and transport failure" time="0.198118423">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Site-isolated media browsing &gt; supports keyboard pagination and grid/list controls" time="0.229205278">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-admin.test.ts" timestamp="2026-11-11T18:50:05.133Z" hostname="ee3e3eb7f70f" tests="10" failures="0" errors="0" skipped="0" time="0.009780136">
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; shows Pages and Menus only when the module is enabled and the user is permitted" time="0.003140986">
+        </testcase>
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; shows Media for a Site Editor when MEDIA is enabled and content.media.view is granted" time="0.000702991">
+        </testcase>
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; shows the Users section without a content module when site user access is granted" time="0.000336762">
+        </testcase>
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; hides a section when the Site module is off" time="0.000542583">
+        </testcase>
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; hides a section when the user lacks that permission" time="0.000448562">
+        </testcase>
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; does not treat another Site&apos;s module row as enabled here" time="0.000344549">
+        </testcase>
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; hides globally disabled or unshipped modules even when the Site switch is on" time="0.000183847">
+        </testcase>
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; lists each accessible Site once and drops an invalid id" time="0.000453735">
+        </testcase>
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; sends a Site switch to that Site&apos;s dashboard" time="0.00101501">
+        </testcase>
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; keeps central module activation off the Site menu unless delegated" time="0.000354512">
+        </testcase>
+    </testsuite>
+</testsuites>

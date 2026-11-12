@@ -1,0 +1,25 @@
+import {act,fireEvent,render,screen,waitFor} from "@testing-library/react";
+import {expect,it,vi} from "vitest";
+const mocks=vi.hoisted(()=>({getSiteMedia:vi.fn(),listSiteMedia:vi.fn(),getMediaUploadPolicy:vi.fn(),updateSiteMedia:vi.fn(),getMediaReferences:vi.fn(),removeSiteMedia:vi.fn()}));
+vi.mock("@/app/sites/media-actions",()=>mocks);
+import {MediaPickerDialog} from "./media-picker";
+import {parseMediaBlock} from "./content-media-builder";
+const ready={id:"11111111-1111-4111-8111-111111111111",site:11,original_filename:"campus.png",status:"READY",processing_state:"READY",detected_mime:"image/png",content_type:"image/png",thumbnail_status:"NOT_GENERATED",alt_text:"Campus"};
+it("audit: a pending confirmation still applies after Escape", async()=>{
+ let resolve!: (value:unknown)=>void;
+ mocks.listSiteMedia.mockResolvedValue({ok:true,data:{count:1,next:null,previous:null,results:[ready]}});
+ mocks.getSiteMedia.mockReturnValue(new Promise(r=>{resolve=r}));
+ const apply=vi.fn();const cancel=vi.fn();
+ const view=render(<MediaPickerDialog open siteId={11} onCancel={cancel} onConfirm={apply}/>);
+ fireEvent.click(await screen.findByRole("button",{name:"Select campus.png"}));
+ await waitFor(()=>expect(mocks.getSiteMedia).toHaveBeenCalled());
+ fireEvent.keyDown(screen.getByRole("dialog"),{key:"Escape",code:"Escape"});
+ expect(cancel).toHaveBeenCalled();
+ view.rerender(<MediaPickerDialog open={false} siteId={11} onCancel={cancel} onConfirm={apply}/>);
+ await act(async()=>resolve({ok:true,data:ready}));
+ expect(apply).toHaveBeenCalledWith(expect.objectContaining({assetId:ready.id}));
+});
+it("audit: editing an Image through the typed editor strips its caption",()=>{
+ const parsed=parseMediaBlock({type:"image",id:"image",ref:`sites/11/assets/${ready.id}`,alt:"Campus",caption:"A required credit"});
+ expect(parsed).not.toHaveProperty("caption");
+});

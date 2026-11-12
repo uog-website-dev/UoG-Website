@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="29" failures="0" errors="0" time="18.74529062">
+    <testsuite name="src/sites/site-admin-frame.test.tsx" timestamp="2026-11-12T02:29:46.916Z" hostname="086c5ea3ae9d" tests="9" failures="0" errors="0" skipped="0" time="1.269185995">
+        <testcase classname="src/sites/site-admin-frame.test.tsx" name="SiteAdminFrame &gt; keeps the active Site name, status, code and organization visible" time="0.581539523">
+        </testcase>
+        <testcase classname="src/sites/site-admin-frame.test.tsx" name="SiteAdminFrame &gt; names the organization by id when this account cannot read it" time="0.069520878">
+        </testcase>
+        <testcase classname="src/sites/site-admin-frame.test.tsx" name="SiteAdminFrame &gt; shows the current section in the breadcrumb" time="0.079381465">
+        </testcase>
+        <testcase classname="src/sites/site-admin-frame.test.tsx" name="SiteAdminFrame &gt; shows the central registry only when that permission was delegated" time="0.085692425">
+        </testcase>
+        <testcase classname="src/sites/site-admin-frame.test.tsx" name="SiteAdminFrame &gt; remounts per Site so a draft does not follow the user" time="0.124928777">
+        </testcase>
+        <testcase classname="src/sites/site-admin-frame.test.tsx" name="SiteAdminFrame &gt; blocks a direct section when the module or permission is missing" time="0.08015656">
+        </testcase>
+        <testcase classname="src/sites/site-admin-frame.test.tsx" name="SiteAdminFrame &gt; blocks direct Posts administration when the Posts module is disabled" time="0.094090451">
+        </testcase>
+        <testcase classname="src/sites/site-admin-frame.test.tsx" name="SiteAdminFrame &gt; blocks a section the account has no permission for" time="0.064863297">
+        </testcase>
+        <testcase classname="src/sites/site-admin-frame.test.tsx" name="SiteAdminDenied &gt; offers only the supplied authorized Sites" time="0.079945099">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-pages.test.tsx" timestamp="2026-11-12T02:29:46.929Z" hostname="086c5ea3ae9d" tests="20" failures="0" errors="0" skipped="0" time="17.476104625">
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; renders a site-scoped accessible table and status dashboard" time="0.758704928">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; announces empty and failed API list states" time="0.373157911">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; applies server search and status filters and resets pagination" time="0.975765277">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; uses API pagination and resets to the first page when sorting changes" time="0.608250433">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; opens a safe preview and submits this Site&apos;s draft for review" time="1.022985898">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; shows review controls only from backend-authorized actions and requires a rejection comment" time="1.048588344">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; shows append-only workflow history and reviewer feedback in a timeline" time="0.356646572">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; defaults a new Page to the Site language" time="1.696056378">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; opens the create dialog once for the dashboard quick action" time="0.36054851">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; starts a new Page blank and fills the slug from the title until it is edited" time="1.017549171">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; ignores the create request without create permission" time="0.114798175">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; creates and edits only with the matching permission and current ETag" time="2.427419209">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; surfaces stale edit conflicts without losing the form" time="1.936876638">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; previews private draft content and blocks malformed block JSON" time="1.612841128">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; asks before discarding unsaved editor changes" time="0.974208912">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; blocks management when the PAGES module is off" time="0.385928037">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; clears filter and page state when the selected Site changes" time="0.621102613">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; does not fetch or expose Pages without view permission" time="0.027857738">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; switches Site scope and enforces view-only access across the admin workspace" time="0.406873848">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; opens a working draft of a published Page and keeps the live route fixed" time="0.746006877">
+        </testcase>
+    </testsuite>
+</testsuites>

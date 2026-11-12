@@ -8,6 +8,7 @@
  * Paragraph HTML is reduced to text and safe links. Script, event handlers
  * and javascript: targets never become markup.
  */
+import { useState } from "react";
 import type { ReactNode } from "react";
 import Box from "@mui/material/Box";
 import Link from "@mui/material/Link";
@@ -23,11 +24,17 @@ export interface PublicBlock {
   label?: string;
   href?: string;
   alt?: string;
+  ref?: string;
+  id?: string;
+  slides?: PublicMediaItem[];
+  images?: PublicMediaItem[];
   items?: string[];
   style?: string;
   heading?: string;
   children?: PublicBlock[];
 }
+
+export interface PublicMediaItem { id: string; asset_id: string; alt: string; caption?: string }
 
 export interface PublicPageDocument {
   title: string;
@@ -70,6 +77,11 @@ export function pageFromResponse(status: number, body: unknown): PublicPageDocum
   };
 }
 
+function normalizeMediaItems(value: unknown): PublicMediaItem[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((item) => item && typeof item.id === "string" && typeof item.asset_id === "string" && typeof item.alt === "string").map((item) => ({ id:item.id, asset_id:item.asset_id, alt:item.alt, caption:typeof item.caption === "string" ? item.caption : undefined }));
+}
+
 function plainSeo(value: unknown, max: number): string {
   if (typeof value !== "string") return "";
   return stripTags(value).replace(/\s+/g, " ").trim().slice(0, max);
@@ -90,6 +102,10 @@ function normalizeBlocks(value: unknown): PublicBlock[] {
       label: typeof row.label === "string" ? row.label : undefined,
       href: typeof row.href === "string" ? row.href : undefined,
       alt: typeof row.alt === "string" ? row.alt : undefined,
+      id: typeof row.id === "string" ? row.id : undefined,
+      slides: normalizeMediaItems(row.slides),
+      images: normalizeMediaItems(row.images),
+      ref: typeof row.ref === "string" ? row.ref : undefined,
       items: Array.isArray(row.items) ? row.items.filter((item) => typeof item === "string") : undefined,
       style: typeof row.style === "string" ? row.style : undefined,
       heading: typeof row.heading === "string" ? row.heading : undefined,
@@ -137,17 +153,17 @@ function pushText(parts: Array<TextPart | LinkPart>, raw: string) {
   if (value) parts.push({ type: "text", value });
 }
 
-function BlockList({ blocks }: { blocks: PublicBlock[] }) {
+function BlockList({ blocks, siteId }: { blocks: PublicBlock[]; siteId?: number | null }) {
   return (
     <>
       {blocks.map((block, index) => (
-        <BlockView key={`${block.type}-${index}`} block={block} />
+        <BlockView key={`${siteId}-${block.id ?? `${block.type}-${index}`}`} block={block} siteId={siteId} />
       ))}
     </>
   );
 }
 
-function BlockView({ block }: { block: PublicBlock }) {
+function BlockView({ block, siteId }: { block: PublicBlock; siteId?: number | null }) {
   if (block.type === "heading" && block.text) {
     const level = block.level === 2 || block.level === 3 || block.level === 4 ? block.level : 2;
     return (
@@ -194,18 +210,49 @@ function BlockView({ block }: { block: PublicBlock }) {
       </Box>
     );
   }
-  if (block.type === "image" && block.alt) {
-    return <Typography component="p">{block.alt}</Typography>;
+  if (block.type === "slider" || block.type === "gallery") return <MediaCollection block={block} siteId={siteId} />;
+  if (block.type === "image") {
+    return <PublishedImage key={`${siteId}-${block.ref}`} block={block} siteId={siteId} />;
   }
   if (block.type === "section") {
     return (
       <Box component="section" sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
         {block.heading ? <Typography variant="h2" component="h2">{block.heading}</Typography> : null}
-        <BlockList blocks={block.children ?? []} />
+        <BlockList blocks={block.children ?? []} siteId={siteId} />
       </Box>
     );
   }
   return null;
+}
+
+function MediaCollection({block,siteId}:{block:PublicBlock;siteId?:number|null}) {
+  const [position,setPosition]=useState(0);
+  const items=block.type==="slider" ? block.slides ?? [] : block.images ?? [];
+  const current=Math.min(position,Math.max(0,items.length-1));
+  const shown=block.type==="slider" ? items.slice(current,current+1) : items;
+  return <Box component="section" aria-label={block.type==="slider" ? "Image slider" : "Image gallery"} sx={{display:"grid",gap:2}}>
+    {shown.map((item) => <Box component="figure" key={`${siteId}-${item.id}-${item.asset_id}`} sx={{m:0}}>
+      <PublishedImage block={{type:"image",ref:`sites/${siteId}/assets/${item.asset_id}`,alt:item.alt}} siteId={siteId} />
+      {item.caption ? <Typography component="figcaption">{item.caption}</Typography> : null}
+    </Box>)}
+    {block.type==="slider" && items.length>1 ? <Box>
+      <button disabled={current===0} onClick={()=>setPosition(current-1)}>Previous slide</button>
+      <span aria-live="polite">{current+1} of {items.length}</span>
+      <button disabled={current===items.length-1} onClick={()=>setPosition(current+1)}>Next slide</button>
+    </Box> : null}
+  </Box>;
+}
+
+function PublishedImage({ block, siteId }: { block: PublicBlock; siteId?: number | null }) {
+  const [failed, setFailed] = useState(false);
+  const match = typeof block.ref === "string" ? /^sites\/([0-9]+)\/assets\/([0-9a-f]{32}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/.exec(block.ref) : null;
+  if (!match || Number(match[1]) !== siteId || failed) return block.alt ? <Typography component="p">{block.alt}</Typography> : null;
+  const assetId = match[2]!.replace(/^([0-9a-f]{8})([0-9a-f]{4})([0-9a-f]{4})([0-9a-f]{4})([0-9a-f]{12})$/, "$1-$2-$3-$4-$5");
+  const url = `/api/v1/site-context/media/${assetId}/`;
+  return <picture>
+    <source media="(max-width: 600px)" srcSet={`${url}?variant=thumbnail`} />
+    <Box component="img" src={`${url}?variant=display`} alt={block.alt ?? ""} loading="lazy" onError={() => setFailed(true)} sx={{ maxWidth: "100%", height: "auto" }} />
+  </picture>;
 }
 
 export function PublicPageView({ page }: { page: PublicPageDocument | null }): ReactNode {
@@ -225,7 +272,7 @@ export function PublicPageView({ page }: { page: PublicPageDocument | null }): R
       <Typography id="public-page-title" variant="h3" component="h1" sx={{ overflowWrap: "anywhere" }}>
         {page.title}
       </Typography>
-      <BlockList blocks={page.blocks} />
+      <BlockList blocks={page.blocks} siteId={page.site} />
     </Box>
   );
 }

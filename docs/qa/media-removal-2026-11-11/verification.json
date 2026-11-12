@@ -1,0 +1,36 @@
+{
+  "full_backend": {
+    "tests": 757,
+    "initial_passed": 754,
+    "initial_failures": 1,
+    "skipped": 2,
+    "corrected_case_rerun_passed": 1,
+    "aggregate_passed_across_runs": 755
+  },
+  "final_dedicated_removal": {
+    "passed": 10,
+    "real_minio": true,
+    "upgrade_rehearsal": true
+  },
+  "race_repeat": {
+    "passed": 2,
+    "both_winning_orders_observed": true
+  },
+  "schema_regression_passed": 14,
+  "library_regression_passed": 11,
+  "builder_regression_passed": 20,
+  "portal_media_passed": 9,
+  "typed_client_media_passed": 4,
+  "typechecks": "five package checks passed",
+  "django_check": "passed",
+  "migration_drift": "none",
+  "openapi": "validated with fail-on-warning",
+  "diff_whitespace": "passed",
+  "local_migrations": [
+    "cms.0013_media_repeater_blocks",
+    "media.0009_mediaasset_deleted_at_mediaasset_deleted_by_and_more",
+    "media.0010_reference_inventory_and_removal"
+  ],
+  "worker_restarted": true,
+  "cleanup_task_registered": true
+}

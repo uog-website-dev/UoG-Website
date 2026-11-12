@@ -77,7 +77,7 @@ export function ModulesWorkspace() {
           aria-labelledby={`modules-tab-${item.value}`}
           hidden={tab !== item.value}
         >
-          {tab === item.value && item.value === "registry" ? <ModuleRegistry refreshKey={refreshKey} /> : null}
+          {tab === item.value && item.value === "registry" ? <ModuleRegistry refreshKey={refreshKey} onChanged={() => setRefreshKey((key) => key + 1)} /> : null}
           {tab === item.value && item.value !== "registry" && summary.error ? (
             <Alert severity="error" action={<Button color="inherit" size="small" onClick={() => summary.reload()}>Try again</Button>}>
               The module registry could not be loaded. {summary.error.message}

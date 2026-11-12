@@ -261,10 +261,15 @@ def test_menu_migrations_reverse_and_reapply():
     try:
         executor.migrate([("cms", "0007_sitepublicationversion_pages_module")])
         assert "cms_menu" not in connection.introspection.table_names()
+        # Shipping alone does not enable the capability; the later platform
+        # rollout is responsible for the final enabled default.
+        MigrationExecutor(connection).migrate([("cms", "0008_menu_menuitem")])
+        assert Module.objects.get(code="MENUS").is_enabled is False
     finally:
         MigrationExecutor(connection).migrate(latest)
     assert "cms_menuitem" in connection.introspection.table_names()
-    assert Module.objects.get(code="MENUS").is_enabled is False
+    # Reapplying the latest graph includes the explicit platform rollout.
+    assert Module.objects.get(code="MENUS").is_enabled is True
 
 
 @pytest.mark.django_db(transaction=True)

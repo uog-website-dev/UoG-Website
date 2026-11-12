@@ -1,0 +1,33 @@
+{
+  "site": 16,
+  "asset_id": "9cf35bb8-c065-4511-9d31-7e833b01b997",
+  "original_problem": {
+    "status": "PENDING",
+    "processing": "QUEUED",
+    "attempts": 0
+  },
+  "resolved": {
+    "status": "READY",
+    "processing": "READY",
+    "attempts": 1,
+    "variants": [
+      "thumbnail",
+      "display"
+    ]
+  },
+  "observed_authenticated_chrome": {
+    "library_image_visible": true,
+    "details_display_image_visible": true,
+    "details_status": "READY",
+    "details_thumbnail_status": "ready"
+  },
+  "services": {
+    "celery": "5.4.0",
+    "kombu": "5.6.2",
+    "redis": "5.2.1",
+    "worker_ping": "pong",
+    "beat_running": true,
+    "restart_policy": "unless-stopped"
+  },
+  "method": "Existing authenticated local Chrome session via computer-use; no authentication changes."
+}

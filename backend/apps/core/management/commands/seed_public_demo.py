@@ -15,7 +15,7 @@ from apps.sites.services.modules import enable_module_for_site
 from apps.sites.services.templates import provision_site
 
 
-FIXTURE = Path(__file__).resolve().parents[2] / "fixtures" / "uog-foundation.json"
+FIXTURE = Path(settings.BASE_DIR) / "apps" / "sites" / "fixtures" / "uog-foundation.json"
 CMS_MODULES = ("PAGES", "POSTS", "MENUS")
 ORGANIZATIONS = (
     ("CI", "College of Informatics", "COLLEGE"),

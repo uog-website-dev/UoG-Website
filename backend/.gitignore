@@ -36,5 +36,9 @@ venv.bak/
 .DS_Store
 staticfiles/
 media/
+!apps/media/
+!apps/media/*.py
+!apps/media/migrations/
+!apps/media/migrations/*.py
 db.sqlite3
 .pytest_cache/

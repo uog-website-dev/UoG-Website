@@ -1,0 +1,1041 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="405" failures="0" errors="0" time="107.651656622">
+    <testsuite name="src/access-token.test.ts" timestamp="2026-11-11T16:54:52.354Z" hostname="ee3e3eb7f70f" tests="12" failures="0" errors="0" skipped="0" time="0.016549281">
+        <testcase classname="src/access-token.test.ts" name="access token expiry and refresh &gt; returns null without any network call when nobody is signed in" time="0.004826236">
+        </testcase>
+        <testcase classname="src/access-token.test.ts" name="access token expiry and refresh &gt; reuses a token that has not expired" time="0.001110599">
+        </testcase>
+        <testcase classname="src/access-token.test.ts" name="access token expiry and refresh &gt; treats a token inside the safety skew as expired" time="0.003465427">
+        </testcase>
+        <testcase classname="src/access-token.test.ts" name="access token expiry and refresh &gt; exchanges an expired token for a fresh one with the stored refresh token" time="0.001577615">
+        </testcase>
+        <testcase classname="src/access-token.test.ts" name="access token expiry and refresh &gt; reuses one exchange when several callers still hold the retired refresh token" time="0.000914522">
+        </testcase>
+        <testcase classname="src/access-token.test.ts" name="access token expiry and refresh &gt; fails closed when the token endpoint rejects the refresh" time="0.000380304">
+        </testcase>
+        <testcase classname="src/access-token.test.ts" name="access token expiry and refresh &gt; fails closed when the identity provider is unreachable" time="0.000428864">
+        </testcase>
+        <testcase classname="src/access-token.test.ts" name="access token expiry and refresh &gt; returns null when the expired token has no refresh token" time="0.000244935">
+        </testcase>
+        <testcase classname="src/access-token.test.ts" name="access token expiry and refresh &gt; cannot refresh at all when the client secret is not configured server-side" time="0.000753321">
+        </testcase>
+        <testcase classname="src/access-token.test.ts" name="session state check &gt; is anonymous without a session and active with a live access token" time="0.000364195">
+        </testcase>
+        <testcase classname="src/access-token.test.ts" name="session state check &gt; stays active while the refresh token is still valid, without refreshing" time="0.000454374">
+        </testcase>
+        <testcase classname="src/access-token.test.ts" name="session state check &gt; is expired once the refresh token has expired or is missing" time="0.000247606">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/access/access-screen.test.tsx" timestamp="2026-11-11T16:54:52.359Z" hostname="ee3e3eb7f70f" tests="16" failures="0" errors="0" skipped="0" time="9.109458778">
+        <testcase classname="src/access/access-screen.test.tsx" name="AccessScreen — states &gt; renders the user search, effective summary, assignments and audit trail" time="1.75709196">
+        </testcase>
+        <testcase classname="src/access/access-screen.test.tsx" name="AccessScreen — states &gt; shows an honest empty state when the search matches nobody" time="0.133882204">
+        </testcase>
+        <testcase classname="src/access/access-screen.test.tsx" name="AccessScreen — states &gt; shows the failure with its correlation id" time="0.15130602">
+        </testcase>
+        <testcase classname="src/access/access-screen.test.tsx" name="AccessScreen — states &gt; renders a permission-denied state when the backend refuses the read (403)" time="0.037226211">
+        </testcase>
+        <testcase classname="src/access/access-screen.test.tsx" name="AccessScreen — states &gt; asks the user to sign in again when the session expired (401)" time="0.029814742">
+        </testcase>
+        <testcase classname="src/access/access-screen.test.tsx" name="AccessScreen — role visibility &gt; offers only the roles and scopes the caller may manage" time="1.547557339">
+        </testcase>
+        <testcase classname="src/access/access-screen.test.tsx" name="AccessScreen — role visibility &gt; disables assignment for a caller with nothing to grant, and says why" time="0.441003254">
+        </testcase>
+        <testcase classname="src/access/access-screen.test.tsx" name="AccessScreen — create assignment &gt; submits role and scope, refreshes the views and closes" time="0.881805948">
+        </testcase>
+        <testcase classname="src/access/access-screen.test.tsx" name="AccessScreen — create assignment &gt; prevents duplicate submissions while the request is in flight" time="0.640842175">
+        </testcase>
+        <testcase classname="src/access/access-screen.test.tsx" name="AccessScreen — create assignment &gt; keeps the dialog and the entered values when the backend rejects (409)" time="0.456305694">
+        </testcase>
+        <testcase classname="src/access/access-screen.test.tsx" name="AccessScreen — create assignment &gt; maps backend field errors onto the offending control" time="0.669937431">
+        </testcase>
+        <testcase classname="src/access/access-screen.test.tsx" name="AccessScreen — create assignment &gt; displays a denied write (403) without pretending it succeeded" time="0.449422009">
+        </testcase>
+        <testcase classname="src/access/access-screen.test.tsx" name="AccessScreen — create assignment &gt; validates the form before calling the API" time="0.334917726">
+        </testcase>
+        <testcase classname="src/access/access-screen.test.tsx" name="AccessScreen — revoke assignment &gt; confirms before revoking, then refreshes the lists" time="0.732290442">
+        </testcase>
+        <testcase classname="src/access/access-screen.test.tsx" name="AccessScreen — revoke assignment &gt; shows the backend failure inside the confirmation instead of closing it" time="0.449464034">
+        </testcase>
+        <testcase classname="src/access/access-screen.test.tsx" name="AccessScreen — revoke assignment &gt; does not offer revoke for a scope the caller does not manage" time="0.390721291">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/admin-shell.test.tsx" timestamp="2026-11-11T16:54:52.363Z" hostname="ee3e3eb7f70f" tests="3" failures="0" errors="0" skipped="0" time="0.989078156">
+        <testcase classname="src/admin-shell.test.tsx" name="AdminShell &gt; renders the console chrome around the page content" time="0.355570323">
+        </testcase>
+        <testcase classname="src/admin-shell.test.tsx" name="AdminShell &gt; pins the footer and header outside the scroll isolation: main owns the scrolling column" time="0.049136788">
+        </testcase>
+        <testcase classname="src/admin-shell.test.tsx" name="AdminShell &gt; opens and closes the mobile navigation drawer from the header toggle" time="0.580837355">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/access/access-control-manager.test.tsx" timestamp="2026-11-11T16:54:52.365Z" hostname="ee3e3eb7f70f" tests="7" failures="0" errors="0" skipped="0" time="2.418849573">
+        <testcase classname="src/app/access/access-control-manager.test.tsx" name="Access control manager &gt; does not present the initial load as an empty grant list" time="0.183672499">
+        </testcase>
+        <testcase classname="src/app/access/access-control-manager.test.tsx" name="Access control manager &gt; shows a backend failure and its correlation id instead of an empty catalog" time="0.074519179">
+        </testcase>
+        <testcase classname="src/app/access/access-control-manager.test.tsx" name="Access control manager &gt; shows an empty state only after a successful empty response" time="0.06440307">
+        </testcase>
+        <testcase classname="src/app/access/access-control-manager.test.tsx" name="Access control manager &gt; renders Editor, Reviewer and Viewer from the registered permission arrays" time="0.299190975">
+        </testcase>
+        <testcase classname="src/app/access/access-control-manager.test.tsx" name="Access control manager &gt; assigns a site role and shows the refreshed effective permissions" time="0.775439754">
+        </testcase>
+        <testcase classname="src/app/access/access-control-manager.test.tsx" name="Access control manager &gt; shows self-escalation and foreign delegation failures without treating them as success" time="0.599018662">
+        </testcase>
+        <testcase classname="src/app/access/access-control-manager.test.tsx" name="Access control manager &gt; revokes a site assignment and refreshes that user&apos;s effective permissions" time="0.419991875">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/access/actions.test.ts" timestamp="2026-11-11T16:54:52.367Z" hostname="ee3e3eb7f70f" tests="5" failures="0" errors="0" skipped="0" time="0.010052997">
+        <testcase classname="src/app/access/actions.test.ts" name="access control loading &gt; returns registered roles and does not invent grants for a successful empty assignment page" time="0.00408361">
+        </testcase>
+        <testcase classname="src/app/access/actions.test.ts" name="access control loading &gt; keeps a backend denial as an error with its correlation id" time="0.001827861">
+        </testcase>
+        <testcase classname="src/app/access/actions.test.ts" name="access control loading &gt; rejects a successful payload that is missing its result list" time="0.00098985">
+        </testcase>
+        <testcase classname="src/app/access/actions.test.ts" name="access control loading &gt; reports a missing session instead of an empty catalog" time="0.00095724">
+        </testcase>
+        <testcase classname="src/app/access/actions.test.ts" name="access control loading &gt; does not turn an unsupported lookup into an empty page" time="0.000448164">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/actions.test.ts" timestamp="2026-11-11T16:54:52.368Z" hostname="ee3e3eb7f70f" tests="3" failures="0" errors="0" skipped="0" time="0.009340495">
+        <testcase classname="src/app/actions.test.ts" name="sign in &gt; starts the Keycloak flow through Auth.js (which owns the CSRF token)" time="0.004417944">
+        </testcase>
+        <testcase classname="src/app/actions.test.ts" name="sign out &gt; clears the local session first, then follows Keycloak sign-out with the ID token" time="0.00158752">
+        </testcase>
+        <testcase classname="src/app/actions.test.ts" name="sign out &gt; still ends the Keycloak session when the ID token is missing" time="0.001024287">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/session/expired/route.test.ts" timestamp="2026-11-11T16:54:52.369Z" hostname="ee3e3eb7f70f" tests="3" failures="0" errors="0" skipped="0" time="0.01244322">
+        <testcase classname="src/app/api/session/expired/route.test.ts" name="expired session route &gt; signs out an expired session and starts a sign-in that returns to the page" time="0.006956363">
+        </testcase>
+        <testcase classname="src/app/api/session/expired/route.test.ts" name="expired session route &gt; leaves a usable session signed in" time="0.002467502">
+        </testcase>
+        <testcase classname="src/app/api/session/expired/route.test.ts" name="expired session route &gt; never returns to another origin" time="0.000906251">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/workspace/route.test.ts" timestamp="2026-11-11T16:54:52.369Z" hostname="ee3e3eb7f70f" tests="9" failures="0" errors="0" skipped="0" time="0.025403218">
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace API &gt; returns only authorized choices and effective modules for the selected Site" time="0.009808821">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace API &gt; does not fetch permissions or module data for a forged Site selection" time="0.001880319">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace API &gt; rejects invalid or ambiguous selection: site=0" time="0.002879612">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace API &gt; rejects invalid or ambiguous selection: site=abc" time="0.002181953">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace API &gt; rejects invalid or ambiguous selection: site=" time="0.001433585">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace API &gt; rejects invalid or ambiguous selection: site=9007199254740993" time="0.000965374">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace API &gt; rejects invalid or ambiguous selection: site=11&amp;site=22" time="0.000621093">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace API &gt; requires a valid session" time="0.000664609">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace API &gt; keeps a failed Site read distinguishable from an empty authorized list" time="0.002710361">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/layout.test.tsx" timestamp="2026-11-11T16:54:52.371Z" hostname="ee3e3eb7f70f" tests="5" failures="0" errors="0" skipped="0" time="0.126796752">
+        <testcase classname="src/app/layout.test.tsx" name="admin session gate &gt; shows the sign-in screen and renders none of the protected routes when signed out" time="0.043620097">
+        </testcase>
+        <testcase classname="src/app/layout.test.tsx" name="admin session gate &gt; explains a failed sign-in callback on the sign-in screen instead of a server error" time="0.013061241">
+        </testcase>
+        <testcase classname="src/app/layout.test.tsx" name="admin session gate &gt; renders the protected routes and the verified identity when signed in" time="0.038491081">
+        </testcase>
+        <testcase classname="src/app/layout.test.tsx" name="admin session gate &gt; sends an expired session to sign out and sign in again instead of rendering the console" time="0.00195544">
+        </testcase>
+        <testcase classname="src/app/layout.test.tsx" name="admin session gate &gt; falls back to the session name when no email claim is present" time="0.026983316">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/modules/actions.test.ts" timestamp="2026-11-11T16:54:52.373Z" hostname="ee3e3eb7f70f" tests="6" failures="0" errors="0" skipped="0" time="0.011390864">
+        <testcase classname="src/app/modules/actions.test.ts" name="module management actions &gt; changes only platform availability with the current ETag" time="0.003365093">
+        </testcase>
+        <testcase classname="src/app/modules/actions.test.ts" name="module management actions &gt; rejects a changed registry row or missing ETag without writing" time="0.001934025">
+        </testcase>
+        <testcase classname="src/app/modules/actions.test.ts" name="module management actions &gt; lists Site activation with only the supplied filters" time="0.001280168">
+        </testcase>
+        <testcase classname="src/app/modules/actions.test.ts" name="module management actions &gt; posts the preview request unchanged" time="0.001175304">
+        </testcase>
+        <testcase classname="src/app/modules/actions.test.ts" name="module management actions &gt; sends the Idempotency-Key header and a longer timeout on apply" time="0.000544803">
+        </testcase>
+        <testcase classname="src/app/modules/actions.test.ts" name="module management actions &gt; returns a clone-safe failure instead of throwing" time="0.000473384">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/organizations/[id]/organization-detail.test.tsx" timestamp="2026-11-11T16:54:52.375Z" hostname="ee3e3eb7f70f" tests="4" failures="0" errors="0" skipped="0" time="0.647270596">
+        <testcase classname="src/app/organizations/[id]/organization-detail.test.tsx" name="organization detail screen &gt; shows approved organization fields and does not assume parent details are accessible" time="0.482005901">
+        </testcase>
+        <testcase classname="src/app/organizations/[id]/organization-detail.test.tsx" name="organization detail screen &gt; renders a retryable error with the server reference id" time="0.066012992">
+        </testcase>
+        <testcase classname="src/app/organizations/[id]/organization-detail.test.tsx" name="organization detail screen &gt; explains a 404 as unavailable without showing the generic not-found page" time="0.07380299">
+        </testcase>
+        <testcase classname="src/app/organizations/[id]/organization-detail.test.tsx" name="organization detail screen &gt; renders the route loading state" time="0.022226533">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/organizations/actions.test.ts" timestamp="2026-11-11T16:54:52.376Z" hostname="ee3e3eb7f70f" tests="2" failures="0" errors="0" skipped="0" time="0.769592969">
+        <testcase classname="src/app/organizations/actions.test.ts" name="organization server actions &gt; keeps mock-created organizations visible to subsequent list reads" time="0.311986118">
+        </testcase>
+        <testcase classname="src/app/organizations/actions.test.ts" name="organization server actions &gt; moves with a fresh ETag and exposes the persisted parent in a later read" time="0.454284912">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/sites/[id]/media-upload/route.test.ts" timestamp="2026-11-11T16:54:52.377Z" hostname="ee3e3eb7f70f" tests="2" failures="0" errors="0" skipped="0" time="0.023816999">
+        <testcase classname="src/app/sites/[id]/media-upload/route.test.ts" name="private upload proxy &gt; rejects cross-origin and anonymous requests before forwarding bytes" time="0.015162446">
+        </testcase>
+        <testcase classname="src/app/sites/[id]/media-upload/route.test.ts" name="private upload proxy &gt; streams to the scoped backend with server credentials and preserves retry identity" time="0.005124845">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/sites/[id]/media/[assetId]/image/route.test.ts" timestamp="2026-11-11T16:54:52.378Z" hostname="ee3e3eb7f70f" tests="2" failures="0" errors="0" skipped="0" time="0.017336843">
+        <testcase classname="src/app/sites/[id]/media/[assetId]/image/route.test.ts" name="Private thumbnail proxy &gt; keeps tokens server-side and responses uncached" time="0.012505008">
+        </testcase>
+        <testcase classname="src/app/sites/[id]/media/[assetId]/image/route.test.ts" name="Private thumbnail proxy &gt; does not forward an anonymous request" time="0.002145268">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/sites/page-actions.test.ts" timestamp="2026-11-11T16:54:52.378Z" hostname="ee3e3eb7f70f" tests="4" failures="0" errors="0" skipped="0" time="0.012069884">
+        <testcase classname="src/app/sites/page-actions.test.ts" name="Site Page API actions &gt; uses the site-scoped list contract with encoded filters and returns pagination" time="0.003481926">
+        </testcase>
+        <testcase classname="src/app/sites/page-actions.test.ts" name="Site Page API actions &gt; builds full-site status totals from the API&apos;s filtered count contract" time="0.001512451">
+        </testcase>
+        <testcase classname="src/app/sites/page-actions.test.ts" name="Site Page API actions &gt; loads a scoped detail with its ETag and sends that ETag for updates" time="0.002986284">
+        </testcase>
+        <testcase classname="src/app/sites/page-actions.test.ts" name="Site Page API actions &gt; sends structured blocks and same-site hierarchy in the create contract" time="0.000940076">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/auth.test.ts" timestamp="2026-11-11T16:54:52.380Z" hostname="ee3e3eb7f70f" tests="6" failures="0" errors="0" skipped="0" time="0.449114551">
+        <testcase classname="src/auth.test.ts" name="OIDC authorization-code sign-in &gt; redirects to Keycloak with PKCE, state, nonce and an allowlisted redirect URI" time="0.054180993">
+        </testcase>
+        <testcase classname="src/auth.test.ts" name="OIDC authorization-code sign-in &gt; refuses a sign-in POST that carries no CSRF token" time="0.017771526">
+            <system-err>
+[auth][error] MissingCSRF: CSRF token was missing during an action signin. Read more at https://errors.authjs.dev#missingcsrf
+    at validateCSRF (/workspace/node_modules/.pnpm/@auth+core@0.41.3/node_modules/@auth/core/lib/actions/callback/oauth/csrf-token.js:38:11)
+    at AuthInternal (/workspace/node_modules/.pnpm/@auth+core@0.41.3/node_modules/@auth/core/lib/index.js:61:17)
+    at Auth (/workspace/node_modules/.pnpm/@auth+core@0.41.3/node_modules/@auth/core/index.js:111:34)
+    at /workspace/apps/admin-web/src/auth.test.ts:174:22
+    at async file:///workspace/node_modules/.pnpm/vitest@5.0.5_@types+node@22.10.5_jsdom@25.0.1_vite@8.3.5_@types+node@22.10.5_/node_modules/vitest/dist/chunks/run.BPv-BBRv.js:2801:20
+
+            </system-err>
+        </testcase>
+        <testcase classname="src/auth.test.ts" name="OIDC authorization-code sign-in &gt; does not establish a session when the callback state does not match" time="0.020304782">
+            <system-err>
+[auth][error] InvalidCheck: state value could not be parsed. Read more at https://errors.authjs.dev#invalidcheck
+    at parseCookie (/workspace/node_modules/.pnpm/@auth+core@0.41.3/node_modules/@auth/core/lib/actions/callback/oauth/checks.js:51:15)
+    at Object.use (/workspace/node_modules/.pnpm/@auth+core@0.41.3/node_modules/@auth/core/lib/actions/callback/oauth/checks.js:73:30)
+    at handleOAuth (/workspace/node_modules/.pnpm/@auth+core@0.41.3/node_modules/@auth/core/lib/actions/callback/oauth/callback.js:90:38)
+    at Module.callback (/workspace/node_modules/.pnpm/@auth+core@0.41.3/node_modules/@auth/core/lib/actions/callback/index.js:37:47)
+    at AuthInternal (/workspace/node_modules/.pnpm/@auth+core@0.41.3/node_modules/@auth/core/lib/index.js:29:38)
+    at Auth (/workspace/node_modules/.pnpm/@auth+core@0.41.3/node_modules/@auth/core/index.js:111:34)
+    at /workspace/apps/admin-web/src/auth.test.ts:185:22
+    at async file:///workspace/node_modules/.pnpm/vitest@5.0.5_@types+node@22.10.5_jsdom@25.0.1_vite@8.3.5_@types+node@22.10.5_/node_modules/vitest/dist/chunks/run.BPv-BBRv.js:2801:20
+
+            </system-err>
+        </testcase>
+        <testcase classname="src/auth.test.ts" name="OIDC authorization-code sign-in &gt; reports no identity while the session cookie is absent" time="0.004166604">
+        </testcase>
+        <testcase classname="src/auth.test.ts" name="redirect allowlist &gt; allows the platform origin and relative targets" time="0.001929092">
+        </testcase>
+        <testcase classname="src/auth.test.ts" name="redirect allowlist &gt; refuses redirect targets on any other origin" time="0.000922585">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/breadcrumb.test.tsx" timestamp="2026-11-11T16:54:52.382Z" hostname="ee3e3eb7f70f" tests="2" failures="0" errors="0" skipped="0" time="0.204277505">
+        <testcase classname="src/breadcrumb.test.tsx" name="Breadcrumb &gt; labels the trail for assistive technology" time="0.165155022">
+        </testcase>
+        <testcase classname="src/breadcrumb.test.tsx" name="Breadcrumb &gt; links ancestor steps and marks the current page" time="0.03549468">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/domains/domain-form-dialog.test.tsx" timestamp="2026-11-11T16:54:52.382Z" hostname="ee3e3eb7f70f" tests="13" failures="0" errors="0" skipped="0" time="2.754389574">
+        <testcase classname="src/domains/domain-form-dialog.test.tsx" name="DomainFormDialog — add &gt; shows the selected site and its existing primary domain" time="0.398778909">
+        </testcase>
+        <testcase classname="src/domains/domain-form-dialog.test.tsx" name="DomainFormDialog — add &gt; validates required fields and rejects invalid hostnames without an API call" time="0.253714118">
+        </testcase>
+        <testcase classname="src/domains/domain-form-dialog.test.tsx" name="DomainFormDialog — add &gt; normalizes the hostname, creates the domain and refreshes the listing" time="0.174800297">
+        </testcase>
+        <testcase classname="src/domains/domain-form-dialog.test.tsx" name="DomainFormDialog — add &gt; displays a duplicate-hostname 409 on the hostname field and preserves input" time="0.14681588">
+        </testcase>
+        <testcase classname="src/domains/domain-form-dialog.test.tsx" name="DomainFormDialog — add &gt; maps a backend 400 onto the offending field" time="0.248617123">
+        </testcase>
+        <testcase classname="src/domains/domain-form-dialog.test.tsx" name="DomainFormDialog — add &gt; surfaces an unauthorized write instead of pretending success" time="0.176893177">
+        </testcase>
+        <testcase classname="src/domains/domain-form-dialog.test.tsx" name="DomainFormDialog — add &gt; blocks duplicate submissions while a request is in flight" time="0.152406738">
+        </testcase>
+        <testcase classname="src/domains/domain-form-dialog.test.tsx" name="DomainFormDialog — primary change confirmation &gt; confirms before promoting an alias to primary, naming the displaced domain" time="0.305285339">
+        </testcase>
+        <testcase classname="src/domains/domain-form-dialog.test.tsx" name="DomainFormDialog — primary change confirmation &gt; does not promote when the confirmation is cancelled" time="0.226530643">
+        </testcase>
+        <testcase classname="src/domains/domain-form-dialog.test.tsx" name="DomainFormDialog — edit &gt; locks hostname and Site, and saves a status change conditionally" time="0.239130461">
+        </testcase>
+        <testcase classname="src/domains/domain-form-dialog.test.tsx" name="DomainFormDialog — edit &gt; keeps the dialog open with entered data when the update fails" time="0.215638321">
+        </testcase>
+        <testcase classname="src/domains/domain-form-dialog.test.tsx" name="DomainFormDialog — edit &gt; removes the Inactive option for the site&apos;s active primary" time="0.116551732">
+        </testcase>
+        <testcase classname="src/domains/domain-form-dialog.test.tsx" name="DomainFormDialog — edit &gt; reports no changes instead of calling the API when nothing was edited" time="0.095090029">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/domains/domains-list.test.tsx" timestamp="2026-11-11T16:54:52.385Z" hostname="ee3e3eb7f70f" tests="13" failures="0" errors="0" skipped="0" time="4.542146558">
+        <testcase classname="src/domains/domains-list.test.tsx" name="DomainsList &gt; renders domains with their site, organization, type and statuses" time="0.843286078">
+        </testcase>
+        <testcase classname="src/domains/domains-list.test.tsx" name="DomainsList &gt; searches across hostname and site, and resets to page 1" time="0.468973356">
+        </testcase>
+        <testcase classname="src/domains/domains-list.test.tsx" name="DomainsList &gt; filters by domain type through the select" time="0.428429792">
+        </testcase>
+        <testcase classname="src/domains/domains-list.test.tsx" name="DomainsList &gt; filters by site through the select" time="0.293553086">
+        </testcase>
+        <testcase classname="src/domains/domains-list.test.tsx" name="DomainsList &gt; sorts by the clicked column header" time="0.297221731">
+        </testcase>
+        <testcase classname="src/domains/domains-list.test.tsx" name="DomainsList &gt; paginates when more than one page exists" time="0.271332431">
+        </testcase>
+        <testcase classname="src/domains/domains-list.test.tsx" name="DomainsList &gt; surfaces an API error with a retry instead of an empty table" time="0.200866543">
+        </testcase>
+        <testcase classname="src/domains/domains-list.test.tsx" name="DomainsList &gt; offers a reset when filters match nothing" time="0.412025999">
+        </testcase>
+        <testcase classname="src/domains/domains-list.test.tsx" name="DomainsList &gt; says so honestly when no domains exist at all" time="0.132635753">
+        </testcase>
+        <testcase classname="src/domains/domains-list.test.tsx" name="DomainsList &gt; falls back to unit ids when the hierarchy read fails" time="0.127686842">
+        </testcase>
+        <testcase classname="src/domains/domains-list.test.tsx" name="DomainsList &gt; warns when the site filter list could not be loaded" time="0.123456822">
+        </testcase>
+        <testcase classname="src/domains/domains-list.test.tsx" name="DomainsList &gt; opens the Add domain dialog from the toolbar button" time="0.568671359">
+        </testcase>
+        <testcase classname="src/domains/domains-list.test.tsx" name="DomainsList &gt; opens the Edit dialog from a row action, pre-filled with the record" time="0.370544775">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/modules/bulk-operation-dialog.test.tsx" timestamp="2026-11-11T16:54:52.388Z" hostname="ee3e3eb7f70f" tests="9" failures="0" errors="0" skipped="0" time="2.304652579">
+        <testcase classname="src/modules/bulk-operation-dialog.test.tsx" name="BulkOperationDialog &gt; shows the backend preview and reports success only after the commit" time="0.587079182">
+        </testcase>
+        <testcase classname="src/modules/bulk-operation-dialog.test.tsx" name="BulkOperationDialog &gt; requires a reason and the typed phrase for a high-impact operation" time="0.311889596">
+        </testcase>
+        <testcase classname="src/modules/bulk-operation-dialog.test.tsx" name="BulkOperationDialog &gt; rejects a stale preview and offers a refreshed one" time="0.380427157">
+        </testcase>
+        <testcase classname="src/modules/bulk-operation-dialog.test.tsx" name="BulkOperationDialog &gt; retries an unconfirmed result with the same idempotency key" time="0.327307622">
+        </testcase>
+        <testcase classname="src/modules/bulk-operation-dialog.test.tsx" name="BulkOperationDialog &gt; explains a permission denial and does not offer a retry" time="0.209835589">
+        </testcase>
+        <testcase classname="src/modules/bulk-operation-dialog.test.tsx" name="BulkOperationDialog &gt; shows a failed preview with a retry and no confirm button" time="0.149370553">
+        </testcase>
+        <testcase classname="src/modules/bulk-operation-dialog.test.tsx" name="BulkOperationDialog &gt; has nothing to confirm when every Site is already in state" time="0.07079779">
+        </testcase>
+        <testcase classname="src/modules/bulk-operation-dialog.test.tsx" name="uncertain operation retries &gt; resends the exact original body and locks the reason until the result is known" time="0.262339448">
+        </testcase>
+        <testcase classname="src/modules/bulk-operation-dialog.test.tsx" name="describeApplyError &gt; maps backend rejections to guidance" time="0.001718474">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/modules/module-registry.test.tsx" timestamp="2026-11-11T16:54:52.390Z" hostname="ee3e3eb7f70f" tests="12" failures="0" errors="0" skipped="0" time="3.299212077">
+        <testcase classname="src/modules/module-registry.test.tsx" name="ModuleRegistry &gt; enables a shipped default-disabled module only after confirmation and refreshes" time="0.851083925">
+        </testcase>
+        <testcase classname="src/modules/module-registry.test.tsx" name="ModuleRegistry &gt; keeps the switch on and displays a failed disable without reporting success" time="0.398628292">
+        </testcase>
+        <testcase classname="src/modules/module-registry.test.tsx" name="ModuleRegistry &gt; does not allow planned or unshipped modules to be enabled and supports cancel" time="0.479840074">
+        </testcase>
+        <testcase classname="src/modules/module-registry.test.tsx" name="ModuleRegistry &gt; keeps implementation status, platform availability and Site activation separate" time="0.155213298">
+        </testcase>
+        <testcase classname="src/modules/module-registry.test.tsx" name="ModuleRegistry &gt; labels an implemented module that is switched off platform-wide" time="0.104203091">
+        </testcase>
+        <testcase classname="src/modules/module-registry.test.tsx" name="ModuleRegistry &gt; opens a details view with counts, dependencies and settings" time="0.215965249">
+        </testcase>
+        <testcase classname="src/modules/module-registry.test.tsx" name="ModuleRegistry &gt; still lists the registry when the activation summary fails" time="0.106084089">
+        </testcase>
+        <testcase classname="src/modules/module-registry.test.tsx" name="ModuleRegistry &gt; applies the search filter against the documented contract" time="0.210555076">
+        </testcase>
+        <testcase classname="src/modules/module-registry.test.tsx" name="ModuleRegistry &gt; surfaces a failed read with a retry instead of an empty table" time="0.232094497">
+        </testcase>
+        <testcase classname="src/modules/module-registry.test.tsx" name="ModuleRegistry &gt; says the registry is empty when it genuinely is" time="0.077632084">
+        </testcase>
+        <testcase classname="src/modules/module-registry.test.tsx" name="ModuleRegistry &gt; offers a reset when filters match nothing" time="0.22613252">
+        </testcase>
+        <testcase classname="src/modules/module-registry.test.tsx" name="ModuleRegistry &gt; paginates when the registry exceeds one page" time="0.23825376">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/modules/operation-history.test.tsx" timestamp="2026-11-11T16:54:52.393Z" hostname="ee3e3eb7f70f" tests="3" failures="0" errors="0" skipped="0" time="1.683130795">
+        <testcase classname="src/modules/operation-history.test.tsx" name="OperationHistory &gt; lists operations and shows every change with its audit fields" time="0.861812455">
+        </testcase>
+        <testcase classname="src/modules/operation-history.test.tsx" name="OperationHistory &gt; filters by action and reloads after a new operation" time="0.667467558">
+        </testcase>
+        <testcase classname="src/modules/operation-history.test.tsx" name="OperationHistory &gt; explains an empty history" time="0.148631778">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/modules/site-module-management.test.tsx" timestamp="2026-11-11T16:54:52.393Z" hostname="ee3e3eb7f70f" tests="6" failures="0" errors="0" skipped="0" time="4.732458612">
+        <testcase classname="src/modules/site-module-management.test.tsx" name="SiteModuleManagement &gt; shows each Site&apos;s activation from the backend, with planned modules left out" time="0.821142161">
+        </testcase>
+        <testcase classname="src/modules/site-module-management.test.tsx" name="SiteModuleManagement &gt; previews exactly the visibly selected Sites" time="1.06174482">
+        </testcase>
+        <testcase classname="src/modules/site-module-management.test.tsx" name="SiteModuleManagement &gt; uses one Site scope for a single selection" time="0.563642714">
+        </testcase>
+        <testcase classname="src/modules/site-module-management.test.tsx" name="SiteModuleManagement &gt; distinguishes the visible page from every matching Site" time="0.700986026">
+        </testcase>
+        <testcase classname="src/modules/site-module-management.test.tsx" name="SiteModuleManagement &gt; targets an Organization with or without its descendants" time="1.213554181">
+        </testcase>
+        <testcase classname="src/modules/site-module-management.test.tsx" name="SiteModuleManagement &gt; shows a failed Site read with a retry" time="0.367186497">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/navigation.test.ts" timestamp="2026-11-11T16:54:52.394Z" hostname="ee3e3eb7f70f" tests="13" failures="0" errors="0" skipped="0" time="0.012914946">
+        <testcase classname="src/navigation.test.ts" name="platform workspace visibility &gt; gates every platform entry on a platform-scoped permission" time="0.003239321">
+        </testcase>
+        <testcase classname="src/navigation.test.ts" name="platform workspace visibility &gt; shows only the entries a platform permission covers" time="0.00053466">
+        </testcase>
+        <testcase classname="src/navigation.test.ts" name="platform workspace visibility &gt; ignores content permissions that do not open a platform screen" time="0.000194452">
+        </testcase>
+        <testcase classname="src/navigation.test.ts" name="workspace paths &gt; finds the Site workspace from a Site administration path only" time="0.000883978">
+        </testcase>
+        <testcase classname="src/navigation.test.ts" name="workspace paths &gt; maps selector values to their dashboards" time="0.000629519">
+        </testcase>
+        <testcase classname="src/navigation.test.ts" name="adminNavItems &gt; exposes the Organizations, Sites, Domains, Modules and permission-gated Access control entries" time="0.001426149">
+        </testcase>
+        <testcase classname="src/navigation.test.ts" name="adminNavItems &gt; labels every entry for the navigation list" time="0.000474616">
+        </testcase>
+        <testcase classname="src/navigation.test.ts" name="normalizeAdminPathname &gt; maps empty input to the dashboard root" time="0.000228626">
+        </testcase>
+        <testcase classname="src/navigation.test.ts" name="normalizeAdminPathname &gt; keeps app-relative paths untouched" time="0.000548894">
+        </testcase>
+        <testcase classname="src/navigation.test.ts" name="normalizeAdminPathname &gt; strips the Next.js base path when present" time="0.00027217">
+        </testcase>
+        <testcase classname="src/navigation.test.ts" name="isNavItemActive &gt; matches the dashboard only on the root path" time="0.000247586">
+        </testcase>
+        <testcase classname="src/navigation.test.ts" name="isNavItemActive &gt; matches a section on its own path and nested paths" time="0.000087366">
+        </testcase>
+        <testcase classname="src/navigation.test.ts" name="isNavItemActive &gt; does not cross-match sibling sections" time="0.000072161">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/organizations/hierarchy-tree.test.ts" timestamp="2026-11-11T16:54:52.397Z" hostname="ee3e3eb7f70f" tests="3" failures="0" errors="0" skipped="0" time="0.030643478">
+        <testcase classname="src/organizations/hierarchy-tree.test.ts" name="organization hierarchy helpers &gt; builds deep trees iteratively and only expands visible branches" time="0.01193069">
+        </testcase>
+        <testcase classname="src/organizations/hierarchy-tree.test.ts" name="organization hierarchy helpers &gt; returns ancestors in root-first order and counts the full descendant branch" time="0.001178302">
+        </testcase>
+        <testcase classname="src/organizations/hierarchy-tree.test.ts" name="organization hierarchy helpers &gt; keeps orphaned nodes visible without treating their missing parent as accessible" time="0.013760221">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/organizations/list-query.test.ts" timestamp="2026-11-11T16:54:52.398Z" hostname="ee3e3eb7f70f" tests="3" failures="0" errors="0" skipped="0" time="0.008804665">
+        <testcase classname="src/organizations/list-query.test.ts" name="organization list URL query contract &gt; parses approved filters, page, and server ordering" time="0.004740958">
+        </testcase>
+        <testcase classname="src/organizations/list-query.test.ts" name="organization list URL query contract &gt; drops invalid and repeated filter values rather than forwarding them" time="0.000498607">
+        </testcase>
+        <testcase classname="src/organizations/list-query.test.ts" name="organization list URL query contract &gt; round-trips filter drafts and shareable query parameters" time="0.000687933">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/organizations/organization-form.test.tsx" timestamp="2026-11-11T16:54:52.399Z" hostname="ee3e3eb7f70f" tests="12" failures="0" errors="0" skipped="0" time="3.060807909">
+        <testcase classname="src/organizations/organization-form.test.tsx" name="OrganizationForm — create &gt; renders labelled controls for the approved DTO fields" time="0.317154128">
+        </testcase>
+        <testcase classname="src/organizations/organization-form.test.tsx" name="OrganizationForm — create &gt; gives usable client feedback and does not call the API when invalid" time="0.183086787">
+        </testcase>
+        <testcase classname="src/organizations/organization-form.test.tsx" name="OrganizationForm — create &gt; submits an approved payload on success and refreshes the view" time="0.529792159">
+        </testcase>
+        <testcase classname="src/organizations/organization-form.test.tsx" name="OrganizationForm — create &gt; shows a 409 duplicate code as a field error rather than a generic failure" time="0.381983412">
+        </testcase>
+        <testcase classname="src/organizations/organization-form.test.tsx" name="OrganizationForm — create &gt; explains a closed development write gate" time="0.493816816">
+        </testcase>
+        <testcase classname="src/organizations/organization-form.test.tsx" name="OrganizationForm — create &gt; distinguishes a missing permission from a closed development write gate" time="0.344996018">
+        </testcase>
+        <testcase classname="src/organizations/organization-form.test.tsx" name="OrganizationForm — create &gt; shows invalid JSON metadata before any request is made" time="0.343586642">
+        </testcase>
+        <testcase classname="src/organizations/organization-form.test.tsx" name="OrganizationForm — edit &gt; locks the immutable code and sends a conditional update with the ETag" time="0.155599862">
+            <system-err>
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or &apos;&apos;.
+The available values are ``.
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or &apos;&apos;.
+The available values are ``.
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or &apos;&apos;.
+The available values are ``.
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or &apos;&apos;.
+The available values are ``.
+
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or &apos;&apos;.
+The available values are ``.
+
+            </system-err>
+        </testcase>
+        <testcase classname="src/organizations/organization-form.test.tsx" name="OrganizationForm — edit &gt; reports a stale ETag (412) as a concurrency conflict asking for a reload" time="0.105587911">
+            <system-err>
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or &apos;&apos;.
+The available values are ``.
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or &apos;&apos;.
+The available values are ``.
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or &apos;&apos;.
+The available values are ``.
+
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or &apos;&apos;.
+The available values are ``.
+
+            </system-err>
+        </testcase>
+        <testcase classname="src/organizations/organization-form.test.tsx" name="OrganizationForm — edit &gt; reports a missing precondition (428) distinctly" time="0.092863759">
+            <system-err>
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or &apos;&apos;.
+The available values are ``.
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or &apos;&apos;.
+The available values are ``.
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or &apos;&apos;.
+The available values are ``.
+
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or &apos;&apos;.
+The available values are ``.
+
+            </system-err>
+        </testcase>
+        <testcase classname="src/organizations/organization-form.test.tsx" name="OrganizationForm — edit &gt; locks hierarchy fields on the institutional root" time="0.048346995">
+        </testcase>
+        <testcase classname="src/organizations/organization-form.test.tsx" name="OrganizationForm — edit &gt; locks hierarchy fields on an archived unit" time="0.060734195">
+            <system-err>
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or &apos;&apos;.
+The available values are ``.
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or &apos;&apos;.
+The available values are ``.
+
+            </system-err>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/organizations/organization-hierarchy.test.tsx" timestamp="2026-11-11T16:54:52.402Z" hostname="ee3e3eb7f70f" tests="6" failures="0" errors="0" skipped="0" time="3.098760567">
+        <testcase classname="src/organizations/organization-hierarchy.test.tsx" name="organization hierarchy browser &gt; renders a nested accessible tree, supports keyboard expansion and ancestor navigation" time="0.634879239">
+        </testcase>
+        <testcase classname="src/organizations/organization-hierarchy.test.tsx" name="organization hierarchy browser &gt; refreshes from the structure section" time="0.093791266">
+        </testcase>
+        <testcase classname="src/organizations/organization-hierarchy.test.tsx" name="organization hierarchy browser &gt; hides the selected and archived parent options and lets the backend reject cycle candidates" time="0.535428936">
+        </testcase>
+        <testcase classname="src/organizations/organization-hierarchy.test.tsx" name="organization hierarchy browser &gt; surfaces backend status 412 without applying a rejected move" time="0.715017233">
+        </testcase>
+        <testcase classname="src/organizations/organization-hierarchy.test.tsx" name="organization hierarchy browser &gt; surfaces backend status 403 without applying a rejected move" time="0.57356724">
+        </testcase>
+        <testcase classname="src/organizations/organization-hierarchy.test.tsx" name="organization hierarchy browser &gt; updates the tree after a successful move and shows the API confirmation" time="0.541194506">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/organizations/organizations-list.test.tsx" timestamp="2026-11-11T16:54:52.404Z" hostname="ee3e3eb7f70f" tests="12" failures="0" errors="0" skipped="0" time="6.261357542">
+        <testcase classname="src/organizations/organizations-list.test.tsx" name="OrganizationsList — reads &gt; renders rows from the API with status chips" time="0.947456711">
+        </testcase>
+        <testcase classname="src/organizations/organizations-list.test.tsx" name="OrganizationsList — reads &gt; shows an empty state and offers a filter reset when filters match nothing" time="0.654020499">
+        </testcase>
+        <testcase classname="src/organizations/organizations-list.test.tsx" name="OrganizationsList — reads &gt; surfaces a denied read with its correlation id" time="0.330942083">
+        </testcase>
+        <testcase classname="src/organizations/organizations-list.test.tsx" name="OrganizationsList — reads &gt; filters by name and exact code through the server query and shareable URL" time="0.48962052">
+        </testcase>
+        <testcase classname="src/organizations/organizations-list.test.tsx" name="OrganizationsList — reads &gt; does not silently apply an invalid exact code filter" time="0.38169652">
+        </testcase>
+        <testcase classname="src/organizations/organizations-list.test.tsx" name="OrganizationsList — reads &gt; links organization names to their details" time="0.380710217">
+        </testcase>
+        <testcase classname="src/organizations/organizations-list.test.tsx" name="OrganizationsList — lifecycle actions &gt; offers Deactivate on an ACTIVE unit and Archive on an INACTIVE one" time="0.402185255">
+        </testcase>
+        <testcase classname="src/organizations/organizations-list.test.tsx" name="OrganizationsList — lifecycle actions &gt; offers no lifecycle action on the institutional root or archived units" time="0.314063088">
+        </testcase>
+        <testcase classname="src/organizations/organizations-list.test.tsx" name="OrganizationsList — lifecycle actions &gt; requires explicit confirmation before deactivating, and only then calls the API" time="0.652264504">
+        </testcase>
+        <testcase classname="src/organizations/organizations-list.test.tsx" name="OrganizationsList — lifecycle actions &gt; closes without writing when the confirmation is cancelled" time="0.808767897">
+        </testcase>
+        <testcase classname="src/organizations/organizations-list.test.tsx" name="OrganizationsList — lifecycle actions &gt; shows a denied write (403) inside the dialog instead of pretending success" time="0.520819527">
+        </testcase>
+        <testcase classname="src/organizations/organizations-list.test.tsx" name="OrganizationsList — lifecycle actions &gt; reports a stale ETag (412) during a lifecycle change" time="0.374421916">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/organizations/validation.test.ts" timestamp="2026-11-11T16:54:52.407Z" hostname="ee3e3eb7f70f" tests="17" failures="0" errors="0" skipped="0" time="0.013103809">
+        <testcase classname="src/organizations/validation.test.ts" name="organization type options &gt; offers a controlled, non-empty set of type codes" time="0.003139125">
+        </testcase>
+        <testcase classname="src/organizations/validation.test.ts" name="organization type options &gt; labels known codes and falls back to the raw code for unknown ones" time="0.000526453">
+        </testcase>
+        <testcase classname="src/organizations/validation.test.ts" name="normalizeCode &gt; trims and upper-cases like the serializer does" time="0.000304691">
+        </testcase>
+        <testcase classname="src/organizations/validation.test.ts" name="validateOrganizationForm &gt; accepts a fully populated create form" time="0.001277553">
+        </testcase>
+        <testcase classname="src/organizations/validation.test.ts" name="validateOrganizationForm &gt; requires code, name and type on create" time="0.000462528">
+        </testcase>
+        <testcase classname="src/organizations/validation.test.ts" name="validateOrganizationForm &gt; rejects codes that break the canonical pattern" time="0.00028158">
+        </testcase>
+        <testcase classname="src/organizations/validation.test.ts" name="validateOrganizationForm &gt; does not re-validate the immutable code when editing" time="0.000194583">
+        </testcase>
+        <testcase classname="src/organizations/validation.test.ts" name="validateOrganizationForm &gt; flags a blank name even when whitespace only" time="0.000134816">
+        </testcase>
+        <testcase classname="src/organizations/validation.test.ts" name="validateOrganizationForm &gt; rejects metadata that is not valid JSON" time="0.000755612">
+        </testcase>
+        <testcase classname="src/organizations/validation.test.ts" name="tryParseMetadata &gt; treats blank as an empty object" time="0.000483487">
+        </testcase>
+        <testcase classname="src/organizations/validation.test.ts" name="tryParseMetadata &gt; parses a JSON object" time="0.000319837">
+        </testcase>
+        <testcase classname="src/organizations/validation.test.ts" name="tryParseMetadata &gt; rejects arrays and scalars, which the backend cannot store" time="0.000146702">
+        </testcase>
+        <testcase classname="src/organizations/validation.test.ts" name="formValuesFromOrganization &gt; round-trips an organization into editable values" time="0.000456144">
+        </testcase>
+        <testcase classname="src/organizations/validation.test.ts" name="formValuesFromOrganization &gt; represents a root parent as the empty sentinel" time="0.000134463">
+        </testcase>
+        <testcase classname="src/organizations/validation.test.ts" name="parentOptionsFor &gt; offers every node when creating (nothing to exclude yet)" time="0.00036159">
+        </testcase>
+        <testcase classname="src/organizations/validation.test.ts" name="parentOptionsFor &gt; excludes the unit being edited to prevent a self-parent" time="0.000994439">
+        </testcase>
+        <testcase classname="src/organizations/validation.test.ts" name="parentOptionsFor &gt; excludes descendants so an obvious cycle cannot be chosen" time="0.000433678">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/session-expiry.test.ts" timestamp="2026-11-11T16:54:52.412Z" hostname="ee3e3eb7f70f" tests="3" failures="0" errors="0" skipped="0" time="0.010739889">
+        <testcase classname="src/session-expiry.test.ts" name="session expiry return path &gt; keeps console paths with their query" time="0.005715988">
+        </testcase>
+        <testcase classname="src/session-expiry.test.ts" name="session expiry return path &gt; falls back to the console home for anything outside the console" time="0.001774145">
+        </testcase>
+        <testcase classname="src/session-expiry.test.ts" name="session expiry return path &gt; encodes the return path into the expired-session route" time="0.0007624">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/session-jwt.test.ts" timestamp="2026-11-11T16:54:52.413Z" hostname="ee3e3eb7f70f" tests="2" failures="0" errors="0" skipped="0" time="0.022566464">
+        <testcase classname="src/session-jwt.test.ts" name="writeSessionToken &gt; stores the replacement refresh token in the session cookie" time="0.017039106">
+        </testcase>
+        <testcase classname="src/session-jwt.test.ts" name="writeSessionToken &gt; clears a previous chunked session cookie when the new value fits in one" time="0.003041177">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/session-watch.test.ts" timestamp="2026-11-11T16:54:52.413Z" hostname="ee3e3eb7f70f" tests="2" failures="0" errors="0" skipped="0" time="0.053297451">
+        <testcase classname="src/session-watch.test.ts" name="session watch &gt; starts a new sign-in only when the session check answers 401" time="0.016580125">
+        </testcase>
+        <testcase classname="src/session-watch.test.ts" name="session watch &gt; checks when the tab regains focus and on the interval" time="0.034459885">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sidebar.test.tsx" timestamp="2026-11-11T16:54:52.414Z" hostname="ee3e3eb7f70f" tests="10" failures="0" errors="0" skipped="0" time="1.267369227">
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — platform workspace &gt; renders platform sections as base-path-relative links for a platform administrator" time="0.547516894">
+        </testcase>
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — platform workspace &gt; marks the current section with aria-current, with or without the base path" time="0.135929235">
+        </testcase>
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — platform workspace &gt; hides platform navigation from a Site-only account and offers its Sites" time="0.08162353">
+        </testcase>
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — platform workspace &gt; switches to a Site workspace from the keyboard-operable selector" time="0.093388926">
+        </testcase>
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — platform workspace &gt; reports a failed workspace read instead of an empty menu" time="0.046567151">
+        </testcase>
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — platform workspace &gt; reports Site list failures without claiming that no workspace is assigned" time="0.081807054">
+        </testcase>
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — platform workspace &gt; tells a signed-out user to sign in again instead of hiding navigation silently" time="0.054042341">
+        </testcase>
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — platform workspace &gt; does not start a new sign-in for other failures" time="0.041698963">
+        </testcase>
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — Site workspace &gt; shows the active Site and only its enabled, authorized sections" time="0.121984319">
+        </testcase>
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — Site workspace &gt; does not render sections for a Site outside the authorized list" time="0.054609126">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/configuration.test.ts" timestamp="2026-11-11T16:54:52.416Z" hostname="ee3e3eb7f70f" tests="6" failures="0" errors="0" skipped="0" time="0.014325006">
+        <testcase classname="src/sites/configuration.test.ts" name="configurationRows — provenance &gt; marks values equal to the template defaults as inherited" time="0.005364254">
+        </testcase>
+        <testcase classname="src/sites/configuration.test.ts" name="configurationRows — provenance &gt; marks values that differ from the template defaults as overrides" time="0.00124121">
+        </testcase>
+        <testcase classname="src/sites/configuration.test.ts" name="configurationRows — provenance &gt; treats the default language as the site&apos;s own value, not provenance" time="0.000641049">
+        </testcase>
+        <testcase classname="src/sites/configuration.test.ts" name="configurationRows — provenance &gt; falls back to schema defaults when the site has no template" time="0.002680239">
+        </testcase>
+        <testcase classname="src/sites/configuration.test.ts" name="configurationRows — provenance &gt; describes each origin in plain language" time="0.000689024">
+        </testcase>
+        <testcase classname="src/sites/configuration.test.ts" name="configuration documents &gt; produces a schema-version-1 document for a given language" time="0.000400745">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/content-workflow.test.tsx" timestamp="2026-11-11T16:54:52.417Z" hostname="ee3e3eb7f70f" tests="2" failures="0" errors="0" skipped="0" time="0.503154069">
+        <testcase classname="src/sites/content-workflow.test.tsx" name="shared content workflow &gt; offers only the actions the backend returned and no schedule control" time="0.171718535">
+        </testcase>
+        <testcase classname="src/sites/content-workflow.test.tsx" name="shared content workflow &gt; requires a reviewer comment to reject and keeps a workflow error on screen" time="0.326606408">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/media-library.test.tsx" timestamp="2026-11-11T16:54:52.417Z" hostname="ee3e3eb7f70f" tests="9" failures="0" errors="0" skipped="0" time="3.02050345">
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; excludes processing images then picks the worker-completed identity on refresh" time="0.34318308">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; shows processing state in the library and preserves the retry key after transfer failure" time="0.343760929">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; never offers upload to a read-only account" time="0.122527643">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; applies filename search before paging and resets to the first page" time="0.40425701">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; loads scoped details and saves only persisted alt text" time="0.576078567">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; shows readonly metadata without a save control" time="0.338977346">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; sends the selected status and type filters to the server" time="0.53228689">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; shows scoped thumbnails and disables a broken preview until retry" time="0.131703294">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; reports terminal image processing without offering selection" time="0.22449666">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/menu-items.test.tsx" timestamp="2026-11-11T16:54:52.419Z" hostname="ee3e3eb7f70f" tests="6" failures="0" errors="0" skipped="0" time="2.22051521">
+        <testcase classname="src/sites/menu-items.test.tsx" name="MenuItemTree &gt; moves, nests and lifts items from the keyboard for this Site only" time="1.014847891">
+        </testcase>
+        <testcase classname="src/sites/menu-items.test.tsx" name="MenuItemTree &gt; reorders by dropping an item onto a sibling" time="0.188259827">
+        </testcase>
+        <testcase classname="src/sites/menu-items.test.tsx" name="MenuItemTree &gt; blocks an unsafe external URL and an unavailable Page" time="0.253915524">
+        </testcase>
+        <testcase classname="src/sites/menu-items.test.tsx" name="MenuItemTree &gt; saves a Page target and removes a leaf" time="0.500845034">
+        </testcase>
+        <testcase classname="src/sites/menu-items.test.tsx" name="MenuItemTree &gt; reports a version conflict and does not send the stale change again" time="0.156519489">
+        </testcase>
+        <testcase classname="src/sites/menu-items.test.tsx" name="MenuItemTree &gt; warns when Pages cannot be loaded and keeps an unavailable target visible" time="0.102977472">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/menu-paths.test.ts" timestamp="2026-11-11T16:54:52.420Z" hostname="ee3e3eb7f70f" tests="2" failures="0" errors="0" skipped="0" time="0.008673568">
+        <testcase classname="src/sites/menu-paths.test.ts" name="siteMenuPath &gt; scopes every menu route to the Site id it was given" time="0.003810219">
+        </testcase>
+        <testcase classname="src/sites/menu-paths.test.ts" name="siteMenuPath &gt; rejects a missing or foreign-looking id" time="0.001491811">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/owner.test.ts" timestamp="2026-11-11T16:54:52.421Z" hostname="ee3e3eb7f70f" tests="8" failures="0" errors="0" skipped="0" time="0.011402425">
+        <testcase classname="src/sites/owner.test.ts" name="ownerInfoFor — root and child topology &gt; classifies a root-owned site and resolves its root name to itself" time="0.004427644">
+        </testcase>
+        <testcase classname="src/sites/owner.test.ts" name="ownerInfoFor — root and child topology &gt; classifies a college-owned site as a child under the institutional root" time="0.001257502">
+        </testcase>
+        <testcase classname="src/sites/owner.test.ts" name="ownerInfoFor — root and child topology &gt; does not assume a child site belongs to a department" time="0.000436487">
+        </testcase>
+        <testcase classname="src/sites/owner.test.ts" name="ownerInfoFor — root and child topology &gt; represents several sites owned by the same organization" time="0.000869447">
+        </testcase>
+        <testcase classname="src/sites/owner.test.ts" name="ownerInfoFor — missing hierarchy data &gt; falls back to unknown instead of inventing an owner" time="0.000482019">
+        </testcase>
+        <testcase classname="src/sites/owner.test.ts" name="ownerInfoFor — missing hierarchy data &gt; still knows a designated main site sits on the root" time="0.000190658">
+        </testcase>
+        <testcase classname="src/sites/owner.test.ts" name="ownerInfoFor — missing hierarchy data &gt; stops walking a parent chain that leaves the known set" time="0.000212677">
+        </testcase>
+        <testcase classname="src/sites/owner.test.ts" name="labels &gt; describes each relation without claiming more than it knows" time="0.00022917">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/page-paths.test.ts" timestamp="2026-11-11T16:54:52.423Z" hostname="ee3e3eb7f70f" tests="2" failures="0" errors="0" skipped="0" time="0.005230963">
+        <testcase classname="src/sites/page-paths.test.ts" name="sitePagePath &gt; builds list, detail, workflow and homepage URLs for one Site" time="0.001971427">
+        </testcase>
+        <testcase classname="src/sites/page-paths.test.ts" name="sitePagePath &gt; rejects a missing Site id" time="0.001094309">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/post-paths.test.ts" timestamp="2026-11-11T16:54:52.424Z" hostname="ee3e3eb7f70f" tests="3" failures="0" errors="0" skipped="0" time="0.011082142">
+        <testcase classname="src/sites/post-paths.test.ts" name="Site Post API paths &gt; keeps every collection and detail scoped to its Site" time="0.004042291">
+        </testcase>
+        <testcase classname="src/sites/post-paths.test.ts" name="Site Post API paths &gt; rejects invalid Site ids" time="0.001526177">
+        </testcase>
+        <testcase classname="src/sites/post-paths.test.ts" name="Site Post API paths &gt; builds the shared workflow route from the Site and Post id" time="0.0009351">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-admin-frame.test.tsx" timestamp="2026-11-11T16:54:52.424Z" hostname="ee3e3eb7f70f" tests="9" failures="0" errors="0" skipped="0" time="0.652026364">
+        <testcase classname="src/sites/site-admin-frame.test.tsx" name="SiteAdminFrame &gt; keeps the active Site name, status, code and organization visible" time="0.315045716">
+        </testcase>
+        <testcase classname="src/sites/site-admin-frame.test.tsx" name="SiteAdminFrame &gt; names the organization by id when this account cannot read it" time="0.037652241">
+        </testcase>
+        <testcase classname="src/sites/site-admin-frame.test.tsx" name="SiteAdminFrame &gt; shows the current section in the breadcrumb" time="0.050406237">
+        </testcase>
+        <testcase classname="src/sites/site-admin-frame.test.tsx" name="SiteAdminFrame &gt; shows the central registry only when that permission was delegated" time="0.042000683">
+        </testcase>
+        <testcase classname="src/sites/site-admin-frame.test.tsx" name="SiteAdminFrame &gt; remounts per Site so a draft does not follow the user" time="0.067301464">
+        </testcase>
+        <testcase classname="src/sites/site-admin-frame.test.tsx" name="SiteAdminFrame &gt; blocks a direct section when the module or permission is missing" time="0.040763242">
+        </testcase>
+        <testcase classname="src/sites/site-admin-frame.test.tsx" name="SiteAdminFrame &gt; blocks direct Posts administration when the Posts module is disabled" time="0.033294993">
+        </testcase>
+        <testcase classname="src/sites/site-admin-frame.test.tsx" name="SiteAdminFrame &gt; blocks a section the account has no permission for" time="0.028531398">
+        </testcase>
+        <testcase classname="src/sites/site-admin-frame.test.tsx" name="SiteAdminDenied &gt; offers only the supplied authorized Sites" time="0.031398216">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-admin.test.ts" timestamp="2026-11-11T16:54:52.426Z" hostname="ee3e3eb7f70f" tests="9" failures="0" errors="0" skipped="0" time="0.011283222">
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; shows Pages and Menus only when the module is enabled and the user is permitted" time="0.00368117">
+        </testcase>
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; shows the Users section without a content module when site user access is granted" time="0.00078333">
+        </testcase>
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; hides a section when the Site module is off" time="0.000276621">
+        </testcase>
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; hides a section when the user lacks that permission" time="0.000410824">
+        </testcase>
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; does not treat another Site&apos;s module row as enabled here" time="0.000409314">
+        </testcase>
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; hides globally disabled or unshipped modules even when the Site switch is on" time="0.000196209">
+        </testcase>
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; lists each accessible Site once and drops an invalid id" time="0.000380772">
+        </testcase>
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; sends a Site switch to that Site&apos;s dashboard" time="0.000457754">
+        </testcase>
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; keeps central module activation off the Site menu unless delegated" time="0.000548732">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-dashboard.test.tsx" timestamp="2026-11-11T16:54:52.429Z" hostname="ee3e3eb7f70f" tests="6" failures="0" errors="0" skipped="0" time="0.87194383">
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="SiteDashboard &gt; summarizes this Site&apos;s Pages, Posts and Menus from the API" time="0.428845821">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="SiteDashboard &gt; offers create-page and navigation quick actions within the Site" time="0.096922304">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="SiteDashboard &gt; omits disabled or unauthorized sections and does not call their APIs" time="0.070810628">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="SiteDashboard &gt; shows an empty state when the Site has no Pages" time="0.058909437">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="SiteDashboard &gt; reports a failed summary and retries it" time="0.157580361">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="SiteDashboard &gt; says so when no content module is available" time="0.052883426">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-detail.test.tsx" timestamp="2026-11-11T16:54:52.431Z" hostname="ee3e3eb7f70f" tests="13" failures="0" errors="0" skipped="0" time="3.513166153">
+        <testcase classname="src/sites/site-detail.test.tsx" name="SiteDetail — owner organization &gt; shows a root-owned site with the owner&apos;s own identity and designation" time="0.470537486">
+        </testcase>
+        <testcase classname="src/sites/site-detail.test.tsx" name="SiteDetail — owner organization &gt; shows a child site with the owner&apos;s real type and its root, without assuming a department" time="0.243376391">
+        </testcase>
+        <testcase classname="src/sites/site-detail.test.tsx" name="SiteDetail — owner organization &gt; falls back to the raw unit reference when the directory read fails" time="0.25443975">
+        </testcase>
+        <testcase classname="src/sites/site-detail.test.tsx" name="SiteDetail — domains &gt; lists hostnames with their primary and status flags" time="0.558989903">
+        </testcase>
+        <testcase classname="src/sites/site-detail.test.tsx" name="SiteDetail — domains &gt; states when no hostnames are registered" time="0.287081688">
+        </testcase>
+        <testcase classname="src/sites/site-detail.test.tsx" name="SiteDetail — domains &gt; reports a failed domain read instead of implying there are no domains" time="0.463370995">
+        </testcase>
+        <testcase classname="src/sites/site-detail.test.tsx" name="SiteDetail — modules &gt; says no modules are enabled and does not present planned capabilities as features" time="0.256779546">
+        </testcase>
+        <testcase classname="src/sites/site-detail.test.tsx" name="SiteDetail — modules &gt; renders enabled and disabled assignments once a capability ships" time="0.237987816">
+        </testcase>
+        <testcase classname="src/sites/site-detail.test.tsx" name="SiteDetail — modules &gt; reports a failed module read instead of implying no modules" time="0.202678431">
+        </testcase>
+        <testcase classname="src/sites/site-detail.test.tsx" name="SiteDetail — primary domain &gt; shows the primary domain prominently on the site profile" time="0.202526459">
+        </testcase>
+        <testcase classname="src/sites/site-detail.test.tsx" name="SiteDetail — primary domain &gt; says so when the site has no primary domain" time="0.120263839">
+        </testcase>
+        <testcase classname="src/sites/site-detail.test.tsx" name="SiteDetail — primary domain &gt; reports a failed primary-domain read instead of guessing" time="0.1082137">
+        </testcase>
+        <testcase classname="src/sites/site-detail.test.tsx" name="SiteDetail — unavailable site &gt; renders the unavailable card for a not-found error payload" time="0.10003058">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-domains-panel.test.tsx" timestamp="2026-11-11T16:54:52.433Z" hostname="ee3e3eb7f70f" tests="18" failures="0" errors="0" skipped="0" time="2.556770839">
+        <testcase classname="src/sites/site-domains-panel.test.tsx" name="publicWebsiteUrl &gt; builds a protocol-relative URL from the bare hostname" time="0.002414458">
+        </testcase>
+        <testcase classname="src/sites/site-domains-panel.test.tsx" name="SiteDomainsPanel — reads &gt; names the associated site the overview is scoped to" time="0.227091009">
+        </testcase>
+        <testcase classname="src/sites/site-domains-panel.test.tsx" name="SiteDomainsPanel — reads &gt; renders domains with lifecycle chips, the redirect warning and lifecycle info" time="0.053956304">
+        </testcase>
+        <testcase classname="src/sites/site-domains-panel.test.tsx" name="SiteDomainsPanel — reads &gt; links directly to the public website only for active domains" time="0.133068923">
+        </testcase>
+        <testcase classname="src/sites/site-domains-panel.test.tsx" name="SiteDomainsPanel — reads &gt; states when no hostnames are registered" time="0.021253874">
+        </testcase>
+        <testcase classname="src/sites/site-domains-panel.test.tsx" name="SiteDomainsPanel — reads &gt; reports a failed domain read instead of implying there are no domains" time="0.028710236">
+        </testcase>
+        <testcase classname="src/sites/site-domains-panel.test.tsx" name="SiteDomainsPanel — set as primary &gt; confirms by naming both hostnames, then applies the switch atomically" time="0.265852107">
+        </testcase>
+        <testcase classname="src/sites/site-domains-panel.test.tsx" name="SiteDomainsPanel — set as primary &gt; does not change anything when the confirmation is cancelled" time="0.124487974">
+        </testcase>
+        <testcase classname="src/sites/site-domains-panel.test.tsx" name="SiteDomainsPanel — set as primary &gt; surfaces a backend rejection in the dialog and stays open" time="0.144213974">
+        </testcase>
+        <testcase classname="src/sites/site-domains-panel.test.tsx" name="SiteDomainsPanel — set as primary &gt; warns when the chosen alias is not active" time="0.096712026">
+        </testcase>
+        <testcase classname="src/sites/site-domains-panel.test.tsx" name="SiteDomainsPanel — activation &gt; activates an inactive domain after confirmation" time="0.178979286">
+        </testcase>
+        <testcase classname="src/sites/site-domains-panel.test.tsx" name="SiteDomainsPanel — activation &gt; surfaces a rejection without closing the dialog or claiming success" time="0.133793784">
+        </testcase>
+        <testcase classname="src/sites/site-domains-panel.test.tsx" name="SiteDomainsPanel — deactivating an alias &gt; deactivates an alias without any replacement payload" time="0.15566837">
+        </testcase>
+        <testcase classname="src/sites/site-domains-panel.test.tsx" name="SiteDomainsPanel — deactivating the active primary &gt; requires a replacement before the server is contacted at all" time="0.063468834">
+        </testcase>
+        <testcase classname="src/sites/site-domains-panel.test.tsx" name="SiteDomainsPanel — deactivating the active primary &gt; sends the chosen replacement and reports the primary swap" time="0.369211383">
+        </testcase>
+        <testcase classname="src/sites/site-domains-panel.test.tsx" name="SiteDomainsPanel — deactivating the active primary &gt; shows the backend&apos;s rejected-replacement sentences, not a generic failure" time="0.301224965">
+        </testcase>
+        <testcase classname="src/sites/site-domains-panel.test.tsx" name="SiteDomainsPanel — conflicting updates &gt; locks every row action while a confirmation is open" time="0.091695358">
+        </testcase>
+        <testcase classname="src/sites/site-domains-panel.test.tsx" name="SiteDomainsPanel — conflicting updates &gt; keeps the lock while a confirmed change is in flight, then applies it" time="0.161129579">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-form.test.tsx" timestamp="2026-11-11T16:54:52.437Z" hostname="ee3e3eb7f70f" tests="8" failures="0" errors="0" skipped="0" time="3.368131261">
+        <testcase classname="src/sites/site-form.test.tsx" name="SiteForm — create &gt; renders labelled controls for the approved DTO fields" time="0.582585065">
+        </testcase>
+        <testcase classname="src/sites/site-form.test.tsx" name="SiteForm — create &gt; gives usable client feedback and does not call the API when invalid" time="0.355409811">
+        </testcase>
+        <testcase classname="src/sites/site-form.test.tsx" name="SiteForm — create &gt; submits the approved payload on success and navigates to the new site" time="0.654200307">
+        </testcase>
+        <testcase classname="src/sites/site-form.test.tsx" name="SiteForm — create &gt; shows the server&apos;s denial instead of pretending the write succeeded" time="0.395680654">
+        </testcase>
+        <testcase classname="src/sites/site-form.test.tsx" name="SiteForm — create &gt; attaches a duplicate-code conflict to the offending field" time="0.588079707">
+        </testcase>
+        <testcase classname="src/sites/site-form.test.tsx" name="SiteForm — edit &gt; does not write anything when nothing changed" time="0.301416759">
+            <system-err>
+MUI: You have provided an out-of-range value `2` for the select component.
+Consider providing a value that matches one of the available options or &apos;&apos;.
+The available values are &quot;&quot;.
+MUI: You have provided an out-of-range value `2` for the select component.
+Consider providing a value that matches one of the available options or &apos;&apos;.
+The available values are &quot;&quot;.
+MUI: You have provided an out-of-range value `2` for the select component.
+Consider providing a value that matches one of the available options or &apos;&apos;.
+The available values are &quot;&quot;.
+
+            </system-err>
+        </testcase>
+        <testcase classname="src/sites/site-form.test.tsx" name="SiteForm — edit &gt; merges configuration first with a fresh ETag, then saves details" time="0.279422121">
+            <system-err>
+MUI: You have provided an out-of-range value `2` for the select component.
+Consider providing a value that matches one of the available options or &apos;&apos;.
+The available values are &quot;&quot;.
+MUI: You have provided an out-of-range value `2` for the select component.
+Consider providing a value that matches one of the available options or &apos;&apos;.
+The available values are &quot;&quot;.
+MUI: You have provided an out-of-range value `2` for the select component.
+Consider providing a value that matches one of the available options or &apos;&apos;.
+The available values are &quot;&quot;.
+MUI: You have provided an out-of-range value `2` for the select component.
+Consider providing a value that matches one of the available options or &apos;&apos;.
+The available values are &quot;&quot;.
+MUI: You have provided an out-of-range value `2` for the select component.
+Consider providing a value that matches one of the available options or &apos;&apos;.
+The available values are &quot;&quot;.
+
+            </system-err>
+        </testcase>
+        <testcase classname="src/sites/site-form.test.tsx" name="SiteForm — edit &gt; locks frozen controls on an archived site" time="0.205732965">
+            <system-err>
+MUI: You have provided an out-of-range value `2` for the select component.
+Consider providing a value that matches one of the available options or &apos;&apos;.
+The available values are &quot;&quot;.
+MUI: You have provided an out-of-range value `2` for the select component.
+Consider providing a value that matches one of the available options or &apos;&apos;.
+The available values are &quot;&quot;.
+
+            </system-err>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-menus.test.tsx" timestamp="2026-11-11T16:54:52.440Z" hostname="ee3e3eb7f70f" tests="10" failures="0" errors="0" skipped="0" time="2.787364385">
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; reorders the header with the keyboard-reachable move control and only for this Site" time="0.520871083">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; shows the reloaded menu order after a move" time="0.398491254">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; creates a local footer for this Site and edits its name and location" time="0.838215186">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; treats a missing inheritance field as no delivery policy" time="0.168128028">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; ignores malformed inheritance entries without crashing or inventing a policy" time="0.199914183">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; states that an empty inheritance list adds no parent menu" time="0.110299121">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; explains central and inherited ownership and does not edit a central menu" time="0.224209674">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; shows an empty list and hides writes without menu permission" time="0.033505319">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; shows the load error and keeps the selected Site on the request" time="0.057036804">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; blocks changes when the MENUS module is off" time="0.233933447">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-modules.test.tsx" timestamp="2026-11-11T16:54:52.443Z" hostname="ee3e3eb7f70f" tests="18" failures="0" errors="0" skipped="0" time="2.755699644">
+        <testcase classname="src/sites/site-modules.test.tsx" name="SiteModules — availability messaging &gt; shows a PLANNED module as unavailable with no enable control" time="0.191515399">
+        </testcase>
+        <testcase classname="src/sites/site-modules.test.tsx" name="SiteModules — availability messaging &gt; shows an implemented module as available with an Enable control" time="0.165659276">
+        </testcase>
+        <testcase classname="src/sites/site-modules.test.tsx" name="SiteModules — availability messaging &gt; explains a globally disabled module instead of offering it" time="0.050455188">
+        </testcase>
+        <testcase classname="src/sites/site-modules.test.tsx" name="SiteModules — empty and error states &gt; says honestly that the registry is empty" time="0.050437787">
+        </testcase>
+        <testcase classname="src/sites/site-modules.test.tsx" name="SiteModules — empty and error states &gt; surfaces a failed registry read with a retry, not an empty list" time="0.09313176">
+        </testcase>
+        <testcase classname="src/sites/site-modules.test.tsx" name="SiteModules — empty and error states &gt; hides the controls when the assignment read fails" time="0.079794522">
+        </testcase>
+        <testcase classname="src/sites/site-modules.test.tsx" name="SiteModules — empty and error states &gt; renders the unavailable card when the site itself is missing" time="0.030595235">
+        </testcase>
+        <testcase classname="src/sites/site-modules.test.tsx" name="SiteModules — enabling &gt; opens the settings form first when the module has required settings" time="0.200389583">
+        </testcase>
+        <testcase classname="src/sites/site-modules.test.tsx" name="SiteModules — enabling &gt; blocks submit with a field error until the required setting is filled" time="0.153632146">
+        </testcase>
+        <testcase classname="src/sites/site-modules.test.tsx" name="SiteModules — enabling &gt; enables with settings and refreshes the module state on success" time="0.299591182">
+        </testcase>
+        <testcase classname="src/sites/site-modules.test.tsx" name="SiteModules — enabling &gt; enables directly when the module has no settings to collect" time="0.149243721">
+        </testcase>
+        <testcase classname="src/sites/site-modules.test.tsx" name="SiteModules — enabling &gt; displays a denied write verbatim and does not claim success" time="0.123407367">
+        </testcase>
+        <testcase classname="src/sites/site-modules.test.tsx" name="SiteModules — enabling &gt; shows the server&apos;s field error inside the open settings panel" time="0.229956132">
+        </testcase>
+        <testcase classname="src/sites/site-modules.test.tsx" name="SiteModules — disabling and settings &gt; confirms before disabling and reports success with data preserved" time="0.266755367">
+        </testcase>
+        <testcase classname="src/sites/site-modules.test.tsx" name="SiteModules — disabling and settings &gt; surfaces a failed disable inside the dialog instead of closing it" time="0.168186246">
+        </testcase>
+        <testcase classname="src/sites/site-modules.test.tsx" name="SiteModules — disabling and settings &gt; saves settings through the PATCH action without toggling enablement" time="0.23526263">
+        </testcase>
+        <testcase classname="src/sites/site-modules.test.tsx" name="SiteModules — disabling and settings &gt; rejects a non-numeric setting locally before any request" time="0.169750185">
+        </testcase>
+        <testcase classname="src/sites/site-modules.test.tsx" name="SiteModules — disabling and settings &gt; shows the stored settings summary for an assigned module" time="0.091733433">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-pages.test.tsx" timestamp="2026-11-11T16:54:52.447Z" hostname="ee3e3eb7f70f" tests="20" failures="0" errors="0" skipped="0" time="21.692758835">
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; renders a site-scoped accessible table and status dashboard" time="0.772307135">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; announces empty and failed API list states" time="0.471938032">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; applies server search and status filters and resets pagination" time="0.990001025">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; uses API pagination and resets to the first page when sorting changes" time="0.504450572">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; opens a safe preview and submits this Site&apos;s draft for review" time="0.830565619">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; shows review controls only from backend-authorized actions and requires a rejection comment" time="0.942106489">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; shows append-only workflow history and reviewer feedback in a timeline" time="0.420323761">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; defaults a new Page to the Site language" time="1.409437633">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; opens the create dialog once for the dashboard quick action" time="0.441350017">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; starts a new Page blank and fills the slug from the title until it is edited" time="1.010207081">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; ignores the create request without create permission" time="0.140715649">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; creates and edits only with the matching permission and current ETag" time="2.718639526">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; surfaces stale edit conflicts without losing the form" time="1.980060657">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; previews private draft content and blocks malformed block JSON" time="2.904342689">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; asks before discarding unsaved editor changes" time="1.992263606">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; blocks management when the PAGES module is off" time="0.760423728">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; clears filter and page state when the selected Site changes" time="1.261894388">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; does not fetch or expose Pages without view permission" time="0.048986965">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; switches Site scope and enforces view-only access across the admin workspace" time="0.86057609">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; opens a working draft of a published Page and keeps the live route fixed" time="1.228676229">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-posts.test.tsx" timestamp="2026-11-11T16:54:52.451Z" hostname="ee3e3eb7f70f" tests="10" failures="0" errors="0" skipped="0" time="11.866252716">
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; loads only the selected Site and renders status, author, taxonomy and featured media" time="0.589906957">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; applies search, status, category and tag filters and resets them" time="1.510329691">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; resets filters on Site change and requests the new Site only" time="0.796357974">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; hides create/edit actions without permissions and blocks the disabled module" time="0.304515871">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; does not request or reveal Site Posts without view permission" time="0.024083001">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; creates drafts and edits with the detail ETag" time="2.821978729">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; shows empty and API error states" time="0.516957668">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; validates media scope and offers taxonomy creation only to authorized creators" time="3.080317601">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; previews the Site draft through the shared safe block renderer" time="1.06314245">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; runs submit, approve and publish only when the API offers that action for this Site" time="1.15652396">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/sites-list.test.tsx" timestamp="2026-11-11T16:54:52.454Z" hostname="ee3e3eb7f70f" tests="13" failures="0" errors="0" skipped="0" time="3.521187579">
+        <testcase classname="src/sites/sites-list.test.tsx" name="SitesList — reads &gt; renders rows from the API with status chips" time="0.669362087">
+        </testcase>
+        <testcase classname="src/sites/sites-list.test.tsx" name="SitesList — reads &gt; shows an empty state when filters match nothing" time="0.388258877">
+        </testcase>
+        <testcase classname="src/sites/sites-list.test.tsx" name="SitesList — reads &gt; surfaces a backend failure through the shared error state" time="0.13089472">
+        </testcase>
+        <testcase classname="src/sites/sites-list.test.tsx" name="SitesList — owner and topology &gt; shows the owner organization as a distinct record with its own type" time="0.196237434">
+        </testcase>
+        <testcase classname="src/sites/sites-list.test.tsx" name="SitesList — owner and topology &gt; represents several sites owned by the same organization" time="0.189567654">
+        </testcase>
+        <testcase classname="src/sites/sites-list.test.tsx" name="SitesList — owner and topology &gt; falls back to the raw unit id when the hierarchy read failed" time="0.134321188">
+        </testcase>
+        <testcase classname="src/sites/sites-list.test.tsx" name="SitesList — primary domain &gt; renders summaries from the Site page without per-row server actions" time="0.090743309">
+        </testcase>
+        <testcase classname="src/sites/sites-list.test.tsx" name="SitesList — primary domain &gt; shows the primary hostname for a row&apos;s site" time="0.095403951">
+        </testcase>
+        <testcase classname="src/sites/sites-list.test.tsx" name="SitesList — primary domain &gt; says there is no primary domain instead of leaving the cell empty" time="0.077462257">
+        </testcase>
+        <testcase classname="src/sites/sites-list.test.tsx" name="SitesList — primary domain &gt; marks an unreadable domain cell as unavailable, not as empty" time="0.096244293">
+        </testcase>
+        <testcase classname="src/sites/sites-list.test.tsx" name="SitesList — lifecycle &gt; offers the transitions the backend matrix allows for each status" time="0.227481681">
+        </testcase>
+        <testcase classname="src/sites/sites-list.test.tsx" name="SitesList — lifecycle &gt; confirms before archiving and refreshes on success" time="0.768982324">
+        </testcase>
+        <testcase classname="src/sites/sites-list.test.tsx" name="SitesList — lifecycle &gt; shows the server&apos;s denial verbatim instead of pretending success" time="0.452155698">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/view-public-site.test.tsx" timestamp="2026-11-11T16:54:52.457Z" hostname="ee3e3eb7f70f" tests="3" failures="0" errors="0" skipped="0" time="0.250986138">
+        <testcase classname="src/sites/view-public-site.test.tsx" name="ViewPublicSite &gt; links an active Site to the API hostname in a separate safe tab" time="0.161238755">
+        </testcase>
+        <testcase classname="src/sites/view-public-site.test.tsx" name="ViewPublicSite &gt; explains when no usable primary hostname is configured" time="0.043320022">
+        </testcase>
+        <testcase classname="src/sites/view-public-site.test.tsx" name="ViewPublicSite &gt; rejects malformed and inactive domains" time="0.044355738">
+        </testcase>
+    </testsuite>
+</testsuites>

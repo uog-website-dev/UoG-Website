@@ -11,6 +11,7 @@ import uuid
 from contextlib import contextmanager
 from contextvars import ContextVar
 
+from apps.organizations.hierarchy_lock import hierarchy_write
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
@@ -356,7 +357,7 @@ class SiteContent(models.Model):
         supplied_locale = self.locale
         supplied_published_at = self.published_at
         supplied_blocks = self.blocks
-        with transaction.atomic(using=using):
+        with hierarchy_write(using=using):
             previous = None
             before = None
             if not self._state.adding:
@@ -448,12 +449,18 @@ class SiteContent(models.Model):
             return result
 
     def delete(self, *args, **kwargs):
+        from apps.media.services import detach_references_for_content
         from .services.revisions import content_revision_delete
 
         using = kwargs.get("using") or self._state.db or router.db_for_write(
             type(self), instance=self,
         )
-        with transaction.atomic(using=using):
+        with hierarchy_write(using=using):
+            detach_references_for_content(
+                self,
+                actor=self.updated_by or self.created_by,
+                using=using,
+            )
             with content_revision_delete(using=using):
                 return super().delete(*args, **kwargs)
 

@@ -1,0 +1,29 @@
+{
+  "story": "Site Editor upload files and manage metadata / delete conflicts",
+  "date": "2026-11-11",
+  "verdict": "DONE",
+  "tests": {
+    "admin_library": {
+      "command": "pnpm --filter @uog/admin-web exec vitest run src/sites/media-library.test.tsx --maxWorkers=2",
+      "passed": 19,
+      "failed": 0,
+      "junit": "library.xml"
+    }
+  },
+  "acceptance": {
+    "successful_upload_status": "pass",
+    "failed_upload_retry_no_false_ready": "pass",
+    "delete_conflict_visible_in_use": "pass",
+    "delete_conflict_retains_card_and_metadata": "pass",
+    "gallery_ref_alt_edit_reload": "pass"
+  },
+  "waivers": [
+    "Full Keycloak/Admin/worker browser E2E unavailable in this checkout (same as uploads/removal packs).",
+    "Advanced Gallery builder UI absent; inventory-shaped nested placements are exercised instead."
+  ],
+  "linked_api_evidence": [
+    "../media-uploads-2026-11-11/report.md",
+    "../media-metadata-2026-11-11/report.md",
+    "../media-removal-2026-11-11/report.md"
+  ]
+}

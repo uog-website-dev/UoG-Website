@@ -106,6 +106,14 @@ def test_other_domains_do_not_import_organizations():
     for app_name in OTHER_APPS:
         for path in (apps_root / app_name).rglob("*.py"):
             for module in _imported_modules(path):
+                # This development-only composition command prepares multiple
+                # domains. Keep its exact imports allowlisted, while core
+                # runtime code and all other commands retain the boundary.
+                if (
+                    path.relative_to(apps_root).as_posix() == "core/management/commands/seed_public_demo.py"
+                    and module in {"apps.organizations.models", "apps.organizations.hierarchy_lock"}
+                ):
+                    continue
                 if _imports_app(module, "apps.organizations"):
                     offenders.append(f"{path.relative_to(apps_root)} imports {module}")
     assert offenders == []

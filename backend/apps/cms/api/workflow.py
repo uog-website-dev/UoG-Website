@@ -1,4 +1,5 @@
 """Site-scoped API for CMS role assignments and content workflow actions."""
+from apps.organizations.hierarchy_lock import hierarchy_write
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError as DomainValidationError
 from django.db import IntegrityError, transaction
@@ -110,7 +111,7 @@ class ContentRoleAssignmentsView(APIView):
             pk=payload.validated_data["user_id"],
         )
         try:
-            with transaction.atomic():
+            with hierarchy_write():
                 assignment = SiteContentRoleAssignment.objects.create(
                     site=site,
                     user=user,

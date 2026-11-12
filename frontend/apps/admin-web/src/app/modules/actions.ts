@@ -8,7 +8,7 @@
  * check; their answers are returned verbatim as clone-safe results.
  */
 import { createApiClient } from "@uog/api-client";
-import type { PaginatedResponse } from "@uog/types";
+import type { PaginatedResponse, PlatformModule } from "@uog/types";
 
 import { getAccessToken } from "@/access-token";
 import type {
@@ -27,6 +27,21 @@ import { serializeApiError } from "@/organizations/contract";
 import type { ActionResult } from "@/organizations/contract";
 
 const APPLY_TIMEOUT_MS = 60_000;
+
+export async function setPlatformModuleAvailability(
+  id: number, isEnabled: boolean, expectedUpdatedAt: string,
+): Promise<ActionResult<PlatformModule>> {
+  return attempt(async () => {
+    const api = await client();
+    const path = `/v1/modules/${encodeURIComponent(id)}/`;
+    const current = await api.getDetailed<PlatformModule>(path);
+    if (current.data.updated_at !== expectedUpdatedAt) {
+      throw new Error("This module changed. Refresh the registry and try again.");
+    }
+    if (!current.etag) throw new Error("The module version could not be verified. Refresh and try again.");
+    return (await api.patchDetailed<PlatformModule>(path, { is_enabled: isEnabled }, { ifMatch: current.etag })).data;
+  });
+}
 
 function apiBaseUrl(): string {
   return process.env.API_BASE_URL ?? "http://backend:8000/api";

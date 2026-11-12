@@ -48,6 +48,7 @@ def _celery_app():
     app.config_from_object("django.conf:settings", namespace="CELERY")
     app.autodiscover_tasks()
     app.conf.beat_schedule = {
+        "media-upload-reconciliation": {"task": "media.reconcile_uploads", "schedule": 300.0},
         "core-heartbeat-every-minute": {
             "task": "core.scheduled_heartbeat",
             "schedule": 60.0,

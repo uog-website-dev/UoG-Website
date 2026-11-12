@@ -207,17 +207,14 @@ def test_image_references_must_belong_to_an_approved_scope(sites):
         assert "blocks[0].ref" in error.value.message_dict
 
 
-def test_sections_cannot_nest_and_deny_empty_children(sites):
+def test_sections_have_bounded_nesting_and_deny_empty_children(sites):
     site = site_of(sites)
-    with pytest.raises(ValidationError) as error:
-        create_page_with_blocks(site, "nested-section", [
-            {"type": "section", "children": [
-                {"type": "section", "children": [PARAGRAPH]},
-            ]},
-        ])
-    assert "sections cannot nest sections" in error.value.message_dict[
-        "blocks[0].children"
-    ][0]
+    deep = PARAGRAPH
+    for _ in range(7): deep = {"type":"section","children":[deep]}
+    with pytest.raises(ValidationError):
+        create_page_with_blocks(site,"too-deep",[deep])
+    allowed=create_page_with_blocks(site,"nested-section",[{"type":"section","children":[{"type":"section","children":[PARAGRAPH]}]}])
+    assert allowed.blocks[0]["children"][0]["type"]=="section"
     with pytest.raises(ValidationError) as error:
         create_page_with_blocks(site, "empty-section", [
             {"type": "section", "children": []},

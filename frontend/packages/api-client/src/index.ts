@@ -114,3 +114,6 @@ export {
   assignmentFixtures,
   auditEventFixtures,
 } from "./fixtures/iam";
+
+export { createLiveMediaAdapter } from "./adapters/media";
+export type { MediaAdapter } from "./adapters/media";

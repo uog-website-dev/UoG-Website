@@ -504,3 +504,5 @@ export interface HealthReport {
   status: HealthState;
   checks: Record<string, HealthCheck>;
 }
+
+export type { MediaAsset, MediaStatus, MediaListQuery, MediaMetadataPatch, MediaReferenceInventory, MediaDeletion } from "./media";

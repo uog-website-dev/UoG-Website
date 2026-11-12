@@ -57,6 +57,7 @@ const SITE_SECTION_ICONS: Record<SiteSection["key"], SvgIconComponent> = {
   pages: DescriptionIcon,
   posts: ArticleIcon,
   menus: AccountTreeIcon,
+  media: ArticleIcon,
   users: GroupIcon,
 };
 
@@ -65,6 +66,7 @@ const SITE_SECTION_DESCRIPTIONS: Record<SiteSection["key"], string> = {
   pages: "Site pages and workflow",
   posts: "News and announcements",
   menus: "Header and footer navigation",
+  media: "Private Site media library",
   users: "Site members and roles",
 };
 

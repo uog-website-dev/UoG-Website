@@ -17,6 +17,16 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Paper from "@mui/material/Paper";
 import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
+import {
+  MediaBlockEditor,
+  createEmptyGalleryBlock,
+  createEmptyImageBlock,
+  createEmptySliderBlock,
+  parseMediaBlock,
+  type MediaBlockValue,
+} from "@/sites/content-media-builder";
+import { MediaPickerDialog, type MediaPickerResult } from "@/sites/media-picker";
+import { imageRefForAsset } from "@/sites/site-image-field";
 import Typography from "@mui/material/Typography";
 import { ApiError } from "@uog/api-client";
 import {
@@ -292,6 +302,8 @@ function SitePagesPanelContent({
   startCreate: boolean;
   onCreateStarted?: () => void;
 }) {
+  const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
+  const mediaInvokeRef = useRef<HTMLButtonElement | null>(null);
   const toast = useToast();
   const defaultLocale = defaultLocaleFor(languages);
   const localeChoices = localeChoicesFor(languages);
@@ -941,25 +953,70 @@ function SitePagesPanelContent({
           </Accordion>
           <Box component="section" aria-label="Content blocks" sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
             <Typography variant="subtitle2">Content blocks</Typography>
-            {form.blocks.map((block, index) => (
-              <Paper key={`block-${index}`} variant="outlined" sx={{ p: 1.5, display: "flex", flexDirection: "column", gap: 1 }}>
-                <Typography variant="caption">Block {index + 1} · edit structured JSON</Typography>
-                <TextField
-                  label={`Block ${index + 1} JSON`}
-                  value={block}
-                  onChange={(event) => setForm((current) => ({ ...current, blocks: current.blocks.map((item, itemIndex) => itemIndex === index ? event.target.value : item) }))}
-                  multiline minRows={3} fullWidth inputProps={{ "aria-label": `Block ${index + 1} JSON` }}
-                />
-                <Box sx={{ display: "flex", gap: 1 }}>
-                  <Button aria-label={`Move block ${index + 1} up`} disabled={index === 0} onClick={() => moveBlock(index, -1)}>Move up</Button>
-                  <Button aria-label={`Move block ${index + 1} down`} disabled={index === form.blocks.length - 1} onClick={() => moveBlock(index, 1)}>Move down</Button>
-                  <Button aria-label={`Remove block ${index + 1}`} color="error" onClick={() => setForm((current) => ({ ...current, blocks: current.blocks.filter((_, itemIndex) => itemIndex !== index) }))}>Remove</Button>
-                </Box>
-              </Paper>
-            ))}
+            {permissions.includes("content.media.view") ? (
+              <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                <Button
+                  ref={mediaInvokeRef}
+                  onClick={() => setMediaPickerOpen(true)}
+                  aria-haspopup="dialog"
+                >
+                  Choose uploaded image
+                </Button>
+                <Button onClick={() => setForm((current) => ({ ...current, blocks: [...current.blocks, JSON.stringify(createEmptySliderBlock(), null, 2)] }))}>Add slider</Button>
+                <Button onClick={() => setForm((current) => ({ ...current, blocks: [...current.blocks, JSON.stringify(createEmptyGalleryBlock(), null, 2)] }))}>Add gallery</Button>
+              </Box>
+            ) : null}
+            <MediaPickerDialog
+              open={mediaPickerOpen}
+              siteId={siteId}
+              returnFocusRef={mediaInvokeRef}
+              canUpload={permissions.includes("content.media.upload")}
+              onCancel={() => setMediaPickerOpen(false)}
+              onConfirm={(result: MediaPickerResult) => {
+                const block = {
+                  ...createEmptyImageBlock(siteId),
+                  ref: imageRefForAsset(siteId, result.assetId),
+                  alt: result.altText || "Describe this image",
+                };
+                setForm((current) => ({ ...current, blocks: [...current.blocks, JSON.stringify(block, null, 2)] }));
+                setMediaPickerOpen(false);
+              }}
+            />
+
+            {form.blocks.map((block, index) => {
+              let mediaBlock: MediaBlockValue | null = null;
+              try { mediaBlock = parseMediaBlock(JSON.parse(block)); } catch { mediaBlock = null; }
+              return (
+                <Paper key={`block-${index}`} variant="outlined" sx={{ p: 1.5, display: "flex", flexDirection: "column", gap: 1 }}>
+                  <Typography variant="caption">Block {index + 1}{mediaBlock ? ` · ${mediaBlock.type}` : " · edit structured JSON"}</Typography>
+                  {mediaBlock && permissions.includes("content.media.view") ? (
+                    <MediaBlockEditor
+                      siteId={siteId}
+                      value={mediaBlock}
+                      canUpload={permissions.includes("content.media.upload")}
+                      onChange={(next) => setForm((current) => ({
+                        ...current,
+                        blocks: current.blocks.map((item, itemIndex) => itemIndex === index ? JSON.stringify(next, null, 2) : item),
+                      }))}
+                    />
+                  ) : null}
+                  <TextField
+                    label={`Block ${index + 1} JSON`}
+                    value={block}
+                    onChange={(event) => setForm((current) => ({ ...current, blocks: current.blocks.map((item, itemIndex) => itemIndex === index ? event.target.value : item) }))}
+                    multiline minRows={3} fullWidth inputProps={{ "aria-label": `Block ${index + 1} JSON` }}
+                  />
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    <Button aria-label={`Move block ${index + 1} up`} disabled={index === 0} onClick={() => moveBlock(index, -1)}>Move up</Button>
+                    <Button aria-label={`Move block ${index + 1} down`} disabled={index === form.blocks.length - 1} onClick={() => moveBlock(index, 1)}>Move down</Button>
+                    <Button aria-label={`Remove block ${index + 1}`} color="error" onClick={() => setForm((current) => ({ ...current, blocks: current.blocks.filter((_, itemIndex) => itemIndex !== index) }))}>Remove</Button>
+                  </Box>
+                </Paper>
+              );
+            })}
             <Button onClick={() => setForm((current) => ({ ...current, blocks: [...current.blocks, '{"type":"heading","level":2,"text":"New heading"}'] }))}>Add heading block</Button>
             <Button onClick={() => setForm((current) => ({ ...current, blocks: [...current.blocks, '{"type":"paragraph","html":"<p>New paragraph</p>"}'] }))}>Add paragraph block</Button>
-            <Button onClick={() => setForm((current) => ({ ...current, blocks: [...current.blocks, JSON.stringify({ type: "image", ref: `sites/${siteId}/image`, alt: "Describe this image" })] }))}>Add image block</Button>
+            <Button onClick={() => setForm((current) => ({ ...current, blocks: [...current.blocks, JSON.stringify(createEmptyImageBlock(siteId), null, 2)] }))}>Add image block</Button>
             <Button onClick={() => setForm((current) => ({ ...current, blocks: [...current.blocks, '{"type":"button","label":"Learn more","href":"/"}'] }))}>Add button block</Button>
             <Button onClick={() => setForm((current) => ({ ...current, blocks: [...current.blocks, '{"type":"list","style":"unordered","items":["First item"]}'] }))}>Add list block</Button>
             <Button onClick={() => setForm((current) => ({ ...current, blocks: [...current.blocks, '{"type":"section","heading":"New section","children":[{"type":"paragraph","html":"<p>Section content</p>"}]}'] }))}>Add section block</Button>

@@ -1,0 +1,31 @@
+{
+  "inventory_while_draft_removed": {
+    "asset_id": "8df072a4-9727-4918-b686-ba6a34b6af47",
+    "references": [
+      {
+        "id": "9",
+        "scope": "PUBLIC",
+        "page_id": "3beadd95-48bc-4213-81cd-c0bb0ac441bd",
+        "revision_id": 648,
+        "publication_id": 46,
+        "node_id": "hero",
+        "field_path": "slides.asset_id",
+        "repeater_item_id": "slide-1",
+        "detachable": false
+      }
+    ]
+  },
+  "blocked_delete_status": 409,
+  "preview_before_publication": 200,
+  "anonymous_before_publication": 404,
+  "published_image": 200,
+  "public_headers": {
+    "cache_control": "private, no-store",
+    "vary": "Host, Authorization, Cookie, origin"
+  },
+  "withdrawn_image": 404,
+  "accepted_delete_status": 202,
+  "cleanup_state": "DONE",
+  "generation_before_delete": 2,
+  "generation_after_delete": 3
+}

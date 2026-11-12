@@ -53,7 +53,7 @@ MAX_LIST_ITEM_TEXT = 1_200
 #: nesting depth is structurally bounded to two levels.
 CONTAINER_TYPES = frozenset({"section"})
 KNOWN_TYPES = frozenset({
-    "heading", "paragraph", "image", "button", "list", "section",
+    "heading", "paragraph", "image", "button", "list", "section", "slider", "gallery",
 })
 
 _REF_SEGMENT = re.compile(r"\A[a-z0-9][a-z0-9._-]*\Z")
@@ -191,6 +191,17 @@ def check_image_ref(ref, *, site_id):
                 "ref segments must be lowercase letters, digits, dots, "
                 "underscores or hyphens."
             )
+    if root == "sites" and len(tail) == 2 and tail[0] == "assets":
+        from apps.media.models import MediaAsset
+        try:
+            import uuid
+            asset_id = uuid.UUID(tail[1])
+        except ValueError as error:
+            raise Rejection("Invalid asset identifier.") from error
+        scope = str(int(scope))
+        tail[1] = str(asset_id)
+        if not MediaAsset.objects.filter(pk=asset_id, site_id=site_id, status="READY", detected_mime__startswith="image/").exclude(processing__state__in=["QUEUED", "PROCESSING", "RETRY", "FAILED"]).exists():
+            raise Rejection("Only a ready image owned by this Site may be selected.")
     return "/".join((root, scope, *tail))
 
 
@@ -223,7 +234,7 @@ def _plain_text(value, key, errors, *, ceiling, label, required=True):
 def _clean_keys(block, expected, key, errors, *, required=None):
     """Reject unknown keys and report missing required ones."""
     required = expected if required is None else required
-    payload_keys = set(block) - {"type"}
+    payload_keys = set(block) - {"type", "id"}
     unknown = sorted(payload_keys - expected)
     if unknown:
         for extra in unknown:
@@ -360,7 +371,7 @@ def _clean_list(block, key, errors):
     return cleaned
 
 
-def _clean_section(block, key, errors, *, site_id):
+def _clean_section(block, key, errors, *, site_id, depth=0):
     _clean_keys(block, {"heading", "children"}, key, errors, required={"children"})
     cleaned = {}
     if "heading" in block:
@@ -377,17 +388,8 @@ def _clean_section(block, key, errors, *, site_id):
             f"children must contain 1-{MAX_BLOCKS} content blocks.",
         )
         return None
-    if any(
-        isinstance(child, dict) and child.get("type") in CONTAINER_TYPES
-        for child in children
-    ):
-        _reject(
-            errors, f"{key}.children",
-            "sections cannot nest sections; a section's children are "
-            "content blocks only.",
-        )
     cleaned_children = _clean_block_list(
-        children, errors, site_id=site_id, prefix=f"{key}.children",
+        children, errors, site_id=site_id, prefix=f"{key}.children", depth=depth + 1,
     )
     if not cleaned_children:
         return None
@@ -395,7 +397,40 @@ def _clean_section(block, key, errors, *, site_id):
     return cleaned
 
 
-def _clean_one_block(block, *, errors, site_id, key):
+def _clean_media_repeater(block, key, errors, *, site_id):
+    field = "slides" if block["type"] == "slider" else "images"
+    _clean_keys(block, {field}, key, errors)
+    items = block.get(field)
+    if not isinstance(items, list) or len(items) > 50:
+        _reject(errors, f"{key}.{field}", "Use a list of at most 50 media items.")
+        return None
+    cleaned, seen = [], set()
+    for index, item in enumerate(items):
+        item_key = f"{key}.{field}[{index}]"
+        if not isinstance(item, dict) or set(item) - {"id", "asset_id", "alt", "caption"}:
+            _reject(errors, item_key, "Use id, asset_id, alt and optional caption only.")
+            continue
+        item_id = item.get("id")
+        if not isinstance(item_id, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:-]{0,127}", item_id) or item_id in seen:
+            _reject(errors, item_key, "A unique stable item id is required.")
+            continue
+        seen.add(item_id)
+        try:
+            import uuid
+            asset_id = str(uuid.UUID(str(item.get("asset_id"))))
+            check_image_ref(f"sites/{site_id}/assets/{asset_id}", site_id=site_id)
+        except (ValueError, Rejection) as error:
+            _reject(errors, f"{item_key}.asset_id", "Use a ready image owned by this Site.")
+            continue
+        alt = _plain_text(item.get("alt"), f"{item_key}.alt", errors, ceiling=MAX_ALT, label="alt")
+        entry = {"id": item_id, "asset_id": asset_id, "alt": alt or ""}
+        if "caption" in item:
+            entry["caption"] = _plain_text(item["caption"], f"{item_key}.caption", errors, ceiling=MAX_TEXT, label="caption") or ""
+        cleaned.append(entry)
+    return {field: cleaned}
+
+
+def _clean_one_block(block, *, errors, site_id, key, depth=0):
     """Validate one block dict; returns its normalized copy or None."""
     if not isinstance(block, dict):
         _reject(errors, key, "block must be a JSON object.")
@@ -412,10 +447,19 @@ def _clean_one_block(block, *, errors, site_id, key):
             + ". Supported: " + ", ".join(sorted(KNOWN_TYPES)) + ".",
         )
         return None
-    if block_type == "image":
+    node_id = block.get("id")
+    if node_id is not None and (not isinstance(node_id, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:-]{0,127}", node_id)):
+        _reject(errors, f"{key}.id", "Use a stable node id of at most 128 characters.")
+        return None
+    if block_type in {"slider", "gallery"} and node_id is None:
+        _reject(errors, f"{key}.id", "A stable node id is required.")
+        return None
+    if block_type in {"slider", "gallery"}:
+        cleaned = _clean_media_repeater(block, key, errors, site_id=site_id)
+    elif block_type == "image":
         cleaned = _clean_image(block, key, errors, site_id=site_id)
     elif block_type == "section":
-        cleaned = _clean_section(block, key, errors, site_id=site_id)
+        cleaned = _clean_section(block, key, errors, site_id=site_id, depth=depth)
     elif block_type == "button":
         cleaned = _clean_button(block, key, errors)
     elif block_type == "list":
@@ -427,13 +471,15 @@ def _clean_one_block(block, *, errors, site_id, key):
     if cleaned is None:
         return None
     cleaned = {"type": block_type, **cleaned}
+    if node_id is not None:
+        cleaned["id"] = node_id
     if _blocks_json_size(cleaned) > MAX_BLOCK_BYTES:
         _reject(errors, key, f"block exceeds {MAX_BLOCK_BYTES} bytes serialized.")
         return None
     return cleaned
 
 
-def _clean_block_list(blocks, errors, *, site_id, prefix="blocks"):
+def _clean_block_list(blocks, errors, *, site_id, prefix="blocks", depth=0):
     """Validate an ordered block list; returns the sanitized copy.
 
     Input order is semantic: positions persist and are returned
@@ -441,10 +487,13 @@ def _clean_block_list(blocks, errors, *, site_id, prefix="blocks"):
     keys (``blocks[i].children[j]``) and may not contain containers, so
     nesting stays bounded without a depth search.
     """
+    if depth > 5:
+        _reject(errors, prefix, "Sections may nest at most five levels.")
+        return []
     cleaned_list = []
     for index, block in enumerate(blocks):
         key = block_key(prefix, index)
-        cleaned = _clean_one_block(block, errors=errors, site_id=site_id, key=key)
+        cleaned = _clean_one_block(block, errors=errors, site_id=site_id, key=key, depth=depth)
         if cleaned is not None:
             cleaned_list.append(cleaned)
     return cleaned_list
@@ -472,6 +521,14 @@ def validate_blocks(blocks, *, site_id):
         })
     errors = {}
     cleaned = _clean_block_list(blocks, errors, site_id=site_id)
+    seen=set()
+    def visit(nodes):
+        for node in nodes:
+            if "id" in node:
+                if node["id"] in seen: _reject(errors,"blocks","Node ids must be unique across the document.")
+                seen.add(node["id"])
+            visit(node.get("children",[]))
+    visit(cleaned)
     if errors:
         raise ValidationError(errors)
     if _blocks_json_size(cleaned) > MAX_BLOCKS_BYTES:

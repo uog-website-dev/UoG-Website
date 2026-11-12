@@ -10,10 +10,10 @@
 export const CENTRAL_MODULE_PERMISSION = "platform.sites.manage_registry";
 
 export interface SiteSection {
-  key: "dashboard" | "pages" | "posts" | "menus" | "users";
+  key: "dashboard" | "pages" | "posts" | "menus" | "media" | "users";
   label: string;
-  segment: "" | "pages" | "posts" | "menus" | "users";
-  module: "PAGES" | "POSTS" | "MENUS" | null;
+  segment: "" | "pages" | "posts" | "menus" | "media" | "users";
+  module: "PAGES" | "POSTS" | "MENUS" | "MEDIA" | null;
   permissions: readonly string[];
 }
 
@@ -49,6 +49,7 @@ export const SITE_SECTIONS: readonly SiteSection[] = [
       "content.posts.publish",
     ],
   },
+  { key: "media", label: "Media", segment: "media", module: "MEDIA", permissions: ["content.media.view"] },
   {
     key: "users",
     label: "Users",

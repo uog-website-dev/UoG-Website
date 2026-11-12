@@ -1,6 +1,7 @@
 """Authorized, transactional workflow transitions shared by CMS content."""
 from contextlib import contextmanager
 
+from apps.organizations.hierarchy_lock import hierarchy_write
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import connections, router, transaction
 from django.utils import timezone
@@ -65,7 +66,7 @@ def transition_content(
         raise ValidationError({"comment": "A reviewer comment is required for rejection."})
 
     using = using or router.db_for_write(SiteContent)
-    with transaction.atomic(using=using):
+    with hierarchy_write(using=using):
         base = (
             SiteContent.objects.using(using)
             .select_for_update()

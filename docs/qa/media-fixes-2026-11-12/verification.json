@@ -1,0 +1,59 @@
+{
+  "admin-full": {
+    "cases": 430,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "admin": {
+    "cases": 33,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "backend-final": {
+    "cases": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "backend": {
+    "cases": 75,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "cms": {
+    "cases": 26,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1
+  },
+  "library-final": {
+    "cases": 21,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "pages": {
+    "cases": 29,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "portal": {
+    "cases": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "checks": {
+    "typechecks": "five package checks passed",
+    "django_check": "passed",
+    "migration_drift": "none",
+    "migrations_applied": "media.0011",
+    "pip_check": "passed",
+    "worker_ping": "pong",
+    "browser_list_and_details": "actual image visibly verified"
+  }
+}

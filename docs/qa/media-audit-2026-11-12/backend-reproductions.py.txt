@@ -1,0 +1,57 @@
+"""Audit diagnostics: passing assertions confirm the reported defects."""
+import io, uuid
+from concurrent.futures import ThreadPoolExecutor
+from threading import Event
+import pytest
+from django.db import connection, transaction, OperationalError, close_old_connections
+from apps.cms.services.pages import create_page
+from apps.media.models import MediaUsage
+from apps.media.removal import remove_asset, cleanup_asset
+from .test_media_assets import media_world
+from .test_media_derivatives import derivative_storage
+from .test_media_removal import asset
+pytestmark = pytest.mark.django_db(transaction=True)
+
+
+def test_noncanonical_uuid_reference_is_not_protected(media_world, derivative_storage, monkeypatch):
+    w = media_world
+    row = asset(w, derivative_storage)
+    monkeypatch.setattr("apps.media.removal.enqueue_cleanup", lambda _: None)
+    page = create_page(site=w.a, title="Audit UUID", slug="audit-uuid", actor=w.actor, blocks=[
+      {"type":"image", "id":"image", "ref":f"sites/{w.a.pk}/assets/{row.pk.hex}", "alt":"Campus"}])
+    assert page.blocks[0]["ref"].endswith(row.pk.hex)
+    assert not MediaUsage.objects.filter(asset=row).exists()
+    removed, job = remove_asset(w.actor, w.a.pk, row.pk)
+    assert removed.deleted_at is not None and job.state == "QUEUED"
+    page.refresh_from_db()
+    assert row.pk.hex in page.blocks[0]["ref"]
+
+
+def test_storage_cleanup_blocks_unrelated_platform_writes(media_world, derivative_storage, monkeypatch):
+    w = media_world
+    row = asset(w, derivative_storage)
+    monkeypatch.setattr("apps.media.removal.enqueue_cleanup", lambda _: None)
+    remove_asset(w.actor, w.a.pk, row.pk)
+    entered, release = Event(), Event()
+    original_delete = derivative_storage.delete
+    def blocking_delete(*args):
+        entered.set()
+        assert release.wait(5)
+        return original_delete(*args)
+    derivative_storage.delete = blocking_delete
+    def run():
+        close_old_connections()
+        try: return cleanup_asset(row.pk, storage=derivative_storage).state
+        finally: close_old_connections()
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        task = pool.submit(run)
+        try:
+            assert entered.wait(5)
+            with pytest.raises(OperationalError):
+                with transaction.atomic(), connection.cursor() as cursor:
+                    cursor.execute("SET LOCAL lock_timeout='150ms'")
+                    # All Site/CMS/IAM writers acquire this same singleton guard.
+                    cursor.execute("SELECT organizations_lock_hierarchy()")
+        finally:
+            release.set()
+        assert task.result(timeout=10) == "DONE"

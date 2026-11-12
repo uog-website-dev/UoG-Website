@@ -150,7 +150,7 @@ def test_disabling_menus_blocks_edits_and_keeps_rows(ready):
     assert MenuItem.objects.filter(pk=item.pk).count() == 1
 
 
-def test_menu_migration_ships_the_module_without_enabling_it():
+def test_menu_module_is_shipped_and_platform_enabled_after_all_migrations():
     loader = MigrationLoader(connection, ignore_no_migrations=True)
     migration = loader.disk_migrations[("cms", "0008_menu_menuitem")]
     assert ("cms", "0008_menu_menuitem") in loader.applied_migrations
@@ -159,7 +159,8 @@ def test_menu_migration_ships_the_module_without_enabling_it():
     assert any(type(operation).__name__ == "RunSQL" for operation in migration.operations)
     module = Module.objects.get(code="MENUS")
     assert module.status == "IMPLEMENTED"
-    assert module.is_enabled is False
+    assert ("api", "0006_enable_shipped_content_modules") in loader.applied_migrations
+    assert module.is_enabled is True
     assert "menu_site_location_uniq" in {constraint.name for constraint in Menu._meta.constraints}
     assert "menu_item_sibling_order" in {constraint.name for constraint in MenuItem._meta.constraints}
 

@@ -50,9 +50,9 @@ CAPABILITIES = (
     Capability("content.posts.publish", "Publish posts", "Show the Posts section to a publisher. Publishing still requires the Site CMS publisher role.", "content", "post", "publish", "HIGH", False),
     Capability("content.menus.view", "View menus", "Legacy catalog record. Menu APIs require menu.read; this code is not an alias.", "content", "menu", "view"),
     Capability("content.menus.manage", "Manage menus", "Legacy catalog record. Menu APIs require menu.write/menu.publish; this code is not an alias.", "content", "menu", "manage", "HIGH", False),
-    Capability("content.media.view", "View media", "Read media. Not executable: no media API exists.", "content", "media", "view"),
-    Capability("content.media.upload", "Upload media", "Upload media. Not executable: no media API exists.", "content", "media", "upload", "HIGH", False),
-    Capability("content.media.delete", "Delete media", "Delete media. Not executable: no media API exists.", "content", "media", "delete", "HIGH", False),
+    Capability("content.media.view", "View media", "Read Site-owned asset metadata and placement references.", "content", "media", "view"),
+    Capability("content.media.upload", "Manage media", "Register stored objects, edit metadata and manage Page placement references in this Site.", "content", "media", "upload", "HIGH", False),
+    Capability("content.media.delete", "Archive media", "Archive Site assets without deleting storage identity or references.", "content", "media", "delete", "HIGH", False),
     Capability("content.pages.delete", "Delete pages", "Delete pages in the current API; no review workflow state exists.", "content", "page", "delete", risk="HIGH", delegable=False),
     Capability("content.pages.publish", "Publish pages", "Set page publication state; the current model has no review prerequisite.", "content", "page", "publish", risk="HIGH", delegable=False),
     Capability("audit.logs.view", "View audit logs", "Inspect authorization and platform audit history.", "audit", "audit_event", "view", risk="HIGH", delegable=False),
@@ -62,6 +62,7 @@ CAPABILITIES = (
 CAPABILITY_CODES = frozenset(item.code for item in CAPABILITIES)
 
 PLATFORM_ADMIN = frozenset({
+    "content.media.view", "content.media.upload", "content.media.delete",
     "menu.read", "menu.write", "menu.publish",
     "content.menus.view", "content.menus.manage",
     "platform.dashboard.view", "platform.sites.manage_registry",
@@ -83,6 +84,7 @@ ORG_ADMIN = frozenset({
     "content.posts.delete", "content.posts.publish",
 })
 SITE_ADMIN = frozenset({
+    "content.media.view", "content.media.upload", "content.media.delete",
     "menu.read", "menu.write", "menu.publish",
     "content.menus.view", "content.menus.manage",
     "platform.dashboard.view", "platform.users.view", "platform.users.assign_roles", "sites.view", "sites.update",
@@ -92,6 +94,7 @@ SITE_ADMIN = frozenset({
     "content.posts.delete", "content.posts.publish",
 })
 EDITOR = frozenset({
+    "sites.view", "content.media.view", "content.media.upload",
     "menu.read", "menu.write",
     "content.menus.view",
     "content.pages.view", "content.pages.create", "content.pages.update",

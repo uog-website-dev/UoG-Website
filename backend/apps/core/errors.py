@@ -21,6 +21,7 @@ def api_exception_handler(exc, context):
         405: ("method_not_allowed", "This HTTP method is not allowed."),
         406: ("not_acceptable", "The requested response format is unavailable."),
         409: ("conflict", "The request conflicts with the current resource state."),
+        413: ("upload_too_large", "Upload exceeds the configured byte limit."),
         412: ("precondition_failed", "The resource changed. Retrieve it and reconcile your changes."),
         415: ("unsupported_media_type", "The request content type is unsupported."),
         429: ("throttled", "Too many requests."),

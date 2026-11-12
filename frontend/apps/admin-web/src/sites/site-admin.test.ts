@@ -24,6 +24,21 @@ describe("site administration matrix", () => {
     ]);
   });
 
+  it("shows Media for a Site Editor when MEDIA is enabled and content.media.view is granted", () => {
+    expect(sectionDecision(sectionByKey("media"), {
+      enabledModuleCodes: ["MEDIA"],
+      permissions: ["content.media.view", "content.media.upload"],
+    })).toBe("visible");
+    expect(sectionDecision(sectionByKey("media"), {
+      enabledModuleCodes: ["PAGES"],
+      permissions: ["content.media.view"],
+    })).toBe("module_disabled");
+    expect(sectionDecision(sectionByKey("media"), {
+      enabledModuleCodes: ["MEDIA"],
+      permissions: ["content.pages.view"],
+    })).toBe("permission_denied");
+  });
+
   it("shows the Users section without a content module when site user access is granted", () => {
     expect(visibleSiteSections({ enabledModuleCodes: [], permissions: ["platform.users.view"] }).map((section) => section.key)).toEqual(["dashboard", "users"]);
     expect(sectionDecision(sectionByKey("users"), { enabledModuleCodes: [], permissions: [] })).toBe("permission_denied");

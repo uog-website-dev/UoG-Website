@@ -11,6 +11,7 @@ import AddIcon from "@mui/icons-material/Add";
 import ArticleIcon from "@mui/icons-material/Article";
 import DescriptionIcon from "@mui/icons-material/Description";
 import GroupIcon from "@mui/icons-material/Group";
+import PhotoLibraryIcon from "@mui/icons-material/PhotoLibrary";
 import type { SvgIconComponent } from "@mui/icons-material";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
@@ -25,6 +26,7 @@ import { useAsync } from "@uog/ui";
 import { loadSiteNavigation } from "@/app/sites/menu-actions";
 import { loadSitePageStatusCounts } from "@/app/sites/page-actions";
 import { loadSitePosts } from "@/app/sites/post-actions";
+import { listSiteMedia } from "@/app/sites/media-actions";
 import { getSiteUsers } from "@/app/sites/user-actions";
 import type { SitePostStatus } from "@/app/sites/post-actions";
 import { unwrap } from "@/organizations/contract";
@@ -87,6 +89,7 @@ const SUMMARIES: Record<Exclude<SiteSection["key"], "dashboard">, {
   pages: { icon: DescriptionIcon, title: "Pages", empty: "This Site has no Pages yet.", load: pageSummary },
   posts: { icon: ArticleIcon, title: "Posts", empty: "This Site has no Posts yet.", load: postSummary },
   menus: { icon: AccountTreeIcon, title: "Menus", empty: "This Site has no local menus yet.", load: menuSummary },
+  media: { icon: PhotoLibraryIcon, title: "Media", empty: "This Site has no media yet.", load: async (siteId) => [{ label: "Assets", value: unwrap(await listSiteMedia(siteId)).count }] },
   users: { icon: GroupIcon, title: "Users", empty: "No users are assigned to this Site yet.", load: userSummary },
 };
 

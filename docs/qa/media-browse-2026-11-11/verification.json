@@ -1,0 +1,25 @@
+{
+  "story": "Site Editor media browse in active Site Administration",
+  "date": "2026-11-11",
+  "verdict": "DONE",
+  "tests": {
+    "admin_library_and_site_admin": {
+      "command": "pnpm --filter @uog/admin-web exec vitest run src/sites/media-library.test.tsx src/sites/site-admin.test.ts --maxWorkers=2",
+      "passed": 25,
+      "failed": 0,
+      "junit": "library.xml"
+    }
+  },
+  "acceptance": {
+    "site_switch_clears_filters_and_stale_results": "pass",
+    "empty_and_retry_keyboard": "pass",
+    "informatics_never_leaks_to_medicine": "pass"
+  },
+  "notes": [
+    "MediaLibrary remounts on siteId change; useAsync ignores cancelled completions.",
+    "MEDIA module and content.media.view gate the Site Administration Media section.",
+    "Empty/retry recovery is keyboard-operable (Enter/Space).",
+    "qa/media-library/server.mjs delays Informatics searches for manual stale-switch review.",
+    "Advanced Slider/Gallery builder browser E2E remains out of scope for this checkout."
+  ]
+}

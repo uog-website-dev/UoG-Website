@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="35" failures="0" errors="0" time="28.425827659">
+    <testsuite name="src/sites/media-library.test.tsx" timestamp="2026-11-12T02:01:25.646Z" hostname="086c5ea3ae9d" tests="19" failures="0" errors="0" skipped="0" time="13.99654293">
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; excludes processing images then picks the worker-completed identity on refresh" time="1.426548701">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; shows processing state in the library and preserves the retry key after transfer failure" time="1.198061976">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; keeps the selected file after a failed upload and never invents a ready row" time="0.863833545">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; never offers upload to a read-only account" time="0.452831286">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; applies filename search before paging and resets to the first page" time="1.176314177">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; loads scoped details and saves only persisted alt text" time="1.220116167">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; shows readonly metadata without a save control" time="0.477132051">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; sends the selected status and type filters to the server" time="0.753210933">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; shows scoped thumbnails and disables a broken preview until retry" time="0.273695555">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; reports terminal image processing without offering selection" time="0.202651499">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; blocks deletion for a live reference and confirms unused removal" time="1.014998631">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; keeps the library card and metadata after a delete conflict" time="0.769932008">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; preserves edited alt text after a recoverable save failure" time="0.41400319">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; keeps a Gallery-referenced asset, saves alt text, and reloads persisted details" time="1.306111176">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; keeps deletion disabled if the reference inventory cannot be verified" time="0.524314028">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Site-isolated media browsing &gt; ignores a delayed Informatics search after switching to Medicine and resets all query state" time="0.258828144">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Site-isolated media browsing &gt; uses responsive grid columns and keeps list layout usable" time="0.305542046">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Site-isolated media browsing &gt; offers recovery for empty search and transport failure" time="0.843731125">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Site-isolated media browsing &gt; supports keyboard pagination and grid/list controls" time="0.507211965">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/media-picker-save.test.tsx" timestamp="2026-11-12T02:01:25.659Z" hostname="086c5ea3ae9d" tests="1" failures="0" errors="0" skipped="0" time="5.980559821">
+        <testcase classname="src/sites/media-picker-save.test.tsx" name="CMS media picker save integration &gt; keeps the draft image selection when save finds the asset ineligible" time="5.976764152">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/media-picker.test.tsx" timestamp="2026-11-12T02:01:25.660Z" hostname="086c5ea3ae9d" tests="6" failures="0" errors="0" skipped="0" time="6.51871898">
+        <testcase classname="src/sites/media-picker.test.tsx" name="MediaPickerDialog &gt; filters, selects a ready Site asset and returns a stable asset ID payload" time="2.018876703">
+        </testcase>
+        <testcase classname="src/sites/media-picker.test.tsx" name="MediaPickerDialog &gt; Escape cancels without change and returns focus to the invoking control" time="0.562049485">
+        </testcase>
+        <testcase classname="src/sites/media-picker.test.tsx" name="MediaPickerDialog &gt; keeps the draft selection when confirm finds the asset ineligible" time="0.862270069">
+        </testcase>
+        <testcase classname="src/sites/media-picker.test.tsx" name="SiteImageField and repeater builder &gt; changes only the targeted Slider slide and restores focus after picking" time="1.965990741">
+        </testcase>
+        <testcase classname="src/sites/media-picker.test.tsx" name="SiteImageField and repeater builder &gt; keeps separate slide references after reorder and reopen" time="1.009127474">
+        </testcase>
+        <testcase classname="src/sites/media-picker.test.tsx" name="SiteImageField and repeater builder &gt; shows an eligibility error on the field while preserving the draft selection" time="0.093075429">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-admin-frame.test.tsx" timestamp="2026-11-12T02:01:25.663Z" hostname="086c5ea3ae9d" tests="9" failures="0" errors="0" skipped="0" time="1.930005928">
+        <testcase classname="src/sites/site-admin-frame.test.tsx" name="SiteAdminFrame &gt; keeps the active Site name, status, code and organization visible" time="0.832140553">
+        </testcase>
+        <testcase classname="src/sites/site-admin-frame.test.tsx" name="SiteAdminFrame &gt; names the organization by id when this account cannot read it" time="0.147087835">
+        </testcase>
+        <testcase classname="src/sites/site-admin-frame.test.tsx" name="SiteAdminFrame &gt; shows the current section in the breadcrumb" time="0.11318954">
+        </testcase>
+        <testcase classname="src/sites/site-admin-frame.test.tsx" name="SiteAdminFrame &gt; shows the central registry only when that permission was delegated" time="0.166149115">
+        </testcase>
+        <testcase classname="src/sites/site-admin-frame.test.tsx" name="SiteAdminFrame &gt; remounts per Site so a draft does not follow the user" time="0.18104479">
+        </testcase>
+        <testcase classname="src/sites/site-admin-frame.test.tsx" name="SiteAdminFrame &gt; blocks a direct section when the module or permission is missing" time="0.112910009">
+        </testcase>
+        <testcase classname="src/sites/site-admin-frame.test.tsx" name="SiteAdminFrame &gt; blocks direct Posts administration when the Posts module is disabled" time="0.148990642">
+        </testcase>
+        <testcase classname="src/sites/site-admin-frame.test.tsx" name="SiteAdminFrame &gt; blocks a section the account has no permission for" time="0.139623407">
+        </testcase>
+        <testcase classname="src/sites/site-admin-frame.test.tsx" name="SiteAdminDenied &gt; offers only the supplied authorized Sites" time="0.08280702">
+        </testcase>
+    </testsuite>
+</testsuites>

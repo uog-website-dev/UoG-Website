@@ -5,6 +5,7 @@ change (or a homepage swap that cleared the old flag but failed to set the
 new one) can never be observed. Authorship is taken from the caller — the
 authenticated principal — never from a request body.
 """
+from apps.organizations.hierarchy_lock import hierarchy_write
 from django.core.exceptions import ValidationError
 from django.db import transaction
 
@@ -41,7 +42,7 @@ def change_route(page, *, slug=_UNCHANGED, parent=_UNCHANGED, actor=None):
     and any redirect whose target path is live again is removed so a route
     is never shadowed by its own history.
     """
-    with transaction.atomic():
+    with hierarchy_write():
         subtree = [page] + _descendants(page)
         # Authoritative paths from the database, not possibly stale copies.
         history = dict(
@@ -95,7 +96,7 @@ def set_as_homepage(page, *, actor=None):
         raise ValidationError({
             "status": "Set the homepage while the Page is draft or unpublished.",
         })
-    with transaction.atomic():
+    with hierarchy_write():
         previous_homepages = Page.objects.filter(
             site_id=page.site_id, is_homepage=True,
         ).exclude(pk=page.pk)

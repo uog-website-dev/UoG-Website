@@ -28,14 +28,15 @@ def owner():
     return OrganizationUnit.objects.create(code="CI", name="College of Informatics", organization_type=college, parent=root)
 
 
-def test_seeded_capabilities_are_not_advertised_as_usable(owner):
+def test_planned_seeded_capabilities_are_not_advertised_as_usable(owner):
     assert INITIAL_CODES <= set(Module.objects.values_list("code", flat=True))
     cms = Module.objects.get(code="CMS")
     assert cms.name == "Content management" and cms.description
     assert cms.status == "PLANNED" and cms.is_enabled is False
     assert cms.configuration_schema == empty_module_schema()
     assert not capability_is_shipped("CMS")
-    assert not usable_modules().exists()
+    assert not usable_modules().filter(code__in=INITIAL_CODES).exists()
+    assert set(usable_modules().values_list("code", flat=True)) == {"PAGES", "POSTS", "MENUS"}
     assert not any(field.name == "module_code" for field in Site._meta.local_fields)
     source = Path(usable_modules.__code__.co_filename).read_text(encoding="utf-8")
     assert not any(code in source for code in INITIAL_CODES)
@@ -74,6 +75,9 @@ def test_planned_and_unshipped_modules_cannot_be_enabled(owner):
 
 
 def test_only_a_shipped_enabled_module_can_be_newly_enabled(owner):
+    # Other shipped capabilities are available after the platform rollout
+    # migration. This test exercises the independent FIXTURE switch.
+    available_before = set(usable_modules().values_list("code", flat=True))
     with connection.cursor() as cursor:
         cursor.execute("INSERT INTO sites_module_implementation (code) VALUES ('FIXTURE')")
     module = Module.objects.create(
@@ -89,12 +93,12 @@ def test_only_a_shipped_enabled_module_can_be_newly_enabled(owner):
     second_site = Site.objects.create(organization_unit=owner, code="SECOND", name="Second")
     enablement = enable_module_for_site(first_site.pk, module.pk)
     assert list(enabled_modules_for_site(first_site.pk)) == [module]
-    assert list(usable_modules()) == [module]
+    assert set(usable_modules().values_list("code", flat=True)) == available_before | {module.code}
     module.is_enabled = False
     module.save(update_fields=["is_enabled"])
     assert SiteModule.objects.filter(pk=enablement.pk).exists()
     assert not enabled_modules_for_site(first_site.pk).exists()
-    assert not usable_modules().exists()
+    assert set(usable_modules().values_list("code", flat=True)) == available_before
     with pytest.raises(ValidationError):
         enable_module_for_site(second_site.pk, module.pk)
     with pytest.raises(IntegrityError), transaction.atomic():

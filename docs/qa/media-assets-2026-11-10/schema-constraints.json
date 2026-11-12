@@ -1,0 +1,152 @@
+﻿{
+  "vendor": "postgresql",
+  "migrations": [
+    "0001_initial",
+    "0002_integrity",
+    "0003_standard_media_permissions"
+  ],
+  "constraints": [
+    [
+      "media_asset_checksum",
+      "CHECK (((checksum)::text ~ '\\A[a-f0-9]{64}\\Z'::text))"
+    ],
+    [
+      "media_asset_dimensions",
+      "CHECK ((((height IS NULL) AND (width IS NULL)) OR ((height > 0) AND (height IS NOT NULL) AND (width > 0) AND (width IS NOT NULL))))"
+    ],
+    [
+      "media_asset_filename",
+      "CHECK ((NOT ((original_filename)::text ~ '^\\s*$'::text)))"
+    ],
+    [
+      "media_asset_mime",
+      "CHECK (((detected_mime)::text ~ '\\A[a-z0-9.+-]+/[a-z0-9.+-]+\\Z'::text))"
+    ],
+    [
+      "media_asset_status",
+      "CHECK (((status)::text = ANY ((ARRAY['PENDING'::character varying, 'READY'::character varying, 'REJECTED'::character varying, 'ARCHIVED'::character varying])::text[])))"
+    ],
+    [
+      "media_mediaasset_byte_count_check",
+      "CHECK ((byte_count >= 0))"
+    ],
+    [
+      "media_mediaasset_created_by_id_f43664aa_fk_auth_user_id",
+      "FOREIGN KEY (created_by_id) REFERENCES auth_user(id) DEFERRABLE INITIALLY DEFERRED"
+    ],
+    [
+      "media_mediaasset_height_check",
+      "CHECK ((height >= 0))"
+    ],
+    [
+      "media_mediaasset_pkey",
+      "PRIMARY KEY (id)"
+    ],
+    [
+      "media_mediaasset_site_id_811ca9e7_fk_sites_site_id",
+      "FOREIGN KEY (site_id) REFERENCES sites_site(id) DEFERRABLE INITIALLY DEFERRED"
+    ],
+    [
+      "media_mediaasset_storage_reference_key",
+      "UNIQUE (storage_reference)"
+    ],
+    [
+      "media_mediaasset_updated_by_id_bf68f66d_fk_auth_user_id",
+      "FOREIGN KEY (updated_by_id) REFERENCES auth_user(id) DEFERRABLE INITIALLY DEFERRED"
+    ],
+    [
+      "media_mediaasset_width_check",
+      "CHECK ((width >= 0))"
+    ],
+    [
+      "media_mediaassetrefe_asset_id_f4a9e340_fk_media_med",
+      "FOREIGN KEY (asset_id) REFERENCES media_mediaasset(id) DEFERRABLE INITIALLY DEFERRED"
+    ],
+    [
+      "media_mediaassetrefe_created_by_id_e05296a4_fk_auth_user",
+      "FOREIGN KEY (created_by_id) REFERENCES auth_user(id) DEFERRABLE INITIALLY DEFERRED"
+    ],
+    [
+      "media_mediaassetrefe_page_revision_id_9c166464_fk_cms_conte",
+      "FOREIGN KEY (page_revision_id) REFERENCES cms_contentrevision(id) DEFERRABLE INITIALLY DEFERRED"
+    ],
+    [
+      "media_mediaassetreference_pkey",
+      "PRIMARY KEY (id)"
+    ],
+    [
+      "media_mediaassetreference_site_id_7889615f_fk_sites_site_id",
+      "FOREIGN KEY (site_id) REFERENCES sites_site(id) DEFERRABLE INITIALLY DEFERRED"
+    ],
+    [
+      "media_reference_field",
+      "CHECK ((NOT ((field_path)::text ~ '^\\s*$'::text)))"
+    ],
+    [
+      "media_reference_node",
+      "CHECK ((NOT ((node_id)::text ~ '^\\s*$'::text)))"
+    ],
+    [
+      "media_reference_slot_uniq",
+      "UNIQUE (page_revision_id, node_id, field_path, repeater_item_id)"
+    ]
+  ],
+  "indexes": [
+    [
+      "media_mediaasset_created_by_id_f43664aa",
+      "CREATE INDEX media_mediaasset_created_by_id_f43664aa ON public.media_mediaasset USING btree (created_by_id)"
+    ],
+    [
+      "media_mediaasset_pkey",
+      "CREATE UNIQUE INDEX media_mediaasset_pkey ON public.media_mediaasset USING btree (id)"
+    ],
+    [
+      "media_mediaasset_site_id_811ca9e7",
+      "CREATE INDEX media_mediaasset_site_id_811ca9e7 ON public.media_mediaasset USING btree (site_id)"
+    ],
+    [
+      "media_mediaasset_storage_reference_8685827c_like",
+      "CREATE INDEX media_mediaasset_storage_reference_8685827c_like ON public.media_mediaasset USING btree (storage_reference varchar_pattern_ops)"
+    ],
+    [
+      "media_mediaasset_storage_reference_key",
+      "CREATE UNIQUE INDEX media_mediaasset_storage_reference_key ON public.media_mediaasset USING btree (storage_reference)"
+    ],
+    [
+      "media_mediaasset_updated_by_id_bf68f66d",
+      "CREATE INDEX media_mediaasset_updated_by_id_bf68f66d ON public.media_mediaasset USING btree (updated_by_id)"
+    ],
+    [
+      "media_mediaassetreference_asset_id_f4a9e340",
+      "CREATE INDEX media_mediaassetreference_asset_id_f4a9e340 ON public.media_mediaassetreference USING btree (asset_id)"
+    ],
+    [
+      "media_mediaassetreference_created_by_id_e05296a4",
+      "CREATE INDEX media_mediaassetreference_created_by_id_e05296a4 ON public.media_mediaassetreference USING btree (created_by_id)"
+    ],
+    [
+      "media_mediaassetreference_page_revision_id_9c166464",
+      "CREATE INDEX media_mediaassetreference_page_revision_id_9c166464 ON public.media_mediaassetreference USING btree (page_revision_id)"
+    ],
+    [
+      "media_mediaassetreference_pkey",
+      "CREATE UNIQUE INDEX media_mediaassetreference_pkey ON public.media_mediaassetreference USING btree (id)"
+    ],
+    [
+      "media_mediaassetreference_site_id_7889615f",
+      "CREATE INDEX media_mediaassetreference_site_id_7889615f ON public.media_mediaassetreference USING btree (site_id)"
+    ],
+    [
+      "media_reference_site_rev_idx",
+      "CREATE INDEX media_reference_site_rev_idx ON public.media_mediaassetreference USING btree (site_id, page_revision_id)"
+    ],
+    [
+      "media_reference_slot_uniq",
+      "CREATE UNIQUE INDEX media_reference_slot_uniq ON public.media_mediaassetreference USING btree (page_revision_id, node_id, field_path, repeater_item_id)"
+    ],
+    [
+      "media_site_status_idx",
+      "CREATE INDEX media_site_status_idx ON public.media_mediaasset USING btree (site_id, status, created_at DESC)"
+    ]
+  ]
+}

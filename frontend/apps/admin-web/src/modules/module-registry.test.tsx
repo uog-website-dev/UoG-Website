@@ -5,12 +5,14 @@ import type { PaginatedResponse, PlatformModule } from "@uog/types";
 
 const listPlatformModules = vi.fn();
 const listModuleActivationSummary = vi.fn();
+const setPlatformModuleAvailability = vi.fn();
 
 vi.mock("@/app/sites/actions", () => ({
   listPlatformModules: (...args: unknown[]) => listPlatformModules(...args),
 }));
 vi.mock("@/app/modules/actions", () => ({
   listModuleActivationSummary: (...args: unknown[]) => listModuleActivationSummary(...args),
+  setPlatformModuleAvailability: (...args: unknown[]) => setPlatformModuleAvailability(...args),
 }));
 
 import { ModuleRegistry } from "./module-registry";
@@ -88,6 +90,49 @@ beforeEach(() => {
 });
 
 describe("ModuleRegistry", () => {
+  it("enables a shipped default-disabled module only after confirmation and refreshes", async () => {
+    const disabled = { ...IMPLEMENTED, is_enabled: false };
+    listPlatformModules.mockResolvedValue(ok({ count: 1, next: null, previous: null, results: [disabled] }));
+    setPlatformModuleAvailability.mockResolvedValue({ ok: true, data: IMPLEMENTED });
+    const onChanged = vi.fn();
+    render(<ModuleRegistry onChanged={onChanged} />);
+    const toggle = await screen.findByRole("checkbox", { name: "Platform availability for EVENTS" });
+    await waitFor(() => expect((toggle as HTMLInputElement).disabled).toBe(false));
+    fireEvent.click(toggle);
+    expect(setPlatformModuleAvailability).not.toHaveBeenCalled();
+    listPlatformModules.mockResolvedValue(ok({ count: 1, next: null, previous: null, results: [IMPLEMENTED] }));
+    fireEvent.click(screen.getByRole("button", { name: "Enable module" }));
+    await screen.findByText("Events enabled platform-wide.");
+    expect(setPlatformModuleAvailability).toHaveBeenCalledWith(10, true, STAMP);
+    expect(onChanged).toHaveBeenCalledOnce();
+    await waitFor(() => expect((screen.getByRole("checkbox", { name: "Platform availability for EVENTS" }) as HTMLInputElement).checked).toBe(true));
+  });
+
+  it("keeps the switch on and displays a failed disable without reporting success", async () => {
+    setPlatformModuleAvailability.mockResolvedValue(failure("Switch failed."));
+    render(<ModuleRegistry />);
+    const toggle = await screen.findByRole("checkbox", { name: "Platform availability for EVENTS" });
+    fireEvent.click(toggle);
+    fireEvent.click(screen.getByRole("button", { name: "Disable module" }));
+    expect(await screen.findByText("Switch failed.")).toBeTruthy();
+    expect((toggle as HTMLInputElement).checked).toBe(true);
+    expect(setPlatformModuleAvailability).toHaveBeenCalledWith(10, false, STAMP);
+  });
+
+  it("does not allow planned or unshipped modules to be enabled and supports cancel", async () => {
+    listModuleActivationSummary.mockResolvedValue({ ok: true, data: [summaryRow("CMS", { is_shipped: false }), summaryRow("EVENTS", { is_shipped: false })] });
+    listPlatformModules.mockResolvedValue(ok({ count: 2, next: null, previous: null, results: [moduleFixture(), { ...IMPLEMENTED, is_enabled: false }] }));
+    const view = render(<ModuleRegistry />);
+    expect((await screen.findByRole("checkbox", { name: "Platform availability for CMS" }) as HTMLInputElement).disabled).toBe(true);
+    expect((screen.getByRole("checkbox", { name: "Platform availability for EVENTS" }) as HTMLInputElement).disabled).toBe(true);
+    view.unmount();
+    listPlatformModules.mockResolvedValue(ok({ count: 1, next: null, previous: null, results: [IMPLEMENTED] }));
+    render(<ModuleRegistry />);
+    fireEvent.click(await screen.findByRole("checkbox", { name: "Platform availability for EVENTS" }));
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(setPlatformModuleAvailability).not.toHaveBeenCalled();
+  });
+
   it("keeps implementation status, platform availability and Site activation separate", async () => {
     render(<ModuleRegistry />);
 

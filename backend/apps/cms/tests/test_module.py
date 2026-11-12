@@ -64,7 +64,7 @@ def test_cms_mounts_scoped_workflow_revision_admin_and_public_routes():
         pattern.name for pattern in context_urls.urlpatterns
     } == {
         "site-context", "public-menus", "public-page-list", "public-homepage",
-        "public-page-detail", "public-post-list", "public-post-detail",
+        "public-page-detail", "public-post-list", "public-post-detail", "public-media-image",
     }
 
 
@@ -121,12 +121,12 @@ def test_cms_migrations_are_repeatable_and_applied():
 
 
 @pytest.mark.django_db
-def test_content_modules_are_shipped_but_disabled_by_default():
+def test_content_modules_are_platform_available_without_site_activation():
     assert CONTENT_CODES <= set(Module.objects.values_list("code", flat=True))
     for code in CONTENT_CODES:
         module = Module.objects.get(code=code)
         assert module.status == "IMPLEMENTED"
-        assert module.is_enabled is False
+        assert module.is_enabled is True
         assert capability_is_shipped(code)
     # Planned registry rows stay unusable until their implementation ships.
     planned = Module.objects.get(code="CMS")
@@ -135,7 +135,8 @@ def test_content_modules_are_shipped_but_disabled_by_default():
     planned.status = "IMPLEMENTED"
     with pytest.raises(ValidationError):
         planned.save()
-    assert not usable_modules().exists()
+    assert set(usable_modules().values_list("code", flat=True)) == CONTENT_CODES
+    assert not SiteModule.objects.exists()
 
 
 @pytest.mark.django_db
