@@ -32,7 +32,7 @@ from decouple import Config, RepositoryEnv
 from django.contrib.auth import get_user_model
 from django.conf import settings
 from apps.authorization.models import Role, UserRoleAssignment
-from apps.cms.models import ContentRole, SiteContentRoleAssignment, PublishedContentSnapshot, Page
+from apps.cms.models import ContentRole, PublishedContentSnapshot, Page
 from apps.cms.services.publication_cache import current_publication_version
 from apps.media.models import MediaAsset, MediaProcessing, MediaDerivative, MediaUsage
 from apps.media.storage import ObjectStorage
@@ -141,7 +141,8 @@ class Review:
         user = get_user_model().objects.get(username=username)
         UserRoleAssignment.objects.create(user=user, role=Role.objects.get(code=role), scope="SITE",site=site,organization=site.organization_unit)
         if cms_role:
-            SiteContentRoleAssignment.objects.create(user=user, site=site, role=cms_role)
+            mapped={"AUTHOR":"editor","REVIEWER":"reviewer","PUBLISHER":"publisher"}[str(cms_role)]
+            UserRoleAssignment.objects.get_or_create(user=user,site=site,organization=site.organization_unit,scope="SITE",role=Role.objects.get(code=mapped),revoked_at=None)
         self.seed["profiles"][name] = {"user_id":user.pk,"username":username,"role":role,"site_id":site.pk,"cms_role":cms_role}
         return user
 

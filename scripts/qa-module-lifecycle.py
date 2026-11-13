@@ -22,7 +22,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from apps.authorization.models import Role, UserRoleAssignment
-from apps.cms.models import SiteContentRoleAssignment
+
 from apps.organizations.models import OrganizationUnit
 from apps.sites.models import Module, Site, SiteDomain
 from apps.sites.services.lifecycle import activate_site, archive_site
@@ -102,9 +102,7 @@ if sys.argv[1] == "setup":
                 http("http://backend:8000/api/v1/authorization/assignments/", "POST", {
                     "user": user.pk, "role": roles[role_code], "scope": "SITE", "site": site["id"], "organization": owner.pk,
                 }, platform_token)
-            http(f"http://backend:8000/api/v1/cms/sites/{site['id']}/content-roles/", "POST", {
-                "user_id": user.pk, "role": {"author": "AUTHOR", "reviewer": "REVIEWER", "publisher": "PUBLISHER"}[name],
-            }, platform_token)
+
     print("Dedicated module lifecycle fixtures ready.")
 elif sys.argv[1] == "cleanup":
     state = json.loads(private.read_text())
@@ -115,7 +113,7 @@ elif sys.argv[1] == "cleanup":
         http("http://keycloak:8080/admin/realms/uog/users/" + actor["kc_id"] + "/logout", "POST", {}, master)
     ids = get_user_model().objects.filter(username__in=[a["username"] for a in owned]).values_list("pk", flat=True)
     UserRoleAssignment.objects.filter(user_id__in=ids, revoked_at=None).update(revoked_at=timezone.now())
-    SiteContentRoleAssignment.objects.filter(user_id__in=ids).delete()
+    pass
     get_user_model().objects.filter(pk__in=ids).update(is_active=False)
     for item in state["sites"]:
         assert Site.objects.get(pk=item["id"]).code.startswith(state["run"].upper() + "-")

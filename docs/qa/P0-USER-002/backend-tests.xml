@@ -1,0 +1,2672 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuites name="Final per-test results: full clean-DB run plus documented contract retry">
+  <testsuite name="P0-USER-002 consolidated; see source-run property on each testcase" tests="533" failures="0" errors="0" skipped="2" time="518.679">
+    <testcase classname="apps.cms.tests.test_blocks" name="test_blocks_live_on_the_shared_record_every_content_type_inherits" time="10.124">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_blocks" name="test_every_block_type_round_trips_in_saved_order" time="0.181">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_blocks" name="test_payloads_are_normalized_but_order_and_content_persist" time="0.164">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_blocks" name="test_unknown_or_malformed_blocks_fail_with_field_level_errors" time="0.294">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_blocks" name="test_blocks_must_be_a_list_bounded_by_max_blocks" time="0.186">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_blocks" name="test_malicious_rich_text_is_sanitized_on_write_and_cannot_execute" time="0.135">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_blocks" name="test_mutation_via_update_also_persists_the_sanitized_payload" time="0.192">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_blocks" name="test_button_hrefs_follow_the_link_policy" time="0.290">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_blocks" name="test_image_references_must_belong_to_an_approved_scope" time="0.395">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_blocks" name="test_sections_have_bounded_nesting_and_deny_empty_children" time="0.318">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_blocks" name="test_rich_text_and_text_fields_have_size_limits" time="0.264">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_blocks" name="test_schema_versions_are_stored_and_unsupported_versions_rejected" time="0.254">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_blocks" name="test_database_backstops_the_block_envelope_for_raw_writers" time="0.242">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_blocks" name="test_block_order_is_data_and_listed_deterministically" time="0.208">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_blocks" name="test_documented_block_contract_matches_the_domain" time="0.006">
+      <skipped type="pytest.skip" message="The runtime image ships code only; docs live in the checkout.">/app/apps/cms/tests/test_blocks.py:336: The runtime image ships code only; docs live in the checkout.</skipped>
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_category_archives" name="test_archive_scope_order_empty_and_category_eligibility" time="6.170">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_category_archives" name="test_archive_rejects_invalid_query[page=0]" time="0.980">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_category_archives" name="test_archive_rejects_invalid_query[page=-1]" time="1.198">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_category_archives" name="test_archive_rejects_invalid_query[page=bad]" time="1.373">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_category_archives" name="test_archive_rejects_invalid_query[page_size=0]" time="1.152">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_category_archives" name="test_archive_rejects_invalid_query[page_size=101]" time="1.293">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_category_archives" name="test_archive_rejects_invalid_query[page_size=1&amp;page_size=2]" time="0.937">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_category_archives" name="test_archive_rejects_invalid_query[category=other]" time="0.895">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_category_archives" name="test_archive_rejects_invalid_query[site_id=99]" time="0.704">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_category_archives" name="test_archive_rejects_invalid_query[tag=&lt;script&gt;]" time="0.644">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_content" name="test_new_content_is_draft_in_the_sites_default_language" time="0.150">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_content" name="test_content_identifiers_are_immutable" time="0.163">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_content" name="test_content_cannot_move_between_sites" time="0.150">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_content" name="test_status_changes_must_use_the_workflow_service" time="0.126">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_content" name="test_raw_updates_cannot_invent_a_status" time="0.115">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_content" name="test_locale_is_normalized_and_must_be_enabled_for_the_site" time="0.109">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_content" name="test_locale_respects_the_owning_sites_enabled_languages" time="0.114">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_content" name="test_raw_locale_updates_hit_the_format_constraint" time="0.096">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_content" name="test_metadata_must_be_a_json_object" time="0.106">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_content" name="test_authorship_is_recorded_and_survives_account_removal" time="0.125">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_content" name="test_a_site_that_owns_content_cannot_be_deleted" time="0.133">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_content" name="test_updated_at_moves_forward_on_every_save" time="0.122">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_homepage" name="test_zero_homepages_is_valid_and_replacement_stays_single" time="0.411">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_homepage" name="test_the_domain_rejects_a_second_homepage" time="0.280">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_homepage" name="test_the_database_rejects_concurrent_homepage_flags" time="0.199">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_homepage" name="test_a_failed_swap_leaves_the_previous_homepage_in_place" time="0.198">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_homepage_assignment" name="test_assignment_rejects_draft_foreign_and_preserves_revisions" time="1.838">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_homepage_assignment" name="test_unpublished_selection_uses_empty_fallback_without_other_site_cache_changes" time="1.640">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_homepage_assignment" name="test_same_slug_slider_pages_stay_isolated_after_warm_cache_and_reassignment" time="2.921">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_homepage_assignment" name="test_permission_module_and_database_backstops" time="1.758">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_homepage_assignment" name="test_assignment_and_cache_generation_roll_back_together" time="1.349">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[three-column-slider]" time="0.046">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[unknown-widget]" time="0.031">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[duplicate-id]" time="0.025">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[nested-section]" time="0.026">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[excessive-items]" time="0.028">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[unsupported-version]" time="0.025">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[ratio-column-mismatch]" time="0.028">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[unsafe-link]" time="0.025">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[unsafe-style]" time="0.018">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[unknown-breakpoint]" time="0.024">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[unknown-responsive-property]" time="0.022">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[widget-stack-forbidden]" time="0.020">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[responsive-spacing-stack]" time="0.023">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-hero_image]" time="0.020">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-image_slider]" time="0.019">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-image_grid]" time="0.022">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-layout_slider]" time="0.022">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-simple_masonry]" time="0.019">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-anything_carousel]" time="0.020">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-lottie_player]" time="0.022">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-video_player]" time="0.020">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-image]" time="0.023">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-button]" time="0.023">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-button_grid]" time="0.032">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-contact_form]" time="0.024">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-tabs]" time="0.024">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-accordion]" time="0.027">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-call_to_action]" time="0.024">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-headline]" time="0.026">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-editor]" time="0.023">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-blog]" time="0.023">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-recent_posts]" time="0.022">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-post_carousel]" time="0.025">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-testimonials]" time="0.023">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-author_box]" time="0.023">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-features]" time="0.023">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-taxonomy]" time="0.024">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-icon]" time="0.024">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-price_table]" time="0.030">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-google_maps]" time="0.046">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-social_media_buttons]" time="0.027">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-site_logo]" time="0.027">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-site_title]" time="0.025">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-page_title]" time="0.022">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-menu]" time="0.024">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-breadcrumbs]" time="0.023">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-loop_grid]" time="0.022">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-loop_carousel]" time="0.019">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-taxonomy_filter]" time="0.019">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-post_title]" time="0.020">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-post_excerpt]" time="0.021">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-featured_image]" time="0.021">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-alert]" time="0.021">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-table_of_contents]" time="0.026">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-menu_anchor]" time="0.023">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_database_contract_cases[catalog-countdown]" time="0.023">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_page_round_trip_and_raw_write_guard" time="0.144">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_membership_authorization" name="test_membership_reads_and_workflow_roles_are_scoped_and_live[site-administrator-allowed0]" time="0.875">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_membership_authorization" name="test_membership_reads_and_workflow_roles_are_scoped_and_live[editor-allowed1]" time="0.796">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_membership_authorization" name="test_membership_reads_and_workflow_roles_are_scoped_and_live[reviewer-allowed2]" time="0.770">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_membership_authorization" name="test_membership_reads_and_workflow_roles_are_scoped_and_live[publisher-allowed3]" time="0.846">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_membership_authorization" name="test_membership_reads_and_workflow_roles_are_scoped_and_live[viewer-allowed4]" time="0.578">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_membership_authorization" name="test_role_deactivation_closes_membership_cms_access" time="0.316">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_membership_authorization" name="test_inactive_member_is_not_reactivated_by_a_valid_token" time="0.593">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_membership_authorization" name="test_membership_only_editor_reviewer_publisher_handoff" time="0.907">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_api" name="test_menu_crud_duplicate_location_version_conflicts_and_request_id" time="1.038">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_api" name="test_inventory_optional_active_filter_preserves_both_states[menus]" time="2.266">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_api" name="test_inventory_optional_active_filter_preserves_both_states[items]" time="3.058">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_api" name="test_item_crud_move_tree_activation_and_safe_delete_policy" time="1.706">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_api" name="test_atomic_reorder_and_invalid_payloads_do_not_partially_mutate" time="1.361">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_api" name="test_invalid_cycle_and_descendant_depth_roll_back_positions_versions_and_audits" time="1.302">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_api" name="test_unsafe_targets_return_typed_errors_without_writes[javascript:alert(1)]" time="0.725">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_api" name="test_unsafe_targets_return_typed_errors_without_writes[data:text/html,bad]" time="0.704">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_api" name="test_unsafe_targets_return_typed_errors_without_writes[//evil.example]" time="0.848">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_api" name="test_unsafe_targets_return_typed_errors_without_writes[https://example.com/%0d%0aLocation:evil]" time="0.617">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_api" name="test_cross_site_scope_foreign_parent_and_forged_claims_are_rejected" time="0.949">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_api" name="test_permission_codes_and_publication_are_independent" time="0.958">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_api" name="test_disabled_permission_is_denied_even_with_platform_administrator_grant" time="0.602">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_api" name="test_invalid_primitive_targets_and_unsupported_idempotency_have_safe_errors" time="0.779">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_api" name="test_disabled_module_blocks_api_mutations_but_not_admin_inspection" time="0.667">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_api" name="test_page_post_targets_and_explicit_cross_site_policy_are_enforced" time="1.260">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_api" name="test_all_changes_have_shared_site_actor_request_audit_and_urls_are_not_logged" time="0.808">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_api" name="test_audit_failure_rolls_back_menu_item_and_aggregate_version" time="1.138">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_api" name="test_raw_item_writes_are_audited_and_invalidate_api_tokens" time="1.020">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_api" name="test_menu_openapi_contract_is_typed_scoped_and_documents_conflicts" time="11.687">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_api" name="test_local_location_edit_cross_site_block_and_central_menu_authority" time="0.944">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_delivery" name="test_precedence_matrix_orders_global_parent_and_local_items" time="0.909">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_delivery" name="test_public_header_and_footer_follow_the_resolved_site" time="1.227">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_delivery" name="test_unpublished_targets_and_inactive_branches_are_omitted" time="0.972">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_delivery" name="test_post_publish_and_unpublish_invalidate_linked_menu_delivery" time="1.329">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_delivery" name="test_inheritance_rejects_loops_and_does_not_grant_parent_management" time="1.460">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_delivery" name="test_disabled_module_hides_public_menus_without_deleting_rows" time="1.032">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_delivery" name="test_menu_changes_invalidate_only_affected_site_and_location_caches" time="1.703">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_integrity" name="test_subtree_move_validates_descendant_depth" time="0.447">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_integrity" name="test_raw_cycle_parent_ownership_and_internal_target_integrity" time="0.340">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_integrity" name="test_unsafe_urls_fail_model_and_database_validation[https://example.com/%0d%0aLocation:evil]" time="0.167">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_integrity" name="test_unsafe_urls_fail_model_and_database_validation[https://example.com/%00]" time="0.198">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_integrity" name="test_unsafe_urls_fail_model_and_database_validation[https://example.com/%250a]" time="0.251">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_integrity" name="test_unsafe_urls_fail_model_and_database_validation[https://example.com/%5c/evil]" time="0.165">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_integrity" name="test_unsafe_urls_fail_model_and_database_validation[https://example.com/%]" time="0.145">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_integrity" name="test_unsafe_urls_fail_model_and_database_validation[https://example.com:99999/path]" time="0.159">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_integrity" name="test_unsafe_urls_fail_model_and_database_validation[https://user@example.com]" time="0.206">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_integrity" name="test_unsafe_urls_fail_model_and_database_validation[javascript:alert(1)]" time="0.192">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_integrity" name="test_unsafe_urls_fail_model_and_database_validation[data:text/html,bad]" time="0.171">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_integrity" name="test_unsafe_urls_fail_model_and_database_validation[//example.com]" time="0.188">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_integrity" name="test_unsafe_urls_fail_model_and_database_validation[https://example.com/\x1f]" time="0.248">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_integrity" name="test_unsafe_urls_fail_model_and_database_validation[https://example.com/\x7f]" time="0.200">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_integrity" name="test_unsafe_urls_fail_model_and_database_validation[https://example.com\\@evil.com]" time="0.178">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_integrity" name="test_unsafe_urls_fail_model_and_database_validation[https://[invalid]" time="0.236">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_integrity" name="test_unsafe_urls_fail_model_and_database_validation[https://example.com:abc]" time="0.230">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_integrity" name="test_unsafe_urls_fail_model_and_database_validation[ https://example.com]" time="0.233">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_integrity" name="test_disabled_module_denies_all_mutations_but_retains_records" time="0.275">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_integrity" name="test_post_owner_cannot_invalidate_existing_menu_link" time="0.207">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_integrity" name="test_authorized_services_deny_foreign_site_and_unsafe_cross_site_opt_in" time="0.499">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_integrity" name="test_tree_order_inactive_branches_and_size_limit" time="0.507">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_integrity" name="test_inactive_actor_and_revoked_assignments_do_not_grant_access" time="0.348">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_integrity" name="test_unconfigured_locations_are_rejected" time="0.146">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_integrity" name="test_missing_internal_target_returns_validation_error" time="0.161">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_integrity" name="test_menu_enablement_api_preserves_records_and_rejects_unauthorized_users" time="0.652">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menus" name="test_locations_belong_to_one_site_and_items_keep_sibling_order" time="0.281">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menus" name="test_cycles_and_excessive_depth_are_rejected" time="0.327">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menus" name="test_internal_targets_stay_on_the_site_unless_cross_site_is_explicit" time="0.529">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menus" name="test_external_urls_reject_unsafe_schemes_and_redirects[javascript:alert(1)]" time="0.305">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menus" name="test_external_urls_reject_unsafe_schemes_and_redirects[data:text/html,hi]" time="0.301">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menus" name="test_external_urls_reject_unsafe_schemes_and_redirects[vbscript:msgbox(1)]" time="0.231">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menus" name="test_external_urls_reject_unsafe_schemes_and_redirects[file:///etc/passwd]" time="0.404">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menus" name="test_external_urls_reject_unsafe_schemes_and_redirects[//evil.example/path]" time="0.239">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menus" name="test_external_urls_reject_unsafe_schemes_and_redirects[https://user:secret@example.com/path]" time="0.242">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menus" name="test_external_urls_reject_unsafe_schemes_and_redirects[https://example.com/path\r\nLocation: https://evil.example]" time="0.216">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menus" name="test_external_urls_reject_unsafe_schemes_and_redirects[http://example.com/a b]" time="0.215">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menus" name="test_disabling_menus_blocks_edits_and_keeps_rows" time="0.192">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menus" name="test_menu_module_is_shipped_and_platform_enabled_after_all_migrations" time="0.304">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_module" name="test_cms_migrations_are_repeatable_and_applied" time="0.783">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_module" name="test_content_modules_are_platform_available_without_site_activation" time="0.018">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_module" name="test_registry_database_gates_activation" time="0.010">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_module" name="test_a_site_cannot_enable_a_planned_module" time="0.100">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_multi_site" name="test_content_is_scoped_to_its_own_site" time="0.104">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_multi_site" name="test_cms_uses_the_shared_schema_only" time="0.065">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_multi_site" name="test_every_index_leads_with_site" time="0.080">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_multi_site" name="test_one_sites_rows_never_appear_in_another_sites_query" time="0.146">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_page_api" name="test_admin_pages_are_site_scoped_filterable_and_conditionally_updated" time="0.936">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_page_api" name="test_page_authoring_requires_an_active_site_author_role" time="0.755">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_page_api" name="test_page_workflow_actions_and_history_are_site_role_aware" time="1.187">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_page_api" name="test_page_review_to_publication_is_site_scoped_and_keeps_live_snapshot_immutable" time="1.231">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_page_api" name="test_database_platform_administrator_can_author_without_keycloak_role" time="0.655">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_page_api" name="test_page_reparenting_is_same_site_and_keeps_route_history" time="0.654">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_page_api" name="test_public_routes_are_host_scoped_published_only_and_snapshot_backed" time="4.925">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_page_api" name="test_publication_versions_invalidate_public_cache_on_unpublish" time="2.276">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_page_api" name="test_disabling_pages_blocks_management_and_delivery_but_keeps_content" time="1.221">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_page_api" name="test_public_delivery_is_closed_when_the_pages_module_is_not_enabled" time="0.426">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_page_api" name="test_disabling_pages_blocks_management_without_deleting_the_page" time="0.614">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_page_api" name="test_homepage_assignment_publish_and_rejection_stay_on_one_site" time="0.953">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_page_redirects" name="test_a_slug_change_records_the_old_route" time="0.189">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_page_redirects" name="test_moving_an_ancestor_records_every_descendant_route" time="0.497">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_page_redirects" name="test_detaching_to_the_root_records_history" time="0.247">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_page_redirects" name="test_returning_to_a_former_route_never_shadows_the_live_page" time="0.604">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_page_redirects" name="test_redirect_rows_are_unique_per_site_and_locale" time="0.185">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_page_redirects" name="test_history_disappears_with_the_page" time="0.278">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_page_redirects" name="test_a_route_change_is_transactional" time="0.310">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_pages" name="test_paths_are_computed_from_the_slug_chain" time="0.256">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_pages" name="test_duplicate_full_routes_are_rejected_per_site_and_locale" time="0.208">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_pages" name="test_the_same_route_is_free_in_another_site_or_locale" time="0.176">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_pages" name="test_parents_must_share_site_and_locale" time="0.178">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_pages" name="test_hierarchy_cycles_are_rejected" time="0.191">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_pages" name="test_hierarchy_depth_is_capped" time="0.892">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_pages" name="test_pages_protect_their_parent_and_site" time="0.181">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_pages" name="test_page_language_is_fixed_after_creation" time="0.128">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_pages" name="test_seo_visibility_and_layout_are_validated" time="0.179">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_pages" name="test_draft_and_hidden_pages_are_not_publicly_served" time="0.964">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_pages" name="test_pages_never_leak_between_sites" time="0.526">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_pages" name="test_sibling_ordering_follows_position" time="0.142">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_post_media" name="test_article_media_round_trip_removal_restore_and_deletion_guard" time="1.114">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_post_media" name="test_invalid_media_is_atomic[foreign_featured]" time="0.990">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_post_media" name="test_invalid_media_is_atomic[foreign_inline]" time="0.816">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_post_media" name="test_invalid_media_is_atomic[pending]" time="0.995">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_post_media" name="test_invalid_media_is_atomic[archived]" time="1.364">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_post_media" name="test_invalid_media_is_atomic[processing]" time="1.141">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_post_media" name="test_invalid_media_is_atomic[document]" time="1.052">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_post_media" name="test_invalid_media_is_atomic[missing_alt]" time="0.802">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_post_media" name="test_invalid_media_is_atomic[duplicate_node]" time="1.133">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_post_media" name="test_invalid_media_is_atomic[storage_path]" time="1.062">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_post_media" name="test_media_permission_and_modules_gate_direct_attachment" time="1.538">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_post_media" name="test_post_public_media_eligibility_and_foreign_host" time="2.403">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_post_media" name="test_reference_endpoint_cannot_detach_retained_article_uses" time="1.772">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_post_media" name="test_stale_article_save_preserves_media_references" time="1.758">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_post_media" name="test_quarantined_images_have_safe_delivery_and_publication_failure[False]" time="1.742">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_post_media" name="test_quarantined_images_have_safe_delivery_and_publication_failure[True]" time="1.835">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_post_working_drafts" name="test_post_working_draft_preserves_publication_until_reviewed_promotion" time="3.152">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_post_working_drafts" name="test_preview_working_copy_and_review_are_scoped_and_module_gated" time="1.297">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_post_working_drafts" name="test_reviewer_comments_invalid_states_and_foreign_site_denial" time="1.301">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_post_working_drafts" name="test_standard_review_roles_have_scoped_workspace_and_media_reads[reviewer]" time="0.846">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_post_working_drafts" name="test_standard_review_roles_have_scoped_workspace_and_media_reads[publisher]" time="0.822">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_posts_crud_filtering_search_ordering_and_pagination" time="2.483">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_duplicate_slug_and_cross_site_taxonomy_return_actionable_errors" time="0.950">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_featured_media_rejects_unregistered_paths_and_preserves_legacy_reads" time="0.669">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_taxonomy_crud_is_site_scoped_with_slug_normalization" time="1.785">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_authoring_requires_a_site_cms_role_and_an_enabled_posts_module" time="0.886">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_patch_requires_the_current_etag" time="0.848">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_versioned_article_round_trip_revisions_and_conflict" time="1.560">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_invalid_article_rejected_without_writes[document0]" time="0.687">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_invalid_article_rejected_without_writes[document1]" time="0.600">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_invalid_article_rejected_without_writes[document2]" time="0.614">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_invalid_article_rejected_without_writes[document3]" time="0.395">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_invalid_article_rejected_without_writes[document4]" time="0.271">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_invalid_article_rejected_without_writes[document5]" time="0.462">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_invalid_article_rejected_without_writes[document6]" time="0.503">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_invalid_article_rejected_without_writes[document7]" time="0.277">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_invalid_article_rejected_without_writes[None]" time="0.390">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_article_title_sanitization_and_legacy_compatibility" time="0.589">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_article_site_permission_and_module_gates" time="0.536">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_invalid_article_update_is_atomic_and_metadata_cannot_replace_body" time="0.629">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_reserved_slug_and_inactive_taxonomy_are_rejected_without_overwrite" time="1.134">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_published_post_metadata_stays_locked_until_workflow_unlock" time="2.633">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_post_metadata_validation_is_atomic[fields0-title]" time="0.599">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_post_metadata_validation_is_atomic[fields1-title]" time="0.607">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_post_metadata_validation_is_atomic[fields2-slug]" time="0.561">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_post_metadata_validation_is_atomic[fields3-slug]" time="0.384">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_post_metadata_validation_is_atomic[fields4-slug]" time="0.692">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_post_metadata_rejects_foreign_and_inactive_taxonomy[Category-categories]" time="0.852">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_post_metadata_rejects_foreign_and_inactive_taxonomy[Tag-tags]" time="0.656">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_taxonomy_only_save_advances_etag_and_complete_revision_can_be_restored" time="0.812">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_failed_taxonomy_persistence_rolls_back_post_relations_and_revision" time="0.224">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_main_and_child_sites_share_post_metadata_contract" time="0.783">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_posts_api" name="test_post_revision_api_uses_posts_gate_and_restores_metadata" time="0.970">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_public_news" name="test_equal_publication_times_have_stable_pages_and_share_widget_order" time="1.739">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_public_news" name="test_invalid_or_foreign_scope_queries_are_rejected[page_size=0]" time="0.400">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_public_news" name="test_invalid_or_foreign_scope_queries_are_rejected[page_size=-1]" time="0.371">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_public_news" name="test_invalid_or_foreign_scope_queries_are_rejected[page_size=101]" time="0.433">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_public_news" name="test_invalid_or_foreign_scope_queries_are_rejected[page_size=abc]" time="0.397">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_public_news" name="test_invalid_or_foreign_scope_queries_are_rejected[page_size=1.5]" time="0.351">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_public_news" name="test_invalid_or_foreign_scope_queries_are_rejected[page_size=]" time="0.421">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_public_news" name="test_invalid_or_foreign_scope_queries_are_rejected[page=0]" time="0.537">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_public_news" name="test_invalid_or_foreign_scope_queries_are_rejected[page=-1]" time="0.395">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_public_news" name="test_invalid_or_foreign_scope_queries_are_rejected[page=abc]" time="0.356">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_public_news" name="test_invalid_or_foreign_scope_queries_are_rejected[page_size=2&amp;page_size=3]" time="0.360">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_public_news" name="test_invalid_or_foreign_scope_queries_are_rejected[site=999]" time="0.312">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_public_news" name="test_invalid_or_foreign_scope_queries_are_rejected[site_id=999]" time="0.403">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_public_news" name="test_future_drafts_unpublished_and_unsnapshotted_posts_are_excluded" time="1.073">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_public_news" name="test_empty_default_maximum_and_disabled_news_contract" time="0.223">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_public_news" name="test_republished_article_orders_by_current_snapshot_time" time="1.162">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_public_news" name="test_main_property_and_child_use_the_same_host_scoped_news_contract" time="1.049">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_public_posts" name="test_public_feed_detail_site_taxonomy_draft_and_host_isolation" time="1.198">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_public_posts" name="test_editor_creates_reviews_and_publishes_post_to_public_feed" time="1.189">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_public_posts" name="test_post_publication_pagination_cache_and_disabled_module" time="1.957">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_public_posts" name="test_public_detail_includes_optional_author_byline_without_admin_fields" time="0.939">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_public_posts" name="test_published_article_document_remains_snapshot_bound" time="0.927">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_public_posts" name="test_draft_metadata_retains_previous_publication_until_workflow_republishes" time="1.865">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_public_site_hosts" name="test_main_and_two_colleges_stay_isolated_through_publish_and_module_gates" time="3.536">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_realm_role_authorization" name="test_realm_platform_admin_cannot_read_or_mutate_another_site" time="0.897">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_realm_role_authorization" name="test_realm_role_without_any_database_grant_cannot_administer_cms" time="0.537">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_realm_role_authorization" name="test_platform_grant_expires_and_revocation_close_cms_access" time="0.446">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_realm_role_authorization" name="test_token_role_string_does_not_authorize_the_workflow_service" time="0.074">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_revision_api" name="test_revision_history_requires_site_role_and_is_site_scoped" time="0.482">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_revision_api" name="test_revision_detail_and_restore_are_authorized_conditional_and_safe" time="0.718">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_revision_api" name="test_reviewer_can_inspect_but_cannot_restore_history" time="0.493">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_revisions" name="test_meaningful_saves_store_complete_immutable_revision_snapshots" time="0.116">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_revisions" name="test_stale_model_save_raises_conflict_without_overwriting_newer_content" time="0.103">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_revisions" name="test_snapshots_have_a_hard_size_limit_and_reject_oversized_saves" time="0.100">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_revisions" name="test_draft_retention_keeps_recent_versions_but_not_unbounded_history" time="2.060">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_revisions" name="test_restore_creates_a_new_draft_revision_and_preserves_source_history" time="0.253">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_revisions" name="test_unpublished_restore_keeps_published_revisions_immutable" time="3.719">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_serializers" name="test_contract_exposes_only_approved_fields" time="0.005">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_serializers" name="test_identity_scope_and_unknown_fields_are_rejected_from_input" time="0.006">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_serializers" name="test_update_rejects_immutable_identity_fields" time="0.097">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_serializers" name="test_valid_editables_validate_and_malformed_locale_does_not" time="0.066">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_serializers" name="test_block_serializer_validation_is_field_level_and_site_scoped" time="0.066">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_serializers" name="test_serialized_shape_matches_the_documented_contract" time="0.072">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_serializers" name="test_page_serializer_contract_exposes_only_approved_fields" time="0.004">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_serializers" name="test_page_serializer_rejects_server_managed_and_unknown_input" time="0.056">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_serializers" name="test_page_serializer_allows_same_site_reparenting_and_locks_locale" time="0.114">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_visual_builder_module" name="test_visual_builder_is_shipped_requires_pages_and_is_site_scoped" time="0.227">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_widget_runtime" name="test_menu_widget_reuses_scoped_published_navigation" time="1.521">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_widget_runtime" name="test_widget_data_scopes_published_filtering_and_private_preview" time="1.512">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_widget_runtime" name="test_contact_validation_replay_and_foreign_host_have_no_partial_writes" time="1.446">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_widget_runtime" name="test_contact_requires_current_published_form_and_module" time="1.356">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_widget_runtime" name="test_contact_rate_limit_is_site_local" time="1.578">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_widget_runtime" name="test_site_logo_configuration_cannot_resolve_foreign_asset" time="1.479">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_workflow" name="test_state_machine_permissions_snapshot_and_publish_idempotency" time="0.693">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_workflow" name="test_rejection_returns_editable_draft_and_keeps_reviewer_comment" time="0.351">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_workflow" name="test_site_roles_are_scoped_and_platform_grant_is_a_database_assignment" time="0.353">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_workflow" name="test_invalid_transitions_from_draft_are_rejected[approve]" time="0.185">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_workflow" name="test_invalid_transitions_from_draft_are_rejected[reject]" time="0.204">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_workflow" name="test_invalid_transitions_from_draft_are_rejected[publish]" time="0.318">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_workflow" name="test_invalid_transitions_from_draft_are_rejected[unpublish]" time="0.594">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_workflow" name="test_invalid_transitions_from_draft_are_rejected[archive]" time="0.468">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_workflow" name="test_invalid_transitions_from_draft_are_rejected[restore]" time="0.478">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_workflow" name="test_audit_failure_rolls_back_status_history_and_snapshot" time="0.650">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_workflow" name="test_approved_published_and_unpublished_content_can_be_archived[APPROVED]" time="0.533">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_workflow" name="test_approved_published_and_unpublished_content_can_be_archived[PUBLISHED]" time="0.590">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_workflow" name="test_approved_published_and_unpublished_content_can_be_archived[UNPUBLISHED]" time="0.557">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_workflow_api" name="test_legacy_role_management_routes_are_retired" time="0.351">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_workflow_api" name="test_site_role_workflow_uses_validated_token_and_never_body_roles" time="0.627">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_workflow_api" name="test_http_review_publish_flow_and_publish_retry" time="0.936">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_workflow_api" name="test_post_workflow_uses_roles_post_module_snapshots_audit_and_idempotency" time="3.812">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_working_draft" name="test_editor_reviews_a_draft_while_visitors_keep_the_published_page" time="2.359">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_working_draft" name="test_unpublish_archive_and_failed_publication_leave_the_public_snapshot" time="1.457">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_working_draft" name="test_archiving_a_working_draft_keeps_the_published_page" time="0.961">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_working_draft" name="test_post_publication_does_not_use_page_working_drafts" time="0.585">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_documentation" name="test_enabled_production_docs_require_database_platform_assignment[/api/schema/]" time="8.670">
+      <properties>
+        <property name="source-run" value="documentation-tests.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_documentation" name="test_enabled_production_docs_require_database_platform_assignment[/api/docs/]" time="0.896">
+      <properties>
+        <property name="source-run" value="documentation-tests.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_documentation" name="test_enabled_production_docs_require_database_platform_assignment[/api/redoc/]" time="1.045">
+      <properties>
+        <property name="source-run" value="documentation-tests.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_documentation" name="test_session_can_open_staff_docs_but_cannot_bypass_bearer_api_permissions" time="0.410">
+      <properties>
+        <property name="source-run" value="documentation-tests.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_documentation" name="test_validation_and_auth_errors_match_envelope_and_request_id" time="0.610">
+      <properties>
+        <property name="source-run" value="documentation-tests.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_site_user_creation" name="test_create_private_avatar_directory_and_identity_link" time="0.924">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_site_user_creation" name="test_create_without_picture_and_main_site_same_contract" time="0.693">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_site_user_creation" name="test_platform_role_id_is_rejected" time="1.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_site_user_creation" name="test_development_bootstrap_identity_cannot_be_created_by_site_admin" time="0.781">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_site_user_creation" name="test_provider_duplicate_has_no_local_assignment" time="0.522">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_site_user_creation" name="test_resource_limit_and_animated_images_rejected" time="0.645">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_site_user_creation" name="test_invalid_fields_have_no_provider_or_membership_side_effects[change0]" time="0.558">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_site_user_creation" name="test_invalid_fields_have_no_provider_or_membership_side_effects[change1]" time="0.863">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_site_user_creation" name="test_invalid_fields_have_no_provider_or_membership_side_effects[change2]" time="0.746">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_site_user_creation" name="test_invalid_fields_have_no_provider_or_membership_side_effects[change3]" time="0.683">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_site_user_creation" name="test_invalid_fields_have_no_provider_or_membership_side_effects[change4]" time="0.831">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_site_user_creation" name="test_invalid_fields_have_no_provider_or_membership_side_effects[change5]" time="1.065">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_site_user_creation" name="test_invalid_fields_have_no_provider_or_membership_side_effects[change6]" time="1.379">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_site_user_creation" name="test_invalid_fields_have_no_provider_or_membership_side_effects[change7]" time="0.844">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_site_user_creation" name="test_invalid_fields_have_no_provider_or_membership_side_effects[change8]" time="0.875">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_site_user_creation" name="test_local_duplicates_case_insensitive[username]" time="0.889">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_site_user_creation" name="test_local_duplicates_case_insensitive[email]" time="0.895">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_site_user_creation" name="test_foreign_site_denied_before_provider" time="0.798">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_site_user_creation" name="test_unprivileged_role_denied[viewer]" time="0.956">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_site_user_creation" name="test_unprivileged_role_denied[editor]" time="0.759">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_site_user_creation" name="test_anonymous_denied" time="0.677">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_site_user_creation" name="test_provider_failure_leaves_no_membership_and_records_outcome" time="0.897">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_site_user_creation" name="test_failed_remote_cleanup_retains_blocked_identity_without_assignment" time="0.759">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_site_user_creation" name="test_recovery_cleans_failed_accounts_and_preserves_active_accounts" time="1.000">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_authorization" name="test_seed_is_idempotent_and_matches_all_seven_reviewed_templates" time="0.584">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_authorization" name="test_unknown_permissions_expired_and_revoked_assignments_fail_closed" time="0.355">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_authorization" name="test_organization_and_site_scopes_do_not_leak_to_siblings_or_platform" time="0.448">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_authorization" name="test_platform_scope_is_explicit_and_audited" time="0.404">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_authorization" name="test_api_rejects_keycloak_role_claims_and_requires_database_roles" time="0.373">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_authorization" name="test_page_writes_need_rbac_and_editor_cannot_publish" time="0.743">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_authorization" name="test_page_site_scope_is_derived_from_site_and_wrong_site_denies" time="0.781">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_authorization" name="test_permission_catalog_is_read_only_and_unknown_codes_cannot_be_added" time="0.828">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_authorization" name="test_role_administrator_cannot_modify_system_templates_or_grant_self" time="0.884">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_authorization" name="test_site_user_directory_and_identity_search_are_site_scoped" time="1.106">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_authorization" name="test_last_active_site_administrator_cannot_be_revoked" time="0.651">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_accounts" name="test_me_without_a_token_is_rejected" time="0.374">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_accounts" name="test_me_with_a_valid_token_returns_the_identity" time="0.383">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_accounts" name="test_explicit_local_dev_admin_bootstrap_creates_database_assignment" time="0.300">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_accounts" name="test_me_with_an_expired_token_is_rejected" time="0.440">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_accounts" name="test_me_with_a_token_of_an_unknown_client_is_rejected" time="0.407">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_accounts" name="test_me_with_a_token_for_another_audience_is_rejected" time="0.391">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_accounts" name="test_the_same_subject_always_maps_to_the_same_account" time="0.445">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_accounts" name="test_a_subject_username_is_replaced_when_the_claim_arrives" time="0.417">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_accounts" name="test_a_renamed_keycloak_user_keeps_the_local_account" time="0.403">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_accounts" name="test_the_admin_overview_requires_database_platform_assignment" time="0.517">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_accounts" name="test_published_pages_stay_public" time="0.371">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_accounts" name="test_writing_a_page_requires_a_token" time="0.362">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_accounts" name="test_writing_a_page_with_a_token_is_allowed" time="0.666">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_homepage" name="test_racing_homepage_saves_leave_exactly_one" time="2.512">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_homepage_assignment" name="test_assignment_serializes_with_unpublication" time="4.937">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_homepage_assignment" name="test_upgrade_preserves_existing_homepage_and_readable_snapshot" time="8.248">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_upgrade_from_pre_visual_contract_preserves_legacy_page" time="5.252">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_api" name="test_two_simultaneous_api_reorders_only_commit_one_version" time="4.761">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_integrity" name="test_simultaneous_inverse_moves_cannot_commit_a_cycle" time="2.285">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_integrity" name="test_menu_migrations_reverse_and_reapply" time="16.270">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_menu_integrity" name="test_integrity_migration_preserves_disabled_data_and_rejects_legacy_cycles" time="16.019">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_post_workflow_migration" name="test_post_working_draft_migration_reverse_and_upgrade_preserve_legacy_publication" time="4.225">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_role_retirement" name="test_legacy_only_requires_explicit_review_then_is_idempotent_and_revocable" time="7.481">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_role_retirement" name="test_multiple_approved_roles_preserve_site_scope_without_administrator" time="7.049">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_role_retirement" name="test_covered_grants_and_inactive_users_do_not_gain_new_assignments" time="2.450">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_role_retirement" name="test_stale_approvals_and_unmapped_roles_cannot_create_memberships" time="6.946">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_role_retirement" name="test_drop_is_guarded_and_rollback_cannot_resurrect_revoked_grant" time="5.501">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_role_retirement" name="test_live_membership_rollback_restores_only_reviewed_grant" time="4.714">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_workflow" name="test_concurrent_publish_retries_create_one_snapshot_and_audit" time="1.106">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_workflow" name="test_concurrent_post_publish_retries_create_one_snapshot_and_audit" time="1.114">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_working_draft" name="test_concurrent_working_draft_publication_applies_once" time="1.742">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_visual_drafts" name="test_complete_tree_round_trip_keeps_order_and_reference_identity" time="1.835">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_visual_drafts" name="test_hostile_visual_writes_are_rejected_atomically[script-url]" time="1.660">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_visual_drafts" name="test_hostile_visual_writes_are_rejected_atomically[style-token]" time="2.487">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_visual_drafts" name="test_hostile_visual_writes_are_rejected_atomically[unexpected-property]" time="2.029">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_visual_drafts" name="test_public_snapshot_independent_of_visual_working_draft" time="2.287">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_visual_drafts" name="test_foreign_item_failure_has_identity_and_rolls_back_everything" time="1.814">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_visual_drafts" name="test_two_editor_sessions_one_winner_no_stale_slider_or_inventory" time="1.778">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_visual_drafts" name="test_revision_inventory_failure_after_insert_rolls_back_page_and_references" time="1.601">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_visual_drafts" name="test_preconditions_scoping_and_legacy_round_trip" time="1.781">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_visual_drafts" name="test_validation_errors_bind_nodes_and_keep_original_draft" time="1.807">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_visual_drafts" name="test_reviewer_cannot_save_and_disabled_pages_rejects_draft_writes" time="1.906">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_visual_drafts" name="test_working_draft_open_rechecks_published_version_inside_service_lock" time="3.692">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_visual_publication" name="test_approval_binds_revision_and_changed_tree_requires_fresh_review" time="13.390">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_visual_publication" name="test_private_revision_preview_and_image_never_enter_public_delivery" time="8.611">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_visual_publication" name="test_unavailable_gallery_blocks_promotion_and_keeps_public_snapshot" time="7.151">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_visual_publication" name="test_approved_slides_freeze_while_later_private_draft_and_restore_differ" time="5.449">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_visual_publication" name="test_cache_invalidation_runs_only_after_commit_and_rollback_preserves_cache" time="2.501">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_visual_publication" name="test_wrong_approval_cannot_create_publication_and_non_publishers_cannot_promote" time="2.830">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_visual_publication" name="test_missing_derivative_uses_private_original_and_approval_is_retained_on_upgrade" time="6.253">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_visual_publication" name="test_failure_after_snapshot_and_public_references_rolls_back_promotion" time="4.451">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_visual_layout_media" name="test_visual_media_inventory_publication_retention_and_removal" time="2.476">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_visual_layout_media" name="test_foreign_visual_media_rejected_before_creating_a_page" time="1.186">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_visual_layout_media" name="test_visual_page_api_rejects_unknown_and_accepts_empty_versioned_document" time="1.610">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_section_templates" name="test_remap_section_ids_are_unique" time="0.641">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_section_templates" name="test_save_and_insert_twice_yields_independent_copies" time="1.928">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_section_templates" name="test_foreign_template_insert_leaves_layout_unchanged" time="1.665">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_section_templates" name="test_retired_media_blocks_insert_without_partial_write" time="1.513">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_section_templates" name="test_retire_template_preserves_already_inserted_content" time="1.601">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_media_assets" name="test_image_detection_and_stream_limit_do_not_depend_on_filename" time="0.664">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_media_assets" name="test_stored_bytes_define_metadata_and_duplicate_object_is_a_database_conflict" time="1.934">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_media_assets" name="test_two_site_selectors_updates_and_reassignment_never_expose_foreign_metadata" time="2.478">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_media_assets" name="test_orm_bulk_and_raw_updates_cannot_reassign_identity[site_id-0]" time="1.081">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_media_assets" name="test_orm_bulk_and_raw_updates_cannot_reassign_identity[storage_reference-changed]" time="1.480">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_media_assets" name="test_orm_bulk_and_raw_updates_cannot_reassign_identity[checksum-0000000000000000000000000000000000000000000000000000000000000000]" time="1.244">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_media_assets" name="test_orm_bulk_and_raw_updates_cannot_reassign_identity[created_by_id-0]" time="1.242">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_media_assets" name="test_lifecycle_and_audit_are_actor_site_bound_and_atomic" time="1.388">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_media_assets" name="test_http_catalog_is_site_scoped_rejects_ownership_and_module_bypasses" time="1.959">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_media_assets" name="test_rejected_status_is_terminal_and_archived_sites_are_frozen" time="1.596">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_media_assets" name="test_http_placements_use_revision_ids_from_the_scoped_revision_api" time="1.803">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_media_assets" name="test_concurrent_registration_commits_one_identity_and_one_audit" time="1.120">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_media_assets" name="test_audit_failure_rolls_back_metadata_and_preserves_asset" time="1.150">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_media_assets" name="test_slider_gallery_and_repeater_placements_share_one_asset_and_detach_independently" time="1.921">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_media_assets" name="test_reference_database_rejects_foreign_page_and_asset" time="1.735">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_media_assets" name="test_upgrade_from_pre_media_sprint_two_preserves_page_and_revision" time="5.932">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_media_assets" name="test_revision_retention_detaches_media_before_history_delete" time="1.494">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_media_assets" name="test_page_delete_detaches_media_references_and_keeps_asset" time="1.263">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[three-column-slider]" time="0.037">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[unknown-widget]" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[duplicate-id]" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[nested-section]" time="0.003">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[excessive-items]" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[unsupported-version]" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[ratio-column-mismatch]" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[unsafe-link]" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[unsafe-style]" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[unknown-breakpoint]" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[unknown-responsive-property]" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[widget-stack-forbidden]" time="0.003">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[responsive-spacing-stack]" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-hero_image]" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-image_slider]" time="0.003">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-image_grid]" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-layout_slider]" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-simple_masonry]" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-anything_carousel]" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-lottie_player]" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-video_player]" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-image]" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-button]" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-button_grid]" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-contact_form]" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-tabs]" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-accordion]" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-call_to_action]" time="0.003">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-headline]" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-editor]" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-blog]" time="0.003">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-recent_posts]" time="0.003">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-post_carousel]" time="0.003">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-testimonials]" time="0.003">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-author_box]" time="0.003">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-features]" time="0.004">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-taxonomy]" time="0.004">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-icon]" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-price_table]" time="0.008">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-google_maps]" time="0.004">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-social_media_buttons]" time="0.003">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-site_logo]" time="0.003">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-site_title]" time="0.003">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-page_title]" time="0.003">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-menu]" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-breadcrumbs]" time="0.005">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-loop_grid]" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-loop_carousel]" time="0.005">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-taxonomy_filter]" time="0.003">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-post_title]" time="0.003">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-post_excerpt]" time="0.003">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-featured_image]" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-alert]" time="0.003">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-table_of_contents]" time="0.012">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-menu_anchor]" time="0.004">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_shared_contract_cases[catalog-countdown]" time="0.005">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_exact_product_catalog" time="0.003">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_payload_and_total_node_boundaries" time="0.015">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_layout_contract" name="test_responsive_overrides_accept_approved_tokens_and_reject_unknown" time="0.004">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_module" name="test_cms_packages_import_and_application_loads" time="0.003">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_module" name="test_cms_mounts_scoped_workflow_revision_admin_and_public_routes" time="0.002">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_module" name="test_django_check_passes" time="0.097">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_module" name="test_documented_strategy_matches_the_migration" time="0.002">
+      <skipped type="pytest.skip" message="The runtime image ships code only; docs live in the checkout.">/app/apps/cms/tests/test_module.py:167: The runtime image ships code only; docs live in the checkout.</skipped>
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_documentation" name="test_production_default_disables_docs" time="0.963">
+      <properties>
+        <property name="source-run" value="documentation-tests.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_documentation" name="test_self_hosted_assets_work_with_debug_false" time="3.099">
+      <properties>
+        <property name="source-run" value="documentation-tests.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_documentation" name="test_schema_validates_without_warnings_and_describes_live_contract" time="7.905">
+      <properties>
+        <property name="source-run" value="documentation-tests.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_documentation" name="test_development_docs_are_public_and_not_cacheable[/api/schema/]" time="0.833">
+      <properties>
+        <property name="source-run" value="documentation-tests.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_documentation" name="test_development_docs_are_public_and_not_cacheable[/api/docs/]" time="0.025">
+      <properties>
+        <property name="source-run" value="documentation-tests.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_documentation" name="test_development_docs_are_public_and_not_cacheable[/api/redoc/]" time="0.019">
+      <properties>
+        <property name="source-run" value="documentation-tests.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_documentation" name="test_production_docs_disabled_even_for_staff[/api/schema/]" time="0.336">
+      <properties>
+        <property name="source-run" value="documentation-tests.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_documentation" name="test_production_docs_disabled_even_for_staff[/api/docs/]" time="0.331">
+      <properties>
+        <property name="source-run" value="documentation-tests.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="tests.test_documentation" name="test_production_docs_disabled_even_for_staff[/api/redoc/]" time="0.319">
+      <properties>
+        <property name="source-run" value="documentation-tests.xml" />
+      </properties>
+    </testcase>
+  </testsuite>
+</testsuites>

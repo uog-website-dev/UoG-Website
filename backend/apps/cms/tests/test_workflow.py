@@ -2,6 +2,7 @@
 from concurrent.futures import ThreadPoolExecutor
 from threading import Barrier
 
+from apps.cms.tests.support import grant_cms_role
 import pytest
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -16,7 +17,6 @@ from apps.cms.models import (
     Page,
     PublishedContentSnapshot,
     SiteContent,
-    SiteContentRoleAssignment,
 )
 from apps.cms.services.pages import create_page
 from apps.cms.services.workflow import transition_content
@@ -30,10 +30,8 @@ def _user(name):
 
 
 def _grant(site, user, *roles):
-    SiteContentRoleAssignment.objects.bulk_create([
-        SiteContentRoleAssignment(site=site, user=user, role=role)
-        for role in roles
-    ])
+    for role in roles:
+        grant_cms_role(site=site,user=user,role=role)
 
 
 def _page(site, actor):

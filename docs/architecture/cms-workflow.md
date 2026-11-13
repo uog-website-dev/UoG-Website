@@ -16,9 +16,6 @@ client-supplied role names are not authorization sources.
 
 | Method and path | Access | Contract |
 | --- | --- | --- |
-| `GET /api/v1/cms/sites/{site_pk}/content-roles/` | active database platform-administrator assignment | List CMS role assignments for this Site |
-| `POST /api/v1/cms/sites/{site_pk}/content-roles/` | active database platform-administrator assignment | Assign an active local user AUTHOR, REVIEWER or PUBLISHER |
-| `DELETE /api/v1/cms/sites/{site_pk}/content-roles/{assignment_id}/` | active database platform-administrator assignment | Revoke only an assignment owned by the path Site |
 | `POST /api/v1/cms/sites/{site_pk}/content/{content_id}/workflow/` | matching Site CMS role or active database platform-administrator assignment | Apply one workflow action; content is looked up under the path Site |
 | `GET /api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/` | any active Site CMS role or active database platform-administrator assignment | List immutable revisions, newest first; returns the current content ETag |
 | `GET /api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/{revision_number}/` | any active Site CMS role or active database platform-administrator assignment | Inspect one immutable snapshot and its diff metadata |
@@ -55,8 +52,7 @@ cannot approve or reject content they authored or submitted. An active
 database `platform-administrator` assignment covers the workflow roles.
 Keycloak realm roles, `is_staff`, and `is_superuser` do not grant workflow
 rights. Site-specific roles are represented by unique `(site, user, role)`
-assignments in `SiteContentRoleAssignment`. Inactive, expired, and revoked
-platform assignments do not authorize.
+canonical `UserRoleAssignment` records. Editor supplies AUTHOR, Reviewer supplies REVIEWER, Publisher supplies PUBLISHER, and Site Administrator covers those Site operations. Viewer is read-only. Inactive users/roles and expired/revoked assignments do not authorize. The former content-role management routes and table are retired; use Site Users and the authorization assignment API. [Reconciliation and rollback](../canonical-cms-authorization.md) describe P0-USER-002.
 
 ## Atomicity, audit and repeat requests
 

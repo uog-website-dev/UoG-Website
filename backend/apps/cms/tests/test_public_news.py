@@ -1,4 +1,5 @@
 """Published news eligibility, snapshot ordering and host-bound pagination."""
+from apps.cms.tests.support import grant_cms_role
 from datetime import timedelta
 import pytest
 from django.utils import timezone
@@ -73,7 +74,7 @@ def test_empty_default_maximum_and_disabled_news_contract(client,sites,posts_mod
 
 def test_republished_article_orders_by_current_snapshot_time(client,sites,posts_module,monkeypatch):
     from apps.api.post_drafts import open_post_draft
-    from apps.cms.models import ContentRole,SiteContentRoleAssignment
+    from apps.cms.models import ContentRole
     from apps.cms.services.working_drafts import content_etag
     site = sites[0]
     host = _host(site)
@@ -85,7 +86,7 @@ def test_republished_article_orders_by_current_snapshot_time(client,sites,posts_
         patch.setattr("django.utils.timezone.now",lambda:now-timedelta(hours=1))
         other = _publish(Post.objects.create(site=site,title="Recent article",slug="recent-article",content="Recent body"))
     actor = _new_user("news-working-author")
-    SiteContentRoleAssignment.objects.create(site=site,user=actor,role=ContentRole.AUTHOR)
+    grant_cms_role(site=site,user=actor,role=ContentRole.AUTHOR)
     draft,_created = open_post_draft(site_id=site.pk,post_id=original.pk,actor=actor,if_match=content_etag(original))
     draft.title = "Updated article"
     draft.save()

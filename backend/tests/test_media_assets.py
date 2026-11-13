@@ -1,4 +1,5 @@
 """PostgreSQL identity, two-Site isolation, placements and upgrade rehearsal."""
+from apps.cms.tests.support import grant_cms_role
 import hashlib
 import io
 import base64
@@ -19,7 +20,7 @@ from rest_framework.test import APIClient
 
 from apps.audit.models import AuditEvent
 from apps.authorization.models import Role, UserRoleAssignment
-from apps.cms.models import ContentRevision, Page, SiteContentRoleAssignment
+from apps.cms.models import ContentRevision, Page
 from apps.cms.services.pages import create_page
 from apps.media.models import MediaAsset, MediaAssetReference
 from apps.media.selectors import asset_for_site, assets_for_site, resolve_reference
@@ -211,7 +212,7 @@ def test_http_placements_use_revision_ids_from_the_scoped_revision_api(media_wor
     w = media_world
     row = _ready(w, _asset(w))
     page = create_page(site=w.a, title="API Page", slug="api-page", actor=w.actor)
-    SiteContentRoleAssignment.objects.create(site=w.a, user=w.actor, role="AUTHOR")
+    grant_cms_role(site=w.a, user=w.actor, role="AUTHOR")
     client = APIClient()
     client.force_authenticate(user=w.actor)
     revisions = client.get(f"/api/v1/cms/sites/{w.a.pk}/content/{page.pk}/revisions/")
@@ -325,17 +326,30 @@ def test_upgrade_from_pre_media_sprint_two_preserves_page_and_revision():
     try:
         executor.migrate([("media", None)])
         assert "media_mediaasset" not in connection.introspection.table_names()
-        kind, _ = OrganizationType.objects.get_or_create(code="UNIVERSITY", defaults={"name": "University"})
-        owner = OrganizationUnit.objects.create(code="UPGRADE", name="University", organization_type=kind)
-        site = Site.objects.create(organization_unit=owner, code="UPGRADE", name="Legacy Site")
-        legacy_image = {"type": "image", "ref": f"sites/{site.pk}/legacy.jpg", "alt": "Legacy image"}
-        page = create_page(site=site, title="Sprint two page", slug="old-page", blocks=[{"type": "paragraph", "html": "<p>Retained</p>"}, legacy_image])
-        revision = page.revisions.latest("revision_number")
+        # Use historical models at the actual baseline, not today's Site
+        # model (whose homepage column does not exist before Media).
+        historical=MigrationExecutor(connection).loader
+        old_apps=historical.project_state(list(historical.applied_migrations)).apps
+        OldType=old_apps.get_model("organizations","OrganizationType")
+        OldOwner=old_apps.get_model("organizations","OrganizationUnit")
+        OldSite=old_apps.get_model("sites","Site")
+        OldPage=old_apps.get_model("cms","Page")
+        OldRevision=old_apps.get_model("cms","ContentRevision")
+        kind, _ = OldType.objects.get_or_create(code="UNIVERSITY",defaults={"name":"University"})
+        owner=OldOwner.objects.create(code="UPGRADE",name="University",organization_type=kind)
+        site=OldSite.objects.create(organization_unit=owner,code="UPGRADE",name="Legacy Site")
+        legacy_image={"type":"image","ref":f"sites/{site.pk}/legacy.jpg","alt":"Legacy image"}
+        from apps.cms.services.revisions import content_revision_write
+        with content_revision_write(using="default"):
+            page=OldPage.objects.create(revision_number=1,locale="en-us",site_id=site.pk,title="Sprint two page",slug="old-page",path="/old-page",blocks=[{"type":"paragraph","html":"<p>Retained</p>"},legacy_image])
+            snapshot={"content_id":str(page.pk),"site_id":site.pk,"title":page.title,"slug":page.slug,"path":page.path,"blocks":page.blocks,"metadata":{},"status":"DRAFT"}
+            import hashlib,json
+            revision=OldRevision.objects.create(content_id=page.pk,site_id=site.pk,revision_number=1,status="DRAFT",snapshot=snapshot,changed_fields=["__created__"],content_hash=hashlib.sha256(json.dumps(snapshot,sort_keys=True).encode()).hexdigest())
         old_snapshot = revision.snapshot
     finally:
         MigrationExecutor(connection).migrate(latest)
-    page.refresh_from_db()
-    revision.refresh_from_db()
+    page=Page.objects.get(pk=page.pk)
+    revision=ContentRevision.objects.get(pk=revision.pk)
     assert page.title == "Sprint two page" and page.blocks[0]["html"] == "<p>Retained</p>"
     assert page.blocks[1] == legacy_image
     assert revision.snapshot == old_snapshot

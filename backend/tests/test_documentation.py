@@ -49,6 +49,7 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
         "/api/v1/authorization/assignments/",
         "/api/v1/authorization/assignments/site-roles/",
         "/api/v1/authorization/assignments/site-users/",
+        "/api/v1/authorization/assignments/site-create-user/",
         "/api/v1/authorization/assignments/site-user-search/",
         "/api/v1/authorization/assignments/users/{user_id}/effective/",
         "/api/v1/authorization/assignments/{id}/revoke/",
@@ -111,8 +112,6 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
         "/api/v1/sites/{site_pk}/modules/", "/api/v1/sites/{site_pk}/modules/{id}/",
         "/api/v1/sites/{site_pk}/modules/{id}/enable/",
         "/api/v1/sites/{site_pk}/modules/{id}/disable/",
-        "/api/v1/cms/sites/{site_pk}/content-roles/",
-        "/api/v1/cms/sites/{site_pk}/content-roles/{assignment_id}/",
         "/api/v1/cms/sites/{site_pk}/content/{content_id}/workflow/",
         "/api/v1/cms/sites/{site_pk}/content/{content_id}/workflow-history/",
         "/api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/",
@@ -128,6 +127,7 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
         "/api/v1/site-context/media/{asset_id}/",
         "/api/v1/site-context/pages/",
         "/api/v1/site-context/posts/",
+        "/api/v1/site-context/posts/categories/{category_slug}/",
         "/api/v1/site-context/posts/{post_slug}/",
         "/api/v1/site-context/homepage/",
         "/api/v1/site-context/widgets/",
@@ -248,14 +248,7 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
     assert paths["/api/v1/site-templates/"]["get"]["tags"] == ["Site templates"]
     assert paths["/api/v1/modules/"]["get"]["tags"] == ["Modules"]
     assert paths["/api/v1/sites/{site_pk}/modules/"]["post"]["tags"] == ["Sites"]
-    role_assignments = paths["/api/v1/cms/sites/{site_pk}/content-roles/"]
-    assert role_assignments["get"]["tags"] == ["CMS workflow"]
-    assert role_assignments["post"]["security"] == [{"keycloakBearer": []}]
-    role_input = role_assignments["post"]["requestBody"]["content"][
-        "application/json"
-    ]["schema"]["$ref"].rsplit("/", 1)[-1]
-    role_fields = schema["components"]["schemas"][role_input]["properties"]
-    assert set(role_fields) == {"user_id", "role"}
+    assert not any("content-roles" in path for path in paths)
     workflow = paths["/api/v1/cms/sites/{site_pk}/content/{content_id}/workflow/"]["post"]
     assert workflow["tags"] == ["CMS workflow"]
     assert workflow["security"] == [{"keycloakBearer": []}]

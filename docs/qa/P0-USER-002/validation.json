@@ -1,0 +1,37 @@
+{
+  "backend_final_per_test": {
+    "tests": 533,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 2
+  },
+  "raw_runs": [
+    "backend-full.xml",
+    "documentation-tests.xml"
+  ],
+  "consolidation": "Later documentation rerun supersedes matching cases; production code unchanged between these runs.",
+  "migration_cases": 6,
+  "browser_checks": 5,
+  "browser_all_pass": true,
+  "schema": {
+    "legacy_table_exists": false,
+    "reconciliation_counts": [
+      {
+        "decision": "RETIRED",
+        "count": 73
+      }
+    ],
+    "unresolved_inventory": [],
+    "created_memberships": 0
+  },
+  "idempotence": {
+    "outcomes": [],
+    "membership_count_unchanged": true,
+    "provenance_records": 73
+  },
+  "openapi": "validated without warnings; legacy management paths absent",
+  "django_check": "no issues",
+  "migration_drift": "no changes detected",
+  "frontend_rebuild_required": false,
+  "independent_review_pr_issue_attachment": "pending"
+}

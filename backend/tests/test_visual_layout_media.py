@@ -1,4 +1,5 @@
 """Visual widgets participate in the same private/public inventory as legacy blocks."""
+from apps.cms.tests.support import grant_cms_role
 import copy
 import json
 from pathlib import Path
@@ -51,8 +52,8 @@ def test_foreign_visual_media_rejected_before_creating_a_page(media_world, deriv
 
 def test_visual_page_api_rejects_unknown_and_accepts_empty_versioned_document(media_world):
     from rest_framework.test import APIClient
-    from apps.cms.models import SiteContentRoleAssignment, ContentRole
-    SiteContentRoleAssignment.objects.create(site=media_world.a,user=media_world.actor,role=ContentRole.AUTHOR)
+    from apps.cms.models import ContentRole
+    grant_cms_role(site=media_world.a,user=media_world.actor,role=ContentRole.AUTHOR)
     client=APIClient();client.force_authenticate(media_world.actor)
     url=f"/api/v1/sites/{media_world.a.pk}/pages/"
     before=Page.objects.count()

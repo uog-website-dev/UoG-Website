@@ -104,8 +104,7 @@ try:
         for name, role in (('siteadmin', 'site-administrator'), ('reviewer', 'reviewer'), ('publisher', 'publisher')):
             api('/api/v1/authorization/assignments/', 'POST', {'user': actors[name]['user_id'], 'role': roles[role],
                 'scope': 'SITE', 'site': site['id'], 'organization': site['organization_unit']})
-            api(f"/api/v1/cms/sites/{site['id']}/content-roles/", 'POST', {'user_id': actors[name]['user_id'],
-                'role': {'siteadmin': 'AUTHOR', 'reviewer': 'REVIEWER', 'publisher': 'PUBLISHER'}[name]})
+
         available = rows(api(f"/api/v1/sites/{site['id']}/modules/", actor='siteadmin'))
         state['modules'] = available
         assert all('is_available' in row for row in available)
@@ -142,7 +141,7 @@ try:
         from django.db import transaction
         from django.utils import timezone
         from apps.authorization.models import UserRoleAssignment
-        from apps.cms.models import SiteContentRoleAssignment
+
         from apps.audit.context import audit_context
         from apps.audit.writer import record_event
         master = token(env['KC_BOOTSTRAP_ADMIN_USERNAME'], env['KC_BOOTSTRAP_ADMIN_PASSWORD'], 'admin-cli')
@@ -154,11 +153,10 @@ try:
         ids = list(get_user_model().objects.filter(username__in=[actor['username'] for actor in owned]).values_list('pk', flat=True))
         with transaction.atomic(), audit_context(actor_id='workspace-qa-cleanup'):
             grants = UserRoleAssignment.objects.filter(user_id__in=ids, revoked_at=None).update(revoked_at=timezone.now())
-            bindings = SiteContentRoleAssignment.objects.filter(user_id__in=ids).delete()[0]
             get_user_model().objects.filter(pk__in=ids).update(is_active=False)
             record_event(action='QA_IDENTITIES_DISABLED', entity_type='qa.run', entity_id=state['run'], after={'identities': len(owned), 'grants_revoked': grants})
         private.unlink()
-        state['cleanup'] = {'disabled_accounts': len(owned), 'revoked_grants': grants, 'removed_cms_bindings': bindings,
+        state['cleanup'] = {'disabled_accounts': len(owned), 'revoked_grants': grants,
             'private_session_removed': True, 'module_switches_changed': False, 'developer_volumes_changed': False}
         result.write_text(json.dumps(state, indent=2))
         print(json.dumps(state['cleanup']))

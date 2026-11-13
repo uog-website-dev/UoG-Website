@@ -1,4 +1,5 @@
 """Post authoring, review and published public Site-context delivery."""
+from apps.cms.tests.support import grant_cms_role
 import pytest
 from django.contrib.auth import get_user_model
 
@@ -6,7 +7,6 @@ from apps.api.models import Category, Post, Tag
 from apps.audit.models import AuditEvent
 from apps.cms.models import (
     ContentRole, ContentStatus, PublishedContentSnapshot,
-    SiteContentRoleAssignment,
 )
 from apps.cms.services.publication_cache import current_publication_version
 from apps.cms.tests.support import transition_with_site_role
@@ -103,7 +103,7 @@ def test_editor_creates_reviews_and_publishes_post_to_public_feed(
         for role in (ContentRole.AUTHOR, ContentRole.REVIEWER, ContentRole.PUBLISHER)
     }
     for role, user in users.items():
-        SiteContentRoleAssignment.objects.create(site=site, user=user, role=role)
+        grant_cms_role(site=site, user=user, role=role)
 
     def auth(role):
         user = users[role]

@@ -15,7 +15,7 @@ from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.utils import timezone
 from apps.authorization.models import UserRoleAssignment
-from apps.cms.models import SiteContentRoleAssignment
+
 from apps.sites.models import Module, Site
 from apps.organizations.models import OrganizationUnit
 from apps.audit.context import audit_context
@@ -58,17 +58,16 @@ for key,actor in owned.items():
 ids=[actor['user_id'] for actor in owned.values() if actor['user_id'] is not None]
 with transaction.atomic(), audit_context(actor_id='qa-gate-cleanup'):
     grants=UserRoleAssignment.objects.filter(user_id__in=ids,revoked_at=None).update(revoked_at=timezone.now())
-    bindings=SiteContentRoleAssignment.objects.filter(user_id__in=ids).delete()[0]
     get_user_model().objects.filter(pk__in=ids).update(is_active=False)
     for pk,value in state.get('restore_global_modules',{}).items():
         module=Module.objects.get(pk=pk)
         module.is_enabled=value
         module.save(update_fields=['is_enabled'])
     record_event(action='QA_IDENTITIES_DISABLED',entity_type='qa.run',entity_id=state['run'],
-                 after={'identities':len(ids),'grants_revoked':grants,'cms_bindings_revoked':bindings},changed_fields=['test_privileges'])
+                 after={'identities':len(ids),'grants_revoked':grants},changed_fields=['test_privileges'])
 clients=call('/admin/realms/uog/clients?clientId=admin-web',token=master)[1]
 report={'date':state['date'],'disabled_qa_keycloak_users':len(owned),'revoked_database_grants':grants,
-        'removed_qa_cms_bindings':bindings,'secret_files_removed':len(paths),
+        'secret_files_removed':len(paths),
         'restored_global_module_flags':state.get('restore_global_modules',{}),
         'admin_web_registered_logout_uris':clients[0].get('attributes',{}).get('post.logout.redirect.uris'),
         'retained_qa_sites':[],'retained_qa_organizations':[]}

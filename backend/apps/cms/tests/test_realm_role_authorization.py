@@ -1,4 +1,5 @@
 """A signed realm role never widens CMS scope beyond persisted grants."""
+from apps.cms.tests.support import grant_cms_role
 from datetime import timedelta
 from uuid import uuid4
 
@@ -10,7 +11,7 @@ from django.utils import timezone
 
 from apps.api.models import Post
 from apps.authorization.models import AuthorizationAuditEvent, Role, UserRoleAssignment
-from apps.cms.models import ContentRole, ContentStatus, Page, SiteContentRoleAssignment
+from apps.cms.models import ContentRole, ContentStatus, Page
 from apps.cms.services.pages import create_page
 from apps.cms.services.workflow import transition_content
 from apps.sites.models import Module
@@ -64,11 +65,11 @@ def realm_admin(client, oidc, sites):
         site=site_a,
         organization=site_a.organization_unit,
     )
-    SiteContentRoleAssignment.objects.create(
+    grant_cms_role(
         site=site_a, user=user, role=ContentRole.AUTHOR,
     )
     owner = get_user_model().objects.create_user(username="site-b-author")
-    SiteContentRoleAssignment.objects.create(
+    grant_cms_role(
         site=site_b, user=owner, role=ContentRole.AUTHOR,
     )
     foreign = create_page(site=site_b, title="Site B page", slug="site-b-page", actor=owner)
@@ -118,7 +119,7 @@ def test_realm_platform_admin_cannot_read_or_mutate_another_site(realm_admin):
     )
     assert history.status_code == 403
     roles = client.get(ROLES.format(site=site_b.pk), **header)
-    assert roles.status_code == 403
+    assert roles.status_code == 404
 
     posted = client.post(
         POSTS.format(site=site_b.pk),
@@ -143,7 +144,7 @@ def test_realm_platform_admin_cannot_read_or_mutate_another_site(realm_admin):
         **header,
     )
     assert submitted.status_code == 200, submitted.content
-    SiteContentRoleAssignment.objects.create(
+    grant_cms_role(
         site=site_a, user=user, role=ContentRole.REVIEWER,
     )
     self_review = client.post(

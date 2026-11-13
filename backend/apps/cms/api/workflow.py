@@ -1,8 +1,5 @@
 """Site-scoped API for CMS role assignments and content workflow actions."""
-from apps.organizations.hierarchy_lock import hierarchy_write
-from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError as DomainValidationError
-from django.db import IntegrityError, transaction
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import OpenApiParameter, PolymorphicProxySerializer, extend_schema
 from rest_framework import serializers, status
@@ -12,7 +9,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.authentication import KeycloakBearerAuthentication
-from apps.accounts.permissions import HasRealmRole
 from apps.api.models import Post
 from apps.api.serializers import PostSerializer
 from apps.authorization.access import reject_disabled_module
@@ -27,7 +23,6 @@ from ..models import (
     ContentWorkflowTransition,
     Page,
     SiteContent,
-    SiteContentRoleAssignment,
 )
 from ..services.workflow import transition_content
 from .serializers import PageSerializer, SiteContentSerializer
@@ -44,20 +39,6 @@ class WorkflowStateConflict(APIException):
     status_code = status.HTTP_409_CONFLICT
     default_detail = "The content workflow changed. Refresh its status and try again."
     default_code = "workflow_conflict"
-
-
-class ContentRoleAssignmentInput(StrictFields, serializers.Serializer):
-    user_id = serializers.IntegerField(min_value=1)
-    role = serializers.ChoiceField(choices=ContentRole.choices)
-
-
-class ContentRoleAssignmentOutput(serializers.ModelSerializer):
-    user_id = serializers.IntegerField(read_only=True)
-
-    class Meta:
-        model = SiteContentRoleAssignment
-        fields = ("id", "site", "user_id", "role", "created_at")
-        read_only_fields = fields
 
 
 class WorkflowActionInput(StrictFields, serializers.Serializer):
@@ -88,90 +69,6 @@ def workflow_expected_revision(request, content, action):
             raise WorkflowStateConflict({"revision":["Content changed after preview. Reload the current revision."]})
         return content.revision_number
     return None
-
-
-class ContentRoleAssignmentsView(APIView):
-    """Manage a Site's CMS role bindings; only validated platform admins."""
-
-    authentication_classes = [KeycloakBearerAuthentication]
-    permission_classes = [IsAuthenticated, HasRealmRole]
-
-    @extend_schema(
-        tags=["CMS workflow"],
-        parameters=[SITE_PARAMETER],
-        responses=ContentRoleAssignmentOutput(many=True),
-        description=(
-            "List AUTHOR, REVIEWER and PUBLISHER assignments for this Site. "
-            "Requires an active database platform-administrator assignment. "
-            "A Keycloak realm role does not grant this operation."
-        ),
-    )
-    def get(self, request, site_pk):
-        site = get_object_or_404(Site, pk=site_pk)
-        assignments = SiteContentRoleAssignment.objects.filter(
-            site=site,
-        ).order_by("user_id", "role")
-        return Response(ContentRoleAssignmentOutput(assignments, many=True).data)
-
-    @extend_schema(
-        tags=["CMS workflow"],
-        parameters=[SITE_PARAMETER],
-        request=ContentRoleAssignmentInput,
-        responses={201: ContentRoleAssignmentOutput},
-        description=(
-            "Assign one CMS role to a local platform user on this Site. "
-            "Requires an active database platform-administrator assignment. "
-            "A Keycloak realm role does not grant this operation."
-        ),
-    )
-    def post(self, request, site_pk):
-        site = get_object_or_404(Site, pk=site_pk)
-        payload = ContentRoleAssignmentInput(data=request.data)
-        payload.is_valid(raise_exception=True)
-        user = get_object_or_404(
-            get_user_model().objects.filter(is_active=True),
-            pk=payload.validated_data["user_id"],
-        )
-        try:
-            with hierarchy_write():
-                assignment = SiteContentRoleAssignment.objects.create(
-                    site=site,
-                    user=user,
-                    role=payload.validated_data["role"],
-                )
-        except IntegrityError as error:
-            raise serializers.ValidationError({
-                "role": ["This user already has that role on this Site."],
-            }) from error
-        return Response(
-            ContentRoleAssignmentOutput(assignment).data,
-            status=status.HTTP_201_CREATED,
-        )
-
-
-class ContentRoleAssignmentDetailView(APIView):
-    """Revoke one assignment without crossing Site boundaries."""
-
-    authentication_classes = [KeycloakBearerAuthentication]
-    permission_classes = [IsAuthenticated, HasRealmRole]
-
-    @extend_schema(
-        tags=["CMS workflow"],
-        parameters=[SITE_PARAMETER],
-        responses={204: None},
-        description=(
-            "Revoke a role assignment on this Site. A role assignment on "
-            "another Site is not addressable here."
-        ),
-    )
-    def delete(self, request, site_pk, assignment_id):
-        assignment = get_object_or_404(
-            SiteContentRoleAssignment,
-            site_id=site_pk,
-            pk=assignment_id,
-        )
-        assignment.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class WorkflowHistorySerializer(serializers.ModelSerializer):

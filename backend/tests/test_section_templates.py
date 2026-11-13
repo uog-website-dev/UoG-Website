@@ -1,4 +1,5 @@
 """Site-owned section templates: create, insert twice, foreign/media isolation."""
+from apps.cms.tests.support import grant_cms_role
 import copy
 import json
 from pathlib import Path
@@ -7,7 +8,7 @@ from types import SimpleNamespace
 import pytest
 from rest_framework.test import APIClient
 
-from apps.cms.models import ContentRole, Page, SectionTemplate, SiteContentRoleAssignment
+from apps.cms.models import ContentRole, Page, SectionTemplate
 from apps.cms.services.working_drafts import content_etag
 from apps.cms.services.section_templates import remap_section_ids
 from apps.media.services import update_asset
@@ -41,8 +42,8 @@ def section_with_slider(first):
 @pytest.fixture
 def world(media_world, derivative_storage):
     w = media_world
-    SiteContentRoleAssignment.objects.create(site=w.a, user=w.actor, role=ContentRole.AUTHOR)
-    SiteContentRoleAssignment.objects.create(site=w.b, user=w.actor, role=ContentRole.AUTHOR)
+    grant_cms_role(site=w.a, user=w.actor, role=ContentRole.AUTHOR)
+    grant_cms_role(site=w.b, user=w.actor, role=ContentRole.AUTHOR)
     first = asset(w, derivative_storage)
     page = Page.objects.create(
         site=w.a,

@@ -1,0 +1,26 @@
+{
+  "run": "canonical-fb10426ebb",
+  "browser": "157.0.4341.46",
+  "results": [
+    {
+      "name": "Editor membership alone opens Posts and offers author actions",
+      "status": "PASS"
+    },
+    {
+      "name": "Role change exposes review controls without a legacy grant",
+      "status": "PASS"
+    },
+    {
+      "name": "Publisher membership offers publish controls and excludes review",
+      "status": "PASS"
+    },
+    {
+      "name": "Foreign Site workspace stays inaccessible",
+      "status": "PASS"
+    },
+    {
+      "name": "Revocation removes CMS access in the same signed-in session",
+      "status": "PASS"
+    }
+  ]
+}

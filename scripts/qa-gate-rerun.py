@@ -25,7 +25,7 @@ from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from apps.authorization.models import Role, UserRoleAssignment
 from apps.organizations.models import OrganizationUnit
-from apps.cms.models import Page, SiteContent, SiteContentRoleAssignment
+from apps.cms.models import Page, SiteContent
 from apps.sites.models import Site, Module
 from apps.audit.models import AuditEvent
 
@@ -218,11 +218,7 @@ def finish_workflow(built):
     for name, role_code in (("siteadmin","site-administrator"),("editor","editor"),("reviewer","reviewer"),("publisher","publisher"),("viewer","viewer")):
         if not UserRoleAssignment.objects.filter(user_id=actors[name]["user_id"],role_id=role_by_code[role_code]["id"],site_id=built[0]["id"],revoked_at=None).exists():
             need("/api/v1/authorization/assignments/", "POST", {"user":actors[name]["user_id"], "role":role_by_code[role_code]["id"], "scope":"SITE", "organization":built[0]["owner"], "site":built[0]["id"]})
-        if name in {"editor","reviewer","publisher"}:
-            cms_role={"editor":"AUTHOR","reviewer":"REVIEWER","publisher":"PUBLISHER"}[name]
-            if not SiteContentRoleAssignment.objects.filter(site_id=built[0]["id"],user_id=actors[name]["user_id"],role=cms_role).exists():
-                need(f"/api/v1/cms/sites/{built[0]['id']}/content-roles/", "POST", {"user_id":actors[name]["user_id"],"role":cms_role})
-    mark("T13", True, "Platform administrator assigned Site Administrator, Editor, Reviewer, Publisher and Viewer through real protected APIs; CMS roles assigned explicitly.")
+    mark("T13", True, "Platform administrator assigned Site Administrator, Editor, Reviewer, Publisher and Viewer through real protected APIs; CMS uses those canonical memberships directly.")
     forbidden = api(built[1]["url"], actor="siteadmin")
     mark("T14", forbidden[0] in (403,404), f"Site-only administrator cannot retrieve Site B: {forbidden[0]}.")
     for name in ("editor","reviewer","viewer"):
@@ -231,8 +227,6 @@ def finish_workflow(built):
     pages = []
     for index, site in enumerate(built):
         actor = "editor" if index==0 else "admin"
-        if index==1:
-            need(f"/api/v1/cms/sites/{site['id']}/content-roles/", "POST", {"user_id":actors['admin']['user_id'],"role":"AUTHOR"})
         page = need(site["url"]+"pages/", "POST", {"title":f"QA Published {'Main' if index==0 else 'College'} {run}","slug":"qa-home", "blocks":[{"type":"paragraph","html":f"<p>QA {'MAIN' if index==0 else 'COLLEGE'} PUBLIC MARKER {run}</p>"}]}, actor)[1]
         site["page_id"] = page["id"]
         page_url = site["url"]+f"pages/{page['id']}/"
@@ -251,7 +245,7 @@ def finish_workflow(built):
         workflow = f"/api/v1/cms/sites/{site['id']}/content/{page['id']}/workflow/"
         if actor == "admin":
             for name,role in (("reviewer","REVIEWER"),("publisher","PUBLISHER")):
-                need(f"/api/v1/cms/sites/{site['id']}/content-roles/", "POST", {"user_id":actors[name]["user_id"],"role":role})
+                need("/api/v1/authorization/assignments/", "POST", {"user":actors[name]["user_id"],"role":role_by_code[role.lower()]["id"],"scope":"SITE","site":site["id"],"organization":site["owner"]})
         need(workflow,"POST",{"action":"submit"},actor)
         need(workflow,"POST",{"action":"approve"},"reviewer")
         need(workflow,"POST",{"action":"publish"},"publisher")
@@ -344,7 +338,7 @@ def security_probe(built):
     assert not UserRoleAssignment.objects.filter(user_id=principal["user_id"],site_id=built[1]['id'],revoked_at=None).exists()
     state['security_probe']={'actor':principal['username'],'actor_user_id':principal['user_id'],'target_site':built[1]['id'],
         'database_grants':list(UserRoleAssignment.objects.filter(user_id=principal['user_id'],revoked_at=None).values('role__code','scope','organization_id','site_id')),
-        'target_site_cms_roles':list(SiteContentRoleAssignment.objects.filter(user_id=principal['user_id'],site_id=built[1]['id']).values_list('role',flat=True)),
+        'target_site_memberships':list(UserRoleAssignment.objects.filter(user_id=principal['user_id'],site_id=built[1]['id'],revoked_at=None).values_list('role__code',flat=True)),
         'temporary_realm_role':'platform-admin'}
     master = http("http://keycloak:8080/realms/master/protocol/openid-connect/token", "POST", form={"grant_type":"password", "client_id":"admin-cli", "username":env["KC_BOOTSTRAP_ADMIN_USERNAME"], "password":env["KC_BOOTSTRAP_ADMIN_PASSWORD"]})[1]["access_token"]
     role = http("http://keycloak:8080/admin/realms/uog/roles/platform-admin", token=master)[1]

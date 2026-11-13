@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from sprint3_live_review import Review, Site, SiteDomain, Module, ContentRole, enable_module_for_site, disable_module_for_site, activate_site
 from apps.api.models import Post
-from apps.cms.models import SiteContentRoleAssignment
+from apps.authorization.models import Role,UserRoleAssignment
 from apps.cms.services.workflow import transition_content
 
 assert settings.DEBUG
@@ -55,9 +55,9 @@ try:
     empty,host_empty = site('empty',a.organization_unit)
     disabled,host_disabled = site('disabled',a.organization_unit)
     for role,person in people_b.items():
-        SiteContentRoleAssignment.objects.create(site=disabled,user=person,role={'author':ContentRole.AUTHOR,'reviewer':ContentRole.REVIEWER,'publisher':ContentRole.PUBLISHER}[role])
+        UserRoleAssignment.objects.create(site=disabled,organization=disabled.organization_unit,scope='SITE',user=person,role=Role.objects.get(code={'author':'editor','reviewer':'reviewer','publisher':'publisher'}[role]))
     publish(Post.objects.create(site=disabled,title='Disabled private marker',slug='disabled-marker',content='DISABLED CONTENT MARKER',created_by=people_b['author'],updated_by=people_b['author']),people_b)
-    SiteContentRoleAssignment.objects.filter(site=disabled).delete()
+    UserRoleAssignment.objects.filter(site=disabled).update(revoked_at=timezone.now())
     disable_module_for_site(disabled.pk,module.pk)
     Post.objects.create(site=a,title='Draft private marker',slug='draft-private-marker',content='DRAFT CONTENT MARKER')
     with patch('django.utils.timezone.now',lambda:timezone.datetime(2035,1,1,tzinfo=timezone.get_current_timezone())):

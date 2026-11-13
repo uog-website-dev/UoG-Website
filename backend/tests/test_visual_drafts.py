@@ -1,4 +1,5 @@
 """Transaction-level complete-tree save, publication isolation and editor races."""
+from apps.cms.tests.support import grant_cms_role
 import copy
 import json
 from concurrent.futures import ThreadPoolExecutor
@@ -11,7 +12,7 @@ from django.contrib.auth import get_user_model
 from django.db import connections, close_old_connections, IntegrityError
 from django.test import Client
 from rest_framework.test import APIClient
-from apps.cms.models import ContentEditConflict, Page, ContentRevision, PublishedContentSnapshot, SiteContentRoleAssignment, ContentRole
+from apps.cms.models import ContentEditConflict, Page, ContentRevision, PublishedContentSnapshot, ContentRole
 from apps.cms.services.working_drafts import content_etag, open_working_draft, save_visual_draft
 from apps.media.models import MediaUsage
 from apps.media.uploads import process_asset
@@ -51,7 +52,7 @@ def inventory(page):
 def world(media_world, derivative_storage):
     w = media_world
     for actor in (w.actor,w.both):
-        SiteContentRoleAssignment.objects.create(site=w.a,user=actor,role=ContentRole.AUTHOR)
+        grant_cms_role(site=w.a,user=actor,role=ContentRole.AUTHOR)
     first=asset(w,derivative_storage);second=asset(w,derivative_storage)
     page=Page.objects.create(site=w.a,title="Visual draft",slug="visual-draft",metadata={"campaign":"Preserve me","visual_layout":tree(first)},created_by=w.actor,updated_by=w.actor)
     return SimpleNamespace(w=w,first=first,second=second,page=page,storage=derivative_storage)
@@ -222,7 +223,7 @@ def test_reviewer_cannot_save_and_disabled_pages_rejects_draft_writes(world):
     from apps.sites.models import Module
     w,page=world.w,world.page
     reader=get_user_model().objects.create_user(username="visual-reviewer")
-    SiteContentRoleAssignment.objects.create(site=w.a,user=reader,role=ContentRole.REVIEWER)
+    grant_cms_role(site=w.a,user=reader,role=ContentRole.REVIEWER)
     api=client(reader);url=endpoint(w.a,page)
     assert api.get(url).status_code == 200
     assert api.patch(url,{"visual_layout":tree(world.second)},format="json",HTTP_IF_MATCH=content_etag(page)).status_code == 403

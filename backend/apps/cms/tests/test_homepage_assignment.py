@@ -1,4 +1,5 @@
 """Site settings, immutable publications and two trusted hosts."""
+from apps.cms.tests.support import grant_cms_role
 from copy import deepcopy
 
 import pytest
@@ -195,10 +196,10 @@ def test_assignment_serializes_with_unpublication(world):
     from threading import Barrier
     from django.core.exceptions import ValidationError
     from django.db import close_old_connections, connections
-    from apps.cms.models import ContentRole, SiteContentRoleAssignment
+    from apps.cms.models import ContentRole
     from apps.cms.services.workflow import transition_content
     a,b,actor,client,first,second,foreign,draft,ha,hb = world
-    SiteContentRoleAssignment.objects.get_or_create(site=a,user=actor,role=ContentRole.PUBLISHER)
+    grant_cms_role(site=a,user=actor,role=ContentRole.PUBLISHER)
     barrier = Barrier(2)
     def operation(assigning):
         close_old_connections()
