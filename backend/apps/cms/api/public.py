@@ -18,7 +18,7 @@ from ..models import (
     PublishedContentSnapshot,
     Visibility,
 )
-from ..selectors.pages import public_pages, resolve_redirect
+from ..selectors.pages import homepage_of, public_pages, resolve_redirect
 from ..services.publication_cache import (
     current_publication_version,
     get_public_cache,
@@ -110,6 +110,7 @@ class PublicTaxonomySerializer(serializers.Serializer):
 
 class PublicPostListSerializer(serializers.Serializer):
     id = serializers.UUIDField()
+    site = serializers.IntegerField()
     locale = serializers.CharField()
     title = serializers.CharField()
     slug = serializers.CharField()
@@ -279,6 +280,7 @@ def _post_snapshot_payload(snapshot):
     payload = snapshot.payload
     data = {
         "id": payload["content_id"],
+        "site": payload["site_id"],
         "locale": payload["locale"],
         "title": payload["title"],
         "slug": payload["slug"],
@@ -386,11 +388,7 @@ class PublicPageDetailView(APIView):
         locale = _locale(site, query.validated_data.get("locale"))
         path = "/" + page_path.strip("/")
         if path == "/":
-            page = Page.objects.filter(
-                site_id=site.pk, locale=locale, is_homepage=True,
-                status=ContentStatus.PUBLISHED,
-                visibility__in=(Visibility.PUBLIC, Visibility.UNLISTED),
-            ).first()
+            page = _eligible_homepage(site.pk, locale)
         else:
             page = Page.objects.filter(
                 site_id=site.pk, locale=locale, path=path,
@@ -426,6 +424,12 @@ class PublicHomepageView(APIView):
     permission_classes = [AllowAny]
     http_method_names = ["get", "head", "options"]
 
+    def finalize_response(self, request, response, *args, **kwargs):
+        response = super().finalize_response(request, response, *args, **kwargs)
+        response["Cache-Control"] = "public, max-age=0, must-revalidate"
+        response["Vary"] = "Host"
+        return response
+
     @extend_schema(
         operation_id="public_site_homepage",
         tags=["Public Pages"],
@@ -433,7 +437,10 @@ class PublicHomepageView(APIView):
         responses=PublicPageSerializer,
         description=(
             "Return the published homepage for the Site resolved from the "
-            "trusted Host. Draft and hidden homepages are not disclosed."
+            "trusted Host. The explicit Site assignment takes precedence. "
+            "An unavailable, hidden or unpublished assignment returns 404, "
+            "the portal's empty root fallback. No arbitrary replacement or "
+            "draft is served. Responses vary by Host and must revalidate."
         ),
     )
     def get(self, request):
@@ -442,11 +449,7 @@ class PublicHomepageView(APIView):
         query = PublicLocaleQuery(data=request.query_params)
         query.is_valid(raise_exception=True)
         locale = _locale(site, query.validated_data.get("locale"))
-        page = Page.objects.filter(
-            site_id=site.pk, locale=locale, is_homepage=True,
-            status=ContentStatus.PUBLISHED,
-            visibility__in=(Visibility.PUBLIC, Visibility.UNLISTED),
-        ).first()
+        page = _eligible_homepage(site.pk, locale)
         if page is None:
             raise NotFound("The requested Page was not found.")
         return _cached_page_response(page)
@@ -457,6 +460,15 @@ def _resolved_site(request):
     if site is None:
         raise NotFound("The requested Page was not found.")
     return site
+
+
+def _eligible_homepage(site_id, locale):
+    page = homepage_of(site_id)
+    if (page and page.locale == locale and page.status == ContentStatus.PUBLISHED
+            and page.visibility in (Visibility.PUBLIC, Visibility.UNLISTED)
+            and PublishedContentSnapshot.objects.filter(content_id=page.pk).exists()):
+        return page
+    return None
 
 
 def _require_pages_module(request):
@@ -488,9 +500,13 @@ def _snapshot_data(pages):
     if set(page_ids) != set(latest):
         raise RuntimeError("A published Page is missing its serving snapshot.")
     data = []
+    homepages = {site_id: homepage_of(site_id) for site_id in {page.site_id for page in pages}}
     for page in pages:
         snapshot = latest.get(page.pk)
-        data.append(_serialize_snapshot(snapshot))
+        document = _serialize_snapshot(snapshot)
+        selected = homepages[page.site_id]
+        document["is_homepage"] = bool(selected and selected.pk == page.pk)
+        data.append(document)
     return data
 
 
@@ -533,9 +549,11 @@ def _cached_page_response(page):
         data = _serialize_snapshot(snapshot)
         set_public_cache(page.site_id, key, data)
     response = Response(data)
+    selected = homepage_of(page.site_id)
+    response.data = {**data, "is_homepage": bool(selected and selected.pk == page.pk)}
     response["Cache-Control"] = "public, max-age=0, must-revalidate"
     response["ETag"] = (
-        f'"cms-page-{page.pk}-publication-{data["publication_version"]}"'
+        f'"cms-page-{page.pk}-publication-{data["publication_version"]}-site-{version}"'
     )
     response["X-Publication-Version"] = str(version)
     response["Vary"] = "Host"

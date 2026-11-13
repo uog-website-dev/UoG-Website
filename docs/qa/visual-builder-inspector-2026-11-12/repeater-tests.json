@@ -1,0 +1,47 @@
+{
+  "cases": [
+    {
+      "id": "slider-add-reorder-media",
+      "widget": "image_slider",
+      "steps": [
+        "Seed two slides with distinct asset_id/alt/caption",
+        "Move Items 2 up",
+        "Choose ready image on the first visible slide",
+        "Add item"
+      ],
+      "expects": [
+        "Item IDs survive reorder",
+        "asset_id updates without clearing existing alt when already set",
+        "Caption/title remain attached to the same item object"
+      ]
+    },
+    {
+      "id": "image-media-then-column-reorder",
+      "widget": "image",
+      "steps": [
+        "Edit alt text",
+        "Select Site asset via media picker callback",
+        "shiftWidget one position in the same column"
+      ],
+      "expects": [
+        "Alt preserved after media selection",
+        "Same widget id remains after reorder"
+      ]
+    },
+    {
+      "id": "unsafe-button-after-slider",
+      "widgets": ["image_slider", "button"],
+      "steps": [
+        "Reorder slider items and bind a Site image",
+        "Set Button href to javascript:alert(1)",
+        "Run validateVisualLayout / attempt Save draft"
+      ],
+      "expects": [
+        "checked.ok === false",
+        "Mapped href field shows SAFE_LINK_MESSAGE",
+        "Draft href input remains editable"
+      ]
+    }
+  ],
+  "coverage_file": "frontend/apps/admin-web/src/sites/visual-builder-inspector.test.tsx"
+}

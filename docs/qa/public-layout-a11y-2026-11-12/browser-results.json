@@ -1,0 +1,314 @@
+{
+  "scope": "Controlled fixtures using the real shared production renderer and theme, with media transport fixtures",
+  "target": "WCAG 2.2 AA review assumption",
+  "rows": [
+    {
+      "surface": "public",
+      "width": 320,
+      "status": "PASS",
+      "metrics": {
+        "scroll": 320,
+        "width": 320,
+        "columns": 1,
+        "headings": [
+          "H1",
+          "H2",
+          "H2",
+          "H2"
+        ],
+        "alternatives": true
+      },
+      "focusIndicator": "3px",
+      "keyboard": "slider Previous/Next; tabs ArrowLeft/Right/Home/End with roving tabindex; accordion summary; safe link — passed",
+      "axe": {
+        "violations": [],
+        "incomplete": [
+          "color-contrast"
+        ],
+        "passes": 24
+      }
+    },
+    {
+      "surface": "public",
+      "width": 390,
+      "status": "PASS",
+      "metrics": {
+        "scroll": 390,
+        "width": 390,
+        "columns": 1,
+        "headings": [
+          "H1",
+          "H2",
+          "H2",
+          "H2"
+        ],
+        "alternatives": true
+      },
+      "focusIndicator": "3px",
+      "keyboard": "slider Previous/Next; tabs ArrowLeft/Right/Home/End with roving tabindex; accordion summary; safe link — passed",
+      "axe": {
+        "violations": [],
+        "incomplete": [
+          "color-contrast"
+        ],
+        "passes": 24
+      }
+    },
+    {
+      "surface": "public",
+      "width": 768,
+      "status": "PASS",
+      "metrics": {
+        "scroll": 768,
+        "width": 768,
+        "columns": 1,
+        "headings": [
+          "H1",
+          "H2",
+          "H2",
+          "H2"
+        ],
+        "alternatives": true
+      },
+      "focusIndicator": "3px",
+      "keyboard": "slider Previous/Next; tabs ArrowLeft/Right/Home/End with roving tabindex; accordion summary; safe link — passed",
+      "axe": {
+        "violations": [],
+        "incomplete": [
+          "color-contrast"
+        ],
+        "passes": 24
+      }
+    },
+    {
+      "surface": "public",
+      "width": 1280,
+      "status": "PASS",
+      "metrics": {
+        "scroll": 1280,
+        "width": 1280,
+        "columns": 3,
+        "headings": [
+          "H1",
+          "H2",
+          "H2",
+          "H2"
+        ],
+        "alternatives": true
+      },
+      "focusIndicator": "3px",
+      "keyboard": "slider Previous/Next; tabs ArrowLeft/Right/Home/End with roving tabindex; accordion summary; safe link — passed",
+      "axe": {
+        "violations": [],
+        "incomplete": [
+          "color-contrast"
+        ],
+        "passes": 24
+      }
+    },
+    {
+      "surface": "public",
+      "width": 1440,
+      "status": "PASS",
+      "metrics": {
+        "scroll": 1440,
+        "width": 1440,
+        "columns": 3,
+        "headings": [
+          "H1",
+          "H2",
+          "H2",
+          "H2"
+        ],
+        "alternatives": true
+      },
+      "focusIndicator": "3px",
+      "keyboard": "slider Previous/Next; tabs ArrowLeft/Right/Home/End with roving tabindex; accordion summary; safe link — passed",
+      "axe": {
+        "violations": [],
+        "incomplete": [
+          "color-contrast"
+        ],
+        "passes": 24
+      }
+    },
+    {
+      "surface": "public",
+      "scenario": "script-url",
+      "status": "PASS",
+      "outcome": "Invalid layout fails closed without links, images or active content"
+    },
+    {
+      "surface": "public",
+      "scenario": "style-token",
+      "status": "PASS",
+      "outcome": "Invalid layout fails closed without links, images or active content"
+    },
+    {
+      "surface": "public",
+      "scenario": "unknown-version",
+      "status": "PASS",
+      "outcome": "Invalid layout fails closed without links, images or active content"
+    },
+    {
+      "surface": "public",
+      "scenario": "foreign-media",
+      "status": "PASS",
+      "outcome": "Invalid layout fails closed without links, images or active content"
+    },
+    {
+      "surface": "preview",
+      "width": 320,
+      "status": "PASS",
+      "metrics": {
+        "scroll": 320,
+        "width": 320,
+        "columns": 1,
+        "headings": [
+          "H1",
+          "H2",
+          "H2",
+          "H2"
+        ],
+        "alternatives": true
+      },
+      "focusIndicator": "3px",
+      "keyboard": "slider Previous/Next; tabs ArrowLeft/Right/Home/End with roving tabindex; accordion summary; safe link — passed",
+      "axe": {
+        "violations": [],
+        "incomplete": [
+          "color-contrast"
+        ],
+        "passes": 24
+      }
+    },
+    {
+      "surface": "preview",
+      "width": 390,
+      "status": "PASS",
+      "metrics": {
+        "scroll": 390,
+        "width": 390,
+        "columns": 1,
+        "headings": [
+          "H1",
+          "H2",
+          "H2",
+          "H2"
+        ],
+        "alternatives": true
+      },
+      "focusIndicator": "3px",
+      "keyboard": "slider Previous/Next; tabs ArrowLeft/Right/Home/End with roving tabindex; accordion summary; safe link — passed",
+      "axe": {
+        "violations": [],
+        "incomplete": [
+          "color-contrast"
+        ],
+        "passes": 24
+      }
+    },
+    {
+      "surface": "preview",
+      "width": 768,
+      "status": "PASS",
+      "metrics": {
+        "scroll": 768,
+        "width": 768,
+        "columns": 1,
+        "headings": [
+          "H1",
+          "H2",
+          "H2",
+          "H2"
+        ],
+        "alternatives": true
+      },
+      "focusIndicator": "3px",
+      "keyboard": "slider Previous/Next; tabs ArrowLeft/Right/Home/End with roving tabindex; accordion summary; safe link — passed",
+      "axe": {
+        "violations": [],
+        "incomplete": [
+          "color-contrast"
+        ],
+        "passes": 24
+      }
+    },
+    {
+      "surface": "preview",
+      "width": 1280,
+      "status": "PASS",
+      "metrics": {
+        "scroll": 1280,
+        "width": 1280,
+        "columns": 3,
+        "headings": [
+          "H1",
+          "H2",
+          "H2",
+          "H2"
+        ],
+        "alternatives": true
+      },
+      "focusIndicator": "3px",
+      "keyboard": "slider Previous/Next; tabs ArrowLeft/Right/Home/End with roving tabindex; accordion summary; safe link — passed",
+      "axe": {
+        "violations": [],
+        "incomplete": [
+          "color-contrast"
+        ],
+        "passes": 24
+      }
+    },
+    {
+      "surface": "preview",
+      "width": 1440,
+      "status": "PASS",
+      "metrics": {
+        "scroll": 1440,
+        "width": 1440,
+        "columns": 3,
+        "headings": [
+          "H1",
+          "H2",
+          "H2",
+          "H2"
+        ],
+        "alternatives": true
+      },
+      "focusIndicator": "3px",
+      "keyboard": "slider Previous/Next; tabs ArrowLeft/Right/Home/End with roving tabindex; accordion summary; safe link — passed",
+      "axe": {
+        "violations": [],
+        "incomplete": [
+          "color-contrast"
+        ],
+        "passes": 24
+      }
+    },
+    {
+      "surface": "preview",
+      "scenario": "script-url",
+      "status": "PASS",
+      "outcome": "Invalid layout fails closed without links, images or active content"
+    },
+    {
+      "surface": "preview",
+      "scenario": "style-token",
+      "status": "PASS",
+      "outcome": "Invalid layout fails closed without links, images or active content"
+    },
+    {
+      "surface": "preview",
+      "scenario": "unknown-version",
+      "status": "PASS",
+      "outcome": "Invalid layout fails closed without links, images or active content"
+    },
+    {
+      "surface": "preview",
+      "scenario": "foreign-media",
+      "status": "PASS",
+      "outcome": "Invalid layout fails closed without links, images or active content"
+    }
+  ]
+}

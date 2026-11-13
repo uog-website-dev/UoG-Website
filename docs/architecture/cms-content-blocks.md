@@ -177,3 +177,7 @@ migrations extend.
 The legacy platform-wide `apps.api.Page` model and `/api/pages/` endpoints
 are untouched, no content endpoint ships in this story and the OpenAPI
 snapshot is therefore unchanged.
+
+## Optional visual layout contract
+
+Pages can opt into the independently versioned [visual layout contract](visual-layout-contract.md) using `metadata.visual_layout`. The legacy block schema and renderer remain the path for Pages without that payload. See the registry, sample and backward-compatibility matrix before authoring visual layouts.

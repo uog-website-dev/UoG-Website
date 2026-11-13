@@ -1,0 +1,52 @@
+﻿[
+    {
+        "name":  "/uog-backend",
+        "image_id":  "sha256:1015f655352f16b8dd36d86beee0acb5942cd6a2be97710a7d96a870885a2ec2",
+        "image":  "uog-backend:dev"
+    },
+    {
+        "name":  "/uog-celery-worker",
+        "image_id":  "sha256:1015f655352f16b8dd36d86beee0acb5942cd6a2be97710a7d96a870885a2ec2",
+        "image":  "uog-backend:dev"
+    },
+    {
+        "name":  "/uog-frontend-admin",
+        "image_id":  "sha256:b14dac5ffd6c9c6076d2429ac4050229b98ac77c1e6b4a5746764f9436261d3f",
+        "image":  "uog-frontend:dev"
+    },
+    {
+        "name":  "/uog-frontend-public",
+        "image_id":  "sha256:b14dac5ffd6c9c6076d2429ac4050229b98ac77c1e6b4a5746764f9436261d3f",
+        "image":  "uog-frontend:dev"
+    },
+    {
+        "name":  "/uog-minio",
+        "image_id":  "sha256:2636fc4155d9a7e41ff58cdb65ddd13ba9304e67184e13c25bc5cb34016269d7",
+        "image":  "pgsty/silo:RELEASE.2026-10-18T00-00-00Z"
+    },
+    {
+        "name":  "/uog-postgres",
+        "image_id":  "sha256:aa6cb33cf4c19c765cefcf48d96176258800870a9a1e930ad126200f9d825139",
+        "image":  "postgres:16.15-alpine"
+    },
+    {
+        "name":  "/uog-keycloak",
+        "image_id":  "sha256:3f3c5f8e03c614774b4bd9173b88391fefa4153bfc010d8012d59ad825377332",
+        "image":  "quay.io/keycloak/keycloak:26.8.1"
+    },
+    {
+        "name":  "/uog-redis-broker",
+        "image_id":  "sha256:d9436322172a5b482c187bf1f363d3c4fea086fcca6b9c8a94de8f0f39ed3193",
+        "image":  "redis:7.4.11-alpine"
+    },
+    {
+        "name":  "/uog-redis-cache",
+        "image_id":  "sha256:d9436322172a5b482c187bf1f363d3c4fea086fcca6b9c8a94de8f0f39ed3193",
+        "image":  "redis:7.4.11-alpine"
+    },
+    {
+        "name":  "/uog-nginx",
+        "image_id":  "sha256:892bb2152464f0c5d8972593a5f5afaf8054552580b699d95f8ff4af08c2d33d",
+        "image":  "nginx:1.31.7-alpine"
+    }
+]

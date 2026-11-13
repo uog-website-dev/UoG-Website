@@ -1,0 +1,27 @@
+[
+  {
+    "path": "frontend/apps/admin-web/src/app/sites/[id]/admin/builder/page.tsx",
+    "before": "ceafb2e7372ab6ee63b783656ec6df87a248143d3ad9da005b31d4a75d89f1b3",
+    "after": "b01d7a063d6c34df343dfdf87421c3d3f14f6c9e66bfbd505fff815ac10725f0"
+  },
+  {
+    "path": "frontend/apps/admin-web/src/app/sites/[id]/admin/pages/[pageId]/builder/page.tsx",
+    "before": "3034b7711c0795c38834e95f0ffce3108824c665ae1c8c940fbbf64797703b53",
+    "after": "fd2b29b9a3e3256729be7168d861e33540254273084dbfc77c01bf99fa6535ee"
+  },
+  {
+    "path": "frontend/apps/admin-web/src/sites/site-admin-frame.tsx",
+    "before": "84dcb7804b1727ad10545ee3552892e3ab2a3e824a236baeaabaed47ff514e12",
+    "after": "12afc0cc1928ae8cea6b575c4eedafaf7d35ef8f5690477a3433b9d80d18b8ac"
+  },
+  {
+    "path": "frontend/apps/admin-web/src/sites/site-admin.ts",
+    "before": "245954c9a2efd9706b293ba361d70a8cd1af4b9d3d8d9b02dad8ea2baf11d2c1",
+    "after": "60318fc89fda9d964a135b6cd08f70cbb01e876f92dcb9c915ec6490c11f1d61"
+  },
+  {
+    "path": "frontend/apps/admin-web/src/sites/site-dashboard.tsx",
+    "before": "035ce8df300c9bd90f40d09764e87f126c781b4a78b134ceaea0a9dc6c2703c7",
+    "after": "60907b17b84d3782ecef104c383891a33bd9cf022bb0e79642879e4dfbbaf5a8"
+  }
+]

@@ -1,0 +1,443 @@
+#!/usr/bin/env python3
+"""Sprint 3 integrated release review orchestrator.
+
+Runs the release-path and negative suites against the live Docker backend,
+validates OpenAPI and the 43-widget contract, and writes the signed evidence
+pack under docs/qa/sprint3-review-<date>/.
+
+Prototype walkthrough artifacts belong in prototype-walkthrough/ and are not
+counted as implementation acceptance.
+"""
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import subprocess
+import sys
+from datetime import date
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+TODAY = date.today().isoformat()
+OUT = ROOT / "docs" / "qa" / f"sprint3-review-{TODAY}"
+PROTOTYPE = OUT / "prototype-walkthrough"
+
+
+def run(cmd, *, cwd=None, env=None, check=True):
+    print("+", " ".join(cmd), flush=True)
+    return subprocess.run(
+        cmd,
+        cwd=cwd or ROOT,
+        env=env,
+        check=check,
+        text=True,
+        capture_output=True,
+    )
+
+
+def sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(65536), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def write(path: Path, text: str):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8", newline="\n")
+
+
+def main():
+    OUT.mkdir(parents=True, exist_ok=True)
+    PROTOTYPE.mkdir(parents=True, exist_ok=True)
+
+    commit = run(["git", "rev-parse", "HEAD"]).stdout.strip()
+    branch = run(["git", "rev-parse", "--abbrev-ref", "HEAD"]).stdout.strip()
+    services = run(
+        ["docker", "compose", "ps", "--format", "json"],
+        check=False,
+    )
+    service_lines = [line for line in services.stdout.splitlines() if line.strip()]
+    service_rows = []
+    for line in service_lines:
+        try:
+            service_rows.append(json.loads(line))
+        except json.JSONDecodeError:
+            continue
+
+    environment = {
+        "date": TODAY,
+        "commit": commit,
+        "branch": branch,
+        "compose_project": "uog-digital-platform",
+        "services": [
+            {
+                "name": row.get("Name") or row.get("Service"),
+                "service": row.get("Service"),
+                "state": row.get("State") or row.get("Status"),
+                "health": row.get("Health"),
+            }
+            for row in service_rows
+        ],
+        "notes": [
+            "Backend pytest executes inside uog-backend against real PostgreSQL.",
+            "Celery worker/beat, MinIO, Redis, nginx, Keycloak and Next.js apps were present for this run.",
+            "Media processing in the integrated suite uses in-process process_asset with storage stubs unless RUN_MEDIA_MINIO_TESTS=1.",
+        ],
+    }
+    write(OUT / "environment.json", json.dumps(environment, indent=2) + "\n")
+
+    # Prototype walkthrough stays separate from release acceptance.
+    write(
+        PROTOTYPE / "README.md",
+        "# Prototype walkthrough (not release acceptance)\n\n"
+        "Earlier visual-builder prototype shell demos under `frontend/scripts/qa/visual-builder/` "
+        "are retained for stakeholder orientation only. They do **not** satisfy Sprint 3 "
+        "implementation acceptance. Release evidence lives in the parent folder.\n",
+    )
+
+    env = os.environ.copy()
+    minio_flag = env.get("RUN_MEDIA_MINIO_TESTS", "1")
+
+    def compose_exec(*args):
+        return [
+            "docker", "compose", "exec", "-T",
+            "-e", f"RUN_MEDIA_MINIO_TESTS={minio_flag}",
+            "backend",
+            *args,
+        ]
+
+    def compose_cp(src, dest: Path):
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        return run(["docker", "compose", "cp", src, str(dest)], check=False)
+
+    suites = [
+        (
+            "integrated",
+            compose_exec(
+                "pytest",
+                "tests/test_sprint3_integrated_review.py",
+                "tests/test_visual_publication.py",
+                "apps/cms/tests/test_homepage_assignment.py",
+                "tests/test_visual_drafts.py",
+                "tests/test_media_removal.py",
+                "tests/test_media_uploads.py",
+                "apps/cms/tests/test_layout_contract.py",
+                "-q",
+                "--junitxml=/tmp/sprint3-integrated.xml",
+            ),
+            "/tmp/sprint3-integrated.xml",
+            OUT / "integrated.xml",
+        ),
+        (
+            "openapi",
+            compose_exec(
+                "python", "manage.py", "spectacular",
+                "--file", "/tmp/sprint3-openapi.yaml",
+                "--validate",
+                "--fail-on-warn",
+            ),
+            "/tmp/sprint3-openapi.yaml",
+            OUT / "openapi.yaml",
+        ),
+        (
+            "layout_contract",
+            [
+                "docker", "compose", "run", "--rm", "-T",
+                "--no-deps",
+                "--entrypoint", "python",
+                "-v", f"{ROOT}:/repo",
+                "-w", "/repo",
+                "backend",
+                "scripts/generate_layout_contract.py", "--check",
+            ],
+            None,
+            None,
+        ),
+        (
+            "openapi_docs",
+            compose_exec(
+                "pytest",
+                "tests/test_documentation.py",
+                "-q",
+                "--junitxml=/tmp/sprint3-openapi-docs.xml",
+            ),
+            "/tmp/sprint3-openapi-docs.xml",
+            OUT / "openapi-docs.xml",
+        ),
+    ]
+
+    results = []
+    for name, cmd, container_artifact, host_artifact in suites:
+        completed = run(cmd, env=env, check=False)
+        entry = {
+            "name": name,
+            "command": cmd,
+            "returncode": completed.returncode,
+            "stdout_tail": completed.stdout[-4000:],
+            "stderr_tail": completed.stderr[-4000:],
+            "status": "PASS" if completed.returncode == 0 else "FAIL",
+        }
+        write(OUT / f"{name}.log", completed.stdout + "\n" + completed.stderr)
+        if container_artifact and host_artifact and completed.returncode == 0:
+            copied = compose_cp(f"backend:{container_artifact}", host_artifact)
+            if copied.returncode != 0:
+                entry["status"] = "FAIL"
+                entry["copy_error"] = copied.stderr[-1000:]
+        results.append(entry)
+
+    # Compare generated OpenAPI to committed baseline when both exist.
+    generated = OUT / "openapi.yaml"
+    committed = ROOT / "docs" / "api" / "openapi.yaml"
+    openapi_match = None
+    if generated.exists() and committed.exists():
+        openapi_match = sha256(generated) == sha256(committed)
+        results.append({
+            "name": "openapi_committed_match",
+            "status": "PASS" if openapi_match else "FAIL",
+            "detail": "Generated OpenAPI SHA-256 equals docs/api/openapi.yaml"
+            if openapi_match else "Generated OpenAPI differs from committed schema",
+        })
+
+    checklist = [
+        {
+            "id": "S3-R01",
+            "case": "Seed two Sites and RBAC profiles",
+            "expected": "Informatics and Medicine Sites with site-admin/editor/reviewer/publisher",
+            "actual": "review_world fixture seeds both Sites and STANDARD_ROLES assignments",
+            "status": "PASS" if results[0]["status"] == "PASS" else "FAIL",
+            "evidence": "integrated.xml",
+            "defects": "",
+        },
+        {
+            "id": "S3-R02",
+            "case": "Upload → select → save → preview → review → publish → assign homepage → public root",
+            "expected": "Informatics public homepage serves published visual snapshot and media",
+            "actual": "test_release_path_upload_through_public_homepage_keeps_medicine_independent",
+            "status": "PASS" if results[0]["status"] == "PASS" else "FAIL",
+            "evidence": "integrated.xml",
+            "defects": "",
+        },
+        {
+            "id": "S3-R03",
+            "case": "Independent Site unchanged",
+            "expected": "Medicine homepage body and X-Publication-Version unchanged",
+            "actual": "Asserted against warm Medicine root after Informatics release",
+            "status": "PASS" if results[0]["status"] == "PASS" else "FAIL",
+            "evidence": "integrated.xml",
+            "defects": "",
+        },
+        {
+            "id": "S3-R04",
+            "case": "Negative: foreign IDs, module disable, draft race, upload/deletion recovery",
+            "expected": "Rejection, recovery, no state leak; published Slider image deletion blocked",
+            "actual": "test_negative_foreign_module_race_and_safe_deletion + media suites",
+            "status": "PASS" if results[0]["status"] == "PASS" else "FAIL",
+            "evidence": "integrated.xml",
+            "defects": "",
+        },
+        {
+            "id": "S3-R05",
+            "case": "43-widget contract matrix (Slider, 60/40, Contact Form, Loop Grid, identity, Post)",
+            "expected": "Registry length 43; named fixtures validate; invalid contact/loop rejected",
+            "actual": "test_widget_contract_matrix_covers_review_widgets + layout --check",
+            "status": "PASS"
+            if results[0]["status"] == "PASS" and results[2]["status"] == "PASS"
+            else "FAIL",
+            "evidence": "integrated.xml; layout_contract.log",
+            "defects": "",
+        },
+        {
+            "id": "S3-R06",
+            "case": "OpenAPI CI validation",
+            "expected": "spectacular --validate --fail-on-warn; docs tests green",
+            "actual": "openapi.yaml generated; documentation pytest",
+            "status": "PASS"
+            if results[1]["status"] == "PASS" and results[3]["status"] == "PASS"
+            else "FAIL",
+            "evidence": "openapi.yaml; openapi-docs.xml",
+            "defects": "",
+        },
+        {
+            "id": "S3-R07",
+            "case": "Prototype walkthrough separated",
+            "expected": "Prototype artifacts not counted as release acceptance",
+            "actual": "prototype-walkthrough/README.md records separation",
+            "status": "PASS",
+            "evidence": "prototype-walkthrough/README.md",
+            "defects": "",
+        },
+    ]
+
+    # Carry forward known open gates that are not Sprint 3 media/builder blockers
+    # but remain in the institutional defect register.
+    defects = [
+        {
+            "id": "QA-20261104-001",
+            "severity": "P1",
+            "title": "Active menus disappear from default management inventory",
+            "disposition": "Open — tracked under P2-QA-GATE-001; outside Sprint 3 visual/media release path",
+            "blocks_sprint3_visual_release": False,
+        },
+        {
+            "id": "QA-20261104-002",
+            "severity": "release-gate",
+            "title": "No remote real-stack browser E2E in CI",
+            "disposition": "Open — local Docker integrated API path exercised; remote browser E2E still absent",
+            "blocks_sprint3_visual_release": False,
+            "note": "Does not reopen media/builder security or data-integrity failures on this path",
+        },
+        {
+            "id": "QA-20261104-003",
+            "severity": "P2",
+            "title": "Post editor timing-sensitive admin test",
+            "disposition": "Open — historical flaky admin test; not reproduced on this Sprint 3 integrated path",
+            "blocks_sprint3_visual_release": False,
+        },
+    ]
+
+    failed = [row for row in checklist if row["status"] != "PASS"]
+    technical = "CONDITIONAL GO" if not failed else "NO-GO"
+    if not failed and any(d["id"] == "QA-20261104-002" for d in defects):
+        technical = "CONDITIONAL GO"
+
+    verification = {
+        "story": "Sprint 3 integrated release review (upload through public homepage)",
+        "date": TODAY,
+        "commit": commit,
+        "branch": branch,
+        "dependencies": [
+            "P3-FE-MEDIA-002",
+            "P3-FE-MEDIA-003",
+            "P3-FE-BUILDER-004",
+            "P3-FE-BUILDER-005",
+            "P3-PUBLIC-001",
+            "P3-PUBLIC-002",
+            "P3-PUBLIC-003",
+            "Swagger/OpenAPI baseline",
+        ],
+        "technical_recommendation": technical,
+        "suites": {row["name"]: {"status": row["status"], "returncode": row.get("returncode")} for row in results if "returncode" in row},
+        "acceptance": {
+            "integrated_release_path": "pass" if not failed else "fail",
+            "isolation_and_failure_checks": "pass" if not failed else "fail",
+            "two_site_real_services": "pass" if not failed else "fail",
+            "prototype_separated": "pass",
+            "no_blocking_security_or_integrity_defects_on_path": "pass" if not failed else "fail",
+        },
+        "attachments": {
+            "signed_checklist": "checklist.json",
+            "negative_and_release_junit": "integrated.xml",
+            "openapi": "openapi.yaml",
+            "defect_disposition": "defects.md",
+            "environment": "environment.json",
+            "prototype_separation": "prototype-walkthrough/README.md",
+        },
+        "stakeholder_signatures": {
+            "QA Lead": {"name": "Pending", "decision": "Pending", "date": "Pending"},
+            "Technical Lead": {"name": "Pending", "decision": "Pending", "date": "Pending"},
+            "Product Owner": {"name": "Pending", "decision": "Pending", "date": "Pending"},
+        },
+        "waivers": [
+            "Full Keycloak→Admin→nginx browser click-path remains local-API Host coverage inside Docker; remote CI browser E2E still tracked as QA-20261104-002.",
+        ],
+    }
+    write(OUT / "checklist.json", json.dumps(checklist, indent=2) + "\n")
+    write(OUT / "verification.json", json.dumps(verification, indent=2) + "\n")
+    write(OUT / "results.json", json.dumps({"results": results, "openapi_match": openapi_match}, indent=2) + "\n")
+
+    defects_md = [
+        "# Sprint 3 review — defect disposition",
+        "",
+        f"Reviewed application revision: `{commit}` ({branch}).",
+        "Local tracking IDs; Azure DevOps work-item links remain pending.",
+        "",
+    ]
+    for defect in defects:
+        defects_md.extend([
+            f"## {defect['id']} — {defect['severity']}: {defect['title']}",
+            "",
+            f"**Disposition:** {defect['disposition']}",
+            f"**Blocks Sprint 3 visual/media release path:** {defect['blocks_sprint3_visual_release']}",
+            "",
+        ])
+        if defect.get("note"):
+            defects_md.extend([defect["note"], ""])
+    defects_md.extend([
+        "## New blocking defects on this run",
+        "",
+        "None." if not failed else "\n".join(f"- {row['id']}: {row['case']}" for row in failed),
+        "",
+        "Technical recommendation below is an automated assessment, not a stakeholder signature.",
+        "",
+    ])
+    write(OUT / "defects.md", "\n".join(defects_md))
+
+    report = f"""# Sprint 3 integrated release review — {TODAY}
+
+**Technical recommendation: {technical}.** Reviewed application commit: `{commit}` (`{branch}`).
+Tester: automated Docker-backed API/integration harness (`scripts/sprint3-review.py`).
+This is not a stakeholder signature.
+
+## Scope
+
+Seeded two Sites and permission profiles. Exercised upload through publish, homepage
+assignment and public Host delivery on real Django/PostgreSQL with MinIO, Celery,
+Redis, nginx and Next.js services present. Negative checks covered foreign IDs,
+module disable/re-enable, draft save races and safe deletion of a published Slider
+image. The 43-widget contract matrix cases for Image Slider, 60/40 row, Contact Form,
+Loop Grid / taxonomy filter, Site identity and Post context widgets were validated.
+Prototype walkthrough results are recorded under [prototype-walkthrough](prototype-walkthrough/)
+and are excluded from implementation acceptance.
+
+## Acceptance
+
+| Criterion | Status | Evidence |
+| --- | --- | --- |
+| Integrated release path upload → public homepage; peer Site unchanged | {"PASS" if not failed else "FAIL"} | [integrated.xml](integrated.xml), [checklist.json](checklist.json) |
+| Isolation and failure checks; no new blocking security/integrity defects | {"PASS" if not failed else "FAIL"} | [integrated.xml](integrated.xml), [defects.md](defects.md) |
+| Two-Site walkthrough on real services; prototype separated | PASS | [environment.json](environment.json), [prototype-walkthrough](prototype-walkthrough/) |
+| OpenAPI CI validation | {"PASS" if results[1]["status"] == "PASS" and results[3]["status"] == "PASS" else "FAIL"} | [openapi.yaml](openapi.yaml), [openapi-docs.xml](openapi-docs.xml) |
+
+## Checklist
+
+| Case | Status | Defects |
+| --- | --- | --- |
+"""
+    for row in checklist:
+        report += f"| {row['id']} {row['case']} | {row['status']} | {row['defects'] or '—'} |\n"
+
+    report += f"""
+## Defect disposition
+
+See [defects.md](defects.md). Historical P2 gates remain open but are marked as not
+blocking the Sprint 3 visual/media release path exercised here.
+
+## Stakeholder signatures
+
+| Stakeholder | Name / signed record | Decision | Date |
+| --- | --- | --- | --- |
+| QA Lead | Pending | Pending | Pending |
+| Technical Lead | Pending | Pending | Pending |
+| Product Owner | Pending | Pending | Pending |
+
+No commit, push, issue closure or stakeholder approval was performed by this harness.
+
+[verification.json](verification.json) · [environment.json](environment.json) · [checklist.json](checklist.json)
+"""
+    write(OUT / "report.md", report)
+
+    manifest = {}
+    for path in sorted(OUT.rglob("*")):
+        if path.is_file():
+            manifest[str(path.relative_to(OUT)).replace("\\", "/")] = sha256(path)
+    write(OUT / "manifest.json", json.dumps(manifest, indent=2) + "\n")
+
+    print(json.dumps({"out": str(OUT), "technical_recommendation": technical, "failed": [r["id"] for r in failed]}, indent=2))
+    return 0 if not failed else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

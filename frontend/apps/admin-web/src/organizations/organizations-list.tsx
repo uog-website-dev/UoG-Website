@@ -63,6 +63,10 @@ import {
   getOrganizationTree,
   listOrganizations,
 } from "@/app/organizations/actions";
+import {
+  runBulkLifecycle,
+  summarizeBulkLifecycle,
+} from "@/admin/bulk-lifecycle";
 import { deserializeApiError, unwrap } from "@/organizations/contract";
 import {
   draftFromQuery,
@@ -72,7 +76,7 @@ import {
   parseListQuery,
   sortFromOrdering,
 } from "@/organizations/list-query";
-import type { ApiError } from "@uog/api-client";
+import { ApiError } from "@uog/api-client";
 import {
   ORGANIZATION_STATUS_OPTIONS,
   ORGANIZATION_TYPE_OPTIONS,
@@ -191,6 +195,9 @@ export function OrganizationsList() {
   );
 
   const [pending, setPending] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string | number>>(new Set());
+  const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false);
+  const [bulkError, setBulkError] = useState<ApiError | null>(null);
   const [confirmTarget, setConfirmTarget] = useState<{
     organization: Organization;
     action: LifecycleAction;
@@ -343,6 +350,54 @@ export function OrganizationsList() {
   }
 
   const rows = organizations.data?.results ?? [];
+  const selectedOrganizations = rows.filter((row) => selectedIds.has(row.id) && row.parent !== null && row.status !== "ARCHIVED");
+  const canBulkDelete = selectedOrganizations.length > 0;
+
+  async function confirmBulkDelete() {
+    if (!canBulkDelete) return;
+    setPending(true);
+    setBulkError(null);
+    try {
+      const summary = await runBulkLifecycle(selectedOrganizations, {
+        labelOf: (organization) => `${organization.code} — ${organization.name}`,
+        apply: async (organization) => {
+          const detail = await getOrganization(organization.id);
+          if (!detail.ok) return detail;
+          const etag = detail.data.etag;
+          if (!etag) {
+            return {
+              ok: false as const,
+              error: {
+                status: 428,
+                code: "precondition_required",
+                message: "The server did not return a concurrency token for this organization.",
+                details: null,
+                requestId: detail.data.requestId,
+              },
+            };
+          }
+          return organization.status === "ACTIVE"
+            ? deactivateOrganization(organization.id, etag)
+            : archiveOrganization(organization.id, etag);
+        },
+      });
+      const message = summarizeBulkLifecycle(summary, "organization");
+      if (summary.failed.length === 0) toast.success(message);
+      else if (summary.succeeded === 0) {
+        setBulkError(new ApiError(`${message} ${summary.failed.map((item) => `${item.label}: ${item.message}`).join(" ")}`, 400));
+        return;
+      } else {
+        toast.warning(message);
+        setBulkError(new ApiError(summary.failed.map((item) => `${item.label}: ${item.message}`).join(" "), 400));
+      }
+      setSelectedIds(new Set());
+      setBulkConfirmOpen(false);
+      organizations.reload();
+      router.refresh();
+    } finally {
+      setPending(false);
+    }
+  }
   const count = organizations.data?.count ?? 0;
 
   const columns = [
@@ -511,6 +566,17 @@ export function OrganizationsList() {
             />
           </FilterBar>
         </Box>
+        {canBulkDelete ? (
+          <Box sx={{ px: { xs: 2, sm: 3 }, py: 1.5, borderTop: 1, borderColor: "divider", display: "flex", gap: 1, alignItems: "center", flexWrap: "wrap", bgcolor: "action.hover" }}>
+            <Typography variant="body2" sx={{ flex: 1 }}>
+              {selectedOrganizations.length} organization{selectedOrganizations.length === 1 ? "" : "s"} selected
+            </Typography>
+            <Button size="small" color="error" variant="contained" disabled={pending} onClick={() => { setBulkError(null); setBulkConfirmOpen(true); }}>
+              Delete selected
+            </Button>
+            <Button size="small" disabled={pending} onClick={() => setSelectedIds(new Set())}>Clear selection</Button>
+          </Box>
+        ) : null}
         <Box sx={{ borderTop: 1, borderColor: "divider", overflowX: "auto" }}>
           <DataTable<Organization>
             caption="Organization units"
@@ -519,6 +585,12 @@ export function OrganizationsList() {
             getRowKey={(row) => row.id}
             sort={sort}
             onSortChange={changeSort}
+            selection={{
+              selected: selectedIds,
+              onChange: setSelectedIds,
+              isRowSelectable: (row) => row.parent !== null && row.status !== "ARCHIVED",
+              getCheckboxLabel: (row) => `Select ${row.name}`,
+            }}
             loading={organizations.loading}
             error={organizations.error}
             onRetry={organizations.reload}
@@ -640,6 +712,31 @@ export function OrganizationsList() {
             {confirmTarget.organization.code} — {confirmTarget.organization.name}
           </Typography>
         ) : null}
+      </ConfirmDialog>
+
+      <ConfirmDialog
+        open={bulkConfirmOpen}
+        title="Delete selected organizations?"
+        description="Organization units cannot be purged. Delete deactivates active units and archives inactive units. The institutional root and already-archived units stay protected."
+        confirmColor="error"
+        confirmLabel="Delete selected"
+        pending={pending}
+        error={bulkError}
+        onConfirm={confirmBulkDelete}
+        onCancel={() => {
+          if (!pending) {
+            setBulkConfirmOpen(false);
+            setBulkError(null);
+          }
+        }}
+      >
+        <Box component="ul" sx={{ m: 0, pl: 2 }}>
+          {selectedOrganizations.map((organization) => (
+            <Typography key={organization.id} component="li" variant="body2" sx={{ fontFamily: "monospace" }}>
+              {organization.code} — {organization.name} · {organization.status}
+            </Typography>
+          ))}
+        </Box>
       </ConfirmDialog>
     </Box>
   );

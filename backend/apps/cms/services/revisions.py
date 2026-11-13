@@ -164,6 +164,7 @@ def _prune_revisions(content_id, *, using, actor=None, site_id=None):
         .filter(content_id=content_id)
         .exclude(status=ContentStatus.PUBLISHED)
         .exclude(revision_number__in=restored_revisions)
+        .filter(workflow_events__isnull=True, review_events__isnull=True, approved_publications__isnull=True)
         .order_by("-revision_number")
         .values_list("pk", flat=True)[MAX_RETAINED_DRAFT_REVISIONS:]
     )

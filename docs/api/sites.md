@@ -125,3 +125,26 @@ the change back. `disable` on one Site does not change another Site.
 PATCH replaces that Site's module settings and does not toggle enablement.
 Another Site's assignment id returns 404. List filters: `module`,
 `is_enabled`, `ordering` (`module_id`), `page`.
+
+## Visual Page drafts
+
+The Pages list's **Visual Builder** entry opens the scoped
+`/sites/{siteId}/admin/pages/{pageId}/builder` workspace. See the
+[accessible shell and context policy](../architecture/visual-builder-shell.md)
+and [route/keyboard evidence](../qa/visual-builder-2026-11-12/report.md).
+
+`GET` and conditional `PATCH /api/v1/sites/{site_pk}/pages/{id}/visual-draft/` load and replace a complete visual draft using the existing Page ETag. Missing preconditions return 428; stale writes return 409. Layout, revision and nested media inventory commit atomically. Published Pages use their separate working-draft ID. See the [persistence contract and examples](../architecture/visual-draft-persistence.md).
+
+## Visual Page review and publication
+
+Scoped `GET /api/v1/sites/{site_pk}/pages/{id}/preview/?revision=N` previews an immutable revision. Visual `approve`, `publish` and `revise` workflow actions require its current `If-Match` ETag. Approval binds the reviewed revision; returning to draft requires fresh review before publication. Preview JSON and referenced images are private and never cached. See the [publication contract](../architecture/visual-publication.md) and [revision, asset and cache evidence](../qa/visual-publication-2026-11-12/report.md).
+
+## Published homepage setting
+
+`POST /api/v1/sites/{site_pk}/pages/{id}/homepage/` with `{}` assigns an eligible
+published Page using scoped `sites.update` permission and the PAGES module gate.
+Site detail exposes its read-only `homepage` UUID. Draft/hidden Pages return 400,
+foreign Pages return 404, and the previous assignment remains intact. Losing
+eligibility returns the existing empty-root fallback, without exposing a draft.
+See the [assignment, audit and cache policy](../architecture/site-homepage.md)
+and [two-host evidence](../qa/homepage-2026-11-12/report.md).

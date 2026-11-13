@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import AddIcon from "@mui/icons-material/Add";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Accordion from "@mui/material/Accordion";
@@ -28,12 +29,15 @@ import {
 import { MediaPickerDialog, type MediaPickerResult } from "@/sites/media-picker";
 import { imageRefForAsset } from "@/sites/site-image-field";
 import Typography from "@mui/material/Typography";
+import { validateVisualLayout } from "@uog/types";
+import type { VisualLayout } from "@uog/types";
 import { ApiError } from "@uog/api-client";
 import {
   DataTable,
   FilterBar,
   Pagination,
   PublicPageView,
+  pageFromResponse,
   SelectFilter,
   TextFilter,
   useAsync,
@@ -48,6 +52,7 @@ import type {
 import {
   createSitePage,
   getSitePage,
+  getSitePagePreview,
   loadSitePages,
   loadSitePageStatusCounts,
   loadSitePageWorkflowHistory,
@@ -64,8 +69,10 @@ import type {
   SitePageStatus,
   SitePageWorkflowAction,
   SitePageWorkflowTransition,
+  SitePagePreview,
 } from "@/app/sites/page-actions";
 import { unwrap } from "@/organizations/contract";
+import { APP_BASE_PATH } from "@/base-path";
 import { ContentWorkflowButtons, ContentWorkflowDialog } from "@/sites/content-workflow";
 import type { WorkflowAction } from "@/sites/content-workflow";
 
@@ -114,7 +121,7 @@ const EMPTY_STATUS_COUNTS: Record<SitePageStatus, number> = {
   ARCHIVED: 0,
 };
 
-type DialogMode = "create" | "edit" | "preview";
+type DialogMode = "create" | "edit";
 
 interface PageFilters {
   search: string;
@@ -143,16 +150,6 @@ function seoPreview(seo: Record<string, unknown> | undefined): PublicPageDocumen
   return {
     title: typeof seo?.meta_title === "string" ? seo.meta_title : "",
     description: typeof seo?.meta_description === "string" ? seo.meta_description : "",
-  };
-}
-
-function previewOf(page: SitePageRecord): PublicPageDocument {
-  return {
-    title: page.title,
-    path: page.path,
-    site: page.site,
-    blocks: page.blocks,
-    seo: seoPreview(page.seo),
   };
 }
 
@@ -207,7 +204,13 @@ function blockInputs(form: PageForm): SitePageBlock[] {
 }
 
 function metadataInput(form: PageForm): Record<string, unknown> {
-  return jsonObject(form.metadata, "Metadata");
+  const value=jsonObject(form.metadata, "Metadata");
+  if(Object.hasOwn(value,"visual_layout")) {
+    const result=validateVisualLayout(value.visual_layout);
+    if(!result.ok)throw new Error(Object.entries(result.errors).map(([path,messages])=>`${path}: ${messages.join(" ")}`).join("\n"));
+    value.visual_layout=result.value;
+  }
+  return value;
 }
 
 function jsonObject(source: string, label: string): Record<string, unknown> {
@@ -261,28 +264,35 @@ function orderingForSort(sort: SortState): SitePageListQuery["ordering"] {
 export function SitePagesPanel({
   siteId,
   pagesEnabled,
+  builderEnabled = null,
   permissions = [],
   languages,
   startCreate = false,
   onCreateStarted,
+  visualBuilderMode = false,
 }: {
   siteId: number;
   pagesEnabled: boolean | null;
+  /** VISUAL_BUILDER Site module. Builder actions stay hidden when false. */
+  builderEnabled?: boolean | null;
   permissions?: readonly string[];
   languages?: PageLanguages;
   /** Open the create dialog once, for the dashboard's "Create page" action. */
   startCreate?: boolean;
   onCreateStarted?: () => void;
+  visualBuilderMode?: boolean;
 }) {
   return (
     <SitePagesPanelContent
       key={siteId}
       siteId={siteId}
       pagesEnabled={pagesEnabled}
+      builderEnabled={builderEnabled}
       permissions={permissions}
       languages={languages}
       startCreate={startCreate}
       onCreateStarted={onCreateStarted}
+      visualBuilderMode={visualBuilderMode}
     />
   );
 }
@@ -290,17 +300,21 @@ export function SitePagesPanel({
 function SitePagesPanelContent({
   siteId,
   pagesEnabled,
+  builderEnabled,
   permissions,
   languages,
   startCreate,
   onCreateStarted,
+  visualBuilderMode,
 }: {
   siteId: number;
   pagesEnabled: boolean | null;
+  builderEnabled: boolean | null;
   permissions: readonly string[];
   languages?: PageLanguages;
   startCreate: boolean;
   onCreateStarted?: () => void;
+  visualBuilderMode:boolean;
 }) {
   const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
   const mediaInvokeRef = useRef<HTMLButtonElement | null>(null);
@@ -317,6 +331,7 @@ function SitePagesPanelContent({
   const [reviewQueue, setReviewQueue] = useState(false);
   const [pendingWorkflow, setPendingWorkflow] = useState<{ page: SitePageRecord; action: SitePageWorkflowAction } | null>(null);
   const [workflowComment, setWorkflowComment] = useState("");
+  const [workflowError,setWorkflowError]=useState("");
   const [historyPage, setHistoryPage] = useState<SitePageRecord | null>(null);
   const [workflowHistory, setWorkflowHistory] = useState<SitePageWorkflowTransition[]>([]);
   const [historyError, setHistoryError] = useState("");
@@ -328,6 +343,9 @@ function SitePagesPanelContent({
   const [dialogError, setDialogError] = useState("");
   const [dialogConflict, setDialogConflict] = useState(false);
   const [showDraftPreview, setShowDraftPreview] = useState(false);
+  const [workflowPreview,setWorkflowPreview]=useState<SitePagePreview|null>(null);
+  const workflowSequence=useRef(0);
+  useEffect(()=>()=>{workflowSequence.current++;},[]);
   const [parentPages, setParentPages] = useState<SitePageRecord[]>([]);
   const [busyPageId, setBusyPageId] = useState<string | null>(null);
 
@@ -533,7 +551,10 @@ function SitePagesPanelContent({
         pages.reload();
         statusCounts.reload();
       } else {
-        toast.error(cause instanceof Error ? cause.message : "The Page could not be updated.");
+        const details=cause instanceof ApiError && cause.fieldErrors ? [...new Set(Object.values(cause.fieldErrors).flat())].join(" ") : "";
+        const message=details || (cause instanceof Error ? cause.message : "The Page could not be updated.");
+        if(pendingWorkflow)setWorkflowError(message);
+        toast.error(message);
       }
       return false;
     } finally {
@@ -556,18 +577,31 @@ function SitePagesPanelContent({
     }
   }
 
-  function queueWorkflowAction(row: SitePageRecord, action: WorkflowAction) {
+  async function queueWorkflowAction(row: SitePageRecord, action: WorkflowAction) {
+    const sequence=++workflowSequence.current;
     setWorkflowComment("");
+    setWorkflowError("");
+    setWorkflowPreview(null);
     setPendingWorkflow({ page: row, action });
+    if(row.metadata?.visual_layout && (action==="approve" || action==="publish" || action==="revise")) {
+      setBusyPageId(row.id);
+      try {
+        const preview=unwrap(await getSitePagePreview(siteId,row.id,row.revision_number));
+        if(sequence!==workflowSequence.current)return;
+        setWorkflowPreview(preview);
+        setPendingWorkflow({page:{...row,etag:preview.etag},action});
+      } catch(cause) {if(sequence===workflowSequence.current){toast.error(cause instanceof Error?cause.message:"Revision preview could not be loaded.");setPendingWorkflow(null);}}
+      finally {if(sequence===workflowSequence.current)setBusyPageId(null);}
+    }
   }
 
   async function confirmWorkflowAction() {
     if (!pendingWorkflow) return;
     const { page: row, action } = pendingWorkflow;
-    await runPageAction(row, async () => unwrap(await transitionSitePage(
-      siteId, row.id, action, workflowComment.trim(),
-    )));
-    setPendingWorkflow(null);
+    const succeeded=await runPageAction(row, async () => unwrap(await (row.metadata?.visual_layout
+      ? transitionSitePage(siteId,row.id,action,workflowComment.trim(),row.etag)
+      : transitionSitePage(siteId,row.id,action,workflowComment.trim()))));
+    if(succeeded)setPendingWorkflow(null);
   }
 
   const columns: TableColumn<SitePageRecord>[] = [
@@ -607,12 +641,15 @@ function SitePagesPanelContent({
 
   function renderActions(row: SitePageRecord) {
     const actions = [
-      <Button key="preview" size="small" aria-label={`Preview ${row.title}`} onClick={() => {
-        setActivePage(row);
-        setDialogError("");
-        setDialogConflict(false);
-        setMode("preview");
-      }}>
+      <Button
+        key="preview"
+        component={Link}
+        href={`/sites/${siteId}/admin/pages/${row.id}/preview${row.revision_number?`?revision=${row.revision_number}`:""}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        size="small"
+        aria-label={`Preview ${row.title}`}
+      >
         Preview
       </Button>,
       <Button key="history" size="small" aria-label={`Workflow history for ${row.title}`} onClick={() => void openWorkflowHistory(row)}>
@@ -624,6 +661,17 @@ function SitePagesPanelContent({
       actions.push(
         <Button key="edit" size="small" aria-label={`Edit ${row.title}`} disabled={!enabled} onClick={() => void openEdit(row)}>
           Edit
+        </Button>,
+      );
+    }
+    if (
+      canEdit
+      && builderEnabled === true
+      && ["DRAFT", "UNPUBLISHED", "PUBLISHED"].includes(row.status)
+    ) {
+      actions.push(
+        <Button key="builder" component={Link} href={`/sites/${siteId}/admin/pages/${row.id}/builder`} size="small" disabled={!enabled} aria-label={`Open Visual Builder for ${row.title}`}>
+          Visual Builder
         </Button>,
       );
     }
@@ -644,8 +692,7 @@ function SitePagesPanelContent({
       />,
     );
     if (
-      canEdit &&
-      (row.status === "DRAFT" || row.status === "UNPUBLISHED") &&
+      row.can_set_homepage && row.status === "PUBLISHED" &&
       !row.is_homepage
     ) {
       actions.push(
@@ -654,7 +701,10 @@ function SitePagesPanelContent({
           size="small"
           aria-label={`Set ${row.title} as homepage`}
           disabled={!enabled}
-          onClick={() => void runPageAction(row, async () => unwrap(await setSiteHomepage(siteId, row.id)))}
+          onClick={() => void runPageAction(row, async () => {
+            unwrap(await setSiteHomepage(siteId, row.id));
+            toast.success(`Homepage assigned: ${row.title}`);
+          })}
         >
           Set homepage
         </Button>,
@@ -679,21 +729,28 @@ function SitePagesPanelContent({
     >
       <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 2 }}>
         <Box>
-          <Typography variant="h2" component="h2" sx={{ fontSize: "1.25rem", fontWeight: 700 }}>Pages</Typography>
+          <Typography variant="h2" component="h2" sx={{ fontSize: "1.25rem", fontWeight: 700 }}>{visualBuilderMode ? "Visual Builder" : "Pages"}</Typography>
           <Typography variant="body2" color="text.secondary">
-            Manage the Pages belonging to this Site.
+            {visualBuilderMode ? "Choose a Page below and select Visual Builder. Published Pages open through a private working draft; Pages in review stay locked." : "Manage the Pages belonging to this Site."}
           </Typography>
         </Box>
-        {canCreate ? (
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => void openCreate()}
-            disabled={!enabled}
-          >
-            Create page
-          </Button>
-        ) : null}
+        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+          {permissions.includes("sites.update") && !visualBuilderMode ? (
+            <Button component={Link} href={`/sites/${siteId}/admin/homepage`} variant="outlined" disabled={!enabled}>
+              Homepage Settings
+            </Button>
+          ) : null}
+          {canCreate ? (
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => void openCreate()}
+              disabled={!enabled}
+            >
+              Create page
+            </Button>
+          ) : null}
+        </Box>
       </Box>
 
       {pagesEnabled === null ? (
@@ -704,6 +761,11 @@ function SitePagesPanelContent({
       {pagesEnabled === false ? (
         <Alert severity="warning">
           Pages are off for this Site. Create, edit and workflow changes are blocked. Existing Pages are preserved.
+        </Alert>
+      ) : null}
+      {visualBuilderMode && builderEnabled === false ? (
+        <Alert severity="warning">
+          Visual Builder is off for this Site. Enable the VISUAL_BUILDER module to compose visual Pages. Existing layouts are preserved.
         </Alert>
       ) : null}
       {!canView ? (
@@ -821,12 +883,14 @@ function SitePagesPanelContent({
         action={pendingWorkflow?.action ?? null}
         title={pendingWorkflow?.page.title ?? ""}
         comment={workflowComment}
-        error=""
+        error={workflowError}
         busy={busyPageId !== null || !enabled}
         onComment={setWorkflowComment}
         onClose={() => setPendingWorkflow(null)}
         onConfirm={() => void confirmWorkflowAction()}
-      />
+      >
+        {workflowPreview && pendingWorkflow ? <Box><Typography variant="overline">Private revision {workflowPreview.revision_number}</Typography><PublicPageView page={pageFromResponse(200,workflowPreview.page)} privateMediaBase={`${APP_BASE_PATH}/sites/${siteId}/pages/${pendingWorkflow.page.id}/preview-media/${workflowPreview.revision_number}`}/></Box> : null}
+      </ContentWorkflowDialog>
 
       <Dialog
         open={historyPage !== null}
@@ -1031,11 +1095,13 @@ function SitePagesPanelContent({
                 try {
                   return (
                     <PublicPageView
+                      privateMediaBase={`${APP_BASE_PATH}/sites/${siteId}/media`}
                       page={{
                         title: form.title || "Untitled Page",
                         path: activePage?.path ?? `/${form.slug}`,
                         site: siteId,
                         blocks: blockInputs(form),
+                        ...(metadataInput(form).visual_layout ? {visual_layout:metadataInput(form).visual_layout as VisualLayout} : {}),
                         seo: seoPreview(seoInput(form)),
                       }}
                     />
@@ -1067,25 +1133,7 @@ function SitePagesPanelContent({
         </DialogActions>
       </Dialog>
 
-      <Dialog
-        open={mode === "preview" && activePage !== null}
-        onClose={() => setMode(null)}
-        fullWidth
-        maxWidth="md"
-        aria-labelledby="page-preview-title"
-      >
-        {activePage ? (
-          <>
-            <DialogTitle id="page-preview-title">Preview: {activePage.title}</DialogTitle>
-            <DialogContent dividers>
-              <PublicPageView page={previewOf(activePage)} />
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setMode(null)}>Close preview</Button>
-            </DialogActions>
-          </>
-        ) : null}
-      </Dialog>
+
     </Paper>
   );
 }

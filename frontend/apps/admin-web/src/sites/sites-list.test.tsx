@@ -400,6 +400,30 @@ describe("SitesList — lifecycle", () => {
     expect(refresh).toHaveBeenCalled();
   });
 
+  it("archives multiple selected sites through Delete selected", async () => {
+    listSites.mockResolvedValue({
+      ok: true,
+      data: page([
+        site({ id: 1, code: "A", name: "Alpha", is_main: false }),
+        site({ id: 2, code: "B", name: "Beta", is_main: false }),
+      ]),
+    });
+    archiveSite.mockResolvedValue({
+      ok: true,
+      data: { data: site({ status: "ARCHIVED" }), etag: '"e"', requestId: "r" },
+    });
+
+    renderList();
+    fireEvent.click(await screen.findByRole("checkbox", { name: "Select Alpha" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Select Beta" }));
+    fireEvent.click(screen.getByRole("button", { name: "Delete selected" }));
+    const dialog = await screen.findByRole("dialog", { name: "Delete selected sites?" });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Delete selected" }));
+    await waitFor(() => expect(archiveSite).toHaveBeenCalledTimes(2));
+    expect(archiveSite).toHaveBeenCalledWith(1);
+    expect(archiveSite).toHaveBeenCalledWith(2);
+  });
+
   it("shows the server's denial verbatim instead of pretending success", async () => {
     listSites.mockResolvedValue({
       ok: true,

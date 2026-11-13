@@ -1,0 +1,6 @@
+{
+  "scope": "generated identities in live-release attempts and release-audit run",
+  "local_review_accounts_inactive": 24,
+  "remaining_active": 0,
+  "keycloak_disable": "each run recorded all created identities disabled"
+}

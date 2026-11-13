@@ -1,0 +1,7 @@
+﻿{
+  "semantic_match": false,
+  "changed_paths": [
+    "/api/v1/sites/{site_pk}/pages/{id}/visual-draft/"
+  ],
+  "changed_schemas": []
+}

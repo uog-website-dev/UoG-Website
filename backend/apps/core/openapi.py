@@ -46,6 +46,7 @@ def add_common_contract(result, generator, request, public):
         "428": "If-Match header is required for this mutation.",
         "415": "Unsupported request content type.",
         "413": "Upload exceeds configured byte limits.",
+        "429": "Request rate exceeded. Retry after the indicated interval.",
         "503": "Required storage or audit infrastructure is unavailable. Failed mutations are rolled back; no provider or SQL details are exposed.",
     }
     for path, item in result.get("paths", {}).items():
@@ -58,6 +59,13 @@ def add_common_contract(result, generator, request, public):
                 "schema": {"type": "string", "format": "uuid"},
             })
             codes = {"401", "403", "405", "406"}
+            if path.startswith("/api/v1/site-context/contact/"):
+                codes.update({"404", "409", "413", "429"})
+                operation.setdefault("responses", {}).setdefault("202", {}).setdefault("headers", {})["Cache-Control"] = {
+                    "description": "private, no-store", "schema": {"type": "string"},
+                }
+            if path in {"/api/v1/site-context/widgets/", "/api/v1/site-context/identity/logo/"}:
+                codes.update({"400", "404"})
             if method in {"post", "put", "patch"}:
                 codes.update({"400", "415"})
             if (
@@ -82,6 +90,14 @@ def add_common_contract(result, generator, request, public):
             ):
                 codes.update({"409", "428"})
             responses = operation.setdefault("responses", {})
+            if path.endswith("/workflow/") and method=="post":
+                codes.discard("412")
+                codes.update({"409","428"})
+            if path.endswith("/preview/") and "/pages/" in path:
+                for value in responses.values():
+                    headers=value.setdefault("headers",{})
+                    headers["Cache-Control"]={"description":"private, no-store; preview never enters public caches.","schema":{"type":"string"}}
+                    headers["Vary"]={"description":"Authorization, Cookie, Host","schema":{"type":"string"}}
             if (
                 method == "get"
                 and path == "/api/v1/site-context/pages/{page_path}/"
@@ -119,7 +135,7 @@ def add_common_contract(result, generator, request, public):
                     codes.update({"412", "428"})
                 collection = path.rstrip("/").split("/")[-1]
                 if method in {"get", "post", "patch"} and not hierarchy and not (method == "get" and "{" not in path):
-                    success = "201" if method == "post" and collection in {"organizations", "sites", "domains", "modules", "site-templates", "pages", "menus", "items", "posts", "categories", "tags"} else "200"
+                    success = "201" if method == "post" and "201" in responses else "200"
                     responses.setdefault(success, {}).setdefault("headers", {})["ETag"] = {
                         "description": "Strong representation validator. Echo exactly in If-Match for mutations.",
                         "schema": {"type": "string"},
@@ -129,6 +145,16 @@ def add_common_contract(result, generator, request, public):
                             "description": "Created resource URL.", "schema": {"type": "string", "format": "uri-reference"},
                         }
             menu_api = path.startswith("/api/v1/sites/") and "/menus/" in path
+            if path.endswith("/homepage/") and method == "post":
+                codes.difference_update({"412", "428"})
+            if path.endswith("/workflow/") and method=="post":
+                codes.discard("412")
+                if "200" in responses:
+                    headers=responses["200"].setdefault("headers",{})
+                    headers["ETag"]={"description":"Current CMS revision; visual approval/publish/revise must echo the selected preview token.","schema":{"type":"string"}}
+                    headers["Cache-Control"]={"description":"private, no-store","schema":{"type":"string"}}
+            if path.endswith("/visual-draft/") and path.startswith("/api/v1/sites/"):
+                codes.discard("412")
             if menu_api:
                 codes.discard("412")
                 if method in {"post", "patch", "delete"}:
@@ -167,6 +193,20 @@ def add_common_contract(result, generator, request, public):
                         "error": {"code": names[code], "message": messages[code], "details": detail},
                         "request_id": "1ea47c51-f2d7-402b-ad9a-4df619d03055",
                     }
+            if path.endswith("/visual-draft/") and path.startswith("/api/v1/sites/"):
+                # CMS draft writes agree on 409, not the generic site's 412.
+                responses.pop("412", None)
+                for code in ("409", "428"):
+                    if code in responses:
+                        responses[code]["content"] = {"application/json":{"schema":{"$ref":"#/components/schemas/APIError"}}}
+                if "200" in responses:
+                    responses["200"].setdefault("headers", {})["Cache-Control"] = {"description":"Private draft data; private, no-store.","schema":{"type":"string"}}
+                if "400" in responses:
+                    responses["400"].setdefault("content", {}).setdefault("application/json", {})["example"] = {
+                        "error":{"code":"validation_error","message":"The request is invalid.","details":{
+                            "fields":{"metadata.visual_layout.rows[0].columns[0].children[0].props.items[1].asset_id":["Only a ready image owned by this Site may be selected."]},
+                            "nodes":[{"path":"metadata.visual_layout.rows[0].columns[0].children[0].props.items[1].asset_id","node_id":"slider-1","item_id":"slide-2","item_index":1,"messages":["Only a ready image owned by this Site may be selected."]}]}},
+                        "request_id":"1ea47c51-f2d7-402b-ad9a-4df619d03055"}
             if menu_api:
                 for code, reason in (("400", "invalid_tree"), ("409", "version_conflict")):
                     if code in responses:

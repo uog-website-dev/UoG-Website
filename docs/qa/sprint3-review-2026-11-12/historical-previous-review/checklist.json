@@ -1,0 +1,65 @@
+[
+  {
+    "id": "S3-R01",
+    "case": "Seed two Sites and RBAC profiles",
+    "expected": "Informatics and Medicine Sites with site-admin/editor/reviewer/publisher",
+    "actual": "review_world fixture seeds both Sites and STANDARD_ROLES assignments",
+    "status": "PASS",
+    "evidence": "integrated.xml",
+    "defects": ""
+  },
+  {
+    "id": "S3-R02",
+    "case": "Upload \u2192 select \u2192 save \u2192 preview \u2192 review \u2192 publish \u2192 assign homepage \u2192 public root",
+    "expected": "Informatics public homepage serves published visual snapshot and media",
+    "actual": "test_release_path_upload_through_public_homepage_keeps_medicine_independent",
+    "status": "PASS",
+    "evidence": "integrated.xml",
+    "defects": ""
+  },
+  {
+    "id": "S3-R03",
+    "case": "Independent Site unchanged",
+    "expected": "Medicine homepage body and X-Publication-Version unchanged",
+    "actual": "Asserted against warm Medicine root after Informatics release",
+    "status": "PASS",
+    "evidence": "integrated.xml",
+    "defects": ""
+  },
+  {
+    "id": "S3-R04",
+    "case": "Negative: foreign IDs, module disable, draft race, upload/deletion recovery",
+    "expected": "Rejection, recovery, no state leak; published Slider image deletion blocked",
+    "actual": "test_negative_foreign_module_race_and_safe_deletion + media suites",
+    "status": "PASS",
+    "evidence": "integrated.xml",
+    "defects": ""
+  },
+  {
+    "id": "S3-R05",
+    "case": "43-widget contract matrix (Slider, 60/40, Contact Form, Loop Grid, identity, Post)",
+    "expected": "Registry length 43; named fixtures validate; invalid contact/loop rejected",
+    "actual": "test_widget_contract_matrix_covers_review_widgets + layout --check",
+    "status": "PASS",
+    "evidence": "integrated.xml; layout_contract.log",
+    "defects": ""
+  },
+  {
+    "id": "S3-R06",
+    "case": "OpenAPI CI validation",
+    "expected": "spectacular --validate --fail-on-warn; docs tests green",
+    "actual": "openapi.yaml generated; documentation pytest",
+    "status": "PASS",
+    "evidence": "openapi.yaml; openapi-docs.xml",
+    "defects": ""
+  },
+  {
+    "id": "S3-R07",
+    "case": "Prototype walkthrough separated",
+    "expected": "Prototype artifacts not counted as release acceptance",
+    "actual": "prototype-walkthrough/README.md records separation",
+    "status": "PASS",
+    "evidence": "prototype-walkthrough/README.md",
+    "defects": ""
+  }
+]

@@ -301,6 +301,12 @@ export function SiteDetail({ site, permissions = [], error }: SiteDetailProps) {
       ? null
       : pagesModuleId != null &&
         (assignments.data?.results ?? []).some((row) => row.module === pagesModuleId && row.is_enabled && row.is_available !== false);
+  const visualBuilderModuleId = registry.data?.results.find((entry) => entry.code === "VISUAL_BUILDER")?.id ?? null;
+  const builderEnabled =
+    assignments.loading || registry.loading
+      ? null
+      : visualBuilderModuleId != null &&
+        (assignments.data?.results ?? []).some((row) => row.module === visualBuilderModuleId && row.is_enabled && row.is_available !== false);
   const postsModuleId = registry.data?.results.find((entry) => entry.code === "POSTS")?.id ?? null;
   const postsEnabled =
     assignments.loading || registry.loading
@@ -738,6 +744,7 @@ export function SiteDetail({ site, permissions = [], error }: SiteDetailProps) {
         <SitePagesPanel
           siteId={site.id}
           pagesEnabled={pagesEnabled}
+          builderEnabled={builderEnabled}
           permissions={permissions}
           languages={{
             defaultLanguage: site.default_language,

@@ -1,0 +1,25 @@
+{
+  "error": {
+    "code": "validation_error",
+    "message": "The request is invalid.",
+    "details": {
+      "fields": {
+        "metadata.visual_layout.rows[0].columns[1].children[0].props.items[1].asset_id": [
+          "Only a ready image owned by this Site may be selected."
+        ]
+      },
+      "nodes": [
+        {
+          "path": "metadata.visual_layout.rows[0].columns[1].children[0].props.items[1].asset_id",
+          "node_id": "slider-1",
+          "item_id": "slide-2",
+          "item_index": 1,
+          "messages": [
+            "Only a ready image owned by this Site may be selected."
+          ]
+        }
+      ]
+    }
+  },
+  "request_id": "1ea47c51-f2d7-402b-ad9a-4df619d03055"
+}

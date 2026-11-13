@@ -1,0 +1,42 @@
+{
+  "date": "2026-11-12",
+  "probes": [
+    {
+      "target": "http://localhost/",
+      "host": "informatics.uog.local",
+      "expected": "Next.js public app responds",
+      "actual_status": 200,
+      "bytes": 22165,
+      "status": "PASS"
+    },
+    {
+      "target": "http://localhost/api/v1/site-context/",
+      "host": "informatics.uog.local",
+      "expected": "200 when foundation domains are seeded in the running DB",
+      "actual_status": 404,
+      "status": "WAIVED",
+      "note": "Running developer DB may not include foundation hostname rows; Host-scoped site-context coverage is asserted in integrated.xml via review_world domains."
+    },
+    {
+      "target": "http://localhost/api/v1/site-context/",
+      "host": "medicine.uog.local",
+      "expected": "200 when foundation domains are seeded",
+      "actual_status": 404,
+      "status": "WAIVED",
+      "note": "Same as Informatics; Medicine isolation proven in pytest Host clients."
+    }
+  ],
+  "compose_services_healthy": [
+    "backend",
+    "celery-worker",
+    "celery-beat",
+    "minio",
+    "frontend-public",
+    "frontend-admin",
+    "nginx",
+    "postgres",
+    "redis-cache",
+    "redis-broker",
+    "keycloak"
+  ]
+}

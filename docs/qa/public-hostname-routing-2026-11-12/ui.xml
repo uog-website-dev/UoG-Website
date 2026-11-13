@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="14" failures="0" errors="0" time="0.354323339">
+    <testsuite name="src/public-page.test.tsx" timestamp="2026-11-12T14:12:49.197Z" hostname="086c5ea3ae9d" tests="10" failures="0" errors="0" skipped="0" time="0.238762362">
+        <testcase classname="src/public-page.test.tsx" name="pageFromResponse &gt; reads one published page and ignores a disabled module" time="0.001977667">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="paragraphParts &gt; drops script and javascript targets" time="0.002736405">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="PublicPageView &gt; renders the published page and does not mount unsafe markup" time="0.119408434">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="PublicPageView &gt; lets a keyboard user reach a safe link" time="0.032467269">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="PublicPageView &gt; states that a missing or unpublished page is not shown" time="0.012759628">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="Published media derivatives &gt; uses Host-scoped responsive variants and falls back to alt text on failure" time="0.020224082">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="Published media derivatives &gt; does not construct a public URL for a foreign Site reference" time="0.002041217">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="Published media derivatives &gt; resets a failed image when the asset or Site changes" time="0.008924029">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="renders nested Slider and Gallery uses independently for the same asset" time="0.03260962">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="renders historical compact UUID references through the canonical public route" time="0.003569178">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/public-site.test.tsx" timestamp="2026-11-12T14:12:49.210Z" hostname="086c5ea3ae9d" tests="4" failures="0" errors="0" skipped="0" time="0.115560977">
+        <testcase classname="src/public-site.test.tsx" name="siteFromContext &gt; keeps three hostnames distinct and drops a failed context" time="0.003770576">
+        </testcase>
+        <testcase classname="src/public-site.test.tsx" name="public page policy &gt; rejects another Site, a draft, a bad path and a foreign redirect" time="0.001966815">
+        </testcase>
+        <testcase classname="src/public-site.test.tsx" name="public page policy &gt; revalidates on every read within the public cache SLA" time="0.000230213">
+        </testcase>
+        <testcase classname="src/public-site.test.tsx" name="PublicSiteFrame &gt; renders one Site and hides posts when that module is off" time="0.107105538">
+        </testcase>
+    </testsuite>
+</testsuites>

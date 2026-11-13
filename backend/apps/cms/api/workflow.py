@@ -18,10 +18,12 @@ from apps.api.serializers import PostSerializer
 from apps.authorization.access import reject_disabled_module
 from apps.cms.authorization import require_cms_grant
 from apps.sites.api.serializers import StrictFields
+from apps.sites.api.access import PreconditionRequired
 from apps.sites.models import Site
 
 from ..models import (
     ContentRole,
+    ContentEditConflict,
     ContentWorkflowTransition,
     Page,
     SiteContent,
@@ -34,6 +36,8 @@ from .serializers import PageSerializer, SiteContentSerializer
 SITE_PARAMETER = OpenApiParameter(
     "site_pk", int, OpenApiParameter.PATH, description="Owning Site id.",
 )
+VISUAL_WORKFLOW_IF_MATCH=OpenApiParameter("If-Match",str,OpenApiParameter.HEADER,required=False,
+    description="Required for visual Page approve, publish and return-to-draft (revise). Echo the exact ETag from the selected private preview. Stale versions return 409.")
 
 
 class WorkflowStateConflict(APIException):
@@ -61,11 +65,29 @@ class WorkflowActionInput(StrictFields, serializers.Serializer):
         choices=(
             "submit", "approve", "reject", "publish", "unpublish",
             "archive", "restore",
+            "revise",
         ),
     )
     comment = serializers.CharField(
         required=False, allow_blank=True, max_length=5000, default="",
     )
+
+
+def workflow_expected_revision(request, content, action):
+    """Bind visual approval/publication to the private revision the actor read."""
+    visual = "visual_layout" in content.metadata and action in {"approve","publish","revise"}
+    if visual:
+        role={"approve":ContentRole.REVIEWER,"publish":ContentRole.PUBLISHER,"revise":ContentRole.AUTHOR}[action]
+        require_cms_grant(request.user,content.site_id,(role,),request=request)
+    supplied=request.headers.get("If-Match")
+    if visual and not supplied:
+        raise PreconditionRequired()
+    if supplied:
+        from ..services.working_drafts import content_etag
+        if supplied != content_etag(content):
+            raise WorkflowStateConflict({"revision":["Content changed after preview. Reload the current revision."]})
+        return content.revision_number
+    return None
 
 
 class ContentRoleAssignmentsView(APIView):
@@ -157,7 +179,7 @@ class WorkflowHistorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ContentWorkflowTransition
-        fields = ("id", "from_status", "to_status", "actor", "comment", "created_at")
+        fields = ("id", "from_status", "to_status", "actor", "comment", "created_at", "revision", "reviewed_revision")
         read_only_fields = fields
 
 
@@ -222,6 +244,7 @@ class ContentWorkflowActionView(APIView):
     @extend_schema(
         tags=["CMS workflow"],
         parameters=[
+            VISUAL_WORKFLOW_IF_MATCH,
             SITE_PARAMETER,
             OpenApiParameter(
                 "content_id", str, OpenApiParameter.PATH,
@@ -261,13 +284,17 @@ class ContentWorkflowActionView(APIView):
         require_cms_grant(
             request.user, site.pk, ContentRole.values, request=request,
         )
+        expected = workflow_expected_revision(request,content,payload.validated_data["action"])
         try:
             transitioned = transition_content(
                 content.pk,
                 action=payload.validated_data["action"],
                 actor=request.user,
                 comment=payload.validated_data.get("comment", ""),
+                expected_revision=expected,
             )
+        except ContentEditConflict as error:
+            raise WorkflowStateConflict({"revision":["Content changed after preview. Reload the revision."]}) from error
         except DomainValidationError as error:
             detail = (
                 error.message_dict if hasattr(error, "message_dict")
@@ -279,8 +306,11 @@ class ContentWorkflowActionView(APIView):
 
         page = Page.objects.filter(pk=transitioned.pk).first()
         if page is not None:
-            return Response(PageSerializer(page).data)
+            from ..services.working_drafts import content_etag
+            return Response(PageSerializer(page,context={"request":request}).data,headers={"ETag":content_etag(page),"Cache-Control":"private, no-store"})
         post = Post.objects.filter(pk=transitioned.pk).first()
         if post is not None:
-            return Response(PostSerializer(post, context={"request": request}).data)
-        return Response(SiteContentSerializer(transitioned).data)
+            from ..services.working_drafts import content_etag
+            return Response(PostSerializer(post, context={"request": request}).data,headers={"ETag":content_etag(post),"Cache-Control":"private, no-store"})
+        from ..services.working_drafts import content_etag
+        return Response(SiteContentSerializer(transitioned).data,headers={"ETag":content_etag(transitioned),"Cache-Control":"private, no-store"})

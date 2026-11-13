@@ -1,0 +1,22 @@
+{
+  "tokens": ["desktop", "tablet", "mobile"],
+  "preview_widths": { "desktop": 1280, "tablet": 768, "mobile": 390 },
+  "ranges": {
+    "mobile": { "max": 767 },
+    "tablet": { "min": 768, "max": 1279 },
+    "desktop": { "min": 1280 }
+  },
+  "stack_default_min_width": 900,
+  "override_tokens": ["tablet", "mobile"],
+  "section_properties": ["stack", "gap"],
+  "widget_properties": ["gap"],
+  "boundaries": [
+    { "width": 390, "breakpoint": "mobile", "applies": ["tablet", "mobile"] },
+    { "width": 767, "breakpoint": "mobile", "applies": ["tablet", "mobile"] },
+    { "width": 768, "breakpoint": "tablet", "applies": ["tablet"] },
+    { "width": 900, "breakpoint": "tablet", "applies": ["tablet"] },
+    { "width": 1279, "breakpoint": "tablet", "applies": ["tablet"] },
+    { "width": 1280, "breakpoint": "desktop", "applies": [] }
+  ],
+  "inheritance": "Desktop style is the base. Present tablet keys apply for tablet and mobile. Present mobile keys then override at mobile. Reset deletes the key."
+}

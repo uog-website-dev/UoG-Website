@@ -1,0 +1,28 @@
+{
+  "story": "Site Editor reusable section templates — save, list, insert with remapped IDs and media revalidation",
+  "date": "2026-11-12",
+  "dependencies": ["P3-BUILDER-001", "P3-BUILDER-002", "P3-FE-BUILDER-002", "P3-FE-BUILDER-003"],
+  "status": "PASS",
+  "implementation": [
+    "backend/apps/cms/section_template_models.py",
+    "backend/apps/cms/services/section_templates.py",
+    "backend/apps/cms/api/section_templates.py",
+    "backend/apps/cms/api/pages.py",
+    "backend/apps/cms/migrations/0018_section_template.py",
+    "frontend/apps/admin-web/src/app/sites/page-actions.ts",
+    "frontend/apps/admin-web/src/sites/visual-builder.tsx",
+    "docs/architecture/section-templates.md"
+  ],
+  "acceptance": {
+    "site_template_inserts_independently": "pass",
+    "foreign_template_no_partial_insert": "pass",
+    "unavailable_media_no_partial_insert": "pass",
+    "double_insert_independent_edits": "pass",
+    "retire_preserves_inserted_content": "pass"
+  },
+  "artifacts": {
+    "report": "report.md",
+    "junit": "junit.xml",
+    "architecture": "../../architecture/section-templates.md"
+  }
+}

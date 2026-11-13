@@ -287,6 +287,14 @@ class SiteContent(models.Model):
         if not isinstance(self.metadata, dict):
             raise ValidationError({"metadata": "Metadata must be a JSON object."})
 
+        if "visual_layout" in self.metadata:
+            if self._meta.label_lower != "cms.page":
+                raise ValidationError({"metadata.visual_layout": "Visual layouts are supported on Pages."})
+            from .layout_contract import validate_layout, validate_layout_media
+            visual = validate_layout(self.metadata["visual_layout"])
+            validate_layout_media(visual, site_id=self.site_id)
+            self.metadata = {**self.metadata, "visual_layout": visual}
+
         if self.site_id:
             enabled = self._enabled_languages()
             if not self.locale:
@@ -978,6 +986,8 @@ class ContentWorkflowTransition(models.Model):
         on_delete=models.SET_NULL, related_name="+",
     )
     comment = models.TextField(blank=True, default="")
+    revision = models.ForeignKey("ContentRevision", null=True, blank=True, on_delete=models.PROTECT, related_name="workflow_events")
+    reviewed_revision = models.ForeignKey("ContentRevision", null=True, blank=True, on_delete=models.PROTECT, related_name="review_events")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -1017,6 +1027,8 @@ class PublishedContentSnapshot(models.Model):
     )
     version = models.PositiveIntegerField()
     payload = models.JSONField()
+    approval = models.ForeignKey(ContentWorkflowTransition, null=True, blank=True, on_delete=models.PROTECT, related_name="publications")
+    approved_revision = models.ForeignKey("ContentRevision", null=True, blank=True, on_delete=models.PROTECT, related_name="approved_publications")
     published_at = models.DateTimeField(default=timezone.now, editable=False)
 
     class Meta:
@@ -1147,3 +1159,5 @@ class SitePublicationVersion(models.Model):
 
 
 from apps.cms.menu_models import Menu, MenuDeliveryVersion, MenuInheritance, MenuItem  # noqa: E402,F401
+from apps.cms.contact_models import ContactSubmission  # noqa: E402,F401
+from apps.cms.section_template_models import SectionTemplate, SectionTemplateStatus  # noqa: E402,F401

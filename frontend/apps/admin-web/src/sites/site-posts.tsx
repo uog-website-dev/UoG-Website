@@ -414,7 +414,7 @@ function SitePostsPanelContent({
   }
 
   function queueWorkflow(row: SitePostRecord, action: WorkflowAction) {
-    if (!enabled) return;
+    if (!enabled || action === "revise") return;
     setWorkflowComment("");
     setWorkflowError("");
     setPendingWorkflow({ post: row, action });

@@ -38,6 +38,11 @@ class Site(models.Model):
         help_text="Template whose defaults were copied at provisioning. Later template edits do not change this Site.",
     )
     is_main = models.BooleanField(default=False, help_text="Main university property; must belong to the UNIVERSITY root.")
+    homepage = models.ForeignKey(
+        "cms.Page", null=True, blank=True, on_delete=models.PROTECT,
+        related_name="homepage_for_sites",
+        help_text="Selected published root Page. Loss of eligibility serves the empty root fallback.",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

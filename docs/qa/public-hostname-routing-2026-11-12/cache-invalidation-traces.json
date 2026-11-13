@@ -1,0 +1,44 @@
+{
+  "date": "2026-11-12",
+  "cache_key_design": "cms:site:{site_id}:locale:{locale}:publication:{version}:{resource}",
+  "site_prefix": "bind_cache_site(site_id) scopes Redis/locmem keys per Site",
+  "vary": "Vary: Host on public homepage/page responses; X-Forwarded-Host ignored",
+  "http_cache": "Cache-Control: public, max-age=0, must-revalidate",
+  "browser_fetch": "publicFetchInit() uses cache: no-store",
+  "routes": {
+    "site_context": "GET /api/v1/site-context/",
+    "homepage": "GET /api/v1/site-context/homepage/",
+    "page": "GET /api/v1/site-context/pages/{path}/"
+  },
+  "invalidation_triggers": [
+    {
+      "event": "homepage assignment",
+      "service": "apps.cms.services.homepage.assign_homepage",
+      "effect": "bump_publication_version(site, locale, path='/') for old/new assignment locales"
+    },
+    {
+      "event": "publish / unpublish",
+      "service": "apps.cms.services.workflow",
+      "effect": "bump_publication_version(site, locale, path=content.path); deletes previous page:{path} entry"
+    }
+  ],
+  "recorded_traces": [
+    {
+      "case": "two-host warm then unpublish Informatics assignment",
+      "test": "test_unpublished_selection_uses_empty_fallback_without_other_site_cache_changes",
+      "informatics_root_after": "404 empty-root fallback; assignment pointer retained",
+      "medicine_root": "body JSON unchanged; X-Publication-Version unchanged"
+    },
+    {
+      "case": "same slug campus with different Slider slide text",
+      "test": "test_same_slug_slider_pages_stay_isolated_after_warm_cache_and_reassignment",
+      "informatics": "slug=campus, slide text 'Informatics slide', then homepage reassigned to Visual welcome",
+      "medicine": "slug=campus slide text 'Medicine slide' retained; root body and X-Publication-Version unchanged"
+    },
+    {
+      "case": "three hosts through publish and module gates",
+      "test": "test_main_and_two_colleges_stay_isolated_through_publish_and_module_gates",
+      "notes": "Informatics vs Medicine independent homepage/page/post/menu; X-Forwarded-Host cannot borrow Medicine onto Informatics"
+    }
+  ]
+}

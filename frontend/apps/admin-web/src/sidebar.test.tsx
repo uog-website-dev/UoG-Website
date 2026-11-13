@@ -141,6 +141,16 @@ describe("DesktopSidebar — platform workspace", () => {
 });
 
 describe("DesktopSidebar — Site workspace", () => {
+  it("shows the Visual Builder menu and keeps it active while editing a Page canvas",async()=>{
+    pathname.mockReturnValue("/sites/2/admin/pages/page-id/builder");
+    respond({platformPermissions:[],site:{id:2,enabledModuleCodes:["PAGES"],permissions:["content.pages.view","content.pages.update"]}});
+    render(<DesktopSidebar/>);
+    const nav=await screen.findByRole("navigation",{name:"Site sections"});
+    const builder=await within(nav).findByRole("link",{name:/Visual Builder/});
+    expect(builder.getAttribute("href")).toBe("/sites/2/admin/builder");
+    expect(builder.getAttribute("aria-current")).toBe("page");
+    expect(within(nav).getByRole("link",{name:/Pages Site pages/}).getAttribute("aria-current")).toBeNull();
+  });
   it("shows the active Site and only its enabled, authorized sections", async () => {
     pathname.mockReturnValue("/sites/2/admin/pages");
     respond({

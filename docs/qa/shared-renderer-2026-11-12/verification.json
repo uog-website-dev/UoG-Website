@@ -1,0 +1,36 @@
+{
+  "story": "P3-FE shared renderer — preview and public Page parity",
+  "date": "2026-11-12",
+  "dependencies": ["P3-BUILDER-001", "P3-BUILDER-003", "P3-MEDIA-005"],
+  "implementation": [
+    "frontend/packages/ui/src/visual-layout.tsx",
+    "frontend/packages/ui/src/public-page.tsx",
+    "frontend/packages/ui/src/visual-layout.test.tsx"
+  ],
+  "suites": {
+    "shared_ui_renderer": {
+      "passed": 72,
+      "failed": 0,
+      "junit": "ui.xml",
+      "breakdown": {
+        "visual-layout.test.tsx": 62,
+        "public-page.test.tsx": 10
+      }
+    }
+  },
+  "acceptance": {
+    "preview_public_structure_parity": "pass",
+    "unsupported_fails_safely": "pass",
+    "slider_tabs_accordion_equivalent": "pass",
+    "public_no_private_urls": "pass",
+    "legacy_retained": "pass"
+  },
+  "attachments": {
+    "renderer_fixture_results": "fixture-results.json",
+    "legacy_unsupported_evidence": "fixture-results.json",
+    "interactive_widget_browser_results": "ui.xml (Slider/Tabs/Accordion cases)"
+  },
+  "waivers": [
+    "Full Keycloak/portal browser E2E unavailable in this checkout; component coverage exercises both surfaces in jsdom."
+  ]
+}

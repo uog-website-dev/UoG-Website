@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="164" failures="0" errors="0" time="30.575685841">
+    <testsuite name="src/confirm-dialog.test.tsx" timestamp="2026-11-12T16:23:05.314Z" hostname="086c5ea3ae9d" tests="7" failures="0" errors="0" skipped="0" time="1.950542935">
+        <testcase classname="src/confirm-dialog.test.tsx" name="ConfirmDialog &gt; exposes the title and description via aria wiring" time="0.846587413">
+        </testcase>
+        <testcase classname="src/confirm-dialog.test.tsx" name="ConfirmDialog &gt; confirms via the confirm button" time="0.481652194">
+        </testcase>
+        <testcase classname="src/confirm-dialog.test.tsx" name="ConfirmDialog &gt; cancels via the cancel button without confirming" time="0.180749946">
+        </testcase>
+        <testcase classname="src/confirm-dialog.test.tsx" name="ConfirmDialog &gt; cancels when Escape is pressed" time="0.112442397">
+        </testcase>
+        <testcase classname="src/confirm-dialog.test.tsx" name="ConfirmDialog &gt; blocks interaction while pending and disables both buttons" time="0.089531475">
+        </testcase>
+        <testcase classname="src/confirm-dialog.test.tsx" name="ConfirmDialog &gt; renders a failure inline without dismissing the dialog" time="0.085019259">
+        </testcase>
+        <testcase classname="src/confirm-dialog.test.tsx" name="ConfirmDialog &gt; renders destructive actions with the error colour" time="0.147950842">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/data-table.test.tsx" timestamp="2026-11-12T16:23:05.349Z" hostname="086c5ea3ae9d" tests="15" failures="0" errors="0" skipped="0" time="2.790595123">
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; renders the caption as the accessible table name" time="0.599353147">
+        </testcase>
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; renders column headers as column-scoped header cells" time="0.120402495">
+        </testcase>
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; renders one row per record" time="0.190770091">
+        </testcase>
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; shows the empty state when there are no rows" time="0.185155231">
+        </testcase>
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; renders a custom empty state when supplied" time="0.0418479">
+        </testcase>
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; shows skeleton rows while loading instead of data" time="0.137392156">
+        </testcase>
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; renders the error state with the correlation id when an error is set" time="0.208141961">
+        </testcase>
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; offers a retry action that fires on click" time="0.440859472">
+        </testcase>
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; labels row actions with the row&apos;s identity" time="0.176841711">
+        </testcase>
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; sortable headers &gt; exposes aria-sort reflecting the active sort" time="0.199553387">
+        </testcase>
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; sortable headers &gt; marks a non-active sortable column as none" time="0.05303516">
+        </testcase>
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; sortable headers &gt; omits aria-sort for non-sortable columns" time="0.06454901">
+        </testcase>
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; sortable headers &gt; toggles asc -&gt; desc when an active column is activated" time="0.127005514">
+        </testcase>
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; sortable headers &gt; starts at asc when a new column is activated" time="0.156414428">
+        </testcase>
+        <testcase classname="src/data-table.test.tsx" name="DataTable &gt; sortable headers &gt; is operable with the keyboard (Enter on the header button)" time="0.071755084">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/filter-controls.test.tsx" timestamp="2026-11-12T16:23:05.362Z" hostname="086c5ea3ae9d" tests="9" failures="0" errors="0" skipped="0" time="3.579448516">
+        <testcase classname="src/filter-controls.test.tsx" name="FilterBar &gt; renders as a labelled search landmark" time="1.182186136">
+        </testcase>
+        <testcase classname="src/filter-controls.test.tsx" name="FilterBar &gt; labels every field so screen readers announce them" time="0.195817737">
+        </testcase>
+        <testcase classname="src/filter-controls.test.tsx" name="FilterBar &gt; submits the filters when Apply is pressed" time="0.360242515">
+        </testcase>
+        <testcase classname="src/filter-controls.test.tsx" name="FilterBar &gt; submits the filters when Enter is pressed in a field" time="0.670352464">
+        </testcase>
+        <testcase classname="src/filter-controls.test.tsx" name="FilterBar &gt; resets the filters when Reset is pressed" time="0.330975207">
+        </testcase>
+        <testcase classname="src/filter-controls.test.tsx" name="FilterBar &gt; shows the active filter count" time="0.025398213">
+        </testcase>
+        <testcase classname="src/filter-controls.test.tsx" name="SelectFilter &gt; renders as a labelled combobox" time="0.162888625">
+        </testcase>
+        <testcase classname="src/filter-controls.test.tsx" name="SelectFilter &gt; offers an explicit All option when includeAll is set" time="0.422033047">
+        </testcase>
+        <testcase classname="src/filter-controls.test.tsx" name="SelectFilter &gt; omits the All option when includeAll is false" time="0.207033955">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/form-fields.test.tsx" timestamp="2026-11-12T16:23:05.369Z" hostname="086c5ea3ae9d" tests="10" failures="0" errors="0" skipped="0" time="1.801476537">
+        <testcase classname="src/form-fields.test.tsx" name="fieldErrorsFrom &gt; flattens per-field messages into a single string per field" time="0.042975444">
+        </testcase>
+        <testcase classname="src/form-fields.test.tsx" name="fieldErrorsFrom &gt; returns an empty map when there are no per-field details" time="0.023771213">
+        </testcase>
+        <testcase classname="src/form-fields.test.tsx" name="fieldErrorsFrom &gt; returns an empty map for null/undefined" time="0.001315028">
+        </testcase>
+        <testcase classname="src/form-fields.test.tsx" name="FormField &gt; binds the label to the input" time="0.36022442">
+        </testcase>
+        <testcase classname="src/form-fields.test.tsx" name="FormField &gt; marks the input invalid and wires aria-describedby when errored" time="0.066930999">
+        </testcase>
+        <testcase classname="src/form-fields.test.tsx" name="FormField &gt; does not mark a valid field invalid" time="0.175942798">
+        </testcase>
+        <testcase classname="src/form-fields.test.tsx" name="FormField &gt; calls onChange with the typed value" time="0.762038321">
+        </testcase>
+        <testcase classname="src/form-fields.test.tsx" name="FormErrorSummary &gt; renders nothing when there are no errors" time="0.013574037">
+        </testcase>
+        <testcase classname="src/form-fields.test.tsx" name="FormErrorSummary &gt; announces itself as an alert and lists every field" time="0.1970553">
+        </testcase>
+        <testcase classname="src/form-fields.test.tsx" name="FormErrorSummary &gt; links each error to its input when ids are supplied" time="0.150186186">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/pagination.test.tsx" timestamp="2026-11-12T16:23:05.379Z" hostname="086c5ea3ae9d" tests="10" failures="0" errors="0" skipped="0" time="1.22255639">
+        <testcase classname="src/pagination.test.tsx" name="paginationSummary &gt; describes a middle range" time="0.004123306">
+        </testcase>
+        <testcase classname="src/pagination.test.tsx" name="paginationSummary &gt; clamps the last page to the total" time="0.000841846">
+        </testcase>
+        <testcase classname="src/pagination.test.tsx" name="paginationSummary &gt; reports an empty result set" time="0.000778286">
+        </testcase>
+        <testcase classname="src/pagination.test.tsx" name="Pagination &gt; is a labelled navigation landmark" time="0.362333113">
+        </testcase>
+        <testcase classname="src/pagination.test.tsx" name="Pagination &gt; announces the current range" time="0.03612414">
+        </testcase>
+        <testcase classname="src/pagination.test.tsx" name="Pagination &gt; disables Previous on the first page" time="0.139706276">
+        </testcase>
+        <testcase classname="src/pagination.test.tsx" name="Pagination &gt; disables Next on the last page" time="0.055287206">
+        </testcase>
+        <testcase classname="src/pagination.test.tsx" name="Pagination &gt; moves to the next page on click" time="0.425727834">
+        </testcase>
+        <testcase classname="src/pagination.test.tsx" name="Pagination &gt; moves to the previous page on click" time="0.16037356">
+        </testcase>
+        <testcase classname="src/pagination.test.tsx" name="Pagination &gt; disables both controls when the parent marks the block disabled" time="0.032807689">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/public-page.test.tsx" timestamp="2026-11-12T16:23:05.389Z" hostname="086c5ea3ae9d" tests="10" failures="0" errors="0" skipped="0" time="1.211116846">
+        <testcase classname="src/public-page.test.tsx" name="pageFromResponse &gt; reads one published page and ignores a disabled module" time="0.022871285">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="paragraphParts &gt; drops script and javascript targets" time="0.008978824">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="PublicPageView &gt; renders the published page and does not mount unsafe markup" time="0.454515401">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="PublicPageView &gt; lets a keyboard user reach a safe link" time="0.143198565">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="PublicPageView &gt; states that a missing or unpublished page is not shown" time="0.062765935">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="Published media derivatives &gt; uses Host-scoped responsive variants and falls back to alt text on failure" time="0.091933234">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="Published media derivatives &gt; does not construct a public URL for a foreign Site reference" time="0.00956455">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="Published media derivatives &gt; resets a failed image when the asset or Site changes" time="0.056129749">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="renders nested Slider and Gallery uses independently for the same asset" time="0.289704947">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="renders historical compact UUID references through the canonical public route" time="0.063501171">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/public-post.test.tsx" timestamp="2026-11-12T16:23:05.405Z" hostname="086c5ea3ae9d" tests="3" failures="0" errors="0" skipped="0" time="0.517783937">
+        <testcase classname="src/public-post.test.tsx" name="postsFromResponse &gt; keeps published posts and drops drafts, foreign markup slugs and a disabled module" time="0.006224595">
+        </testcase>
+        <testcase classname="src/public-post.test.tsx" name="PublicPostFeed and PublicPostDetail &gt; renders a stacked feed link and a detail body without script or javascript targets" time="0.485326548">
+        </testcase>
+        <testcase classname="src/public-post.test.tsx" name="PublicPostFeed and PublicPostDetail &gt; shows nothing for a missing feed or detail" time="0.02230011">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/public-site.test.tsx" timestamp="2026-11-12T16:23:05.409Z" hostname="086c5ea3ae9d" tests="4" failures="0" errors="0" skipped="0" time="0.332250114">
+        <testcase classname="src/public-site.test.tsx" name="siteFromContext &gt; keeps three hostnames distinct and drops a failed context" time="0.008753199">
+        </testcase>
+        <testcase classname="src/public-site.test.tsx" name="public page policy &gt; rejects another Site, a draft, a bad path and a foreign redirect" time="0.004469104">
+        </testcase>
+        <testcase classname="src/public-site.test.tsx" name="public page policy &gt; revalidates on every read within the public cache SLA" time="0.001907195">
+        </testcase>
+        <testcase classname="src/public-site.test.tsx" name="PublicSiteFrame &gt; renders one Site and hides posts when that module is off" time="0.307403756">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/site-navigation.test.tsx" timestamp="2026-11-12T16:23:05.413Z" hostname="086c5ea3ae9d" tests="7" failures="0" errors="0" skipped="0" time="2.286923133">
+        <testcase classname="src/site-navigation.test.tsx" name="safeMenuHref &gt; keeps same-site paths and http(s) URLs" time="0.006225097">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="safeMenuHref &gt; rejects scriptable, protocol-relative and credentialed targets" time="0.005852536">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="menusFromResponse &gt; reads only the resolved Site header and footer" time="0.004090329">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="menusFromResponse &gt; treats a disabled module as an empty menu" time="0.00521454">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="PublicMenuFrame &gt; shows this Site&apos;s header and footer and does not link unsafe URLs" time="0.781066275">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="PublicMenuFrame &gt; opens the mobile header from the keyboard and closes it with Escape" time="1.027502713">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="PublicMenuFrame &gt; closes the mobile header from its close button" time="0.452500614">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sprint3-runtime-evidence.test.tsx" timestamp="2026-11-12T16:23:05.419Z" hostname="086c5ea3ae9d" tests="1" failures="0" errors="0" skipped="0" time="0.394071503">
+        <testcase classname="src/sprint3-runtime-evidence.test.tsx" name="Sprint 3 renderer capability evidence &gt; records actual output for every catalog fixture without substituting providers" time="0.389113483">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/theme.test.ts" timestamp="2026-11-12T16:23:05.420Z" hostname="086c5ea3ae9d" tests="3" failures="0" errors="0" skipped="0" time="0.014582719">
+        <testcase classname="src/theme.test.ts" name="uogTheme &gt; uses the UoG navy as the primary brand colour" time="0.006414294">
+        </testcase>
+        <testcase classname="src/theme.test.ts" name="uogTheme &gt; uses the UoG gold as the secondary accent" time="0.001268193">
+        </testcase>
+        <testcase classname="src/theme.test.ts" name="uogTheme &gt; renders on a light background" time="0.001071977">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/toast.test.tsx" timestamp="2026-11-12T16:23:05.423Z" hostname="086c5ea3ae9d" tests="5" failures="0" errors="0" skipped="0" time="1.652644457">
+        <testcase classname="src/toast.test.tsx" name="useToast &gt; throws when used outside a provider" time="0.113944521">
+        </testcase>
+        <testcase classname="src/toast.test.tsx" name="useToast &gt; shows a success toast that can be dismissed" time="1.151680322">
+        </testcase>
+        <testcase classname="src/toast.test.tsx" name="useToast &gt; shows an error toast" time="0.120791768">
+        </testcase>
+        <testcase classname="src/toast.test.tsx" name="useToast &gt; replaces the current toast when a new one is shown" time="0.153319876">
+        </testcase>
+        <testcase classname="src/toast.test.tsx" name="useToast &gt; auto-dismisses after the configured duration" time="0.106342787">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/useAsync.test.tsx" timestamp="2026-11-12T16:23:05.427Z" hostname="086c5ea3ae9d" tests="11" failures="0" errors="0" skipped="0" time="1.030285991">
+        <testcase classname="src/useAsync.test.tsx" name="useAsync &gt; shares a StrictMode mount read but still performs fresh reloads" time="0.59123283">
+        </testcase>
+        <testcase classname="src/useAsync.test.tsx" name="useAsync &gt; does not share responses between separate component instances" time="0.066931251">
+        </testcase>
+        <testcase classname="src/useAsync.test.tsx" name="useAsync &gt; starts a fresh read when scope changes and ignores the old response" time="0.027092439">
+        </testcase>
+        <testcase classname="src/useAsync.test.tsx" name="useAsync &gt; transitions loading -&gt; success and exposes the data" time="0.023341169">
+        </testcase>
+        <testcase classname="src/useAsync.test.tsx" name="useAsync &gt; transitions to error and surfaces the structured message" time="0.053839816">
+        </testcase>
+        <testcase classname="src/useAsync.test.tsx" name="useAsync &gt; normalises a non-ApiError rejection into the shared error shape" time="0.025022809">
+        </testcase>
+        <testcase classname="src/useAsync.test.tsx" name="useAsync &gt; reports empty only when the success payload matches isEmpty" time="0.021769235">
+        </testcase>
+        <testcase classname="src/useAsync.test.tsx" name="useAsync &gt; does not report empty when the payload has items" time="0.013003288">
+        </testcase>
+        <testcase classname="src/useAsync.test.tsx" name="useAsync &gt; defaults empty to false when no isEmpty predicate is given" time="0.025754516">
+        </testcase>
+        <testcase classname="src/useAsync.test.tsx" name="useAsync &gt; re-runs the fetcher when reload is triggered" time="0.087211218">
+        </testcase>
+        <testcase classname="src/useAsync.test.tsx" name="useAsync &gt; clears a previous error when a reload succeeds" time="0.082429076">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/visual-layout.test.tsx" timestamp="2026-11-12T16:23:05.435Z" hostname="086c5ea3ae9d" tests="62" failures="0" errors="0" skipped="0" time="5.382616625">
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; three-column-slider" time="0.03546999">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; unknown-widget" time="0.00190508">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; duplicate-id" time="0.001143746">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; nested-section" time="0.002103266">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; excessive-items" time="0.002524996">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; unsupported-version" time="0.000841881">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; ratio-column-mismatch" time="0.00215563">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; unsafe-link" time="0.001961828">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; unsafe-style" time="0.002152574">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-hero_image" time="0.002850256">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-image_slider" time="0.001164888">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-image_grid" time="0.000905676">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-layout_slider" time="0.00085338">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-simple_masonry" time="0.000819761">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-anything_carousel" time="0.000515217">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-lottie_player" time="0.000478902">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-video_player" time="0.000529905">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-image" time="0.000460556">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-button" time="0.000713582">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-button_grid" time="0.000460664">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-contact_form" time="0.000451203">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-tabs" time="0.020977581">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-accordion" time="0.000879423">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-call_to_action" time="0.001141067">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-headline" time="0.002296889">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-editor" time="0.000569482">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-blog" time="0.001106107">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-recent_posts" time="0.00104262">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-post_carousel" time="0.024616036">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-testimonials" time="0.000640177">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-author_box" time="0.000430002">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-features" time="0.000390029">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-taxonomy" time="0.000479289">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-icon" time="0.000489483">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-price_table" time="0.000454991">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-google_maps" time="0.000363487">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-social_media_buttons" time="0.000388694">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-site_logo" time="0.000454226">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-site_title" time="0.000341225">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-page_title" time="0.000325027">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-menu" time="0.00408893">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-breadcrumbs" time="0.001404931">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-loop_grid" time="0.000439756">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-loop_carousel" time="0.00048915">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-taxonomy_filter" time="0.000354955">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-post_title" time="0.000509456">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-post_excerpt" time="0.000372053">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-featured_image" time="0.002627797">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-alert" time="0.0009439">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-table_of_contents" time="0.00052463">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-menu_anchor" time="0.000522341">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-countdown" time="0.001131743">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; exports exactly the product&apos;s 43 typed widgets" time="0.000452315">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; renders three ordered columns and the scoped Slider without mutating IDs" time="0.518851768">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; keeps the existing renderer for legacy Pages and fails closed for unknown visual versions" time="0.17251781">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; imports legacy flat blocks deterministically without editing the source" time="0.008019434">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; rejects duplicate item identity, over-node limits and oversized payloads" time="0.050131806">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="imports a full 100-block legacy document within the new contract bounds" time="0.004156533">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="isolates private revision image URLs from public rendering and retries a changed preview" time="0.368061269">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared renderer preview/public parity &gt; produces the same content structure for approved fixtures on both surfaces" time="3.410669251">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared renderer preview/public parity &gt; keeps Slider, Tabs and Accordion behavior equivalent across surfaces" time="0.628205709">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared renderer preview/public parity &gt; fails closed for malformed nodes without breaking sibling content or leaking private URLs" time="0.081543393">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/widget-runtime.test.tsx" timestamp="2026-11-12T16:23:05.478Z" hostname="086c5ea3ae9d" tests="7" failures="0" errors="0" skipped="0" time="6.408791015">
+        <testcase classname="src/widget-runtime.test.tsx" name="Configured widget runtime &gt; loads Site title and logo once with same-Site identity data" time="0.551698171">
+        </testcase>
+        <testcase classname="src/widget-runtime.test.tsx" name="Configured widget runtime &gt; ignores stale identity responses when the active Site changes" time="0.091243185">
+        </testcase>
+        <testcase classname="src/widget-runtime.test.tsx" name="Configured widget runtime &gt; filters the published Loop Grid using the active taxonomy selection" time="0.378881185">
+        </testcase>
+        <testcase classname="src/widget-runtime.test.tsx" name="Configured widget runtime &gt; switches Post fields and hides a foreign Post" time="0.073988737">
+        </testcase>
+        <testcase classname="src/widget-runtime.test.tsx" name="Configured widget runtime &gt; loads private Post preview choices through the scoped proxy" time="0.472424597">
+        </testcase>
+        <testcase classname="src/widget-runtime.test.tsx" name="Configured widget runtime &gt; validates contact fields and correlates an unchanged retry" time="4.674274086">
+        </testcase>
+        <testcase classname="src/widget-runtime.test.tsx" name="Configured widget runtime &gt; disables contact submission in private preview" time="0.158264735">
+        </testcase>
+    </testsuite>
+</testsuites>

@@ -1,0 +1,28 @@
+{
+  "legacy_no_overrides": {
+    "fixture": "three-column-slider",
+    "expectation": "Absent responsive fields keep gap=md and stack below 900px in preview and public"
+  },
+  "mobile_spacing_override": {
+    "fixture": "responsive-spacing-stack",
+    "section": {
+      "base_gap": "md",
+      "mobile_gap": "lg",
+      "tablet_stack": true
+    },
+    "widget_heading": {
+      "base_gap": "sm",
+      "mobile_gap": "none"
+    },
+    "checks": [
+      { "width": 390, "section_gap": "lg", "heading_gap": "none", "stack": true },
+      { "width": 768, "section_gap": "md", "heading_gap": "sm", "stack": true },
+      { "width": 1280, "section_gap": "md", "heading_gap": "sm", "stack": false }
+    ]
+  },
+  "rejected": [
+    "unknown-breakpoint",
+    "unknown-responsive-property",
+    "widget-stack-forbidden"
+  ]
+}

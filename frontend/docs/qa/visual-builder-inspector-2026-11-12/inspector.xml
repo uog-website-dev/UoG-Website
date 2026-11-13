@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="12" failures="0" errors="0" time="1.45283122">
+    <testsuite name="src/sites/visual-builder-composition.test.ts" timestamp="2026-11-12T13:36:20.811Z" hostname="086c5ea3ae9d" tests="5" failures="0" errors="0" skipped="0" time="0.042735209">
+        <testcase classname="src/sites/visual-builder-composition.test.ts" name="Visual Builder composition &gt; produces the same ordered IDs for pointer-equivalent and keyboard row moves" time="0.018470673">
+        </testcase>
+        <testcase classname="src/sites/visual-builder-composition.test.ts" name="Visual Builder composition &gt; moves a slider across columns with keyboard or pointer and keeps stable widget IDs" time="0.004923664">
+        </testcase>
+        <testcase classname="src/sites/visual-builder-composition.test.ts" name="Visual Builder composition &gt; keeps the original structure on an invalid drop and restores logical focus after delete" time="0.003501855">
+        </testcase>
+        <testcase classname="src/sites/visual-builder-composition.test.ts" name="Visual Builder composition &gt; duplicates a section with fresh descendant IDs and blocks shrinking occupied trailing columns" time="0.005827145">
+        </testcase>
+        <testcase classname="src/sites/visual-builder-composition.test.ts" name="Visual Builder composition &gt; shifts siblings with keyboard controls without changing other columns" time="0.001967215">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/visual-builder-inspector.test.tsx" timestamp="2026-11-12T13:36:20.831Z" hostname="086c5ea3ae9d" tests="4" failures="0" errors="0" skipped="0" time="1.368607884">
+        <testcase classname="src/sites/visual-builder-inspector.test.tsx" name="Visual Builder inspector &gt; edits text, binds media by asset ID, and keeps fields on the same node after reorder" time="0.503611386">
+        </testcase>
+        <testcase classname="src/sites/visual-builder-inspector.test.tsx" name="Visual Builder inspector &gt; maps unsafe Button destinations to an actionable field error and keeps draft input" time="0.134849722">
+        </testcase>
+        <testcase classname="src/sites/visual-builder-inspector.test.tsx" name="Visual Builder inspector &gt; supports slider item add/reorder while preserving item IDs and attached media fields" time="0.419655873">
+        </testcase>
+        <testcase classname="src/sites/visual-builder-inspector.test.tsx" name="Visual Builder inspector &gt; blocks save when a Button href is unsafe after slider media edits" time="0.306681369">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/visual-builder-model.test.ts" timestamp="2026-11-12T13:36:20.841Z" hostname="086c5ea3ae9d" tests="3" failures="0" errors="0" skipped="0" time="0.041488127">
+        <testcase classname="src/sites/visual-builder-model.test.ts" name="Visual Builder contract helpers &gt; covers each of the 43 approved widget types once and produces valid initial properties" time="0.030256829">
+        </testcase>
+        <testcase classname="src/sites/visual-builder-model.test.ts" name="Visual Builder contract helpers &gt; provides a valid 60/40 demonstration with selectable nested slider content" time="0.002505041">
+        </testcase>
+        <testcase classname="src/sites/visual-builder-model.test.ts" name="Visual Builder contract helpers &gt; rejects stale/illegal insertion contexts and enforces the shared node limit" time="0.004413411">
+        </testcase>
+    </testsuite>
+</testsuites>

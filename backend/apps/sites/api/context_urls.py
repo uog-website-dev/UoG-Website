@@ -12,9 +12,13 @@ from apps.cms.api.public import (
 
 from .context import SiteContextView
 from apps.media.delivery import PublicMediaImage
+from apps.cms.api.widget_runtime import PublicWidgetData, PublicSiteLogo, PublicContact
 
 app_name = "site_context"
 urlpatterns = [
+    path("widgets/", PublicWidgetData.as_view(), name="public-widget-data"),
+    path("identity/logo/", PublicSiteLogo.as_view(), name="public-site-logo"),
+    path("contact/<uuid:page_id>/<str:form_code>/", PublicContact.as_view(), name="public-contact"),
     path("media/<uuid:asset_id>/", PublicMediaImage.as_view(), name="public-media-image"),
     path("", SiteContextView.as_view(), name="site-context"),
     path("menus/", PublicMenusView.as_view(), name="public-menus"),

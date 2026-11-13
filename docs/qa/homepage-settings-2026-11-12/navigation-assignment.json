@@ -1,0 +1,36 @@
+{
+  "date": "2026-11-12",
+  "site_administration_navigation": {
+    "section": "Homepage Settings",
+    "route": "/sites/{siteId}/admin/homepage",
+    "gate": "PAGES enabled + sites.update",
+    "connected_surfaces": [
+      "Dashboard quick action → Homepage Settings",
+      "Pages header → Homepage Settings",
+      "Homepage Settings → Dashboard / Pages / Public Preview / Page editor (builder)",
+      "Pages row → Set homepage (existing) + success toast"
+    ]
+  },
+  "assignment_recording": {
+    "informatics": {
+      "site_id": 11,
+      "code": "CI",
+      "domain": "informatics.example.test",
+      "assigned_page_id": "page-1",
+      "title": "Campus Home / Informatics Home"
+    },
+    "medicine": {
+      "site_id": 22,
+      "code": "CM",
+      "domain": "medicine.example.test",
+      "assigned_page_id": "page-m",
+      "title": "Medicine Home"
+    },
+    "independence": "Switching Sites remounts Homepage Settings; Informatics and Medicine assignments do not share selection state."
+  },
+  "stale_eligibility": {
+    "reject_message": "Select an eligible published Page on this Site.",
+    "selection_preserved": true,
+    "fallback_when_unpublished": "Current assignment retained with warning; public root may serve empty fallback"
+  }
+}

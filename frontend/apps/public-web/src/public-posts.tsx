@@ -52,7 +52,8 @@ export function PublicPostsPage() {
           publicFetchInit(),
         );
         const body = response.ok ? await response.json().catch(() => null) : null;
-        return postsFromResponse(response.status, body);
+        const posts=postsFromResponse(response.status, body);
+        return posts?.filter(post=>post.site===undefined || post.site===site.id)??null;
       })
       .catch(() => null)
       .then((next) => {
@@ -98,6 +99,10 @@ export function PublicPostsPage() {
 }
 
 export function PublicPostPage({ slug }: { slug: string }) {
+  return <ScopedPublicPost key={slug} slug={slug} />;
+}
+
+function ScopedPublicPost({ slug }: { slug: string }) {
   const [post, setPost] = useState<PublicPostDocument | null>(null);
   const [ready, setReady] = useState(false);
 
@@ -117,7 +122,8 @@ export function PublicPostPage({ slug }: { slug: string }) {
         if (!site.modules.posts) return null;
         const response = await fetch(`/api/v1/site-context/posts/${slug}/`, publicFetchInit());
         const body = response.ok ? await response.json().catch(() => null) : null;
-        return postFromResponse(response.status, body);
+        const post=postFromResponse(response.status, body);
+        return post && (post.site===undefined || post.site===site.id)?post:null;
       })
       .catch(() => null)
       .then((next) => {

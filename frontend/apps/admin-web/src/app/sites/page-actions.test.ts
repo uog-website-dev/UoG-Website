@@ -11,7 +11,8 @@ const { api } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock("@uog/api-client", () => ({
+vi.mock("@uog/api-client", async (importOriginal) => ({
+  ...await importOriginal<typeof import("@uog/api-client")>(),
   createApiClient: vi.fn(() => api),
 }));
 
@@ -25,7 +26,14 @@ import {
   loadSitePages,
   loadSitePageStatusCounts,
   updateSitePage,
+  getSiteVisualDraft,
+  saveSiteVisualDraft,
+  getSitePagePreview,
+  transitionSitePage,
 } from "./page-actions";
+import { ApiError } from "@uog/api-client";
+import { validateVisualLayout } from "@uog/types";
+import layoutFixtures from "../../../../../packages/types/src/layout/fixtures.json";
 
 const record = {
   id: "page-1",
@@ -152,5 +160,48 @@ describe("Site Page API actions", () => {
       seo: {},
       blocks: [{ type: "paragraph", html: "<p>Applications</p>" }],
     });
+  });
+
+  it("reloads a visual draft through its scoped endpoint and preserves the returned ETag",async()=>{
+    api.getDetailed.mockResolvedValue({data:{...record,metadata:{visual_layout:layoutFixtures[0]!.layout}},etag:'"cms-content-page-1-r4"'});
+    const result=await getSiteVisualDraft(11,"page-1");
+    expect(api.getDetailed).toHaveBeenCalledWith("/v1/sites/11/pages/page-1/visual-draft/");
+    expect(result).toMatchObject({ok:true,data:{etag:'"cms-content-page-1-r4"',metadata:{visual_layout:layoutFixtures[0]!.layout}}});
+  });
+
+  it("submits complete trees from two editors without retrying the stale Slider",async()=>{
+    const parsed=validateVisualLayout(layoutFixtures[0]!.layout);
+    if(!parsed.ok)throw new Error("Invalid shared fixture");
+    const first=structuredClone(parsed.value),second=structuredClone(parsed.value);
+    const a=first.rows[0]!.columns[1]!.children[0]!,b=second.rows[0]!.columns[1]!.children[0]!;
+    if(a.type!=="image_slider" || b.type!=="image_slider")throw new Error("Missing slider");
+    a.props.items[0]!.alt="Editor A alt";b.props.items[0]!.caption="Editor B caption";
+    api.patchDetailed.mockResolvedValueOnce({data:{...record,metadata:{visual_layout:first}},etag:'"cms-content-page-1-r5"'})
+      .mockRejectedValueOnce(new ApiError("Content changed",409,{code:"conflict"}));
+    const saved=await saveSiteVisualDraft(11,"page-1",'"cms-content-page-1-r4"',first);
+    const stale=await saveSiteVisualDraft(11,"page-1",'"cms-content-page-1-r4"',second);
+    expect(saved).toMatchObject({ok:true,data:{etag:'"cms-content-page-1-r5"',metadata:{visual_layout:first}}});
+    expect(stale).toMatchObject({ok:false,error:{status:409,code:"conflict"}});
+    expect(api.patchDetailed).toHaveBeenNthCalledWith(2,"/v1/sites/11/pages/page-1/visual-draft/",{visual_layout:second},{ifMatch:'"cms-content-page-1-r4"'});
+    expect(api.patchDetailed).toHaveBeenCalledTimes(2);
+    expect(api.getDetailed).not.toHaveBeenCalled();
+    expect(b.props.items[0]!.caption).toBe("Editor B caption");
+  });
+
+  it("preserves node and numeric item-position error bindings",async()=>{
+    const details={fields:{"metadata.visual_layout.rows[0]": ["Invalid reference"]},nodes:[{path:"metadata.visual_layout.rows[0]",node_id:"slider-1",item_id:"slide-2",item_index:1,messages:["Invalid reference"]}]};
+    api.patchDetailed.mockRejectedValue(new ApiError("Invalid layout",400,{code:"validation_error",details}));
+    const result=await saveSiteVisualDraft(11,"page-1",'"r1"',{schema_version:1,rows:[]});
+    expect(result).toMatchObject({ok:false,error:{status:400,details}});
+  });
+
+  it("loads an immutable revision preview and uses its ETag for approval",async()=>{
+    api.getDetailed.mockResolvedValue({data:{revision_id:80,revision_number:8,page:{site:11,title:"Reviewed",metadata:{}}},etag:'"cms-content-page-1-r8"'});
+    const result=await getSitePagePreview(11,"page-1",8);
+    expect(api.getDetailed).toHaveBeenCalledWith("/v1/sites/11/pages/page-1/preview/?revision=8");
+    expect(result).toMatchObject({ok:true,data:{revision_id:80,etag:'"cms-content-page-1-r8"'}});
+    api.postDetailed.mockResolvedValue({data:record,etag:'"cms-content-page-1-r9"'});
+    await transitionSitePage(11,"page-1","approve","Reviewed exact tree",'"cms-content-page-1-r8"');
+    expect(api.postDetailed).toHaveBeenCalledWith("/v1/sites/11/pages/page-1/workflow/",{action:"approve",comment:"Reviewed exact tree"},{headers:{"If-Match":'"cms-content-page-1-r8"'}});
   });
 });

@@ -1,0 +1,40 @@
+{
+  "story": "P3-FE-BUILDER homepage settings — assign Site root from Site Administration",
+  "date": "2026-11-12",
+  "dependencies": ["P3-BUILDER-004", "P3-FE-BUILDER-004"],
+  "implementation": [
+    "frontend/apps/admin-web/src/sites/site-homepage.tsx",
+    "frontend/apps/admin-web/src/sites/site-admin.ts",
+    "frontend/apps/admin-web/src/app/sites/[id]/admin/homepage/page.tsx",
+    "frontend/apps/admin-web/src/sites/site-dashboard.tsx",
+    "frontend/apps/admin-web/src/sites/site-pages.tsx",
+    "frontend/packages/types/src/index.ts"
+  ],
+  "suites": {
+    "admin_homepage_settings": {
+      "passed": 39,
+      "failed": 0,
+      "junit": "admin.xml",
+      "breakdown": {
+        "site-homepage.test.tsx": 4,
+        "site-admin.test.ts": 12,
+        "site-pages.test.tsx": 23
+      }
+    }
+  },
+  "acceptance": {
+    "eligible_same_site_only": "pass",
+    "assignment_survives_reload_site_switch": "pass",
+    "stale_eligibility_keeps_selection": "pass",
+    "pages_to_homepage_settings_flow": "pass",
+    "fallback_when_eligibility_lost": "pass"
+  },
+  "attachments": {
+    "settings_editor_route_checks": "admin.xml + /sites/{id}/admin/homepage + builder link",
+    "stale_eligibility_evidence": "navigation-assignment.json",
+    "navigation_assignment_recording": "navigation-assignment.json"
+  },
+  "waivers": [
+    "Full Keycloak/Admin/portal browser E2E unavailable in this checkout (same as homepage-2026-11-12 pack)."
+  ]
+}

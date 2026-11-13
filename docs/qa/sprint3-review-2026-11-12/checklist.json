@@ -1,0 +1,6 @@
+{
+  "decision": "NO-GO",
+  "status": "UNSIGNED",
+  "checklist": "release-audit/checklist.json",
+  "signoff_template": "release-audit/signoff.json"
+}

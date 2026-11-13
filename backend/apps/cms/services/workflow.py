@@ -14,6 +14,8 @@ from apps.audit.writer import record_event
 from ..authorization import cms_grant_allows
 from ..models import (
     ContentRole,
+    ContentEditConflict,
+    ContentRevision,
     ContentStatus,
     ContentWorkflowTransition,
     Page,
@@ -42,10 +44,11 @@ _ACTIONS = {
     "restore": (
         ContentStatus.UNPUBLISHED, ContentStatus.DRAFT, ContentRole.AUTHOR,
     ),
+    "revise": (ContentStatus.APPROVED,ContentStatus.DRAFT,ContentRole.AUTHOR),
 }
 
 def transition_content(
-    content_id, *, action, actor, roles=(), comment="", using=None,
+    content_id, *, action, actor, roles=(), comment="", using=None, expected_revision=None,
 ):
     """Apply one authorized workflow action and return the locked content.
 
@@ -66,6 +69,10 @@ def transition_content(
         raise ValidationError({"comment": "A reviewer comment is required for rejection."})
 
     using = using or router.db_for_write(SiteContent)
+    probe_revision = None
+    if action == "publish":
+        from .visual_publication import probe_publication
+        probe_revision = probe_publication(content_id, actor=actor, using=using)
     with hierarchy_write(using=using):
         base = (
             SiteContent.objects.using(using)
@@ -73,6 +80,9 @@ def transition_content(
             .get(pk=content_id)
         )
         content = _content_instance(base, using=using)
+        if ((expected_revision is not None and content.revision_number != expected_revision)
+                or (probe_revision is not None and content.revision_number != probe_revision)):
+            raise ContentEditConflict("Content changed after preview or review. Reload the revision.")
         required_role = _ACTIONS[action][2]
         _authorize(
             actor, site_id=content.site_id, role=required_role,
@@ -94,6 +104,14 @@ def transition_content(
             raise PermissionDenied(
                 "The author and submitter cannot review their own content."
             )
+        if action=="revise" and (not isinstance(content,Page) or "visual_layout" not in content.metadata):
+            raise ValidationError({"status":"Return to draft is available for approved visual Pages."})
+
+        from .visual_publication import approval_for, validate_publication
+        approval = approval_for(content, using=using) if action == "publish" else None
+        if action == "publish":
+            validate_publication(content, using=using)
+        reviewed_revision = ContentRevision.objects.using(using).filter(content_id=content.pk, revision_number=content.revision_number).first() if action == "approve" else None
 
         publish_working_draft = (
             action == "publish"
@@ -110,6 +128,10 @@ def transition_content(
             elif action in {"approve", "reject"}:
                 content.reviewed_by = actor
                 content.review_comment = comment
+            elif action == "revise":
+                content.submitted_by=None
+                content.reviewed_by=None
+                content.review_comment=""
 
         audit_context_before = current_audit_context()
         with audit_context(
@@ -122,7 +144,7 @@ def transition_content(
                 with _workflow_database_write(using=using), workflow_write():
                     if publish_working_draft:
                         return _publish_working_draft(
-                            content, actor=actor, comment=comment, using=using,
+                            content, actor=actor, comment=comment, using=using, approval=approval,
                         )
                     content.save(using=using)
                     ContentWorkflowTransition.objects.using(using).create(
@@ -131,9 +153,11 @@ def transition_content(
                         to_status=target,
                         actor=actor,
                         comment=comment,
+                        revision=ContentRevision.objects.using(using).get(content_id=content.pk, revision_number=content.revision_number),
+                        reviewed_revision=reviewed_revision,
                     )
                     if action == "publish":
-                        _create_publication_snapshot(content, using=using)
+                        _create_publication_snapshot(content, using=using, approval=approval)
                     if isinstance(content, Page) and (
                         action in {"publish", "unpublish"}
                         or (action == "archive" and source == ContentStatus.PUBLISHED)
@@ -170,11 +194,9 @@ def _workflow_database_write(*, using):
     try:
         yield
     finally:
-        with connections[using].cursor() as cursor:
-            cursor.execute(
-                "SELECT set_config('cms.workflow_transition', %s, true)",
-                [previous],
-            )
+        if not connections[using].needs_rollback:
+            with connections[using].cursor() as cursor:
+                cursor.execute("SELECT set_config('cms.workflow_transition', %s, true)",[previous])
 
 
 @contextmanager
@@ -188,14 +210,12 @@ def _apply_working_draft_database(*, using):
     try:
         yield
     finally:
-        with connections[using].cursor() as cursor:
-            cursor.execute(
-                "SELECT set_config('cms.apply_working_draft', %s, true)",
-                [previous],
-            )
+        if not connections[using].needs_rollback:
+            with connections[using].cursor() as cursor:
+                cursor.execute("SELECT set_config('cms.apply_working_draft', %s, true)",[previous])
 
 
-def _publish_working_draft(draft, *, actor, comment, using):
+def _publish_working_draft(draft, *, actor, comment, using, approval=None):
     """Copy an approved draft onto its published Page and archive the draft.
 
     The published row stays PUBLISHED. Its route and homepage flag stay.
@@ -233,7 +253,7 @@ def _publish_working_draft(draft, *, actor, comment, using):
     target.updated_at = timezone.now()
     with apply_working_draft(), _apply_working_draft_database(using=using):
         target.save(using=using)
-    _create_publication_snapshot(target, using=using)
+    _create_publication_snapshot(target, using=using, approval=approval)
     bump_publication_version(
         target.site_id, target.locale, path=target.path, using=using,
     )
@@ -259,6 +279,7 @@ def _publish_working_draft(draft, *, actor, comment, using):
         to_status=ContentStatus.ARCHIVED,
         actor=actor,
         comment=comment or f"Published onto page {target.pk}.",
+        revision=ContentRevision.objects.using(using).get(content_id=draft.pk, revision_number=draft.revision_number),
     )
     return draft
 
@@ -303,7 +324,7 @@ def _content_instance(base, *, using):
     return base
 
 
-def _create_publication_snapshot(content, *, using):
+def _create_publication_snapshot(content, *, using, approval=None):
     latest = (
         PublishedContentSnapshot.objects.using(using)
         .filter(content_id=content.pk)
@@ -367,4 +388,6 @@ def _create_publication_snapshot(content, *, using):
         version=(latest or 0) + 1,
         payload=payload,
         published_at=timezone.now(),
+        approval=approval,
+        approved_revision=approval.revision if approval is not None else None,
     )

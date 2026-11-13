@@ -1,0 +1,58 @@
+[
+  {
+    "id": "S3-RUNTIME-001",
+    "severity": "release-blocker",
+    "status": "OPEN",
+    "summary": "Required widgets do not have functional public provider/context rendering",
+    "actual": [
+      "contact_form",
+      "site_logo",
+      "site_title",
+      "loop_grid",
+      "taxonomy_filter",
+      "post_title",
+      "post_excerpt",
+      "featured_image"
+    ],
+    "evidence": "runtime-matrix.json",
+    "blocks_acceptance": true
+  },
+  {
+    "id": "S3-E2E-002",
+    "severity": "release-gate",
+    "status": "NOT_VERIFIED",
+    "summary": "Real browser OAuth, picker/dashboard hydration and provider interactions have no end-to-end evidence",
+    "evidence": "live-services.json records Next shell HTTP only; no waiver granted",
+    "blocks_acceptance": true
+  },
+  {
+    "id": "S3-SIGNOFF-003",
+    "severity": "approval-gate",
+    "status": "PENDING",
+    "summary": "Named reviewer signatures and an actual hosted OpenAPI CI run are not supplied",
+    "evidence": "signoff.json",
+    "blocks_acceptance": true
+  },
+  {
+    "id": "S3-CHECK-004",
+    "severity": "release-blocker",
+    "status": "OPEN",
+    "summary": "One or more recorded commands failed",
+    "evidence": "commands.json",
+    "blocks_acceptance": true
+  },
+  {
+    "id": "S3-SCHEMA-005",
+    "severity": "release-blocker",
+    "status": "OPEN",
+    "summary": "Generated OpenAPI differs from the checked-in baseline or is missing",
+    "blocks_acceptance": true
+  },
+  {
+    "id": "S3-SOURCE-006",
+    "severity": "evidence-integrity",
+    "status": "OPEN",
+    "summary": "Source changed during the run; repeat against one frozen source snapshot",
+    "blocks_acceptance": true
+  }
+]

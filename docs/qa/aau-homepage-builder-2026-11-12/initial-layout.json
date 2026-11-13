@@ -1,0 +1,882 @@
+{
+  "schema_version": 1,
+  "rows": [
+    {
+      "id": "aau-row-3",
+      "type": "section",
+      "ratios": [
+        40,
+        60
+      ],
+      "columns": [
+        {
+          "id": "aau-column-3-0",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-site_title-1",
+              "type": "site_title",
+              "props": {}
+            }
+          ]
+        },
+        {
+          "id": "aau-column-3-1",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-button_grid-2",
+              "type": "button_grid",
+              "props": {
+                "items": [
+                  {
+                    "id": "link-0",
+                    "label": "About",
+                    "href": "/informatics-home-aau-reference#about"
+                  },
+                  {
+                    "id": "link-1",
+                    "label": "Academics",
+                    "href": "/informatics-home-aau-reference#academics"
+                  },
+                  {
+                    "id": "link-2",
+                    "label": "Research",
+                    "href": "/informatics-home-aau-reference#research"
+                  },
+                  {
+                    "id": "link-3",
+                    "label": "Campus life",
+                    "href": "/informatics-home-aau-reference#campus"
+                  },
+                  {
+                    "id": "link-4",
+                    "label": "Contact",
+                    "href": "/informatics-home-aau-reference#contact"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "style": {
+        "gap": "lg",
+        "tone": "default"
+      }
+    },
+    {
+      "id": "aau-row-8",
+      "type": "section",
+      "ratios": [
+        50,
+        50
+      ],
+      "columns": [
+        {
+          "id": "aau-column-8-0",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-image-4",
+              "type": "image",
+              "props": {
+                "asset_id": "9bc6f387-0faa-453b-9858-27689e6599cb",
+                "alt": "AAU research laboratory, used as a private design reference"
+              }
+            }
+          ]
+        },
+        {
+          "id": "aau-column-8-1",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-headline-5",
+              "type": "headline",
+              "props": {
+                "text": "Explore ideas. Build the future.",
+                "level": 2
+              }
+            },
+            {
+              "id": "aau-editor-6",
+              "type": "editor",
+              "props": {
+                "html": "<p>Welcome to the College of Informatics. Discover learning, research and a community connected through technology.</p>"
+              }
+            },
+            {
+              "id": "aau-button_grid-7",
+              "type": "button_grid",
+              "props": {
+                "items": [
+                  {
+                    "id": "link-0",
+                    "label": "Explore our programs",
+                    "href": "/informatics-home-aau-reference#academics"
+                  },
+                  {
+                    "id": "link-1",
+                    "label": "Discover research",
+                    "href": "/informatics-home-aau-reference#research"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "style": {
+        "gap": "lg",
+        "tone": "muted"
+      }
+    },
+    {
+      "id": "aau-row-10",
+      "type": "section",
+      "ratios": [
+        100
+      ],
+      "columns": [
+        {
+          "id": "aau-column-10-0",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-image_slider-9",
+              "type": "image_slider",
+              "props": {
+                "items": [
+                  {
+                    "id": "slide-0",
+                    "asset_id": "9bc6f387-0faa-453b-9858-27689e6599cb",
+                    "alt": "Research laboratory",
+                    "caption": "Research and discovery"
+                  },
+                  {
+                    "id": "slide-1",
+                    "asset_id": "de0f283c-68cf-4c3f-83f2-f9c18ca14a4c",
+                    "alt": "Students on campus",
+                    "caption": "A welcoming learning community"
+                  },
+                  {
+                    "id": "slide-2",
+                    "asset_id": "9d0d13c1-92f2-4ea3-8b73-eaafaff963ec",
+                    "alt": "University campus entrance",
+                    "caption": "Explore campus life"
+                  },
+                  {
+                    "id": "slide-3",
+                    "asset_id": "e465d23b-e6cd-48f8-96ca-0f90994d2b9b",
+                    "alt": "Campus recreation",
+                    "caption": "Community beyond the classroom"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "style": {
+        "gap": "lg",
+        "tone": "default"
+      }
+    },
+    {
+      "id": "aau-row-14",
+      "type": "section",
+      "ratios": [
+        100
+      ],
+      "columns": [
+        {
+          "id": "aau-column-14-0",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-menu_anchor-11",
+              "type": "menu_anchor",
+              "props": {
+                "anchor": "about"
+              }
+            },
+            {
+              "id": "aau-headline-12",
+              "type": "headline",
+              "props": {
+                "text": "Our impact in the community",
+                "level": 2
+              }
+            },
+            {
+              "id": "aau-editor-13",
+              "type": "editor",
+              "props": {
+                "html": "<p>Learning, discovery and collaboration shape the Informatics experience.</p>"
+              }
+            }
+          ]
+        }
+      ],
+      "style": {
+        "gap": "lg",
+        "tone": "default"
+      }
+    },
+    {
+      "id": "aau-row-21",
+      "type": "section",
+      "ratios": [
+        1,
+        1,
+        1
+      ],
+      "columns": [
+        {
+          "id": "aau-column-21-0",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-headline-15",
+              "type": "headline",
+              "props": {
+                "text": "Learn",
+                "level": 2
+              }
+            },
+            {
+              "id": "aau-editor-16",
+              "type": "editor",
+              "props": {
+                "html": "<p>Build practical knowledge through our academic programs.</p>"
+              }
+            }
+          ]
+        },
+        {
+          "id": "aau-column-21-1",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-headline-17",
+              "type": "headline",
+              "props": {
+                "text": "Discover",
+                "level": 2
+              }
+            },
+            {
+              "id": "aau-editor-18",
+              "type": "editor",
+              "props": {
+                "html": "<p>Explore research and new ideas in computing and information systems.</p>"
+              }
+            }
+          ]
+        },
+        {
+          "id": "aau-column-21-2",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-headline-19",
+              "type": "headline",
+              "props": {
+                "text": "Connect",
+                "level": 2
+              }
+            },
+            {
+              "id": "aau-editor-20",
+              "type": "editor",
+              "props": {
+                "html": "<p>Meet our academic community and explore opportunities to collaborate.</p>"
+              }
+            }
+          ]
+        }
+      ],
+      "style": {
+        "gap": "lg",
+        "tone": "muted"
+      }
+    },
+    {
+      "id": "aau-row-24",
+      "type": "section",
+      "ratios": [
+        100
+      ],
+      "columns": [
+        {
+          "id": "aau-column-24-0",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-headline-22",
+              "type": "headline",
+              "props": {
+                "text": "Quick links",
+                "level": 2
+              }
+            },
+            {
+              "id": "aau-button_grid-23",
+              "type": "button_grid",
+              "props": {
+                "items": [
+                  {
+                    "id": "link-0",
+                    "label": "Library",
+                    "href": "https://www.uog.edu.et/"
+                  },
+                  {
+                    "id": "link-1",
+                    "label": "E-learning",
+                    "href": "https://www.uog.edu.et/"
+                  },
+                  {
+                    "id": "link-2",
+                    "label": "Campus life",
+                    "href": "/informatics-home-aau-reference#campus"
+                  },
+                  {
+                    "id": "link-3",
+                    "label": "Our community",
+                    "href": "/informatics-home-aau-reference#about"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "style": {
+        "gap": "lg",
+        "tone": "default"
+      }
+    },
+    {
+      "id": "aau-row-28",
+      "type": "section",
+      "ratios": [
+        100
+      ],
+      "columns": [
+        {
+          "id": "aau-column-28-0",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-menu_anchor-25",
+              "type": "menu_anchor",
+              "props": {
+                "anchor": "campus"
+              }
+            },
+            {
+              "id": "aau-headline-26",
+              "type": "headline",
+              "props": {
+                "text": "Explore life at Informatics",
+                "level": 2
+              }
+            },
+            {
+              "id": "aau-editor-27",
+              "type": "editor",
+              "props": {
+                "html": "<p>Campus life, facilities and a community of learners.</p>"
+              }
+            }
+          ]
+        }
+      ],
+      "style": {
+        "gap": "lg",
+        "tone": "default"
+      }
+    },
+    {
+      "id": "aau-row-35",
+      "type": "section",
+      "ratios": [
+        50,
+        50
+      ],
+      "columns": [
+        {
+          "id": "aau-column-35-0",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-image-29",
+              "type": "image",
+              "props": {
+                "asset_id": "de0f283c-68cf-4c3f-83f2-f9c18ca14a4c",
+                "alt": "AAU student community reference photograph"
+              }
+            },
+            {
+              "id": "aau-headline-30",
+              "type": "headline",
+              "props": {
+                "text": "Student life",
+                "level": 2
+              }
+            },
+            {
+              "id": "aau-editor-31",
+              "type": "editor",
+              "props": {
+                "html": "<p>Discover events, activities and opportunities to connect.</p>"
+              }
+            }
+          ]
+        },
+        {
+          "id": "aau-column-35-1",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-image-32",
+              "type": "image",
+              "props": {
+                "asset_id": "e465d23b-e6cd-48f8-96ca-0f90994d2b9b",
+                "alt": "AAU sports and recreation reference photograph"
+              }
+            },
+            {
+              "id": "aau-headline-33",
+              "type": "headline",
+              "props": {
+                "text": "Beyond the classroom",
+                "level": 2
+              }
+            },
+            {
+              "id": "aau-editor-34",
+              "type": "editor",
+              "props": {
+                "html": "<p>Make room for recreation, shared interests and new experiences.</p>"
+              }
+            }
+          ]
+        }
+      ],
+      "style": {
+        "gap": "lg",
+        "tone": "default"
+      }
+    },
+    {
+      "id": "aau-row-39",
+      "type": "section",
+      "ratios": [
+        100
+      ],
+      "columns": [
+        {
+          "id": "aau-column-39-0",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-menu_anchor-36",
+              "type": "menu_anchor",
+              "props": {
+                "anchor": "academics"
+              }
+            },
+            {
+              "id": "aau-headline-37",
+              "type": "headline",
+              "props": {
+                "text": "Learning and campus facilities",
+                "level": 2
+              }
+            },
+            {
+              "id": "aau-tabs-38",
+              "type": "tabs",
+              "props": {
+                "items": [
+                  {
+                    "id": "programs",
+                    "title": "Programs",
+                    "text": "Explore academic pathways in computing and information systems."
+                  },
+                  {
+                    "id": "facilities",
+                    "title": "Facilities",
+                    "text": "Discover learning spaces and resources for the academic community."
+                  },
+                  {
+                    "id": "student-support",
+                    "title": "Student support",
+                    "text": "Contact the College for guidance on your next step."
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "style": {
+        "gap": "lg",
+        "tone": "muted"
+      }
+    },
+    {
+      "id": "aau-row-44",
+      "type": "section",
+      "ratios": [
+        60,
+        40
+      ],
+      "columns": [
+        {
+          "id": "aau-column-44-0",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-menu_anchor-40",
+              "type": "menu_anchor",
+              "props": {
+                "anchor": "research"
+              }
+            },
+            {
+              "id": "aau-headline-41",
+              "type": "headline",
+              "props": {
+                "text": "Research and discovery",
+                "level": 2
+              }
+            },
+            {
+              "id": "aau-editor-42",
+              "type": "editor",
+              "props": {
+                "html": "<p>Connect ideas, people and practical challenges through research.</p>"
+              }
+            }
+          ]
+        },
+        {
+          "id": "aau-column-44-1",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-image-43",
+              "type": "image",
+              "props": {
+                "asset_id": "9bc6f387-0faa-453b-9858-27689e6599cb",
+                "alt": "Research laboratory reference photograph"
+              }
+            }
+          ]
+        }
+      ],
+      "style": {
+        "gap": "lg",
+        "tone": "default"
+      }
+    },
+    {
+      "id": "aau-row-48",
+      "type": "section",
+      "ratios": [
+        100
+      ],
+      "columns": [
+        {
+          "id": "aau-column-48-0",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-headline-45",
+              "type": "headline",
+              "props": {
+                "text": "Latest news",
+                "level": 2
+              }
+            },
+            {
+              "id": "aau-editor-46",
+              "type": "editor",
+              "props": {
+                "html": "<p>Published Informatics articles appear here as they become available.</p>"
+              }
+            },
+            {
+              "id": "aau-loop_grid-47",
+              "type": "loop_grid",
+              "props": {
+                "source": "posts",
+                "limit": 4
+              }
+            }
+          ]
+        }
+      ],
+      "style": {
+        "gap": "lg",
+        "tone": "default"
+      }
+    },
+    {
+      "id": "aau-row-52",
+      "type": "section",
+      "ratios": [
+        40,
+        60
+      ],
+      "columns": [
+        {
+          "id": "aau-column-52-0",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-headline-49",
+              "type": "headline",
+              "props": {
+                "text": "Explore our campus",
+                "level": 2
+              }
+            },
+            {
+              "id": "aau-editor-50",
+              "type": "editor",
+              "props": {
+                "html": "<p>A place to learn, connect and exchange ideas.</p>"
+              }
+            }
+          ]
+        },
+        {
+          "id": "aau-column-52-1",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-image-51",
+              "type": "image",
+              "props": {
+                "asset_id": "9d0d13c1-92f2-4ea3-8b73-eaafaff963ec",
+                "alt": "AAU campus entrance reference photograph"
+              }
+            }
+          ]
+        }
+      ],
+      "style": {
+        "gap": "lg",
+        "tone": "muted"
+      }
+    },
+    {
+      "id": "aau-row-56",
+      "type": "section",
+      "ratios": [
+        100
+      ],
+      "columns": [
+        {
+          "id": "aau-column-56-0",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-headline-53",
+              "type": "headline",
+              "props": {
+                "text": "Partnership and collaboration",
+                "level": 2
+              }
+            },
+            {
+              "id": "aau-editor-54",
+              "type": "editor",
+              "props": {
+                "html": "<p>Bring your ideas to our academic community.</p>"
+              }
+            },
+            {
+              "id": "aau-call_to_action-55",
+              "type": "call_to_action",
+              "props": {
+                "title": "Work with Informatics",
+                "text": "Start a conversation about learning and research.",
+                "label": "Contact the College",
+                "href": "/informatics-home-aau-reference#contact"
+              }
+            }
+          ]
+        }
+      ],
+      "style": {
+        "gap": "lg",
+        "tone": "default"
+      }
+    },
+    {
+      "id": "aau-row-61",
+      "type": "section",
+      "ratios": [
+        100
+      ],
+      "columns": [
+        {
+          "id": "aau-column-61-0",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-menu_anchor-57",
+              "type": "menu_anchor",
+              "props": {
+                "anchor": "contact"
+              }
+            },
+            {
+              "id": "aau-headline-58",
+              "type": "headline",
+              "props": {
+                "text": "Contact Informatics",
+                "level": 2
+              }
+            },
+            {
+              "id": "aau-editor-59",
+              "type": "editor",
+              "props": {
+                "html": "<p>This form is available for submission after the Page completes its publishing workflow.</p>"
+              }
+            },
+            {
+              "id": "aau-contact_form-60",
+              "type": "contact_form",
+              "props": {
+                "form_code": "informatics-home-contact",
+                "submit_label": "Send message"
+              }
+            }
+          ]
+        }
+      ],
+      "style": {
+        "gap": "lg",
+        "tone": "default"
+      }
+    },
+    {
+      "id": "aau-row-68",
+      "type": "section",
+      "ratios": [
+        1,
+        1,
+        1
+      ],
+      "columns": [
+        {
+          "id": "aau-column-68-0",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-headline-62",
+              "type": "headline",
+              "props": {
+                "text": "Explore",
+                "level": 2
+              }
+            },
+            {
+              "id": "aau-button_grid-63",
+              "type": "button_grid",
+              "props": {
+                "items": [
+                  {
+                    "id": "link-0",
+                    "label": "About",
+                    "href": "/informatics-home-aau-reference#about"
+                  },
+                  {
+                    "id": "link-1",
+                    "label": "Academics",
+                    "href": "/informatics-home-aau-reference#academics"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "aau-column-68-1",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-headline-64",
+              "type": "headline",
+              "props": {
+                "text": "Resources",
+                "level": 2
+              }
+            },
+            {
+              "id": "aau-button_grid-65",
+              "type": "button_grid",
+              "props": {
+                "items": [
+                  {
+                    "id": "link-0",
+                    "label": "Research",
+                    "href": "/informatics-home-aau-reference#research"
+                  },
+                  {
+                    "id": "link-1",
+                    "label": "Campus life",
+                    "href": "/informatics-home-aau-reference#campus"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "aau-column-68-2",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-headline-66",
+              "type": "headline",
+              "props": {
+                "text": "Connect",
+                "level": 2
+              }
+            },
+            {
+              "id": "aau-button_grid-67",
+              "type": "button_grid",
+              "props": {
+                "items": [
+                  {
+                    "id": "link-0",
+                    "label": "Contact",
+                    "href": "/informatics-home-aau-reference#contact"
+                  },
+                  {
+                    "id": "link-1",
+                    "label": "University of Gondar",
+                    "href": "https://www.uog.edu.et/"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "style": {
+        "gap": "lg",
+        "tone": "muted"
+      }
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "date": "2026-11-12",
+  "component": "frontend/apps/admin-web/src/sites/visual-builder-preview.tsx",
+  "viewports": {
+    "desktop": { "width_px": 1280, "aria_pressed_control": "Desktop" },
+    "tablet": { "width_px": 768, "aria_pressed_control": "Tablet" },
+    "mobile": { "width_px": 390, "aria_pressed_control": "Mobile" }
+  },
+  "revision_binding": "Private preview renders the current editing revision (local layout + Page revision_number/status). Public snapshots stay on the last published revision until a later publish.",
+  "media": "Unsaved/local private preview uses APP_BASE_PATH/sites/{siteId}/media. Workflow approve/publish dialogs use revision-scoped preview-media URLs from getSitePagePreview."
+}

@@ -8,13 +8,18 @@
  * Paragraph HTML is reduced to text and safe links. Script, event handlers
  * and javascript: targets never become markup.
  */
-import { useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { validateVisualLayout } from "@uog/types";
+import type { VisualLayout } from "@uog/types";
+import { VisualLayoutView } from "./visual-layout";
 import type { ReactNode } from "react";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 
 import { safeMenuHref } from "./site-navigation";
+const PrivateMediaBase = createContext<string | null>(null);
 
 export interface PublicBlock {
   type: string;
@@ -37,10 +42,13 @@ export interface PublicBlock {
 export interface PublicMediaItem { id: string; asset_id: string; alt: string; caption?: string }
 
 export interface PublicPageDocument {
+  id?: string;
   title: string;
   path: string;
   site: number | null;
   blocks: PublicBlock[];
+  visual_layout?: VisualLayout;
+  layout_unavailable?: boolean;
   seo: { title: string; description: string };
 }
 
@@ -60,12 +68,16 @@ export function pageFromResponse(status: number, body: unknown): PublicPageDocum
   if (status !== 200 || body == null || typeof body !== "object" || Array.isArray(body)) {
     return null;
   }
-  const row = body as { title?: unknown; path?: unknown; status?: unknown; blocks?: unknown; site?: unknown; seo?: unknown };
+  const row = body as { title?: unknown; path?: unknown; status?: unknown; blocks?: unknown; site?: unknown; metadata?: unknown; seo?: unknown };
   if (row.status != null && row.status !== "PUBLISHED") return null;
   if (typeof row.title !== "string" || !row.title.trim()) return null;
   const path = typeof row.path === "string" && row.path.startsWith("/") ? row.path : "/";
   const seo = row.seo != null && typeof row.seo === "object" ? row.seo as { meta_title?: unknown; meta_description?: unknown } : {};
+  const metadata = row.metadata && typeof row.metadata === "object" ? row.metadata as Record<string,unknown> : {};
+  const visual = Object.hasOwn(metadata,"visual_layout") ? validateVisualLayout(metadata.visual_layout) : null;
   return {
+    ...(typeof (body as {id?:unknown}).id==="string" ? {id:(body as {id:string}).id}:{}),
+    ...(visual ? visual.ok ? {visual_layout:visual.value} : {layout_unavailable:true} : {}),
     title: row.title.trim(),
     path,
     site: typeof row.site === "number" ? row.site : null,
@@ -163,7 +175,7 @@ function BlockList({ blocks, siteId }: { blocks: PublicBlock[]; siteId?: number 
   );
 }
 
-function BlockView({ block, siteId }: { block: PublicBlock; siteId?: number | null }) {
+export function BlockView({ block, siteId }: { block: PublicBlock; siteId?: number | null }) {
   if (block.type === "heading" && block.text) {
     const level = block.level === 2 || block.level === 3 || block.level === 4 ? block.level : 2;
     return (
@@ -195,7 +207,20 @@ function BlockView({ block, siteId }: { block: PublicBlock; siteId?: number | nu
       return <Typography component="p">{block.label}</Typography>;
     }
     return (
-      <Link href={href} rel="noopener noreferrer" sx={{ fontWeight: 700 }}>
+      <Link
+        href={href}
+        rel="noopener noreferrer"
+        sx={{
+          fontWeight: 700,
+          display: "inline-flex",
+          alignItems: "center",
+          minHeight: 44,
+          minWidth: 44,
+          px: 0.5,
+          overflowWrap: "anywhere",
+          "&:focus-visible": { outline: "3px solid", outlineColor: "primary.main", outlineOffset: 2 },
+        }}
+      >
         {block.label}
       </Link>
     );
@@ -230,32 +255,34 @@ function MediaCollection({block,siteId}:{block:PublicBlock;siteId?:number|null})
   const items=block.type==="slider" ? block.slides ?? [] : block.images ?? [];
   const current=Math.min(position,Math.max(0,items.length-1));
   const shown=block.type==="slider" ? items.slice(current,current+1) : items;
-  return <Box component="section" aria-label={block.type==="slider" ? "Image slider" : "Image gallery"} sx={{display:"grid",gap:2}}>
+  return <Box component="section" aria-label={block.type==="slider" ? "Image slider" : "Image gallery"} aria-roledescription={block.type==="slider"?"carousel":undefined} sx={{display:"grid",gridTemplateColumns:block.type==="gallery"?"repeat(auto-fit,minmax(min(100%,240px),1fr))":"minmax(0,1fr)",gap:2,minWidth:0,overflowWrap:"anywhere"}}>
     {shown.map((item) => <Box component="figure" key={`${siteId}-${item.id}-${item.asset_id}`} sx={{m:0}}>
       <PublishedImage block={{type:"image",ref:`sites/${siteId}/assets/${item.asset_id}`,alt:item.alt}} siteId={siteId} />
       {item.caption ? <Typography component="figcaption">{item.caption}</Typography> : null}
     </Box>)}
-    {block.type==="slider" && items.length>1 ? <Box>
-      <button disabled={current===0} onClick={()=>setPosition(current-1)}>Previous slide</button>
-      <span aria-live="polite">{current+1} of {items.length}</span>
-      <button disabled={current===items.length-1} onClick={()=>setPosition(current+1)}>Next slide</button>
+    {block.type==="slider" && items.length>1 ? <Box sx={{display:"flex",alignItems:"center",gap:1,flexWrap:"wrap"}}>
+      <Button type="button" variant="outlined" sx={{minHeight:44,"&:focus-visible":{outline:"3px solid",outlineColor:"primary.main",outlineOffset:2}}} disabled={current===0} onClick={()=>setPosition(current-1)}>Previous slide</Button>
+      <Box component="span" aria-live="polite" aria-atomic="true">{current+1} of {items.length}</Box>
+      <Button type="button" variant="outlined" sx={{minHeight:44,"&:focus-visible":{outline:"3px solid",outlineColor:"primary.main",outlineOffset:2}}} disabled={current===items.length-1} onClick={()=>setPosition(current+1)}>Next slide</Button>
     </Box> : null}
   </Box>;
 }
 
 function PublishedImage({ block, siteId }: { block: PublicBlock; siteId?: number | null }) {
+  const privateBase=useContext(PrivateMediaBase);
   const [failed, setFailed] = useState(false);
+  useEffect(()=>setFailed(false),[privateBase,block.ref]);
   const match = typeof block.ref === "string" ? /^sites\/([0-9]+)\/assets\/([0-9a-f]{32}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/.exec(block.ref) : null;
   if (!match || Number(match[1]) !== siteId || failed) return block.alt ? <Typography component="p">{block.alt}</Typography> : null;
   const assetId = match[2]!.replace(/^([0-9a-f]{8})([0-9a-f]{4})([0-9a-f]{4})([0-9a-f]{4})([0-9a-f]{12})$/, "$1-$2-$3-$4-$5");
-  const url = `/api/v1/site-context/media/${assetId}/`;
+  const url = privateBase ? `${privateBase}/${assetId}/image` : `/api/v1/site-context/media/${assetId}/`;
   return <picture>
     <source media="(max-width: 600px)" srcSet={`${url}?variant=thumbnail`} />
     <Box component="img" src={`${url}?variant=display`} alt={block.alt ?? ""} loading="lazy" onError={() => setFailed(true)} sx={{ maxWidth: "100%", height: "auto" }} />
   </picture>;
 }
 
-export function PublicPageView({ page }: { page: PublicPageDocument | null }): ReactNode {
+export function PublicPageView({ page, privateMediaBase, viewportWidth, hideTitle = false }: { page: PublicPageDocument | null; privateMediaBase?: string; viewportWidth?: number; hideTitle?: boolean }): ReactNode {
   if (!page) {
     return (
       <Typography role="status" color="text.secondary">
@@ -263,16 +290,18 @@ export function PublicPageView({ page }: { page: PublicPageDocument | null }): R
       </Typography>
     );
   }
+  const titleHidden=hideTitle || page.visual_layout?.settings?.show_title===false;
+  const contentWidth={full:"100%",wide:1280,reading:880}[page.visual_layout?.settings?.content_width??"full"];
   return (
-    <Box
+    <PrivateMediaBase.Provider value={privateMediaBase ?? null}><Box
       component="article"
       aria-labelledby="public-page-title"
-      sx={{ display: "flex", flexDirection: "column", gap: 2, maxWidth: "100%" }}
+      sx={{ display: "flex", flexDirection: "column", gap: 2, minWidth:0, width:"100%", maxWidth: contentWidth, mx:"auto", overflowWrap:"anywhere" }}
     >
-      <Typography id="public-page-title" variant="h3" component="h1" sx={{ overflowWrap: "anywhere" }}>
-        {page.title}
-      </Typography>
-      <BlockList blocks={page.blocks} siteId={page.site} />
-    </Box>
+        <Typography id="public-page-title" variant="h3" component="h1" sx={titleHidden ? {position:"absolute",width:1,height:1,p:0,m:-1,overflow:"hidden",clipPath:"inset(50%)",whiteSpace:"nowrap"} : { overflowWrap: "anywhere" }}>
+          {page.title}
+        </Typography>
+      {page.layout_unavailable ? <Typography role="status">This page content is currently unavailable.</Typography> : page.visual_layout ? <VisualLayoutView layout={page.visual_layout} siteId={page.site} pageTitle={page.title} pageId={page.id} preview={Boolean(privateMediaBase)} mediaBase={privateMediaBase} viewportWidth={viewportWidth} /> : <BlockList blocks={page.blocks} siteId={page.site} />}
+    </Box></PrivateMediaBase.Provider>
   );
 }

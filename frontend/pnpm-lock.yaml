@@ -184,6 +184,9 @@ importers:
       '@uog/api-client':
         specifier: workspace:*
         version: link:../api-client
+      '@uog/types':
+        specifier: workspace:*
+        version: link:../types
       react:
         specifier: 19.2.9
         version: 19.2.9

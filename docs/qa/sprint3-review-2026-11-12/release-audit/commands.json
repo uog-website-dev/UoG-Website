@@ -1,0 +1,165 @@
+[
+  {
+    "name": "live-services",
+    "command": [
+      "docker",
+      "compose",
+      "run",
+      "--rm",
+      "-T",
+      "--no-deps",
+      "--entrypoint",
+      "python",
+      "-v",
+      "D:\\Projects\\Website_Project\\UoG-Website:/repo",
+      "backend",
+      "/repo/scripts/sprint3_live_review.py",
+      "--output",
+      "/repo/docs/qa/sprint3-review-2026-11-12/release-audit"
+    ],
+    "returncode": 0,
+    "status": "PASS"
+  },
+  {
+    "name": "protocol-and-negatives",
+    "command": [
+      "docker",
+      "compose",
+      "exec",
+      "-T",
+      "-e",
+      "RUN_MEDIA_MINIO_TESTS=1",
+      "backend",
+      "pytest",
+      "tests/test_sprint3_integrated_review.py",
+      "tests/test_visual_publication.py",
+      "apps/cms/tests/test_homepage_assignment.py",
+      "tests/test_visual_drafts.py",
+      "tests/test_media_removal.py",
+      "tests/test_media_uploads.py",
+      "apps/cms/tests/test_layout_contract.py",
+      "apps/cms/tests/test_visual_builder_module.py",
+      "-q",
+      "--create-db",
+      "--tb=short",
+      "--junitxml=/tmp/sprint3-protocol.xml"
+    ],
+    "returncode": 0,
+    "status": "PASS"
+  },
+  {
+    "name": "openapi",
+    "command": [
+      "docker",
+      "compose",
+      "exec",
+      "-T",
+      "backend",
+      "python",
+      "manage.py",
+      "spectacular",
+      "--file",
+      "/tmp/sprint3-schema.yaml",
+      "--validate",
+      "--fail-on-warn"
+    ],
+    "returncode": 0,
+    "status": "PASS"
+  },
+  {
+    "name": "openapi-ci-regression",
+    "command": [
+      "docker",
+      "compose",
+      "exec",
+      "-T",
+      "backend",
+      "pytest",
+      "tests/test_documentation.py",
+      "-q",
+      "--tb=short",
+      "--junitxml=/tmp/sprint3-openapi.xml"
+    ],
+    "returncode": 0,
+    "status": "PASS"
+  },
+  {
+    "name": "contract-generator",
+    "command": [
+      "C:\\Python313\\python.exe",
+      "scripts/generate_layout_contract.py",
+      "--check"
+    ],
+    "returncode": 0,
+    "status": "PASS"
+  },
+  {
+    "name": "renderer-capability",
+    "command": [
+      "docker",
+      "compose",
+      "exec",
+      "-T",
+      "-e",
+      "SPRINT3_EVIDENCE_FILE=/tmp/sprint3-runtime.json",
+      "frontend-admin",
+      "pnpm",
+      "--filter",
+      "@uog/ui",
+      "exec",
+      "vitest",
+      "run",
+      "src/sprint3-runtime-evidence.test.tsx",
+      "src/visual-layout.test.tsx",
+      "src/public-page.test.tsx",
+      "--reporter=junit",
+      "--outputFile=/tmp/sprint3-renderer.xml"
+    ],
+    "returncode": 0,
+    "status": "PASS"
+  },
+  {
+    "name": "typescript",
+    "command": [
+      "docker",
+      "compose",
+      "exec",
+      "-T",
+      "frontend-admin",
+      "pnpm",
+      "typecheck"
+    ],
+    "returncode": 2,
+    "status": "FAIL"
+  },
+  {
+    "name": "build-admin-web",
+    "command": [
+      "docker",
+      "compose",
+      "exec",
+      "-T",
+      "frontend-admin",
+      "node",
+      "/workspace/scripts/qa/sprint3/build-isolated.mjs",
+      "admin-web"
+    ],
+    "returncode": 1,
+    "status": "FAIL"
+  },
+  {
+    "name": "build-public-web",
+    "command": [
+      "docker",
+      "compose",
+      "exec",
+      "-T",
+      "frontend-admin",
+      "node",
+      "/workspace/scripts/qa/sprint3/build-isolated.mjs",
+      "public-web"
+    ],
+    "returncode": 0,
+    "status": "PASS"
+  }
+]

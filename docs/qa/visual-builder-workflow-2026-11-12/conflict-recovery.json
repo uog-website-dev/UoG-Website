@@ -1,0 +1,32 @@
+{
+  "date": "2026-11-12",
+  "scenario": "Two editor sessions save the same visual draft ETag",
+  "loser_ux": {
+    "retains_local_layout": true,
+    "dirty_chip": "Unsaved changes",
+    "message": "A newer draft was saved elsewhere. Your local layout is preserved. Reload the server draft to refresh the revision token, or adopt the server version.",
+    "actions": [
+      {
+        "label": "Reload server draft",
+        "effect": "Fetches latest Page/ETag; keeps local layout dirty so Save can overwrite with If-Match refresh"
+      },
+      {
+        "label": "Adopt server draft",
+        "effect": "Replaces local layout with server tree, clears dirty/undo, no silent merge"
+      }
+    ],
+    "no_auto_retry": true,
+    "no_silent_overwrite": true
+  },
+  "navigation_guard": {
+    "beforeunload": true,
+    "back_to_pages_confirm": "Discard unsaved visual draft changes?"
+  },
+  "tested_build_ids": {
+    "page_id": "00000000-0000-4000-8000-000000000001",
+    "site_id": 11,
+    "losing_etag": "\"revision-1\"",
+    "reloaded_etag": "\"revision-9\"",
+    "reconcile_save_etag": "\"revision-10\""
+  }
+}

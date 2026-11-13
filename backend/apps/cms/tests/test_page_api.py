@@ -506,7 +506,7 @@ def test_public_routes_are_host_scoped_published_only_and_snapshot_backed(
 
 
 def test_publication_versions_invalidate_public_cache_on_unpublish(
-    client, settings, sites,
+    client, settings, sites, django_capture_on_commit_callbacks,
 ):
     settings.ALLOWED_HOSTS = ["*"]
     site, _ = sites
@@ -542,7 +542,8 @@ def test_publication_versions_invalidate_public_cache_on_unpublish(
     assert client.get(url, HTTP_HOST=host).status_code == 200
 
     publisher = get_user_model().objects.create_user(username="public-unpublisher")
-    transition_with_site_role(page, "unpublish", publisher)
+    with django_capture_on_commit_callbacks(execute=True):
+        transition_with_site_role(page, "unpublish", publisher)
     assert SitePublicationVersion.objects.get(
         site=site, locale=page.locale,
     ).version == published_version + 1
@@ -695,8 +696,8 @@ def test_homepage_assignment_publish_and_rejection_stay_on_one_site(
     assert created.status_code == 201, created.content
     page_id = created.json()["id"]
     homepage = client.post(f"{page_url}{page_id}/homepage/")
-    assert homepage.status_code == 200, homepage.content
-    assert homepage.json()["is_homepage"] is True
+    assert homepage.status_code == 400, homepage.content
+    assert homepage.json().get("error")
     assert client.post(
         f"{ADMIN_PAGES.format(site_id=other_site.pk)}{page_id}/homepage/",
     ).status_code == 404

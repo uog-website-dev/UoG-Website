@@ -9,6 +9,7 @@
  * comment, not a publish time.
  */
 import Alert from "@mui/material/Alert";
+import type { ReactNode } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -19,7 +20,7 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 
 export const WORKFLOW_ACTIONS = [
-  "submit", "approve", "reject", "publish", "unpublish", "archive", "restore",
+  "submit", "approve", "reject", "publish", "unpublish", "archive", "restore", "revise",
 ] as const;
 
 export type WorkflowAction = (typeof WORKFLOW_ACTIONS)[number];
@@ -35,6 +36,7 @@ const BUTTON_TEXT: Record<WorkflowAction, string> = {
   unpublish: "Unpublish",
   archive: "Archive",
   restore: "Restore",
+  revise: "Return to draft",
 };
 
 export interface WorkflowTransition {
@@ -48,6 +50,7 @@ export interface WorkflowTransition {
 
 function actionLabel(action: WorkflowAction, title: string): string {
   if (action === "submit") return `Submit ${title} for review`;
+  if (action === "revise") return `Return ${title} to draft`;
   return `${BUTTON_TEXT[action]} ${title}`;
 }
 
@@ -90,6 +93,7 @@ export function ContentWorkflowDialog({
   onComment,
   onClose,
   onConfirm,
+  children,
 }: {
   noun: "Page" | "Post";
   action: WorkflowAction | null;
@@ -100,8 +104,9 @@ export function ContentWorkflowDialog({
   onComment: (value: string) => void;
   onClose: () => void;
   onConfirm: () => void;
+  children?: ReactNode;
 }) {
-  const heading = action
+  const heading = action === "revise" ? `Return ${noun} to draft?` : action
     ? `${action[0].toUpperCase()}${action.slice(1)} ${noun}?`
     : `Confirm ${noun} action`;
   const commentKind = action === "approve" || action === "reject";
@@ -111,7 +116,7 @@ export function ContentWorkflowDialog({
       onClose={() => { if (!busy) onClose(); }}
       aria-labelledby={`${noun.toLowerCase()}-workflow-confirm-title`}
       fullWidth
-      maxWidth="xs"
+      maxWidth={children ? "md" : "xs"}
     >
       <DialogTitle id={`${noun.toLowerCase()}-workflow-confirm-title`}>{heading}</DialogTitle>
       <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, pt: "8px !important" }}>
@@ -119,6 +124,7 @@ export function ContentWorkflowDialog({
         <Typography>
           {action ? `Confirm ${action} for “${title}”. The workflow status will change for this Site.` : ""}
         </Typography>
+        {children}
         {commentKind ? (
           <TextField
             label={action === "reject" ? "Reviewer comment (required)" : "Reviewer comment (optional)"}
@@ -139,7 +145,7 @@ export function ContentWorkflowDialog({
           onClick={onConfirm}
           disabled={busy || (action === "reject" && !comment.trim())}
         >
-          Confirm {action ?? "action"}
+          Confirm {action === "revise" ? "return to draft" : action ?? "action"}
         </Button>
       </DialogActions>
     </Dialog>

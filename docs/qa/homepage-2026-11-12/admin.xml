@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="31" failures="0" errors="0" time="23.315351518">
+    <testsuite name="src/app/sites/page-actions.test.ts" timestamp="2026-11-12T12:20:17.618Z" hostname="086c5ea3ae9d" tests="8" failures="0" errors="0" skipped="0" time="0.031444855">
+        <testcase classname="src/app/sites/page-actions.test.ts" name="Site Page API actions &gt; uses the site-scoped list contract with encoded filters and returns pagination" time="0.008598205">
+        </testcase>
+        <testcase classname="src/app/sites/page-actions.test.ts" name="Site Page API actions &gt; builds full-site status totals from the API&apos;s filtered count contract" time="0.004649926">
+        </testcase>
+        <testcase classname="src/app/sites/page-actions.test.ts" name="Site Page API actions &gt; loads a scoped detail with its ETag and sends that ETag for updates" time="0.003151788">
+        </testcase>
+        <testcase classname="src/app/sites/page-actions.test.ts" name="Site Page API actions &gt; sends structured blocks and same-site hierarchy in the create contract" time="0.001176335">
+        </testcase>
+        <testcase classname="src/app/sites/page-actions.test.ts" name="Site Page API actions &gt; reloads a visual draft through its scoped endpoint and preserves the returned ETag" time="0.001502833">
+        </testcase>
+        <testcase classname="src/app/sites/page-actions.test.ts" name="Site Page API actions &gt; submits complete trees from two editors without retrying the stale Slider" time="0.005637274">
+        </testcase>
+        <testcase classname="src/app/sites/page-actions.test.ts" name="Site Page API actions &gt; preserves node and numeric item-position error bindings" time="0.001870248">
+        </testcase>
+        <testcase classname="src/app/sites/page-actions.test.ts" name="Site Page API actions &gt; loads an immutable revision preview and uses its ETag for approval" time="0.00121677">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-pages.test.tsx" timestamp="2026-11-12T12:20:17.628Z" hostname="086c5ea3ae9d" tests="23" failures="0" errors="0" skipped="0" time="23.283906663">
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; assigns only published Pages allowed by the backend as the homepage" time="1.268454536">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; renders a site-scoped accessible table and status dashboard" time="0.288422742">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; announces empty and failed API list states" time="0.42731063">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; applies server search and status filters and resets pagination" time="1.057382052">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; uses API pagination and resets to the first page when sorting changes" time="0.691218008">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; opens a safe preview and submits this Site&apos;s draft for review" time="1.110953615">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; shows review controls only from backend-authorized actions and requires a rejection comment" time="1.029699177">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; shows append-only workflow history and reviewer feedback in a timeline" time="0.409867847">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; defaults a new Page to the Site language" time="1.464954014">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; opens the create dialog once for the dashboard quick action" time="0.449710666">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; starts a new Page blank and fills the slug from the title until it is edited" time="1.131798266">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; ignores the create request without create permission" time="0.159701619">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; creates and edits only with the matching permission and current ETag" time="3.271139762">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; surfaces stale edit conflicts without losing the form" time="2.08939842">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; previews private draft content and blocks malformed block JSON" time="1.959709198">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; shows the frozen private revision and sends its exact ETag when publishing" time="0.736083869">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; previews the shared visual fixture and rejects unsupported layout versions before saving" time="1.782423645">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; asks before discarding unsaved editor changes" time="1.204082434">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; blocks management when the PAGES module is off" time="0.445344158">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; clears filter and page state when the selected Site changes" time="0.785177702">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; does not fetch or expose Pages without view permission" time="0.024176202">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; switches Site scope and enforces view-only access across the admin workspace" time="0.633381338">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; opens a working draft of a published Page and keeps the live route fixed" time="0.858970484">
+        </testcase>
+    </testsuite>
+</testsuites>

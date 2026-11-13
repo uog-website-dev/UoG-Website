@@ -1,0 +1,71 @@
+{
+  "visual_layout": {
+    "schema_version": 1,
+    "rows": [
+      {
+        "id": "section-1",
+        "type": "section",
+        "ratios": [
+          1,
+          1,
+          1
+        ],
+        "columns": [
+          {
+            "id": "column-1",
+            "type": "column",
+            "children": [
+              {
+                "id": "heading-1",
+                "type": "headline",
+                "props": {
+                  "text": "Our university",
+                  "level": 2
+                }
+              }
+            ]
+          },
+          {
+            "id": "column-2",
+            "type": "column",
+            "children": [
+              {
+                "id": "slider-1",
+                "type": "image_slider",
+                "props": {
+                  "items": [
+                    {
+                      "id": "slide-1",
+                      "asset_id": "00000000-0000-4000-8000-000000000001",
+                      "alt": "Campus",
+                      "caption": "Campus life"
+                    },
+                    {
+                      "id": "slide-2",
+                      "asset_id": "00000000-0000-4000-8000-000000000002",
+                      "alt": "Second campus view",
+                      "caption": "Second ordered slide"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "column-3",
+            "type": "column",
+            "children": [
+              {
+                "id": "text-1",
+                "type": "editor",
+                "props": {
+                  "html": "<p>Study and research</p>"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

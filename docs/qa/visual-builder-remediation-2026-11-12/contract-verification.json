@@ -1,0 +1,15 @@
+{
+  "date": "2026-11-12",
+  "environment": "local Docker Compose",
+  "openapi_generation": "python manage.py spectacular --file /tmp/widget-openapi.yaml --validate --fail-on-warn",
+  "generation_exit_code": 0,
+  "baseline": "docs/api/openapi.yaml",
+  "comparison": "yaml.safe_load(generated) == yaml.safe_load(baseline)",
+  "semantic_equality": true,
+  "path_count": 106,
+  "contract_generator": "python scripts/generate_layout_contract.py --check",
+  "contract_generator_exit_code": 0,
+  "django_check": "System check identified no issues (0 silenced).",
+  "migration_drift": "No changes detected",
+  "hosted_ci_executed": false
+}

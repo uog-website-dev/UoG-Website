@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="39" failures="0" errors="0" time="11.360421221">
+    <testsuite name="src/sites/site-admin.test.ts" timestamp="2026-11-12T14:00:28.357Z" hostname="086c5ea3ae9d" tests="12" failures="0" errors="0" skipped="0" time="0.011658193">
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; shows Visual Builder only for enabled Page editors and recognizes its canvas routes" time="0.004366935">
+        </testcase>
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; shows Pages and Menus only when the module is enabled and the user is permitted" time="0.001672603">
+        </testcase>
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; shows Homepage Settings for Site administrators when PAGES is enabled" time="0.00057415">
+        </testcase>
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; shows Media for a Site Editor when MEDIA is enabled and content.media.view is granted" time="0.00070231">
+        </testcase>
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; shows the Users section without a content module when site user access is granted" time="0.000377967">
+        </testcase>
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; hides a section when the Site module is off" time="0.000139408">
+        </testcase>
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; hides a section when the user lacks that permission" time="0.000107922">
+        </testcase>
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; does not treat another Site&apos;s module row as enabled here" time="0.00025341">
+        </testcase>
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; hides globally disabled or unshipped modules even when the Site switch is on" time="0.000410033">
+        </testcase>
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; lists each accessible Site once and drops an invalid id" time="0.000360536">
+        </testcase>
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; sends a Site switch to that Site&apos;s dashboard" time="0.000337131">
+        </testcase>
+        <testcase classname="src/sites/site-admin.test.ts" name="site administration matrix &gt; keeps central module activation off the Site menu unless delegated" time="0.000127449">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-homepage.test.tsx" timestamp="2026-11-12T14:00:28.375Z" hostname="086c5ea3ae9d" tests="4" failures="0" errors="0" skipped="0" time="0.741465855">
+        <testcase classname="src/sites/site-homepage.test.tsx" name="Homepage Settings &gt; lists only eligible same-Site published Pages and assigns with authoritative success" time="0.455005434">
+        </testcase>
+        <testcase classname="src/sites/site-homepage.test.tsx" name="Homepage Settings &gt; keeps the confirmed selection when eligibility is lost between list and submit" time="0.089916832">
+        </testcase>
+        <testcase classname="src/sites/site-homepage.test.tsx" name="Homepage Settings &gt; shows fallback state when the assigned Page is no longer published" time="0.068748615">
+        </testcase>
+        <testcase classname="src/sites/site-homepage.test.tsx" name="Homepage Settings &gt; resets assignment context when switching Sites" time="0.125440744">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-pages.test.tsx" timestamp="2026-11-12T14:00:28.379Z" hostname="086c5ea3ae9d" tests="23" failures="0" errors="0" skipped="0" time="10.607297173">
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; assigns only published Pages allowed by the backend as the homepage" time="0.690153514">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; renders a site-scoped accessible table and status dashboard" time="0.166518762">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; announces empty and failed API list states" time="0.2642286">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; applies server search and status filters and resets pagination" time="0.533204502">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; uses API pagination and resets to the first page when sorting changes" time="0.191278374">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; opens a safe preview and submits this Site&apos;s draft for review" time="0.567450831">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; shows review controls only from backend-authorized actions and requires a rejection comment" time="0.538978142">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; shows append-only workflow history and reviewer feedback in a timeline" time="0.228115551">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; defaults a new Page to the Site language" time="0.681307929">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; opens the create dialog once for the dashboard quick action" time="0.154915733">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; starts a new Page blank and fills the slug from the title until it is edited" time="0.544710041">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; ignores the create request without create permission" time="0.087816452">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; creates and edits only with the matching permission and current ETag" time="1.367875724">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; surfaces stale edit conflicts without losing the form" time="0.872413003">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; previews private draft content and blocks malformed block JSON" time="0.806577249">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; shows the frozen private revision and sends its exact ETag when publishing" time="0.357922092">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; previews the shared visual fixture and rejects unsupported layout versions before saving" time="0.842534105">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; asks before discarding unsaved editor changes" time="0.689142852">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; blocks management when the PAGES module is off" time="0.162054485">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; clears filter and page state when the selected Site changes" time="0.244556669">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; does not fetch or expose Pages without view permission" time="0.003830333">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; switches Site scope and enforces view-only access across the admin workspace" time="0.197249175">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; opens a working draft of a published Page and keeps the live route fixed" time="0.41256108">
+        </testcase>
+    </testsuite>
+</testsuites>

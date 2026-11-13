@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError as DomainValidationError
 from django.db import IntegrityError, transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import OpenApiParameter, extend_schema
+from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import mixins, serializers
 from rest_framework.decorators import action
 from rest_framework.exceptions import APIException
@@ -12,11 +12,14 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
+from rest_framework.renderers import JSONRenderer
+from django.utils.cache import patch_vary_headers
+from apps.media.delivery import ImageDeliveryMixin, WebPImageRenderer
 from uuid import UUID
 
 from apps.accounts.authentication import KeycloakBearerAuthentication
 from apps.sites.api.access import Conflict, PreconditionRequired
-from apps.sites.api.serializers import StrictFields
+from apps.sites.api.serializers import StrictFields, EmptyObjectSerializer
 from apps.sites.models import Site
 
 from ..authorization import require_cms_grant
@@ -26,11 +29,20 @@ from ..models import (
     ContentWorkflowTransition,
     Page,
 )
-from ..services.pages import change_route, require_pages_module, set_as_homepage
+from ..services.pages import change_route, require_pages_module, require_visual_builder_module
+from ..services.homepage import assign_homepage
 from ..services.workflow import transition_content
-from ..services.working_drafts import open_working_draft
+from ..services.working_drafts import content_etag, open_working_draft, save_visual_draft
+from ..services import section_templates as section_template_domain
+from .visual_drafts import VISUAL_DRAFT_REQUEST_SCHEMA, VisualDraftInput, VisualDraftErrorSerializer, VisualDraftValidationError
 from .serializers import PageSerializer
-from .workflow import WorkflowActionInput, WorkflowStateConflict
+from .preview import PagePreviewSerializer, preview_revision
+from .widget_runtime import WidgetQuery, WidgetPayload, widget_data
+from .workflow import WorkflowActionInput, WorkflowStateConflict, workflow_expected_revision, VISUAL_WORKFLOW_IF_MATCH
+
+
+class InsertSectionTemplateInput(StrictFields, serializers.Serializer):
+    template_id = serializers.UUIDField()
 
 
 SITE_PARAMETER = OpenApiParameter(
@@ -109,17 +121,51 @@ class PageWorkflowHistorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ContentWorkflowTransition
-        fields = ("id", "from_status", "to_status", "actor", "comment", "created_at")
+        fields = ("id", "from_status", "to_status", "actor", "comment", "created_at", "revision", "reviewed_revision")
         read_only_fields = fields
 
 
 class SitePageViewSet(
+    ImageDeliveryMixin,
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
     mixins.CreateModelMixin,
     GenericViewSet,
 ):
     """Author and inspect Pages within the Site named in the URL."""
+    renderer_classes=[JSONRenderer]
+
+    def finalize_response(self, request, response, *args, **kwargs):
+        response=super().finalize_response(request,response,*args,**kwargs)
+        if getattr(self,"action",None)=="preview":
+            response["Cache-Control"]="private, no-store"
+            response["Surrogate-Control"]="no-store"
+            response["X-Robots-Tag"]="noindex, nofollow"
+            patch_vary_headers(response,("Authorization","Cookie","Host"))
+        return response
+
+    @extend_schema(tags=["CMS pages"],parameters=[SITE_PARAMETER,PAGE_PARAMETER,
+        OpenApiParameter("revision",int,description="Immutable revision number; defaults to current."),
+        OpenApiParameter("asset_id",str,description="Optional referenced asset UUID for private image bytes."),
+        OpenApiParameter("variant",str,enum=["thumbnail","display"])],
+        responses={200:PagePreviewSerializer,(200,"image/webp"):{"type":"string","format":"binary"}},
+        description="Private revision preview for this Site's CMS readers. Immutable revision IDs, content hash and approval provenance; no-store and Vary Authorization/Cookie/Host. Optional asset_id only serves an image referenced by this exact revision. Anonymous/foreign access fails; nothing enters public caches.")
+    @action(detail=True,methods=["get"],url_path="preview",renderer_classes=[JSONRenderer,WebPImageRenderer])
+    def preview(self,request,*args,**kwargs):
+        site,page=self._page()
+        ensure_pages_module_enabled(site.pk)
+        return preview_revision(request,page)
+
+    @extend_schema(tags=["CMS pages"], parameters=[SITE_PARAMETER, PAGE_PARAMETER, WidgetQuery], responses=WidgetPayload,
+                   description="Private Site-scoped widget preview data from published content. Requires CMS read access and enabled PAGES and VISUAL_BUILDER. Responses are private/no-store.")
+    @action(detail=True, methods=["get"], url_path="widget-data")
+    def widget_data(self, request, *args, **kwargs):
+        site, page = self._page()
+        ensure_pages_module_enabled(site.pk)
+        ensure_visual_builder_module_enabled(site.pk)
+        query = WidgetQuery(data=request.query_params)
+        query.is_valid(raise_exception=True)
+        return Response(widget_data(site, query.validated_data), headers={"Cache-Control": "private, no-store", "Vary": "Authorization, Cookie, Host"})
 
     authentication_classes = [KeycloakBearerAuthentication]
     permission_classes = [IsAuthenticated]
@@ -301,7 +347,7 @@ class SitePageViewSet(
 
     @extend_schema(
         tags=["CMS pages"],
-        parameters=[SITE_PARAMETER, PAGE_PARAMETER],
+        parameters=[SITE_PARAMETER, PAGE_PARAMETER, VISUAL_WORKFLOW_IF_MATCH],
         request=WorkflowActionInput,
         responses=PageSerializer,
         description=(
@@ -319,13 +365,17 @@ class SitePageViewSet(
         ensure_pages_module_enabled(site.pk)
         payload = WorkflowActionInput(data=request.data)
         payload.is_valid(raise_exception=True)
+        expected = workflow_expected_revision(request,page,payload.validated_data["action"])
         try:
             transitioned = transition_content(
                 page.pk,
                 action=payload.validated_data["action"],
                 actor=request.user,
                 comment=payload.validated_data.get("comment", ""),
+                expected_revision=expected,
             )
+        except ContentEditConflict as error:
+            raise PageEditConflict() from error
         except DomainValidationError as error:
             detail = (
                 error.message_dict if hasattr(error, "message_dict")
@@ -393,7 +443,9 @@ class SitePageViewSet(
         if supplied != page_etag(page):
             raise PageEditConflict()
         try:
-            draft, created = open_working_draft(page, actor=request.user)
+            draft, created = open_working_draft(page, actor=request.user, if_match=supplied)
+        except ContentEditConflict as error:
+            raise PageEditConflict() from error
         except DomainValidationError as error:
             detail = (
                 error.message_dict if hasattr(error, "message_dict")
@@ -409,27 +461,116 @@ class SitePageViewSet(
         return response
 
     @extend_schema(
+        methods=["GET"], tags=["CMS pages"], parameters=[SITE_PARAMETER, PAGE_PARAMETER],
+        responses=PageSerializer,
+        description="Reload this Site-owned Page, including its complete visual tree or unchanged legacy blocks, revision number and strong ETag. Does not create a draft. For a published Page, open its working-draft first and edit the returned draft ID.",
+    )
+    @extend_schema(
+        methods=["PATCH"], tags=["CMS pages"], parameters=[SITE_PARAMETER, PAGE_PARAMETER, IF_MATCH],
+        request={"application/json":VISUAL_DRAFT_REQUEST_SCHEMA},
+        responses={200:PageSerializer,400:VisualDraftErrorSerializer,
+                   409:OpenApiResponse(description="Stale Page ETag. No tree, revision or reference changes were committed."),
+                   428:OpenApiResponse(description="If-Match is required.")},
+        examples=[OpenApiExample("Complete visual draft", request_only=True, value={"visual_layout":{"schema_version":1,"rows":[{"id":"main","type":"section","ratios":[100],"columns":[{"id":"main-column","type":"column","children":[{"id":"title","type":"headline","props":{"level":2,"text":"Welcome"}}]}]}]}})],
+        description="Replace the complete body of a draft/unpublished Page with a visual tree. Requires an active Site AUTHOR grant and enabled PAGES and VISUAL_BUILDER modules. The exact If-Match is checked under the CMS write lock before layout/media validation. Payload, immutable revision and nested media inventory commit atomically. Legacy flat blocks are cleared from this draft's active body and remain in history/public snapshots. Other Page metadata and the public snapshot are unchanged. Validation returns fields plus node/item-position bindings. Stale writes return 409 without automatic merging or retry.",
+    )
+    @action(detail=True, methods=["get","patch"], url_path="visual-draft")
+    def visual_draft(self, request, *args, **kwargs):
+        site, page = self._page()
+        ensure_pages_module_enabled(site.pk)
+        ensure_visual_builder_module_enabled(site.pk)
+        if request.method == "GET":
+            return self._response(page)
+        self._authorize(site, (ContentRole.AUTHOR,))
+        supplied = request.headers.get("If-Match")
+        if not supplied:
+            raise PreconditionRequired()
+        payload = VisualDraftInput(data=request.data)
+        try:
+            payload.is_valid(raise_exception=True)
+        except serializers.ValidationError as error:
+            fields = {key:[str(message) for message in messages] for key,messages in error.detail.items()}
+            layout = request.data.get("visual_layout") if isinstance(request.data, dict) else None
+            raise VisualDraftValidationError(DomainValidationError(fields),layout) from error
+        layout = payload.validated_data["visual_layout"]
+        try:
+            page = save_visual_draft(site_id=site.pk, page_id=page.pk, actor=request.user,
+                                     if_match=supplied, visual_layout=layout)
+        except ContentEditConflict as error:
+            raise PageEditConflict() from error
+        except DomainValidationError as error:
+            raise VisualDraftValidationError(error, layout) from error
+        except IntegrityError as error:
+            raise Conflict() from error
+        return self._response(page)
+
+    @extend_schema(
+        tags=["CMS pages"],
+        parameters=[SITE_PARAMETER, PAGE_PARAMETER, IF_MATCH],
+        request=InsertSectionTemplateInput,
+        responses={
+            200: PageSerializer,
+            400: VisualDraftErrorSerializer,
+            409: OpenApiResponse(description="Stale Page ETag. No insertion was committed."),
+            428: OpenApiResponse(description="If-Match is required."),
+        },
+        description=(
+            "Insert a same-Site ACTIVE section template into this Page draft. "
+            "Clones with fresh node IDs and revalidates media. Foreign templates, "
+            "retired templates, stale schema versions and unavailable media fail "
+            "without partial insertion. Existing Page content is preserved when "
+            "templates later change or retire."
+        ),
+    )
+    @action(detail=True, methods=["post"], url_path="visual-draft/insert-template")
+    def insert_section_template(self, request, *args, **kwargs):
+        site, page = self._page()
+        ensure_pages_module_enabled(site.pk)
+        ensure_visual_builder_module_enabled(site.pk)
+        self._authorize(site, (ContentRole.AUTHOR,))
+        supplied = request.headers.get("If-Match")
+        if not supplied:
+            raise PreconditionRequired()
+        payload = InsertSectionTemplateInput(data=request.data)
+        payload.is_valid(raise_exception=True)
+        try:
+            page = section_template_domain.insert_section_template(
+                site_id=site.pk,
+                page_id=page.pk,
+                template_id=payload.validated_data["template_id"],
+                actor=request.user,
+                if_match=supplied,
+            )
+        except ContentEditConflict as error:
+            raise PageEditConflict() from error
+        except DomainValidationError as error:
+            raise VisualDraftValidationError(
+                error,
+                page.metadata.get("visual_layout") if isinstance(page.metadata, dict) else None,
+            ) from error
+        return self._response(page)
+
+    @extend_schema(
         tags=["CMS pages"],
         parameters=[SITE_PARAMETER, PAGE_PARAMETER],
-        request=None,
+        request={"application/json": {"type": "object", "additionalProperties": False, "maxProperties": 0}},
         responses=PageSerializer,
         description=(
-            "Make this draft or unpublished Page the Site homepage. Any "
-            "previous homepage on this Site is cleared in the same "
-            "transaction. Requires an active Site AUTHOR assignment or an "
-            "active database platform-administrator assignment, and an "
-            "enabled PAGES module. Keycloak realm roles do not grant access. "
-            "The row is not deleted when the module is off."
+            "Assign an eligible same-Site published Page to Site settings. Requires "
+            "sites.update and enabled PAGES. Draft, hidden and foreign Pages are "
+            "rejected atomically. No Page revision is changed. Loss of publication "
+            "eligibility returns the empty root fallback (404); no draft is served."
         ),
     )
     @action(detail=True, methods=["post"], url_path="homepage")
     def homepage(self, request, *args, **kwargs):
-        site, page = self._page()
-        self._authorize(site, (ContentRole.AUTHOR,))
+        site = self._site()
+        page = get_object_or_404(self.get_queryset(), pk=self.kwargs["pk"])
+        EmptyObjectSerializer(data=request.data).is_valid(raise_exception=True)
         ensure_pages_module_enabled(site.pk)
         try:
             with hierarchy_write():
-                page = set_as_homepage(page, actor=request.user)
+                page = assign_homepage(site_id=site.pk, page_id=page.pk, actor=request.user)
         except DomainValidationError as error:
             detail = (
                 error.message_dict if hasattr(error, "message_dict")
@@ -451,13 +592,28 @@ class SitePageViewSet(
 
 
 def page_etag(page):
-    return f'"cms-content-{page.pk}-r{page.revision_number}"'
+    return content_etag(page)
 
 
 def ensure_pages_module_enabled(site_id):
     """Map a disabled PAGES module to the shared validation envelope."""
     try:
         require_pages_module(site_id)
+    except DomainValidationError as error:
+        fields = (
+            error.message_dict if hasattr(error, "message_dict")
+            else {"module": error.messages}
+        )
+        raise serializers.ValidationError({
+            "reason": "module_disabled",
+            "fields": fields,
+        }) from error
+
+
+def ensure_visual_builder_module_enabled(site_id):
+    """Map a disabled VISUAL_BUILDER module to the shared validation envelope."""
+    try:
+        require_visual_builder_module(site_id)
     except DomainValidationError as error:
         fields = (
             error.message_dict if hasattr(error, "message_dict")

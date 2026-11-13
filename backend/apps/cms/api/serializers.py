@@ -22,6 +22,20 @@ from ..workflow_actions import available_workflow_actions
 class BlocksValidationMixin:
     """Validate blocks before serializer.save(), using the owning Site scope."""
 
+    def validate_metadata(self, value):
+        if not isinstance(value, dict):
+            raise serializers.ValidationError("Metadata must be a JSON object.")
+        if "visual_layout" not in value:
+            return value
+        from ..layout_contract import validate_layout, validate_layout_media
+        site_id = getattr(self.instance, "site_id", None) or getattr(self.context.get("site"), "pk", None) or self.context.get("site_id")
+        try:
+            layout = validate_layout(value["visual_layout"])
+            validate_layout_media(layout, site_id=site_id)
+            return {**value, "visual_layout": layout}
+        except DjangoValidationError as error:
+            raise serializers.ValidationError(error.message_dict) from error
+
     def validate_blocks(self, value):
         site_id = getattr(self.instance, "site_id", None)
         if site_id is None:
@@ -81,6 +95,8 @@ class PageSerializer(
         ),
     )
     available_actions = serializers.SerializerMethodField()
+    is_homepage = serializers.SerializerMethodField()
+    can_set_homepage = serializers.SerializerMethodField()
     draft_of = serializers.PrimaryKeyRelatedField(read_only=True)
 
     immutable_on_update = ("id", "site", "locale", "created_by", "created_at")
@@ -95,6 +111,7 @@ class PageSerializer(
             "created_by", "updated_by", "submitted_by", "reviewed_by",
             "review_comment", "metadata", "created_at", "updated_at",
             "available_actions",
+            "can_set_homepage",
         )
         read_only_fields = (
             "id", "site", "path", "is_homepage", "status", "published_at",
@@ -117,3 +134,16 @@ class PageSerializer(
     def get_available_actions(self, page):
         """Return workflow actions the current authenticated user may attempt."""
         return available_workflow_actions(page, self.context.get("request"))
+
+    @extend_schema_field(serializers.BooleanField())
+    def get_is_homepage(self, page):
+        return page.site.homepage_id == page.pk if page.site.homepage_id else page.is_homepage
+
+    @extend_schema_field(serializers.BooleanField())
+    def get_can_set_homepage(self, page):
+        from ..services.homepage import can_assign_homepage
+        from ..models import ContentStatus, Visibility
+        request = self.context.get("request")
+        return bool(request and page.status == ContentStatus.PUBLISHED
+                    and page.visibility in (Visibility.PUBLIC, Visibility.UNLISTED)
+                    and not page.draft_of_id and can_assign_homepage(request.user, page.site))

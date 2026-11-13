@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ToastProvider } from "@uog/ui";
+import layoutFixtures from "../../../../packages/types/src/layout/fixtures.json";
 
 import type { SitePageRecord, SitePageStatus } from "@/app/sites/page-actions";
 
@@ -8,6 +9,7 @@ const { push } = vi.hoisted(() => ({ push: vi.fn() }));
 const loadSitePages = vi.fn();
 const loadSitePageStatusCounts = vi.fn();
 const getSitePage = vi.fn();
+const getSitePagePreview = vi.fn();
 const createSitePage = vi.fn();
 const updateSitePage = vi.fn();
 const transitionSitePage = vi.fn();
@@ -19,6 +21,7 @@ vi.mock("@/app/sites/page-actions", () => ({
   loadSitePages: (...args: unknown[]) => loadSitePages(...args),
   loadSitePageStatusCounts: (...args: unknown[]) => loadSitePageStatusCounts(...args),
   getSitePage: (...args: unknown[]) => getSitePage(...args),
+  getSitePagePreview: (...args: unknown[]) => getSitePagePreview(...args),
   createSitePage: (...args: unknown[]) => createSitePage(...args),
   updateSitePage: (...args: unknown[]) => updateSitePage(...args),
   transitionSitePage: (...args: unknown[]) => transitionSitePage(...args),
@@ -104,7 +107,7 @@ function renderPanel(
 ) {
   return render(
     <ToastProvider>
-      <SitePagesPanel siteId={siteId} pagesEnabled={pagesEnabled} permissions={permissions} />
+      <SitePagesPanel siteId={siteId} pagesEnabled={pagesEnabled} builderEnabled permissions={permissions} />
     </ToastProvider>,
   );
 }
@@ -139,6 +142,17 @@ beforeEach(() => {
 });
 
 describe("SitePagesPanel", () => {
+  it("assigns only published Pages allowed by the backend as the homepage", async () => {
+    loadSitePages.mockResolvedValue(pageResult([
+      draft({status:"PUBLISHED",can_set_homepage:true}),
+      draft({id:"page-2",title:"Private draft",can_set_homepage:false}),
+    ]));
+    renderPanel();
+    fireEvent.click(await screen.findByRole("button", {name:"Set Admissions as homepage"}));
+    await waitFor(() => expect(setSiteHomepage).toHaveBeenCalledWith(11,"page-1"));
+    expect(screen.queryByRole("button", {name:"Set Private draft as homepage"})).toBeNull();
+  });
+
   it("renders a site-scoped accessible table and status dashboard", async () => {
     loadSitePages.mockResolvedValue(pageResult([
       draft(),
@@ -153,7 +167,8 @@ describe("SitePagesPanel", () => {
     expect(within(table).queryByText("Hospital")).toBeNull();
     expect(screen.getByRole("region", { name: "Page status dashboard" })).toBeTruthy();
     expect(screen.getByText("Total").parentElement?.textContent).toContain("1");
-    expect(screen.getByRole("button", { name: "Preview Admissions" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Preview Admissions" }).getAttribute("href")).toBe("/sites/11/admin/pages/page-1/preview");
+    expect(screen.getByRole("link", { name: "Open Visual Builder for Admissions" }).getAttribute("href")).toBe("/sites/11/admin/pages/page-1/builder");
   });
 
   it("announces empty and failed API list states", async () => {
@@ -226,13 +241,12 @@ describe("SitePagesPanel", () => {
     })));
   });
 
-  it("opens a safe preview and submits this Site's draft for review", async () => {
+  it("opens full-page preview in a new tab and submits this Site's draft for review", async () => {
     renderPanel();
-    fireEvent.click(await screen.findByRole("button", { name: "Preview Admissions" }));
-    expect(screen.getByRole("dialog", { name: "Preview: Admissions" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "About" }).getAttribute("href")).toBe("/about");
-    expect(screen.queryByRole("link", { name: "Bad" })).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "Close preview" }));
+    const preview = await screen.findByRole("link", { name: "Preview Admissions" });
+    expect(preview.getAttribute("href")).toBe("/sites/11/admin/pages/page-1/preview");
+    expect(preview.getAttribute("target")).toBe("_blank");
+    expect(preview.getAttribute("rel")).toContain("noopener");
 
     fireEvent.click(await screen.findByRole("button", { name: "Submit Admissions for review" }));
     expect(screen.getByRole("dialog", { name: "Submit Page?" })).toBeTruthy();
@@ -408,6 +422,35 @@ describe("SitePagesPanel", () => {
     });
     expect(screen.getByRole("button", { name: "Create Page" })).toHaveProperty("disabled", true);
     expect(screen.getAllByRole("alert").some((alert) => /JSON at position|Expected property/i.test(alert.textContent ?? ""))).toBe(true);
+  });
+
+  it("shows the frozen private revision and sends its exact ETag when publishing",async()=>{
+    const visual=structuredClone(layoutFixtures[0]!.layout);
+    const row=draft({status:"APPROVED",revision_number:8,metadata:{visual_layout:visual},available_actions:["publish"]});
+    loadSitePages.mockResolvedValue(pageResult([row]));
+    getSitePagePreview.mockResolvedValue({ok:true,data:{revision_id:80,revision_number:8,status:"APPROVED",content_hash:"hash",approval_id:4,reviewed_revision_id:79,approved_revision_id:80,etag:'"cms-content-page-1-r8"',page:{title:"Reviewed Page",path:"/admissions",site:11,blocks:[],metadata:{visual_layout:visual},seo:{}}}});
+    renderPanel();
+    fireEvent.click(await screen.findByRole("button",{name:"Publish Admissions"}));
+    await screen.findByText("Private revision 8");
+    expect(screen.getByRole("heading",{name:"Reviewed Page"})).toBeTruthy();
+    expect(screen.getByRole("img",{name:"Campus"}).getAttribute("src")).toContain("/admin/sites/11/pages/page-1/preview-media/8/");
+    fireEvent.click(screen.getByRole("button",{name:"Confirm publish"}));
+    await waitFor(()=>expect(transitionSitePage).toHaveBeenCalledWith(11,"page-1","publish","",'"cms-content-page-1-r8"'));
+    expect(getSitePagePreview).toHaveBeenCalledWith(11,"page-1",8);
+  });
+
+  it("previews the shared visual fixture and rejects unsupported layout versions before saving", async () => {
+    renderPanel();
+    fireEvent.click(await screen.findByRole("button", {name:"Create page"}));
+    fireEvent.click(screen.getByRole("button", {name:"Advanced"}));
+    const field=screen.getByRole("textbox", {name:"Metadata (JSON object)"});
+    fireEvent.change(field,{target:{value:JSON.stringify({visual_layout:layoutFixtures[0]!.layout})}});
+    fireEvent.click(screen.getByRole("button",{name:"Preview draft"}));
+    expect(screen.getByRole("region",{name:"Image slider"})).toBeTruthy();
+    expect(screen.getByRole("heading",{name:"Our university"})).toBeTruthy();
+    fireEvent.change(field,{target:{value:JSON.stringify({visual_layout:{schema_version:99,rows:[]}})}});
+    expect(screen.getByRole("button",{name:"Create Page"})).toHaveProperty("disabled",true);
+    expect(createSitePage).not.toHaveBeenCalled();
   });
 
   it("asks before discarding unsaved editor changes", async () => {
