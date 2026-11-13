@@ -8,6 +8,8 @@ export default defineConfig({
   },
   test: {
     environment: "jsdom",
+    // Bound jsdom workers so concurrent workspace tests do not exhaust CI memory.
+    maxWorkers: 2,
     include: ["src/**/*.test.{ts,tsx}"],
     setupFiles: ["./src/test/setup.ts"],
   },

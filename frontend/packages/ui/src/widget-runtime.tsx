@@ -17,6 +17,7 @@ export interface WidgetPost {
   slug:string;
   excerpt:string;
   featured_media:string;
+  featured_alt?:string;
 }
 interface WidgetEnvelope {site:number; results:Record<string,unknown>[]}
 interface WidgetScope {
@@ -151,15 +152,16 @@ export function PostExcerptWidget() {
   return <Typography>{post?post.excerpt:"Choose a Post to preview its excerpt."}</Typography>;
 }
 
-export function FeaturedImageWidget({compact=false}:{compact?:boolean}) {
+export function FeaturedImageWidget({compact=false,variant="inline"}:{compact?:boolean;variant?:"inline"|"hero"}={}) {
   const post=useCurrentPost();
   const scope=useContext(ScopeContext);
   const reference=post?.featured_media??"";
   const match=/^sites\/([1-9][0-9]*)\/assets\/([0-9a-f-]{36})$/.exec(reference);
   const [failed,setFailed]=useState(false);
   useEffect(()=>setFailed(false),[reference]);
+  const omitMissing=compact || variant==="hero";
   if(!post || !match || Number(match[1])!==post.site || !uuid.test(match[2]!) || failed){
-    return compact?null:<Typography role="status">{post?"This Post has no available featured image.":"Choose a Post to preview its featured image."}</Typography>;
+    return omitMissing?null:<Typography role="status">{post?"This Post has no available featured image.":"Choose a Post to preview its featured image."}</Typography>;
   }
   let base="/api/v1/site-context/media";
   if(scope?.preview){
@@ -168,13 +170,22 @@ export function FeaturedImageWidget({compact=false}:{compact?:boolean}) {
     base=library.endsWith("/media")?library:`${library}/media`;
   }
   const src=scope?.preview?`${base}/${match[2]}/image?variant=display`:`${base}/${match[2]}/?variant=display`;
-  return <Box component="img" src={src} alt={post.title} onError={()=>setFailed(true)} loading="lazy" sx={{maxWidth:"100%",height:"auto"}}/>;
+  return <Box
+    component="img"
+    src={src}
+    alt={post.featured_alt || post.title}
+    onError={()=>setFailed(true)}
+    loading="lazy"
+    sx={variant==="hero"
+      ? {width:"100%",maxHeight:{xs:240,sm:360,md:440},objectFit:"cover",display:"block"}
+      : {maxWidth:"100%",height:"auto"}}
+  />;
 }
 
 function asPost(row:Record<string,unknown>,siteId:number|null):WidgetPost|null {
   if(row.site!==siteId || typeof row.id!=="string" || typeof row.title!=="string" || typeof row.slug!=="string" || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(row.slug))return null;
   return {id:row.id,site:row.site as number,title:row.title,slug:row.slug,
-    excerpt:typeof row.excerpt==="string"?row.excerpt:"",featured_media:typeof row.featured_media==="string"?row.featured_media:""};
+    featured_alt:typeof row.featured_alt==="string"?row.featured_alt:"",excerpt:typeof row.excerpt==="string"?row.excerpt:"",featured_media:typeof row.featured_media==="string"?row.featured_media:""};
 }
 
 export function LoopGridWidget({source,limit,category}:{source:"posts"|"pages";limit:number;category?:string}) {

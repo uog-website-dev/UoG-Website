@@ -1,0 +1,223 @@
+{
+  "run": "post-0a98658c92",
+  "site": 47,
+  "results": [
+    {
+      "case": "author-b: real Keycloak authentication",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "reviewer-b: real Keycloak authentication",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "publisher-b: real Keycloak authentication",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Independent Site article",
+      "expected": {
+        "http_status": 201
+      },
+      "actual": {
+        "http_status": 201,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-bea14700-2b1d-4702-b5d0-e31d88453c8d-r1\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Independent Site submit",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-bea14700-2b1d-4702-b5d0-e31d88453c8d-r2\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Independent Site approve",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-bea14700-2b1d-4702-b5d0-e31d88453c8d-r3\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Independent Site publish",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-bea14700-2b1d-4702-b5d0-e31d88453c8d-r4\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Anonymous preview denied",
+      "expected": {
+        "http_status": 401
+      },
+      "actual": {
+        "http_status": 401,
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Authorized private saved revision preview",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-f68aaae9-9703-4bb4-9a5d-e4c492c8be3e-r4\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Foreign ID preview hidden",
+      "expected": {
+        "http_status": 404
+      },
+      "actual": {
+        "http_status": 404,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Foreign Site preview denied",
+      "expected": {
+        "http_status": 403
+      },
+      "actual": {
+        "http_status": 403,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Foreign Site review denied",
+      "expected": {
+        "http_status": 403
+      },
+      "actual": {
+        "http_status": 403,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Foreign Site publication denied",
+      "expected": {
+        "http_status": 403
+      },
+      "actual": {
+        "http_status": 403,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Unsupported scheduling rejected",
+      "expected": {
+        "http_status": 400
+      },
+      "actual": {
+        "http_status": 400,
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Disabled POSTS preview denied",
+      "expected": {
+        "http_status": 400
+      },
+      "actual": {
+        "http_status": 400,
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Disabled POSTS workflow denied",
+      "expected": {
+        "http_status": 400
+      },
+      "actual": {
+        "http_status": 400,
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Original publication preserved after failures",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "ETag": "\"cms-post-f68aaae9-9703-4bb4-9a5d-e4c492c8be3e-publication-1\"",
+        "X-Publication-Version": "1",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    }
+  ]
+}

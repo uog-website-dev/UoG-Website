@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="7" failures="0" errors="0" time="0.568611132">
+    <testsuite name="src/article-document.test.tsx" timestamp="2026-11-13T12:24:40.063Z" hostname="6a6ec1b6cec7" tests="3" failures="0" errors="0" skipped="0" time="0.258744136">
+        <testcase classname="src/article-document.test.tsx" name="versioned article rendering &gt; preserves supported semantics and safely renders hostile text and links" time="0.165127473">
+        </testcase>
+        <testcase classname="src/article-document.test.tsx" name="versioned article rendering &gt; rejects unknown versions and unbounded documents without executing content" time="0.042809632">
+        </testcase>
+        <testcase classname="src/article-document.test.tsx" name="persists asset identities without supplied URLs and renders scoped delivery with a stable fallback" time="0.047884541">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/public-post.test.tsx" timestamp="2026-11-13T12:24:40.067Z" hostname="6a6ec1b6cec7" tests="4" failures="0" errors="0" skipped="0" time="0.309866996">
+        <testcase classname="src/public-post.test.tsx" name="postsFromResponse &gt; keeps published posts and drops drafts, foreign markup slugs and a disabled module" time="0.003313174">
+        </testcase>
+        <testcase classname="src/public-post.test.tsx" name="PublicPostFeed and PublicPostDetail &gt; renders a stacked feed link and a detail body without script or javascript targets" time="0.253851841">
+        </testcase>
+        <testcase classname="src/public-post.test.tsx" name="PublicPostFeed and PublicPostDetail &gt; shows nothing for a missing feed or detail" time="0.00897395">
+        </testcase>
+        <testcase classname="src/public-post.test.tsx" name="PublicPostFeed and PublicPostDetail &gt; renders versioned editor_document bodies without executing hostile markup" time="0.041451798">
+        </testcase>
+    </testsuite>
+</testsuites>

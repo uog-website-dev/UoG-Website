@@ -1,0 +1,220 @@
+{
+  "run": "post-14a6169c2f",
+  "site_a": 49,
+  "results": [
+    {
+      "case": "author-b: real Keycloak authentication",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "reviewer-b: real Keycloak authentication",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "publisher-b: real Keycloak authentication",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Default public page",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "X-Publication-Version": "24",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Default twenty and scoped count",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    },
+    {
+      "case": "Second public page",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "X-Publication-Version": "24",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Stable page boundary",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    },
+    {
+      "case": "Summary has no draft body or internal fields",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    },
+    {
+      "case": "Maximum page size",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "X-Publication-Version": "24",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Invalid query page_size=101",
+      "expected": {
+        "http_status": 400
+      },
+      "actual": {
+        "http_status": 400,
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Invalid query page_size=0",
+      "expected": {
+        "http_status": 400
+      },
+      "actual": {
+        "http_status": 400,
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Invalid query page_size=bad",
+      "expected": {
+        "http_status": 400
+      },
+      "actual": {
+        "http_status": 400,
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Invalid query page=-1",
+      "expected": {
+        "http_status": 400
+      },
+      "actual": {
+        "http_status": 400,
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Invalid query site_id=50",
+      "expected": {
+        "http_status": 400
+      },
+      "actual": {
+        "http_status": 400,
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Future detail hidden",
+      "expected": {
+        "http_status": 404
+      },
+      "actual": {
+        "http_status": 404,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Empty Site list",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "X-Publication-Version": "0",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Disabled Site list",
+      "expected": {
+        "http_status": 404
+      },
+      "actual": {
+        "http_status": 404,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Independent university-owned Site list",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "X-Publication-Version": "1",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Independent catalog",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    }
+  ]
+}

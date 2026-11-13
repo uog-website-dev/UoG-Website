@@ -1,0 +1,13 @@
+{
+  "backend/apps/cms/api/public.py": "686ecaefff8c5cdbb0f0059711b3bca998efe6df55165651b4363aa2aec5e170",
+  "backend/apps/sites/api/context_urls.py": "34a8bc6b13a20600907706ddc0118c89d6c5930218d27198d4803ff68592c9b8",
+  "backend/apps/cms/tests/test_category_archives.py": "c6adb07ea9d2bb6b8fdeb1d45cc2ec0a3ba4975ad211161eccd7922f7d084607",
+  "backend/apps/cms/tests/test_public_posts.py": "f6f975474964048eba711c58ca2b620e2d13b24c90a2b2782c7876f2113b1c65",
+  "frontend/apps/public-web/src/public-posts.tsx": "d685dc101940c1da4082012f7426fdb8206a7f871c327c75bd0a26b397457b69",
+  "frontend/apps/public-web/src/app/posts/categories/[slug]/page.tsx": "e73026106937a378ffd3c9be3f95ffea7a134019ec7e10107cf2167c4ca2a706",
+  "frontend/packages/ui/src/public-post.tsx": "aa6d1d0d8980f77d7305992057980f2c5825b0f33190d70d7e02c2dd4d1bd565",
+  "frontend/packages/ui/src/public-post.test.tsx": "95c2c41e307526fa9f4941659e90c7d6ab7cb428e0641e842605a45af52156e2",
+  "scripts/qa-category-archives-seed.py": "955a966f90e71d6154d9e674c534b203444d219d33d9fd7277eb21d65073810f",
+  "scripts/qa-category-archives-browser.cjs": "94a374558c2825707a4235484ab3e7ed4b3c3c08f094fb2842f5216d2bb9163b",
+  "docs/api/openapi.yaml": "1ab23f039255c518574024c806255f6e1f619d00ba21f39aa87e5520df9bf0e4"
+}

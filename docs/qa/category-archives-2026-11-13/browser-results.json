@@ -1,0 +1,30 @@
+{
+  "run": "655af51c8f",
+  "browser": "157.0.4341.46",
+  "results": [
+    {
+      "name": "Published category heading, scoped cards and approved archive link",
+      "status": "PASS"
+    },
+    {
+      "name": "Stable archive pagination, keyboard operation and mobile stacking",
+      "status": "PASS"
+    },
+    {
+      "name": "Intentional empty archive and all-news navigation",
+      "status": "PASS"
+    },
+    {
+      "name": "Foreign, unpublished and unknown category API requests return 404",
+      "status": "PASS"
+    },
+    {
+      "name": "Invalid pagination recovery stays within the category",
+      "status": "PASS"
+    },
+    {
+      "name": "Archive automated accessibility scan",
+      "status": "PASS"
+    }
+  ]
+}

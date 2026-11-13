@@ -1,0 +1,215 @@
+{
+  "run": "post-48c6375e21",
+  "site_a": 42,
+  "results": [
+    {
+      "case": "reader: real Keycloak authentication",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "reviewer: real Keycloak authentication",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "publisher: real Keycloak authentication",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Unauthenticated direct write denied",
+      "expected": {
+        "http_status": 401
+      },
+      "actual": {
+        "http_status": 401,
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Authenticated viewer direct write denied",
+      "expected": {
+        "http_status": 403
+      },
+      "actual": {
+        "http_status": 403,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Foreign ID read under authorized Site denied",
+      "expected": {
+        "http_status": 404
+      },
+      "actual": {
+        "http_status": 404,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Foreign ID mutation under authorized Site denied",
+      "expected": {
+        "http_status": 404
+      },
+      "actual": {
+        "http_status": 404,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Foreign Site route denied",
+      "expected": {
+        "http_status": 403
+      },
+      "actual": {
+        "http_status": 403,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Invalid title and editor version rejected",
+      "expected": {
+        "http_status": 400
+      },
+      "actual": {
+        "http_status": 400,
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Field errors and atomic rejection",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    },
+    {
+      "case": "Disabled POSTS write denied",
+      "expected": {
+        "http_status": 400
+      },
+      "actual": {
+        "http_status": 400,
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Foreign metadata unchanged",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    },
+    {
+      "case": "Re-enabled POSTS formatted draft create",
+      "expected": {
+        "http_status": 201
+      },
+      "actual": {
+        "http_status": 201,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-f1f13dae-c888-4cfa-82f1-df892316799d-r1\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Existing workflow submit",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-f1f13dae-c888-4cfa-82f1-df892316799d-r2\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Existing workflow approve",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-f1f13dae-c888-4cfa-82f1-df892316799d-r3\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Existing workflow publish",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-f1f13dae-c888-4cfa-82f1-df892316799d-r4\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Anonymous formatted Post on existing public API",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "ETag": "\"cms-post-f1f13dae-c888-4cfa-82f1-df892316799d-publication-1\"",
+        "X-Publication-Version": "1",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Published representation preserved",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    }
+  ]
+}

@@ -91,6 +91,8 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
         "/api/v1/sites/{site_pk}/pages/{id}/preview/",
         "/api/v1/sites/{site_pk}/posts/",
         "/api/v1/sites/{site_pk}/posts/{id}/",
+        "/api/v1/sites/{site_pk}/posts/{id}/preview/",
+        "/api/v1/sites/{site_pk}/posts/{id}/working-draft/",
         "/api/v1/sites/{site_pk}/categories/",
         "/api/v1/sites/{site_pk}/categories/{id}/",
         "/api/v1/sites/{site_pk}/tags/",
@@ -177,7 +179,7 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
     )
     assert {} in paths["/api/v1/site-context/posts/{post_slug}/"]["get"]["security"]
     public_post_schema = schema["components"]["schemas"]["PublicPostDetail"]
-    assert {"content", "excerpt", "featured_media", "seo", "categories", "tags"} <= set(
+    assert {"content", "excerpt", "featured_media", "author", "seo", "categories", "tags"} <= set(
         public_post_schema["properties"]
     )
     assert paths["/api/v1/authorization/roles/"]["get"]["security"] == [{"keycloakBearer": []}]

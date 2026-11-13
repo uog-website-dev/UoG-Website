@@ -1,0 +1,11 @@
+{
+  "implementation_qa": "PASS",
+  "independent_review": "PENDING",
+  "reviewer": null,
+  "approval": null,
+  "pull_request_url": null,
+  "azure_devops_issue_url": null,
+  "issue_attachment": "PENDING: issue identifier not supplied",
+  "production_deployment": "Not performed; production builds validated in isolated source copies",
+  "evidence": "README.md"
+}

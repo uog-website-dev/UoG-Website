@@ -1,0 +1,38 @@
+{
+  "run": "post-14a6169c2f",
+  "browser": "157.0.4341.46",
+  "results": [
+    {
+      "name": "Loading state, twenty scoped cards, dates and approved thumbnail",
+      "status": "PASS"
+    },
+    {
+      "name": "Stable pagination, mobile keyboard focus and responsive accessibility",
+      "status": "PASS"
+    },
+    {
+      "name": "Card opens the approved article on the same hostname",
+      "status": "PASS"
+    },
+    {
+      "name": "University-owned, child, empty and disabled Site catalogs stay independent",
+      "status": "PASS"
+    },
+    {
+      "name": "Transport failure exposes a retry and recovers without stale cards",
+      "status": "PASS"
+    },
+    {
+      "name": "Missing media uses the card fallback and retains its article link",
+      "status": "PASS"
+    },
+    {
+      "name": "A cancelled earlier request cannot replace the active filtered catalog",
+      "status": "PASS"
+    },
+    {
+      "name": "Invalid page size has a usable first-page recovery",
+      "status": "PASS"
+    }
+  ]
+}

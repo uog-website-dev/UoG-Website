@@ -1,0 +1,40 @@
+{
+  "status": "PASS",
+  "reports": {
+    "backend-tests.xml": {
+      "tests": 29,
+      "failures": 0
+    },
+    "admin-tests.xml": {
+      "tests": 505,
+      "failures": 0
+    },
+    "ui-tests.xml": {
+      "tests": 184,
+      "failures": 0
+    },
+    "final-post-editor-tests.xml": {
+      "tests": 13,
+      "failures": 0
+    },
+    "current-editor-tests.xml": {
+      "tests": 19,
+      "failures": 0
+    }
+  },
+  "browser_checks": 10,
+  "live_api_checks": 18,
+  "automated_accessibility_violations": 0,
+  "workspace_typecheck": "PASS",
+  "admin_production_build": "PASS",
+  "public_production_build": "PASS",
+  "openapi": "validated and matches baseline",
+  "migration_merge": "applied, reversed and reapplied; clean-database tests pass",
+  "cleanup": {
+    "generated_keycloak_accounts_disabled": 5,
+    "generated_local_accounts_disabled": 5,
+    "secret_file_removed": true
+  },
+  "independent_approval": "PENDING",
+  "pr_and_issue_linking": "PENDING"
+}

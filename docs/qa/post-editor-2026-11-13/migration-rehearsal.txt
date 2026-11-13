@@ -1,0 +1,29 @@
+Recorded migration rehearsal, 2026-11-13
+
+Initial clean database attempt:
+Conflicting migrations detected: sites.0010_published_homepage and sites.0010_retained_module_deactivation.
+
+Added sites.0011_merge_homepage_module_deactivation:
+dependencies = both existing leaves
+operations = []
+
+python manage.py migrate --noinput
+Applying sites.0011_merge_homepage_module_deactivation... OK
+
+python manage.py migrate sites 0010_published_homepage --plan
+Planned operations:
+sites.0011_merge_homepage_module_deactivation
+
+python manage.py migrate sites 0010_published_homepage --noinput
+Unapplying sites.0011_merge_homepage_module_deactivation... OK
+
+python manage.py migrate --noinput
+Applying sites.0011_merge_homepage_module_deactivation... OK
+
+python manage.py makemigrations --check --dry-run
+No changes detected
+
+Final API/revision regression: pytest --create-db (full clean migration graph).
+See backend-tests.xml for individual results.
+
+Article editor storage uses existing metadata/content/revision columns. No article data conversion or schema migration was introduced.

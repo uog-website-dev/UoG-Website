@@ -1,0 +1,35 @@
+{
+  "run": "post-0a98658c92",
+  "site": 47,
+  "browser": "157.0.4341.46",
+  "results": [
+    {
+      "name": "Author saves a separate working draft",
+      "status": "PASS"
+    },
+    {
+      "name": "New-tab preview stays private while the old publication remains public",
+      "status": "PASS"
+    },
+    {
+      "name": "Reviewer rejection requires a comment and preserves the draft",
+      "status": "PASS"
+    },
+    {
+      "name": "Approval remains private until a permitted Publisher releases it",
+      "status": "PASS"
+    },
+    {
+      "name": "Publication replaces the original revision and preserves the independent Site",
+      "status": "PASS"
+    },
+    {
+      "name": "Workflow controls support mobile keyboard access and accessibility scan",
+      "status": "PASS"
+    },
+    {
+      "name": "Unpublish withdraws this article and keeps the other Site public",
+      "status": "PASS"
+    }
+  ]
+}

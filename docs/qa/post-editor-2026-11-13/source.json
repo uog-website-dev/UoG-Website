@@ -1,0 +1,112 @@
+{
+  "base_commit": "b7abe39df2762eb0ae37eafe09a2922878ed411b",
+  "branch": "P4-POST-001-ot-007",
+  "recorded_utc": "2026-11-13T04:39:00.314866+00:00",
+  "working_tree_uncommitted": true,
+  "files": [
+    {
+      "path": "backend/apps/api/models.py",
+      "sha256": "90cfb6893c06e2b712d9c9015ce4ce21316885c7a21840d74d10e2399d0ffc2d"
+    },
+    {
+      "path": "backend/apps/api/post_editor.py",
+      "sha256": "f3c60b09c53640b4a198e9d7bfd4fbe2d1f30d7a9ebe675186f6f624d619372f"
+    },
+    {
+      "path": "backend/apps/api/serializers.py",
+      "sha256": "3a3654774560f4b6d4372df3f2203bd18c5472485dfe98a98d991dd7a4d760e6"
+    },
+    {
+      "path": "backend/apps/cms/api/public.py",
+      "sha256": "83b3d23207fa9f1d9a493b0fc34f08d7213018ce2db7c4fdc5e818e666e3a11e"
+    },
+    {
+      "path": "backend/apps/cms/tests/test_posts_api.py",
+      "sha256": "23602427a2bda2752997e9903df8f940b28671be3453ea648a2a7bf44e8cb8a9"
+    },
+    {
+      "path": "backend/apps/cms/tests/test_public_posts.py",
+      "sha256": "0205c1f5969473366ca578050146d30a8d9d8e9c047eb65018c427c3a0baca80"
+    },
+    {
+      "path": "backend/apps/sites/migrations/0011_merge_homepage_module_deactivation.py",
+      "sha256": "4e11b85403d5c516df61c55e474cf53c5f6df481b3888ef55602563eb7ee3bdb"
+    },
+    {
+      "path": "docs/api/openapi.yaml",
+      "sha256": "b45c11aa135a4ecc61ea2bf7e20afd3f96325f38979f68ee66109feed79834b0"
+    },
+    {
+      "path": "docs/post-editor.md",
+      "sha256": "bd1a3d258026947caae021ac988d92ae31171b50410927d4e92e901004b7823f"
+    },
+    {
+      "path": "frontend/apps/admin-web/src/app/sites/post-actions.ts",
+      "sha256": "0488fa7029b367ce7b63a8f9b6e8e07c5e14ee5946754d266b515da2f3f071d8"
+    },
+    {
+      "path": "frontend/apps/admin-web/src/sidebar.test.tsx",
+      "sha256": "7690bb85ce16b6bab50243a0c58872e313c8c410fdc527439ccc0423059539ae"
+    },
+    {
+      "path": "frontend/apps/admin-web/src/sites/post-rich-editor.tsx",
+      "sha256": "a83b6e7183608ac4ce5d200c2421c797279999ebc3f8d87572151823b29996fe"
+    },
+    {
+      "path": "frontend/apps/admin-web/src/sites/site-posts.test.tsx",
+      "sha256": "b25c9e023874028f6eba8119534353c7e9307a52c7a43ba740ac39f58a16ea80"
+    },
+    {
+      "path": "frontend/apps/admin-web/src/sites/site-posts.tsx",
+      "sha256": "65ee8bff0054a5f63f99eb9fa2548325104a6f9087ef4799c5eb07a2ccee0f58"
+    },
+    {
+      "path": "frontend/apps/admin-web/src/sites/view-public-site.test.tsx",
+      "sha256": "4aab15f681c3a33583adbfa6fe188fb4759928bffc7d000929c1b41f2c2b8d7f"
+    },
+    {
+      "path": "frontend/packages/ui/package.json",
+      "sha256": "06242b6a917a07ab3e4dd009d029b3b96aaee04bba9bf721d941b4b711090fbf"
+    },
+    {
+      "path": "frontend/packages/ui/src/article-document.test.tsx",
+      "sha256": "86879184d5a6c6ccdcf0d52a283b9d249e438edfc5cc77aeff076d4ae8e9f4e9"
+    },
+    {
+      "path": "frontend/packages/ui/src/article-document.tsx",
+      "sha256": "30b61ba2b4b5b916f8eb9453c869b1b7dc3750af238376ef3b71b7ba67985bbb"
+    },
+    {
+      "path": "frontend/packages/ui/src/index.ts",
+      "sha256": "e9a7caf0f2674ffcc7680ae2515c77dba0f6d1d63af555976631bd2469c0a618"
+    },
+    {
+      "path": "frontend/packages/ui/src/public-post.tsx",
+      "sha256": "50b6e8e82c0a27fdb68835c3ca77a74c0118087d4c5836acf1c1c1d93a1e935f"
+    },
+    {
+      "path": "frontend/packages/ui/vitest.config.mts",
+      "sha256": "f549475e1f9e5510fcd517c2ca8ca06b978faae01e89c5c865cc4828a5e69418"
+    },
+    {
+      "path": "frontend/pnpm-lock.yaml",
+      "sha256": "996a68142e8d850c298d0557b4d6fe9c01468064c4bdb8bf11b158637464860c"
+    },
+    {
+      "path": "scripts/qa-post-editor-browser.cjs",
+      "sha256": "c4928474e957ff453b4819d3a5ca6967dea42f54d01c8c591ad39577d60d16e9"
+    },
+    {
+      "path": "scripts/qa-post-editor-cleanup.py",
+      "sha256": "b802c979ec3e047b502e3a465ff7c0666b25ecc0ed182a6185b509c47bfc5927"
+    },
+    {
+      "path": "scripts/qa-post-editor-live-api.py",
+      "sha256": "d81f291d6ad4634f52de5d8fe9952bae804d67c30dfff47fff3e489ba7ec08c0"
+    },
+    {
+      "path": "scripts/qa-post-editor-seed.py",
+      "sha256": "93fe3475d3398aa49f769df4f14943f45c791aa54f5a1b2f418d5049e4c7a2f8"
+    }
+  ]
+}

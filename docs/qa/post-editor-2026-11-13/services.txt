@@ -1,0 +1,12 @@
+backend uog-backend:dev running healthy
+celery-beat sha256:6c2721228021f3382d44800041b90b8605538ba2ebfc8fefe785ea779ed9183f running 
+celery-worker sha256:6c2721228021f3382d44800041b90b8605538ba2ebfc8fefe785ea779ed9183f running healthy
+frontend-admin uog-frontend:dev running healthy
+frontend-public uog-frontend:dev running healthy
+keycloak quay.io/keycloak/keycloak:26.8.1 running healthy
+keycloak-db postgres:16.15-alpine running healthy
+minio pgsty/silo:RELEASE.2026-10-18T00-00-00Z running healthy
+nginx nginx:1.31.7-alpine running healthy
+postgres postgres:16.15-alpine running healthy
+redis-broker redis:7.4.11-alpine running healthy
+redis-cache redis:7.4.11-alpine running healthy

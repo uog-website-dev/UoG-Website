@@ -1,0 +1,27 @@
+{
+  "run": "post-52c342cdbc",
+  "site": 46,
+  "browser": "157.0.4341.46",
+  "results": [
+    {
+      "name": "Featured image picker and private delivery",
+      "status": "PASS"
+    },
+    {
+      "name": "Inline image and alternative text round trip",
+      "status": "PASS"
+    },
+    {
+      "name": "Featured removal retains shared inline image",
+      "status": "PASS"
+    },
+    {
+      "name": "Mobile keyboard and automated accessibility",
+      "status": "PASS"
+    },
+    {
+      "name": "Published featured and inline image delivery",
+      "status": "PASS"
+    }
+  ]
+}

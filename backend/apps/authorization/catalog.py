@@ -100,8 +100,9 @@ EDITOR = frozenset({
     "content.pages.view", "content.pages.create", "content.pages.update",
     "content.posts.view", "content.posts.create", "content.posts.update",
 })
-REVIEWER = frozenset({"content.pages.view", "content.posts.view", "menu.read"})
+REVIEWER = frozenset({"sites.view", "content.media.view", "content.pages.view", "content.posts.view", "menu.read"})
 PUBLISHER = frozenset({
+    "sites.view", "content.media.view",
     "content.pages.view", "content.pages.publish",
     "content.posts.view", "content.posts.publish",
     "menu.read", "menu.publish",
@@ -122,6 +123,16 @@ STANDARD_ROLES = (
     ("publisher", "Publisher", "Publish content only where the workflow allows it.", PUBLISHER),
     ("viewer", "Viewer", "Read explicitly granted resources only.", VIEWER),
 )
+
+# Roles a Site may grant through Site user management. Platform and organization
+# administrators stay out of SITE scope and are managed only at their own scopes.
+SITE_MEMBERSHIP_ROLE_CODES = frozenset({
+    "site-administrator",
+    "editor",
+    "publisher",
+    "reviewer",
+    "viewer",
+})
 
 
 def capability_for(code):

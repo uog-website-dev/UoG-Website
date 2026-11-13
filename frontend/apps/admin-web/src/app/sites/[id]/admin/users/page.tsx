@@ -30,6 +30,7 @@ import Typography from "@mui/material/Typography";
 import { useParams } from "next/navigation";
 
 import { SiteSection, useSiteAdmin } from "@/sites/site-admin-frame";
+import { isSiteMembershipRole } from "@/sites/site-membership";
 import { assignSiteRole, getSiteRoles, getSiteUsers, revokeSiteRole, searchSiteUsers } from "@/app/sites/user-actions";
 import type { SiteAssignment, SiteDirectoryUser, SiteIdentity, SiteRole } from "@/app/sites/user-actions";
 
@@ -63,7 +64,7 @@ function UsersDirectory() {
     setLoading(true); setError("");
     try {
       const [directory, availableRoles] = await Promise.all([getSiteUsers(siteId, search, page + 1, filter, ordering), getSiteRoles(siteId)]);
-      setPeople(directory.results); setCount(directory.count); setRoles(availableRoles);
+      setPeople(directory.results); setCount(directory.count); setRoles(availableRoles.filter((role) => isSiteMembershipRole(role.code)));
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Could not load Site users."); }
     finally { setLoading(false); }
   }, [filter, ordering, page, search, siteId]);
@@ -95,7 +96,7 @@ function UsersDirectory() {
 
   return <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
     <Box sx={{ display: "flex", alignItems: { xs: "stretch", sm: "center" }, justifyContent: "space-between", gap: 2, flexWrap: "wrap" }}>
-      <Box><Typography variant="h4" component="h2" fontWeight={800}>Users</Typography><Typography color="text.secondary">Manage the people and roles assigned to {site.name}.</Typography></Box>
+      <Box><Typography variant="h4" component="h2" fontWeight={800}>Users</Typography><Typography color="text.secondary">Assign Site Admin, Editor, Publisher, Reviewer, or Viewer for {site.name}. Platform and organization roles are managed outside this Site.</Typography></Box>
       <Button variant="contained" startIcon={<AddIcon />} onClick={() => { setError(""); setDialog(true); }}>Add existing user</Button>
     </Box>
     {notice ? <Alert severity="success" onClose={() => setNotice("")}>{notice}</Alert> : null}
@@ -132,7 +133,7 @@ function UsersDirectory() {
     <Dialog open={dialog} onClose={() => !busy && setDialog(false)} fullWidth maxWidth="sm">
       <DialogTitle>Add an existing user</DialogTitle>
       <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, pt: "12px !important" }}>
-        <Typography variant="body2" color="text.secondary">Find an existing platform identity and assign a role for this Site only.</Typography>
+        <Typography variant="body2" color="text.secondary">Find an existing platform identity and grant a Site role (Admin, Editor, Publisher, Reviewer, or Viewer) for this Site only.</Typography>
         <Autocomplete options={identities} value={selected} onChange={(_, value) => { setSelected(value); setRoleId(""); }} inputValue={needle} onInputChange={(_, value) => setNeedle(value)} getOptionLabel={(option) => `${option.first_name} ${option.last_name} (${option.username})`.trim()} isOptionEqualToValue={(a, b) => a.id === b.id} noOptionsText={needle.length < 2 ? "Type at least two characters" : "No eligible users found"} renderInput={(props) => <TextField {...props} label="Search platform users" placeholder="Name, email or username" />} renderOption={(props, option) => <li {...props} key={option.id}><Box><Typography>{[option.first_name, option.last_name].filter(Boolean).join(" ") || option.username}</Typography><Typography variant="caption" color="text.secondary">{option.email} · {option.username}</Typography></Box></li>} />
         <TextField select label="Site role" value={roleId} onChange={(event) => setRoleId(Number(event.target.value))}>
           {roles.filter((role) => role.assignable && !selected?.assigned_role_ids.includes(role.id)).map((role) => <MenuItem key={role.id} value={role.id}>{role.name}</MenuItem>)}

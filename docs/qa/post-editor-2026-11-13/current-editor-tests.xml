@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="19" failures="0" errors="0" time="14.76615759">
+    <testsuite name="src/sites/post-rich-editor.test.tsx" timestamp="2026-11-13T11:48:56.397Z" hostname="1b3723ea3fe1" tests="1" failures="0" errors="0" skipped="0" time="0.450271834">
+        <testcase classname="src/sites/post-rich-editor.test.tsx" name="applies Paragraph even when the menu already displays Paragraph for an existing heading" time="0.44900998">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-posts.test.tsx" timestamp="2026-11-13T11:48:56.401Z" hostname="1b3723ea3fe1" tests="18" failures="0" errors="0" skipped="0" time="14.315885756">
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; loads only the selected Site and renders status, author, taxonomy and featured media" time="0.489069713">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; applies search, status, category and tag filters and resets them" time="0.845247299">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; resets filters on Site change and requests the new Site only" time="0.39759328">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; hides create/edit actions without permissions and blocks the disabled module" time="0.216169843">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; does not request or reveal Site Posts without view permission" time="0.006416263">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; creates drafts and edits with the detail ETag" time="2.184710893">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; shows empty and API error states" time="0.347523989">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; validates media scope and offers taxonomy creation only to authorized creators" time="2.216688067">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; previews the Site draft through the shared safe block renderer" time="0.901227039">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; runs submit, approve and publish only when the API offers that action for this Site" time="0.67279106">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; keeps unsaved formatting after failed saves and warns before discard" time="0.826980604">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; preserves a stale draft and displays explicit conflict guidance" time="0.646154042">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; refreshes the revision marker after a conflict while keeping unsaved text" time="1.1874839">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; surfaces editor_document field errors on the draft dialog" time="0.532827532">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; rejects reserved permalinks and shows the public path preview" time="0.602262057">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; surfaces duplicate slug API field errors on the settings panel" time="1.084958643">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; locks Post settings while the Post is published" time="0.372957716">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; lets an editor remove selected taxonomy that is no longer eligible" time="0.782323464">
+        </testcase>
+    </testsuite>
+</testsuites>

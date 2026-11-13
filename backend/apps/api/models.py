@@ -14,7 +14,22 @@ from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db import models
 
-from apps.cms.models import SEO_KEYS, SLUG_FORMAT, SiteContent, normalize_slug
+from apps.cms.models import ContentStatus, SEO_KEYS, SLUG_FORMAT, SiteContent, normalize_slug
+
+# Permalinks under /posts/{slug}. Keep in sync with the admin Post settings UI.
+RESERVED_POST_SLUGS = frozenset({
+    "new",
+    "edit",
+    "create",
+    "admin",
+    "api",
+    "preview",
+    "feed",
+    "search",
+    "rss",
+    "atom",
+    "index",
+})
 
 
 class Page(models.Model):
@@ -65,6 +80,8 @@ class Post(SiteContent):
     history from SiteContent. Adds taxonomy (Category/Tag), featured media,
     author and SEO metadata scoped to the owning Site.
     """
+
+    draft_of = models.ForeignKey("self", null=True, blank=True, on_delete=models.PROTECT, related_name="working_drafts")
 
     title = models.CharField(
         max_length=255,
@@ -142,14 +159,115 @@ class Post(SiteContent):
         return super().full_clean(*args, **kwargs)
 
     def clean(self):
-        # Shared content rules first: they settle locale and reject writes
-        # that bypass the workflow. Then this type's own keys, and blocks
-        # last (see Page.clean) so a rejection never leaves half-normalized
-        # state behind for the post-clean constraint checks.
+        # Normalize the versioned representation before validating the full
+        # candidate against shared Site/workflow and Post-specific rules.
+        # All mutations still pass full_clean before the revisioned save.
+        if isinstance(self.metadata, dict) and "post_editor" in self.metadata:
+            from .post_editor import normalize_document
+            try:
+                document = normalize_document(self.metadata["post_editor"])
+            except ValidationError as error:
+                raise ValidationError({"editor_document": error.messages}) from error
+            self.metadata = {**self.metadata, "post_editor": document}
+            self.content = document["html"]
         self._validate_content()
+        from .post_media import validate_post_images
+        from apps.cms.models import _workflow_write
+        returning_to_draft = _workflow_write.get() and self.status == ContentStatus.DRAFT
+        if self.status not in {ContentStatus.UNPUBLISHED, ContentStatus.ARCHIVED} and not returning_to_draft:
+            validate_post_images(self)
+        self._validate_working_draft()
+        self._validate_identity_lock()
+        self._validate_reserved_slug()
         _validate_seo(self.seo)
         self._validate_slug_is_free()
         self._validate_blocks()
+
+    def save(self, *args, taxonomy=None, **kwargs):
+        if taxonomy and kwargs.get("update_fields") is not None:
+            raise ValueError("Post taxonomy requires a complete revisioned save.")
+        self._pending_taxonomy = {field: list(terms) for field, terms in (taxonomy or {}).items()}
+        try:
+            return super().save(*args, **kwargs)
+        finally:
+            del self._pending_taxonomy
+
+    def _save_revision_relations(self, *, using):
+        for field, terms in self._pending_taxonomy.items():
+            model = Category if field == "categories" else Tag
+            identifiers = {term.pk for term in terms}
+            rows = list(
+                model.objects.using(using).select_for_update()
+                .filter(pk__in=identifiers, site_id=self.site_id, is_active=True)
+                .order_by("pk")
+            )
+            if len(rows) != len(identifiers):
+                raise ValidationError({field: "Select active taxonomy owned by this Site."})
+            relation = getattr(self, field)
+            from apps.cms.models import _apply_working_draft
+            editable = self.status in {ContentStatus.DRAFT, ContentStatus.UNPUBLISHED} or _apply_working_draft.get()
+            if not editable and set(relation.values_list("pk", flat=True)) != identifiers:
+                raise ValidationError({field: "Return the Post to draft before changing taxonomy."})
+            relation.set(rows)
+
+    def _validate_working_draft(self):
+        if not self.draft_of_id:
+            return
+        target = type(self).objects.filter(pk=self.draft_of_id).first()
+        if target is None or target.pk == self.pk or target.draft_of_id or target.site_id != self.site_id or target.locale != self.locale:
+            raise ValidationError({"draft_of": "A working draft must target an original Post on the same Site and language."})
+        previous = type(self).objects.filter(pk=self.pk).values_list("draft_of_id",flat=True).first()
+        if not self._state.adding and previous != self.draft_of_id:
+            raise ValidationError({"draft_of": "The published article link is immutable."})
+        if self._state.adding and target.status != ContentStatus.PUBLISHED:
+            raise ValidationError({"draft_of": "Open a working draft from a published Post."})
+        if self.status != ContentStatus.ARCHIVED and type(self).objects.filter(draft_of_id=self.draft_of_id).exclude(pk=self.pk).exclude(status=ContentStatus.ARCHIVED).exists():
+            raise ValidationError({"draft_of": "This article already has an active working draft."})
+
+    def _validate_reserved_slug(self):
+        if self.slug and self.slug in RESERVED_POST_SLUGS:
+            raise ValidationError({
+                "slug": f'"{self.slug}" is reserved and cannot be used as a Post permalink.',
+            })
+
+    def _validate_identity_lock(self):
+        """Keep published (and review) identity stable until workflow unlocks it.
+
+        Public listing/detail resolve the live Post row then serve the publication
+        snapshot. Mutating title/slug/excerpt while published would move the public
+        route or diverge from the frozen snapshot without a new publish.
+        """
+        from apps.cms.models import _apply_working_draft
+        if self._state.adding or _apply_working_draft.get():
+            return
+        from django.db import router
+        previous = (
+            type(self).objects.using(
+                self._state.db or router.db_for_write(type(self), instance=self)
+            )
+            .filter(pk=self.pk)
+            .values(
+                "status", "title", "slug", "excerpt", "content",
+                "featured_media", "seo", "excerpt_html", "author_id",
+            )
+            .first()
+        )
+        if not previous:
+            return
+        if previous["status"] not in {
+            ContentStatus.IN_REVIEW, ContentStatus.APPROVED,
+            ContentStatus.PUBLISHED, ContentStatus.ARCHIVED,
+        }:
+            return
+        locked = (
+            "title", "slug", "excerpt", "content", "featured_media", "seo", "excerpt_html", "author_id",
+        )
+        if any(previous[name] != getattr(self, name) for name in locked):
+            raise ValidationError({
+                "status": "Post title, permalink, summary and body are locked while "
+                          "in review, approved, published or archived. Return the Post "
+                          "to draft through the workflow before changing them.",
+            })
 
     def _validate_slug_is_free(self):
         """Refuse a duplicate slug in the same Site and language.

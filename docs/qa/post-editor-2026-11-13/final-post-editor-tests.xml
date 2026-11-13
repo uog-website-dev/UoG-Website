@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="13" failures="0" errors="0" time="15.254854379">
+    <testsuite name="src/sites/post-rich-editor.test.tsx" timestamp="2026-11-13T05:02:40.724Z" hostname="4716cbe477ac" tests="1" failures="0" errors="0" skipped="0" time="0.934881183">
+        <testcase classname="src/sites/post-rich-editor.test.tsx" name="applies Paragraph even when the menu already displays Paragraph for an existing heading" time="0.932273842">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-posts.test.tsx" timestamp="2026-11-13T05:02:40.727Z" hostname="4716cbe477ac" tests="12" failures="0" errors="0" skipped="0" time="14.319973196">
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; loads only the selected Site and renders status, author, taxonomy and featured media" time="0.967391587">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; applies search, status, category and tag filters and resets them" time="1.418982637">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; resets filters on Site change and requests the new Site only" time="0.816579809">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; hides create/edit actions without permissions and blocks the disabled module" time="0.46591657">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; does not request or reveal Site Posts without view permission" time="0.029466364">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; creates drafts and edits with the detail ETag" time="2.278918636">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; shows empty and API error states" time="0.343477997">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; validates media scope and offers taxonomy creation only to authorized creators" time="3.293819897">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; previews the Site draft through the shared safe block renderer" time="0.766736066">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; runs submit, approve and publish only when the API offers that action for this Site" time="1.566379214">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; keeps unsaved formatting after failed saves and warns before discard" time="1.593999313">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; preserves a stale draft and displays explicit conflict guidance" time="0.775186701">
+        </testcase>
+    </testsuite>
+</testsuites>

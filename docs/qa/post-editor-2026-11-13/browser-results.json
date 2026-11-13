@@ -1,0 +1,58 @@
+{
+  "run": "post-48c6375e21",
+  "site": 42,
+  "services": "Real Edge, Keycloak, Next.js, Django, PostgreSQL",
+  "browser_version": "157.0.4341.46",
+  "results": [
+    {
+      "name": "Real Site author access",
+      "status": "PASS",
+      "details": "Keycloak session and Site-scoped Posts administration loaded."
+    },
+    {
+      "name": "Formatted draft save",
+      "status": "PASS",
+      "details": "Browser formatting, safe paste, headings/lists/quote/link saved through real server actions."
+    },
+    {
+      "name": "Reopen preserves formatting",
+      "status": "PASS",
+      "details": "All supported semantic elements reload; unsafe pasted content cannot execute."
+    },
+    {
+      "name": "Two-session stale revision",
+      "status": "PASS",
+      "details": "Second editor save wins; stale author gets explicit conflict and retains unsaved text."
+    },
+    {
+      "name": "Discard warning",
+      "status": "PASS",
+      "details": "Cancel requires confirmation and dismiss preserves article."
+    },
+    {
+      "name": "Failed save retry",
+      "status": "PASS",
+      "details": "An interrupted server-action request displays a recoverable error, retains text and saves successfully on retry."
+    },
+    {
+      "name": "All formatting controls",
+      "status": "PASS",
+      "details": "H2, H3, H4, paragraph, quotation, unordered/ordered lists and emphasis controls operate on the selected article text."
+    },
+    {
+      "name": "Mobile keyboard",
+      "status": "PASS",
+      "details": "Article remains focusable at 390px; Ctrl+K opens accessible link dialog and Escape closes it."
+    },
+    {
+      "name": "Automated accessibility",
+      "status": "PASS",
+      "details": "No WCAG A/AA violations in the mobile editor dialog."
+    },
+    {
+      "name": "Anonymous public formatting",
+      "status": "PASS",
+      "details": "Existing public Post route renders the published H2, emphasis, list and quotation at mobile width."
+    }
+  ]
+}

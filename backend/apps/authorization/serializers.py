@@ -6,7 +6,7 @@ from rest_framework import serializers
 from apps.organizations.models import OrganizationUnit
 from apps.sites.models import Site
 
-from .catalog import capability_for
+from .catalog import SITE_MEMBERSHIP_ROLE_CODES, capability_for
 from .models import AuthorizationAuditEvent, Permission, Role, UserRoleAssignment
 
 
@@ -101,6 +101,12 @@ class AssignmentCreateSerializer(serializers.Serializer):
                 raise serializers.ValidationError({"site": ["The selected site must belong to the selected organization."]})
             if organization.status != OrganizationUnit.Status.ACTIVE or site.status == Site.Status.ARCHIVED:
                 raise serializers.ValidationError({"site": ["Assignments require an active organization and a non-archived site."]})
+            if role.code not in SITE_MEMBERSHIP_ROLE_CODES:
+                raise serializers.ValidationError({
+                    "role": [
+                        "Only Site Administrator, Editor, Publisher, Reviewer, or Viewer can be assigned to a Site."
+                    ]
+                })
         return attrs
 
 

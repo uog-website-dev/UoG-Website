@@ -8,6 +8,7 @@ from apps.cms.api.public import (
     PublicPageListView,
     PublicPostDetailView,
     PublicPostListView,
+    PublicCategoryArchiveView,
 )
 
 from .context import SiteContextView
@@ -23,6 +24,7 @@ urlpatterns = [
     path("", SiteContextView.as_view(), name="site-context"),
     path("menus/", PublicMenusView.as_view(), name="public-menus"),
     path("pages/", PublicPageListView.as_view(), name="public-page-list"),
+    path("posts/categories/<slug:category_slug>/", PublicCategoryArchiveView.as_view(), name="public-category-archive"),
     path("posts/", PublicPostListView.as_view(), name="public-post-list"),
     path("posts/<slug:post_slug>/", PublicPostDetailView.as_view(), name="public-post-detail"),
     path(

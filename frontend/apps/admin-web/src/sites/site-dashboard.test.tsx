@@ -91,7 +91,7 @@ describe("SiteDashboard", () => {
 
   it("offers create-page and navigation quick actions within the Site", async () => {
     renderDashboard(["PAGES", "MENUS"], ALL);
-    expect(screen.getByRole("link", { name: "Create page" }).getAttribute("href")).toBe("/sites/11/admin/pages?create=1");
+    expect(screen.getByRole("link", { name: "Create page" }).getAttribute("href")).toBe("/sites/11/admin/pages/new");
     expect(screen.getByRole("link", { name: "Manage navigation" }).getAttribute("href")).toBe("/sites/11/admin/menus");
     await screen.findByRole("region", { name: "Pages" });
   });

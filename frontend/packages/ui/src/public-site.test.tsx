@@ -5,6 +5,7 @@ import { pageFromResponse } from "./public-page";
 import {
   EMPTY_SITE,
   pageMetadata,
+  postMetadata,
   PUBLIC_CACHE_MODE,
   PUBLIC_CACHE_SLA,
   publicFetchInit,
@@ -74,6 +75,20 @@ describe("public page policy", () => {
     expect(pageMetadata(site, page).title).toBe("Informatics news");
     expect(pageMetadata(site, page).description).toBe("College news");
     expect(pageMetadata(site, page).title).not.toContain("<script");
+    expect(
+      postMetadata(site, {
+        title: "Campus update",
+        excerpt: "Campus excerpt",
+        seo: { title: "Campus SEO", description: "Campus description" },
+      }).title,
+    ).toBe("Campus SEO");
+    expect(
+      postMetadata(site, {
+        title: "Campus update",
+        excerpt: "Campus excerpt",
+        seo: { title: "", description: "" },
+      }).description,
+    ).toBe("Campus excerpt");
   });
 
   it("revalidates on every read within the public cache SLA", () => {

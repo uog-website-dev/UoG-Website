@@ -69,16 +69,19 @@ def revision_snapshot(content):
             "content": content.content,
             "excerpt_html": content.excerpt_html,
             "featured_media": content.featured_media,
+            "draft_of_id": content.draft_of_id and str(content.draft_of_id),
             "seo": content.seo,
             "author_id": content.author_id,
         })
-        if content.pk is not None and not content._state.adding:
-            snapshot["categories"] = sorted(
-                str(pk) for pk in content.categories.values_list("pk", flat=True)
-            )
-            snapshot["tags"] = sorted(
-                str(pk) for pk in content.tags.values_list("pk", flat=True)
-            )
+        pending = getattr(content, "_pending_taxonomy", {})
+        for field in ("categories", "tags"):
+            if field in pending:
+                identifiers = [term.pk for term in pending[field]]
+            elif content.pk is not None and not content._state.adding:
+                identifiers = getattr(content, field).values_list("pk", flat=True)
+            else:
+                identifiers = []
+            snapshot[field] = sorted({str(pk) for pk in identifiers})
     return snapshot
 
 
@@ -143,6 +146,9 @@ def create_content_revision(
                 if restored_from is not None else None
             ),
         )
+    if content._meta.model_name == "post":
+        from apps.api.post_media import record_post_images
+        record_post_images(content, revision, using=using)
     _prune_revisions(
         content.pk,
         using=using,
@@ -296,13 +302,31 @@ def restore_content_revision(
         else:
             content.locale = payload.get("locale", content.locale)
             restore_homepage = False
+            if content._meta.model_name == "post":
+                from apps.api.models import Category, Tag
+                for field in ("title", "slug", "excerpt", "content", "excerpt_html", "featured_media", "seo", "author_id"):
+                    if field in payload:
+                        setattr(content, field, payload[field])
+                taxonomy = {}
+                for field, model in (("categories", Category), ("tags", Tag)):
+                    if field in payload:
+                        identifiers = set(payload[field])
+                        terms = list(model.objects.using(using).filter(pk__in=identifiers, site_id=content.site_id, is_active=True))
+                        if {str(term.pk) for term in terms} != identifiers:
+                            raise ValidationError({field: "Historical taxonomy is unavailable for this Site."})
+                        taxonomy[field] = terms
 
         content.metadata = payload["metadata"]
         content.blocks = payload["blocks"]
         content.blocks_version = payload["blocks_version"]
         content.updated_by = actor
         with revision_origin(source):
-            content.save(using=using)
+            if content._meta.model_name == "post":
+                from apps.api.post_media import validate_post_images
+                validate_post_images(content, actor=actor, using=using)
+                content.save(using=using, taxonomy=taxonomy)
+            else:
+                content.save(using=using)
         if restore_homepage and not content.is_homepage:
             content = set_as_homepage(content, actor=actor)
 
@@ -340,6 +364,10 @@ def _content_instance(content_id, *, using):
     page = Page.objects.using(using).filter(pk=content_id).first()
     if page is not None:
         return page
+    from apps.api.models import Post
+    post = Post.objects.using(using).filter(pk=content_id).first()
+    if post is not None:
+        return post
     return SiteContent.objects.using(using).get(pk=content_id)
 
 

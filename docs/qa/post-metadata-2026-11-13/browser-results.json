@@ -1,0 +1,52 @@
+{
+  "run": "post-76ed869f24",
+  "site": 44,
+  "browser": "157.0.4341.46",
+  "results": [
+    {
+      "name": "Site Editor access",
+      "status": "PASS",
+      "details": "Real Keycloak session opens the active Site Post administration."
+    },
+    {
+      "name": "Complete metadata save",
+      "status": "PASS",
+      "details": "Title, permalink, summary, category and tag save through real server actions."
+    },
+    {
+      "name": "Taxonomy pagination and Site scope",
+      "status": "PASS",
+      "details": "All 101 active Site categories are available including the final page. Inactive and foreign terms are excluded."
+    },
+    {
+      "name": "Metadata round trip",
+      "status": "PASS",
+      "details": "Reopening reproduces all five metadata values."
+    },
+    {
+      "name": "Duplicate permalink recovery",
+      "status": "PASS",
+      "details": "The slug field identifies a conflict with published news. Correcting the value enables a successful save."
+    },
+    {
+      "name": "Taxonomy-only edit",
+      "status": "PASS",
+      "details": "A category-only save reloads with the selected category and retains the summary and tag."
+    },
+    {
+      "name": "Reserved slug and accessible settings",
+      "status": "PASS",
+      "details": "Reserved input blocks save. Mobile fields remain keyboard reachable and the editor has zero scanned WCAG A/AA violations."
+    },
+    {
+      "name": "Published identity lock",
+      "status": "PASS",
+      "details": "Published title and permalink use the existing workflow lock."
+    },
+    {
+      "name": "Public metadata and draft privacy",
+      "status": "PASS",
+      "details": "The approved title, summary and taxonomy render through the existing public route. Draft metadata returns 404."
+    }
+  ]
+}

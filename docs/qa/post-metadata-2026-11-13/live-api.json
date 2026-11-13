@@ -1,0 +1,331 @@
+{
+  "run": "post-76ed869f24",
+  "results": [
+    {
+      "case": "reader: real Keycloak authentication",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "reviewer: real Keycloak authentication",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "publisher: real Keycloak authentication",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "editor-b: real Keycloak authentication",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Create complete metadata",
+      "expected": {
+        "http_status": 201
+      },
+      "actual": {
+        "http_status": 201,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-754d7e88-b3dd-4529-b8a6-265969ed82b3-r1\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Complete taxonomy in revision",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    },
+    {
+      "case": "Foreign category denied",
+      "expected": {
+        "http_status": 400
+      },
+      "actual": {
+        "http_status": 400,
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Foreign tag denied",
+      "expected": {
+        "http_status": 400
+      },
+      "actual": {
+        "http_status": 400,
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Inactive category denied",
+      "expected": {
+        "http_status": 400
+      },
+      "actual": {
+        "http_status": 400,
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Reserved permalink denied",
+      "expected": {
+        "http_status": 400
+      },
+      "actual": {
+        "http_status": 400,
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Invalid permalink denied",
+      "expected": {
+        "http_status": 400
+      },
+      "actual": {
+        "http_status": 400,
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Title length enforced",
+      "expected": {
+        "http_status": 400
+      },
+      "actual": {
+        "http_status": 400,
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Viewer metadata update denied",
+      "expected": {
+        "http_status": 403
+      },
+      "actual": {
+        "http_status": 403,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Duplicate Site slug denied",
+      "expected": {
+        "http_status": 400
+      },
+      "actual": {
+        "http_status": 400,
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Duplicate has slug field error",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    },
+    {
+      "case": "Same slug accepted in independent hostname namespace",
+      "expected": {
+        "http_status": 201
+      },
+      "actual": {
+        "http_status": 201,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-32706721-c52b-47b3-9841-d6c53f9fa90c-r1\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Foreign Post read denied",
+      "expected": {
+        "http_status": 404
+      },
+      "actual": {
+        "http_status": 404,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Foreign Site metadata update denied",
+      "expected": {
+        "http_status": 403
+      },
+      "actual": {
+        "http_status": 403,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Disabled module blocks metadata update",
+      "expected": {
+        "http_status": 400
+      },
+      "actual": {
+        "http_status": 400,
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Rejected updates retain metadata",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-754d7e88-b3dd-4529-b8a6-265969ed82b3-r1\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Identity and summary intact",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    },
+    {
+      "case": "Existing metadata workflow submit",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-754d7e88-b3dd-4529-b8a6-265969ed82b3-r2\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Existing metadata workflow approve",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-754d7e88-b3dd-4529-b8a6-265969ed82b3-r3\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Existing metadata workflow publish",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-754d7e88-b3dd-4529-b8a6-265969ed82b3-r4\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Published metadata is public",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "ETag": "\"cms-post-754d7e88-b3dd-4529-b8a6-265969ed82b3-publication-1\"",
+        "X-Publication-Version": "1",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Published summary and taxonomy readable",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    },
+    {
+      "case": "Independent hostname draft remains private",
+      "expected": {
+        "http_status": 404
+      },
+      "actual": {
+        "http_status": 404,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    }
+  ],
+  "site_a": 44,
+  "fixtures": {
+    "site_b": 45,
+    "host_a": "meta-post-76ed869f24-a.uog.local",
+    "host_b": "meta-post-76ed869f24-b.uog.local",
+    "category": "ae5340df-cf19-4303-8515-a616766fc7f7",
+    "tag": "1cade161-8133-4020-9eaa-a6663ca51908",
+    "category_name": "Zoology Research",
+    "published_slug": "published-post-76ed869f24",
+    "published_title": "Published metadata review"
+  }
+}

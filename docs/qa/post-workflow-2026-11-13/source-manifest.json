@@ -1,0 +1,30 @@
+{
+  "scope": "Post workflow, preview, working copies and review workspace reads. Shared files also contain earlier and concurrent worktree changes.",
+  "sha256": {
+    "backend/apps/api/models.py": "010e5de10ae2b1a9991617abf54daef9e5b1dc85b36b29bffe37f4e912be03f8",
+    "backend/apps/api/serializers.py": "e91780fdbc15cf3d042199bed17ef63636aef1dcd000c7c2ae592fe121a06cc9",
+    "backend/apps/api/posts_api.py": "fd1c04ad7d212d6efffd92fd3565326bbaa7573e7442d991ccae5b2bb9b9e15f",
+    "backend/apps/api/post_drafts.py": "0690d019ff08d19e2f5261dde1364e00564187752177fcc1c5eb6d3e416914e3",
+    "backend/apps/api/post_media.py": "8b3e5458b49bc53a02e5301f12e159ade1446e14a8ec817e0e1eb797f8ba4da9",
+    "backend/apps/api/migrations/0007_post_working_draft.py": "293e8f964d0d1fcf860eb933439dd163be75923b173069b07dd7d39bb7d77bf1",
+    "backend/apps/api/migrations/0008_review_workspace_read_permissions.py": "43a1a748777309ce2f1392b35c04b1b9b14e249e94d10d1bdcef55b8773f5b44",
+    "backend/apps/authorization/catalog.py": "c6d90fd2e486fea34b1e2a8374cbdcb99e4bce08ae408ab6b0c02b3580f0bcd2",
+    "backend/apps/cms/services/workflow.py": "b5e0434c5f281d2a3ae2e0ae20193242375e40c2a550323cc7f04990e0611ecc",
+    "backend/apps/cms/services/revisions.py": "e14d3dc5bc1f32187e32f817b5a3d3b52b3beb4fe2fe9185bd5a91bed1b6c92d",
+    "backend/apps/cms/services/visual_publication.py": "3dd9c077f3d876adb8894e150fc9885d518e816457d9463518f40b27af739eca",
+    "backend/apps/cms/tests/test_post_working_drafts.py": "a9924fda44ec3ac1cc835497a0b62b2a8e6c6b84ada697c094cf99e6fcbbaba9",
+    "backend/apps/cms/tests/test_post_workflow_migration.py": "716ea11c35a1eb877b84b21473114b7c630879a7d84247a588e06fd03b3fc4cd",
+    "frontend/apps/admin-web/src/sites/site-post-editor.tsx": "421de50390ba9416e9c7516b2f3421240a2b51c5b1e0a3563210d4919e7344ad",
+    "frontend/apps/admin-web/src/sites/site-post-preview.tsx": "9efc3258f35c91273e82e62790542cc5ad00a033d65fa5b7c79c341fab65585c",
+    "frontend/apps/admin-web/src/app/sites/[id]/admin/posts/[postId]/preview/page.tsx": "666c6a369121ee3e230237b96aedd53b96d874d06d973f209186cce0f5885372",
+    "frontend/apps/admin-web/src/app/sites/post-actions.ts": "d36a4d11059346281ccf04b114ec025aa4b40cc7c45eaba75383a7173c68b2b2",
+    "frontend/apps/admin-web/src/sites/site-posts.tsx": "017d6c8a7dc7bcaffc58d19781254910b2077cfff06d5f0b48acbb575d4b7ab4",
+    "frontend/apps/admin-web/src/sites/post-workflow.test.tsx": "ae68b47b2a05195c9f35ffd4f8774d89bcc5f78ed59a3e3de341e1e29576202b",
+    "frontend/apps/admin-web/src/sites/post-media.test.tsx": "2280e547fb7df0a7082ee82f54d4b76d1262bc14dfa0eeeb48a970244cb34360",
+    "frontend/packages/ui/src/index.ts": "aa2601b8e6fd68d5250eb56dcf41a7db32ca1ccb0221ad818e684f821e6b71f9",
+    "frontend/packages/ui/src/public-post.tsx": "f6d9f68609eb7c2c12b558aa3e02fd00cef374778f41bc15779523c822e5883d",
+    "scripts/qa-post-workflow-live.py": "dc2c55a9f41bf8d4f2454a8156437e6b23ad0f7854db1ac07c426683d97baac9",
+    "scripts/qa-post-workflow-browser.cjs": "ef2632e21093f0fcacf066d2fcefb4fc4397a18f4f74e5f30f8e5b58c8851587",
+    "docs/api/openapi.yaml": "3ec37fe879d5b8577a6197e71c1574795e03ff482cf50b5f5036cedde8bbe33f"
+  }
+}

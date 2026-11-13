@@ -7,6 +7,7 @@ import { getAccessToken } from "@/access-token";
 import { serializeApiError } from "@/organizations/contract";
 import type { ActionResult } from "@/organizations/contract";
 import { siteCategoriesPath, sitePostWorkflowHistoryPath, sitePostWorkflowPath, sitePostsPath, siteTagsPath } from "@/sites/post-paths";
+import type { ArticleDocument } from "@uog/ui";
 
 export type SitePostStatus =
   | "DRAFT" | "IN_REVIEW" | "APPROVED" | "PUBLISHED" | "UNPUBLISHED" | "ARCHIVED";
@@ -18,9 +19,17 @@ export interface SitePostRecord {
   slug: string;
   excerpt: string;
   content: string;
+  editor_document?: ArticleDocument | null;
   blocks: SitePostBlock[];
   seo: Record<string, unknown>;
   featured_media: string;
+  featured_alt?: string;
+  revision_number?: number;
+  draft_of?: string | null;
+  publication_slug?: string;
+  publication_status?: SitePostStatus;
+  review_comment?: string;
+  last_publication_at?: string | null;
   author: number | string | null;
   categories: string[];
   tags: string[];
@@ -123,10 +132,18 @@ export async function loadSiteTaxonomy(
   return attempt(async () => {
     const api = await client();
     const path = kind === "categories" ? siteCategoriesPath(siteId) : siteTagsPath(siteId);
-    const listed = await api.get<{ results: SiteTaxonomyRecord[] }>(
-      `${path}?is_active=true&page_size=100&ordering=name`,
-    );
-    return listed.results.filter((row) => row.site === siteId && row.is_active);
+    const rows: SiteTaxonomyRecord[] = [];
+    let page = 1;
+    let more = true;
+    while (more) {
+      const listed = await api.get<{ next: string | null; results: SiteTaxonomyRecord[] }>(
+        `${path}?is_active=true&page_size=100&ordering=name&page=${page}`,
+      );
+      rows.push(...listed.results.filter(row => row.site === siteId && row.is_active));
+      more = Boolean(listed.next);
+      page += 1;
+    }
+    return rows;
   });
 }
 
@@ -144,7 +161,7 @@ export async function getSitePost(
 
 export async function createSitePost(
   siteId: number,
-  input: Pick<SitePostRecord, "title" | "slug" | "excerpt" | "content" | "blocks" | "seo" | "featured_media" | "categories" | "tags">,
+  input: Pick<SitePostRecord, "title" | "slug" | "excerpt" | "seo" | "featured_media" | "categories" | "tags"> & Partial<Pick<SitePostRecord,"editor_document"|"content"|"blocks"|"featured_alt">>,
 ): Promise<ActionResult<SitePostRecord>> {
   return attempt(async () => {
     const api = await client();
@@ -157,7 +174,7 @@ export async function updateSitePost(
   siteId: number,
   postId: string,
   ifMatch: string,
-  input: Pick<SitePostRecord, "title" | "slug" | "excerpt" | "content" | "blocks" | "seo" | "featured_media" | "categories" | "tags">,
+  input: Pick<SitePostRecord, "title" | "slug" | "excerpt" | "seo" | "featured_media" | "categories" | "tags"> & Partial<Pick<SitePostRecord,"editor_document"|"content"|"blocks"|"featured_alt">>,
 ): Promise<ActionResult<SitePostRecord>> {
   return attempt(async () => {
     const api = await client();
@@ -192,12 +209,14 @@ export async function transitionSitePost(
   postId: string,
   action: SitePostWorkflowAction,
   comment = "",
+  ifMatch?: string,
 ): Promise<ActionResult<SitePostRecord>> {
   return attempt(async () => {
     const api = await client();
     const result = await api.postDetailed<SitePostRecord>(
       sitePostWorkflowPath(siteId, postId),
       { action, comment },
+      ifMatch ? {headers:{"If-Match":ifMatch}} : undefined,
     );
     if (result.data.site !== siteId) throw new Error("The Post does not belong to this Site.");
     return { ...result.data, etag: result.etag ?? "" };
@@ -215,5 +234,22 @@ export async function createSiteTaxonomy(
     const result = await api.postDetailed<SiteTaxonomyRecord>(path, input);
     if (result.data.site !== siteId) throw new Error("The taxonomy record does not belong to this Site.");
     return result.data;
+  });
+}
+
+
+export async function openSitePostWorkingDraft(siteId:number,postId:string,ifMatch:string):Promise<ActionResult<SitePostRecord>> {
+  return attempt(async () => {
+    const result = await (await client()).postDetailed<SitePostRecord>(sitePostsPath(siteId,`${postId}/working-draft/`),undefined,{headers:{"If-Match":ifMatch}});
+    if (result.data.site !== siteId) throw new Error("The article does not belong to this Site.");
+    return {...result.data,etag:result.etag ?? ""};
+  });
+}
+
+export async function getSitePostPreview(siteId:number,postId:string):Promise<ActionResult<SitePostRecord>> {
+  return attempt(async () => {
+    const result = await (await client()).getDetailed<SitePostRecord>(sitePostsPath(siteId,`${postId}/preview/`));
+    if (result.data.site !== siteId) throw new Error("The article does not belong to this Site.");
+    return {...result.data,etag:result.etag ?? ""};
   });
 }

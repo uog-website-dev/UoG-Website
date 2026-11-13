@@ -13,6 +13,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.dateparse import parse_date, parse_datetime
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import mixins, serializers, viewsets
+from rest_framework.decorators import action
 from rest_framework.exceptions import APIException
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
@@ -281,6 +282,13 @@ class SiteContentAdminViewSet(
         except DomainValidationError as error:
             raise serializers.ValidationError(_domain_detail(error)) from error
         except IntegrityError as error:
+            # Prefer a field-level slug error when taxonomy uniqueness races;
+            # other integrity failures stay a generic edit conflict.
+            message = str(error).lower()
+            if "slug" in message:
+                raise serializers.ValidationError({
+                    "slug": ["This slug is already used in this Site and language."],
+                }) from error
             raise ContentEditConflict(
                 "This change conflicts with the current content (possibly a "
                 "duplicate slug in this Site and language)."
@@ -322,6 +330,30 @@ def content_etag(instance):
 @extend_schema(tags=["Posts"])
 class PostViewSet(SiteContentAdminViewSet):
     """Author and administer Posts inside the Site named in the URL."""
+
+    @extend_schema(responses=PostSerializer, description="Authorized, Site-scoped saved revision preview. Session/bearer authentication and POSTS are required. Private no-store response with its ETag.")
+    @action(detail=True,methods=["get"])
+    def preview(self,request,site_pk=None,pk=None):
+        return self.retrieve(request,site_pk=site_pk,pk=pk)
+
+    @extend_schema(request=None,responses={200:PostSerializer,201:PostSerializer},parameters=[IF_MATCH],description="Open or reuse the current private working draft of a published Post. Requires Post author access and the published revision ETag. Keeps the public article and its permalink available.")
+    @action(detail=True,methods=["post"],url_path="working-draft")
+    def working_draft(self,request,site_pk=None,pk=None):
+        from .post_drafts import open_post_draft
+        from apps.cms.models import ContentEditConflict
+        self._authorize(self._site(),(ContentRole.AUTHOR,))
+        self._module(self._site())
+        if not request.headers.get("If-Match"):
+            from apps.sites.api.access import PreconditionRequired
+            raise PreconditionRequired()
+        try:
+            instance,created = open_post_draft(site_id=int(site_pk),post_id=pk,actor=request.user,if_match=request.headers.get("If-Match"))
+        except ContentEditConflict as error:
+            from apps.cms.api.workflow import WorkflowStateConflict
+            raise WorkflowStateConflict() from error
+        except DomainValidationError as error:
+            raise serializers.ValidationError(_domain_detail(error)) from error
+        return self._response(instance,status_code=201 if created else 200)
 
     queryset = Post.objects.all()
     serializer_class = PostSerializer
