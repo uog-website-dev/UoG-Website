@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuites name="Migration cases extracted from the full clean-DB run">
+  <testsuite name="CMS role retirement migration rehearsal" tests="6" failures="0" errors="0" skipped="0">
+    <testcase classname="apps.cms.tests.test_role_retirement" name="test_legacy_only_requires_explicit_review_then_is_idempotent_and_revocable" time="7.481">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_role_retirement" name="test_multiple_approved_roles_preserve_site_scope_without_administrator" time="7.049">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_role_retirement" name="test_covered_grants_and_inactive_users_do_not_gain_new_assignments" time="2.450">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_role_retirement" name="test_stale_approvals_and_unmapped_roles_cannot_create_memberships" time="6.946">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_role_retirement" name="test_drop_is_guarded_and_rollback_cannot_resurrect_revoked_grant" time="5.501">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+    <testcase classname="apps.cms.tests.test_role_retirement" name="test_live_membership_rollback_restores_only_reviewed_grant" time="4.714">
+      <properties>
+        <property name="source-run" value="backend-full.xml" />
+      </properties>
+    </testcase>
+  </testsuite>
+</testsuites>

@@ -1,4 +1,5 @@
 """Published widget providers and Site-owned contact receipts."""
+from apps.cms.tests.support import grant_cms_role
 import copy
 import uuid
 
@@ -9,7 +10,7 @@ from rest_framework.test import APIClient
 
 from apps.api.models import Category, Post
 from apps.cms.contact_models import ContactSubmission
-from apps.cms.models import Page, ContentRole, SiteContentRoleAssignment
+from apps.cms.models import Page, ContentRole
 from apps.cms.services.workflow import transition_content
 from apps.cms.tests.test_public_site_hosts import _host, _publish, _enable, _actor
 from apps.cms.tests.support import transition_with_site_role
@@ -81,7 +82,7 @@ def test_widget_data_scopes_published_filtering_and_private_preview(world, clien
     assert client.get(path + "?source=posts&source=identity", HTTP_HOST=ha).status_code == 400
     assert client.get(path, {"source": "identity", "site": b.pk}, HTTP_HOST=ha).status_code == 400
     actor = _actor("widget-author")
-    SiteContentRoleAssignment.objects.create(site=a, user=actor, role=ContentRole.AUTHOR)
+    grant_cms_role(site=a, user=actor, role=ContentRole.AUTHOR)
     api = APIClient()
     api.force_authenticate(actor)
     private = api.get(f"/api/v1/sites/{a.pk}/pages/{page.pk}/widget-data/?source=posts")

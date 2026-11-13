@@ -3,8 +3,8 @@
 Keycloak authenticates the caller. A realm role, Django staff flag, or
 superuser flag never authorizes a CMS operation. The only platform-wide CMS
 grant is an active ``platform-administrator`` database assignment. Every other
-caller needs a live Site membership or a legacy ``SiteContentRoleAssignment``
-on the Site that owns the resource. Memberships are evaluated on every call;
+caller needs a live canonical Site membership on the Site that owns the
+resource. Memberships are evaluated on every call;
 they are never copied into a second grant table.
 """
 from django.core.exceptions import PermissionDenied
@@ -12,7 +12,7 @@ from django.core.exceptions import PermissionDenied
 from apps.authorization.access import is_platform_administrator, live_assignments
 from apps.authorization.services import record_decision
 
-from .models import ContentRole, SiteContentRoleAssignment
+from .models import ContentRole
 
 
 def cms_grant_allows(actor, site_id, required_roles, *, using=None):
@@ -39,15 +39,7 @@ def cms_grant_allows(actor, site_id, required_roles, *, using=None):
         assignments = assignments.using(using)
     if assignments.filter(scope="SITE",site_id=site_id,role__is_system=True,role__code__in=membership_roles).exists():
         return True
-    queryset = SiteContentRoleAssignment.objects
-    if using is not None:
-        queryset = queryset.using(using)
-    return queryset.filter(
-        site_id=site_id,
-        user_id=actor.pk,
-        role__in=required_roles,
-        user__is_active=True,
-    ).exists()
+    return False
 
 
 def require_cms_grant(

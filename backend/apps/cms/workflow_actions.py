@@ -1,5 +1,6 @@
 """Workflow controls derived from the Site roles the workflow service enforces."""
-from .models import ContentRole, ContentStatus, SiteContentRoleAssignment
+from .models import ContentRole, ContentStatus
+from .authorization import cms_grant_allows
 
 
 def available_workflow_actions(content, request):
@@ -12,26 +13,7 @@ def available_workflow_actions(content, request):
     user = getattr(request, "user", None) if request is not None else None
     if not getattr(user, "is_authenticated", False):
         return []
-    is_admin = getattr(request, "_cms_is_platform_admin", None)
-    if is_admin is None:
-        try:
-            from apps.authorization.access import is_platform_administrator
-            is_admin = is_platform_administrator(user)
-        except (ImportError, AttributeError):
-            is_admin = False
-        request._cms_is_platform_admin = is_admin
-    if is_admin:
-        content_roles = set(ContentRole.values)
-    else:
-        roles_by_site = getattr(request, "_cms_content_roles_by_site", {})
-        if content.site_id not in roles_by_site:
-            roles_by_site[content.site_id] = set(
-                SiteContentRoleAssignment.objects.filter(
-                    site_id=content.site_id, user_id=user.pk, user__is_active=True,
-                ).values_list("role", flat=True)
-            )
-            request._cms_content_roles_by_site = roles_by_site
-        content_roles = roles_by_site[content.site_id]
+    content_roles = {role for role in ContentRole.values if cms_grant_allows(user,content.site_id,[role])}
 
     actions = []
     if content.status == ContentStatus.APPROVED and "visual_layout" in content.metadata and ContentRole.AUTHOR in content_roles:

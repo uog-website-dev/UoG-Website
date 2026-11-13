@@ -1,11 +1,12 @@
 """Reviewed revision provenance, private previews, assets and commit-only caching."""
+from apps.cms.tests.support import grant_cms_role
 import copy
 from unittest.mock import patch
 import pytest
 from django.contrib.auth import get_user_model
 from django.db import transaction, IntegrityError
 from django.test import Client
-from apps.cms.models import ContentRevision,ContentWorkflowTransition,PublishedContentSnapshot,SiteContentRoleAssignment,ContentRole,Page
+from apps.cms.models import ContentRevision,ContentWorkflowTransition,PublishedContentSnapshot,ContentRole,Page
 from apps.cms.services.workflow import transition_content
 from apps.cms.services.working_drafts import content_etag,open_working_draft,save_visual_draft
 from apps.cms.services.publication_cache import current_publication_version,public_cache_key,get_public_cache,set_public_cache
@@ -22,8 +23,8 @@ pytestmark=pytest.mark.django_db(transaction=True)
 def roles(w):
     reviewer=get_user_model().objects.create_user(username="visual-reviewer")
     publisher=get_user_model().objects.create_user(username="visual-publisher")
-    SiteContentRoleAssignment.objects.create(site=w.a,user=reviewer,role=ContentRole.REVIEWER)
-    SiteContentRoleAssignment.objects.create(site=w.a,user=publisher,role=ContentRole.PUBLISHER)
+    grant_cms_role(site=w.a,user=reviewer,role=ContentRole.REVIEWER)
+    grant_cms_role(site=w.a,user=publisher,role=ContentRole.PUBLISHER)
     return reviewer,publisher
 
 
@@ -163,8 +164,10 @@ def test_cache_invalidation_runs_only_after_commit_and_rollback_preserves_cache(
 
 def test_wrong_approval_cannot_create_publication_and_non_publishers_cannot_promote(world):
     w,page=world.w,world.page;reviewer,publisher=roles(w);approved=approve(w,page,reviewer)
-    assert action(w,page,w.actor,"publish",approved["ETag"]).status_code==403
-    assert action(w,page,w.actor,"approve",approved["ETag"]).status_code==403
+    author_only=get_user_model().objects.create_user(username="author-without-publication")
+    grant_cms_role(site=w.a,user=author_only,role=ContentRole.AUTHOR)
+    assert action(w,page,author_only,"publish",approved["ETag"]).status_code==403
+    assert action(w,page,author_only,"approve",approved["ETag"]).status_code==403
     from apps.cms.services import workflow
     original=workflow._create_publication_snapshot
     def fault(content,*,using,approval=None):

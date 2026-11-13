@@ -944,42 +944,17 @@ class ContentRole(models.TextChoices):
     PUBLISHER = "PUBLISHER", "Publisher"
 
 
-class SiteContentRoleAssignment(models.Model):
-    """A Site-scoped CMS role.
-
-    Platform-wide CMS authority is an active database platform-administrator
-    assignment. A Keycloak realm role is not a CMS grant.
-    """
-
-    site = models.ForeignKey(
-        "sites.Site", on_delete=models.CASCADE,
-        related_name="content_role_assignments",
-    )
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
-        related_name="site_content_roles",
-    )
-    role = models.CharField(max_length=10, choices=ContentRole.choices)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ("site_id", "user_id", "role")
-        constraints = [
-            models.UniqueConstraint(
-                fields=("site", "user", "role"),
-                name="cms_site_content_role_uniq",
-            ),
-            models.CheckConstraint(
-                condition=Q(role__in=ContentRole.values),
-                name="cms_site_content_role_valid",
-            ),
-        ]
-        indexes = [
-            models.Index(
-                fields=("user", "site", "role"),
-                name="cms_content_role_lookup_idx",
-            ),
-        ]
+class LegacyCMSRoleReconciliation(models.Model):
+    """Non-authorizing retirement provenance; never consulted to grant access."""
+    legacy_id = models.BigIntegerField(unique=True)
+    snapshot = models.JSONField()
+    fingerprint = models.CharField(max_length=64)
+    decision = models.CharField(max_length=12, choices=[("MAPPED","Mapped"),("COVERED","Covered"),("RETIRED","Retired")])
+    permission_delta = models.JSONField(default=list)
+    target_assignment_id = models.BigIntegerField(null=True,blank=True)
+    reviewer_id = models.BigIntegerField()
+    reason = models.TextField()
+    reconciled_at = models.DateTimeField(auto_now_add=True)
 
 
 class ContentWorkflowTransition(models.Model):

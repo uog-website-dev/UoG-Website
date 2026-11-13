@@ -1,8 +1,9 @@
 """Review and publish Post working copies while the approved article stays live."""
+from apps.cms.tests.support import grant_cms_role
 import pytest
 from django.contrib.auth import get_user_model
 from apps.api.models import Post
-from apps.cms.models import PublishedContentSnapshot, ContentStatus, ContentRole, SiteContentRoleAssignment
+from apps.cms.models import PublishedContentSnapshot, ContentStatus, ContentRole
 from apps.cms.services.working_drafts import content_etag
 from .test_posts_api import author, site_editor, _enable_posts_module, POSTS
 from .test_public_posts import _publish, _host
@@ -43,7 +44,7 @@ def test_post_working_draft_preserves_publication_until_reviewed_promotion(site_
     reviewer = get_user_model().objects.create_user(username="working-reviewer")
     publisher = get_user_model().objects.create_user(username="working-publisher")
     for user,role in [(reviewer,ContentRole.REVIEWER),(publisher,ContentRole.PUBLISHER)]:
-        SiteContentRoleAssignment.objects.create(user=user,site=site,role=role)
+        grant_cms_role(user=user,site=site,role=role)
     def auth(user):
         return oidc.header(sub=str(user.pk),preferred_username=user.username,email=f"{user.username}@example.test")
     stale = client.post(workflow,{"action":"approve"},content_type="application/json",HTTP_IF_MATCH=saved["ETag"],**auth(reviewer))
@@ -91,7 +92,7 @@ def test_reviewer_comments_invalid_states_and_foreign_site_denial(site_editor, a
     article = Post.objects.create(site=site,title="Review article",slug="review-article",content="Review body",created_by=author,updated_by=author)
     other = Post.objects.create(site=foreign,title="Foreign review",slug="foreign-review",content="Foreign body")
     reviewer = get_user_model().objects.create_user(username="scoped-reviewer")
-    SiteContentRoleAssignment.objects.create(user=reviewer,site=site,role=ContentRole.REVIEWER)
+    grant_cms_role(user=reviewer,site=site,role=ContentRole.REVIEWER)
     headers = oidc.header(sub=str(reviewer.pk),preferred_username=reviewer.username,email="scoped-reviewer@example.test")
     flow = f"/api/v1/cms/sites/{site.pk}/content/{article.pk}/workflow/"
     invalid = client.post(flow,{"action":"approve"},content_type="application/json",**headers)

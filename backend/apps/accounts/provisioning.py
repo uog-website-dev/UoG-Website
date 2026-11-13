@@ -82,7 +82,6 @@ def _sync_profile(user, claims: TokenClaims) -> None:
     user.last_name = claims.family_name or user.last_name
     if claims.email:
         user.email = claims.email
-    user.is_active = True
 
 
 def _sync_roles(user, claims: TokenClaims) -> None:
@@ -161,6 +160,8 @@ def provision_user(claims: TokenClaims):
             user=user,
         )
 
+    if not user.is_active:
+        raise AccountLinkError("This platform account is disabled. Contact your administrator.")
     _sync_profile(user, claims)
     user.save()
     identity.save()

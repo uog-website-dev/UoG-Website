@@ -6,7 +6,7 @@ from django.core.management import call_command
 from django.utils import timezone
 from apps.authorization.models import Role,UserRoleAssignment
 from apps.cms.authorization import cms_grant_allows
-from apps.cms.models import ContentRole,SiteContentRoleAssignment
+from apps.cms.models import ContentRole
 from .test_realm_role_authorization import _enable,_identity,PAGES,POSTS,WORKFLOW
 
 pytestmark=pytest.mark.django_db
@@ -25,7 +25,7 @@ def test_membership_reads_and_workflow_roles_are_scoped_and_live(client,oidc,sit
     assert client.get("/api/me/",**header).status_code==200
     user=get_user_model().objects.get(username="membership-"+code)
     assignment=UserRoleAssignment.objects.create(user=user,role=Role.objects.get(code=code),scope="SITE",site=own,organization=own.organization_unit)
-    assert not SiteContentRoleAssignment.objects.filter(user=user).exists()
+    assert UserRoleAssignment.objects.filter(user=user).count()==1
     for path in [PAGES,POSTS]:
         assert client.get(path.format(site=own.pk),**header).status_code==200
         assert client.get(path.format(site=other.pk),**header).status_code==403
@@ -51,6 +51,19 @@ def test_role_deactivation_closes_membership_cms_access(client,oidc,sites):
     assert not cms_grant_allows(user,sites[0].pk,[ContentRole.PUBLISHER])
 
 
+def test_inactive_member_is_not_reactivated_by_a_valid_token(client,oidc,sites):
+    call_command("seed_rbac",verbosity=0)
+    site=sites[0];_enable("POSTS",site)
+    header=_identity(oidc,"inactive-member",roles=["platform-admin"])
+    assert client.get("/api/me/",**header).status_code==200
+    user=get_user_model().objects.get(username="inactive-member")
+    UserRoleAssignment.objects.create(user=user,role=Role.objects.get(code="publisher"),scope="SITE",site=site,organization=site.organization_unit)
+    user.is_active=False;user.save()
+    assert not cms_grant_allows(user,site.pk,ContentRole.values)
+    assert client.get(POSTS.format(site=site.pk),**header).status_code==401
+    user.refresh_from_db();assert not user.is_active
+
+
 def test_membership_only_editor_reviewer_publisher_handoff(client,oidc,sites):
     call_command("seed_rbac",verbosity=0)
     site=sites[0];_enable("POSTS",site)
@@ -67,4 +80,4 @@ def test_membership_only_editor_reviewer_publisher_handoff(client,oidc,sites):
     for code,action in [("editor","submit"),("reviewer","approve"),("publisher","publish"),("publisher","unpublish")]:
         response=client.post(workflow,{"action":action,"comment":"Reviewed membership regression"},content_type="application/json",**headers[code])
         assert response.status_code==200,response.content
-    assert not SiteContentRoleAssignment.objects.filter(site=site,user__username__startswith="handoff-").exists()
+    assert UserRoleAssignment.objects.filter(site=site,user__username__startswith="handoff-").count()==3

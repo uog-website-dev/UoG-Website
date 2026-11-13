@@ -6,6 +6,7 @@ safe deletion of a published Slider image. Medicine remains unchanged while
 Informatics advances through the release path.
 """
 from __future__ import annotations
+from apps.cms.tests.support import grant_cms_role
 
 import copy
 import io
@@ -31,7 +32,6 @@ from apps.cms.models import (
     ContentRole,
     Page,
     PublishedContentSnapshot,
-    SiteContentRoleAssignment,
 )
 from apps.cms.services.homepage import assign_homepage
 from apps.cms.services.publication_cache import current_publication_version
@@ -144,7 +144,7 @@ def review_world(storage, settings):
         (medicine, ContentRole.REVIEWER, reviewer),
         (medicine, ContentRole.PUBLISHER, publisher),
     ):
-        SiteContentRoleAssignment.objects.create(site=site, user=user, role=role)
+        grant_cms_role(site=site, user=user, role=role)
 
     from django.db import connection
     with connection.cursor() as cursor:
@@ -467,7 +467,7 @@ def test_negative_foreign_module_race_and_safe_deletion(review_world):
         site=w.informatics,
         organization=w.informatics.organization_unit,
     )
-    SiteContentRoleAssignment.objects.create(
+    grant_cms_role(
         site=w.informatics, user=second, role=ContentRole.AUTHOR
     )
 

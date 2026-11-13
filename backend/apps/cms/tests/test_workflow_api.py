@@ -1,4 +1,5 @@
 """HTTP integration tests: validated identity, Site roles and workflow."""
+from apps.cms.tests.support import grant_cms_role
 import pytest
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -10,7 +11,6 @@ from apps.cms.models import (
     ContentStatus,
     Page,
     PublishedContentSnapshot,
-    SiteContentRoleAssignment,
 )
 from apps.cms.services.pages import create_page
 from apps.cms.services.publication_cache import current_publication_version
@@ -36,71 +36,9 @@ def _workflow_url(site, content):
     return f"{BASE}{site.pk}/content/{content.pk}/workflow/"
 
 
-def test_anonymous_and_non_admin_cannot_manage_site_role_assignments(
-    client, oidc, sites,
-):
-    site, _ = sites
-    anonymous = client.get(_role_url(site))
-    assert anonymous.status_code == 401
-    denied = client.get(
-        _role_url(site),
-        **oidc.header(realm_access={"roles": ["platform-viewer"]}),
-    )
-    assert denied.status_code == 403
-    denied = client.post(
-        _role_url(site),
-        {"user_id": 1, "role": ContentRole.AUTHOR},
-        content_type="application/json",
-        **oidc.header(realm_access={"roles": ["platform-viewer"]}),
-    )
-    assert denied.status_code == 403
-
-
-def test_platform_admin_manages_roles_with_site_scoping_and_strict_input(
-    platform_admin, sites,
-):
-    site, other_site = sites
-    platform_admin.get("/api/me/")
-    user = get_user_model().objects.get(username="devuser")
-    response = platform_admin.post(
-        _role_url(site),
-        {"user_id": user.pk, "role": ContentRole.AUTHOR},
-        content_type="application/json",
-    )
-    assert response.status_code == 201, response.content
-    assignment_id = response.json()["id"]
-    assert response.json()["site"] == site.pk
-
-    listed = platform_admin.get(_role_url(site))
-    assert listed.status_code == 200
-    assert [item["id"] for item in listed.json()] == [assignment_id]
-
-    duplicate = platform_admin.post(
-        _role_url(site),
-        {"user_id": user.pk, "role": ContentRole.AUTHOR},
-        content_type="application/json",
-    )
-    assert duplicate.status_code == 400
-    extra_role = platform_admin.post(
-        _role_url(site),
-        {
-            "user_id": user.pk,
-            "role": ContentRole.AUTHOR,
-            "roles": ["platform-admin"],
-        },
-        content_type="application/json",
-    )
-    assert extra_role.status_code == 400
-
-    foreign_delete = platform_admin.delete(
-        f"{BASE}{other_site.pk}/content-roles/{assignment_id}/",
-    )
-    assert foreign_delete.status_code == 404
-    deleted = platform_admin.delete(
-        f"{BASE}{site.pk}/content-roles/{assignment_id}/",
-    )
-    assert deleted.status_code == 204
-    assert not SiteContentRoleAssignment.objects.filter(pk=assignment_id).exists()
+def test_legacy_role_management_routes_are_retired(client,oidc,sites):
+    for method in [client.get,client.post,client.delete]:
+        assert method(_role_url(sites[0]),**oidc.header()).status_code==404
 
 
 def _enable_pages(site):
@@ -121,12 +59,7 @@ def test_site_role_workflow_uses_validated_token_and_never_body_roles(
     _enable_pages(site)
     platform_admin = cms_platform_admin
     author = get_user_model().objects.get(username="devuser")
-    role_response = platform_admin.post(
-        _role_url(site),
-        {"user_id": author.pk, "role": ContentRole.AUTHOR},
-        content_type="application/json",
-    )
-    assert role_response.status_code == 201, role_response.content
+    grant_cms_role(site=site,user=author,role=ContentRole.AUTHOR)
 
     page = create_page(
         site=site, title="Admissions", slug="admissions", actor=author,
@@ -187,12 +120,7 @@ def test_http_review_publish_flow_and_publish_retry(
         identities[role] = (subject, username)
     for role, (_subject, username) in identities.items():
         user = get_user_model().objects.create_user(username=username)
-        result = platform_admin.post(
-            _role_url(site),
-            {"user_id": user.pk, "role": role},
-            content_type="application/json",
-        )
-        assert result.status_code == 201, result.content
+        grant_cms_role(site=site,user=user,role=role)
 
     page = create_page(
         site=site, title="Admissions", slug="admissions", actor=author,
@@ -243,7 +171,7 @@ def test_post_workflow_uses_roles_post_module_snapshots_audit_and_idempotency(
         ContentRole.PUBLISHER: get_user_model().objects.create_user(username="post-flow-publisher"),
     }
     for role, user in users.items():
-        SiteContentRoleAssignment.objects.create(site=site, user=user, role=role)
+        grant_cms_role(site=site, user=user, role=role)
 
     category = Category.objects.create(site=site, code="FLOW_NEWS", name="Flow News")
     tag = Tag.objects.create(site=site, code="FLOW", name="Workflow")

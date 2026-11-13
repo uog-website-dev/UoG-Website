@@ -1,4 +1,5 @@
 """HTTP authorization, Site isolation, ETags and restore behavior."""
+from apps.cms.tests.support import grant_cms_role
 import pytest
 from django.contrib.auth import get_user_model
 
@@ -42,12 +43,7 @@ def test_revision_history_requires_site_role_and_is_site_scoped(
     denied = client.get(_url(site, page), **outsider_token)
     assert denied.status_code == 403
 
-    assigned = platform_admin.post(
-        f"{BASE}{site.pk}/content-roles/",
-        {"user_id": author.pk, "role": ContentRole.AUTHOR},
-        content_type="application/json",
-    )
-    assert assigned.status_code == 201
+    grant_cms_role(site=site,user=author,role=ContentRole.AUTHOR)
     author_token = oidc.header(realm_access={"roles": ["platform-viewer"]})
     history = client.get(_url(site, page), **author_token)
     assert history.status_code == 200
@@ -71,11 +67,7 @@ def test_revision_detail_and_restore_are_authorized_conditional_and_safe(
     page.title = "Newer title"
     page.updated_by = author
     page.save()
-    platform_admin.post(
-        f"{BASE}{site.pk}/content-roles/",
-        {"user_id": author.pk, "role": ContentRole.AUTHOR},
-        content_type="application/json",
-    )
+    grant_cms_role(site=site,user=author,role=ContentRole.AUTHOR)
     author_token = oidc.header(realm_access={"roles": ["platform-viewer"]})
 
     detail = client.get(
@@ -129,12 +121,7 @@ def test_reviewer_can_inspect_but_cannot_restore_history(
     site, _ = sites
     page = create_page(site=site, title="Review", slug="review")
     reviewer = get_user_model().objects.create_user(username="history-reviewer")
-    assigned = platform_admin.post(
-        f"{BASE}{site.pk}/content-roles/",
-        {"user_id": reviewer.pk, "role": ContentRole.REVIEWER},
-        content_type="application/json",
-    )
-    assert assigned.status_code == 201
+    grant_cms_role(site=site,user=reviewer,role=ContentRole.REVIEWER)
     token = _identity(
         oidc, "5f1b2c3d-0000-4000-8000-000000000023", "history-reviewer",
     )

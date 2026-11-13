@@ -1,4 +1,5 @@
 """Content revision capture, restore, retention and concurrency contracts."""
+from apps.cms.tests.support import grant_cms_role
 import pytest
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -12,7 +13,6 @@ from apps.cms.models import (
     Page,
     PublishedContentSnapshot,
     SiteContent,
-    SiteContentRoleAssignment,
 )
 from apps.cms.services.pages import create_page
 from apps.cms.services.revisions import (
@@ -101,7 +101,7 @@ def test_draft_retention_keeps_recent_versions_but_not_unbounded_history(sites):
 def test_restore_creates_a_new_draft_revision_and_preserves_source_history(sites):
     site, _ = sites
     editor = get_user_model().objects.create_user(username="restore-author")
-    SiteContentRoleAssignment.objects.create(
+    grant_cms_role(
         site=site, user=editor, role=ContentRole.AUTHOR,
     )
     page = create_page(
@@ -143,7 +143,7 @@ def test_unpublished_restore_keeps_published_revisions_immutable(sites):
         (reviewer, ContentRole.REVIEWER),
         (publisher, ContentRole.PUBLISHER),
     ):
-        SiteContentRoleAssignment.objects.create(
+        grant_cms_role(
             site=site, user=user, role=role,
         )
     page = create_page(

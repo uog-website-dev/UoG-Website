@@ -1,0 +1,1880 @@
+{
+  "inventory": [
+    {
+      "legacy_id": 31,
+      "snapshot": {
+        "id": 31,
+        "site_id": 28,
+        "user_id": 18,
+        "role": "AUTHOR",
+        "created_at": "2026-11-12T15:05:01.083609+00:00"
+      },
+      "target_role": "editor",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.upload",
+        "content.media.view",
+        "content.menus.view",
+        "content.pages.create",
+        "content.pages.update",
+        "content.pages.view",
+        "content.posts.create",
+        "content.posts.update",
+        "content.posts.view",
+        "menu.read",
+        "menu.write",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "506bc5582bef215434be182292129fc8c55b846a0136d82ad720aaf66957a30c",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 32,
+      "snapshot": {
+        "id": 32,
+        "site_id": 28,
+        "user_id": 19,
+        "role": "REVIEWER",
+        "created_at": "2026-11-12T15:05:01.224742+00:00"
+      },
+      "target_role": "reviewer",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.view",
+        "content.posts.view",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "beb9e6fbefda24e0c203ea08df93b925361b0925b868cbd2e5e16c1648b2b69f",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 33,
+      "snapshot": {
+        "id": 33,
+        "site_id": 28,
+        "user_id": 20,
+        "role": "PUBLISHER",
+        "created_at": "2026-11-12T15:05:01.337368+00:00"
+      },
+      "target_role": "publisher",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.publish",
+        "content.pages.view",
+        "content.posts.publish",
+        "content.posts.view",
+        "menu.publish",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "63933a807889047840e6e2f0e51a6a9d935e51ef7cd11f57df496317e3c2257e",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 34,
+      "snapshot": {
+        "id": 34,
+        "site_id": 29,
+        "user_id": 22,
+        "role": "AUTHOR",
+        "created_at": "2026-11-12T15:05:01.564546+00:00"
+      },
+      "target_role": "editor",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.upload",
+        "content.media.view",
+        "content.menus.view",
+        "content.pages.create",
+        "content.pages.update",
+        "content.pages.view",
+        "content.posts.create",
+        "content.posts.update",
+        "content.posts.view",
+        "menu.read",
+        "menu.write",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "a89105b4ebbfca7616bf0496f529707306d137b1a0e12748f4fc868d5717ce2c",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 35,
+      "snapshot": {
+        "id": 35,
+        "site_id": 29,
+        "user_id": 23,
+        "role": "REVIEWER",
+        "created_at": "2026-11-12T15:05:01.713661+00:00"
+      },
+      "target_role": "reviewer",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.view",
+        "content.posts.view",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "3fda8bb92f5b7f7375cf19f321a28837912a858b171358b8cf565bd3ef466bbe",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 36,
+      "snapshot": {
+        "id": 36,
+        "site_id": 29,
+        "user_id": 24,
+        "role": "PUBLISHER",
+        "created_at": "2026-11-12T15:05:01.828845+00:00"
+      },
+      "target_role": "publisher",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.publish",
+        "content.pages.view",
+        "content.posts.publish",
+        "content.posts.view",
+        "menu.publish",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "023220aea80754c1e0427c0ecffeaba57fa4fe969b4e21ecc09f05a5d6c129d3",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 37,
+      "snapshot": {
+        "id": 37,
+        "site_id": 30,
+        "user_id": 26,
+        "role": "AUTHOR",
+        "created_at": "2026-11-12T15:08:00.416383+00:00"
+      },
+      "target_role": "editor",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.upload",
+        "content.media.view",
+        "content.menus.view",
+        "content.pages.create",
+        "content.pages.update",
+        "content.pages.view",
+        "content.posts.create",
+        "content.posts.update",
+        "content.posts.view",
+        "menu.read",
+        "menu.write",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "5edfa3d6812f69031bf49a0454a1113afaa2bdeb301c2a8cd0df7f13239a260c",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 38,
+      "snapshot": {
+        "id": 38,
+        "site_id": 30,
+        "user_id": 27,
+        "role": "REVIEWER",
+        "created_at": "2026-11-12T15:08:00.526844+00:00"
+      },
+      "target_role": "reviewer",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.view",
+        "content.posts.view",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "33b0c647eb842283c72e4f3dc85855399162be14d9de0a8417c5f2c1fd1468b7",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 39,
+      "snapshot": {
+        "id": 39,
+        "site_id": 30,
+        "user_id": 28,
+        "role": "PUBLISHER",
+        "created_at": "2026-11-12T15:08:00.631227+00:00"
+      },
+      "target_role": "publisher",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.publish",
+        "content.pages.view",
+        "content.posts.publish",
+        "content.posts.view",
+        "menu.publish",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "46e1c5cc1de1d2536dfe883e4556c0a70ad7432682c4d9bfb22e5ec694878460",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 40,
+      "snapshot": {
+        "id": 40,
+        "site_id": 31,
+        "user_id": 30,
+        "role": "AUTHOR",
+        "created_at": "2026-11-12T15:08:00.853768+00:00"
+      },
+      "target_role": "editor",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.upload",
+        "content.media.view",
+        "content.menus.view",
+        "content.pages.create",
+        "content.pages.update",
+        "content.pages.view",
+        "content.posts.create",
+        "content.posts.update",
+        "content.posts.view",
+        "menu.read",
+        "menu.write",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "39473b1539701a6f15dd36ae62bc5fbe81138597743eb3eabe05277993bfc0ad",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 41,
+      "snapshot": {
+        "id": 41,
+        "site_id": 31,
+        "user_id": 31,
+        "role": "REVIEWER",
+        "created_at": "2026-11-12T15:08:00.973676+00:00"
+      },
+      "target_role": "reviewer",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.view",
+        "content.posts.view",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "5e56169ef3842b6f22a57ddfd530048d48b7665dbb3f63fc81a31274f0e06c40",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 42,
+      "snapshot": {
+        "id": 42,
+        "site_id": 31,
+        "user_id": 32,
+        "role": "PUBLISHER",
+        "created_at": "2026-11-12T15:08:01.073760+00:00"
+      },
+      "target_role": "publisher",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.publish",
+        "content.pages.view",
+        "content.posts.publish",
+        "content.posts.view",
+        "menu.publish",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "4bf9d24117f83ef2623392067db0a582f0c1ffe6bf67c6ce66374a3b70b99ef0",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 43,
+      "snapshot": {
+        "id": 43,
+        "site_id": 32,
+        "user_id": 34,
+        "role": "AUTHOR",
+        "created_at": "2026-11-12T15:13:44.335561+00:00"
+      },
+      "target_role": "editor",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.upload",
+        "content.media.view",
+        "content.menus.view",
+        "content.pages.create",
+        "content.pages.update",
+        "content.pages.view",
+        "content.posts.create",
+        "content.posts.update",
+        "content.posts.view",
+        "menu.read",
+        "menu.write",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "e15f2662eda61d0303ca76fff3b583f81a0badb288d6ef752d33f70d0a9b25d5",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 44,
+      "snapshot": {
+        "id": 44,
+        "site_id": 32,
+        "user_id": 35,
+        "role": "REVIEWER",
+        "created_at": "2026-11-12T15:13:44.558611+00:00"
+      },
+      "target_role": "reviewer",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.view",
+        "content.posts.view",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "222f18be58503f2b6cb83f3122cd0a2f5ce2f06853344aa5d8e425e3c633e272",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 45,
+      "snapshot": {
+        "id": 45,
+        "site_id": 32,
+        "user_id": 36,
+        "role": "PUBLISHER",
+        "created_at": "2026-11-12T15:13:44.764556+00:00"
+      },
+      "target_role": "publisher",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.publish",
+        "content.pages.view",
+        "content.posts.publish",
+        "content.posts.view",
+        "menu.publish",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "b3b491a5d31e0e88fcc50e97f19f064cc18b43d4369bd3818de2a5dc8b2ebaa9",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 46,
+      "snapshot": {
+        "id": 46,
+        "site_id": 33,
+        "user_id": 38,
+        "role": "AUTHOR",
+        "created_at": "2026-11-12T15:13:45.205001+00:00"
+      },
+      "target_role": "editor",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.upload",
+        "content.media.view",
+        "content.menus.view",
+        "content.pages.create",
+        "content.pages.update",
+        "content.pages.view",
+        "content.posts.create",
+        "content.posts.update",
+        "content.posts.view",
+        "menu.read",
+        "menu.write",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "167a9d4e12a021f71b096df8f39107f927080808e41714f13cf271f3398908aa",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 47,
+      "snapshot": {
+        "id": 47,
+        "site_id": 33,
+        "user_id": 39,
+        "role": "REVIEWER",
+        "created_at": "2026-11-12T15:13:45.472120+00:00"
+      },
+      "target_role": "reviewer",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.view",
+        "content.posts.view",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "f9d035a8c413a414c23cda3b3732d00563e4f3037df750a8ddf47dc720314d42",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 48,
+      "snapshot": {
+        "id": 48,
+        "site_id": 33,
+        "user_id": 40,
+        "role": "PUBLISHER",
+        "created_at": "2026-11-12T15:13:45.707732+00:00"
+      },
+      "target_role": "publisher",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.publish",
+        "content.pages.view",
+        "content.posts.publish",
+        "content.posts.view",
+        "menu.publish",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "2be0741666be73265c3677ac8e2efb2ddddd6642d3d8f44e707b2550471a4f1e",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 49,
+      "snapshot": {
+        "id": 49,
+        "site_id": 34,
+        "user_id": 42,
+        "role": "AUTHOR",
+        "created_at": "2026-11-12T16:24:12.550075+00:00"
+      },
+      "target_role": "editor",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.upload",
+        "content.media.view",
+        "content.menus.view",
+        "content.pages.create",
+        "content.pages.update",
+        "content.pages.view",
+        "content.posts.create",
+        "content.posts.update",
+        "content.posts.view",
+        "menu.read",
+        "menu.write",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "1b9d571e608e6e95415fe4257e844fbc702b0313c3dbf14581776c8003044c23",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 50,
+      "snapshot": {
+        "id": 50,
+        "site_id": 34,
+        "user_id": 43,
+        "role": "REVIEWER",
+        "created_at": "2026-11-12T16:24:13.266607+00:00"
+      },
+      "target_role": "reviewer",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.view",
+        "content.posts.view",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "925dd4760de0db0a4308f95e54316bcb68c777fada3db2d8449638b9f3117ca6",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 51,
+      "snapshot": {
+        "id": 51,
+        "site_id": 34,
+        "user_id": 44,
+        "role": "PUBLISHER",
+        "created_at": "2026-11-12T16:24:14.239787+00:00"
+      },
+      "target_role": "publisher",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.publish",
+        "content.pages.view",
+        "content.posts.publish",
+        "content.posts.view",
+        "menu.publish",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "73fe497be44107ec13ac1ef294f27c0209d13af1b216c991cf462e28d01b7018",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 52,
+      "snapshot": {
+        "id": 52,
+        "site_id": 35,
+        "user_id": 46,
+        "role": "AUTHOR",
+        "created_at": "2026-11-12T16:24:15.203706+00:00"
+      },
+      "target_role": "editor",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.upload",
+        "content.media.view",
+        "content.menus.view",
+        "content.pages.create",
+        "content.pages.update",
+        "content.pages.view",
+        "content.posts.create",
+        "content.posts.update",
+        "content.posts.view",
+        "menu.read",
+        "menu.write",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "1a857866b0be5b14a16c870ec9c7999d39aab843975d2dac628642b513d56481",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 53,
+      "snapshot": {
+        "id": 53,
+        "site_id": 35,
+        "user_id": 47,
+        "role": "REVIEWER",
+        "created_at": "2026-11-12T16:24:15.399986+00:00"
+      },
+      "target_role": "reviewer",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.view",
+        "content.posts.view",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "c8ddb1ce8e2380a43514686424d6efcbecafd6fa9477e3630591d193d9447f92",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 54,
+      "snapshot": {
+        "id": 54,
+        "site_id": 35,
+        "user_id": 48,
+        "role": "PUBLISHER",
+        "created_at": "2026-11-12T16:24:15.671790+00:00"
+      },
+      "target_role": "publisher",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.publish",
+        "content.pages.view",
+        "content.posts.publish",
+        "content.posts.view",
+        "menu.publish",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "1dab42b31d756cdfda9aff414472f4b81ec56e189691522d342597d293f73b09",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 55,
+      "snapshot": {
+        "id": 55,
+        "site_id": 36,
+        "user_id": 50,
+        "role": "AUTHOR",
+        "created_at": "2026-11-12T16:25:37.947969+00:00"
+      },
+      "target_role": "editor",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.upload",
+        "content.media.view",
+        "content.menus.view",
+        "content.pages.create",
+        "content.pages.update",
+        "content.pages.view",
+        "content.posts.create",
+        "content.posts.update",
+        "content.posts.view",
+        "menu.read",
+        "menu.write",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "37c321d0a5cb25e73f404ac0c0890266d4ac297f09f841aca4032942ed2d95b8",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 56,
+      "snapshot": {
+        "id": 56,
+        "site_id": 36,
+        "user_id": 51,
+        "role": "REVIEWER",
+        "created_at": "2026-11-12T16:25:38.138078+00:00"
+      },
+      "target_role": "reviewer",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.view",
+        "content.posts.view",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "7e4bb15cabe01d61e0428875df3e1726d3bf3c7d5710de3884ed2c414af18b60",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 57,
+      "snapshot": {
+        "id": 57,
+        "site_id": 36,
+        "user_id": 52,
+        "role": "PUBLISHER",
+        "created_at": "2026-11-12T16:25:38.351855+00:00"
+      },
+      "target_role": "publisher",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.publish",
+        "content.pages.view",
+        "content.posts.publish",
+        "content.posts.view",
+        "menu.publish",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "e0418596656638d1093986b039a13c87c0c1aab85b2d71cf13692d89d5f4e206",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 58,
+      "snapshot": {
+        "id": 58,
+        "site_id": 37,
+        "user_id": 54,
+        "role": "AUTHOR",
+        "created_at": "2026-11-12T16:25:38.781747+00:00"
+      },
+      "target_role": "editor",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.upload",
+        "content.media.view",
+        "content.menus.view",
+        "content.pages.create",
+        "content.pages.update",
+        "content.pages.view",
+        "content.posts.create",
+        "content.posts.update",
+        "content.posts.view",
+        "menu.read",
+        "menu.write",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "9b44150bfa4433d8eeae8c67026b449e1bcd469f2925f02feb5104f2a5b07213",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 59,
+      "snapshot": {
+        "id": 59,
+        "site_id": 37,
+        "user_id": 55,
+        "role": "REVIEWER",
+        "created_at": "2026-11-12T16:25:39.016022+00:00"
+      },
+      "target_role": "reviewer",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.view",
+        "content.posts.view",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "2fce2af268ee8f14497c51ebca5b0b14cf7f3a86e310457972ed2142050dfbb9",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 60,
+      "snapshot": {
+        "id": 60,
+        "site_id": 37,
+        "user_id": 56,
+        "role": "PUBLISHER",
+        "created_at": "2026-11-12T16:25:39.277578+00:00"
+      },
+      "target_role": "publisher",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.publish",
+        "content.pages.view",
+        "content.posts.publish",
+        "content.posts.view",
+        "menu.publish",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "3bd9b96370536047ab0fe555ddb8c9b183aa11ad1599e15ead6614543780a036",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 61,
+      "snapshot": {
+        "id": 61,
+        "site_id": 38,
+        "user_id": 58,
+        "role": "AUTHOR",
+        "created_at": "2026-11-12T16:26:23.850209+00:00"
+      },
+      "target_role": "editor",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.upload",
+        "content.media.view",
+        "content.menus.view",
+        "content.pages.create",
+        "content.pages.update",
+        "content.pages.view",
+        "content.posts.create",
+        "content.posts.update",
+        "content.posts.view",
+        "menu.read",
+        "menu.write",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "b72785e7c22a1496bf7756c60c2733d29379577aa43bd358779790c90e80722f",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 62,
+      "snapshot": {
+        "id": 62,
+        "site_id": 38,
+        "user_id": 59,
+        "role": "REVIEWER",
+        "created_at": "2026-11-12T16:26:24.065211+00:00"
+      },
+      "target_role": "reviewer",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.view",
+        "content.posts.view",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "63df025ecd469660a0502756555dceda98937d4a1f01baacd5397b19d12406fa",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 63,
+      "snapshot": {
+        "id": 63,
+        "site_id": 38,
+        "user_id": 60,
+        "role": "PUBLISHER",
+        "created_at": "2026-11-12T16:26:24.193472+00:00"
+      },
+      "target_role": "publisher",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.publish",
+        "content.pages.view",
+        "content.posts.publish",
+        "content.posts.view",
+        "menu.publish",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "50e460c647c564929b8f830bfaba5d71d3958676f33c1334f0bba19919cd4ec3",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 64,
+      "snapshot": {
+        "id": 64,
+        "site_id": 39,
+        "user_id": 62,
+        "role": "AUTHOR",
+        "created_at": "2026-11-12T16:26:24.423634+00:00"
+      },
+      "target_role": "editor",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.upload",
+        "content.media.view",
+        "content.menus.view",
+        "content.pages.create",
+        "content.pages.update",
+        "content.pages.view",
+        "content.posts.create",
+        "content.posts.update",
+        "content.posts.view",
+        "menu.read",
+        "menu.write",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "e647bf191f19352109a6a4ddca5dd43701214cc36f8748a5dfdfe70f8c62e343",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 65,
+      "snapshot": {
+        "id": 65,
+        "site_id": 39,
+        "user_id": 63,
+        "role": "REVIEWER",
+        "created_at": "2026-11-12T16:26:24.531127+00:00"
+      },
+      "target_role": "reviewer",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.view",
+        "content.posts.view",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "bee53c4da43191cf86cce49db6a1d3db4a4d21f26635e9cb432336e9de5a1c24",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 66,
+      "snapshot": {
+        "id": 66,
+        "site_id": 39,
+        "user_id": 64,
+        "role": "PUBLISHER",
+        "created_at": "2026-11-12T16:26:24.660106+00:00"
+      },
+      "target_role": "publisher",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.publish",
+        "content.pages.view",
+        "content.posts.publish",
+        "content.posts.view",
+        "menu.publish",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "27ccadc3830403cb9e6dca1ce70e9b6c821162f0e580148eba92a37d6e779b19",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 67,
+      "snapshot": {
+        "id": 67,
+        "site_id": 40,
+        "user_id": 65,
+        "role": "AUTHOR",
+        "created_at": "2026-11-13T03:52:38.822645+00:00"
+      },
+      "target_role": "editor",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.upload",
+        "content.media.view",
+        "content.menus.view",
+        "content.pages.create",
+        "content.pages.update",
+        "content.pages.view",
+        "content.posts.create",
+        "content.posts.update",
+        "content.posts.view",
+        "menu.read",
+        "menu.write",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "ac2a9691b449bcf74e722f1d4cf639bc03cbeffecec394fbed630615afa0eb6d",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 68,
+      "snapshot": {
+        "id": 68,
+        "site_id": 40,
+        "user_id": 66,
+        "role": "AUTHOR",
+        "created_at": "2026-11-13T03:52:39.102892+00:00"
+      },
+      "target_role": "editor",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.upload",
+        "content.media.view",
+        "content.menus.view",
+        "content.pages.create",
+        "content.pages.update",
+        "content.pages.view",
+        "content.posts.create",
+        "content.posts.update",
+        "content.posts.view",
+        "menu.read",
+        "menu.write",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "13d07cb107ab9850216c60da91ae2bbc75433755e5afab57a34fd08ad9b21290",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 69,
+      "snapshot": {
+        "id": 69,
+        "site_id": 40,
+        "user_id": 68,
+        "role": "REVIEWER",
+        "created_at": "2026-11-13T04:16:41.106040+00:00"
+      },
+      "target_role": "reviewer",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.view",
+        "content.posts.view",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "cbd74302050018df01deca48ff7aef5d184a2deda18ed3a4a1f5d1462db5d6a7",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 70,
+      "snapshot": {
+        "id": 70,
+        "site_id": 40,
+        "user_id": 69,
+        "role": "PUBLISHER",
+        "created_at": "2026-11-13T04:16:41.240089+00:00"
+      },
+      "target_role": "publisher",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.publish",
+        "content.pages.view",
+        "content.posts.publish",
+        "content.posts.view",
+        "menu.publish",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "ed1af176f107095eb0618a4c2f58c8f4483ca318fc398cddb090d08116ca7f7d",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 71,
+      "snapshot": {
+        "id": 71,
+        "site_id": 42,
+        "user_id": 70,
+        "role": "AUTHOR",
+        "created_at": "2026-11-13T04:48:35.523581+00:00"
+      },
+      "target_role": "editor",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.upload",
+        "content.media.view",
+        "content.menus.view",
+        "content.pages.create",
+        "content.pages.update",
+        "content.pages.view",
+        "content.posts.create",
+        "content.posts.update",
+        "content.posts.view",
+        "menu.read",
+        "menu.write",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "c76e67614360d56796e2f51916f9375a099e11dfd22c329690192481da463914",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 72,
+      "snapshot": {
+        "id": 72,
+        "site_id": 42,
+        "user_id": 71,
+        "role": "AUTHOR",
+        "created_at": "2026-11-13T04:48:35.710143+00:00"
+      },
+      "target_role": "editor",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.upload",
+        "content.media.view",
+        "content.menus.view",
+        "content.pages.create",
+        "content.pages.update",
+        "content.pages.view",
+        "content.posts.create",
+        "content.posts.update",
+        "content.posts.view",
+        "menu.read",
+        "menu.write",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "d937ba3d901c29d54c5f3de2d59745d882544345e1c42b8fe90343b09f468a8b",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 73,
+      "snapshot": {
+        "id": 73,
+        "site_id": 42,
+        "user_id": 73,
+        "role": "REVIEWER",
+        "created_at": "2026-11-13T04:48:39.848237+00:00"
+      },
+      "target_role": "reviewer",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.view",
+        "content.posts.view",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "e8a9724687ead2eafe8a969d713d9c63fac94b3f6fb3b6d509a2534bc1da6c11",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 74,
+      "snapshot": {
+        "id": 74,
+        "site_id": 42,
+        "user_id": 74,
+        "role": "PUBLISHER",
+        "created_at": "2026-11-13T04:48:40.045389+00:00"
+      },
+      "target_role": "publisher",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.publish",
+        "content.pages.view",
+        "content.posts.publish",
+        "content.posts.view",
+        "menu.publish",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "42b65cd9bf27e2c9a426625f968317c851a2619df152541a799ce05fa681049d",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 75,
+      "snapshot": {
+        "id": 75,
+        "site_id": 44,
+        "user_id": 75,
+        "role": "AUTHOR",
+        "created_at": "2026-11-13T10:25:12.655407+00:00"
+      },
+      "target_role": "editor",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.upload",
+        "content.media.view",
+        "content.menus.view",
+        "content.pages.create",
+        "content.pages.update",
+        "content.pages.view",
+        "content.posts.create",
+        "content.posts.update",
+        "content.posts.view",
+        "menu.read",
+        "menu.write",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "f15265020b3d9279e2c2587b4a82d17b1081e25ed83e4209a0261a6a48013975",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 76,
+      "snapshot": {
+        "id": 76,
+        "site_id": 44,
+        "user_id": 76,
+        "role": "AUTHOR",
+        "created_at": "2026-11-13T10:25:12.757364+00:00"
+      },
+      "target_role": "editor",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.upload",
+        "content.media.view",
+        "content.menus.view",
+        "content.pages.create",
+        "content.pages.update",
+        "content.pages.view",
+        "content.posts.create",
+        "content.posts.update",
+        "content.posts.view",
+        "menu.read",
+        "menu.write",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "0c7effeaa74c6a62ec87ea83133473738ac8d4f5686fff2bd0fd155c299a737a",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 77,
+      "snapshot": {
+        "id": 77,
+        "site_id": 44,
+        "user_id": 78,
+        "role": "REVIEWER",
+        "created_at": "2026-11-13T10:25:15.690790+00:00"
+      },
+      "target_role": "reviewer",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.view",
+        "content.posts.view",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "e664ecddf3744df81127de5cfc19b63cd841cfcfb05be7fd9ccbde7789fc18b4",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 78,
+      "snapshot": {
+        "id": 78,
+        "site_id": 44,
+        "user_id": 79,
+        "role": "PUBLISHER",
+        "created_at": "2026-11-13T10:25:15.775998+00:00"
+      },
+      "target_role": "publisher",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.publish",
+        "content.pages.view",
+        "content.posts.publish",
+        "content.posts.view",
+        "menu.publish",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "75ff757de42eb4338e8a3363bdd5825dff59107d9b271cb0c5dc14aa891f5660",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 79,
+      "snapshot": {
+        "id": 79,
+        "site_id": 45,
+        "user_id": 80,
+        "role": "AUTHOR",
+        "created_at": "2026-11-13T10:25:15.877923+00:00"
+      },
+      "target_role": "editor",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.upload",
+        "content.media.view",
+        "content.menus.view",
+        "content.pages.create",
+        "content.pages.update",
+        "content.pages.view",
+        "content.posts.create",
+        "content.posts.update",
+        "content.posts.view",
+        "menu.read",
+        "menu.write",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "23b3ba38bd8f4790ed91222b90adf6acdfdcf3cca885f0a0179ffa7499732b14",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 80,
+      "snapshot": {
+        "id": 80,
+        "site_id": 46,
+        "user_id": 81,
+        "role": "AUTHOR",
+        "created_at": "2026-11-13T12:01:10.321769+00:00"
+      },
+      "target_role": "editor",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.upload",
+        "content.media.view",
+        "content.menus.view",
+        "content.pages.create",
+        "content.pages.update",
+        "content.pages.view",
+        "content.posts.create",
+        "content.posts.update",
+        "content.posts.view",
+        "menu.read",
+        "menu.write",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "e5fbe5c42b5525b293702ec731d68ef3e3da0f9fc6a6f80c11257af7c9ac4ab4",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 81,
+      "snapshot": {
+        "id": 81,
+        "site_id": 46,
+        "user_id": 82,
+        "role": "AUTHOR",
+        "created_at": "2026-11-13T12:01:10.485618+00:00"
+      },
+      "target_role": "editor",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.upload",
+        "content.media.view",
+        "content.menus.view",
+        "content.pages.create",
+        "content.pages.update",
+        "content.pages.view",
+        "content.posts.create",
+        "content.posts.update",
+        "content.posts.view",
+        "menu.read",
+        "menu.write",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "112699e700b421080f90309b2c2189c28f3ab104c571e57f16dc98c780ce5516",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 82,
+      "snapshot": {
+        "id": 82,
+        "site_id": 46,
+        "user_id": 83,
+        "role": "REVIEWER",
+        "created_at": "2026-11-13T12:01:14.252120+00:00"
+      },
+      "target_role": "reviewer",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.view",
+        "content.posts.view",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "24a05f130c6c74e114591dc461b03c2118a7bd410347cd5047502c593cc4aa67",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 83,
+      "snapshot": {
+        "id": 83,
+        "site_id": 46,
+        "user_id": 84,
+        "role": "PUBLISHER",
+        "created_at": "2026-11-13T12:01:14.378611+00:00"
+      },
+      "target_role": "publisher",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.publish",
+        "content.pages.view",
+        "content.posts.publish",
+        "content.posts.view",
+        "menu.publish",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "3131f59bb08b86d7d09b06797341cff309cf2909eaa2db2665df94811e51e3c8",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 84,
+      "snapshot": {
+        "id": 84,
+        "site_id": 47,
+        "user_id": 85,
+        "role": "AUTHOR",
+        "created_at": "2026-11-13T14:38:44.172870+00:00"
+      },
+      "target_role": "editor",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.upload",
+        "content.media.view",
+        "content.menus.view",
+        "content.pages.create",
+        "content.pages.update",
+        "content.pages.view",
+        "content.posts.create",
+        "content.posts.update",
+        "content.posts.view",
+        "menu.read",
+        "menu.write",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "57cfdb59290aa167c33a88c9c4a8afa955fde86bc32c64fecd8a4c2d4b0af153",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 85,
+      "snapshot": {
+        "id": 85,
+        "site_id": 47,
+        "user_id": 86,
+        "role": "AUTHOR",
+        "created_at": "2026-11-13T14:38:44.972242+00:00"
+      },
+      "target_role": "editor",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.upload",
+        "content.media.view",
+        "content.menus.view",
+        "content.pages.create",
+        "content.pages.update",
+        "content.pages.view",
+        "content.posts.create",
+        "content.posts.update",
+        "content.posts.view",
+        "menu.read",
+        "menu.write",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "d273ce332f912283afbfa7adcebb1daf37f00003c1217b04baf01069c0c62d8b",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 86,
+      "snapshot": {
+        "id": 86,
+        "site_id": 47,
+        "user_id": 87,
+        "role": "REVIEWER",
+        "created_at": "2026-11-13T14:38:48.743978+00:00"
+      },
+      "target_role": "reviewer",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.view",
+        "content.posts.view",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "a6783cef6859e351a7c679ccc9b9d5881d6e46f5e795f66443328b002dd654f9",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 87,
+      "snapshot": {
+        "id": 87,
+        "site_id": 47,
+        "user_id": 88,
+        "role": "PUBLISHER",
+        "created_at": "2026-11-13T14:38:48.902641+00:00"
+      },
+      "target_role": "publisher",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.publish",
+        "content.pages.view",
+        "content.posts.publish",
+        "content.posts.view",
+        "menu.publish",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "df274bca8f4cf9930162dcfc9ca98b38d2eb63b07edf0859e9154c4692c7e780",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 88,
+      "snapshot": {
+        "id": 88,
+        "site_id": 48,
+        "user_id": 89,
+        "role": "AUTHOR",
+        "created_at": "2026-11-13T14:38:55.295560+00:00"
+      },
+      "target_role": "editor",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.upload",
+        "content.media.view",
+        "content.menus.view",
+        "content.pages.create",
+        "content.pages.update",
+        "content.pages.view",
+        "content.posts.create",
+        "content.posts.update",
+        "content.posts.view",
+        "menu.read",
+        "menu.write",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "564f2424cbe1cf294bf433ca6057001430907ae60a7d3118327e62e8a7dc6d63",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 89,
+      "snapshot": {
+        "id": 89,
+        "site_id": 48,
+        "user_id": 90,
+        "role": "REVIEWER",
+        "created_at": "2026-11-13T14:38:55.453935+00:00"
+      },
+      "target_role": "reviewer",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.view",
+        "content.posts.view",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "ed0547ce4715f6c59f2541989846f2634cce425f55065db100488760e561e954",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 90,
+      "snapshot": {
+        "id": 90,
+        "site_id": 48,
+        "user_id": 91,
+        "role": "PUBLISHER",
+        "created_at": "2026-11-13T14:38:55.612527+00:00"
+      },
+      "target_role": "publisher",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.publish",
+        "content.pages.view",
+        "content.posts.publish",
+        "content.posts.view",
+        "menu.publish",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "86a4aedb548a57db4967795ce47c4ef82854507df1f7879e847efb91539b97f7",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 91,
+      "snapshot": {
+        "id": 91,
+        "site_id": 49,
+        "user_id": 92,
+        "role": "AUTHOR",
+        "created_at": "2026-11-13T15:59:58.061105+00:00"
+      },
+      "target_role": "editor",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.upload",
+        "content.media.view",
+        "content.menus.view",
+        "content.pages.create",
+        "content.pages.update",
+        "content.pages.view",
+        "content.posts.create",
+        "content.posts.update",
+        "content.posts.view",
+        "menu.read",
+        "menu.write",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "34785cb300a9787f63899bcca7daaac78fd48e8dfa63487507623b7d74d0b2b3",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 92,
+      "snapshot": {
+        "id": 92,
+        "site_id": 49,
+        "user_id": 93,
+        "role": "AUTHOR",
+        "created_at": "2026-11-13T15:59:58.390285+00:00"
+      },
+      "target_role": "editor",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.upload",
+        "content.media.view",
+        "content.menus.view",
+        "content.pages.create",
+        "content.pages.update",
+        "content.pages.view",
+        "content.posts.create",
+        "content.posts.update",
+        "content.posts.view",
+        "menu.read",
+        "menu.write",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "ccdc9a97383f106a716f6561af4b0804bd3e1c8621b9e61dc7f2de1d36bfb3a3",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 93,
+      "snapshot": {
+        "id": 93,
+        "site_id": 49,
+        "user_id": 94,
+        "role": "REVIEWER",
+        "created_at": "2026-11-13T16:00:04.727402+00:00"
+      },
+      "target_role": "reviewer",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.view",
+        "content.posts.view",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "bcab1fd83428470fd860b35b502d42191d478420470a9d600dfb8ca6bc32f7ec",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 94,
+      "snapshot": {
+        "id": 94,
+        "site_id": 49,
+        "user_id": 95,
+        "role": "PUBLISHER",
+        "created_at": "2026-11-13T16:00:04.966979+00:00"
+      },
+      "target_role": "publisher",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.publish",
+        "content.pages.view",
+        "content.posts.publish",
+        "content.posts.view",
+        "menu.publish",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "aa857115d2c59c585b111c3f9dcc4815f92c35e628b833e6d12d62dd0d49d84c",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 95,
+      "snapshot": {
+        "id": 95,
+        "site_id": 50,
+        "user_id": 96,
+        "role": "AUTHOR",
+        "created_at": "2026-11-13T16:02:09.188870+00:00"
+      },
+      "target_role": "editor",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.upload",
+        "content.media.view",
+        "content.menus.view",
+        "content.pages.create",
+        "content.pages.update",
+        "content.pages.view",
+        "content.posts.create",
+        "content.posts.update",
+        "content.posts.view",
+        "menu.read",
+        "menu.write",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "a6d6de9f16ebdd638b027ad335f1856bd77d4fb17740a83e1413cd7492af041e",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 96,
+      "snapshot": {
+        "id": 96,
+        "site_id": 50,
+        "user_id": 97,
+        "role": "REVIEWER",
+        "created_at": "2026-11-13T16:02:09.416786+00:00"
+      },
+      "target_role": "reviewer",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.view",
+        "content.posts.view",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "96c0df1aa18971d0a86bbdc6111a2f68f854f2def46fb0acfbcb33c0fd9b6998",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 97,
+      "snapshot": {
+        "id": 97,
+        "site_id": 50,
+        "user_id": 98,
+        "role": "PUBLISHER",
+        "created_at": "2026-11-13T16:02:11.172230+00:00"
+      },
+      "target_role": "publisher",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.publish",
+        "content.pages.view",
+        "content.posts.publish",
+        "content.posts.view",
+        "menu.publish",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "fa461822354327179e9ed613836b4a62d8fe307340bdeb6b747e6576198fd4bf",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 101,
+      "snapshot": {
+        "id": 101,
+        "site_id": 49,
+        "user_id": 99,
+        "role": "AUTHOR",
+        "created_at": "2026-11-13T16:31:18.541892+00:00"
+      },
+      "target_role": "editor",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.upload",
+        "content.media.view",
+        "content.menus.view",
+        "content.pages.create",
+        "content.pages.update",
+        "content.pages.view",
+        "content.posts.create",
+        "content.posts.update",
+        "content.posts.view",
+        "menu.read",
+        "menu.write",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "26f7f8ccc2ce17dd4ed9c1a99216a346d2c97346e1a5e66301c2398e31e668f4",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 102,
+      "snapshot": {
+        "id": 102,
+        "site_id": 49,
+        "user_id": 100,
+        "role": "REVIEWER",
+        "created_at": "2026-11-13T16:31:18.790635+00:00"
+      },
+      "target_role": "reviewer",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.view",
+        "content.posts.view",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "2df576a95db6bcd6160a7923bb68e7821f92af90e87b85e282c776648f255955",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 103,
+      "snapshot": {
+        "id": 103,
+        "site_id": 49,
+        "user_id": 101,
+        "role": "PUBLISHER",
+        "created_at": "2026-11-13T16:31:18.989346+00:00"
+      },
+      "target_role": "publisher",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.publish",
+        "content.pages.view",
+        "content.posts.publish",
+        "content.posts.view",
+        "menu.publish",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "67a1ca4dd970cf3340b78287c541e19df7a685805a34b139cf614fab2d0fdef3",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 104,
+      "snapshot": {
+        "id": 104,
+        "site_id": 50,
+        "user_id": 99,
+        "role": "AUTHOR",
+        "created_at": "2026-11-13T16:31:20.014913+00:00"
+      },
+      "target_role": "editor",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.upload",
+        "content.media.view",
+        "content.menus.view",
+        "content.pages.create",
+        "content.pages.update",
+        "content.pages.view",
+        "content.posts.create",
+        "content.posts.update",
+        "content.posts.view",
+        "menu.read",
+        "menu.write",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "31d091ac0e19e4f44a878123d742c86a5f00a0f8c4e4a6591b7e44ef1f714a7f",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 105,
+      "snapshot": {
+        "id": 105,
+        "site_id": 50,
+        "user_id": 100,
+        "role": "REVIEWER",
+        "created_at": "2026-11-13T16:31:20.157127+00:00"
+      },
+      "target_role": "reviewer",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.view",
+        "content.posts.view",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "f4819c57e5a7c41d3c3f0ff5d4de36771fd1095960ffbada9b30025a43e95d47",
+      "existing_assignment_id": null
+    },
+    {
+      "legacy_id": 106,
+      "snapshot": {
+        "id": 106,
+        "site_id": 50,
+        "user_id": 101,
+        "role": "PUBLISHER",
+        "created_at": "2026-11-13T16:31:20.331986+00:00"
+      },
+      "target_role": "publisher",
+      "status": "RETIRE_INACTIVE",
+      "permission_delta": [
+        "content.media.view",
+        "content.pages.publish",
+        "content.pages.view",
+        "content.posts.publish",
+        "content.posts.view",
+        "menu.publish",
+        "menu.read",
+        "sites.view"
+      ],
+      "effective_permissions_before": [],
+      "fingerprint": "367843e93a5f8d29cd7221c0f4d8fae2ab48085351f81d20cca7ddc6bfc548fb",
+      "existing_assignment_id": null
+    }
+  ],
+  "unresolved": 0
+}

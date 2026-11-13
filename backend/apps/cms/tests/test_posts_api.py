@@ -1,11 +1,12 @@
 """Site-scoped Post authoring and taxonomy administration contracts."""
+from apps.cms.tests.support import grant_cms_role
 from uuid import uuid4
 
 import pytest
 from django.contrib.auth import get_user_model
 
 from apps.api.models import Category, Post, Tag
-from apps.cms.models import ContentRole, ContentStatus, SiteContentRoleAssignment
+from apps.cms.models import ContentRole, ContentStatus
 from apps.sites.models import Module
 from apps.sites.services.modules import disable_module_for_site, enable_module_for_site
 
@@ -38,7 +39,7 @@ def _viewer(oidc, username, roles=("platform-viewer",)):
 @pytest.fixture
 def author(sites):
     user = get_user_model().objects.create_user(username="posts-author")
-    SiteContentRoleAssignment.objects.create(
+    grant_cms_role(
         site=sites[0], user=user, role=ContentRole.AUTHOR,
     )
     return user
@@ -595,7 +596,7 @@ def test_failed_taxonomy_persistence_rolls_back_post_relations_and_revision(site
 def test_main_and_child_sites_share_post_metadata_contract(site_editor,sites,author):
     from apps.sites.models import Site
     main=Site.objects.create(organization_unit=sites[0].organization_unit.parent,code="MAIN_NEWS",name="Main Site")
-    SiteContentRoleAssignment.objects.create(site=main,user=author,role=ContentRole.AUTHOR)
+    grant_cms_role(site=main,user=author,role=ContentRole.AUTHOR)
     _enable_posts_module(main,sites[0])
     for site in [main,sites[0]]:
         category=Category.objects.create(site=site,code="COMMON_NEWS",name="University news")

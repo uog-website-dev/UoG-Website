@@ -73,7 +73,7 @@ def _isolate_external_services(settings):
 @pytest.fixture
 def pages_module(sites):
     """Enable Page authoring for the shared multi-Site CMS test fixture."""
-    module = Module.objects.get(code="PAGES")
+    module, _ = Module.objects.get_or_create(code="PAGES",defaults={"name":"Pages","description":"Site Pages","status":"IMPLEMENTED"})
     if not module.is_enabled:
         module.is_enabled = True
         module.save(update_fields=("is_enabled",))
@@ -86,7 +86,7 @@ def pages_module(sites):
 @pytest.fixture
 def posts_module(sites):
     """Enable Site-scoped Post workflows for the shared CMS test Sites."""
-    module = Module.objects.get(code="POSTS")
+    module, _ = Module.objects.get_or_create(code="POSTS",defaults={"name":"Posts","description":"Site Posts","status":"IMPLEMENTED"})
     if not module.is_enabled:
         module.is_enabled = True
         module.save(update_fields=("is_enabled",))

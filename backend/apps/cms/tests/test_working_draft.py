@@ -1,4 +1,5 @@
 """Published Pages stay public while a working draft is reviewed and published."""
+from apps.cms.tests.support import grant_cms_role
 from concurrent.futures import ThreadPoolExecutor
 from threading import Barrier
 
@@ -14,7 +15,6 @@ from apps.cms.models import (
     ContentStatus,
     Page,
     PublishedContentSnapshot,
-    SiteContentRoleAssignment,
 )
 from apps.cms.services.pages import create_page
 from apps.cms.services.publication_cache import (
@@ -48,7 +48,7 @@ def _login(client, oidc, username, sub):
 
 
 def _grant(site, user, role):
-    SiteContentRoleAssignment.objects.get_or_create(
+    grant_cms_role(
         site=site, user=user, role=role,
     )
 
@@ -322,7 +322,7 @@ def test_concurrent_working_draft_publication_applies_once(sites):
         (reviewer, ContentRole.REVIEWER),
         (publisher, ContentRole.PUBLISHER),
     ):
-        SiteContentRoleAssignment.objects.create(site=site, user=user, role=role)
+        grant_cms_role(site=site, user=user, role=role)
     page = create_page(site=site, title="Research", slug="research", actor=author)
     transition_content(page.pk, action="submit", actor=author)
     transition_content(page.pk, action="approve", actor=reviewer)

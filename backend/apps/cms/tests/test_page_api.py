@@ -1,4 +1,5 @@
 """Site-scoped Page authoring and host-resolved public delivery contracts."""
+from apps.cms.tests.support import grant_cms_role
 import pytest
 from django.contrib.auth import get_user_model
 
@@ -6,7 +7,6 @@ from apps.cms.models import (
     ContentRole,
     ContentStatus,
     Page,
-    SiteContentRoleAssignment,
     SitePublicationVersion,
 )
 from apps.cms.services.pages import change_route
@@ -186,7 +186,7 @@ def test_page_authoring_requires_an_active_site_author_role(
     )
     assert denied.status_code == 403
 
-    SiteContentRoleAssignment.objects.create(
+    grant_cms_role(
         site=site, user=outsider, role=ContentRole.AUTHOR,
     )
     created = client.post(
@@ -205,10 +205,10 @@ def test_page_workflow_actions_and_history_are_site_role_aware(
     _enable_pages_module((site,))
     author = get_user_model().objects.create_user(username="workflow-author")
     reviewer = get_user_model().objects.create_user(username="workflow-reviewer")
-    SiteContentRoleAssignment.objects.create(
+    grant_cms_role(
         site=site, user=author, role=ContentRole.AUTHOR,
     )
-    SiteContentRoleAssignment.objects.create(
+    grant_cms_role(
         site=site, user=reviewer, role=ContentRole.REVIEWER,
     )
     url = ADMIN_PAGES.format(site_id=site.pk)
@@ -287,7 +287,7 @@ def test_page_review_to_publication_is_site_scoped_and_keeps_live_snapshot_immut
         (reviewer, ContentRole.REVIEWER),
         (publisher, ContentRole.PUBLISHER),
     ):
-        SiteContentRoleAssignment.objects.create(site=site, user=user, role=role)
+        grant_cms_role(site=site, user=user, role=role)
 
     def auth(user, suffix):
         return _token(
@@ -715,7 +715,7 @@ def test_homepage_assignment_publish_and_rejection_stay_on_one_site(
         content_type="application/json",
     )
     assert rejected.status_code == 403
-    SiteContentRoleAssignment.objects.create(
+    grant_cms_role(
         site=site, user=reviewer, role=ContentRole.REVIEWER,
     )
     rejected = client.post(
