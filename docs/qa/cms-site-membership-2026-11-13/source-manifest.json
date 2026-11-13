@@ -1,0 +1,4 @@
+{
+  "backend/apps/cms/authorization.py": "ab742a55f5a7efee41fe60363c558b7853673f689a2bd3d71a4aac75cf412234",
+  "backend/apps/cms/tests/test_membership_authorization.py": "a2c1ce4c502df89f662d275353883b5ad0c4d4abebf18bdf9b87e895abda7278"
+}

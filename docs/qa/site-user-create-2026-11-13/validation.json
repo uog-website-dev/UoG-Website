@@ -1,0 +1,34 @@
+{
+  "backend-tests.xml": {
+    "tests": 36,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "component-tests.xml": {
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "live-api.json": {
+    "checks": 1,
+    "all_pass": true
+  },
+  "live-permissions.json": {
+    "checks": 14,
+    "all_pass": true
+  },
+  "browser-results.json": {
+    "checks": 4,
+    "all_pass": true
+  },
+  "accessibility_violations": 0,
+  "typescript": true,
+  "admin_build": true,
+  "openapi": "validated with warnings treated as errors",
+  "migration": "accounts.0002 applied; test upgrade and rollback passed",
+  "django_check": "no issues",
+  "migration_drift": "no changes detected",
+  "review_pr_issue_attachment": "pending"
+}

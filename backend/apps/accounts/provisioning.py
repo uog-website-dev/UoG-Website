@@ -150,6 +150,9 @@ def provision_user(claims: TokenClaims):
     )
     if identity is not None:
         user = identity.user
+        from .models import AccountProfile
+        if AccountProfile.objects.filter(user=user).exclude(state="ACTIVE").exists():
+            raise AccountLinkError("Account provisioning is incomplete. Contact your Site administrator.")
     else:
         user = _claim_local_user(claims)
         identity = OIDCIdentity.objects.create(

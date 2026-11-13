@@ -26,6 +26,8 @@ services:
     restart: unless-stopped
     environment:
       DJANGO_SETTINGS_MODULE: config.settings
+      ACCOUNT_PROVISIONING_URL: ${ACCOUNT_PROVISIONING_URL:-http://keycloak:8080}
+      ACCOUNT_PROVISIONING_SECRET: ${ACCOUNT_PROVISIONING_SECRET:-}
       # IMPORTANT: Use 'postgres' not 'db' as the hostname
       DATABASE_URL: postgres://${DB_USER:-uog_admin}:${DB_PASSWORD:-secure_password_change_me}@postgres:5432/${DB_NAME:-uog_database}
       # Alternative: Individual settings

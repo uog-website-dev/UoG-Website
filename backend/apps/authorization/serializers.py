@@ -129,7 +129,49 @@ class SiteDirectoryUserSerializer(serializers.Serializer):
     user_email = serializers.EmailField(allow_blank=True)
     user_first_name = serializers.CharField(allow_blank=True)
     user_last_name = serializers.CharField(allow_blank=True)
+    profile_picture = serializers.CharField(allow_blank=True)
     assignments = AssignmentSerializer(many=True)
+
+
+class SiteUserCreateSerializer(serializers.Serializer):
+    site = serializers.PrimaryKeyRelatedField(queryset=Site.objects.exclude(status=Site.Status.ARCHIVED))
+    role = serializers.PrimaryKeyRelatedField(queryset=Role.objects.filter(is_active=True,code__in=SITE_MEMBERSHIP_ROLE_CODES))
+    username = serializers.RegexField(r"^[a-zA-Z0-9][a-zA-Z0-9._@+-]{2,149}$",max_length=150)
+    email = serializers.EmailField(max_length=254)
+    password = serializers.CharField(write_only=True,trim_whitespace=False,max_length=128)
+    password_confirmation = serializers.CharField(write_only=True,trim_whitespace=False,max_length=128)
+    profile_picture = serializers.CharField(required=False,allow_blank=True,max_length=2796204,write_only=True)
+
+    def validate(self,attrs):
+        from django.contrib.auth.password_validation import validate_password
+        from django.core.exceptions import ValidationError as DjangoValidationError
+        from apps.accounts.site_provisioning import normalize_picture
+        unknown = set(self.initial_data)-set(self.fields)
+        if unknown:
+            raise serializers.ValidationError({key:"Unknown field." for key in unknown})
+        attrs["username"] = attrs["username"].lower()
+        attrs["email"] = attrs["email"].lower()
+        errors = {}
+        user_model=get_user_model()
+        from django.conf import settings
+        if attrs["username"] == getattr(settings,"DEV_PLATFORM_ADMIN_USERNAME","").lower() or attrs["username"].startswith("service-account-"):
+            errors["username"]="This username is reserved for platform identity management."
+        if user_model.objects.filter(username__iexact=attrs["username"]).exists():
+            errors["username"]="This username is already registered. Use Add existing user."
+        if user_model.objects.filter(email__iexact=attrs["email"]).exists():
+            errors["email"]="This email is already registered. Use Add existing user."
+        if attrs["password"] != attrs.pop("password_confirmation"):
+            errors["password_confirmation"]="Passwords do not match."
+        try:
+            validate_password(attrs["password"],user_model(username=attrs["username"],email=attrs["email"]))
+        except DjangoValidationError as exc:
+            errors["password"]=exc.messages
+        if attrs["site"].organization_unit.status != OrganizationUnit.Status.ACTIVE:
+            errors["site"]="Choose a Site with an active owning organization."
+        if errors:
+            raise serializers.ValidationError(errors)
+        attrs["profile_picture"] = normalize_picture(attrs.get("profile_picture",""))
+        return attrs
 
 
 class SiteIdentitySearchSerializer(serializers.Serializer):

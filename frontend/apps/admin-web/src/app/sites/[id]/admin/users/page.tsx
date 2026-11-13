@@ -1,6 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import Avatar from "@mui/material/Avatar";
+import { SiteUserCreate } from "@/sites/site-user-create";
 import AddIcon from "@mui/icons-material/PersonAddAlt1";
 import SearchIcon from "@mui/icons-material/Search";
 import Alert from "@mui/material/Alert";
@@ -35,13 +37,16 @@ import { assignSiteRole, getSiteRoles, getSiteUsers, revokeSiteRole, searchSiteU
 import type { SiteAssignment, SiteDirectoryUser, SiteIdentity, SiteRole } from "@/app/sites/user-actions";
 
 export default function SiteUsersPage() {
-  return <SiteSection sectionKey="users"><UsersDirectory /></SiteSection>;
+  const params=useParams<{id:string}>();
+  return <SiteSection sectionKey="users"><UsersDirectory key={params.id} /></SiteSection>;
 }
 
 function UsersDirectory() {
   const { site } = useSiteAdmin();
   const params = useParams<{ id: string }>();
   const siteId = Number(params.id);
+  const [revision,setRevision]=useState(0);
+  const generation=useRef(0);
   const [people, setPeople] = useState<SiteDirectoryUser[]>([]);
   const [count, setCount] = useState(0);
   const [page, setPage] = useState(0);
@@ -52,6 +57,7 @@ function UsersDirectory() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [dialog, setDialog] = useState(false);
+  const [creating,setCreating]=useState(false);
   const [needle, setNeedle] = useState("");
   const [identities, setIdentities] = useState<SiteIdentity[]>([]);
   const [selected, setSelected] = useState<SiteIdentity | null>(null);
@@ -61,13 +67,15 @@ function UsersDirectory() {
   const [notice, setNotice] = useState("");
 
   const load = useCallback(async () => {
+    const requestGeneration=++generation.current;
     setLoading(true); setError("");
     try {
       const [directory, availableRoles] = await Promise.all([getSiteUsers(siteId, search, page + 1, filter, ordering), getSiteRoles(siteId)]);
+      if(requestGeneration!==generation.current)return;
       setPeople(directory.results); setCount(directory.count); setRoles(availableRoles.filter((role) => isSiteMembershipRole(role.code)));
-    } catch (cause) { setError(cause instanceof Error ? cause.message : "Could not load Site users."); }
-    finally { setLoading(false); }
-  }, [filter, ordering, page, search, siteId]);
+    } catch (cause) { if(requestGeneration===generation.current)setError(cause instanceof Error ? cause.message : "Could not load Site users."); }
+    finally { if(requestGeneration===generation.current)setLoading(false); }
+  }, [filter, ordering, page, search, siteId,revision]);
   useEffect(() => { void load(); }, [load]);
 
   useEffect(() => {
@@ -97,7 +105,7 @@ function UsersDirectory() {
   return <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
     <Box sx={{ display: "flex", alignItems: { xs: "stretch", sm: "center" }, justifyContent: "space-between", gap: 2, flexWrap: "wrap" }}>
       <Box><Typography variant="h4" component="h2" fontWeight={800}>Users</Typography><Typography color="text.secondary">Assign Site Admin, Editor, Publisher, Reviewer, or Viewer for {site.name}. Platform and organization roles are managed outside this Site.</Typography></Box>
-      <Button variant="contained" startIcon={<AddIcon />} onClick={() => { setError(""); setDialog(true); }}>Add existing user</Button>
+      {roles.some(role=>role.assignable) ? <Stack direction="row" gap={1} flexWrap="wrap"><Button variant="outlined" startIcon={<AddIcon />} onClick={() => { setError(""); setDialog(true); }}>Add existing user</Button><Button variant="contained" onClick={()=>setCreating(true)}>Create user</Button></Stack> : null}
     </Box>
     {notice ? <Alert severity="success" onClose={() => setNotice("")}>{notice}</Alert> : null}
     {error ? <Alert severity="error" onClose={() => setError("")}>{error}</Alert> : null}
@@ -119,17 +127,18 @@ function UsersDirectory() {
           {loading ? <TableRow><TableCell colSpan={5} align="center"><CircularProgress size={24} aria-label="Loading users" /></TableCell></TableRow> : null}
           {!loading && people.length === 0 ? <TableRow><TableCell colSpan={5} align="center"><Typography color="text.secondary" sx={{ py: 3 }}>No users are assigned to this Site or no users match the filter.</Typography></TableCell></TableRow> : null}
           {!loading && people.map((person) => <TableRow key={person.user} hover>
-            <TableCell><Typography fontWeight={650}>{[person.user_first_name, person.user_last_name].filter(Boolean).join(" ") || person.user_name}</Typography><Typography variant="body2" color="text.secondary">{person.user_email || "No email on record"}</Typography></TableCell>
+            <TableCell><Box sx={{display:"flex",alignItems:"center",gap:1.5}}><Avatar src={person.profile_picture || undefined} alt="" /> <Box><Typography fontWeight={650}>{[person.user_first_name, person.user_last_name].filter(Boolean).join(" ") || person.user_name}</Typography><Typography variant="body2" color="text.secondary">{person.user_email || "No email on record"}</Typography></Box></Box></TableCell>
             <TableCell>{person.user_name}</TableCell>
-            <TableCell><Stack direction="row" gap={0.75} flexWrap="wrap">{person.assignments.map((assignment) => <Chip key={assignment.id} size="small" label={assignment.role_name} onDelete={() => setConfirming(assignment)} />)}</Stack></TableCell>
+            <TableCell><Stack direction="row" gap={0.75} flexWrap="wrap">{person.assignments.map((assignment) => <Chip key={assignment.id} size="small" label={assignment.role_name} onDelete={roles.some(role=>role.assignable) ? ()=>setConfirming(assignment) : undefined} />)}</Stack></TableCell>
             <TableCell>{person.assignments.map((assignment) => <Typography key={assignment.id} variant="body2">{new Date(assignment.assigned_at).toLocaleDateString()}</Typography>)}</TableCell>
-            <TableCell align="right">{person.assignments.map((assignment) => <IconButton key={assignment.id} size="small" aria-label={`Remove ${assignment.role_name} from ${person.user_name}`} title={`Remove ${assignment.role_name}`} onClick={() => setConfirming(assignment)}>×</IconButton>)}</TableCell>
+            <TableCell align="right">{roles.some(role=>role.assignable) ? person.assignments.map((assignment) => <IconButton key={assignment.id} size="small" aria-label={`Remove ${assignment.role_name} from ${person.user_name}`} title={`Remove ${assignment.role_name}`} onClick={() => setConfirming(assignment)}>×</IconButton>) : null}</TableCell>
           </TableRow>)}
         </TableBody>
       </Table>
       <TablePagination component="div" count={count} page={page} onPageChange={(_, next) => setPage(next)} rowsPerPage={20} rowsPerPageOptions={[20]} />
     </TableContainer>
 
+    {creating ? <SiteUserCreate siteId={siteId} siteName={site.name} roles={roles} onClose={()=>setCreating(false)} onCreated={username=>{setCreating(false);setNotice(`Created ${username} and assigned their Site role.`);setSearch("");setFilter("");setPage(0);setRevision(value=>value+1);}} /> : null}
     <Dialog open={dialog} onClose={() => !busy && setDialog(false)} fullWidth maxWidth="sm">
       <DialogTitle>Add an existing user</DialogTitle>
       <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, pt: "12px !important" }}>

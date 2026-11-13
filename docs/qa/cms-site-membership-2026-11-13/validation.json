@@ -1,0 +1,14 @@
+{
+  "tests": 17,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "django_system_check": "no issues",
+  "affected_account_site": 16,
+  "live_drf_read_statuses": {
+    "posts": 200,
+    "pages": 200
+  },
+  "new_migration": false,
+  "frontend_rebuild_required": false
+}

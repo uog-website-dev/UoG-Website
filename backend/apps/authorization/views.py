@@ -23,6 +23,7 @@ from .catalog import PLATFORM_ADMIN, SITE_MEMBERSHIP_ROLE_CODES, STANDARD_ROLES,
 from .models import AuthorizationAuditEvent, Permission, Role, RolePermission, UserRoleAssignment
 from .permissions import ManagementPermission
 from .serializers import (
+    SiteUserCreateSerializer,
     AssignmentCreateSerializer,
     AssignmentSerializer,
     AuthorizationAuditSerializer,
@@ -155,6 +156,7 @@ class AssignmentViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Authoriz
         "effective": "platform.users.view",
         "site_users": "platform.users.view", "site_user_search": "platform.users.view",
         "site_roles": "platform.users.view",
+        "site_create_user": "platform.users.assign_roles",
     }
 
     def get_queryset(self):
@@ -187,6 +189,19 @@ class AssignmentViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Authoriz
     def get_serializer_class(self):
         return AssignmentCreateSerializer if self.action == "create" else AssignmentSerializer
 
+    @extend_schema(request=SiteUserCreateSerializer,responses={201:AssignmentSerializer},description="Create a Keycloak identity and one Site-only membership. Requires assign_roles in that Site. No realm roles or privileged flags are accepted. Picture is optional base64 PNG/JPEG/WebP, at most 2 MiB and 4 million pixels, normalized to a private 128px JPEG. Validation returns field errors; provider outages return 503 without Site access.")
+    @action(detail=False,methods=["post"],url_path="site-create-user")
+    def site_create_user(self,request):
+        from apps.accounts.site_provisioning import create_site_user
+        serializer=SiteUserCreateSerializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except serializers.ValidationError:
+            record_decision(user=request.user,action="SITE_USER_CREATE_VALIDATION",outcome="DENY",site_id=str(request.data.get("site",""))[:64],request=request)
+            raise
+        assignment=create_site_user(actor=request.user,request=request,**serializer.validated_data)
+        return Response(AssignmentSerializer(assignment).data,status=201)
+
     @extend_schema(parameters=[
         OpenApiParameter("site", int, required=True, description="Site id. Results are limited to active assignments in this Site."),
         OpenApiParameter("search", str), OpenApiParameter("role", str),
@@ -204,7 +219,7 @@ class AssignmentViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Authoriz
         site = get_object_or_404(Site.objects.only("pk", "organization_unit_id"), pk=site_id)
         if not permission_granted(request.user, "platform.users.view", organization_id=site.organization_unit_id, site_id=site.pk, request=request):
             raise PermissionDenied("You cannot view users for this Site.")
-        query = self.filter_queryset(self.get_queryset().filter(scope=UserRoleAssignment.Scope.SITE, site_id=site_id, revoked_at__isnull=True).filter(Q(expires_at__isnull=True) | Q(expires_at__gt=timezone.now())))
+        query = self.filter_queryset(self.get_queryset().filter(user__is_active=True,scope=UserRoleAssignment.Scope.SITE, site_id=site_id, revoked_at__isnull=True).filter(Q(expires_at__isnull=True) | Q(expires_at__gt=timezone.now()))).select_related("user__account_profile")
         ordering = request.query_params.get("ordering", "name")
         order_fields = {"name": ("user__last_name", "user__first_name", "user__username", "role_id"), "-name": ("-user__last_name", "-user__first_name", "-user__username", "role_id"), "assigned_at": ("assigned_at", "pk"), "-assigned_at": ("-assigned_at", "pk")}
         if ordering not in order_fields:
@@ -212,12 +227,16 @@ class AssignmentViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Authoriz
         query = query.order_by(*order_fields[ordering])
         people = {}
         for assignment in query:
+            import base64
+            profile=getattr(assignment.user,"account_profile",None)
+            picture = "data:image/jpeg;base64,"+base64.b64encode(bytes(profile.picture)).decode() if profile and profile.picture and profile.state=="ACTIVE" else ""
             person = people.setdefault(assignment.user_id, {
                 "user": assignment.user_id,
                 "user_name": assignment.user.get_username(),
                 "user_email": assignment.user.email,
                 "user_first_name": assignment.user.first_name,
                 "user_last_name": assignment.user.last_name,
+                "profile_picture": picture,
                 "assignments": [],
             })
             person["assignments"].append(AssignmentSerializer(assignment).data)
