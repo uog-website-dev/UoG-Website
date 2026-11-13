@@ -1,0 +1,1082 @@
+{
+  "run_id": "111216235804a4",
+  "started_at_utc": "2026-11-12T16:23:58.843865+00:00",
+  "completed_at_utc": "2026-11-12T16:24:30.425025+00:00",
+  "scope": "real HTTP Keycloak/Django/PostgreSQL/MinIO/Celery/nginx; Next shell only, no browser hydration claim",
+  "status": "FAIL",
+  "seed": {
+    "run_id": "111216235804a4",
+    "sites": {
+      "a": {
+        "id": 34,
+        "hostname": "s3-111216235804a4-a.uog.local",
+        "code": "S3-111216235804A4-A"
+      },
+      "b": {
+        "id": 35,
+        "hostname": "s3-111216235804a4-b.uog.local",
+        "code": "S3-111216235804A4-B"
+      }
+    },
+    "profiles": {
+      "admin-a": {
+        "user_id": 41,
+        "username": "s3-111216235804a4-admin-a",
+        "role": "site-administrator",
+        "site_id": 34,
+        "cms_role": null
+      },
+      "editor-a": {
+        "user_id": 42,
+        "username": "s3-111216235804a4-editor-a",
+        "role": "editor",
+        "site_id": 34,
+        "cms_role": "AUTHOR"
+      },
+      "reviewer-a": {
+        "user_id": 43,
+        "username": "s3-111216235804a4-reviewer-a",
+        "role": "reviewer",
+        "site_id": 34,
+        "cms_role": "REVIEWER"
+      },
+      "publisher-a": {
+        "user_id": 44,
+        "username": "s3-111216235804a4-publisher-a",
+        "role": "publisher",
+        "site_id": 34,
+        "cms_role": "PUBLISHER"
+      },
+      "admin-b": {
+        "user_id": 45,
+        "username": "s3-111216235804a4-admin-b",
+        "role": "site-administrator",
+        "site_id": 35,
+        "cms_role": null
+      },
+      "editor-b": {
+        "user_id": 46,
+        "username": "s3-111216235804a4-editor-b",
+        "role": "editor",
+        "site_id": 35,
+        "cms_role": "AUTHOR"
+      },
+      "reviewer-b": {
+        "user_id": 47,
+        "username": "s3-111216235804a4-reviewer-b",
+        "role": "reviewer",
+        "site_id": 35,
+        "cms_role": "REVIEWER"
+      },
+      "publisher-b": {
+        "user_id": 48,
+        "username": "s3-111216235804a4-publisher-b",
+        "role": "publisher",
+        "site_id": 35,
+        "cms_role": "PUBLISHER"
+      }
+    },
+    "assets": [
+      "a9b97094-dcfc-44ae-bcf7-2d8ea14b9986",
+      "adba5611-08a9-4832-a0c2-ff48cd93ba8b",
+      "4e58af45-644d-4731-b2b3-0e7c5d0da977"
+    ],
+    "page_a_id": "0cd3aadf-b3eb-4c1b-b82b-a378e1e491a7"
+  },
+  "checks": [
+    {
+      "case": "Celery is not eager",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    },
+    {
+      "case": "Real Celery worker responds",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    },
+    {
+      "case": "MEDIA: existing global capability enabled",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    },
+    {
+      "case": "PAGES: existing global capability enabled",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    },
+    {
+      "case": "VISUAL_BUILDER: existing global capability enabled",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    },
+    {
+      "case": "POSTS: existing global capability enabled",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    },
+    {
+      "case": "admin-a: real Keycloak authentication",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "editor-a: real Keycloak authentication",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "reviewer-a: real Keycloak authentication",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "publisher-a: real Keycloak authentication",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "admin-b: real Keycloak authentication",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "editor-b: real Keycloak authentication",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "reviewer-b: real Keycloak authentication",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "publisher-b: real Keycloak authentication",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Create private Page",
+      "expected": {
+        "http_status": 201
+      },
+      "actual": {
+        "http_status": 201,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-95331f99-1b3d-4f56-92a6-fa179463ce1a-r1\"",
+        "Content-Type": "application/json",
+        "Vary": "origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Load draft revision",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-95331f99-1b3d-4f56-92a6-fa179463ce1a-r1\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Save visual tree",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-95331f99-1b3d-4f56-92a6-fa179463ce1a-r2\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Editor cannot approve",
+      "expected": {
+        "http_status": 403
+      },
+      "actual": {
+        "http_status": 403,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Submit for review",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-95331f99-1b3d-4f56-92a6-fa179463ce1a-r3\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Scoped private preview",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-95331f99-1b3d-4f56-92a6-fa179463ce1a-r3\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Private preview never cached",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    },
+    {
+      "case": "Reviewer approves exact revision",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-95331f99-1b3d-4f56-92a6-fa179463ce1a-r4\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Publisher promotes approved tree",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-95331f99-1b3d-4f56-92a6-fa179463ce1a-r5\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Site Administrator assigns root",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-95331f99-1b3d-4f56-92a6-fa179463ce1a-r5\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Immutable approval provenance",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    },
+    {
+      "case": "editor-b: upload",
+      "expected": {
+        "http_status": 202
+      },
+      "actual": {
+        "http_status": 202,
+        "Cache-Control": "private, no-store",
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Poll real worker state",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Poll real worker state",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Real worker produced derivatives",
+      "expected": true,
+      "actual": {
+        "asset_id": "a9b97094-dcfc-44ae-bcf7-2d8ea14b9986",
+        "attempts": 1,
+        "states": [
+          {
+            "status": "PENDING",
+            "processing_state": "PROCESSING"
+          },
+          {
+            "status": "READY",
+            "processing_state": "READY"
+          }
+        ]
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Warm Medicine public root",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "ETag": "\"cms-page-95331f99-1b3d-4f56-92a6-fa179463ce1a-publication-1-site-3\"",
+        "X-Publication-Version": "3",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "editor-a: upload",
+      "expected": {
+        "http_status": 400
+      },
+      "actual": {
+        "http_status": 400,
+        "Cache-Control": "private, no-store",
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "editor-a: upload",
+      "expected": {
+        "http_status": 202
+      },
+      "actual": {
+        "http_status": 202,
+        "Cache-Control": "private, no-store",
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Upload response exposes no storage reference",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    },
+    {
+      "case": "Poll real worker state",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Poll real worker state",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Real worker produced derivatives",
+      "expected": true,
+      "actual": {
+        "asset_id": "adba5611-08a9-4832-a0c2-ff48cd93ba8b",
+        "attempts": 1,
+        "states": [
+          {
+            "status": "PENDING",
+            "processing_state": "PROCESSING"
+          },
+          {
+            "status": "READY",
+            "processing_state": "READY"
+          }
+        ]
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Original MinIO object is private",
+      "expected": {
+        "http_status": 403
+      },
+      "actual": {
+        "http_status": 403,
+        "Content-Type": "application/xml",
+        "Vary": "Origin"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "editor-a: upload",
+      "expected": {
+        "http_status": 202
+      },
+      "actual": {
+        "http_status": 202,
+        "Cache-Control": "private, no-store",
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Retry/replay has one canonical asset",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    },
+    {
+      "case": "Ready-image library selection",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Private image before publication",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "Content-Type": "image/webp",
+        "Vary": "Host, Authorization, Cookie, Accept, origin"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Unpublished image is not public",
+      "expected": {
+        "http_status": 404
+      },
+      "actual": {
+        "http_status": 404,
+        "Cache-Control": "private, no-store",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Foreign read denied",
+      "expected": {
+        "http_status": 403
+      },
+      "actual": {
+        "http_status": 403,
+        "Cache-Control": "private, no-store",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Create private Page",
+      "expected": {
+        "http_status": 201
+      },
+      "actual": {
+        "http_status": 201,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-0cd3aadf-b3eb-4c1b-b82b-a378e1e491a7-r1\"",
+        "Content-Type": "application/json",
+        "Vary": "origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Load draft revision",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-0cd3aadf-b3eb-4c1b-b82b-a378e1e491a7-r1\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Save visual tree",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-0cd3aadf-b3eb-4c1b-b82b-a378e1e491a7-r2\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Editor cannot approve",
+      "expected": {
+        "http_status": 403
+      },
+      "actual": {
+        "http_status": 403,
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Submit for review",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-0cd3aadf-b3eb-4c1b-b82b-a378e1e491a7-r3\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Scoped private preview",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-0cd3aadf-b3eb-4c1b-b82b-a378e1e491a7-r3\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Private preview never cached",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    },
+    {
+      "case": "Reviewer approves exact revision",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-0cd3aadf-b3eb-4c1b-b82b-a378e1e491a7-r4\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Publisher promotes approved tree",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-0cd3aadf-b3eb-4c1b-b82b-a378e1e491a7-r5\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Site Administrator assigns root",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-0cd3aadf-b3eb-4c1b-b82b-a378e1e491a7-r5\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Immutable approval provenance",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    },
+    {
+      "case": "Informatics public homepage",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "ETag": "\"cms-page-0cd3aadf-b3eb-4c1b-b82b-a378e1e491a7-publication-1-site-2\"",
+        "X-Publication-Version": "2",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Approved Slider and 60/40 order",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    },
+    {
+      "case": "Published image through nginx",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "Content-Type": "image/webp",
+        "Vary": "Host, Authorization, Cookie, origin"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Missing derivative scoped public fallback",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "Content-Type": "image/webp",
+        "Vary": "Host, Authorization, Cookie, origin"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Missing derivative scoped private fallback",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "Content-Type": "image/webp",
+        "Vary": "Host, Authorization, Cookie, Accept, origin"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Foreign public image hidden",
+      "expected": {
+        "http_status": 404
+      },
+      "actual": {
+        "http_status": 404,
+        "Cache-Control": "private, no-store",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Published Slider asset cannot be deleted",
+      "expected": {
+        "http_status": 409
+      },
+      "actual": {
+        "http_status": 409,
+        "Cache-Control": "private, no-store",
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Disabled Builder denies direct draft API",
+      "expected": {
+        "http_status": 400
+      },
+      "actual": {
+        "http_status": 400,
+        "Content-Type": "application/json",
+        "Vary": "origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Disabling authoring preserves public root",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "ETag": "\"cms-page-0cd3aadf-b3eb-4c1b-b82b-a378e1e491a7-publication-1-site-2\"",
+        "X-Publication-Version": "2",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Reenabled Builder recovers draft API",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-0cd3aadf-b3eb-4c1b-b82b-a378e1e491a7-r5\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Open private working draft",
+      "expected": {
+        "http_status": 201
+      },
+      "actual": {
+        "http_status": 201,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-394095a3-6d26-4e20-b4d5-47fdb1d8d620-r1\"",
+        "Content-Type": "application/json",
+        "Vary": "origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Load racing draft",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-394095a3-6d26-4e20-b4d5-47fdb1d8d620-r1\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Real HTTP draft race has one winner",
+      "expected": true,
+      "actual": {
+        "http_statuses": [
+          200,
+          409
+        ]
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Cross-Site asset injection rejected",
+      "expected": {
+        "http_status": 400
+      },
+      "actual": {
+        "http_status": 400,
+        "Content-Type": "application/json",
+        "Vary": "origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Foreign injection has no partial write",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    },
+    {
+      "case": "editor-a: upload",
+      "expected": {
+        "http_status": 202
+      },
+      "actual": {
+        "http_status": 202,
+        "Cache-Control": "private, no-store",
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Poll real worker state",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Poll real worker state",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "private, no-store",
+        "Content-Type": "application/json",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Real worker produced derivatives",
+      "expected": true,
+      "actual": {
+        "asset_id": "4e58af45-644d-4731-b2b3-0e7c5d0da977",
+        "attempts": 1,
+        "states": [
+          {
+            "status": "PENDING",
+            "processing_state": "PROCESSING"
+          },
+          {
+            "status": "READY",
+            "processing_state": "READY"
+          }
+        ]
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Unreferenced deletion accepted",
+      "expected": {
+        "http_status": 202
+      },
+      "actual": {
+        "http_status": 202,
+        "Cache-Control": "private, no-store",
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Real Celery reconciles deletion",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    },
+    {
+      "case": "Medicine body and cache generation remain unchanged",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    },
+    {
+      "case": "Published snapshot unaffected by private race",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    },
+    {
+      "case": "a: nginx reaches real Next.js shell",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "no-store, must-revalidate",
+        "Content-Type": "text/html; charset=utf-8",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "a: Next.js shell contains Next scripts",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    },
+    {
+      "case": "b: nginx reaches real Next.js shell",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 200,
+        "Cache-Control": "no-store, must-revalidate",
+        "Content-Type": "text/html; charset=utf-8",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "b: Next.js shell contains Next scripts",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    },
+    {
+      "case": "Homepage audit preserves actual administrator",
+      "expected": true,
+      "actual": true,
+      "status": "PASS"
+    },
+    {
+      "case": "Create configured Post provider data",
+      "expected": {
+        "http_status": 201
+      },
+      "actual": {
+        "http_status": 201,
+        "Cache-Control": "private, no-store",
+        "ETag": "\"cms-content-fee84a13-30e4-4a1c-9110-b7cf1779bd88-r1\"",
+        "Content-Type": "application/json",
+        "Vary": "Accept, origin, Host"
+      },
+      "status": "PASS"
+    },
+    {
+      "case": "Post provider submit",
+      "expected": {
+        "http_status": 200
+      },
+      "actual": {
+        "http_status": 404,
+        "Content-Type": "text/html; charset=utf-8",
+        "Vary": "Accept-Encoding"
+      },
+      "status": "FAIL"
+    },
+    {
+      "case": "Live run completion",
+      "status": "FAIL",
+      "actual": "AssertionError: Post provider submit: expected HTTP 200, got 404"
+    },
+    {
+      "case": "Ephemeral review identities disabled",
+      "expected": true,
+      "actual": {
+        "created": 8,
+        "disabled": 8
+      },
+      "status": "PASS"
+    }
+  ]
+}

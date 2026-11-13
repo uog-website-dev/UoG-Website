@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="9" failures="0" errors="0" time="0.595908421">
+    <testsuite name="src/responsive-layout.test.tsx" timestamp="2026-11-12T18:47:02.858Z" hostname="6b662efa530b" tests="9" failures="0" errors="0" skipped="0" time="0.595908421">
+        <testcase classname="src/responsive-layout.test.tsx" name="breakpoint precedence matrix &gt; classifies preview widths and boundaries" time="0.006666076">
+        </testcase>
+        <testcase classname="src/responsive-layout.test.tsx" name="shared resolution inheritance and reset &gt; keeps legacy stack/gap defaults when override fields are absent" time="0.005236291">
+        </testcase>
+        <testcase classname="src/responsive-layout.test.tsx" name="shared resolution inheritance and reset &gt; applies mobile-only spacing and restores inheritance after reset" time="0.001379726">
+        </testcase>
+        <testcase classname="src/responsive-layout.test.tsx" name="shared resolution inheritance and reset &gt; lets mobile win over tablet and tablet win over desktop base" time="0.003302166">
+        </testcase>
+        <testcase classname="src/responsive-layout.test.tsx" name="shared resolution inheritance and reset &gt; resolves widget spacing without accepting stack" time="0.001152123">
+        </testcase>
+        <testcase classname="src/responsive-layout.test.tsx" name="contract validation for responsive fields &gt; accepts approved overrides and rejects unknown breakpoint or property tokens" time="0.006323832">
+        </testcase>
+        <testcase classname="src/responsive-layout.test.tsx" name="preview and public parity at viewport boundaries &gt; emits the same resolved gap/stack attributes for preview and public at each width" time="0.492209458">
+        </testcase>
+        <testcase classname="src/responsive-layout.test.tsx" name="preview and public parity at viewport boundaries &gt; keeps legacy three-column defaults identical without override fields" time="0.020682198">
+        </testcase>
+        <testcase classname="src/responsive-layout.test.tsx" name="preview and public parity at viewport boundaries &gt; applies mobile spacing override only below the tablet floor" time="0.051416652">
+        </testcase>
+    </testsuite>
+</testsuites>

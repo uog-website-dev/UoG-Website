@@ -1,0 +1,20 @@
+{
+  "story": "Visual Page Builder as Site module (enable/disable + menu)",
+  "date": "2026-11-12",
+  "module_code": "VISUAL_BUILDER",
+  "depends_on": ["PAGES"],
+  "implementation": [
+    "backend/apps/cms/migrations/0016_visual_builder_module.py",
+    "backend/apps/cms/services/pages.py",
+    "backend/apps/cms/api/pages.py",
+    "frontend/apps/admin-web/src/sites/site-admin.ts",
+    "frontend/apps/admin-web/src/sites/site-pages.tsx",
+    "frontend/apps/admin-web/src/sites/visual-builder.tsx"
+  ],
+  "acceptance": {
+    "platform_and_site_toggle": "pass",
+    "menu_when_enabled": "pass",
+    "api_and_route_gate": "pass",
+    "pages_dependency": "pass"
+  }
+}

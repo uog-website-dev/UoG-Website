@@ -1,0 +1,85 @@
+{
+  "date": "2026-11-12",
+  "commit": "ed82e429a801bc8fd2dc616698c2f948cc4b792c",
+  "branch": "P3-MEDIA",
+  "compose_project": "uog-digital-platform",
+  "services": [
+    {
+      "name": "uog-backend",
+      "service": "backend",
+      "state": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "uog-celery-beat",
+      "service": "celery-beat",
+      "state": "running",
+      "health": ""
+    },
+    {
+      "name": "uog-celery-worker",
+      "service": "celery-worker",
+      "state": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "uog-frontend-admin",
+      "service": "frontend-admin",
+      "state": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "uog-frontend-public",
+      "service": "frontend-public",
+      "state": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "uog-keycloak",
+      "service": "keycloak",
+      "state": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "uog-keycloak-db",
+      "service": "keycloak-db",
+      "state": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "uog-minio",
+      "service": "minio",
+      "state": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "uog-nginx",
+      "service": "nginx",
+      "state": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "uog-postgres",
+      "service": "postgres",
+      "state": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "uog-redis-broker",
+      "service": "redis-broker",
+      "state": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "uog-redis-cache",
+      "service": "redis-cache",
+      "state": "running",
+      "health": "healthy"
+    }
+  ],
+  "notes": [
+    "Backend pytest executes inside uog-backend against real PostgreSQL.",
+    "Celery worker/beat, MinIO, Redis, nginx, Keycloak and Next.js apps were present for this run.",
+    "Media processing in the integrated suite uses in-process process_asset with storage stubs unless RUN_MEDIA_MINIO_TESTS=1."
+  ]
+}

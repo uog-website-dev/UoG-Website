@@ -1,0 +1,44 @@
+{
+  "story": "P3-PUBLIC public hostname routing, homepage/Page delivery and cache isolation",
+  "date": "2026-11-12",
+  "dependencies": ["P3-PUBLIC-001", "P3-BUILDER-004", "Sprint 1 hostname resolution"],
+  "implementation": [
+    "backend/apps/sites/middleware.py",
+    "backend/apps/sites/selectors/domains.py",
+    "backend/apps/cms/api/public.py",
+    "backend/apps/cms/services/publication_cache.py",
+    "backend/apps/cms/services/homepage.py",
+    "frontend/apps/public-web/src/app/page.tsx",
+    "frontend/packages/ui/src/public-site.ts"
+  ],
+  "suites": {
+    "backend_two_host": {
+      "passed": 18,
+      "failed": 0,
+      "junit": "backend.xml"
+    },
+    "ui_public": {
+      "passed": 14,
+      "failed": 0,
+      "junit": "ui.xml"
+    },
+    "slider_isolation": {
+      "passed": 1,
+      "failed": 0,
+      "junit": "slider-isolation.xml"
+    }
+  },
+  "acceptance": {
+    "independent_same_slug_sites": "pass",
+    "root_assignment_or_fallback": "pass",
+    "draft_isolated_from_public_and_warm_cache": "pass",
+    "slider_and_homepage_assignment_isolation": "pass"
+  },
+  "attachments": {
+    "two_host_routing_cache_evidence": "backend.xml",
+    "route_cache_invalidation_traces": "cache-invalidation-traces.json"
+  },
+  "waivers": [
+    "Full multi-host browser E2E through nginx unavailable in this checkout; Host-header API tests cover the public routes."
+  ]
+}

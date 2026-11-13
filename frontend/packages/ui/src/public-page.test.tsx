@@ -70,6 +70,12 @@ describe("PublicPageView", () => {
     render(<PublicPageView page={null} />);
     expect(screen.getByRole("status").textContent).toMatch(/no published page/i);
   });
+
+  it("can hide the automatic page title for builder canvas composition", () => {
+    render(<PublicPageView page={pageFromResponse(200, published)} hideTitle />);
+      expect(getComputedStyle(screen.getByRole("heading", { level: 1, name: "Admissions" })).position).toBe("absolute");
+    expect(screen.getByRole("article", { name: "Admissions" })).toBeTruthy();
+  });
 });
 
 

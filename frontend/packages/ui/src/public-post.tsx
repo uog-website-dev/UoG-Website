@@ -13,6 +13,7 @@ import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 
 import { paragraphParts } from "./public-page";
+import {VisualPostProvider,PostTitleWidget,PostExcerptWidget,FeaturedImageWidget} from "./widget-runtime";
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -22,6 +23,9 @@ export interface PublicTaxonomyRef {
 }
 
 export interface PublicPostSummary {
+  id?:string;
+  site?:number;
+  featured_media?:string;
   title: string;
   slug: string;
   excerpt: string;
@@ -51,6 +55,9 @@ function summaryFrom(row: Record<string, unknown>): PublicPostSummary | null {
   if (typeof row.title !== "string" || !row.title.trim()) return null;
   if (typeof row.slug !== "string" || !SLUG.test(row.slug)) return null;
   return {
+    ...(typeof row.id==="string"?{id:row.id}:{}),
+    ...(typeof row.site==="number"?{site:row.site}:{}),
+    ...(typeof row.featured_media==="string"?{featured_media:row.featured_media}:{}),
     title: row.title.trim(),
     slug: row.slug,
     excerpt: typeof row.excerpt === "string" ? row.excerpt : "",
@@ -149,23 +156,26 @@ export function PublicPostDetail({ post }: { post: PublicPostDocument | null }):
     );
   }
   return (
-    <Box
+    <VisualPostProvider siteId={post.site??null} post={post.site===undefined?null:{
+      id:post.id??post.slug,site:post.site,title:post.title,slug:post.slug,excerpt:post.excerpt,featured_media:post.featured_media??""
+    }}><Box
       component="article"
       aria-labelledby="public-post-title"
       sx={{ display: "flex", flexDirection: "column", gap: 2, width: "100%", maxWidth: "65ch" }}
     >
-      <Typography
+      {post.site!==undefined?<PostTitleWidget id="public-post-title" level={1}/>:<Typography
         id="public-post-title"
         variant="h1"
         component="h1"
         sx={{ fontSize: { xs: "1.75rem", sm: "2.25rem" }, overflowWrap: "anywhere" }}
       >
         {post.title}
-      </Typography>
+      </Typography>}
+      {post.site!==undefined?<><PostExcerptWidget/><FeaturedImageWidget compact/></>:null}
       <Typography variant="body2" color="text.secondary">
         {[...post.categories.map((item) => item.name), ...post.tags.map((item) => item.name)].join(" · ")}
       </Typography>
       <RichText html={post.body} />
-    </Box>
+    </Box></VisualPostProvider>
   );
 }

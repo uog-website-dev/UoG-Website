@@ -44,11 +44,16 @@ def public_pages(site_id, locale, *, using=DEFAULT_DB_ALIAS):
 
 
 def homepage_of(site_id, *, using=DEFAULT_DB_ALIAS):
-    """The page flagged to serve the Site root, regardless of status.
+    """The configured root Page, regardless of current publication status.
 
     The serving layer must still apply the published/served rules before
-    rendering it — configuring a homepage does not publish it.
+    rendering it. An explicit Site assignment takes precedence over legacy
+    flags, including when it becomes ineligible (no implicit replacement).
     """
+    from apps.sites.models import Site
+    assigned = Site.objects.using(using).filter(pk=site_id).values_list("homepage_id", flat=True).first()
+    if assigned is not None:
+        return Page.objects.using(using).filter(pk=assigned, site_id=site_id).first()
     return (
         Page.objects.using(using)
         .filter(site_id=site_id, is_homepage=True)

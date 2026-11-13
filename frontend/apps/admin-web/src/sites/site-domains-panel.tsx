@@ -41,8 +41,10 @@ import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import Checkbox from "@mui/material/Checkbox";
 import Chip from "@mui/material/Chip";
 import Divider from "@mui/material/Divider";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
@@ -55,8 +57,13 @@ import {
   listAllSiteDomains,
   makeSiteDomainPrimary,
 } from "@/app/sites/actions";
+import {
+  runBulkLifecycle,
+  summarizeBulkLifecycle,
+} from "@/admin/bulk-lifecycle";
 import { deserializeApiError, unwrap } from "@/organizations/contract";
 import type { ApiErrorPayload } from "@/organizations/contract";
+import { ApiError } from "@uog/api-client";
 
 export interface SiteDomainsPanelProps {
   site: Site;
@@ -138,10 +145,54 @@ export function SiteDomainsPanel({ site, onChanged }: SiteDomainsPanelProps) {
   const [pending, setPending] = useState<{ id: number; kind: DomainAction } | null>(
     null,
   );
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false);
+  const [bulkError, setBulkError] = useState<ApiError | null>(null);
+  const [bulkPending, setBulkPending] = useState(false);
 
   const rows = domains.data ?? [];
   const currentPrimary = rows.find((row) => row.is_primary) ?? null;
-  const busy = pending !== null || confirm !== null;
+  const busy = pending !== null || confirm !== null || bulkPending;
+  /** Bulk delete only covers non-primary active aliases; primaries need a replacement. */
+  const bulkCandidates = rows.filter((row) => row.status === "ACTIVE" && !row.is_primary);
+  const selectedDomains = bulkCandidates.filter((row) => selectedIds.has(row.id));
+  const canBulkDelete = selectedDomains.length > 0;
+
+  function toggleDomain(id: number) {
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  async function confirmBulkDelete() {
+    if (!canBulkDelete) return;
+    setBulkPending(true);
+    setBulkError(null);
+    try {
+      const summary = await runBulkLifecycle(selectedDomains, {
+        labelOf: (domain) => domain.hostname,
+        apply: (domain) => deactivateSiteDomain(site.id, domain.id),
+      });
+      const message = summarizeBulkLifecycle(summary, "domain");
+      if (summary.failed.length === 0) toast.success(message);
+      else if (summary.succeeded === 0) {
+        setBulkError(new ApiError(`${message} ${summary.failed.map((item) => `${item.label}: ${item.message}`).join(" ")}`, 400));
+        return;
+      } else {
+        toast.warning(message);
+        setBulkError(new ApiError(summary.failed.map((item) => `${item.label}: ${item.message}`).join(" "), 400));
+      }
+      setSelectedIds(new Set());
+      setBulkConfirmOpen(false);
+      domains.reload();
+      onChanged?.();
+    } finally {
+      setBulkPending(false);
+    }
+  }
 
   /** Other active domains of this Site — the only valid replacements for
    * deactivating the active primary (the backend re-checks both rules). */
@@ -273,6 +324,7 @@ export function SiteDomainsPanel({ site, onChanged }: SiteDomainsPanelProps) {
       });
     }
 
+    const selectable = domain.status === "ACTIVE" && !domain.is_primary;
     return (
       <Box
         component="li"
@@ -295,6 +347,14 @@ export function SiteDomainsPanel({ site, onChanged }: SiteDomainsPanelProps) {
             flexWrap: "wrap",
           }}
         >
+          <Checkbox
+            size="small"
+            checked={selectedIds.has(domain.id)}
+            disabled={!selectable || busy}
+            onChange={() => toggleDomain(domain.id)}
+            inputProps={{ "aria-label": `Select ${domain.hostname}` }}
+            sx={{ p: 0.5 }}
+          />
           <Typography
             variant="body2"
             sx={{ fontFamily: "monospace", fontWeight: 600 }}
@@ -434,18 +494,47 @@ export function SiteDomainsPanel({ site, onChanged }: SiteDomainsPanelProps) {
               No hostnames are registered for this site yet.
             </Alert>
           ) : (
-            <Box
-              component="ul"
-              sx={{
-                m: 0,
-                p: 0,
-                listStyle: "none",
-                display: "flex",
-                flexDirection: "column",
-                gap: 1.5,
-              }}
-            >
-              {rows.map((domain) => renderRow(domain))}
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+              {bulkCandidates.length > 0 ? (
+                <Box sx={{ display: "flex", gap: 1, alignItems: "center", flexWrap: "wrap" }}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        size="small"
+                        checked={selectedDomains.length > 0 && selectedDomains.length === bulkCandidates.length}
+                        indeterminate={selectedDomains.length > 0 && selectedDomains.length < bulkCandidates.length}
+                        disabled={busy}
+                        onChange={() => {
+                          if (selectedDomains.length === bulkCandidates.length) setSelectedIds(new Set());
+                          else setSelectedIds(new Set(bulkCandidates.map((row) => row.id)));
+                        }}
+                      />
+                    }
+                    label="Select all deletable aliases"
+                  />
+                  {canBulkDelete ? (
+                    <>
+                      <Button size="small" color="error" variant="contained" disabled={busy} onClick={() => { setBulkError(null); setBulkConfirmOpen(true); }}>
+                        Delete selected
+                      </Button>
+                      <Button size="small" disabled={busy} onClick={() => setSelectedIds(new Set())}>Clear selection</Button>
+                    </>
+                  ) : null}
+                </Box>
+              ) : null}
+              <Box
+                component="ul"
+                sx={{
+                  m: 0,
+                  p: 0,
+                  listStyle: "none",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 1.5,
+                }}
+              >
+                {rows.map((domain) => renderRow(domain))}
+              </Box>
             </Box>
           )}
         </Box>
@@ -535,6 +624,31 @@ export function SiteDomainsPanel({ site, onChanged }: SiteDomainsPanelProps) {
           ) : null}
         </ConfirmDialog>
       ) : null}
+
+      <ConfirmDialog
+        open={bulkConfirmOpen}
+        title="Delete selected domains?"
+        description="Domains cannot be purged. Delete deactivates the selected non-primary aliases so they stop being served. The primary domain must be handled individually with a replacement."
+        confirmColor="error"
+        confirmLabel="Delete selected"
+        pending={bulkPending}
+        error={bulkError}
+        onConfirm={() => { void confirmBulkDelete(); }}
+        onCancel={() => {
+          if (!bulkPending) {
+            setBulkConfirmOpen(false);
+            setBulkError(null);
+          }
+        }}
+      >
+        <Box component="ul" sx={{ m: 0, pl: 2 }}>
+          {selectedDomains.map((domain) => (
+            <Typography key={domain.id} component="li" variant="body2" sx={{ fontFamily: "monospace" }}>
+              {domain.hostname}
+            </Typography>
+          ))}
+        </Box>
+      </ConfirmDialog>
     </>
   );
 }

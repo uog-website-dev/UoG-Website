@@ -1,0 +1,7 @@
+/** Browser-only fixtures. Never imported by the production application. */
+import {starterLayout} from "../../../apps/admin-web/src/sites/visual-builder-model";
+const records=new Map<string,ReturnType<typeof record>>();
+function record(site:number,id:string){return {id,site,title:site===11?"Welcome to Informatics":"Medicine welcome",slug:"welcome",path:"/welcome",parent:null,status:"DRAFT" as const,visibility:"PUBLIC" as const,locale:"en-us",is_homepage:false,created_by:7,updated_at:"2026-11-12T00:00:00Z",revision_number:1,etag:'"fixture-1"',blocks:[],metadata:{visual_layout:starterLayout()}};}
+export async function getSiteVisualDraft(site:number,id:string){await new Promise(resolve=>setTimeout(resolve,300));const key=`${site}:${id}`;if(!records.has(key))records.set(key,record(site,id));return {ok:true as const,data:structuredClone(records.get(key)!)};}
+export async function saveSiteVisualDraft(site:number,id:string,etag:string,layout:ReturnType<typeof starterLayout>){const key=`${site}:${id}`;const value=records.get(key)!;if(value.etag!==etag)return {ok:false as const,error:{status:409,code:"conflict",message:"Stale fixture revision",details:null,requestId:null}};value.metadata.visual_layout=structuredClone(layout);value.revision_number++;value.etag=`"fixture-${value.revision_number}"`;return {ok:true as const,data:structuredClone(value)};}
+export async function openWorkingDraft(){throw new Error("Not used by this browser fixture");}

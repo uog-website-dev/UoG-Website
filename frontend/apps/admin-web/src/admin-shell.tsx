@@ -26,6 +26,8 @@ import type { ReactNode } from "react";
 
 import { useSessionWatch } from "@/session-watch";
 import { DesktopSidebar, MobileNavDrawer } from "@/sidebar";
+import { usePathname } from "next/navigation";
+import { normalizeAdminPathname } from "@/navigation";
 
 /** Visually hidden until focused — first tab stop on every page. */
 const skipLinkSx = {
@@ -56,6 +58,10 @@ export function AdminShell({
 }) {
   const [navOpen, setNavOpen] = useState(false);
   useSessionWatch();
+  const currentPath=normalizeAdminPathname(usePathname());
+  if(/^\/sites\/[1-9][0-9]*\/admin\/pages\/[^/]+\/(builder|preview)\/?$/.test(currentPath)){
+    return <Box component="main" id="main-content" sx={{minHeight:"100dvh",bgcolor:"background.paper"}}>{children}</Box>;
+  }
 
   return (
     <Box

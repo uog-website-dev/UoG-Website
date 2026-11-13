@@ -11,7 +11,9 @@ import AddIcon from "@mui/icons-material/Add";
 import ArticleIcon from "@mui/icons-material/Article";
 import DescriptionIcon from "@mui/icons-material/Description";
 import GroupIcon from "@mui/icons-material/Group";
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PhotoLibraryIcon from "@mui/icons-material/PhotoLibrary";
+import ViewQuiltIcon from "@mui/icons-material/ViewQuilt";
 import type { SvgIconComponent } from "@mui/icons-material";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
@@ -30,7 +32,7 @@ import { listSiteMedia } from "@/app/sites/media-actions";
 import { getSiteUsers } from "@/app/sites/user-actions";
 import type { SitePostStatus } from "@/app/sites/post-actions";
 import { unwrap } from "@/organizations/contract";
-import { SITE_SECTIONS, sectionDecision, siteAdminHref } from "@/sites/site-admin";
+import { SITE_SECTIONS, sectionByKey, sectionDecision, siteAdminHref } from "@/sites/site-admin";
 import type { SiteSection } from "@/sites/site-admin";
 import { useSiteAdmin } from "@/sites/site-admin-frame";
 
@@ -80,7 +82,9 @@ async function userSummary(siteId: number): Promise<Metric[]> {
   return [{ label: "Assigned users", value: directory.count }];
 }
 
-const SUMMARIES: Record<Exclude<SiteSection["key"], "dashboard">, {
+type SummarySectionKey = Exclude<SiteSection["key"], "dashboard" | "builder" | "homepage">;
+
+const SUMMARIES: Record<SummarySectionKey, {
   icon: SvgIconComponent;
   title: string;
   empty: string;
@@ -97,7 +101,7 @@ function SummaryCard({
   sectionKey,
   siteId,
 }: {
-  sectionKey: Exclude<SiteSection["key"], "dashboard">;
+  sectionKey: SummarySectionKey;
   siteId: number;
 }) {
   const summary = SUMMARIES[sectionKey];
@@ -180,7 +184,8 @@ export function SiteDashboard() {
   const admin = useSiteAdmin();
   const siteId = admin.site.id;
   const contentSections = SITE_SECTIONS.filter(
-    (section): section is SiteSection & { key: Exclude<SiteSection["key"], "dashboard"> } => section.key !== "dashboard",
+    (section): section is SiteSection & { key: SummarySectionKey } =>
+      section.key !== "dashboard" && section.key !== "builder" && section.key !== "homepage",
   );
   const visible = contentSections.filter((section) => sectionDecision(section, admin) === "visible");
   const disabled = contentSections.filter(
@@ -191,10 +196,12 @@ export function SiteDashboard() {
   const canCreatePage = visible.some((section) => section.key === "pages") &&
     admin.permissions.includes("content.pages.create");
   const canManageMenus = visible.some((section) => section.key === "menus");
+  const canManageHomepage = sectionDecision(sectionByKey("homepage"), admin) === "visible";
+  const canOpenBuilder = sectionDecision(sectionByKey("builder"), admin) === "visible";
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-      {canCreatePage || canManageMenus ? (
+      {canCreatePage || canManageMenus || canManageHomepage || canOpenBuilder ? (
         <Box component="section" aria-labelledby="site-quick-actions" sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
           <Typography id="site-quick-actions" variant="h6" component="h2" sx={{ fontWeight: 700 }}>
             Quick actions
@@ -208,6 +215,16 @@ export function SiteDashboard() {
                 startIcon={<AddIcon />}
               >
                 Create page
+              </Button>
+            ) : null}
+            {canOpenBuilder ? (
+              <Button component={Link} href={siteAdminHref(siteId, "builder")} variant="outlined" startIcon={<ViewQuiltIcon />}>
+                Visual Builder
+              </Button>
+            ) : null}
+            {canManageHomepage ? (
+              <Button component={Link} href={siteAdminHref(siteId, "homepage")} variant="outlined" startIcon={<HomeOutlinedIcon />}>
+                Homepage Settings
               </Button>
             ) : null}
             {canManageMenus ? (

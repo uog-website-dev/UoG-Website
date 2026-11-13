@@ -1,0 +1,80 @@
+{
+  "utc": "2026-11-12T15:13:34.290858+00:00",
+  "services": [
+    {
+      "Service": "backend",
+      "Image": "uog-backend:dev",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "celery-beat",
+      "Image": "uog-backend:dev",
+      "State": "running",
+      "Health": ""
+    },
+    {
+      "Service": "celery-worker",
+      "Image": "uog-backend:dev",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "frontend-admin",
+      "Image": "uog-frontend:dev",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "frontend-public",
+      "Image": "uog-frontend:dev",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "keycloak",
+      "Image": "quay.io/keycloak/keycloak:26.8.1",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "keycloak-db",
+      "Image": "postgres:16.15-alpine",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "minio",
+      "Image": "pgsty/silo:RELEASE.2026-10-18T00-00-00Z",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "nginx",
+      "Image": "nginx:1.31.7-alpine",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "postgres",
+      "Image": "postgres:16.15-alpine",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "redis-broker",
+      "Image": "redis:7.4.11-alpine",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "redis-cache",
+      "Image": "redis:7.4.11-alpine",
+      "State": "running",
+      "Health": "healthy"
+    }
+  ],
+  "execution": "existing development Compose services; pytest is a separate test DB",
+  "secrets_recorded": false,
+  "live_seed_requested": true
+}

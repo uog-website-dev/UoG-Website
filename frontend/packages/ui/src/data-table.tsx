@@ -22,6 +22,7 @@ import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
 import Box from "@mui/material/Box";
+import Checkbox from "@mui/material/Checkbox";
 import Skeleton from "@mui/material/Skeleton";
 import MuiTable from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -55,6 +56,15 @@ export interface TableColumn<T> {
   align?: "left" | "right" | "center";
 }
 
+export interface DataTableSelection<T> {
+  selected: ReadonlySet<string | number>;
+  onChange: (next: Set<string | number>) => void;
+  /** Defaults to every row. */
+  isRowSelectable?: (row: T) => boolean;
+  /** Accessible name for the row checkbox. */
+  getCheckboxLabel?: (row: T) => string;
+}
+
 export interface DataTableProps<T> {
   /** Describes the table for assistive technology. */
   caption: string;
@@ -65,6 +75,8 @@ export interface DataTableProps<T> {
   renderActions?: (row: T) => ReactNode;
   sort?: SortState | null;
   onSortChange?: (sort: SortState) => void;
+  /** Optional multi-select column for bulk actions. */
+  selection?: DataTableSelection<T>;
   /** Rendered instead of the table body when there are no rows. */
   emptyState?: ReactNode;
   /** Shows skeleton rows while a request is in flight. */
@@ -84,6 +96,7 @@ export function DataTable<T>({
   renderActions,
   sort,
   onSortChange,
+  selection,
   emptyState,
   loading = false,
   loadingRows = 5,
@@ -95,6 +108,13 @@ export function DataTable<T>({
   }
 
   const hasActions = Boolean(renderActions);
+  const selectableRows = selection
+    ? rows.filter((row) => selection.isRowSelectable?.(row) ?? true)
+    : [];
+  const selectableKeys = selectableRows.map((row) => getRowKey(row));
+  const selectedSelectableCount = selectableKeys.filter((key) => selection?.selected.has(key)).length;
+  const allSelectableSelected = selectableKeys.length > 0 && selectedSelectableCount === selectableKeys.length;
+  const someSelectableSelected = selectedSelectableCount > 0 && !allSelectableSelected;
 
   const handleHeaderClick = (column: TableColumn<T>) => {
     if (!column.sortable || !onSortChange) return;
@@ -103,6 +123,25 @@ export function DataTable<T>({
       isActive && sort?.direction === "asc" ? "desc" : "asc";
     onSortChange({ field: column.field, direction: nextDirection });
   };
+
+  function toggleAllSelectable() {
+    if (!selection) return;
+    const next = new Set(selection.selected);
+    if (allSelectableSelected) {
+      for (const key of selectableKeys) next.delete(key);
+    } else {
+      for (const key of selectableKeys) next.add(key);
+    }
+    selection.onChange(next);
+  }
+
+  function toggleRow(key: string | number) {
+    if (!selection) return;
+    const next = new Set(selection.selected);
+    if (next.has(key)) next.delete(key);
+    else next.add(key);
+    selection.onChange(next);
+  }
 
   return (
     <TableContainer>
@@ -113,6 +152,18 @@ export function DataTable<T>({
       >
         <TableHead>
           <TableRow>
+            {selection ? (
+              <TableCell padding="checkbox" scope="col">
+                <Checkbox
+                  size="small"
+                  indeterminate={someSelectableSelected}
+                  checked={allSelectableSelected}
+                  disabled={loading || selectableKeys.length === 0}
+                  onChange={toggleAllSelectable}
+                  inputProps={{ "aria-label": `Select all rows in ${caption}` }}
+                />
+              </TableCell>
+            ) : null}
             {columns.map((column) => {
               const isActive = sort?.field === column.field;
               const ariaSort = !column.sortable
@@ -168,6 +219,11 @@ export function DataTable<T>({
           {loading
             ? Array.from({ length: loadingRows }).map((_, index) => (
                 <TableRow key={`skeleton-${index}`}>
+                  {selection ? (
+                    <TableCell padding="checkbox">
+                      <Skeleton variant="rectangular" width={18} height={18} />
+                    </TableCell>
+                  ) : null}
                   {columns.map((column) => (
                     <TableCell key={column.field}>
                       <Skeleton variant="text" width={120} />
@@ -180,8 +236,24 @@ export function DataTable<T>({
                   ) : null}
                 </TableRow>
               ))
-            : rows.map((row) => (
-                <TableRow key={getRowKey(row)} hover>
+            : rows.map((row) => {
+                const key = getRowKey(row);
+                const canSelect = selection ? (selection.isRowSelectable?.(row) ?? true) : false;
+                return (
+                <TableRow key={key} hover selected={selection?.selected.has(key)}>
+                  {selection ? (
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        size="small"
+                        checked={selection.selected.has(key)}
+                        disabled={!canSelect}
+                        onChange={() => toggleRow(key)}
+                        inputProps={{
+                          "aria-label": selection.getCheckboxLabel?.(row) ?? `Select row ${key}`,
+                        }}
+                      />
+                    </TableCell>
+                  ) : null}
                   {columns.map((column) => (
                     <TableCell key={column.field} align={column.align ?? "left"}>
                       {column.render(row)}
@@ -191,7 +263,8 @@ export function DataTable<T>({
                     <TableCell align="right">{renderActions?.(row)}</TableCell>
                   ) : null}
                 </TableRow>
-              ))}
+                );
+              })}
         </TableBody>
       </MuiTable>
 

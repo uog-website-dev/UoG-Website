@@ -39,9 +39,9 @@ class SiteSerializer(StrictFields, serializers.ModelSerializer):
         model = Site
         fields = (
             "id", "code", "name", "short_name", "organization_unit", "default_language",
-            "status", "is_main", "template", "configuration", "primary_domain", "created_at", "updated_at",
+            "status", "is_main", "template", "homepage", "configuration", "primary_domain", "created_at", "updated_at",
         )
-        read_only_fields = ("id", "status", "configuration", "primary_domain", "created_at", "updated_at")
+        read_only_fields = ("id", "status", "homepage", "configuration", "primary_domain", "created_at", "updated_at")
         extra_kwargs = {"code": {"validators": []}, "template": {"allow_null": True, "required": False}}
 
     def validate_code(self, value):

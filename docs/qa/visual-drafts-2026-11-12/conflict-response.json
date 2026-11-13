@@ -1,0 +1,10 @@
+{
+  "error": {
+    "code": "conflict",
+    "message": "The request conflicts with the current resource state.",
+    "details": {
+      "detail": "Content changed. Retrieve the current Page and retry."
+    }
+  },
+  "request_id": "1ea47c51-f2d7-402b-ad9a-4df619d03055"
+}

@@ -61,10 +61,14 @@ import {
   suspendSite,
 } from "@/app/sites/actions";
 import { getOrganizationTree } from "@/app/organizations/actions";
+import {
+  runBulkLifecycle,
+  summarizeBulkLifecycle,
+} from "@/admin/bulk-lifecycle";
 import { deserializeApiError, unwrap } from "@/organizations/contract";
 import { ownerInfoFor, relationLabel } from "@/sites/owner";
 import { ViewPublicSite } from "@/sites/view-public-site";
-import type { ApiError } from "@uog/api-client";
+import { ApiError } from "@uog/api-client";
 import {
   draftFromQuery,
   draftToQuery,
@@ -270,6 +274,9 @@ export function SitesList() {
   );
 
   const [pending, setPending] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string | number>>(new Set());
+  const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false);
+  const [bulkError, setBulkError] = useState<ApiError | null>(null);
   const [confirmTarget, setConfirmTarget] = useState<{
     site: Site;
     action: LifecycleAction;
@@ -395,6 +402,35 @@ export function SitesList() {
 
   const rows = sites.data?.results ?? [];
   const count = sites.data?.count ?? 0;
+  const selectedSites = rows.filter((row) => selectedIds.has(row.id) && row.status !== "ARCHIVED");
+  const canBulkDelete = selectedSites.length > 0;
+
+  async function confirmBulkDelete() {
+    if (!canBulkDelete) return;
+    setPending(true);
+    setBulkError(null);
+    try {
+      const summary = await runBulkLifecycle(selectedSites, {
+        labelOf: (site) => `${site.code} — ${site.name}`,
+        apply: (site) => archiveSite(site.id),
+      });
+      const message = summarizeBulkLifecycle(summary, "site");
+      if (summary.failed.length === 0) toast.success(message);
+      else if (summary.succeeded === 0) {
+        setBulkError(new ApiError(`${message} ${summary.failed.map((item) => `${item.label}: ${item.message}`).join(" ")}`, 400));
+        return;
+      } else {
+        toast.warning(message);
+        setBulkError(new ApiError(summary.failed.map((item) => `${item.label}: ${item.message}`).join(" "), 400));
+      }
+      setSelectedIds(new Set());
+      setBulkConfirmOpen(false);
+      sites.reload();
+      router.refresh();
+    } finally {
+      setPending(false);
+    }
+  }
 
   const columns = [
     {
@@ -568,6 +604,17 @@ export function SitesList() {
             />
           </FilterBar>
         </Box>
+        {canBulkDelete ? (
+          <Box sx={{ px: { xs: 2, sm: 3 }, py: 1.5, borderTop: 1, borderColor: "divider", display: "flex", gap: 1, alignItems: "center", flexWrap: "wrap", bgcolor: "action.hover" }}>
+            <Typography variant="body2" sx={{ flex: 1 }}>
+              {selectedSites.length} site{selectedSites.length === 1 ? "" : "s"} selected
+            </Typography>
+            <Button size="small" color="error" variant="contained" disabled={pending} onClick={() => { setBulkError(null); setBulkConfirmOpen(true); }}>
+              Delete selected
+            </Button>
+            <Button size="small" disabled={pending} onClick={() => setSelectedIds(new Set())}>Clear selection</Button>
+          </Box>
+        ) : null}
         <Box sx={{ borderTop: 1, borderColor: "divider", overflowX: "auto" }}>
           <DataTable<Site>
             caption="Managed sites"
@@ -576,6 +623,12 @@ export function SitesList() {
             getRowKey={(row) => row.id}
             sort={sort}
             onSortChange={changeSort}
+            selection={{
+              selected: selectedIds,
+              onChange: setSelectedIds,
+              isRowSelectable: (row) => row.status !== "ARCHIVED",
+              getCheckboxLabel: (row) => `Select ${row.name}`,
+            }}
             loading={sites.loading}
             error={sites.error}
             onRetry={sites.reload}
@@ -684,6 +737,31 @@ export function SitesList() {
             {siteStatusLabel(confirmTarget.site.status)}
           </Typography>
         ) : null}
+      </ConfirmDialog>
+
+      <ConfirmDialog
+        open={bulkConfirmOpen}
+        title="Delete selected sites?"
+        description="Sites cannot be purged. Delete archives each selected Site so it leaves public service permanently while historical references remain."
+        confirmColor="error"
+        confirmLabel="Delete selected"
+        pending={pending}
+        error={bulkError}
+        onConfirm={confirmBulkDelete}
+        onCancel={() => {
+          if (!pending) {
+            setBulkConfirmOpen(false);
+            setBulkError(null);
+          }
+        }}
+      >
+        <Box component="ul" sx={{ m: 0, pl: 2 }}>
+          {selectedSites.map((site) => (
+            <Typography key={site.id} component="li" variant="body2" sx={{ fontFamily: "monospace" }}>
+              {site.code} — {site.name}
+            </Typography>
+          ))}
+        </Box>
       </ConfirmDialog>
     </Box>
   );

@@ -69,7 +69,7 @@ def _public(client, host, slug):
 
 
 def test_editor_reviews_a_draft_while_visitors_keep_the_published_page(
-    client, oidc, pages_module, sites,
+    client, oidc, pages_module, sites, django_capture_on_commit_callbacks,
 ):
     del pages_module
     site, other = sites
@@ -207,7 +207,8 @@ def test_editor_reviews_a_draft_while_visitors_keep_the_published_page(
     own_review = act(author_id, "approve", draft_url)
     assert own_review.status_code == 403
     assert act(reviewer_id, "approve", draft_url).status_code == 200
-    replaced = act(publisher_id, "publish", draft_url)
+    with django_capture_on_commit_callbacks(execute=True):
+        replaced = act(publisher_id, "publish", draft_url)
     assert replaced.status_code == 200, replaced.content
     assert replaced.json()["status"] == "ARCHIVED"
 

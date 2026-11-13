@@ -1,0 +1,36 @@
+{
+  "story": "Public Visitor published layouts — responsive, assistive tech and hostile rendering safety",
+  "date": "2026-11-12",
+  "target": "WCAG 2.2 AA review assumption",
+  "dependencies": ["P3-PUBLIC-001", "P3-PUBLIC-002", "P3-FE-BUILDER-003"],
+  "status": "PASS",
+  "viewports_px": [320, 390, 768, 1280, 1440],
+  "surfaces": ["public", "preview"],
+  "artifacts": {
+    "report": "report.md",
+    "viewport_matrix": "browser-results.json",
+    "screenshots": [
+      "public-320.png",
+      "public-390.png",
+      "public-768.png",
+      "public-1280.png",
+      "public-1440.png",
+      "preview-320.png",
+      "preview-390.png",
+      "preview-768.png",
+      "preview-1280.png",
+      "preview-1440.png"
+    ],
+    "harness": "frontend/scripts/qa/public-layout-a11y/"
+  },
+  "keyboard_blocker_remediation": {
+    "widget": "tabs",
+    "issue": "Inactive tabs used roving tabindex=-1 without reliable arrow-key focus movement",
+    "fix": "APG horizontal tablist: ArrowLeft/ArrowRight/Home/End activate and move focus via tab refs after selection"
+  },
+  "security_scenarios": ["script-url", "style-token", "unknown-version", "foreign-media"],
+  "notes": [
+    "320px included for WCAG 2.2 reflow alongside existing mobile/tablet/desktop widths",
+    "axe color-contrast incomplete requires manual brand-token review; zero automated violations"
+  ]
+}

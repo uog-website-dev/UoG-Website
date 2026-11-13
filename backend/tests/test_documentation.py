@@ -42,6 +42,9 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
     paths = schema["paths"]
     assert set(paths) == {
         "/api/pages/", "/api/pages/{id}/", "/api/pages/home/",
+        "/api/v1/sites/{site_pk}/section-templates/",
+        "/api/v1/sites/{site_pk}/section-templates/{id}/",
+        "/api/v1/sites/{site_pk}/pages/{id}/visual-draft/insert-template/",
         "/api/me/", "/api/admin/overview/",
         "/api/v1/authorization/assignments/",
         "/api/v1/authorization/assignments/site-roles/",
@@ -84,6 +87,8 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
         "/api/v1/sites/{site_pk}/pages/{id}/homepage/",
         "/api/v1/sites/{site_pk}/pages/{id}/workflow-history/",
         "/api/v1/sites/{site_pk}/pages/{id}/working-draft/",
+        "/api/v1/sites/{site_pk}/pages/{id}/visual-draft/",
+        "/api/v1/sites/{site_pk}/pages/{id}/preview/",
         "/api/v1/sites/{site_pk}/posts/",
         "/api/v1/sites/{site_pk}/posts/{id}/",
         "/api/v1/sites/{site_pk}/categories/",
@@ -123,6 +128,10 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
         "/api/v1/site-context/posts/",
         "/api/v1/site-context/posts/{post_slug}/",
         "/api/v1/site-context/homepage/",
+        "/api/v1/site-context/widgets/",
+        "/api/v1/site-context/identity/logo/",
+        "/api/v1/site-context/contact/{page_id}/{form_code}/",
+        "/api/v1/sites/{site_pk}/pages/{id}/widget-data/",
         "/api/v1/site-context/pages/{page_path}/",
         "/api/v1/site-context/menus/",
     }
@@ -291,6 +300,15 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
         parameter["name"] == "If-Match" and parameter["required"]
         for parameter in page_patch["parameters"]
     )
+    visual = paths["/api/v1/sites/{site_pk}/pages/{id}/visual-draft/"]
+    assert set(visual) == {"get", "patch"}
+    assert {"200","400","409","428"} <= set(visual["patch"]["responses"])
+    assert "412" not in visual["patch"]["responses"]
+    assert any(p["name"] == "If-Match" and p["required"] for p in visual["patch"]["parameters"])
+    assert "ETag" in visual["get"]["responses"]["200"]["headers"]
+    visual_input = visual["patch"]["requestBody"]["content"]["application/json"]["schema"]
+    assert visual_input["required"] == ["visual_layout"]
+    assert visual_input["properties"]["visual_layout"]["properties"]["schema_version"]["enum"] == [1]
     public_list = paths["/api/v1/site-context/pages/"]["get"]
     assert {} in public_list["security"]
     assert "site_id" not in {

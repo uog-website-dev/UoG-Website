@@ -83,6 +83,7 @@ stages:
 
           - script: |
               set -euo pipefail
+              python scripts/generate_layout_contract.py --check
               cd backend
               python -m pip install --upgrade pip
               python -m pip install -r requirements/dev.txt

@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "purpose": "University of Gondar academic and support structure for local seed. Based on the public Academic Units listing (uog.edu.et). Not a substitute for an officially signed registry export.",
+  "source": "https://uog.edu.et/academic-units/",
+  "preserve_sites": ["UOG-COI"],
+  "preserve_hostnames": ["coi.uog.edu.et"],
+  "units": [
+    {"code": "UOG", "name": "University of Gondar", "organization_type": "UNIVERSITY", "parent_code": null, "short_name": "UoG"},
+    {"code": "CMHS", "name": "College of Medicine and Health Sciences", "organization_type": "COLLEGE", "parent_code": "UOG", "short_name": "CMHS"},
+    {"code": "CAES", "name": "College of Agriculture and Environmental Sciences", "organization_type": "COLLEGE", "parent_code": "UOG", "short_name": "CAES"},
+    {"code": "CBE", "name": "College of Business and Economics", "organization_type": "COLLEGE", "parent_code": "UOG", "short_name": "CBE"},
+    {"code": "CNCS", "name": "College of Natural and Computational Sciences", "organization_type": "COLLEGE", "parent_code": "UOG", "short_name": "CNCS"},
+    {"code": "CSSH", "name": "College of Social Sciences and Humanities", "organization_type": "COLLEGE", "parent_code": "UOG", "short_name": "CSSH"},
+    {"code": "CVMAS", "name": "College of Veterinary Medicine and Animal Sciences", "organization_type": "COLLEGE", "parent_code": "UOG", "short_name": "CVMAS"},
+    {"code": "CI", "name": "College of Informatics", "organization_type": "COLLEGE", "parent_code": "UOG", "short_name": "CoI"},
+    {"code": "IOT", "name": "Institute of Technology", "organization_type": "INSTITUTE", "parent_code": "UOG", "short_name": "IoT"},
+    {"code": "IOB", "name": "Institute of Biotechnology", "organization_type": "INSTITUTE", "parent_code": "UOG", "short_name": "IoB"},
+    {"code": "LAW", "name": "School of Law", "organization_type": "SCHOOL", "parent_code": "UOG", "short_name": "Law"},
+    {"code": "EDU", "name": "Faculty of Education", "organization_type": "SCHOOL", "parent_code": "UOG", "short_name": "Education"},
+    {"code": "DABAT", "name": "Dabat Research Center", "organization_type": "RESEARCH_CENTER", "parent_code": "UOG"},
+    {"code": "TDRC", "name": "Tropical Disease Research Center", "organization_type": "RESEARCH_CENTER", "parent_code": "UOG"},
+    {"code": "LIBRARY", "name": "Library and Documentation Services", "organization_type": "DIRECTORATE", "parent_code": "UOG"},
+    {"code": "REGISTRAR", "name": "Registrar and Alumni Directorate", "organization_type": "DIRECTORATE", "parent_code": "UOG"},
+    {"code": "PIR", "name": "Public and International Relations", "organization_type": "OFFICE", "parent_code": "UOG", "short_name": "PIR"}
+  ],
+  "sites": [
+    {
+      "organization_code": "UOG",
+      "code": "MAIN",
+      "name": "University of Gondar Main Site",
+      "is_main": true,
+      "template": "UNIVERSITY_MAIN",
+      "hostname": "www.uog.local",
+      "configuration": {
+        "identity": {"display_name": "University of Gondar"},
+        "presentation": {"theme": "institutional"},
+        "behavior": {"show_search": true, "show_language_switcher": true}
+      }
+    },
+    {
+      "organization_code": "CMHS",
+      "code": "CMHS",
+      "name": "College of Medicine and Health Sciences Site",
+      "is_main": false,
+      "template": "COLLEGE",
+      "hostname": "cmhs.uog.local",
+      "configuration": {"identity": {"display_name": "College of Medicine and Health Sciences"}}
+    },
+    {
+      "organization_code": "CAES",
+      "code": "CAES",
+      "name": "College of Agriculture and Environmental Sciences Site",
+      "is_main": false,
+      "template": "COLLEGE",
+      "hostname": "caes.uog.local",
+      "configuration": {"identity": {"display_name": "College of Agriculture and Environmental Sciences"}}
+    },
+    {
+      "organization_code": "CBE",
+      "code": "CBE",
+      "name": "College of Business and Economics Site",
+      "is_main": false,
+      "template": "COLLEGE",
+      "hostname": "cbe.uog.local",
+      "configuration": {"identity": {"display_name": "College of Business and Economics"}}
+    },
+    {
+      "organization_code": "CNCS",
+      "code": "CNCS",
+      "name": "College of Natural and Computational Sciences Site",
+      "is_main": false,
+      "template": "COLLEGE",
+      "hostname": "cncs.uog.local",
+      "configuration": {"identity": {"display_name": "College of Natural and Computational Sciences"}}
+    },
+    {
+      "organization_code": "CSSH",
+      "code": "CSSH",
+      "name": "College of Social Sciences and Humanities Site",
+      "is_main": false,
+      "template": "COLLEGE",
+      "hostname": "cssh.uog.local",
+      "configuration": {"identity": {"display_name": "College of Social Sciences and Humanities"}}
+    },
+    {
+      "organization_code": "CVMAS",
+      "code": "CVMAS",
+      "name": "College of Veterinary Medicine and Animal Sciences Site",
+      "is_main": false,
+      "template": "COLLEGE",
+      "hostname": "cvmas.uog.local",
+      "configuration": {"identity": {"display_name": "College of Veterinary Medicine and Animal Sciences"}}
+    },
+    {
+      "organization_code": "IOT",
+      "code": "IOT",
+      "name": "Institute of Technology Site",
+      "is_main": false,
+      "template": "GENERAL",
+      "hostname": "iot.uog.local",
+      "configuration": {"identity": {"display_name": "Institute of Technology"}}
+    },
+    {
+      "organization_code": "IOB",
+      "code": "IOB",
+      "name": "Institute of Biotechnology Site",
+      "is_main": false,
+      "template": "RESEARCH_CENTER",
+      "hostname": "biotech.uog.local",
+      "configuration": {"identity": {"display_name": "Institute of Biotechnology"}}
+    },
+    {
+      "organization_code": "LAW",
+      "code": "LAW",
+      "name": "School of Law Site",
+      "is_main": false,
+      "template": "GENERAL",
+      "hostname": "law.uog.local",
+      "configuration": {"identity": {"display_name": "School of Law"}}
+    },
+    {
+      "organization_code": "EDU",
+      "code": "EDU",
+      "name": "Faculty of Education Site",
+      "is_main": false,
+      "template": "GENERAL",
+      "hostname": "education.uog.local",
+      "configuration": {"identity": {"display_name": "Faculty of Education"}}
+    }
+  ],
+  "informatics_binding": {
+    "site_code": "UOG-COI",
+    "organization_code": "CI",
+    "hostname": "coi.uog.edu.et"
+  }
+}

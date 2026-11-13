@@ -1,0 +1,24 @@
+{
+  "pattern_source": "frontend/apps/admin-web/src/sites/visual-builder-model.ts#SAFE_LINK_PATTERN",
+  "message": "Use a site path (/about), http(s) URL or mailto link. javascript: and other unsafe destinations are not allowed.",
+  "allowed": [
+    "/about",
+    "/news/campus-update",
+    "https://uog.edu.et",
+    "http://example.com/path?q=1",
+    "mailto:info@example.com"
+  ],
+  "rejected": [
+    "javascript:alert(1)",
+    "javascript:alert(2)",
+    "data:text/html,bad",
+    "//evil.example",
+    "ftp://files.example",
+    "about:blank"
+  ],
+  "api_ux": {
+    "draft_preserved": true,
+    "save_disabled_when_layout_invalid": true,
+    "field_error_role": "alert / TextField error+helperText"
+  }
+}

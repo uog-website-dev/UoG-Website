@@ -14,11 +14,14 @@ export function ViewPublicSite({
   siteStatus,
   primaryDomain,
   compact = false,
+  label = "View Public Website",
 }: {
   siteName: string;
   siteStatus: "DRAFT" | "ACTIVE" | "SUSPENDED" | "ARCHIVED";
   primaryDomain: PrimaryDomain;
   compact?: boolean;
+  /** Button label; Homepage Settings uses Public Preview. */
+  label?: string;
 }) {
   const hostname = primaryDomain?.hostname;
   const validHostname = typeof hostname === "string" && hostname.length <= 253 &&
@@ -43,14 +46,14 @@ export function ViewPublicSite({
         href={active ? href : undefined}
         target={active ? "_blank" : undefined}
         rel={active ? "noopener noreferrer" : undefined}
-        aria-label={`View ${siteName} public website${hostname ? ` at ${hostname}` : ""}`}
+        aria-label={`${label} for ${siteName}${hostname ? ` at ${hostname}` : ""}`}
         variant={compact ? "text" : "outlined"}
         size={compact ? "small" : "medium"}
         startIcon={<OpenInNewRoundedIcon />}
         disabled={!active || !href}
         title={message ?? `Opens ${hostname} in a new tab`}
       >
-        View Public Website
+        {label}
       </Button>
       {validHostname && !compact ? (
         <Typography variant="caption" color="text.secondary" sx={{ fontFamily: "monospace" }}>

@@ -26,9 +26,10 @@ import { Breadcrumb } from "@/breadcrumb";
 import { normalizeAdminPathname } from "@/navigation";
 import {
   canActivateCentralModules,
-  sectionByKey,
+  findSiteSection,
   sectionDecision,
   siteAdminHref,
+  isSiteSectionActive,
   siteSwitchHref,
   visibleSiteSections,
 } from "@/sites/site-admin";
@@ -47,6 +48,8 @@ export interface SiteAdminSite {
   defaultLanguage?: string;
   enabledLanguages?: readonly string[];
   primaryDomain?: { hostname: string; status: "ACTIVE" | "INACTIVE" } | null;
+  /** Assigned published root Page UUID when configured. */
+  homepageId?: string | null;
 }
 
 interface SiteAdminValue extends SiteAccessInput {
@@ -82,10 +85,13 @@ export function SiteAdminFrame({
   const access = { enabledModuleCodes, permissions };
   const sections = visibleSiteSections(access);
   const current = sections.find(
-    (section) => section.segment && currentPath.startsWith(siteAdminHref(site.id, section.segment)),
+    (section) => isSiteSectionActive(section,site.id,currentPath),
   );
   const value = { site, enabledModuleCodes, permissions };
   const chip = siteStatusChip(site.status);
+  if(/^\/sites\/[1-9][0-9]*\/admin\/pages\/[^/]+\/(builder|preview)\/?$/.test(currentPath)){
+    return <SiteAdminContext.Provider value={value}>{children}</SiteAdminContext.Provider>;
+  }
 
   return (
     <SiteAdminContext.Provider value={value}>
@@ -184,8 +190,9 @@ export function SectionBlocked({
   label: string;
   decision: Exclude<SectionDecision, "visible">;
 }) {
+  const verb = /s$/i.test(label) && !/Builder$/i.test(label) ? "are" : "is";
   const message = decision === "module_disabled"
-    ? `${label} are not enabled for this Site.`
+    ? `${label} ${verb} not enabled for this Site.`
     : `You do not have permission to open ${label} for this Site.`;
   return <Alert severity="warning">{message}</Alert>;
 }
@@ -194,13 +201,21 @@ export function SiteSection({
   sectionKey,
   children,
 }: {
-  sectionKey: SiteSection["key"];
+  sectionKey: SiteSection["key"] | string;
   children: ReactNode;
 }) {
   const admin = useSiteAdmin();
-  const decision = sectionDecision(sectionByKey(sectionKey), admin);
+  const section = findSiteSection(sectionKey);
+  if (!section) {
+    return (
+      <Alert severity="error" role="alert">
+        Unknown site section{sectionKey ? `: ${sectionKey}` : ""}.
+      </Alert>
+    );
+  }
+  const decision = sectionDecision(section, admin);
   if (decision !== "visible") {
-    return <SectionBlocked label={sectionByKey(sectionKey).label} decision={decision} />;
+    return <SectionBlocked label={section.label} decision={decision} />;
   }
   return children;
 }

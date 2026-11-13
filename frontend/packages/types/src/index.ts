@@ -165,6 +165,8 @@ export interface Site {
   is_main: boolean;
   /** Read-only routing summary; null means no primary domain. Optional for older APIs. */
   primary_domain?: { hostname: string; status: SiteDomainStatus } | null;
+  /** Read-only assigned root Page UUID; null when unset. Optional for older APIs. */
+  homepage?: string | null;
   template: number | null;
   configuration: SiteConfiguration;
   created_at: string;
@@ -275,8 +277,8 @@ export interface PlatformModule {
  *
  * Disabling keeps the row and its configuration; it does not delete data.
  * `module` is the registry id. `module_code` is the stable code (PAGES,
- * POSTS, MENUS) so a Site administrator can see enablement without the
- * central module registry.
+ * POSTS, MENUS, MEDIA, VISUAL_BUILDER) so a Site administrator can see
+ * enablement without the central module registry.
  */
 export interface SiteModuleAssignment {
   id: number;
@@ -506,3 +508,5 @@ export interface HealthReport {
 }
 
 export type { MediaAsset, MediaStatus, MediaListQuery, MediaMetadataPatch, MediaReferenceInventory, MediaDeletion } from "./media";
+
+export * from "./layout";

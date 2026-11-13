@@ -89,6 +89,15 @@ def require_pages_module(site_id, *, using="default"):
         raise ValidationError({"module": "The PAGES module is not enabled for this Site."})
 
 
+def require_visual_builder_module(site_id, *, using="default"):
+    """Refuse Visual Builder writes when VISUAL_BUILDER is off for this Site."""
+    from apps.sites.selectors.modules import module_is_available
+    if not module_is_available(site_id, "VISUAL_BUILDER", using=using):
+        raise ValidationError({
+            "module": "The VISUAL_BUILDER module is not enabled for this Site.",
+        })
+
+
 def set_as_homepage(page, *, actor=None):
     """Designate this page as the Site's homepage, replacing any previous
     one atomically: either the swap happens entirely or neither flag moved."""

@@ -52,16 +52,32 @@ def media_world():
         for site in sites:
             UserRoleAssignment.objects.create(user=user, role=Role.objects.get(code="site-administrator"), scope="SITE", site=site, organization=owner)
     with connection.cursor() as cursor:
-        cursor.execute("INSERT INTO sites_module_implementation(code) VALUES ('MEDIA'), ('PAGES') ON CONFLICT DO NOTHING")
+        cursor.execute(
+            "INSERT INTO sites_module_implementation(code) VALUES ('MEDIA'), ('PAGES'), ('VISUAL_BUILDER') "
+            "ON CONFLICT DO NOTHING"
+        )
     module, _ = Module.objects.get_or_create(code="MEDIA", defaults={"name": "Media", "description": "Site-owned assets", "status": "IMPLEMENTED"})
     pages, _ = Module.objects.get_or_create(code="PAGES", defaults={"name": "Pages", "description": "Pages", "status": "IMPLEMENTED", "is_enabled": True})
+    builder, _ = Module.objects.get_or_create(
+        code="VISUAL_BUILDER",
+        defaults={
+            "name": "Visual Page Builder",
+            "description": "Visual Page composition",
+            "status": "IMPLEMENTED",
+            "is_enabled": True,
+        },
+    )
     pages.is_enabled = True
     pages.save()
     module.is_enabled = True
     module.save()
+    builder.status = "IMPLEMENTED"
+    builder.is_enabled = True
+    builder.save(update_fields=["status", "is_enabled"])
     for site in (a, b):
         enable_module_for_site(site.pk, module.pk)
         enable_module_for_site(site.pk, Module.objects.get(code="PAGES").pk)
+        enable_module_for_site(site.pk, builder.pk)
     return SimpleNamespace(a=a, b=b, actor=actor, both=both)
 
 

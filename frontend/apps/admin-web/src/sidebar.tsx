@@ -18,6 +18,8 @@ import ArticleIcon from "@mui/icons-material/Article";
 import GroupIcon from "@mui/icons-material/Group";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import DescriptionIcon from "@mui/icons-material/Description";
+import ViewQuiltIcon from "@mui/icons-material/ViewQuilt";
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import type { SvgIconComponent } from "@mui/icons-material";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
@@ -39,7 +41,7 @@ import {
   siteWorkspaceId,
   visiblePlatformNavItems,
 } from "@/navigation";
-import { siteAdminHref, visibleSiteSections } from "@/sites/site-admin";
+import { siteAdminHref, visibleSiteSections, isSiteSectionActive } from "@/sites/site-admin";
 import type { SiteSection } from "@/sites/site-admin";
 import { siteStatusChip } from "@/sites/validation";
 import {
@@ -55,6 +57,8 @@ const DRAWER_WIDTH = 296;
 const SITE_SECTION_ICONS: Record<SiteSection["key"], SvgIconComponent> = {
   dashboard: DashboardIcon,
   pages: DescriptionIcon,
+  builder: ViewQuiltIcon,
+  homepage: HomeOutlinedIcon,
   posts: ArticleIcon,
   menus: AccountTreeIcon,
   media: ArticleIcon,
@@ -64,6 +68,8 @@ const SITE_SECTION_ICONS: Record<SiteSection["key"], SvgIconComponent> = {
 const SITE_SECTION_DESCRIPTIONS: Record<SiteSection["key"], string> = {
   dashboard: "Site content overview",
   pages: "Site pages and workflow",
+  builder: "Compose a visual Page layout",
+  homepage: "Assign the published Site root",
   posts: "News and announcements",
   menus: "Header and footer navigation",
   media: "Private Site media library",
@@ -355,7 +361,7 @@ function SiteNav({
       ) : null}
       {site && access ? sections.map((section) => {
         const href = siteAdminHref(siteId, section.segment);
-        const active = section.segment ? currentPath === href || currentPath.startsWith(`${href}/`) : currentPath === href;
+        const active = isSiteSectionActive(section,siteId,currentPath);
         return (
           <NavItem
             key={section.key}

@@ -1,0 +1,25 @@
+{
+  "story": "Site Editor local visual undo/redo — bounded history, selection restore, keyboard scoping, Page/Site isolation",
+  "date": "2026-11-12",
+  "dependencies": ["P3-FE-BUILDER-002", "P3-FE-BUILDER-003", "P3-FE-BUILDER-004"],
+  "status": "PASS",
+  "history_bound": 50,
+  "shortcuts": ["Ctrl/Cmd+Z", "Ctrl/Cmd+Y", "Ctrl/Cmd+Shift+Z"],
+  "implementation": [
+    "frontend/apps/admin-web/src/sites/visual-builder-history.ts",
+    "frontend/apps/admin-web/src/sites/visual-builder.tsx",
+    "docs/architecture/visual-builder-shell.md"
+  ],
+  "acceptance": {
+    "restore_order_fields_selection": "pass",
+    "divergent_edit_clears_redo": "pass",
+    "site_page_switch_clears_history": "pass",
+    "cms_snapshot_isolated": "pass",
+    "text_field_shortcuts_not_captured": "pass"
+  },
+  "artifacts": {
+    "report": "report.md",
+    "helper_tests": "frontend/apps/admin-web/src/sites/visual-builder-history.test.ts",
+    "builder_tests": "frontend/apps/admin-web/src/sites/visual-builder.test.tsx"
+  }
+}

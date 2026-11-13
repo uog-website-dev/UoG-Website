@@ -6,6 +6,7 @@ import {
   enabledModuleCodes,
   sectionByKey,
   sectionDecision,
+  isSiteSectionActive,
   siteSwitchHref,
   visibleSiteSections,
 } from "./site-admin";
@@ -16,12 +17,38 @@ const editor = {
 };
 
 describe("site administration matrix", () => {
+  it("shows Visual Builder only when VISUAL_BUILDER is enabled for Page editors",()=>{
+    const builder=sectionByKey("builder");
+    expect(sectionDecision(builder,{enabledModuleCodes:["VISUAL_BUILDER"],permissions:["content.pages.update"]})).toBe("visible");
+    expect(sectionDecision(builder,{enabledModuleCodes:["PAGES"],permissions:["content.pages.update"]})).toBe("module_disabled");
+    expect(sectionDecision(builder,{enabledModuleCodes:["VISUAL_BUILDER"],permissions:["content.pages.view"]})).toBe("permission_denied");
+    expect(sectionDecision(builder,{enabledModuleCodes:[],permissions:["content.pages.update"]})).toBe("module_disabled");
+    expect(isSiteSectionActive(builder,11,"/sites/11/admin/builder")).toBe(true);
+    expect(isSiteSectionActive(builder,11,"/sites/11/admin/pages/page-id/builder")).toBe(true);
+    expect(isSiteSectionActive(sectionByKey("pages"),11,"/sites/11/admin/pages/page-id/builder")).toBe(false);
+    expect(isSiteSectionActive(builder,11,"/sites/22/admin/builder")).toBe(false);
+  });
   it("shows Pages and Menus only when the module is enabled and the user is permitted", () => {
     expect(visibleSiteSections(editor).map((section) => section.key)).toEqual([
       "dashboard",
       "pages",
       "menus",
     ]);
+  });
+
+  it("shows Homepage Settings for Site administrators when PAGES is enabled", () => {
+    const homepage = sectionByKey("homepage");
+    expect(sectionDecision(homepage, {
+      enabledModuleCodes: ["PAGES"],
+      permissions: ["sites.update"],
+    })).toBe("visible");
+    expect(sectionDecision(homepage, editor)).toBe("permission_denied");
+    expect(sectionDecision(homepage, {
+      enabledModuleCodes: [],
+      permissions: ["sites.update"],
+    })).toBe("module_disabled");
+    expect(isSiteSectionActive(homepage, 11, "/sites/11/admin/homepage")).toBe(true);
+    expect(isSiteSectionActive(homepage, 22, "/sites/11/admin/homepage")).toBe(false);
   });
 
   it("shows Media for a Site Editor when MEDIA is enabled and content.media.view is granted", () => {

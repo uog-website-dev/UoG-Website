@@ -4,6 +4,7 @@ export { UogHeader, UogFooter } from "./UogShell";
 export { SiteNavigation, PublicMenuFrame, safeMenuHref, menusFromResponse } from "./site-navigation";
 export type { PublicMenuNode } from "./site-navigation";
 export { PublicPageView, pageFromResponse, paragraphParts } from "./public-page";
+export { VisualLayoutView } from "./visual-layout";
 export { PublicSiteFrame } from "./public-site-frame";
 export {
   EMPTY_SITE,
@@ -29,6 +30,7 @@ export type { AsyncState, AsyncStatus } from "./useAsync";
 export { DataTable, VisuallyHiddenCaption } from "./data-table";
 export type {
   DataTableProps,
+  DataTableSelection,
   TableColumn,
   SortState,
   SortDirection,

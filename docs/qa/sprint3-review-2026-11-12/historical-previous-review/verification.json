@@ -1,0 +1,72 @@
+{
+  "story": "Sprint 3 integrated release review (upload through public homepage)",
+  "date": "2026-11-12",
+  "commit": "ed82e429a801bc8fd2dc616698c2f948cc4b792c",
+  "branch": "P3-MEDIA",
+  "dependencies": [
+    "P3-FE-MEDIA-002",
+    "P3-FE-MEDIA-003",
+    "P3-FE-BUILDER-004",
+    "P3-FE-BUILDER-005",
+    "P3-PUBLIC-001",
+    "P3-PUBLIC-002",
+    "P3-PUBLIC-003",
+    "Swagger/OpenAPI baseline"
+  ],
+  "technical_recommendation": "CONDITIONAL GO",
+  "suites": {
+    "integrated": {
+      "status": "PASS",
+      "returncode": 0
+    },
+    "openapi": {
+      "status": "PASS",
+      "returncode": 0
+    },
+    "layout_contract": {
+      "status": "PASS",
+      "returncode": 0
+    },
+    "openapi_docs": {
+      "status": "PASS",
+      "returncode": 0
+    }
+  },
+  "acceptance": {
+    "integrated_release_path": "pass",
+    "isolation_and_failure_checks": "pass",
+    "two_site_real_services": "pass",
+    "prototype_separated": "pass",
+    "no_blocking_security_or_integrity_defects_on_path": "pass"
+  },
+  "attachments": {
+    "signed_checklist": "checklist.json",
+    "negative_and_release_junit": "integrated.xml",
+    "openapi": "openapi.yaml",
+    "defect_disposition": "defects.md",
+    "environment": "environment.json",
+    "live_services_probe": "live-services-probe.json",
+    "prototype_separation": "prototype-walkthrough/README.md",
+    "manifest": "manifest.json"
+  },
+  "stakeholder_signatures": {
+    "QA Lead": {
+      "name": "Pending",
+      "decision": "Pending",
+      "date": "Pending"
+    },
+    "Technical Lead": {
+      "name": "Pending",
+      "decision": "Pending",
+      "date": "Pending"
+    },
+    "Product Owner": {
+      "name": "Pending",
+      "decision": "Pending",
+      "date": "Pending"
+    }
+  },
+  "waivers": [
+    "Full Keycloak\u2192Admin\u2192nginx browser click-path remains local-API Host coverage inside Docker; remote CI browser E2E still tracked as QA-20261104-002."
+  ]
+}

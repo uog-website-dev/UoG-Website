@@ -1,0 +1,103 @@
+{
+  "results": [
+    {
+      "name": "integrated",
+      "command": [
+        "docker",
+        "compose",
+        "exec",
+        "-T",
+        "-e",
+        "RUN_MEDIA_MINIO_TESTS=1",
+        "backend",
+        "pytest",
+        "tests/test_sprint3_integrated_review.py",
+        "tests/test_visual_publication.py",
+        "apps/cms/tests/test_homepage_assignment.py",
+        "tests/test_visual_drafts.py",
+        "tests/test_media_removal.py",
+        "tests/test_media_uploads.py",
+        "apps/cms/tests/test_layout_contract.py",
+        "-q",
+        "--junitxml=/tmp/sprint3-integrated.xml"
+      ],
+      "returncode": 0,
+      "stdout_tail": "........................................................................ [ 44%]\n........................................................................ [ 89%]\n.................                                                        [100%]\n=============================== warnings summary ===============================\ntests/test_media_removal.py: 21 warnings\ntests/test_media_uploads.py: 11 warnings\n  /usr/local/lib/python3.12/site-packages/botocore/auth.py:424: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).\n    datetime_now = datetime.datetime.utcnow()\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n--------------- generated xml file: /tmp/sprint3-integrated.xml ----------------\n",
+      "stderr_tail": "",
+      "status": "PASS"
+    },
+    {
+      "name": "openapi",
+      "command": [
+        "docker",
+        "compose",
+        "exec",
+        "-T",
+        "-e",
+        "RUN_MEDIA_MINIO_TESTS=1",
+        "backend",
+        "python",
+        "manage.py",
+        "spectacular",
+        "--file",
+        "/tmp/sprint3-openapi.yaml",
+        "--validate",
+        "--fail-on-warn"
+      ],
+      "returncode": 0,
+      "stdout_tail": "",
+      "stderr_tail": "",
+      "status": "PASS"
+    },
+    {
+      "name": "layout_contract",
+      "command": [
+        "docker",
+        "compose",
+        "run",
+        "--rm",
+        "-T",
+        "--no-deps",
+        "--entrypoint",
+        "python",
+        "-v",
+        "D:\\Projects\\Website_Project\\UoG-Website:/repo",
+        "-w",
+        "/repo",
+        "backend",
+        "scripts/generate_layout_contract.py",
+        "--check"
+      ],
+      "returncode": 0,
+      "stdout_tail": "",
+      "stderr_tail": " Container uog-digital-platform-backend-run-9adc7bfbe633 Creating \n Container uog-digital-platform-backend-run-9adc7bfbe633 Created \n",
+      "status": "PASS"
+    },
+    {
+      "name": "openapi_docs",
+      "command": [
+        "docker",
+        "compose",
+        "exec",
+        "-T",
+        "-e",
+        "RUN_MEDIA_MINIO_TESTS=1",
+        "backend",
+        "pytest",
+        "tests/test_documentation.py",
+        "-q",
+        "--junitxml=/tmp/sprint3-openapi-docs.xml"
+      ],
+      "returncode": 0,
+      "stdout_tail": "..............                                                           [100%]\n-------------- generated xml file: /tmp/sprint3-openapi-docs.xml ---------------\n",
+      "stderr_tail": "",
+      "status": "PASS"
+    },
+    {
+      "name": "openapi_committed_match",
+      "status": "PASS",
+      "detail": "Generated OpenAPI SHA-256 equals docs/api/openapi.yaml"
+    }
+  ],
+  "openapi_match": true
+}

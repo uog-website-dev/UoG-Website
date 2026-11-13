@@ -1,0 +1,54 @@
+{
+  "story": "P3-FE-BUILDER draft save, private preview and CMS workflow controls",
+  "date": "2026-11-12",
+  "dependencies": [
+    "P3-BUILDER-002",
+    "P3-BUILDER-003",
+    "P3-FE-BUILDER-002",
+    "P3-FE-BUILDER-003"
+  ],
+  "implementation": [
+    "frontend/apps/admin-web/src/sites/visual-builder.tsx",
+    "frontend/apps/admin-web/src/sites/visual-builder-preview.tsx",
+    "frontend/apps/admin-web/src/sites/content-workflow.tsx",
+    "frontend/apps/admin-web/src/app/sites/page-actions.ts"
+  ],
+  "suites": {
+    "workflow_regression": {
+      "passed": 48,
+      "failed": 0,
+      "junit": "workflow.xml",
+      "breakdown": {
+        "visual-builder.test.tsx": 15,
+        "site-pages.test.tsx": 23,
+        "content-workflow.test.tsx": 2,
+        "page-actions.test.ts": 8
+      }
+    }
+  },
+  "acceptance": {
+    "saved_draft_private_after_reload": "pass",
+    "failed_save_conflict_preserves_local": "pass",
+    "workflow_actions_authoritative_state": "pass",
+    "private_preview_all_widths_editing_revision": "pass",
+    "handoff_uses_saved_draft": "pass",
+    "navigation_guard": "pass",
+    "session_undo_separate_from_cms": "pass"
+  },
+  "attachments": {
+    "workflow_navigation_conflict_e2e": "workflow.xml",
+    "viewport_evidence": "viewport-fixtures.json",
+    "conflict_recovery": "conflict-recovery.json",
+    "tested_build_revision_ids": {
+      "site_id": 11,
+      "page_id": "00000000-0000-4000-8000-000000000001",
+      "save_revision": 2,
+      "submit_revision": 3,
+      "conflict_reload_etag": "\"revision-9\"",
+      "reconcile_save_revision": 10
+    }
+  },
+  "waivers": [
+    "Full Keycloak/Admin/portal browser E2E unavailable in this checkout (same as visual-builder shell pack)."
+  ]
+}

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="19" failures="0" errors="0" time="12.251396759">
+    <testsuite name="src/sites/visual-builder-composition.test.ts" timestamp="2026-11-12T13:23:50.958Z" hostname="086c5ea3ae9d" tests="5" failures="0" errors="0" skipped="0" time="0.036633129">
+        <testcase classname="src/sites/visual-builder-composition.test.ts" name="Visual Builder composition &gt; produces the same ordered IDs for pointer-equivalent and keyboard row moves" time="0.016986044">
+        </testcase>
+        <testcase classname="src/sites/visual-builder-composition.test.ts" name="Visual Builder composition &gt; moves a slider across columns with keyboard or pointer and keeps stable widget IDs" time="0.00295026">
+        </testcase>
+        <testcase classname="src/sites/visual-builder-composition.test.ts" name="Visual Builder composition &gt; keeps the original structure on an invalid drop and restores logical focus after delete" time="0.002032114">
+        </testcase>
+        <testcase classname="src/sites/visual-builder-composition.test.ts" name="Visual Builder composition &gt; duplicates a section with fresh descendant IDs and blocks shrinking occupied trailing columns" time="0.003813798">
+        </testcase>
+        <testcase classname="src/sites/visual-builder-composition.test.ts" name="Visual Builder composition &gt; shifts siblings with keyboard controls without changing other columns" time="0.001974424">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/visual-builder-model.test.ts" timestamp="2026-11-12T13:23:50.969Z" hostname="086c5ea3ae9d" tests="3" failures="0" errors="0" skipped="0" time="0.049790386">
+        <testcase classname="src/sites/visual-builder-model.test.ts" name="Visual Builder contract helpers &gt; covers each of the 43 approved widget types once and produces valid initial properties" time="0.035625904">
+        </testcase>
+        <testcase classname="src/sites/visual-builder-model.test.ts" name="Visual Builder contract helpers &gt; provides a valid 60/40 demonstration with selectable nested slider content" time="0.00392979">
+        </testcase>
+        <testcase classname="src/sites/visual-builder-model.test.ts" name="Visual Builder contract helpers &gt; rejects stale/illegal insertion contexts and enforces the shared node limit" time="0.004554598">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/visual-builder.test.tsx" timestamp="2026-11-12T13:23:50.977Z" hostname="086c5ea3ae9d" tests="11" failures="0" errors="0" skipped="0" time="12.164973244">
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; mounts the actual Page route inside Site Administration and guards disabled/view-only direct navigation" time="0.609742046">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; blocks unavailable, disabled, unauthorized and invalid direct contexts before loading a Page" time="0.036394136">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; renders loading, empty and initial keyboard focus with explicit Page and Site context" time="0.111990412">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; searches the 43-card picker, supports arrow/Enter selection and restores invoking focus" time="3.346412961">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; provides a meaningful empty palette search and Escape restores focus" time="1.620828422">
+            <system-err>
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(ButtonBase) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+A component suspended inside an `act` scope, but the `act` call was not awaited. When testing React components that depend on asynchronous data, you must await the result:
+
+await act(() =&gt; ...)
+
+            </system-err>
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; saves the complete valid tree with the last loaded ETag and reports conflicts without losing edits" time="1.540048694">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; uses the canonical saved tree/revision and keeps local undo distinct from CMS history" time="2.055426177">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; ignores late Page results and clears selection, picker, focus mode and inspector on Site/Page changes" time="1.567415889">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; shows backend denial and retryable transport errors without exposing a former canvas" time="0.078940917">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; opens the existing private working draft for a published Page before allowing canvas edits" time="0.118000042">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; keeps the canvas visible in focus mode and Escape returns to the full workspace" time="1.076145009">
+        </testcase>
+    </testsuite>
+</testsuites>

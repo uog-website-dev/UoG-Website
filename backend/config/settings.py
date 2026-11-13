@@ -256,6 +256,7 @@ SPECTACULAR_SETTINGS = {
         "SiteStatusEnum": "apps.sites.models.Site.Status",
         "ActiveInactiveStatusEnum": "apps.sites.models.SiteDomain.Status",
         "ModuleStatusEnum": "apps.sites.models.Module.Status",
+        "SectionTemplateStatusEnum": [("ACTIVE", "Active"), ("RETIRED", "Retired")],
         "CMSContentStatusEnum": "apps.cms.models.ContentStatus",
     },
     "POSTPROCESSING_HOOKS": [
@@ -493,6 +494,7 @@ SPECTACULAR_SETTINGS = {
         "SiteStatusEnum": "apps.sites.models.Site.Status",
         "ActiveInactiveStatusEnum": "apps.sites.models.SiteDomain.Status",
         "ModuleStatusEnum": "apps.sites.models.Module.Status",
+        "SectionTemplateStatusEnum": [("ACTIVE", "Active"), ("RETIRED", "Retired")],
         "ContentStatusEnum": "apps.cms.models.ContentStatus",
         "SiteModuleActionEnum": "apps.sites.models.SiteModuleOperation.Action",
         "SiteModuleScopeEnum": "apps.sites.models.SiteModuleOperation.ScopeType",

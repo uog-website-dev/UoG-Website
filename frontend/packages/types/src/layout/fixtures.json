@@ -1,0 +1,2718 @@
+[
+  {
+    "name": "three-column-slider",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "section-1",
+          "type": "section",
+          "ratios": [
+            1,
+            1,
+            1
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "heading-1",
+                  "type": "headline",
+                  "props": {
+                    "text": "Our university",
+                    "level": 2
+                  }
+                }
+              ]
+            },
+            {
+              "id": "column-2",
+              "type": "column",
+              "children": [
+                {
+                  "id": "slider-1",
+                  "type": "image_slider",
+                  "props": {
+                    "items": [
+                      {
+                        "id": "slide-1",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "id": "column-3",
+              "type": "column",
+              "children": [
+                {
+                  "id": "text-1",
+                  "type": "editor",
+                  "props": {
+                    "html": "<p>Study and research</p>"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "unknown-widget",
+    "valid": false,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "section-1",
+          "type": "section",
+          "ratios": [
+            1,
+            1,
+            1
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "heading-1",
+                  "type": "unknown",
+                  "props": {
+                    "text": "Our university",
+                    "level": 2
+                  }
+                }
+              ]
+            },
+            {
+              "id": "column-2",
+              "type": "column",
+              "children": [
+                {
+                  "id": "slider-1",
+                  "type": "image_slider",
+                  "props": {
+                    "items": [
+                      {
+                        "id": "slide-1",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "id": "column-3",
+              "type": "column",
+              "children": [
+                {
+                  "id": "text-1",
+                  "type": "editor",
+                  "props": {
+                    "html": "<p>Study and research</p>"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "duplicate-id",
+    "valid": false,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "section-1",
+          "type": "section",
+          "ratios": [
+            1,
+            1,
+            1
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "heading-1",
+                  "type": "headline",
+                  "props": {
+                    "text": "Our university",
+                    "level": 2
+                  }
+                }
+              ]
+            },
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "slider-1",
+                  "type": "image_slider",
+                  "props": {
+                    "items": [
+                      {
+                        "id": "slide-1",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "id": "column-3",
+              "type": "column",
+              "children": [
+                {
+                  "id": "text-1",
+                  "type": "editor",
+                  "props": {
+                    "html": "<p>Study and research</p>"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "nested-section",
+    "valid": false,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "section-1",
+          "type": "section",
+          "ratios": [
+            1,
+            1,
+            1
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "heading-1",
+                  "type": "headline",
+                  "props": {
+                    "text": "Our university",
+                    "level": 2
+                  }
+                },
+                {
+                  "id": "section-1",
+                  "type": "section",
+                  "ratios": [
+                    1,
+                    1,
+                    1
+                  ],
+                  "columns": [
+                    {
+                      "id": "column-1",
+                      "type": "column",
+                      "children": [
+                        {
+                          "id": "heading-1",
+                          "type": "headline",
+                          "props": {
+                            "text": "Our university",
+                            "level": 2
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "id": "column-2",
+                      "type": "column",
+                      "children": [
+                        {
+                          "id": "slider-1",
+                          "type": "image_slider",
+                          "props": {
+                            "items": [
+                              {
+                                "id": "slide-1",
+                                "asset_id": "00000000-0000-4000-8000-000000000001",
+                                "alt": "Campus",
+                                "caption": "Campus life"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "id": "column-3",
+                      "type": "column",
+                      "children": [
+                        {
+                          "id": "text-1",
+                          "type": "editor",
+                          "props": {
+                            "html": "<p>Study and research</p>"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "column-2",
+              "type": "column",
+              "children": [
+                {
+                  "id": "slider-1",
+                  "type": "image_slider",
+                  "props": {
+                    "items": [
+                      {
+                        "id": "slide-1",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "id": "column-3",
+              "type": "column",
+              "children": [
+                {
+                  "id": "text-1",
+                  "type": "editor",
+                  "props": {
+                    "html": "<p>Study and research</p>"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "excessive-items",
+    "valid": false,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "section-1",
+          "type": "section",
+          "ratios": [
+            1,
+            1,
+            1
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "heading-1",
+                  "type": "headline",
+                  "props": {
+                    "text": "Our university",
+                    "level": 2
+                  }
+                }
+              ]
+            },
+            {
+              "id": "column-2",
+              "type": "column",
+              "children": [
+                {
+                  "id": "slider-1",
+                  "type": "image_slider",
+                  "props": {
+                    "items": [
+                      {
+                        "id": "slide-0",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-1",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-2",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-3",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-4",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-5",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-6",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-7",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-8",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-9",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-10",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-11",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-12",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-13",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-14",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-15",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-16",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-17",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-18",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-19",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-20",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-21",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-22",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-23",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-24",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-25",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-26",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-27",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-28",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-29",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-30",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-31",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-32",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-33",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-34",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-35",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-36",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-37",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-38",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-39",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-40",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-41",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-42",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-43",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-44",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-45",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-46",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-47",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-48",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-49",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      },
+                      {
+                        "id": "slide-50",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "id": "column-3",
+              "type": "column",
+              "children": [
+                {
+                  "id": "text-1",
+                  "type": "editor",
+                  "props": {
+                    "html": "<p>Study and research</p>"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "unsupported-version",
+    "valid": false,
+    "layout": {
+      "schema_version": 99,
+      "rows": [
+        {
+          "id": "section-1",
+          "type": "section",
+          "ratios": [
+            1,
+            1,
+            1
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "heading-1",
+                  "type": "headline",
+                  "props": {
+                    "text": "Our university",
+                    "level": 2
+                  }
+                }
+              ]
+            },
+            {
+              "id": "column-2",
+              "type": "column",
+              "children": [
+                {
+                  "id": "slider-1",
+                  "type": "image_slider",
+                  "props": {
+                    "items": [
+                      {
+                        "id": "slide-1",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "id": "column-3",
+              "type": "column",
+              "children": [
+                {
+                  "id": "text-1",
+                  "type": "editor",
+                  "props": {
+                    "html": "<p>Study and research</p>"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "ratio-column-mismatch",
+    "valid": false,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "section-1",
+          "type": "section",
+          "ratios": [
+            60,
+            40
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "heading-1",
+                  "type": "headline",
+                  "props": {
+                    "text": "Our university",
+                    "level": 2
+                  }
+                }
+              ]
+            },
+            {
+              "id": "column-2",
+              "type": "column",
+              "children": [
+                {
+                  "id": "slider-1",
+                  "type": "image_slider",
+                  "props": {
+                    "items": [
+                      {
+                        "id": "slide-1",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "id": "column-3",
+              "type": "column",
+              "children": [
+                {
+                  "id": "text-1",
+                  "type": "editor",
+                  "props": {
+                    "html": "<p>Study and research</p>"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "unsafe-link",
+    "valid": false,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "section-1",
+          "type": "section",
+          "ratios": [
+            1,
+            1,
+            1
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "heading-1",
+                  "type": "headline",
+                  "props": {
+                    "text": "Our university",
+                    "level": 2
+                  }
+                },
+                {
+                  "id": "bad-link",
+                  "type": "button",
+                  "props": {
+                    "label": "Bad",
+                    "href": "javascript:alert(1)"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "column-2",
+              "type": "column",
+              "children": [
+                {
+                  "id": "slider-1",
+                  "type": "image_slider",
+                  "props": {
+                    "items": [
+                      {
+                        "id": "slide-1",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "id": "column-3",
+              "type": "column",
+              "children": [
+                {
+                  "id": "text-1",
+                  "type": "editor",
+                  "props": {
+                    "html": "<p>Study and research</p>"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "unsafe-style",
+    "valid": false,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "section-1",
+          "type": "section",
+          "ratios": [
+            1,
+            1,
+            1
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "heading-1",
+                  "type": "headline",
+                  "props": {
+                    "text": "Our university",
+                    "level": 2
+                  }
+                }
+              ]
+            },
+            {
+              "id": "column-2",
+              "type": "column",
+              "children": [
+                {
+                  "id": "slider-1",
+                  "type": "image_slider",
+                  "props": {
+                    "items": [
+                      {
+                        "id": "slide-1",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "id": "column-3",
+              "type": "column",
+              "children": [
+                {
+                  "id": "text-1",
+                  "type": "editor",
+                  "props": {
+                    "html": "<p>Study and research</p>"
+                  }
+                }
+              ]
+            }
+          ],
+          "style": {
+            "background": "url(evil)"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "name": "unknown-breakpoint",
+    "valid": false,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "section-1",
+          "type": "section",
+          "ratios": [
+            1,
+            1,
+            1
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "heading-1",
+                  "type": "headline",
+                  "props": {
+                    "text": "Our university",
+                    "level": 2
+                  }
+                }
+              ]
+            },
+            {
+              "id": "column-2",
+              "type": "column",
+              "children": [
+                {
+                  "id": "slider-1",
+                  "type": "image_slider",
+                  "props": {
+                    "items": [
+                      {
+                        "id": "slide-1",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "id": "column-3",
+              "type": "column",
+              "children": [
+                {
+                  "id": "text-1",
+                  "type": "editor",
+                  "props": {
+                    "html": "<p>Study and research</p>"
+                  }
+                }
+              ]
+            }
+          ],
+          "responsive": {
+            "desktop": {
+              "gap": "sm"
+            }
+          }
+        }
+      ]
+    }
+  },
+  {
+    "name": "unknown-responsive-property",
+    "valid": false,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "section-1",
+          "type": "section",
+          "ratios": [
+            1,
+            1,
+            1
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "heading-1",
+                  "type": "headline",
+                  "props": {
+                    "text": "Our university",
+                    "level": 2
+                  }
+                }
+              ]
+            },
+            {
+              "id": "column-2",
+              "type": "column",
+              "children": [
+                {
+                  "id": "slider-1",
+                  "type": "image_slider",
+                  "props": {
+                    "items": [
+                      {
+                        "id": "slide-1",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "id": "column-3",
+              "type": "column",
+              "children": [
+                {
+                  "id": "text-1",
+                  "type": "editor",
+                  "props": {
+                    "html": "<p>Study and research</p>"
+                  }
+                }
+              ]
+            }
+          ],
+          "responsive": {
+            "mobile": {
+              "padding": "lg"
+            }
+          }
+        }
+      ]
+    }
+  },
+  {
+    "name": "widget-stack-forbidden",
+    "valid": false,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "section-1",
+          "type": "section",
+          "ratios": [
+            1,
+            1,
+            1
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "heading-1",
+                  "type": "headline",
+                  "props": {
+                    "text": "Our university",
+                    "level": 2
+                  },
+                  "responsive": {
+                    "mobile": {
+                      "stack": true
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "id": "column-2",
+              "type": "column",
+              "children": [
+                {
+                  "id": "slider-1",
+                  "type": "image_slider",
+                  "props": {
+                    "items": [
+                      {
+                        "id": "slide-1",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "id": "column-3",
+              "type": "column",
+              "children": [
+                {
+                  "id": "text-1",
+                  "type": "editor",
+                  "props": {
+                    "html": "<p>Study and research</p>"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "responsive-spacing-stack",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "section-1",
+          "type": "section",
+          "ratios": [
+            1,
+            1,
+            1
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "heading-1",
+                  "type": "headline",
+                  "props": {
+                    "text": "Our university",
+                    "level": 2
+                  },
+                  "style": {
+                    "gap": "sm"
+                  },
+                  "responsive": {
+                    "mobile": {
+                      "gap": "none"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "id": "column-2",
+              "type": "column",
+              "children": [
+                {
+                  "id": "slider-1",
+                  "type": "image_slider",
+                  "props": {
+                    "items": [
+                      {
+                        "id": "slide-1",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "Campus",
+                        "caption": "Campus life"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "id": "column-3",
+              "type": "column",
+              "children": [
+                {
+                  "id": "text-1",
+                  "type": "editor",
+                  "props": {
+                    "html": "<p>Study and research</p>"
+                  }
+                }
+              ]
+            }
+          ],
+          "style": {
+            "gap": "md"
+          },
+          "responsive": {
+            "mobile": {
+              "gap": "lg"
+            },
+            "tablet": {
+              "stack": true
+            }
+          }
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-hero_image",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "hero_image",
+                  "props": {
+                    "asset_id": "00000000-0000-4000-8000-000000000001",
+                    "alt": "example",
+                    "title": "example"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-image_slider",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "image_slider",
+                  "props": {
+                    "items": [
+                      {
+                        "id": "item-example",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "example",
+                        "caption": "example"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-image_grid",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "image_grid",
+                  "props": {
+                    "items": [
+                      {
+                        "id": "item-example",
+                        "asset_id": "00000000-0000-4000-8000-000000000001",
+                        "alt": "example",
+                        "caption": "example"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-layout_slider",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "layout_slider",
+                  "props": {
+                    "items": [
+                      {
+                        "id": "item-example",
+                        "children": [
+                          {
+                            "id": "item-example",
+                            "type": "hero_image",
+                            "props": {
+                              "asset_id": "00000000-0000-4000-8000-000000000001",
+                              "alt": "example",
+                              "title": "example"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-simple_masonry",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "simple_masonry",
+                  "props": {
+                    "items": [
+                      {
+                        "id": "item-example",
+                        "children": [
+                          {
+                            "id": "item-example",
+                            "type": "hero_image",
+                            "props": {
+                              "asset_id": "00000000-0000-4000-8000-000000000001",
+                              "alt": "example",
+                              "title": "example"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-anything_carousel",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "anything_carousel",
+                  "props": {
+                    "items": [
+                      {
+                        "id": "item-example",
+                        "children": [
+                          {
+                            "id": "item-example",
+                            "type": "hero_image",
+                            "props": {
+                              "asset_id": "00000000-0000-4000-8000-000000000001",
+                              "alt": "example",
+                              "title": "example"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-lottie_player",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "lottie_player",
+                  "props": {
+                    "animation_code": "item-example",
+                    "loop": false
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-video_player",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "video_player",
+                  "props": {
+                    "provider": "youtube",
+                    "video_id": "example",
+                    "title": "example"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-image",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "image",
+                  "props": {
+                    "asset_id": "00000000-0000-4000-8000-000000000001",
+                    "alt": "example"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-button",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "button",
+                  "props": {
+                    "label": "example",
+                    "href": "/about"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-button_grid",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "button_grid",
+                  "props": {
+                    "items": [
+                      {
+                        "id": "item-example",
+                        "label": "example",
+                        "href": "/about"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-contact_form",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "contact_form",
+                  "props": {
+                    "form_code": "item-example",
+                    "submit_label": "example"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-tabs",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "tabs",
+                  "props": {
+                    "items": [
+                      {
+                        "id": "item-example",
+                        "title": "example",
+                        "text": "example"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-accordion",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "accordion",
+                  "props": {
+                    "items": [
+                      {
+                        "id": "item-example",
+                        "title": "example",
+                        "text": "example"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-call_to_action",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "call_to_action",
+                  "props": {
+                    "title": "example",
+                    "text": "example"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-headline",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "headline",
+                  "props": {
+                    "text": "example",
+                    "level": 2
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-editor",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "editor",
+                  "props": {
+                    "html": "example"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-blog",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "blog",
+                  "props": {
+                    "source": "posts",
+                    "limit": 1
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-recent_posts",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "recent_posts",
+                  "props": {
+                    "source": "posts",
+                    "limit": 1
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-post_carousel",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "post_carousel",
+                  "props": {
+                    "source": "posts",
+                    "limit": 1
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-testimonials",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "testimonials",
+                  "props": {
+                    "text": "example",
+                    "attribution": "example"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-author_box",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "author_box",
+                  "props": {
+                    "title": "example",
+                    "text": "example"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-features",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "features",
+                  "props": {
+                    "items": [
+                      {
+                        "id": "item-example",
+                        "title": "example",
+                        "text": "example"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-taxonomy",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "taxonomy",
+                  "props": {
+                    "taxonomy_code": "item-example",
+                    "limit": 1
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-icon",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "icon",
+                  "props": {
+                    "icon": "school",
+                    "label": "example"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-price_table",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "price_table",
+                  "props": {
+                    "title": "example",
+                    "price": "example",
+                    "items": [
+                      {
+                        "id": "item-example",
+                        "text": "example"
+                      }
+                    ],
+                    "label": "example",
+                    "href": "/about"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-google_maps",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "google_maps",
+                  "props": {
+                    "latitude": -90,
+                    "longitude": -180,
+                    "zoom": 1,
+                    "title": "example"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-social_media_buttons",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "social_media_buttons",
+                  "props": {
+                    "items": [
+                      {
+                        "id": "item-example",
+                        "label": "example",
+                        "href": "/about"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-site_logo",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "site_logo",
+                  "props": {}
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-site_title",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "site_title",
+                  "props": {}
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-page_title",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "page_title",
+                  "props": {}
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-menu",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "menu",
+                  "props": {
+                    "menu_code": "item-example"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-breadcrumbs",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "breadcrumbs",
+                  "props": {}
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-loop_grid",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "loop_grid",
+                  "props": {
+                    "source": "posts",
+                    "limit": 1
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-loop_carousel",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "loop_carousel",
+                  "props": {
+                    "source": "posts",
+                    "limit": 1
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-taxonomy_filter",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "taxonomy_filter",
+                  "props": {
+                    "taxonomy_code": "item-example",
+                    "limit": 1
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-post_title",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "post_title",
+                  "props": {}
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-post_excerpt",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "post_excerpt",
+                  "props": {}
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-featured_image",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "featured_image",
+                  "props": {}
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-alert",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "alert",
+                  "props": {
+                    "text": "example",
+                    "severity": "info"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-table_of_contents",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "table_of_contents",
+                  "props": {
+                    "title": "example",
+                    "max_level": 2
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-menu_anchor",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "menu_anchor",
+                  "props": {
+                    "anchor": "example"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "catalog-countdown",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "countdown",
+                  "props": {
+                    "ends_at": "2030-01-01T00:00:00Z",
+                    "label": "example"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+]

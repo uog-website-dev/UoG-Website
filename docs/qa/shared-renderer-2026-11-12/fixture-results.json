@@ -1,0 +1,23 @@
+{
+  "date": "2026-11-12",
+  "shared_entry": "frontend/packages/ui/src/public-page.tsx#PublicPageView → visual-layout.tsx#VisualLayoutView",
+  "catalog_fixtures": 43,
+  "structure_parity": "public vs privateMediaBase preview compared via data-layout-version / data-widget-type / data-node-id signatures",
+  "interactive_widgets": {
+    "image_slider": "Previous/Next navigation; 1 of N live region; public uses /api/v1/site-context/media/; preview uses privateMediaBase",
+    "tabs": "role=tablist with aria-selected; only active panel text visible",
+    "accordion": "details/summary disclosures; first panel open initially"
+  },
+  "integration_fallback": [
+    "lottie_player", "contact_form", "blog", "recent_posts", "post_carousel", "taxonomy",
+    "site_logo", "site_title", "menu", "breadcrumbs", "loop_grid", "loop_carousel",
+    "taxonomy_filter", "post_title", "post_excerpt", "featured_image", "table_of_contents"
+  ],
+  "legacy_and_unsupported": {
+    "legacy_blocks": "BlockList path when metadata.visual_layout absent",
+    "unknown_schema": "layout_unavailable status; does not expose stale legacy blocks",
+    "empty_rows": "status: This page has no visual content yet.",
+    "sibling_isolation": "blog unavailable status leaves headline and safe button intact"
+  },
+  "public_url_policy": "public markup contains site-context media URLs only; no /admin or preview-media paths"
+}

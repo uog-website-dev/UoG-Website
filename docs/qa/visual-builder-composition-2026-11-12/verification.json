@@ -1,0 +1,32 @@
+{
+  "story": "P3-FE-BUILDER composition — pointer and keyboard insert/reorder/remove",
+  "date": "2026-11-12",
+  "implementation": [
+    "frontend/apps/admin-web/src/sites/visual-builder-model.ts",
+    "frontend/apps/admin-web/src/sites/visual-builder.tsx"
+  ],
+  "suites": {
+    "composition_model_and_shell": {
+      "passed": 19,
+      "failed": 0,
+      "junit": "composition.xml"
+    }
+  },
+  "acceptance": {
+    "pointer_keyboard_same_order": "pass",
+    "invalid_drop_preserves_structure": "pass",
+    "focus_after_edits": "pass",
+    "column_placement_both_modes": "pass",
+    "column_resize_guard_or_clear": "pass",
+    "duplicate_section_fresh_ids": "pass"
+  },
+  "coverage": {
+    "pointer": "row and widget HTML5 drag/drop onto page and column lists",
+    "keyboard": "row/widget ↑↓, Add here, Duplicate, Remove with announcements",
+    "invalid_drop": "row-into-column nesting blocked; missing targets unchanged",
+    "column_resize": "occupied trailing columns reported; empty trailing removable"
+  },
+  "waivers": [
+    "Full Keycloak/Admin/portal browser E2E unavailable in this checkout (same as visual-builder shell pack)."
+  ]
+}

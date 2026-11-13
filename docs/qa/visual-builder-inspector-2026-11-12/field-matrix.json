@@ -1,0 +1,32 @@
+{
+  "story": "P3-FE-BUILDER inspector — registry-driven properties",
+  "date": "2026-11-12",
+  "controls": {
+    "text": ["headline.text", "editor.html", "tabs.items[].title|text", "accordion.items[].title|text", "features.items[].title|text", "alert.text"],
+    "links": ["button.href", "button_grid.items[].href", "call_to_action.href", "price_table.href", "social_media_buttons.items[].href"],
+    "media": ["image.asset_id+alt", "hero_image.asset_id+alt", "image_slider.items[].asset_id+alt+caption", "image_grid.items[].asset_id+alt+caption", "featured_image (site)"],
+    "style_tokens": {
+      "align": ["start", "center", "end"],
+      "tone": ["default", "muted", "brand"],
+      "gap": ["none", "sm", "md", "lg"]
+    },
+    "provider_settings": ["video_player.provider+video_id", "google_maps.latitude+longitude+zoom", "blog|recent_posts|post_carousel.source+limit", "contact_form.form_code"],
+    "repeaters": {
+      "slides": "image_slider.items / layout_slider.items",
+      "questions": "accordion.items",
+      "tabs": "tabs.items",
+      "gallery_images": "image_grid.items",
+      "metrics": "features.items / price_table.items"
+    }
+  },
+  "disallowed_outside_contract": ["raw script tags", "inline event handlers", "free-form CSS properties", "javascript: destinations"],
+  "error_mapping": {
+    "client": "InspectorFields local safe-link check + fieldMessages(errors, path)",
+    "server": "validateVisualLayout / layout_contract reject → serverFields merged into inspector errors",
+    "path_helper": "widgetPropsPath(layout, widgetId)"
+  },
+  "focus": {
+    "media_picker": "mediaInvoker + MediaPickerDialog returnFocusRef restores Choose ready image control",
+    "canvas": "updateNode mutates selected props in place; inspector keyed by entry.id so input focus is retained"
+  }
+}

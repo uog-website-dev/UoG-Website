@@ -36,7 +36,9 @@ def test_planned_seeded_capabilities_are_not_advertised_as_usable(owner):
     assert cms.configuration_schema == empty_module_schema()
     assert not capability_is_shipped("CMS")
     assert not usable_modules().filter(code__in=INITIAL_CODES).exists()
-    assert set(usable_modules().values_list("code", flat=True)) == {"PAGES", "POSTS", "MENUS"}
+    assert set(usable_modules().values_list("code", flat=True)) == {
+        "PAGES", "POSTS", "MENUS", "VISUAL_BUILDER",
+    }
     assert not any(field.name == "module_code" for field in Site._meta.local_fields)
     source = Path(usable_modules.__code__.co_filename).read_text(encoding="utf-8")
     assert not any(code in source for code in INITIAL_CODES)

@@ -42,7 +42,7 @@ def test_site_fields_owner_and_organization_independence(site, owners):
     assert not owners[2].sites.exists()  # A unit needs no digital property.
     assert str(site) == "Informatics Website"
     assert site.template_id is None
-    assert not {"organization_type", "parent", "domain", "homepage", "theme"} & {field.name for field in Site._meta.fields}
+    assert not {"organization_type", "parent", "domain", "theme"} & {field.name for field in Site._meta.fields}
     assert not {"site", "configuration", "default_language"} & {field.name for field in OrganizationUnit._meta.fields}
     assert Site.objects.create(organization_unit=owners[1], code="RESEARCH_PORTAL", name="Another digital property").pk != site.pk
 

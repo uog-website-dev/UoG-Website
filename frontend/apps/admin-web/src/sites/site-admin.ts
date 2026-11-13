@@ -10,10 +10,10 @@
 export const CENTRAL_MODULE_PERMISSION = "platform.sites.manage_registry";
 
 export interface SiteSection {
-  key: "dashboard" | "pages" | "posts" | "menus" | "media" | "users";
+  key: "dashboard" | "pages" | "builder" | "homepage" | "posts" | "menus" | "media" | "users";
   label: string;
-  segment: "" | "pages" | "posts" | "menus" | "media" | "users";
-  module: "PAGES" | "POSTS" | "MENUS" | "MEDIA" | null;
+  segment: "" | "pages" | "builder" | "homepage" | "posts" | "menus" | "media" | "users";
+  module: "PAGES" | "POSTS" | "MENUS" | "MEDIA" | "VISUAL_BUILDER" | null;
   permissions: readonly string[];
 }
 
@@ -36,6 +36,20 @@ export const SITE_SECTIONS: readonly SiteSection[] = [
       "content.pages.update",
       "content.pages.publish",
     ],
+  },
+  {
+    key: "builder",
+    label: "Visual Builder",
+    segment: "builder",
+    module: "VISUAL_BUILDER",
+    permissions: ["content.pages.update"],
+  },
+  {
+    key: "homepage",
+    label: "Homepage Settings",
+    segment: "homepage",
+    module: "PAGES",
+    permissions: ["sites.update"],
   },
   {
     key: "posts",
@@ -73,9 +87,13 @@ export interface SiteAccessInput {
   permissions: readonly string[];
 }
 
-export function sectionByKey(key: SiteSection["key"]): SiteSection {
-  const section = SITE_SECTIONS.find((item) => item.key === key);
-  if (!section) throw new Error("Unknown site section.");
+export function findSiteSection(key: string): SiteSection | null {
+  return SITE_SECTIONS.find((item) => item.key === key) ?? null;
+}
+
+export function sectionByKey(key: SiteSection["key"] | string): SiteSection {
+  const section = findSiteSection(key);
+  if (!section) throw new Error(`Unknown site section: ${key}`);
   return section;
 }
 
@@ -101,6 +119,13 @@ export function siteAdminHref(siteId: number, segment: SiteSection["segment"] = 
     throw new Error("A site administration link needs one Site id.");
   }
   return segment ? `/sites/${siteId}/admin/${segment}` : `/sites/${siteId}/admin`;
+}
+
+export function isSiteSectionActive(section:SiteSection,siteId:number,path:string):boolean {
+  const canvas=path.startsWith(`${siteAdminHref(siteId,"pages")}/`) && path.endsWith("/builder");
+  if(canvas)return section.key==="builder";
+  const href=siteAdminHref(siteId,section.segment);
+  return path===href || Boolean(section.segment && path.startsWith(`${href}/`));
 }
 
 /** Switching Sites always opens that Site's dashboard so forms are not carried over. */

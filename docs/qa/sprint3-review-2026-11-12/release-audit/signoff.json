@@ -1,0 +1,9 @@
+{
+  "status": "UNSIGNED",
+  "QA Lead": null,
+  "Technical Lead": null,
+  "Product Owner": null,
+  "hosted_ci_run": null,
+  "waivers": [],
+  "note": "Only actual reviewers may populate signatures; checksums do not constitute sign-off."
+}

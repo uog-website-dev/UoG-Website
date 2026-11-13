@@ -47,6 +47,23 @@ describe("DataTable", () => {
     expect(headers.map((h) => h.textContent)).toEqual(["Code", "Name"]);
   });
 
+  it("supports multi-select for bulk actions", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    renderTable({
+      selection: {
+        selected: new Set([1]),
+        onChange,
+        getCheckboxLabel: (row) => `Select ${row.name}`,
+      },
+    });
+    expect((screen.getByRole("checkbox", { name: "Select University of Gondar" }) as HTMLInputElement).checked).toBe(true);
+    await user.click(screen.getByRole("checkbox", { name: "Select College of Informatics" }));
+    expect(onChange).toHaveBeenCalled();
+    const next = onChange.mock.calls.at(-1)?.[0] as Set<number>;
+    expect([...next].sort()).toEqual([1, 2]);
+  });
+
   it("renders one row per record", () => {
     renderTable();
     expect(screen.getAllByRole("row")).toHaveLength(rows.length + 1); // + header

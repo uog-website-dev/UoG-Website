@@ -1,0 +1,17 @@
+{
+  "checklist.json": "e6ea26806768070ba056a82e73345c0d1985ec48cdf676564d878ff4a93e2119",
+  "defects.md": "f382ce35a7050e955bf4bfb72e2b87f4d538fb9a2b8186f8b8dff0c7de1939f4",
+  "environment.json": "477ac893a0ee5dc82e643d26c2e957bcb70c1a6a16444597c90a645b71ddf202",
+  "integrated.log": "7d064cafd439fc2a994f9c1b253bf0f7b464cb15fe620341d8b535d9d5d18465",
+  "integrated.xml": "f342fa0f50153a2247f1f4d725ee65d07601607d8f279da175ebf6c9a5972d25",
+  "layout_contract.log": "5c7f98edd5680884d225ad06b8161eeab70a6b9b10d9dbdcaa4a2bfc77005304",
+  "live-services-probe.json": "40faaf2951b7d0844246064f426525a67f23f6d63ebc7156c20018b5525043a9",
+  "openapi-docs.xml": "77e58da9e29fbbe6f746a122f5340b8f3574498f5b8561acc277cc38badc7c28",
+  "openapi.log": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+  "openapi.yaml": "1c757d31d9b3bca12a44dee12c71e2a9d2089f72df9472bd785edf574c22fce9",
+  "openapi_docs.log": "fba3fafc05dcba32ec9f24a8ed111c367fe6944aa3ba7ba4cd375cc3913a7f2d",
+  "prototype-walkthrough/README.md": "a433b25539eea1949274e614ffebfd5aa824a77cec3e9cb9b8faed8fc6462f17",
+  "report.md": "8f401df16560ec80776f7b848932babfd52be39aea91702dfb59899a13e22b2e",
+  "results.json": "de1b858f5ea0f0136782b2068069c5d54f8d1a731b4a9b8b6a16a9b4e888dc49",
+  "verification.json": "2808c305c9355d1b5a833965a07392640b2d72c29e9d7105d102ea2ff01bcc84"
+}

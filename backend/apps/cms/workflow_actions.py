@@ -34,6 +34,8 @@ def available_workflow_actions(content, request):
         content_roles = roles_by_site[content.site_id]
 
     actions = []
+    if content.status == ContentStatus.APPROVED and "visual_layout" in content.metadata and ContentRole.AUTHOR in content_roles:
+        actions.append("revise")
     if content.status == ContentStatus.DRAFT and ContentRole.AUTHOR in content_roles:
         actions.append("submit")
     if (

@@ -2,7 +2,7 @@
 from contextlib import contextmanager
 
 from django.core.cache import cache
-from django.db import DEFAULT_DB_ALIAS
+from django.db import DEFAULT_DB_ALIAS, transaction
 from django.db.models import F
 from django.utils import timezone
 
@@ -54,8 +54,10 @@ def bump_publication_version(site_id, locale, *, path, using=DEFAULT_DB_ALIAS):
     old_page_key = public_cache_key(
         site_id, locale, f"page:{path}", version=previous_version,
     )
-    with _site_cache_scope(site_id):
-        cache.delete(old_page_key)
+    def invalidate():
+        with _site_cache_scope(site_id):
+            cache.delete(old_page_key)
+    transaction.on_commit(invalidate, using=using, robust=True)
     return version.version
 
 

@@ -63,6 +63,7 @@ export default async function SiteAdminLayout({ children, params }: SiteAdminLay
         defaultLanguage: site.default_language,
         enabledLanguages: site.configuration.language.enabled,
         primaryDomain: site.primary_domain,
+        homepageId: site.homepage ?? null,
       }}
       enabledModuleCodes={assignments.ok ? enabledModuleCodes(assignments.data.results, site.id) : []}
       permissions={permissions}

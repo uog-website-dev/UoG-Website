@@ -1,0 +1,22 @@
+{
+  "story": "visual-responsive-breakpoints",
+  "date": "2026-11-12",
+  "status": "PASS",
+  "acceptance": {
+    "overrides_scoped_and_resettable": "PASS",
+    "invalid_tokens_fail_validation": "PASS",
+    "mobile_spacing_preview_public_parity": "PASS"
+  },
+  "evidence": [
+    "precedence-matrix.json",
+    "parity-fixtures.json",
+    "backend.xml",
+    "ui-responsive.xml",
+    "report.md"
+  ],
+  "suites": {
+    "backend_layout_contract": "PASS",
+    "ui_responsive_layout": "PASS",
+    "admin_visual_builder": "PASS (21/21 including mobile spacing inherit reset)"
+  }
+}

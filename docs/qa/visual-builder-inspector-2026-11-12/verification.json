@@ -1,0 +1,50 @@
+{
+  "story": "P3-FE-BUILDER inspector — registry-driven properties, media binding and safe links",
+  "date": "2026-11-12",
+  "implementation": [
+    "frontend/apps/admin-web/src/sites/visual-builder-inspector.tsx",
+    "frontend/apps/admin-web/src/sites/visual-builder-model.ts",
+    "frontend/apps/admin-web/src/sites/visual-builder.tsx"
+  ],
+  "dependencies": [
+    "P3-FE-BUILDER-001",
+    "P3-FE-MEDIA-003",
+    "P3-BUILDER-001"
+  ],
+  "suites": {
+    "inspector_model_composition": {
+      "passed": 12,
+      "failed": 0,
+      "junit": "inspector.xml",
+      "breakdown": {
+        "visual-builder-inspector.test.tsx": 4,
+        "visual-builder-model.test.ts": 3,
+        "visual-builder-composition.test.ts": 5
+      }
+    }
+  },
+  "acceptance": {
+    "property_updates_target_node": "pass",
+    "invalid_url_token_actionable_errors": "pass",
+    "media_persists_asset_id_preserves_fields": "pass",
+    "slide_fields_survive_reorder": "pass",
+    "unsafe_button_validation_message": "pass",
+    "live_canvas_without_losing_inspector_focus": "pass"
+  },
+  "attachments": {
+    "field_matrix": "field-matrix.json",
+    "repeater_tests": "repeater-tests.json",
+    "safe_link_fixtures": "safe-link-fixtures.json",
+    "media_picker_integration": "MediaPickerDialog returnFocusRef via mediaInvoker in visual-builder.tsx",
+    "unsafe_input_results": "safe-link-fixtures.json + inspector unsafe Button cases"
+  },
+  "coverage": {
+    "registry_controls": "InspectorFields driven by schemaFor(type) for text, enum tokens, media, href, arrays",
+    "repeaters": "add / move up / move down / remove for image_slider items",
+    "errors": "client isSafeLink + server validateVisualLayout merged into inspector errors",
+    "focus": "inspector key=entry.id; media picker restores invoker focus"
+  },
+  "waivers": [
+    "Full Keycloak/Admin/portal browser E2E unavailable in this checkout (same as visual-builder shell pack)."
+  ]
+}

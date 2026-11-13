@@ -1,11 +1,14 @@
 # Module registry
 
 Implementation date: 2026-10-27 (content codes added 2026-10-29 by
-P2-CMS-001; PAGES shipped by P2-CMS-006). `Module` is the platform catalog of
-capabilities. Sites do not invent module names. Pages, Media, Staff
-directory, Academics, News and announcements, Events, Job notice board,
-Search and Analytics are registry rows. POSTS and MENUS are implemented; their
-global switches stay off until an operator enables them.
+P2-CMS-001; PAGES shipped by P2-CMS-006; VISUAL_BUILDER shipped 2026-11-12).
+`Module` is the platform catalog of capabilities. Sites do not invent module
+names. Pages, Media, Staff directory, Academics, News and announcements,
+Events, Job notice board, Search and Analytics are registry rows. POSTS,
+MENUS and VISUAL_BUILDER are implemented; platform operators enable their
+global switches, then Site administrators enable them per Site.
+VISUAL_BUILDER requires PAGES on the same Site and drives the Visual Builder
+admin menu.
 
 ## Fields
 

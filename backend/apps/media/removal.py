@@ -45,6 +45,9 @@ def remove_asset(actor,site_id,asset_id,*,using="default"):
         asset=MediaAsset.objects.using(using).select_for_update().filter(pk=asset_id,site_id=site_id).first()
         if asset is None: raise Http404("Asset not found.")
         if asset.deleted_at is not None: return asset,MediaCleanup.objects.using(using).get(asset=asset)
+        logo = asset.site.configuration.get("identity", {}).get("logo_ref")
+        if logo in {str(asset.pk), asset.pk.hex}:
+            raise Conflict("Asset is assigned as this Site's logo.")
         if asset.references.exists() or MediaUsage.objects.using(using).filter(asset=asset).exists():
             raise Conflict("Asset is still referenced by a draft, publication or placement.")
         asset.deleted_at=timezone.now();asset.deleted_by=actor;asset.updated_by=actor;asset.status="ARCHIVED"
