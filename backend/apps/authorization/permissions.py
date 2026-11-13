@@ -163,6 +163,10 @@ def _assignment_scope(request, action, object_pk):
     from .models import UserRoleAssignment
     from apps.sites.models import Site
 
+    if action == "site_create_user":
+        site_id = _positive_id(request.data.get("site"))
+        site = Site.objects.filter(pk=site_id).only("pk", "organization_unit_id").first()
+        return (site.organization_unit_id,site.pk) if site else (None,None)
     if action == "create":
         payload = request.data if isinstance(request.data, dict) else {}
         scope = payload.get("scope")

@@ -1,0 +1,3 @@
+Allow Site Administrators to create a Keycloak-backed account and assign one approved Site membership from Users. Preserve add-existing-user, enforce database-backed Site delegation, validate passwords/uniqueness and normalize private optional profile pictures. Block incomplete provisioning from authenticating and provide scoped audit events and operator recovery.
+
+Add the reversible AccountProfile migration, strict create API/OpenAPI contract, accessible form, directory avatars and configuration guidance. Backend, component, real Keycloak/browser, migration and build evidence is linked in README.md. Independent review and Azure DevOps Issue association remain pending.

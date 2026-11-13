@@ -522,6 +522,29 @@ def report_logout() -> int:
     return 0
 
 
+def ensure_site_provisioner(token):
+    """Dedicated backend service account with user-management permissions only."""
+    secret=os.environ.get("ACCOUNT_PROVISIONING_SECRET","")
+    if not secret:
+        log("Site user provisioning disabled: no service secret configured.")
+        return
+    client_id="site-user-provisioner"
+    rows=request(f"{KC_URL}/admin/realms/{REALM}/clients?clientId={client_id}",token=token)
+    body={"clientId":client_id,"secret":secret,"enabled":True,"protocol":"openid-connect",
+          "publicClient":False,"serviceAccountsEnabled":True,"standardFlowEnabled":False,
+          "directAccessGrantsEnabled":False,"implicitFlowEnabled":False,"fullScopeAllowed":False}
+    if not rows:
+        request(f"{KC_URL}/admin/realms/{REALM}/clients",method="POST",token=token,body=body)
+    client=find_client(token,client_id)
+    request(f"{KC_URL}/admin/realms/{REALM}/clients/{client['id']}",method="PUT",token=token,body=body)
+    service=request(f"{KC_URL}/admin/realms/{REALM}/clients/{client['id']}/service-account-user",token=token)
+    management=find_client(token,"realm-management")
+    roles=[request(f"{KC_URL}/admin/realms/{REALM}/clients/{management['id']}/roles/{name}",token=token) for name in ("manage-users","view-users","query-users")]
+    request(f"{KC_URL}/admin/realms/{REALM}/users/{service['id']}/role-mappings/clients/{management['id']}",method="POST",token=token,body=roles)
+    request(f"{KC_URL}/admin/realms/{REALM}/clients/{client['id']}/scope-mappings/clients/{management['id']}",method="POST",token=token,body=roles)
+    log("Site user provisioning service account reconciled.")
+
+
 def main() -> int:
     wait_for_keycloak()
     token = admin_token()
@@ -535,6 +558,7 @@ def main() -> int:
     user_id = ensure_dev_user(token)
     ensure_dev_user_roles(token, user_id)
     ensure_post_logout_uris(token)
+    ensure_site_provisioner(token)
     smoke_test(token)
     log("Keycloak bootstrap complete.")
     return 0

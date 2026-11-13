@@ -1,0 +1,22 @@
+{
+  "run": "staff-ca2d109a32",
+  "browser": "157.0.4341.46",
+  "results": [
+    {
+      "name": "Accessible responsive form, optional picture and Site-only role options",
+      "status": "PASS"
+    },
+    {
+      "name": "Create user completes and directory shows role and normalized profile image",
+      "status": "PASS"
+    },
+    {
+      "name": "Duplicate account returns field errors without losing form input",
+      "status": "PASS"
+    },
+    {
+      "name": "New account signs in with provided credentials and reaches its Site workspace",
+      "status": "PASS"
+    }
+  ]
+}

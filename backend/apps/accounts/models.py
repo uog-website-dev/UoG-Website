@@ -42,3 +42,14 @@ class OIDCIdentity(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user} ({self.issuer})"
+
+
+class AccountProfile(models.Model):
+    """Private, normalized avatar and fail-closed provisioning lifecycle."""
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="account_profile")
+    state = models.CharField(max_length=12, choices=[("PENDING", "Pending"), ("ACTIVE", "Active"), ("FAILED", "Failed")], default="PENDING")
+    picture = models.BinaryField(blank=True, default=bytes)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [models.CheckConstraint(condition=models.Q(state__in=["PENDING", "ACTIVE", "FAILED"]), name="account_profile_valid_state")]

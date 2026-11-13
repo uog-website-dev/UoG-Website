@@ -1,0 +1,16 @@
+
+> @uog/admin-web@0.1.0 test /workspace/apps/admin-web
+> vitest run --reporter\=default src/sites/site-user-create.test.tsx
+
+
+ RUN  v5.0.5 /workspace/apps/admin-web
+
+ ? src/sites/site-user-create.test.tsx (5 tests) 1913ms
+   ? requires a Site role before calling the server 422ms
+   ? retains existing-user search and Site-only assignment flow 861ms
+
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+   Start at  17:37:51
+   Duration  4.06s (tests 49%, import 21%, environment 17%, transform 8%, setup 5%)
+

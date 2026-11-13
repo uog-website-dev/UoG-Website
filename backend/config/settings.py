@@ -308,6 +308,10 @@ OIDC_ALLOWED_ALGORITHMS = config(
 OIDC_LEEWAY_SECONDS = config("OIDC_LEEWAY_SECONDS", default=30, cast=int)
 OIDC_JWKS_CACHE_SECONDS = config("OIDC_JWKS_CACHE_SECONDS", default=300, cast=int)
 OIDC_HTTP_TIMEOUT_SECONDS = config("OIDC_HTTP_TIMEOUT_SECONDS", default=10, cast=int)
+ACCOUNT_PROVISIONING_URL = config("ACCOUNT_PROVISIONING_URL", default="http://keycloak:8080")
+ACCOUNT_PROVISIONING_SECRET = config("ACCOUNT_PROVISIONING_SECRET", default="")
+ACCOUNT_PICTURE_MAX_BYTES = 2 * 1024 * 1024
+DATA_UPLOAD_MAX_MEMORY_SIZE = 4 * 1024 * 1024
 # Keycloak roles that make a local account a staff account.
 OIDC_STAFF_ROLES = config("OIDC_STAFF_ROLES", default="platform-admin", cast=Csv())
 

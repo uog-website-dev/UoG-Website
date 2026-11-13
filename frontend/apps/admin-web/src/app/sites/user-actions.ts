@@ -38,6 +38,7 @@ export interface SiteDirectoryUser {
   user_email: string;
   user_first_name: string;
   user_last_name: string;
+  profile_picture?: string;
   assignments: SiteAssignment[];
 }
 export interface SiteIdentity { id: number; username: string; email: string; first_name: string; last_name: string; assigned_role_ids: number[] }
@@ -61,4 +62,29 @@ export async function assignSiteRole(siteId: number, organizationId: number, use
 }
 export async function revokeSiteRole(assignmentId: number) {
   return request<SiteAssignment>(`/v1/authorization/assignments/${assignmentId}/revoke/`, { method: "POST", body: "{}" });
+}
+
+export async function createSiteUser(siteId: number, form: FormData): Promise<{ok:true;username:string} | {ok:false;message:string;errors:Record<string,string>}> {
+  const token = await getAccessToken();
+  if (!token) return {ok:false,message:"Your session has expired. Sign in again.",errors:{}};
+  const values: Record<string,unknown> = {site:siteId};
+  for (const field of ["username","email","password","password_confirmation","role"]) values[field]=String(form.get(field) ?? "");
+  const picture=form.get("profile_picture");
+  if (picture instanceof File && picture.size) {
+    if (picture.size > 2*1024*1024) return {ok:false,message:"Check the profile picture.",errors:{profile_picture:"Choose an image up to 2 MiB."}};
+    values.profile_picture=Buffer.from(await picture.arrayBuffer()).toString("base64");
+  }
+  try {
+    const response=await fetch(`${api}/v1/authorization/assignments/site-create-user/`,{method:"POST",cache:"no-store",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},body:JSON.stringify(values)});
+    const body=await response.json().catch(()=>null);
+    if (response.ok) return {ok:true,username:body.user_name};
+    const detail=body?.error?.details ?? body;
+    const errors:Record<string,string>={};
+    if (detail && typeof detail==="object") for (const field of ["username","email","password","password_confirmation","role","profile_picture","site"]) {
+      if (detail[field]) errors[field]=Array.isArray(detail[field]) ? detail[field].join(" ") : String(detail[field]);
+    }
+    return {ok:false,message:response.status===403 ? "You cannot create users for this Site." : response.status===503 ? "Account creation is temporarily unavailable. Please try again." : "Could not create the user. Check the highlighted fields.",errors};
+  } catch {
+    return {ok:false,message:"Could not confirm account creation. Refresh the directory before retrying.",errors:{}};
+  }
 }

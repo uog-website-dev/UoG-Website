@@ -5,6 +5,7 @@ import { APP_BASE_PATH } from "./src/base-path";
 const nextConfig: NextConfig = {
   // The admin console is served under /admin by the nginx reverse proxy.
   basePath: APP_BASE_PATH,
+  experimental: { serverActions: { bodySizeLimit: "4mb" } },
   // Dev compiles each screen the first time it is opened. The default cache
   // keeps only a couple of those screens, so moving between menus compiles
   // them again. Hold the console's screens for the session.

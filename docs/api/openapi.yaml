@@ -1673,6 +1673,145 @@ paths:
               schema:
                 type: string
                 format: uuid
+  /api/v1/authorization/assignments/site-create-user/:
+    post:
+      operationId: v1_authorization_assignments_site_create_user_create
+      description: Create a Keycloak identity and one Site-only membership. Requires
+        assign_roles in that Site. No realm roles or privileged flags are accepted.
+        Picture is optional base64 PNG/JPEG/WebP, at most 2 MiB and 4 million pixels,
+        normalized to a private 128px JPEG. Validation returns field errors; provider
+        outages return 503 without Site access.
+      tags:
+      - Authorization
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SiteUserCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SiteUserCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SiteUserCreateRequest'
+        required: true
+      security:
+      - keycloakBearer: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assignment'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          description: Invalid body, malformed input, or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    title:
+                    - This field is required.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '415':
+          description: Unsupported request content type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+      parameters:
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
   /api/v1/authorization/assignments/site-roles/:
     get:
       operationId: v1_authorization_assignments_site_roles_list
@@ -38081,12 +38220,15 @@ components:
           type: string
         user_last_name:
           type: string
+        profile_picture:
+          type: string
         assignments:
           type: array
           items:
             $ref: '#/components/schemas/Assignment'
       required:
       - assignments
+      - profile_picture
       - user
       - user_email
       - user_first_name
@@ -38741,6 +38883,44 @@ components:
       - primary_domain
       - status
       - updated_at
+    SiteUserCreateRequest:
+      type: object
+      properties:
+        site:
+          type: integer
+        role:
+          type: integer
+        username:
+          type: string
+          minLength: 1
+          maxLength: 150
+          pattern: ^[a-zA-Z0-9][a-zA-Z0-9._@+-]{2,149}$
+        email:
+          type: string
+          format: email
+          minLength: 1
+          maxLength: 254
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+          maxLength: 128
+        password_confirmation:
+          type: string
+          writeOnly: true
+          minLength: 1
+          maxLength: 128
+        profile_picture:
+          type: string
+          writeOnly: true
+          maxLength: 2796204
+      required:
+      - email
+      - password
+      - password_confirmation
+      - role
+      - site
+      - username
     SourceEnum:
       enum:
       - global

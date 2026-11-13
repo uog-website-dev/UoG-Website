@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="5" failures="0" errors="0" time="4.155980073">
+    <testsuite name="src/sites/site-user-create.test.tsx" timestamp="2026-11-13T17:29:03.967Z" hostname="5daa56de437b" tests="5" failures="0" errors="0" skipped="0" time="4.155980073">
+        <testcase classname="src/sites/site-user-create.test.tsx" name="requires a Site role before calling the server" time="0.594315091">
+        </testcase>
+        <testcase classname="src/sites/site-user-create.test.tsx" name="creates with explicit Site role and optional picture omitted" time="0.357273717">
+        </testcase>
+        <testcase classname="src/sites/site-user-create.test.tsx" name="preserves inputs and focuses the field on recoverable rejection" time="0.548181107">
+        </testcase>
+        <testcase classname="src/sites/site-user-create.test.tsx" name="rejects password mismatch without submitting" time="0.492933012">
+        </testcase>
+        <testcase classname="src/sites/site-user-create.test.tsx" name="retains existing-user search and Site-only assignment flow" time="2.158514899">
+        </testcase>
+    </testsuite>
+</testsuites>
