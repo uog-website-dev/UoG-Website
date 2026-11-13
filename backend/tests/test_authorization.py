@@ -219,8 +219,33 @@ def test_site_user_directory_and_identity_search_are_site_scoped(actor):
     roles = client.get(f"/api/v1/authorization/assignments/site-roles/?site={site.pk}")
     assert roles.status_code == 200
     role_options = {role["code"]: role for role in roles.json()}
-    assert role_options["reviewer"]["assignable"] is True
-    assert role_options["site-administrator"]["assignable"] is False
+    assert set(role_options) == {
+        "site-administrator",
+        "editor",
+        "publisher",
+        "reviewer",
+        "viewer",
+    }
+    assert "platform-administrator" not in role_options
+    assert "organization-administrator" not in role_options
+    for code in role_options:
+        assert role_options[code]["assignable"] is True
+    assigned = client.post("/api/v1/authorization/assignments/", {
+        "user": other_target.pk,
+        "role": Role.objects.get(code="publisher").pk,
+        "scope": "SITE",
+        "organization": college.pk,
+        "site": site.pk,
+    }, content_type="application/json")
+    assert assigned.status_code == 201, assigned.content
+    blocked = client.post("/api/v1/authorization/assignments/", {
+        "user": other_target.pk,
+        "role": Role.objects.get(code="platform-administrator").pk,
+        "scope": "SITE",
+        "organization": college.pk,
+        "site": site.pk,
+    }, content_type="application/json")
+    assert blocked.status_code == 400
 
 
 def test_last_active_site_administrator_cannot_be_revoked(actor):

@@ -210,7 +210,7 @@ export function SiteDashboard() {
             {canCreatePage ? (
               <Button
                 component={Link}
-                href={`${siteAdminHref(siteId, "pages")}?create=1`}
+                href={`${siteAdminHref(siteId, "pages")}/new`}
                 variant="contained"
                 startIcon={<AddIcon />}
               >

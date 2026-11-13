@@ -13,7 +13,7 @@ describe("ViewPublicSite", () => {
       />,
     );
 
-    const link = screen.getByRole("link", { name: "View Informatics public website at informatics.uog.local" });
+    const link = screen.getByRole("link", { name: "View Public Website for Informatics at informatics.uog.local" });
     expect(link.getAttribute("href")).toBe("//informatics.uog.local/");
     expect(link.getAttribute("target")).toBe("_blank");
     expect(link.getAttribute("rel")).toBe("noopener noreferrer");
@@ -24,7 +24,7 @@ describe("ViewPublicSite", () => {
     render(<ViewPublicSite siteName="Main Site" siteStatus="ACTIVE" primaryDomain={null} />);
 
     expect(screen.getByText(/no usable primary hostname/i)).toBeTruthy();
-    expect(screen.getByRole("button", { name: "View Main Site public website" }).getAttribute("href")).toBeNull();
+    expect(screen.getByRole("button", { name: "View Public Website for Main Site" }).getAttribute("href")).toBeNull();
   });
 
   it("rejects malformed and inactive domains", () => {
@@ -35,7 +35,7 @@ describe("ViewPublicSite", () => {
         primaryDomain={{ hostname: "https://evil.example/path", status: "ACTIVE" }}
       />,
     );
-    expect(screen.getByRole("button", { name: "View Site public website at https://evil.example/path" }).getAttribute("href")).toBeNull();
+    expect(screen.getByRole("button", { name: "View Public Website for Site at https://evil.example/path" }).getAttribute("href")).toBeNull();
 
     rerender(
       <ViewPublicSite
@@ -45,6 +45,6 @@ describe("ViewPublicSite", () => {
       />,
     );
     expect(screen.getByText(/primary hostname is inactive/i)).toBeTruthy();
-    expect(screen.getByRole("button", { name: "View Site public website at site.uog.local" }).getAttribute("href")).toBeNull();
+    expect(screen.getByRole("button", { name: "View Public Website for Site at site.uog.local" }).getAttribute("href")).toBeNull();
   });
 });

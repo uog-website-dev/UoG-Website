@@ -115,8 +115,7 @@ def transition_content(
 
         publish_working_draft = (
             action == "publish"
-            and isinstance(content, Page)
-            and content.draft_of_id
+            and getattr(content, "draft_of_id", None)
         )
         if not publish_working_draft:
             content.status = target
@@ -221,6 +220,8 @@ def _publish_working_draft(draft, *, actor, comment, using, approval=None):
     The published row stays PUBLISHED. Its route and homepage flag stay.
     Callers hold the draft row lock and the workflow write settings.
     """
+    if draft._meta.model_name == "post":
+        return _publish_post_draft(draft, actor=actor, comment=comment, using=using, approval=approval)
     try:
         target = (
             Page.objects.using(using)
@@ -284,6 +285,34 @@ def _publish_working_draft(draft, *, actor, comment, using, approval=None):
     return draft
 
 
+def _publish_post_draft(draft, *, actor, comment, using, approval):
+    from apps.api.models import Post
+    from ..menu_cache import invalidate_post_delivery
+    target = Post.objects.using(using).select_for_update().get(pk=draft.draft_of_id)
+    if target.site_id != draft.site_id or target.locale != draft.locale or target.status != ContentStatus.PUBLISHED:
+        raise ValidationError({"status":"The original article must remain published on this Site and language."})
+    for field in ("title","excerpt","content","excerpt_html","featured_media","seo","author_id","blocks","blocks_version","metadata","submitted_by_id","reviewed_by_id","review_comment"):
+        setattr(target,field,getattr(draft,field))
+    target.updated_by = actor
+    taxonomy = {field:list(getattr(draft,field).all()) for field in ("categories","tags")}
+    with apply_working_draft(), _apply_working_draft_database(using=using):
+        target.save(using=using,taxonomy=taxonomy)
+    _create_publication_snapshot(target,using=using,approval=approval)
+    bump_publication_version(target.site_id,target.locale,path=f"/posts/{target.slug}",using=using)
+    invalidate_post_delivery(target.pk,using=using)
+    record_event(action="CONTENT_PUBLISHED",entity_type="cms.sitecontent",entity_id=str(target.pk),
+                 before=None,after={"working_draft_id":str(draft.pk)},changed_fields=["content","metadata"],using=using)
+    draft.status = ContentStatus.ARCHIVED
+    draft.updated_by = actor
+    draft.save(using=using)
+    ContentWorkflowTransition.objects.using(using).create(
+        content=draft,from_status=ContentStatus.APPROVED,to_status=ContentStatus.ARCHIVED,
+        actor=actor,comment=comment or f"Published onto Post {target.pk}.",
+        revision=ContentRevision.objects.using(using).get(content_id=draft.pk,revision_number=draft.revision_number),
+    )
+    return draft
+
+
 def _action_transition(action, current_status):
     if action == "archive":
         if current_status not in {
@@ -325,6 +354,12 @@ def _content_instance(base, *, using):
 
 
 def _create_publication_snapshot(content, *, using, approval=None):
+    if content._meta.model_name == "post":
+        from apps.api.post_media import validate_post_images
+        from apps.sites.selectors.modules import module_is_available
+        uses = validate_post_images(content, using=using)
+        if uses and not module_is_available(content.site_id, "MEDIA", using=using):
+            raise ValidationError({"media": "MEDIA must be enabled to publish article images."})
     latest = (
         PublishedContentSnapshot.objects.using(using)
         .filter(content_id=content.pk)
@@ -355,6 +390,12 @@ def _create_publication_snapshot(content, *, using, approval=None):
             "parent_id": content.parent_id,
         })
     elif content._meta.model_name == "post":
+        author = content.author
+        author_name = ""
+        if author is not None:
+            author_name = (author.get_full_name() or "").strip() or (
+                getattr(author, "username", "") or ""
+            ).strip()
         payload.update({
             "title": content.title,
             "slug": content.slug,
@@ -362,6 +403,7 @@ def _create_publication_snapshot(content, *, using, approval=None):
             "content": content.content,
             "excerpt_html": content.excerpt_html,
             "author_id": content.author_id,
+            "author": author_name[:255],
             "featured_media": content.featured_media,
             "seo": content.seo,
             "categories": [

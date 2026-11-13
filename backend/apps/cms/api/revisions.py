@@ -229,12 +229,13 @@ class ContentRestorePreconditionRequired(APIException):
 
 def _scoped_content(site_pk, content_id):
     get_object_or_404(Site, pk=site_pk)
-    # A Site that has PAGES disabled cannot manage its Page history.
-    reject_disabled_module(site_pk, "PAGES")
-    return get_object_or_404(
+    content = get_object_or_404(
         SiteContent.objects.select_related("site").filter(site_id=site_pk),
         pk=content_id,
     )
+    post_content = any(hasattr(content, relation) for relation in ("post", "category", "tag"))
+    reject_disabled_module(site_pk, "POSTS" if post_content else "PAGES")
+    return content
 
 
 def _authorize(request, site_id, *, author_only=False):

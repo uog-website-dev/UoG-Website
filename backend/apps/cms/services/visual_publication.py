@@ -26,6 +26,17 @@ def references(layout):
 def approval_for(content, *, using):
     approval=ContentWorkflowTransition.objects.using(using).select_related("revision","reviewed_revision").filter(
         content_id=content.pk,to_status="APPROVED",revision__revision_number=content.revision_number).order_by("-id").first()
+    if content._meta.model_name == "post":
+        from .revisions import revision_snapshot
+        keys = ("title","slug","excerpt","content","excerpt_html","featured_media","seo","categories","tags","metadata","blocks","blocks_version","locale","author_id","draft_of_id")
+        current = revision_snapshot(content)
+        def article_state(payload):
+            return {key:payload.get(key) for key in keys}
+        if (approval is None or approval.reviewed_revision_id is None
+                or article_state(approval.revision.snapshot) != article_state(current)
+                or article_state(approval.reviewed_revision.snapshot) != article_state(current)):
+            raise ValidationError({"status":"The current article revision needs a matching review approval."})
+        return approval
     if not isinstance(content,Page) or "visual_layout" not in content.metadata:
         return approval
     from .revisions import revision_snapshot

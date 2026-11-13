@@ -1,0 +1,13 @@
+# Public category archives
+
+Visitors can follow a published news card's category to `/posts/categories/{slug}`. The archive uses the same responsive cards, Site hostname, Post detail routes and publication ordering as `/posts`. It has an All news link, keyboard-operable pagination, a category heading and an intentional empty state. Empty results can mean that the category has no eligible articles or that an optional tag filter matches none.
+
+The API is `GET /api/v1/site-context/posts/categories/{category_slug}/`. Its response extends the existing news page envelope (`count`, `next`, `previous`, `results`) with `category: {id, code, name, slug}`. Article fields are unchanged. The shared published-Post selector excludes drafts, unpublished Posts, future publications and working copies, orders by latest snapshot publication time and descending stable ID, and applies distinct results across taxonomy joins.
+
+Categories must belong to the hostname-resolved Site and enabled locale, be active, have PUBLISHED workflow status and a publication timestamp that is not in the future. Publish a category through the existing taxonomy review workflow before advertising its archive. Existing draft categories remain usable by authorized editors but are not public archive destinations. News list/detail responses recheck category link eligibility even when their article snapshot payload is cached. Category changes do not rewrite the approved article text or copy taxonomy labels into a new workflow.
+
+The archive accepts optional `locale`, `tag`, `page` and `page_size`. Defaults are page 1 and 20 articles, with size 1 through 100 accepted. Invalid or excessive sizes, malformed page/filter values, repeated parameters, unknown parameters (including `site`/`site_id`) and a redundant `category` query return HTTP 400. The category is selected by the path. A positive out-of-range page returns 404. Unknown, inactive, unpublished and foreign categories share a 404 response. Disabled POSTS returns 404 before content lookup. An eligible empty category returns 200 with count 0 and an empty results array.
+
+The frontend preserves archive context, tag and page-size selections while paging. Retry and return-to-first-page controls remain within the archive. Changed query identities immediately hide prior results and abort obsolete requests. Category names render as text; links use encoded slugs and local Site routes. The API's next/previous URLs are never followed as arbitrary destinations.
+
+No database migration is required. This reuses existing taxonomy, revision, publication, Site routing and module contracts. See the [OpenAPI baseline](api/openapi.yaml) and [QA evidence](qa/category-archives-2026-11-13/README.md).

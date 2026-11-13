@@ -89,7 +89,12 @@ export function SiteAdminFrame({
   );
   const value = { site, enabledModuleCodes, permissions };
   const chip = siteStatusChip(site.status);
-  if(/^\/sites\/[1-9][0-9]*\/admin\/pages\/[^/]+\/(builder|preview)\/?$/.test(currentPath)){
+  const dashboardHref = siteAdminHref(site.id);
+  const onDashboard = currentPath === dashboardHref || currentPath === `${dashboardHref}/`;
+  if(
+    /^\/sites\/[1-9][0-9]*\/admin\/pages\/[^/]+\/(builder|preview)\/?$/.test(currentPath)
+    || /^\/sites\/[1-9][0-9]*\/admin\/posts\/[^/]+\/preview\/?$/.test(currentPath)
+  ){
     return <SiteAdminContext.Provider value={value}>{children}</SiteAdminContext.Provider>;
   }
 
@@ -100,49 +105,51 @@ export function SiteAdminFrame({
         <Breadcrumb
           items={[
             { label: "Home", href: "/" },
-            { label: site.name, href: siteAdminHref(site.id) },
+            { label: site.name, href: dashboardHref },
             { label: current?.label ?? "Dashboard" },
           ]}
         />
-        <Paper
-          component="section"
-          aria-label="Active Site"
-          variant="outlined"
-          sx={{
-            p: { xs: 2, sm: 3 },
-            borderRadius: 3,
-            borderLeft: 4,
-            borderLeftColor: "secondary.main",
-            display: "flex",
-            flexDirection: "column",
-            gap: 1,
-          }}
-        >
-          <Typography variant="overline" color="primary.main" sx={{ fontWeight: 700, letterSpacing: 1.1 }}>
-            Site administration
-          </Typography>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap" }}>
-            <Typography variant="h4" component="h1" sx={{ fontWeight: 800, overflowWrap: "anywhere" }}>
-              {site.name}
+        {onDashboard ? (
+          <Paper
+            component="section"
+            aria-label="Active Site"
+            variant="outlined"
+            sx={{
+              p: { xs: 2, sm: 3 },
+              borderRadius: 3,
+              borderLeft: 4,
+              borderLeftColor: "secondary.main",
+              display: "flex",
+              flexDirection: "column",
+              gap: 1,
+            }}
+          >
+            <Typography variant="overline" color="primary.main" sx={{ fontWeight: 700, letterSpacing: 1.1 }}>
+              Site administration
             </Typography>
-            {chip ? <Chip size="small" variant="outlined" color={chip.color} label={chip.label} /> : null}
-          </Box>
-          <Box sx={{ display: "flex", gap: { xs: 1, sm: 3 }, flexWrap: "wrap", color: "text.secondary" }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
-              <LanguageRoundedIcon sx={{ fontSize: 18 }} aria-hidden="true" />
-              <Typography variant="body2" sx={{ fontFamily: "monospace" }}>{site.code}</Typography>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap" }}>
+              <Typography variant="h4" component="h1" sx={{ fontWeight: 800, overflowWrap: "anywhere" }}>
+                {site.name}
+              </Typography>
+              {chip ? <Chip size="small" variant="outlined" color={chip.color} label={chip.label} /> : null}
             </Box>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
-              <BusinessIcon sx={{ fontSize: 18 }} aria-hidden="true" />
-              <Typography variant="body2">{organizationLabel(site)}</Typography>
+            <Box sx={{ display: "flex", gap: { xs: 1, sm: 3 }, flexWrap: "wrap", color: "text.secondary" }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+                <LanguageRoundedIcon sx={{ fontSize: 18 }} aria-hidden="true" />
+                <Typography variant="body2" sx={{ fontFamily: "monospace" }}>{site.code}</Typography>
+              </Box>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+                <BusinessIcon sx={{ fontSize: 18 }} aria-hidden="true" />
+                <Typography variant="body2">{organizationLabel(site)}</Typography>
+              </Box>
             </Box>
-          </Box>
-          <ViewPublicSite
-            siteName={site.name}
-            siteStatus={site.status}
-            primaryDomain={site.primaryDomain}
-          />
-        </Paper>
+            <ViewPublicSite
+              siteName={site.name}
+              siteStatus={site.status}
+              primaryDomain={site.primaryDomain}
+            />
+          </Paper>
+        ) : null}
       </Box>
       <Box sx={{ minWidth: 0 }}>{children}</Box>
       {canActivateCentralModules(permissions) ? (

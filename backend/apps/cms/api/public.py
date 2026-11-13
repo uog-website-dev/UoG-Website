@@ -1,6 +1,8 @@
 """Published-only Page delivery for the Site resolved from the request Host."""
 from urllib.parse import urlencode
 
+from django.utils import timezone
+
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import serializers
 from rest_framework.exceptions import NotFound
@@ -9,7 +11,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.api.models import Post
+from apps.api.models import Category, Post
+from apps.api.serializers import ArticleDocumentField
 from apps.sites.selectors.modules import module_available_on_request
 
 from ..models import (
@@ -18,6 +21,7 @@ from ..models import (
     PublishedContentSnapshot,
     Visibility,
 )
+from ..selectors.posts import published_posts
 from ..selectors.pages import homepage_of, public_pages, resolve_redirect
 from ..services.publication_cache import (
     current_publication_version,
@@ -117,6 +121,8 @@ class PublicPostListSerializer(serializers.Serializer):
     excerpt = serializers.CharField(allow_blank=True)
     excerpt_html = serializers.CharField(allow_blank=True)
     featured_media = serializers.CharField(allow_blank=True)
+    featured_alt = serializers.CharField(allow_blank=True)
+    author = serializers.CharField(allow_blank=True)
     seo = serializers.JSONField()
     categories = PublicTaxonomySerializer(many=True)
     tags = PublicTaxonomySerializer(many=True)
@@ -126,6 +132,7 @@ class PublicPostListSerializer(serializers.Serializer):
 
 class PublicPostDetailSerializer(PublicPostListSerializer):
     content = serializers.CharField()
+    editor_document = serializers.JSONField(required=False,allow_null=True)
 
 
 class PublicPostPageSerializer(serializers.Serializer):
@@ -133,6 +140,23 @@ class PublicPostPageSerializer(serializers.Serializer):
     next = serializers.URLField(allow_null=True)
     previous = serializers.URLField(allow_null=True)
     results = PublicPostListSerializer(many=True)
+
+
+class PublicPostPagination(PublicPagePagination):
+    def get_page_size(self, request):
+        raw = request.query_params.get("page_size")
+        if raw is None:
+            return self.page_size
+        normalized = raw.lstrip("0") or "0"
+        if not raw.isascii() or not raw.isdecimal() or len(normalized) > 3 or not 1 <= int(normalized) <= self.max_page_size:
+            raise serializers.ValidationError({"page_size":"Use an integer from 1 to 100."})
+        return int(normalized)
+
+    def paginate_queryset(self, queryset, request, view=None):
+        page = request.query_params.get("page")
+        if page is not None and (not page.isascii() or not page.isdecimal() or not page.strip("0")):
+            raise serializers.ValidationError({"page":"Use a positive page number."})
+        return super().paginate_queryset(queryset,request,view=view)
 
 
 class PublicPostQuery(serializers.Serializer):
@@ -158,7 +182,7 @@ class PublicPostQuery(serializers.Serializer):
 class PublicPostListView(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
-    pagination_class = PublicPagePagination
+    pagination_class = PublicPostPagination
     http_method_names = ["get", "head", "options"]
 
     @extend_schema(
@@ -168,8 +192,8 @@ class PublicPostListView(APIView):
             OpenApiParameter("locale", str, description="Enabled Site language; defaults to the Site language."),
             OpenApiParameter("category", str, description="Active Category slug owned by this Site."),
             OpenApiParameter("tag", str, description="Active Tag slug owned by this Site."),
-            OpenApiParameter("page", int),
-            OpenApiParameter("page_size", int, description="Default 20, maximum 100."),
+            OpenApiParameter("page", {"type":"integer","minimum":1,"default":1}),
+            OpenApiParameter("page_size", {"type":"integer","minimum":1,"maximum":100,"default":20}, description="Default 20. Integers 1?100 accepted. Invalid or excessive sizes return HTTP 400."),
         ],
         responses=PublicPostPageSerializer,
         description=(
@@ -179,27 +203,22 @@ class PublicPostListView(APIView):
             "only active taxonomy owned by that Site."
         ),
     )
-    def get(self, request):
+    def get(self, request, category_slug=None):
         site = _resolved_site(request)
         _require_posts_module(request)
         query = PublicPostQuery(data=request.query_params)
         query.is_valid(raise_exception=True)
         filters = query.validated_data
         locale = _locale(site, filters.get("locale"))
-        posts = Post.objects.filter(
-            site_id=site.pk, locale=locale, status=ContentStatus.PUBLISHED,
-        )
-        if "category" in filters:
-            posts = posts.filter(
-                categories__site_id=site.pk, categories__locale=locale,
-                categories__is_active=True, categories__slug=filters["category"],
-            )
-        if "tag" in filters:
-            posts = posts.filter(
-                tags__site_id=site.pk, tags__locale=locale,
-                tags__is_active=True, tags__slug=filters["tag"],
-            )
-        posts = posts.distinct().order_by("-published_at", "-pk")
+        category = None
+        if category_slug is not None:
+            if "category" in filters:
+                raise serializers.ValidationError({"category":"The archive path selects the category; omit this parameter."})
+            category = Category.objects.filter(site_id=site.pk,locale=locale,is_active=True,status=ContentStatus.PUBLISHED,published_at__lte=timezone.now(),slug=category_slug).first()
+            if category is None:
+                raise NotFound("The requested category was not found.")
+            filters["category"] = category.slug
+        posts = published_posts(site.pk,locale,category=filters.get("category"),tag=filters.get("tag"))
         paginator = self.pagination_class()
         page = paginator.paginate_queryset(posts, request, view=self)
         resource = (
@@ -213,9 +232,30 @@ class PublicPostListView(APIView):
         if results is None:
             results = _post_snapshot_data(page, detail=False)
             set_public_cache(site.pk, key, results)
-        response = paginator.get_paginated_response(results)
+        response = paginator.get_paginated_response(_eligible_category_links(results,site.pk,locale))
+        if category is not None:
+            response.data["category"] = PublicTaxonomySerializer(category).data
         _public_post_headers(response, version)
         return response
+
+
+class PublicCategoryArchiveSerializer(PublicPostPageSerializer):
+    category = PublicTaxonomySerializer()
+
+
+class PublicCategoryArchiveView(PublicPostListView):
+    @extend_schema(
+        operation_id="public_site_category_archive", tags=["Public Posts"],
+        parameters=[
+            OpenApiParameter("category_slug",str,OpenApiParameter.PATH),
+            OpenApiParameter("locale",str), OpenApiParameter("tag",str),
+            OpenApiParameter("page",{"type":"integer","minimum":1,"default":1}),
+            OpenApiParameter("page_size",{"type":"integer","minimum":1,"maximum":100,"default":20}),
+        ], responses=PublicCategoryArchiveSerializer,
+        description="Host-scoped active category archive. Unknown, inactive and foreign categories or disabled POSTS return 404. Invalid, duplicate or unknown query parameters return 400. Out-of-range pages return 404. Empty categories return 200 with no results.",
+    )
+    def get(self,request,category_slug):
+        return super().get(request,category_slug=category_slug)
 
 
 class PublicPostDetailView(APIView):
@@ -243,10 +283,7 @@ class PublicPostDetailView(APIView):
         query = PublicLocaleQuery(data=request.query_params)
         query.is_valid(raise_exception=True)
         locale = _locale(site, query.validated_data.get("locale"))
-        post = Post.objects.filter(
-            site_id=site.pk, locale=locale, slug=post_slug,
-            status=ContentStatus.PUBLISHED,
-        ).first()
+        post = published_posts(site.pk,locale).filter(slug=post_slug).first()
         if post is None:
             raise NotFound("The requested Post was not found.")
         version = current_publication_version(site.pk, locale)
@@ -257,7 +294,7 @@ class PublicPostDetailView(APIView):
         if data is None:
             data = _post_snapshot_data([post], detail=True)[0]
             set_public_cache(site.pk, key, data)
-        response = Response(data)
+        response = Response(_eligible_category_links([data],site.pk,locale)[0])
         _public_post_headers(response, version)
         response["ETag"] = f'"cms-post-{post.pk}-publication-{data["publication_version"]}"'
         return response
@@ -268,12 +305,20 @@ def _post_snapshot_data(posts, *, detail):
     latest = {}
     for snapshot in PublishedContentSnapshot.objects.filter(
         content_id__in=post_ids,
-    ).order_by("content_id", "-version"):
+    ).order_by("content_id", "-version").distinct("content_id"):
         latest.setdefault(snapshot.content_id, snapshot)
     if set(post_ids) != set(latest):
         raise RuntimeError("A published Post is missing its serving snapshot.")
     serializer = PublicPostDetailSerializer if detail else PublicPostListSerializer
     return [serializer(_post_snapshot_payload(latest[post.pk])).data for post in posts]
+
+
+def _eligible_category_links(rows,site_id,locale):
+    allowed = {str(pk) for pk in Category.objects.filter(
+        site_id=site_id,locale=locale,is_active=True,status=ContentStatus.PUBLISHED,published_at__lte=timezone.now(),
+    ).values_list("pk",flat=True)}
+    return [{**row,"categories":[term for term in row["categories"] if str(term["id"]) in allowed]} for row in rows]
+
 
 
 def _post_snapshot_payload(snapshot):
@@ -287,6 +332,8 @@ def _post_snapshot_payload(snapshot):
         "excerpt": payload["excerpt"],
         "excerpt_html": payload["excerpt_html"],
         "featured_media": payload["featured_media"],
+        "featured_alt": payload.get("metadata", {}).get("post_media", {}).get("featured_alt", ""),
+        "author": payload.get("author") or "",
         "seo": payload["seo"],
         "categories": payload["categories"],
         "tags": payload["tags"],
@@ -295,6 +342,7 @@ def _post_snapshot_payload(snapshot):
     }
     if "content" in payload:
         data["content"] = payload["content"]
+    data["editor_document"]=payload.get("metadata",{}).get("post_editor")
     return data
 
 

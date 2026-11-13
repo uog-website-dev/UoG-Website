@@ -19,7 +19,7 @@ from .access import (
     is_platform_administrator,
     live_assignments,
 )
-from .catalog import PLATFORM_ADMIN, STANDARD_ROLES, capability_for
+from .catalog import PLATFORM_ADMIN, SITE_MEMBERSHIP_ROLE_CODES, STANDARD_ROLES, capability_for
 from .models import AuthorizationAuditEvent, Permission, Role, RolePermission, UserRoleAssignment
 from .permissions import ManagementPermission
 from .serializers import (
@@ -259,16 +259,25 @@ class AssignmentViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Authoriz
         site = get_object_or_404(Site.objects.only("pk", "organization_unit_id"), pk=int(site_value))
         if not permission_granted(request.user, "platform.users.view", organization_id=site.organization_unit_id, site_id=site.pk, request=request):
             raise PermissionDenied("You cannot view roles for this Site.")
-        roles = Role.objects.filter(is_active=True).prefetch_related("permission_links__permission").order_by("name")
+        roles = list(
+            Role.objects.filter(is_active=True, code__in=SITE_MEMBERSHIP_ROLE_CODES)
+            .prefetch_related("permission_links__permission")
+            .order_by("name")
+        )
         platform_admin = is_platform_administrator(request.user)
+        can_manage_site_users = platform_admin or permission_granted(
+            request.user,
+            "platform.users.assign_roles",
+            organization_id=site.organization_unit_id,
+            site_id=site.pk,
+            audit=False,
+        )
         result = RoleSerializer(roles, many=True).data
         for role, item in zip(roles, result):
-            codes = role.permission_links.filter(permission__is_active=True, permission__is_system=True).values_list("permission__code", flat=True)
-            item["assignable"] = platform_admin or all(
-                capability_for(code) and capability_for(code).delegable
-                and permission_granted(request.user, code, organization_id=site.organization_unit_id, site_id=site.pk, audit=False)
-                for code in codes
-            )
+            # Site membership roles are peer-managed within the Site when the
+            # caller holds assign_roles there. Capability-by-capability
+            # delegation would otherwise block Site Admin, Publisher and Viewer.
+            item["assignable"] = can_manage_site_users and role.code in SITE_MEMBERSHIP_ROLE_CODES
         return Response(result)
 
     def create(self, request, *args, **kwargs):
@@ -278,25 +287,26 @@ class AssignmentViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, Authoriz
         role = values["role"]
         if values["user"].pk == request.user.pk:
             raise PermissionDenied("You cannot assign a role to yourself.")
-        if not is_platform_administrator(request.user):
-            # Delegators may only grant capabilities they hold in the exact target scope.
-            target_codes = set(role.permission_links.filter(permission__is_active=True, permission__is_system=True).values_list("permission__code", flat=True))
-            target_org_id = values.get("organization").pk if values.get("organization") else None
-            target_site_id = values.get("site").pk if values.get("site") else None
-            if any(
-                (capability_for(code) is None or not capability_for(code).delegable)
-                or not permission_granted(
-                    request.user, code, organization_id=target_org_id, site_id=target_site_id, audit=False,
-                )
-                for code in target_codes
-            ):
-                raise PermissionDenied("You cannot assign a role with permissions beyond your authority in the requested scope.")
         scope = values["scope"]
         organization = values.get("organization")
         site = values.get("site")
         target_org_id = organization.pk if organization else None
         target_site_id = site.pk if site else None
+        site_membership_grant = (
+            scope == UserRoleAssignment.Scope.SITE and role.code in SITE_MEMBERSHIP_ROLE_CODES
+        )
         if not is_platform_administrator(request.user):
+            if not site_membership_grant:
+                # Delegators may only grant capabilities they hold in the exact target scope.
+                target_codes = set(role.permission_links.filter(permission__is_active=True, permission__is_system=True).values_list("permission__code", flat=True))
+                if any(
+                    (capability_for(code) is None or not capability_for(code).delegable)
+                    or not permission_granted(
+                        request.user, code, organization_id=target_org_id, site_id=target_site_id, audit=False,
+                    )
+                    for code in target_codes
+                ):
+                    raise PermissionDenied("You cannot assign a role with permissions beyond your authority in the requested scope.")
             delegations = live_assignments(request.user, "platform.users.assign_roles")
             if not any(
                 (item.scope == UserRoleAssignment.Scope.ORGANIZATION and assignment_covers_target(item, organization_id=target_org_id, site_id=target_site_id))

@@ -90,18 +90,15 @@ def widget_data(site, parameters):
         return {"site": site.pk, "source": source, "results": data}
     if not module_is_available(site.pk, "POSTS"):
         raise NotFound()
+    from ..selectors.posts import published_posts
     if source == "taxonomy":
+        eligible = published_posts(site.pk,locale).order_by().values("pk")
         model = Tag if parameters["taxonomy_code"] in ("tag", "tags") else Category
         terms = model.objects.filter(site_id=site.pk, locale=locale, is_active=True,
-                                     posts__site_id=site.pk, posts__status=ContentStatus.PUBLISHED).distinct().order_by("name", "pk")
+                                     posts__site_id=site.pk, posts__pk__in=eligible).distinct().order_by("name", "pk")
         data = list(terms.values("id", "code", "name", "slug")[:limit])
     else:
-        posts = Post.objects.filter(site_id=site.pk, locale=locale, status=ContentStatus.PUBLISHED)
-        for key, relation in (("category", "categories"), ("tag", "tags")):
-            if parameters.get(key):
-                posts = posts.filter(**{f"{relation}__site_id": site.pk, f"{relation}__locale": locale,
-                                        f"{relation}__is_active": True, f"{relation}__slug": parameters[key]})
-        posts = list(posts.distinct().order_by("-published_at", "pk")[:min(limit, 20)])
+        posts = list(published_posts(site.pk,locale,category=parameters.get("category"),tag=parameters.get("tag"))[:min(limit,20)])
         data = _post_snapshot_data(posts, detail=False)
     return {"site": site.pk, "source": source, "results": data}
 

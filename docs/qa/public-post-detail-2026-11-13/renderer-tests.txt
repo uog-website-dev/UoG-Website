@@ -1,0 +1,22 @@
+
+> @uog/ui@0.1.0 test /workspace/packages/ui
+> vitest run --reporter\=default src/public-post.test.tsx src/public-site.test.tsx src/article-document.test.tsx
+
+
+ RUN  v5.0.5 /workspace/packages/ui
+
+ ? src/public-site.test.tsx (4 tests) 187ms
+ ? src/public-post.test.tsx (6 tests) 441ms
+   ? PublicPostFeed and PublicPostDetail (5)
+     ? renders a stacked feed link and a detail body without script or javascript targets 312ms
+ ? src/article-document.test.tsx (3 tests) 179ms
+
+ Test Files  3 passed (3)
+      Tests  13 passed (13)
+   Start at  15:23:52
+   Duration  3.98s (environment 37%, import 31%, tests 14%, setup 9%, transform 9%)
+
+Environment  jsdom was created 3 times ? 2.20s total, 37% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+

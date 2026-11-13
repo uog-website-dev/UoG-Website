@@ -1,0 +1,13 @@
+{
+  "backend/apps/cms/selectors/posts.py": "553f9718164fbf6b5174adc16eed8be8f3f130f228bdee628aa615a5fc4de6f0",
+  "backend/apps/cms/api/public.py": "48c48e437e2913b820bf4e824067c471923827655a8cc920e9bef240dd26391d",
+  "backend/apps/cms/api/widget_runtime.py": "5447782e28aea04b0342dc0093d159410733812d7c418d69f23d884f1de71510",
+  "backend/apps/cms/tests/test_public_news.py": "e7198cd23edce28a22466a7d3179789fc5ff941dff7c5acbbf809cb7205a84ff",
+  "frontend/packages/ui/src/public-post.tsx": "0befda97fcbc6092dc32aab9c1454f43aa83b426c54f158cec14d2121ba8e493",
+  "frontend/packages/ui/src/public-post.test.tsx": "b4d207f7b672fade0bf74de21f7e8944f74038d1a477a41d4eadac92094368ca",
+  "frontend/packages/ui/src/index.ts": "5a4d044fec9157b9047bf9902f295cf76b74d794614b139bbb869c49cba1ab6b",
+  "frontend/apps/public-web/src/public-posts.tsx": "c054eae1d2fb1d8b17b0bde2e8c82803bcde257c71e59237f0451de4bf4e5b98",
+  "scripts/qa-public-news-live.py": "d854c46c984fdff7e2f5d573d94b4d05ee6d40c124a91882a2b557b2a553528e",
+  "scripts/qa-public-news-browser.cjs": "dc99db29ded20274f8ea470dbfae649c5e79120391ca75373de6240b2e328eec",
+  "docs/api/openapi.yaml": "717b7ec346cd41f3b2920ebe8222d9172cd0a4894c9ae2bd6ee9e3288dd6593d"
+}

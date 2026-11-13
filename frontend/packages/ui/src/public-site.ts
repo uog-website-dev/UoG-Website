@@ -114,3 +114,13 @@ export function pageMetadata(
   const description = page?.seo.description || site.displayName;
   return { title, description };
 }
+
+/** Document title and description for a published Post detail page. */
+export function postMetadata(
+  site: PublicSiteContext,
+  post: { title: string; excerpt?: string; seo: { title: string; description: string } } | null,
+): { title: string; description: string } {
+  const title = post?.seo.title || post?.title || site.displayName;
+  const description = post?.seo.description || post?.excerpt?.trim() || site.displayName;
+  return { title, description };
+}

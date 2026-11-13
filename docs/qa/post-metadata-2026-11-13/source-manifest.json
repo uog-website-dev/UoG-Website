@@ -1,0 +1,23 @@
+{
+  "files": {
+    "backend/apps/api/models.py": "d815d9e82f202b7901530455ffd74437f91612931cee6de7e53f8baca9ee2963",
+    "backend/apps/api/serializers.py": "c88b5081cd05732e6ad2e48c7dd148fae46a63a71be1b2f222531211cd7822f4",
+    "backend/apps/api/posts_api.py": "bf73e4804e16b63ebff4ceb2203b25e1d0cd702c330f1b3f3e8c31a942f9e5cb",
+    "backend/apps/cms/models.py": "79ba6581c97238e9b8e923e9212478d3b878bb5385326cf23996f4d2632b05a4",
+    "backend/apps/cms/services/revisions.py": "44a998e1e006d3723fcf4c1b12636afec5bd0701d4b39adfecc2bc50f35177df",
+    "backend/apps/cms/api/revisions.py": "e4b77dc689c7c9e6177338b80d48f0521d4ebda28c2c84baa3462bbba6a534bc",
+    "backend/apps/cms/tests/test_posts_api.py": "650f7c3a06977dee91ad5f8c28f549144989d8c6e438001632968ca6c3e9be2f",
+    "backend/apps/cms/tests/test_public_posts.py": "201f50e57571502f756523fa547fddafa644253478608fb9a862178a7e526528",
+    "frontend/apps/admin-web/src/sites/site-posts.tsx": "f96fdca4f7484801ac5a54910d93ffd90745629ff25fde7484da6976f5bc4f76",
+    "frontend/apps/admin-web/src/sites/site-posts.test.tsx": "d136af2edca8f8e9eab52f17436391a469241f83c78ef7c90a832e8e3f4e7ed7",
+    "frontend/apps/admin-web/src/app/sites/post-actions.ts": "a79e13d73165373cc8c4f1b1dea26276914c75d80ffd8ffc31804baac647d02d",
+    "frontend/apps/admin-web/src/app/sites/post-actions.test.ts": "a0797239667ee08c687975b0d3646a444ff9f3f49a8a1b256d0ba99fa99b863b",
+    "frontend/apps/admin-web/src/sites/site-membership.ts": "e0a877f2cf724681dca9abf8da859ea6e1e7dbc1be4267932f6455840043d55b",
+    "frontend/apps/admin-web/src/app/sites/user-actions.ts": "6c407131993fa8059eb4cdfbb431d719723cde45bbcbb45074a147e29ac259ac",
+    "frontend/apps/admin-web/src/app/sites/[id]/admin/users/page.tsx": "e8bc792fd6cfe285d6a4572a5541d1e72ddc4c91769d43abb99cd7a569b40e08",
+    "docs/api/openapi.yaml": "b7f7d8f48d289019fd6b85e91347ce6c6c720ef71997799117789dece2fb9fbe",
+    "scripts/qa-post-metadata-live-api.py": "1cbfba74b7a99bbb4915bfa4aae1f0c05811ba27586f703d908910177ba7f0c3",
+    "scripts/qa-post-metadata-browser.cjs": "c1c12d4ad637da40f2135ff57c6706b1f35af5a55e1a3d865bdc97315e323fa6"
+  },
+  "scope": "Post metadata and Server Actions build correction. Shared files also contain existing worktree changes."
+}

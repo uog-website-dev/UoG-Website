@@ -415,6 +415,9 @@ class SiteContent(models.Model):
                     if key not in {"content_id", "content_type", "site_id"}
                 )
             )
+            restored_from = _revision_origin.get()
+            if restored_from is not None and not changed_fields:
+                changed_fields = ["restored_from_revision"]
             if snapshot_size(candidate) > MAX_REVISION_SNAPSHOT_BYTES:
                 raise ValidationError({
                     "revision": (
@@ -432,6 +435,7 @@ class SiteContent(models.Model):
 
             with content_revision_write(using=using):
                 result = super().save(*args, **kwargs)
+                self._save_revision_relations(using=using)
                 if changed_fields:
                     saved = (
                         type(self).objects.using(using)
@@ -444,6 +448,8 @@ class SiteContent(models.Model):
                         if before is not None
                         else changed_fields
                     )
+                    if restored_from is not None and not actual_changes:
+                        actual_changes = ["restored_from_revision"]
                     if actual_changes:
                         create_content_revision(
                             saved,
@@ -455,6 +461,10 @@ class SiteContent(models.Model):
                     self.revision_number = saved.revision_number
             self._loaded_revision_number = self.revision_number
             return result
+
+    def _save_revision_relations(self, *, using):
+        """Persist related values inside the same transaction as the snapshot."""
+        pass
 
     def delete(self, *args, **kwargs):
         from apps.media.services import detach_references_for_content

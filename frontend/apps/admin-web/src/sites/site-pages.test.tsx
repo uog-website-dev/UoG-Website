@@ -46,6 +46,7 @@ vi.mock("next/link", () => ({
 }));
 
 import { SitePagesPanel } from "./site-pages";
+import { SitePageEditor } from "./site-page-editor";
 import { SiteAdminFrame, SiteSection } from "./site-admin-frame";
 import type { SiteAdminSite } from "./site-admin-frame";
 
@@ -112,6 +113,31 @@ function renderPanel(
   );
 }
 
+
+function renderEditor(
+  mode: "create" | "edit",
+  options: {
+    siteId?: number;
+    pagesEnabled?: boolean | null;
+    permissions?: readonly string[];
+    languages?: { defaultLanguage: string; enabled: readonly string[] };
+    pageId?: string;
+  } = {},
+) {
+  return render(
+    <ToastProvider>
+      <SitePageEditor
+        siteId={options.siteId ?? 11}
+        pagesEnabled={options.pagesEnabled ?? true}
+        permissions={options.permissions ?? ALL_PERMISSIONS}
+        languages={options.languages}
+        mode={mode}
+        pageId={options.pageId}
+      />
+    </ToastProvider>,
+  );
+}
+
 function siteWorkspace(site: SiteAdminSite, permissions: readonly string[]) {
   return (
     <ToastProvider>
@@ -130,6 +156,7 @@ function siteWorkspace(site: SiteAdminSite, permissions: readonly string[]) {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  push.mockReset();
   loadSitePages.mockResolvedValue(pageResult([draft()]));
   loadSitePageStatusCounts.mockResolvedValue({ ok: true, data: counts() });
   getSitePage.mockResolvedValue({ ok: true, data: draft() });
@@ -297,18 +324,8 @@ describe("SitePagesPanel", () => {
   });
 
   it("defaults a new Page to the Site language", async () => {
-    render(
-      <ToastProvider>
-        <SitePagesPanel
-          siteId={11}
-          pagesEnabled
-          permissions={ALL_PERMISSIONS}
-          languages={{ defaultLanguage: "en-us", enabled: ["en-us", "am"] }}
-        />
-      </ToastProvider>,
-    );
-    await screen.findByRole("table", { name: "Pages for this Site" });
-    fireEvent.click(screen.getByRole("button", { name: "Create page" }));
+    renderEditor("create", { languages: { defaultLanguage: "en-us", enabled: ["en-us", "am"] } });
+    await screen.findByRole("heading", { name: "Create Page" });
     expect(screen.getByRole("combobox", { name: "Locale" }).textContent).toContain("en-us");
     fireEvent.change(screen.getByRole("textbox", { name: "Title" }), { target: { value: "Library hours" } });
     fireEvent.click(screen.getByRole("button", { name: "Create Page" }));
@@ -316,23 +333,19 @@ describe("SitePagesPanel", () => {
       11,
       expect.objectContaining({ locale: "en-us", seo: {}, metadata: {} }),
     ));
+    expect(push).toHaveBeenCalledWith("/sites/11/admin/pages");
   });
 
-  it("opens the create dialog once for the dashboard quick action", async () => {
-    const started = vi.fn();
-    render(
-      <ToastProvider>
-        <SitePagesPanel siteId={11} pagesEnabled permissions={ALL_PERMISSIONS} startCreate onCreateStarted={started} />
-      </ToastProvider>,
-    );
-    expect(await screen.findByRole("dialog", { name: "Create Page" })).toBeTruthy();
-    expect(started).toHaveBeenCalledTimes(1);
+  it("links Create page to the dedicated create screen", async () => {
+    renderPanel();
+    await screen.findByRole("table", { name: "Pages for this Site" });
+    expect(screen.getByRole("link", { name: "Create page" }).getAttribute("href")).toBe("/sites/11/admin/pages/new");
+    expect(screen.getByRole("link", { name: "Edit Admissions" }).getAttribute("href")).toBe("/sites/11/admin/pages/page-1/edit");
   });
 
   it("starts a new Page blank and fills the slug from the title until it is edited", async () => {
-    renderPanel();
-    await screen.findByRole("table", { name: "Pages for this Site" });
-    fireEvent.click(screen.getByRole("button", { name: "Create page" }));
+    renderEditor("create");
+    await screen.findByRole("heading", { name: "Create Page" });
     const title = screen.getByRole("textbox", { name: "Title" });
     const slug = screen.getByRole("textbox", { name: "Slug" });
     expect(title).toHaveProperty("value", "");
@@ -347,21 +360,15 @@ describe("SitePagesPanel", () => {
     expect(slug).toHaveProperty("value", "grad-admissions");
   });
 
-  it("ignores the create request without create permission", async () => {
-    render(
-      <ToastProvider>
-        <SitePagesPanel siteId={11} pagesEnabled permissions={["content.pages.view"]} startCreate />
-      </ToastProvider>,
-    );
-    await screen.findByRole("table", { name: "Pages for this Site" });
-    expect(screen.queryByRole("dialog")).toBeNull();
+  it("blocks create without create permission on the editor screen", async () => {
+    renderEditor("create", { permissions: ["content.pages.view"] });
+    expect(await screen.findByText(/do not have permission to create Pages/i)).toBeTruthy();
+    expect(screen.queryByRole("textbox", { name: "Title" })).toBeNull();
   });
 
   it("creates and edits only with the matching permission and current ETag", async () => {
-    renderPanel();
-    await screen.findByRole("table", { name: "Pages for this Site" });
-
-    fireEvent.click(screen.getByRole("button", { name: "Create page" }));
+    const createView = renderEditor("create");
+    await screen.findByRole("heading", { name: "Create Page" });
     fireEvent.change(screen.getByRole("textbox", { name: "Title" }), {
       target: { value: "Admissions" },
     });
@@ -376,9 +383,10 @@ describe("SitePagesPanel", () => {
       seo: {},
       blocks: [],
     }));
-    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    expect(push).toHaveBeenCalledWith("/sites/11/admin/pages");
+    createView.unmount();
 
-    fireEvent.click(await screen.findByRole("button", { name: "Edit Admissions" }));
+    renderEditor("edit", { pageId: "page-1" });
     await waitFor(() => expect(getSitePage).toHaveBeenCalledWith(11, "page-1"));
     fireEvent.change(await screen.findByRole("textbox", { name: "Title" }), {
       target: { value: "Admissions updated" },
@@ -400,9 +408,8 @@ describe("SitePagesPanel", () => {
       ok: false,
       error: { status: 409, code: "conflict", message: "Content changed. Retrieve the current Page.", details: null, requestId: null },
     });
-    renderPanel();
-    fireEvent.click(await screen.findByRole("button", { name: "Edit Admissions" }));
-    await screen.findByRole("dialog", { name: "Edit Page" });
+    renderEditor("edit", { pageId: "page-1" });
+    await screen.findByRole("heading", { name: "Edit Page" });
     fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
     expect((await screen.findByRole("alert")).textContent).toMatch(/Content changed/i);
     expect(screen.getByRole("textbox", { name: "Title" })).toHaveProperty("value", "Admissions");
@@ -411,8 +418,8 @@ describe("SitePagesPanel", () => {
   });
 
   it("previews private draft content and blocks malformed block JSON", async () => {
-    renderPanel();
-    fireEvent.click(await screen.findByRole("button", { name: "Create page" }));
+    renderEditor("create");
+    await screen.findByRole("heading", { name: "Create Page" });
     fireEvent.click(screen.getByRole("button", { name: "Add paragraph block" }));
     fireEvent.click(screen.getByRole("button", { name: "Preview draft" }));
     expect(screen.getByText("Private draft preview")).toBeTruthy();
@@ -440,8 +447,8 @@ describe("SitePagesPanel", () => {
   });
 
   it("previews the shared visual fixture and rejects unsupported layout versions before saving", async () => {
-    renderPanel();
-    fireEvent.click(await screen.findByRole("button", {name:"Create page"}));
+    renderEditor("create");
+    await screen.findByRole("heading", { name: "Create Page" });
     fireEvent.click(screen.getByRole("button", {name:"Advanced"}));
     const field=screen.getByRole("textbox", {name:"Metadata (JSON object)"});
     fireEvent.change(field,{target:{value:JSON.stringify({visual_layout:layoutFixtures[0]!.layout})}});
@@ -455,18 +462,18 @@ describe("SitePagesPanel", () => {
 
   it("asks before discarding unsaved editor changes", async () => {
     const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
-    renderPanel();
-    fireEvent.click(await screen.findByRole("button", { name: "Create page" }));
+    renderEditor("create");
+    await screen.findByRole("heading", { name: "Create Page" });
     fireEvent.change(screen.getByRole("textbox", { name: "Title" }), {
       target: { value: "Changed title" },
     });
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
     expect(confirm).toHaveBeenCalledWith("Discard your unsaved Page changes?");
-    expect(screen.getByRole("dialog", { name: "Create Page" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Create Page" })).toBeTruthy();
 
     confirm.mockReturnValue(true);
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
-    await waitFor(() => expect(screen.queryByRole("dialog", { name: "Create Page" })).toBeNull());
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/sites/11/admin/pages"));
     confirm.mockRestore();
   });
 
@@ -474,7 +481,7 @@ describe("SitePagesPanel", () => {
     renderPanel(11, false);
     const submit = await screen.findByRole("button", { name: "Submit Admissions for review" });
     expect(submit).toHaveProperty("disabled", true);
-    expect(screen.getByRole("button", { name: "Create page" })).toHaveProperty("disabled", true);
+    expect(screen.getByRole("link", { name: "Create page" }).getAttribute("aria-disabled")).toBe("true");
     expect(screen.getByText(/Create, edit and workflow changes are blocked/)).toBeTruthy();
     fireEvent.click(submit);
     expect(transitionSitePage).not.toHaveBeenCalled();
@@ -541,8 +548,8 @@ describe("SitePagesPanel", () => {
       expect.objectContaining({ search: undefined, status: undefined, page: 1 }),
     ));
     expect(screen.queryByText("Informatics Admissions")).toBeNull();
-    expect(screen.queryByRole("button", { name: "Create page" })).toBeNull();
-    expect(screen.queryByRole("button", { name: /^Edit/ })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Create page" })).toBeNull();
+    expect(screen.queryByRole("link", { name: /^Edit/ })).toBeNull();
   });
 
   it("opens a working draft of a published Page and keeps the live route fixed", async () => {
@@ -573,8 +580,11 @@ describe("SitePagesPanel", () => {
     await waitFor(() => expect(openWorkingDraft).toHaveBeenCalledWith(
       11, "live-1", '"cms-content-live-1-r1"',
     ));
-    const dialog = await screen.findByRole("dialog", { name: "Edit draft of published Page" });
-    expect(within(dialog).getByRole("textbox", { name: "Slug" })).toHaveProperty("disabled", true);
-    expect(within(dialog).getByRole("combobox", { name: "Parent Page" }).getAttribute("aria-disabled")).toBe("true");
+    expect(push).toHaveBeenCalledWith("/sites/11/admin/pages/draft-1/edit");
+
+    renderEditor("edit", { pageId: "draft-1" });
+    await screen.findByRole("heading", { name: "Edit draft of published Page" });
+    expect(screen.getByRole("textbox", { name: "Slug" })).toHaveProperty("disabled", true);
+    expect(screen.getByRole("combobox", { name: "Parent Page" }).getAttribute("aria-disabled")).toBe("true");
   });
 });

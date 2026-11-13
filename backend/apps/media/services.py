@@ -175,6 +175,9 @@ def detach_reference(actor, site_id, reference_id, *, using="default"):
         row = references_for_site(actor, site_id, using=using).filter(pk=reference_id).first()
         if row is None:
             raise Http404("Reference not found.")
+        from apps.api.models import Post
+        if Post.objects.using(using).filter(pk=row.page_revision.content_id).exists():
+            raise ValidationError("Article references are managed by revision retention. Edit the article to remove a placement.")
         row.delete(using=using)
 
 

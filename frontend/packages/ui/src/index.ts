@@ -9,6 +9,7 @@ export { PublicSiteFrame } from "./public-site-frame";
 export {
   EMPTY_SITE,
   pageMetadata,
+  postMetadata,
   PUBLIC_CACHE_MODE,
   PUBLIC_CACHE_SLA,
   publicFetchInit,
@@ -19,8 +20,8 @@ export {
 } from "./public-site";
 export type { PublicSiteContext } from "./public-site";
 export type { PublicBlock, PublicPageDocument } from "./public-page";
-export { PublicPostFeed, PublicPostDetail, postsFromResponse, postFromResponse } from "./public-post";
-export type { PublicPostDocument, PublicPostSummary } from "./public-post";
+export { PublicPostFeed, PublicPostDetail, postsFromResponse, postsPageFromResponse, postFromResponse } from "./public-post";
+export type { PublicPostDocument, PublicPostSummary, PublicPostPageResult } from "./public-post";
 
 // Shared admin-screen building blocks.
 export { LoadingState, EmptyState, ApiErrorState } from "./async-states";
@@ -54,4 +55,17 @@ export { FormField, FormErrorSummary, fieldErrorsFrom } from "./form-fields";
 export type { FormFieldProps, FormErrorSummaryProps } from "./form-fields";
 
 export { ToastProvider, useToast } from "./toast";
+export {
+  ArticleDocumentView,
+  ArticleAssetImage,
+  normalizeArticleDocument,
+  articlePlainText,
+  articleHref,
+  ARTICLE_MAX_BYTES,
+  ARTICLE_MAX_ELEMENTS,
+  ARTICLE_MAX_DEPTH,
+} from "./article-document";
+export type { ArticleDocument } from "./article-document";
 export type { ToastApi, ToastOptions } from "./toast";
+
+export { WidgetRuntimeProvider } from "./widget-runtime";

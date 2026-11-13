@@ -229,7 +229,7 @@ class AssetDetail(MediaView):
 
 class UsageSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)
-    scope = serializers.ChoiceField(choices=["DRAFT", "PUBLIC", "MANUAL"], read_only=True)
+    scope = serializers.ChoiceField(choices=["DRAFT", "PUBLIC", "MANUAL", "REVISION"], read_only=True)
     page_id = serializers.UUIDField(read_only=True)
     revision_id = serializers.IntegerField(read_only=True)
     publication_id = serializers.IntegerField(read_only=True, allow_null=True)
@@ -251,8 +251,8 @@ class AssetInventory(MediaView):
         rows=[{"id":str(row.pk),"scope":row.scope,"page_id":str(row.page_id),"revision_id":row.revision_id,"publication_id":row.publication_id,
                "node_id":row.node_id,"field_path":row.field_path,"repeater_item_id":row.repeater_item_id,"detachable":False}
               for row in MediaUsage.objects.filter(asset=asset,site_id=site_pk)]
-        rows.extend({"id":str(row.pk),"scope":"MANUAL","page_id":str(row.page_revision.content_id),"revision_id":row.page_revision_id,"publication_id":None,
-                     "node_id":row.node_id,"field_path":row.field_path,"repeater_item_id":row.repeater_item_id,"detachable":True}
+        rows.extend({"id":str(row.pk),"scope":"REVISION" if row.page_revision.snapshot.get("content_type") == "api.post" else "MANUAL","page_id":str(row.page_revision.content_id),"revision_id":row.page_revision_id,"publication_id":None,
+                     "node_id":row.node_id,"field_path":row.field_path,"repeater_item_id":row.repeater_item_id,"detachable":row.page_revision.snapshot.get("content_type") != "api.post"}
                     for row in MediaAssetReference.objects.filter(asset=asset,site_id=site_pk).select_related("page_revision"))
         return Response({"asset_id":str(asset.pk),"references":rows})
 

@@ -1,0 +1,24 @@
+{
+  "backend-tests.xml": {
+    "tests": 29,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "component-tests.xml": {
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "typescript": true,
+  "builds": {
+    "public-build.log": true,
+    "admin-build.log": true
+  },
+  "openapi": "spectacular --validate --fail-on-warn passed",
+  "new_migrations": false,
+  "browser_checks": 8,
+  "live_api_checks": 19,
+  "accessibility_violations": 0
+}

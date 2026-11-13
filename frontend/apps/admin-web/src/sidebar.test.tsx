@@ -143,7 +143,7 @@ describe("DesktopSidebar — platform workspace", () => {
 describe("DesktopSidebar — Site workspace", () => {
   it("shows the Visual Builder menu and keeps it active while editing a Page canvas",async()=>{
     pathname.mockReturnValue("/sites/2/admin/pages/page-id/builder");
-    respond({platformPermissions:[],site:{id:2,enabledModuleCodes:["PAGES"],permissions:["content.pages.view","content.pages.update"]}});
+    respond({platformPermissions:[],site:{id:2,enabledModuleCodes:["PAGES","VISUAL_BUILDER"],permissions:["content.pages.view","content.pages.update"]}});
     render(<DesktopSidebar/>);
     const nav=await screen.findByRole("navigation",{name:"Site sections"});
     const builder=await within(nav).findByRole("link",{name:/Visual Builder/});

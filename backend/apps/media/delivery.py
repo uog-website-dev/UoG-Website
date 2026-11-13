@@ -83,8 +83,23 @@ def image_response(asset, variant, *, storage=None, eligible=None):
 
 
 def is_published(asset):
+    from django.db.models import OuterRef, Subquery
+    from apps.cms.models import PublishedContentSnapshot
+    from apps.sites.selectors.modules import module_is_available
     from .models import MediaUsage
-    return MediaUsage.objects.filter(asset=asset,site_id=asset.site_id,scope="PUBLIC",page__status="PUBLISHED",page__visibility__in=["PUBLIC","UNLISTED"]).exists()
+    if module_is_available(asset.site_id, "PAGES") and MediaUsage.objects.filter(
+        asset=asset, site_id=asset.site_id, scope="PUBLIC", page__status="PUBLISHED",
+        page__visibility__in=["PUBLIC", "UNLISTED"],
+    ).exists():
+        return True
+    if not module_is_available(asset.site_id, "POSTS"):
+        return False
+    latest = PublishedContentSnapshot.objects.filter(content_id=OuterRef("content_id")).order_by("-version").values("pk")[:1]
+    return PublishedContentSnapshot.objects.filter(
+        pk=Subquery(latest), content__site_id=asset.site_id,
+        content__status="PUBLISHED", content__post__isnull=False,
+        approved_revision__media_references__asset=asset,
+    ).exists()
 
 
 class PublicMediaImage(ImageDeliveryMixin, APIView):
@@ -97,10 +112,10 @@ class PublicMediaImage(ImageDeliveryMixin, APIView):
         response["Vary"] = "Host, Authorization, Cookie"
         return response
 
-    @extend_schema(tags=["Media"], parameters=[OpenApiParameter("variant", str, enum=list(VARIANTS))], responses={(200, "image/webp"): {"type": "string", "format": "binary"}}, description="Host-resolved Site only, effective MEDIA/PAGES and a current published visible Page reference required. READY images only. Missing derivatives regenerate bounded WebP from verified private original; missing/invalid original is 404. No public original or storage keys. No-store, Vary Host.")
+    @extend_schema(tags=["Media"], parameters=[OpenApiParameter("variant", str, enum=list(VARIANTS))], responses={(200, "image/webp"): {"type": "string", "format": "binary"}}, description="Host-resolved Site only, effective MEDIA and a current published Page/PAGES or Post/POSTS reference required. READY images only. Missing derivatives regenerate bounded WebP from verified private original; missing/invalid original is 404. No public original or storage keys. No-store, Vary Host.")
     def get(self, request, asset_id):
         site = getattr(request, "site", None)
-        if site is None or not module_available_on_request(request, "MEDIA") or not module_available_on_request(request, "PAGES"):
+        if site is None or not module_available_on_request(request, "MEDIA"):
             raise Http404("Image unavailable.")
         asset = MediaAsset.objects.select_related("site", "processing").filter(pk=asset_id, site=site, status="READY").first()
         if asset is None or not is_published(asset):

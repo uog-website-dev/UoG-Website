@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="10" failures="0" errors="0" time="1.282033595">
+    <testsuite name="src/public-post.test.tsx" timestamp="2026-11-13T15:55:43.971Z" hostname="61acde4677aa" tests="10" failures="0" errors="0" skipped="0" time="1.282033595">
+        <testcase classname="src/public-post.test.tsx" name="postsFromResponse &gt; keeps published posts and drops drafts, foreign markup slugs and a disabled module" time="0.011379573">
+        </testcase>
+        <testcase classname="src/public-post.test.tsx" name="PublicPostFeed and PublicPostDetail &gt; renders responsive news cards and a detail body without script or javascript targets" time="0.785283803">
+        </testcase>
+        <testcase classname="src/public-post.test.tsx" name="PublicPostFeed and PublicPostDetail &gt; shows nothing for a missing feed or detail" time="0.015654371">
+        </testcase>
+        <testcase classname="src/public-post.test.tsx" name="PublicPostFeed and PublicPostDetail &gt; renders versioned editor_document bodies without executing hostile markup" time="0.129440906">
+        </testcase>
+        <testcase classname="src/public-post.test.tsx" name="PublicPostFeed and PublicPostDetail &gt; renders a hero banner, date, optional author, back navigation and omits a broken featured image" time="0.085303974">
+        </testcase>
+        <testcase classname="src/public-post.test.tsx" name="PublicPostFeed and PublicPostDetail &gt; can hide the public listing link for private Site preview chrome" time="0.064006874">
+        </testcase>
+        <testcase classname="src/public-post.test.tsx" name="PublicPostFeed and PublicPostDetail &gt; keeps Site B documents out of Site A rendering helpers" time="0.001276835">
+        </testcase>
+        <testcase classname="src/public-post.test.tsx" name="renders an approved thumbnail and publication date and falls back after an image error" time="0.11638369">
+        </testcase>
+        <testcase classname="src/public-post.test.tsx" name="keeps foreign or unsafe media out of news cards and escapes card strings" time="0.052293764">
+        </testcase>
+        <testcase classname="src/public-post.test.tsx" name="validates the paginated Site contract without following response URLs" time="0.014682784">
+        </testcase>
+    </testsuite>
+</testsuites>

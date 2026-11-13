@@ -62,6 +62,7 @@ describe("SiteAdminFrame", () => {
   });
 
   it("names the organization by id when this account cannot read it", () => {
+    pathname.mockReturnValue("/sites/22/admin");
     renderFrame({ enabledModuleCodes: [], permissions: [] }, medicine);
     expect(screen.getByText("Organization unit #9")).toBeTruthy();
     expect(screen.getByText("Suspended")).toBeTruthy();
@@ -73,6 +74,20 @@ describe("SiteAdminFrame", () => {
     const crumbs = screen.getByRole("navigation", { name: "Breadcrumb" });
     expect(within(crumbs).getByText("Pages")).toBeTruthy();
     expect(within(crumbs).getByRole("link", { name: "Informatics" }).getAttribute("href")).toBe("/sites/11/admin");
+  });
+
+  it("keeps the Site administration banner on the dashboard only", () => {
+    const view = renderFrame({ enabledModuleCodes: ["PAGES"], permissions: ["content.pages.view"] });
+    expect(screen.getByRole("region", { name: "Active Site" })).toBeTruthy();
+
+    pathname.mockReturnValue("/sites/11/admin/pages");
+    view.rerender(
+      <SiteAdminFrame site={informatics} enabledModuleCodes={["PAGES"]} permissions={["content.pages.view"]}>
+        <p>Workspace</p>
+      </SiteAdminFrame>,
+    );
+    expect(screen.queryByRole("region", { name: "Active Site" })).toBeNull();
+    expect(screen.queryByText("Site administration")).toBeNull();
   });
 
   it("shows the central registry only when that permission was delegated", () => {
@@ -87,6 +102,7 @@ describe("SiteAdminFrame", () => {
       <input aria-label="Draft title" />,
     );
     fireEvent.change(screen.getByRole("textbox", { name: "Draft title" }), { target: { value: "Secret draft" } });
+    pathname.mockReturnValue("/sites/22/admin");
     view.rerender(
       <SiteAdminFrame site={medicine} enabledModuleCodes={["PAGES"]} permissions={["content.pages.view"]}>
         <input aria-label="Draft title" />

@@ -1,0 +1,54 @@
+{
+  "date": "2026-11-13",
+  "reports": {
+    "backend-tests.xml": {
+      "tests": 83,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "component-tests.xml": {
+      "tests": 27,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "renderer-tests.xml": {
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "migration-tests.xml": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "final-working-draft-tests.xml": {
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "browser_checks": 7,
+  "api_negative_checks": 17,
+  "upload_publication_checks": 15,
+  "accessibility_violations": 0,
+  "admin_build": "PASS",
+  "public_build": "PASS",
+  "typecheck": "PASS",
+  "openapi": "validated and baseline generated",
+  "system_check": "PASS",
+  "schema_changes": "only declared migrations",
+  "cleanup": {
+    "run": "post-0a98658c92",
+    "site": 47,
+    "generated_keycloak_accounts_disabled": 7,
+    "generated_local_accounts_disabled": 7,
+    "secret_file_removed": true
+  },
+  "publication_policy": "Published working copies preserve the original public ID and permalink. Approval and media are revalidated during atomic promotion.",
+  "review_status": "Independent code approval, PR creation and Issue attachment pending."
+}

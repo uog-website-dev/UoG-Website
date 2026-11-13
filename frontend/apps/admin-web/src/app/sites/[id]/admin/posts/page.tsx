@@ -4,10 +4,10 @@ import { SitePostsPanel } from "@/sites/site-posts";
 import { SiteSection, useSiteAdmin } from "@/sites/site-admin-frame";
 
 export default function SitePostsAdminPage() {
-  const { site, permissions } = useSiteAdmin();
+  const { site, permissions, enabledModuleCodes } = useSiteAdmin();
   return (
     <SiteSection sectionKey="posts">
-      <SitePostsPanel siteId={site.id} postsEnabled permissions={permissions} />
+      <SitePostsPanel mediaEnabled={enabledModuleCodes.includes("MEDIA")} siteId={site.id} postsEnabled permissions={permissions} />
     </SiteSection>
   );
 }

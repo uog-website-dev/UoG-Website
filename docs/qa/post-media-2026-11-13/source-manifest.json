@@ -1,0 +1,28 @@
+{
+  "scope": "Article media integration. Shared files include existing and concurrent worktree changes.",
+  "sha256": {
+    "backend/apps/api/post_editor.py": "97a7cf30ed38608e171cbf4c047df9a33e9c84320aecefa88b8562b426fc7d12",
+    "backend/apps/api/post_media.py": "11269c99856d8440694efd73f8add74dda8c352993294e1bcad2e1279d46a475",
+    "backend/apps/api/serializers.py": "a6780af2a53012b4bd730864bc7649d4e5470f664f6d051d2e54fe3f6780520e",
+    "backend/apps/api/models.py": "b1c0224943797cf88a7bc67504332a7ef83a2e57041e046e1104c39a31912362",
+    "backend/apps/cms/services/revisions.py": "79621ad0170671a2a8b4dcf933a01077c275bbeca38006c490aa0f2f993a725b",
+    "backend/apps/cms/services/workflow.py": "09c2ae06838833a61a8525eca804fbe88534da91f7a46fcabdd04bf0a67d5d07",
+    "backend/apps/cms/api/public.py": "2b255c0da9faa4067962d542068f2d9aaf3931debaa6714bef35fe7b48e1999e",
+    "backend/apps/media/api.py": "75ccf714bc5fa787e73454c95400cb3c1c23845142bc84757f2cfb43e0a4d919",
+    "backend/apps/media/delivery.py": "90da4a7be6a36cd1f6cb54515ae0db7737a14abfae4ff6526adbd3939970a732",
+    "backend/apps/media/services.py": "dbf0b6c1e357c4e9cd773e85f6b796d3952c3f72897e8752fc65bfaceda79d07",
+    "backend/apps/media/migrations/0013_post_revision_references.py": "b9b81322092fe21b0d143d01cd5d583f4b6573845b555a73a830598ee1dea327",
+    "backend/apps/cms/tests/test_post_media.py": "94fe4002cff23b19c8e10a0a838b82edd7a7737474243e2593b7cc582906c6f8",
+    "backend/tests/test_post_media_race.py": "f4312fdeb4fb82f632be7333f47ea8341c002be57a8a0201faf031eca7ef97a3",
+    "frontend/apps/admin-web/src/sites/site-post-editor.tsx": "7fcbd24e46f86805b34169a751fa092ac5988e893b779a40ee9576d6cccd2f58",
+    "frontend/apps/admin-web/src/sites/post-rich-editor.tsx": "5d45a78973dc7f4daddf5c7d8437a530f35ae74e8fff54c3f9603fbd1f63663f",
+    "frontend/apps/admin-web/src/sites/post-media.test.tsx": "9146746e9228564b1ac1431d6bc0f5f9aa3a2581f153844a801500fba88dc3bb",
+    "frontend/apps/admin-web/src/app/sites/post-actions.ts": "1289b4e22df1f55a5d8bbf8a4f9bc42f6ac6f99759547f60308e27ebbd76de02",
+    "frontend/packages/types/src/media.ts": "fa2fa7eee2b829a28c0382e93da3814e163b057999b539a85c1ef7f5aba0ff63",
+    "frontend/packages/ui/src/article-document.tsx": "bd9fb9d390a695e542e7adf4e2ee81c3e304e30b39749c887cd5c78039aa2e54",
+    "frontend/packages/ui/src/article-document.test.tsx": "060cf137edccefb14dc0df3f90830a201309d163b0daab7d4ead216b70a3ceb7",
+    "frontend/packages/ui/src/public-post.tsx": "36c0d5a9cd35dbc1ea1f634224d41bec7e9eb8d0a5853841b93d998c2ea80be5",
+    "frontend/packages/ui/src/widget-runtime.tsx": "c529485ca323a7adde70dd3c128ea49624e46025f070b65f3ff85f3b3cee1f42",
+    "docs/api/openapi.yaml": "887ac9029972c6b327e3bba8e3054c7607a78f2a86377b1a2924aafa12d78f2c"
+  }
+}

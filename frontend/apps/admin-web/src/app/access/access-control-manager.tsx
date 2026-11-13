@@ -39,6 +39,13 @@ import type {
 import type { ApiErrorPayload } from "@/organizations/contract";
 
 const CONTENT_ROLES = ["editor", "reviewer", "viewer"] as const;
+const SITE_MEMBERSHIP_ROLE_CODES = new Set([
+  "site-administrator",
+  "editor",
+  "publisher",
+  "reviewer",
+  "viewer",
+]);
 
 function Field(props: React.ComponentProps<typeof TextField>) {
   return <TextField size="small" fullWidth {...props} />;
@@ -119,7 +126,14 @@ export function AccessControlManager() {
   const assignments = data?.assignments.status === "ready" ? data.assignments.data : [];
   const effective = data?.effective.status === "ready" ? data.effective.data : [];
   const selectedRole = roles.find((role) => role.code === selectedCode) ?? null;
-  const activeRoles = useMemo(() => roles.filter((role) => role.is_active), [roles]);
+  const activeRoles = useMemo(() => {
+    const active = roles.filter((role) => role.is_active);
+    if (scope === "SITE") return active.filter((role) => SITE_MEMBERSHIP_ROLE_CODES.has(role.code));
+    return active;
+  }, [roles, scope]);
+  useEffect(() => {
+    if (roleId && !activeRoles.some((role) => String(role.id) === roleId)) setRoleId("");
+  }, [activeRoles, roleId]);
   const permissionsReady = data?.effective.status === "ready";
   const canCreateRoles = permissionsReady && effective.includes("platform.roles.create");
   const canUpdateRoles = permissionsReady && effective.includes("platform.roles.update");

@@ -1,12 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import AddIcon from "@mui/icons-material/Add";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import Accordion from "@mui/material/Accordion";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import AccordionSummary from "@mui/material/AccordionSummary";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -16,21 +13,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Paper from "@mui/material/Paper";
-import MenuItem from "@mui/material/MenuItem";
-import TextField from "@mui/material/TextField";
-import {
-  MediaBlockEditor,
-  createEmptyGalleryBlock,
-  createEmptyImageBlock,
-  createEmptySliderBlock,
-  parseMediaBlock,
-  type MediaBlockValue,
-} from "@/sites/content-media-builder";
-import { MediaPickerDialog, type MediaPickerResult } from "@/sites/media-picker";
-import { imageRefForAsset } from "@/sites/site-image-field";
 import Typography from "@mui/material/Typography";
-import { validateVisualLayout } from "@uog/types";
-import type { VisualLayout } from "@uog/types";
 import { ApiError } from "@uog/api-client";
 import {
   DataTable,
@@ -44,13 +27,11 @@ import {
   useToast,
 } from "@uog/ui";
 import type {
-  PublicPageDocument,
   SortState,
   TableColumn,
 } from "@uog/ui";
 
 import {
-  createSitePage,
   getSitePage,
   getSitePagePreview,
   loadSitePages,
@@ -59,12 +40,10 @@ import {
   openWorkingDraft,
   setSiteHomepage,
   transitionSitePage,
-  updateSitePage,
 } from "@/app/sites/page-actions";
 import type {
   SitePageListQuery,
   SitePageListResponse,
-  SitePageBlock,
   SitePageRecord,
   SitePageStatus,
   SitePageWorkflowAction,
@@ -75,6 +54,9 @@ import { unwrap } from "@/organizations/contract";
 import { APP_BASE_PATH } from "@/base-path";
 import { ContentWorkflowButtons, ContentWorkflowDialog } from "@/sites/content-workflow";
 import type { WorkflowAction } from "@/sites/content-workflow";
+import type { PageLanguages } from "@/sites/site-page-editor";
+
+export type { PageLanguages };
 
 const PAGE_SIZE = 20;
 const STATUSES: readonly SitePageStatus[] = [
@@ -121,36 +103,9 @@ const EMPTY_STATUS_COUNTS: Record<SitePageStatus, number> = {
   ARCHIVED: 0,
 };
 
-type DialogMode = "create" | "edit";
-
 interface PageFilters {
   search: string;
   status: SitePageStatus | "";
-}
-
-export interface PageLanguages {
-  defaultLanguage: string;
-  enabled: readonly string[];
-}
-
-interface PageForm {
-  title: string;
-  slug: string;
-  parent: string;
-  locale: string;
-  visibility: SitePageRecord["visibility"];
-  metadata: string;
-  seoTitle: string;
-  seoDescription: string;
-  seoExtra: string;
-  blocks: string[];
-}
-
-function seoPreview(seo: Record<string, unknown> | undefined): PublicPageDocument["seo"] {
-  return {
-    title: typeof seo?.meta_title === "string" ? seo.meta_title : "",
-    description: typeof seo?.meta_description === "string" ? seo.meta_description : "",
-  };
 }
 
 function formatUpdatedAt(value: string): string {
@@ -167,95 +122,6 @@ function authorLabel(author: SitePageRecord["created_by"]): string {
   return author == null ? "—" : `User ${author}`;
 }
 
-function emptyForm(locale = "en"): PageForm {
-  return {
-    title: "", slug: "", parent: "", locale, visibility: "PUBLIC",
-    metadata: "{}", seoTitle: "", seoDescription: "", seoExtra: "{}",
-    blocks: [],
-  };
-}
-
-function slugFromTitle(title: string): string {
-  return title.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-}
-
-function formFromRecord(current: SitePageRecord, fallbackLocale: string): PageForm {
-  const seo = { ...(current.seo ?? {}) };
-  const metaTitle = seo.meta_title;
-  const metaDescription = seo.meta_description;
-  delete seo.meta_title;
-  delete seo.meta_description;
-  return {
-    title: current.title,
-    slug: current.slug,
-    parent: current.parent ?? "",
-    locale: current.locale || fallbackLocale,
-    visibility: current.visibility,
-    metadata: JSON.stringify(current.metadata ?? {}, null, 2),
-    seoTitle: typeof metaTitle === "string" ? metaTitle : "",
-    seoDescription: typeof metaDescription === "string" ? metaDescription : "",
-    seoExtra: JSON.stringify(seo, null, 2),
-    blocks: (current.blocks ?? []).map((block) => JSON.stringify(block, null, 2)),
-  };
-}
-
-function blockInputs(form: PageForm): SitePageBlock[] {
-  return form.blocks.map((raw) => JSON.parse(raw) as SitePageBlock);
-}
-
-function metadataInput(form: PageForm): Record<string, unknown> {
-  const value=jsonObject(form.metadata, "Metadata");
-  if(Object.hasOwn(value,"visual_layout")) {
-    const result=validateVisualLayout(value.visual_layout);
-    if(!result.ok)throw new Error(Object.entries(result.errors).map(([path,messages])=>`${path}: ${messages.join(" ")}`).join("\n"));
-    value.visual_layout=result.value;
-  }
-  return value;
-}
-
-function jsonObject(source: string, label: string): Record<string, unknown> {
-  const value: unknown = JSON.parse(source);
-  if (!value || typeof value !== "object" || Array.isArray(value)) {
-    throw new Error(`${label} must be a JSON object.`);
-  }
-  return value as Record<string, unknown>;
-}
-
-function seoInput(form: PageForm): Record<string, unknown> {
-  const seo = jsonObject(form.seoExtra, "Additional SEO");
-  const title = form.seoTitle.trim();
-  const description = form.seoDescription.trim();
-  if (title) seo.meta_title = title;
-  else delete seo.meta_title;
-  if (description) seo.meta_description = description;
-  else delete seo.meta_description;
-  return seo;
-}
-
-function formSyntaxError(form: PageForm): string | null {
-  try {
-    metadataInput(form);
-    seoInput(form);
-    blockInputs(form);
-  } catch (error) {
-    return error instanceof Error ? error.message : "Correct the JSON fields before saving.";
-  }
-  return null;
-}
-
-function localeChoicesFor(languages: PageLanguages | undefined): string[] | null {
-  const enabled = (languages?.enabled ?? []).map((code) => code.trim()).filter(Boolean);
-  const unique = [...new Set(enabled)];
-  return unique.length > 0 ? unique : null;
-}
-
-function defaultLocaleFor(languages: PageLanguages | undefined): string {
-  const choices = localeChoicesFor(languages);
-  const preferred = languages?.defaultLanguage.trim() ?? "";
-  if (choices && preferred && choices.includes(preferred)) return preferred;
-  return choices?.[0] ?? "en";
-}
-
 function orderingForSort(sort: SortState): SitePageListQuery["ordering"] {
   if (sort.field === "title") return sort.direction === "desc" ? "-title" : "title";
   return sort.direction === "desc" ? "-updated_at" : "updated_at";
@@ -267,8 +133,6 @@ export function SitePagesPanel({
   builderEnabled = null,
   permissions = [],
   languages,
-  startCreate = false,
-  onCreateStarted,
   visualBuilderMode = false,
 }: {
   siteId: number;
@@ -277,9 +141,6 @@ export function SitePagesPanel({
   builderEnabled?: boolean | null;
   permissions?: readonly string[];
   languages?: PageLanguages;
-  /** Open the create dialog once, for the dashboard's "Create page" action. */
-  startCreate?: boolean;
-  onCreateStarted?: () => void;
   visualBuilderMode?: boolean;
 }) {
   return (
@@ -290,8 +151,6 @@ export function SitePagesPanel({
       builderEnabled={builderEnabled}
       permissions={permissions}
       languages={languages}
-      startCreate={startCreate}
-      onCreateStarted={onCreateStarted}
       visualBuilderMode={visualBuilderMode}
     />
   );
@@ -302,9 +161,6 @@ function SitePagesPanelContent({
   pagesEnabled,
   builderEnabled,
   permissions,
-  languages,
-  startCreate,
-  onCreateStarted,
   visualBuilderMode,
 }: {
   siteId: number;
@@ -312,15 +168,10 @@ function SitePagesPanelContent({
   builderEnabled: boolean | null;
   permissions: readonly string[];
   languages?: PageLanguages;
-  startCreate: boolean;
-  onCreateStarted?: () => void;
-  visualBuilderMode:boolean;
+  visualBuilderMode: boolean;
 }) {
-  const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
-  const mediaInvokeRef = useRef<HTMLButtonElement | null>(null);
   const toast = useToast();
-  const defaultLocale = defaultLocaleFor(languages);
-  const localeChoices = localeChoicesFor(languages);
+  const router = useRouter();
   const canView = permissions.includes(PERMISSIONS.view);
   const canCreate = permissions.includes(PERMISSIONS.create);
   const canEdit = permissions.includes(PERMISSIONS.update);
@@ -331,22 +182,14 @@ function SitePagesPanelContent({
   const [reviewQueue, setReviewQueue] = useState(false);
   const [pendingWorkflow, setPendingWorkflow] = useState<{ page: SitePageRecord; action: SitePageWorkflowAction } | null>(null);
   const [workflowComment, setWorkflowComment] = useState("");
-  const [workflowError,setWorkflowError]=useState("");
+  const [workflowError, setWorkflowError] = useState("");
   const [historyPage, setHistoryPage] = useState<SitePageRecord | null>(null);
   const [workflowHistory, setWorkflowHistory] = useState<SitePageWorkflowTransition[]>([]);
   const [historyError, setHistoryError] = useState("");
   const [historyLoading, setHistoryLoading] = useState(false);
-  const [mode, setMode] = useState<DialogMode | null>(null);
-  const [activePage, setActivePage] = useState<SitePageRecord | null>(null);
-  const [form, setForm] = useState<PageForm>(emptyForm);
   const [saving, setSaving] = useState(false);
-  const [dialogError, setDialogError] = useState("");
-  const [dialogConflict, setDialogConflict] = useState(false);
-  const [showDraftPreview, setShowDraftPreview] = useState(false);
-  const [workflowPreview,setWorkflowPreview]=useState<SitePagePreview|null>(null);
-  const workflowSequence=useRef(0);
-  useEffect(()=>()=>{workflowSequence.current++;},[]);
-  const [parentPages, setParentPages] = useState<SitePageRecord[]>([]);
+  const [workflowPreview, setWorkflowPreview] = useState<SitePagePreview | null>(null);
+  const workflowSequence = useRef(0);
   const [busyPageId, setBusyPageId] = useState<string | null>(null);
 
   const ordering = orderingForSort(sort);
@@ -373,16 +216,6 @@ function SitePagesPanelContent({
   const rows = (pages.data?.results ?? []).filter((row) => row.site === siteId);
   const enabled = pagesEnabled === true && !saving && busyPageId === null;
   const activeFilterCount = Number(Boolean(appliedFilters.search)) + Number(Boolean(appliedFilters.status));
-  const createStarted = useRef(false);
-
-  useEffect(() => {
-    if (!startCreate || createStarted.current || pagesEnabled !== true || !canCreate) return;
-    createStarted.current = true;
-    onCreateStarted?.();
-    void openCreate();
-    // openCreate reads current state; this runs once per dashboard request.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [startCreate, pagesEnabled, canCreate]);
 
   function applyFilters() {
     setAppliedFilters({
@@ -399,32 +232,8 @@ function SitePagesPanelContent({
     setPage(1);
   }
 
-  async function openCreate() {
-    setActivePage(null);
-    setForm(emptyForm(defaultLocale));
-    setDialogError("");
-    setDialogConflict(false);
-    setShowDraftPreview(false);
-    setMode("create");
-    try {
-      const results: SitePageRecord[] = [];
-      let pageNumber = 1;
-      let hasNext = true;
-      while (hasNext && pageNumber <= 100) {
-        const response = unwrap(await loadSitePages(siteId, { page: pageNumber, page_size: 100, ordering: "title" }));
-        results.push(...response.results.filter((row) => row.site === siteId));
-        hasNext = response.next !== null;
-        pageNumber += 1;
-      }
-      setParentPages(results);
-    } catch {
-      setParentPages(rows);
-    }
-  }
-
   async function openPublishedDraft(row: SitePageRecord) {
     setSaving(true);
-    setDialogError("");
     try {
       const current = unwrap(await getSitePage(siteId, row.id));
       const opened = unwrap(await openWorkingDraft(siteId, row.id, current.etag ?? ""));
@@ -433,109 +242,12 @@ function SitePagesPanelContent({
         pages.reload();
         return;
       }
-      await openEdit(opened);
+      router.push(`/sites/${siteId}/admin/pages/${opened.id}/edit`);
     } catch (cause) {
       toast.error(cause instanceof Error ? cause.message : "The working draft could not be opened.");
     } finally {
       setSaving(false);
     }
-  }
-
-  async function openEdit(row: SitePageRecord) {
-    setSaving(true);
-    setDialogError("");
-    setDialogConflict(false);
-      setShowDraftPreview(false);
-    try {
-      const current = unwrap(await getSitePage(siteId, row.id));
-      setActivePage(current);
-      setForm(formFromRecord(current, defaultLocale));
-      setMode("edit");
-    } catch (cause) {
-      toast.error(cause instanceof Error ? cause.message : "The Page could not be loaded.");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function savePage() {
-    setSaving(true);
-    setDialogError("");
-    setDialogConflict(false);
-      setShowDraftPreview(false);
-    try {
-      if (mode === "create") {
-        unwrap(await createSitePage(siteId, {
-          title: form.title.trim(),
-          slug: form.slug.trim(),
-          parent: form.parent || null,
-          locale: form.locale.trim(),
-          visibility: form.visibility,
-          metadata: metadataInput(form),
-          seo: seoInput(form),
-          blocks: blockInputs(form),
-        }));
-      } else if (mode === "edit" && activePage?.etag) {
-        unwrap(await updateSitePage(siteId, activePage.id, activePage.etag, {
-          title: form.title.trim(),
-          slug: activePage.draft_of ? activePage.slug : form.slug.trim(),
-          parent: activePage.draft_of ? null : form.parent || null,
-          visibility: form.visibility,
-          metadata: metadataInput(form),
-          seo: seoInput(form),
-          blocks: blockInputs(form),
-        }));
-      } else {
-        throw new Error("The Page revision is unavailable. Close and reopen the editor.");
-      }
-      setMode(null);
-      setActivePage(null);
-      pages.reload();
-      statusCounts.reload();
-    } catch (cause) {
-      if (cause instanceof ApiError && cause.status === 409) {
-        setDialogConflict(true);
-        setDialogError(`${cause.message} Your edits are still here. Reload the latest version to continue.`);
-      } else {
-        setDialogError(cause instanceof Error ? cause.message : "The Page could not be saved.");
-      }
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function reloadLatestAfterConflict() {
-    if (!activePage) return;
-    setSaving(true);
-    try {
-      const current = unwrap(await getSitePage(siteId, activePage.id));
-      setActivePage(current);
-      setForm(formFromRecord(current, defaultLocale));
-      setDialogConflict(false);
-      setDialogError("");
-    } catch (cause) {
-      setDialogError(cause instanceof Error ? cause.message : "The latest Page could not be loaded.");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  function closeEditor() {
-    if (saving) return;
-    const dirty = mode === "create"
-      ? JSON.stringify(form) !== JSON.stringify(emptyForm(defaultLocale))
-      : activePage !== null && JSON.stringify(form) !== JSON.stringify(formFromRecord(activePage, defaultLocale));
-    if (!dirty || window.confirm("Discard your unsaved Page changes?")) setMode(null);
-  }
-
-  function moveBlock(index: number, offset: number) {
-    setForm((current) => {
-      const next = [...current.blocks];
-      const target = index + offset;
-      if (target < 0 || target >= next.length) return current;
-      [next[index], next[target]] = [next[target], next[index]];
-      return { ...current, blocks: next };
-    });
   }
 
   async function runPageAction(row: SitePageRecord, action: () => Promise<unknown>): Promise<boolean> {
@@ -551,9 +263,9 @@ function SitePagesPanelContent({
         pages.reload();
         statusCounts.reload();
       } else {
-        const details=cause instanceof ApiError && cause.fieldErrors ? [...new Set(Object.values(cause.fieldErrors).flat())].join(" ") : "";
-        const message=details || (cause instanceof Error ? cause.message : "The Page could not be updated.");
-        if(pendingWorkflow)setWorkflowError(message);
+        const details = cause instanceof ApiError && cause.fieldErrors ? [...new Set(Object.values(cause.fieldErrors).flat())].join(" ") : "";
+        const message = details || (cause instanceof Error ? cause.message : "The Page could not be updated.");
+        if (pendingWorkflow) setWorkflowError(message);
         toast.error(message);
       }
       return false;
@@ -578,30 +290,36 @@ function SitePagesPanelContent({
   }
 
   async function queueWorkflowAction(row: SitePageRecord, action: WorkflowAction) {
-    const sequence=++workflowSequence.current;
+    const sequence = ++workflowSequence.current;
     setWorkflowComment("");
     setWorkflowError("");
     setWorkflowPreview(null);
     setPendingWorkflow({ page: row, action });
-    if(row.metadata?.visual_layout && (action==="approve" || action==="publish" || action==="revise")) {
+    if (row.metadata?.visual_layout && (action === "approve" || action === "publish" || action === "revise")) {
       setBusyPageId(row.id);
       try {
-        const preview=unwrap(await getSitePagePreview(siteId,row.id,row.revision_number));
-        if(sequence!==workflowSequence.current)return;
+        const preview = unwrap(await getSitePagePreview(siteId, row.id, row.revision_number));
+        if (sequence !== workflowSequence.current) return;
         setWorkflowPreview(preview);
-        setPendingWorkflow({page:{...row,etag:preview.etag},action});
-      } catch(cause) {if(sequence===workflowSequence.current){toast.error(cause instanceof Error?cause.message:"Revision preview could not be loaded.");setPendingWorkflow(null);}}
-      finally {if(sequence===workflowSequence.current)setBusyPageId(null);}
+        setPendingWorkflow({ page: { ...row, etag: preview.etag }, action });
+      } catch (cause) {
+        if (sequence === workflowSequence.current) {
+          toast.error(cause instanceof Error ? cause.message : "Revision preview could not be loaded.");
+          setPendingWorkflow(null);
+        }
+      } finally {
+        if (sequence === workflowSequence.current) setBusyPageId(null);
+      }
     }
   }
 
   async function confirmWorkflowAction() {
     if (!pendingWorkflow) return;
     const { page: row, action } = pendingWorkflow;
-    const succeeded=await runPageAction(row, async () => unwrap(await (row.metadata?.visual_layout
-      ? transitionSitePage(siteId,row.id,action,workflowComment.trim(),row.etag)
-      : transitionSitePage(siteId,row.id,action,workflowComment.trim()))));
-    if(succeeded)setPendingWorkflow(null);
+    const succeeded = await runPageAction(row, async () => unwrap(await (row.metadata?.visual_layout
+      ? transitionSitePage(siteId, row.id, action, workflowComment.trim(), row.etag)
+      : transitionSitePage(siteId, row.id, action, workflowComment.trim()))));
+    if (succeeded) setPendingWorkflow(null);
   }
 
   const columns: TableColumn<SitePageRecord>[] = [
@@ -644,7 +362,7 @@ function SitePagesPanelContent({
       <Button
         key="preview"
         component={Link}
-        href={`/sites/${siteId}/admin/pages/${row.id}/preview${row.revision_number?`?revision=${row.revision_number}`:""}`}
+        href={`/sites/${siteId}/admin/pages/${row.id}/preview${row.revision_number ? `?revision=${row.revision_number}` : ""}`}
         target="_blank"
         rel="noopener noreferrer"
         size="small"
@@ -659,7 +377,14 @@ function SitePagesPanelContent({
 
     if (canEdit && (row.status === "DRAFT" || row.status === "UNPUBLISHED")) {
       actions.push(
-        <Button key="edit" size="small" aria-label={`Edit ${row.title}`} disabled={!enabled} onClick={() => void openEdit(row)}>
+        <Button
+          key="edit"
+          component={Link}
+          href={`/sites/${siteId}/admin/pages/${row.id}/edit`}
+          size="small"
+          aria-label={`Edit ${row.title}`}
+          disabled={!enabled}
+        >
           Edit
         </Button>,
       );
@@ -742,9 +467,10 @@ function SitePagesPanelContent({
           ) : null}
           {canCreate ? (
             <Button
+              component={Link}
+              href={`/sites/${siteId}/admin/pages/new`}
               variant="contained"
               startIcon={<AddIcon />}
-              onClick={() => void openCreate()}
               disabled={!enabled}
             >
               Create page
@@ -889,7 +615,7 @@ function SitePagesPanelContent({
         onClose={() => setPendingWorkflow(null)}
         onConfirm={() => void confirmWorkflowAction()}
       >
-        {workflowPreview && pendingWorkflow ? <Box><Typography variant="overline">Private revision {workflowPreview.revision_number}</Typography><PublicPageView page={pageFromResponse(200,workflowPreview.page)} privateMediaBase={`${APP_BASE_PATH}/sites/${siteId}/pages/${pendingWorkflow.page.id}/preview-media/${workflowPreview.revision_number}`}/></Box> : null}
+        {workflowPreview && pendingWorkflow ? <Box><Typography variant="overline">Private revision {workflowPreview.revision_number}</Typography><PublicPageView page={pageFromResponse(200, workflowPreview.page)} privateMediaBase={`${APP_BASE_PATH}/sites/${siteId}/pages/${pendingWorkflow.page.id}/preview-media/${workflowPreview.revision_number}`} /></Box> : null}
       </ContentWorkflowDialog>
 
       <Dialog
@@ -915,225 +641,6 @@ function SitePagesPanelContent({
         </DialogContent>
         <DialogActions><Button onClick={() => setHistoryPage(null)}>Close</Button></DialogActions>
       </Dialog>
-
-      <Dialog
-        open={mode === "create" || mode === "edit"}
-        onClose={closeEditor}
-        fullWidth
-        maxWidth="sm"
-        aria-labelledby="page-editor-title"
-      >
-        <DialogTitle id="page-editor-title">
-          {mode === "create" ? "Create Page" : activePage?.draft_of ? "Edit draft of published Page" : "Edit Page"}
-        </DialogTitle>
-        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, pt: "8px !important" }}>
-          {dialogError ? (
-            <Alert severity={dialogConflict ? "warning" : "error"} role="alert" action={dialogConflict ? <Button color="inherit" size="small" onClick={() => void reloadLatestAfterConflict()}>Reload latest</Button> : undefined}>
-              {dialogError}
-            </Alert>
-          ) : null}
-          {formSyntaxError(form) ? <Alert severity="error" role="alert">{formSyntaxError(form)}</Alert> : null}
-          <TextField
-            label="Title"
-            value={form.title}
-            onChange={(event) => setForm((current) => ({
-              ...current,
-              title: event.target.value,
-              slug: mode === "create" && current.slug === slugFromTitle(current.title)
-                ? slugFromTitle(event.target.value)
-                : current.slug,
-            }))}
-            disabled={!enabled}
-            autoFocus
-            required
-          />
-          <TextField
-            label="Slug"
-            value={form.slug}
-            onChange={(event) => setForm((current) => ({ ...current, slug: event.target.value }))}
-            disabled={!enabled || Boolean(activePage?.draft_of)}
-            required
-            helperText={activePage?.draft_of
-              ? "Publication keeps the live Page route. This draft uses an internal slug."
-              : mode === "create"
-                ? "Filled from the title until you edit it. Use lowercase letters, numbers and hyphens."
-                : "Use lowercase letters, numbers and hyphens."}
-          />
-          <TextField
-            select
-            label="Parent Page"
-            value={form.parent}
-            disabled={!enabled || Boolean(activePage?.draft_of)}
-            helperText="Only Pages from this Site are available. Route history is preserved when a Page moves."
-            onChange={(event) => setForm((current) => ({ ...current, parent: event.target.value }))}
-          >
-            <MenuItem value="">No parent (top level)</MenuItem>
-            {parentPages.filter((row) => row.id !== activePage?.id && !(activePage && row.path.startsWith(`${activePage.path}/`))).map((row) => (
-              <MenuItem key={row.id} value={row.id}>{row.title} — {row.path}</MenuItem>
-            ))}
-          </TextField>
-          {localeChoices ? (
-            <TextField
-              select
-              label="Locale"
-              value={form.locale}
-              onChange={(event) => setForm((current) => ({ ...current, locale: event.target.value }))}
-              disabled={mode === "edit"}
-              required
-              helperText={mode === "edit"
-                ? "Locale is fixed when the Page is created."
-                : "Choose one of this Site's enabled languages."}
-            >
-              {(localeChoices.includes(form.locale) ? localeChoices : [form.locale, ...localeChoices]).map((code) => (
-                <MenuItem key={code} value={code}>{code}</MenuItem>
-              ))}
-            </TextField>
-          ) : (
-            <TextField label="Locale" value={form.locale} onChange={(event) => setForm((current) => ({ ...current, locale: event.target.value }))} disabled={mode === "edit"} required helperText={mode === "edit" ? "Locale is fixed when the Page is created." : "Use a language this Site enables, such as en-us."} />
-          )}
-          <TextField select label="Visibility" value={form.visibility} onChange={(event) => setForm((current) => ({ ...current, visibility: event.target.value as SitePageRecord["visibility"] }))}>
-            <MenuItem value="PUBLIC">Public</MenuItem><MenuItem value="UNLISTED">Unlisted</MenuItem><MenuItem value="HIDDEN">Hidden</MenuItem>
-          </TextField>
-          <TextField
-            label="SEO title"
-            value={form.seoTitle}
-            onChange={(event) => setForm((current) => ({ ...current, seoTitle: event.target.value }))}
-            helperText="Search result title. Leave blank to use the Page title."
-          />
-          <TextField
-            label="Meta description"
-            value={form.seoDescription}
-            onChange={(event) => setForm((current) => ({ ...current, seoDescription: event.target.value }))}
-            multiline
-            minRows={2}
-            helperText="Short summary shown in search results."
-          />
-          <Accordion disableGutters elevation={0} sx={{ border: 1, borderColor: "divider", "&:before": { display: "none" } }}>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>Advanced</AccordionSummary>
-            <AccordionDetails sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <TextField label="Metadata (JSON object)" value={form.metadata} onChange={(event) => setForm((current) => ({ ...current, metadata: event.target.value }))} multiline minRows={3} helperText="Technical page metadata. Leave this as {} for an ordinary Page." />
-              <TextField label="Additional SEO (JSON object)" value={form.seoExtra} onChange={(event) => setForm((current) => ({ ...current, seoExtra: event.target.value }))} multiline minRows={3} helperText="Other search settings. SEO title and description are edited above." />
-            </AccordionDetails>
-          </Accordion>
-          <Box component="section" aria-label="Content blocks" sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-            <Typography variant="subtitle2">Content blocks</Typography>
-            {permissions.includes("content.media.view") ? (
-              <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-                <Button
-                  ref={mediaInvokeRef}
-                  onClick={() => setMediaPickerOpen(true)}
-                  aria-haspopup="dialog"
-                >
-                  Choose uploaded image
-                </Button>
-                <Button onClick={() => setForm((current) => ({ ...current, blocks: [...current.blocks, JSON.stringify(createEmptySliderBlock(), null, 2)] }))}>Add slider</Button>
-                <Button onClick={() => setForm((current) => ({ ...current, blocks: [...current.blocks, JSON.stringify(createEmptyGalleryBlock(), null, 2)] }))}>Add gallery</Button>
-              </Box>
-            ) : null}
-            <MediaPickerDialog
-              open={mediaPickerOpen}
-              siteId={siteId}
-              returnFocusRef={mediaInvokeRef}
-              canUpload={permissions.includes("content.media.upload")}
-              onCancel={() => setMediaPickerOpen(false)}
-              onConfirm={(result: MediaPickerResult) => {
-                const block = {
-                  ...createEmptyImageBlock(siteId),
-                  ref: imageRefForAsset(siteId, result.assetId),
-                  alt: result.altText || "Describe this image",
-                };
-                setForm((current) => ({ ...current, blocks: [...current.blocks, JSON.stringify(block, null, 2)] }));
-                setMediaPickerOpen(false);
-              }}
-            />
-
-            {form.blocks.map((block, index) => {
-              let mediaBlock: MediaBlockValue | null = null;
-              try { mediaBlock = parseMediaBlock(JSON.parse(block)); } catch { mediaBlock = null; }
-              return (
-                <Paper key={`block-${index}`} variant="outlined" sx={{ p: 1.5, display: "flex", flexDirection: "column", gap: 1 }}>
-                  <Typography variant="caption">Block {index + 1}{mediaBlock ? ` · ${mediaBlock.type}` : " · edit structured JSON"}</Typography>
-                  {mediaBlock && permissions.includes("content.media.view") ? (
-                    <MediaBlockEditor
-                      siteId={siteId}
-                      value={mediaBlock}
-                      canUpload={permissions.includes("content.media.upload")}
-                      onChange={(next) => setForm((current) => ({
-                        ...current,
-                        blocks: current.blocks.map((item, itemIndex) => itemIndex === index ? JSON.stringify(next, null, 2) : item),
-                      }))}
-                    />
-                  ) : null}
-                  <TextField
-                    label={`Block ${index + 1} JSON`}
-                    value={block}
-                    onChange={(event) => setForm((current) => ({ ...current, blocks: current.blocks.map((item, itemIndex) => itemIndex === index ? event.target.value : item) }))}
-                    multiline minRows={3} fullWidth inputProps={{ "aria-label": `Block ${index + 1} JSON` }}
-                  />
-                  <Box sx={{ display: "flex", gap: 1 }}>
-                    <Button aria-label={`Move block ${index + 1} up`} disabled={index === 0} onClick={() => moveBlock(index, -1)}>Move up</Button>
-                    <Button aria-label={`Move block ${index + 1} down`} disabled={index === form.blocks.length - 1} onClick={() => moveBlock(index, 1)}>Move down</Button>
-                    <Button aria-label={`Remove block ${index + 1}`} color="error" onClick={() => setForm((current) => ({ ...current, blocks: current.blocks.filter((_, itemIndex) => itemIndex !== index) }))}>Remove</Button>
-                  </Box>
-                </Paper>
-              );
-            })}
-            <Button onClick={() => setForm((current) => ({ ...current, blocks: [...current.blocks, '{"type":"heading","level":2,"text":"New heading"}'] }))}>Add heading block</Button>
-            <Button onClick={() => setForm((current) => ({ ...current, blocks: [...current.blocks, '{"type":"paragraph","html":"<p>New paragraph</p>"}'] }))}>Add paragraph block</Button>
-            <Button onClick={() => setForm((current) => ({ ...current, blocks: [...current.blocks, JSON.stringify(createEmptyImageBlock(siteId), null, 2)] }))}>Add image block</Button>
-            <Button onClick={() => setForm((current) => ({ ...current, blocks: [...current.blocks, '{"type":"button","label":"Learn more","href":"/"}'] }))}>Add button block</Button>
-            <Button onClick={() => setForm((current) => ({ ...current, blocks: [...current.blocks, '{"type":"list","style":"unordered","items":["First item"]}'] }))}>Add list block</Button>
-            <Button onClick={() => setForm((current) => ({ ...current, blocks: [...current.blocks, '{"type":"section","heading":"New section","children":[{"type":"paragraph","html":"<p>Section content</p>"}]}'] }))}>Add section block</Button>
-          </Box>
-          <Button onClick={() => setShowDraftPreview((value) => !value)} aria-expanded={showDraftPreview}>
-            {showDraftPreview ? "Hide draft preview" : "Preview draft"}
-          </Button>
-          {showDraftPreview ? (
-            <Paper variant="outlined" sx={{ p: 2 }} aria-label="Unpublished Page preview">
-              <Typography variant="overline">Private draft preview</Typography>
-              {(() => {
-                try {
-                  return (
-                    <PublicPageView
-                      privateMediaBase={`${APP_BASE_PATH}/sites/${siteId}/media`}
-                      page={{
-                        title: form.title || "Untitled Page",
-                        path: activePage?.path ?? `/${form.slug}`,
-                        site: siteId,
-                        blocks: blockInputs(form),
-                        ...(metadataInput(form).visual_layout ? {visual_layout:metadataInput(form).visual_layout as VisualLayout} : {}),
-                        seo: seoPreview(seoInput(form)),
-                      }}
-                    />
-                  );
-                } catch {
-                  return <Alert severity="error">Fix block JSON errors to preview this draft.</Alert>;
-                }
-              })()}
-            </Paper>
-          ) : null}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={closeEditor} disabled={saving}>Cancel</Button>
-          <Button
-            variant="contained"
-            onClick={() => void savePage()}
-            disabled={
-              !enabled ||
-              !form.title.trim() ||
-              !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(form.slug.trim()) ||
-              !form.locale.trim() ||
-              form.blocks.some((block) => { try { JSON.parse(block); return false; } catch { return true; } }) ||
-              (() => { try { metadataInput(form); return false; } catch { return true; } })()
-              || (() => { try { seoInput(form); return false; } catch { return true; } })()
-            }
-          >
-            {saving ? "Saving…" : mode === "create" ? "Create Page" : "Save changes"}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-
     </Paper>
   );
 }

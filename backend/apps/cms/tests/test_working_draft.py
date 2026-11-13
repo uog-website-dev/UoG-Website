@@ -372,6 +372,6 @@ def test_post_publication_does_not_use_page_working_drafts(sites, posts_module):
     transition_with_site_role(post, "approve", reviewer)
     published = transition_with_site_role(post, "publish", publisher)
     assert published.status == ContentStatus.PUBLISHED
-    assert not hasattr(published, "draft_of_id")
+    assert published.draft_of_id is None
     assert PublishedContentSnapshot.objects.filter(content_id=post.pk).count() == 1
     assert Page.objects.filter(draft_of__isnull=False).count() == 0

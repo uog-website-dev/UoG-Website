@@ -1,0 +1,27 @@
+{
+  "backend-tests.xml": {
+    "tests": 33,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "component-tests.xml": {
+    "tests": 10,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "browser": {
+    "checks": 6,
+    "all_pass": true
+  },
+  "accessibility_violations": 0,
+  "typescript": true,
+  "public_build": true,
+  "openapi": "validate and fail-on-warn passed",
+  "system_check": "no issues",
+  "migration_check": "no changes detected",
+  "new_migrations": false,
+  "generated_local_accounts_disabled": 3,
+  "independent_review_pr_issue_attachment": "pending"
+}

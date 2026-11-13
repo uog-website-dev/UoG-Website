@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="27" failures="0" errors="0" time="46.10535048">
+    <testsuite name="src/sites/post-media.test.tsx" timestamp="2026-11-13T15:14:18.088Z" hostname="5daa56de437b" tests="4" failures="0" errors="0" skipped="0" time="7.541197994">
+        <testcase classname="src/sites/post-media.test.tsx" name="saves a featured asset identity and editable alternative text" time="3.689031373">
+        </testcase>
+        <testcase classname="src/sites/post-media.test.tsx" name="removes the featured reference and retains the article body" time="1.501107234">
+        </testcase>
+        <testcase classname="src/sites/post-media.test.tsx" name="hides attachment controls when MEDIA is disabled" time="0.931551859">
+        </testcase>
+        <testcase classname="src/sites/post-media.test.tsx" name="inserts inline images with a stable placement ID and requires alternative text" time="1.415396294">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/post-workflow.test.tsx" timestamp="2026-11-13T15:14:18.100Z" hostname="5daa56de437b" tests="4" failures="0" errors="0" skipped="0" time="7.858862971">
+        <testcase classname="src/sites/post-workflow.test.tsx" name="submits the saved revision and displays the backend-confirmed status" time="2.28753488">
+        </testcase>
+        <testcase classname="src/sites/post-workflow.test.tsx" name="prevents transitions while unsaved text exists and retains text after a rejected transition" time="1.717088205">
+        </testcase>
+        <testcase classname="src/sites/post-workflow.test.tsx" name="lets a scoped reviewer read and reject with a required comment" time="2.803960897">
+        </testcase>
+        <testcase classname="src/sites/post-workflow.test.tsx" name="opens a working draft from the published revision and links a new-tab private preview" time="1.04672536">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-posts.test.tsx" timestamp="2026-11-13T15:14:18.105Z" hostname="5daa56de437b" tests="19" failures="0" errors="0" skipped="0" time="30.705289515">
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; loads only the selected Site and renders status, author, taxonomy and featured media" time="1.662605776">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; applies search, status, category and tag filters and resets them" time="3.356686217">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; links Create and Edit to dedicated editor routes" time="0.725851749">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; hides create/edit actions without permissions and blocks the disabled module" time="0.817232186">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; does not request or reveal Site Posts without view permission" time="0.07233182">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; shows empty and API error states" time="1.063618225">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; runs submit, approve and publish only when the API offers that action for this Site" time="2.002334179">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; creates drafts and edits with the detail ETag on the full-page editor" time="3.016676911">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; validates media scope and offers taxonomy creation only to authorized creators" time="6.019639698">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; previews the Site draft through the shared safe block renderer" time="1.175943706">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; keeps unsaved formatting after failed saves and warns before discard" time="1.157331772">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; preserves a stale draft and displays explicit conflict guidance" time="1.183700844">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; refreshes the revision marker after a conflict while keeping unsaved text" time="1.617335227">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; surfaces editor_document field errors on the draft editor" time="0.922036067">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; fills the permalink from the title until the slug is edited" time="0.988408139">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; rejects reserved permalinks and shows the public path preview" time="1.278713049">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; surfaces duplicate slug API field errors on the settings panel" time="1.582041983">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; locks Post settings while the Post is published" time="0.532438121">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; lets an editor remove selected taxonomy that is no longer eligible" time="1.521830822">
+        </testcase>
+    </testsuite>
+</testsuites>

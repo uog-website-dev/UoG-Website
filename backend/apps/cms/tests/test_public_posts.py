@@ -51,6 +51,7 @@ def test_public_feed_detail_site_taxonomy_draft_and_host_isolation(
     host = _host(site)
     other_host = _host(other)
     category = Category.objects.create(site=site, code="NEWS", name="News")
+    _publish(category)
     tag = Tag.objects.create(site=site, code="CAMPUS", name="Campus")
     foreign_category = Category.objects.create(site=other, code="PRIVATE_NEWS", name="Private News")
     foreign_tag = Tag.objects.create(site=other, code="PRIVATE_TAG", name="Private Tag")
@@ -126,12 +127,11 @@ def test_editor_creates_reviews_and_publishes_post_to_public_feed(
         base + "/posts/",
         {
             "title": "Research update", "slug": "research-update",
-            "excerpt": "New research", "content": "Research body",
+            "excerpt": "New research", "editor_document": {"schema_version":1,"html":"<h2>Research</h2><p><strong>Research body</strong></p>"},
             "excerpt_html": (
                 '<p onclick="alert(1)">Safe <script>alert(2)</script>'
                 '<a href="javascript:alert(3)">bad link</a></p>'
             ),
-            "featured_media": "shared/research.jpg",
             "seo": {"meta_title": "Research update"},
             "categories": [category.json()["id"]], "tags": [tag.json()["id"]],
         }, content_type="application/json", **auth(ContentRole.AUTHOR),
@@ -167,7 +167,8 @@ def test_editor_creates_reviews_and_publishes_post_to_public_feed(
     assert feed.status_code == 200 and feed.json()["count"] == 1
     detail = client.get(PUBLIC_POSTS + "research-update/", HTTP_HOST=host)
     assert detail.status_code == 200
-    assert detail.json()["content"] == "Research body"
+    assert detail.json()["editor_document"] == created.json()["editor_document"]
+    assert detail.json()["content"] == "<h2>Research</h2><p><strong>Research body</strong></p>"
     assert "<script" not in detail.json()["excerpt_html"]
     assert PublishedContentSnapshot.objects.filter(content_id=post_id).count() == 1
     assert AuditEvent.objects.filter(entity_id=str(post_id), action="CONTENT_PUBLISHED").exists()
@@ -201,3 +202,94 @@ def test_post_publication_pagination_cache_and_disabled_module(
     assert client.get(PUBLIC_POSTS + "post-1/", HTTP_HOST=host).status_code == 404
     assert client.get(PUBLIC_POSTS, HTTP_HOST=other_host).status_code == 200
 
+
+
+def test_public_detail_includes_optional_author_byline_without_admin_fields(
+    client, sites, posts_module,
+):
+    site = sites[0]
+    host = _host(site)
+    author = get_user_model().objects.create_user(
+        username="campus-writer",
+        first_name="Ada",
+        last_name="Bekele",
+    )
+    post = Post.objects.create(
+        site=site,
+        title="Author byline article",
+        slug="author-byline",
+        content="<p>Public body</p>",
+        author=author,
+        featured_media="",
+    )
+    _publish(post)
+    detail = client.get(PUBLIC_POSTS + "author-byline/", HTTP_HOST=host)
+    assert detail.status_code == 200, detail.content
+    body = detail.json()
+    assert body["author"] == "Ada Bekele"
+    assert body["featured_media"] == ""
+    assert "author_id" not in body
+    assert "status" not in body
+    assert "available_actions" not in body
+
+
+def test_published_article_document_remains_snapshot_bound(client,sites,posts_module):
+    site=sites[0]
+    host=_host(site)
+    document={"schema_version":1,"html":"<h2>Approved report</h2><p><strong>Published text</strong></p>"}
+    post=Post.objects.create(site=site,title="Formatted report",slug="formatted-public",content=document["html"],metadata={"post_editor":document})
+    _publish(post)
+    public=client.get(PUBLIC_POSTS+post.slug+"/",HTTP_HOST=host)
+    assert public.status_code==200,public.content
+    assert public.json()["editor_document"]==document
+    post.metadata={"post_editor":{"schema_version":1,"html":"<p>Private revision</p>"}}
+    from django.core.exceptions import ValidationError
+    with pytest.raises(ValidationError, match="locked"):
+        post.save()
+    after=client.get(PUBLIC_POSTS+post.slug+"/",HTTP_HOST=host)
+    assert after.json()["editor_document"]==document
+    assert "Private revision" not in after.content.decode()
+
+
+def test_draft_metadata_retains_previous_publication_until_workflow_republishes(client,sites,posts_module):
+    site=sites[0]
+    host=_host(site)
+    category=_publish(Category.objects.create(site=site,code="META_NEWS",name="News"))
+    tag=Tag.objects.create(site=site,code="META_CAMPUS",name="Campus")
+    post=Post.objects.create(site=site,title="Published identity",slug="published-identity",excerpt="Published summary",content="Published body")
+    post.categories.add(category)
+    post.tags.add(tag)
+    _publish(post)
+    original=PublishedContentSnapshot.objects.get(content_id=post.pk)
+    payload=original.payload
+    public=client.get(PUBLIC_POSTS+post.slug+"/",HTTP_HOST=host)
+    assert public.status_code==200
+    assert public.json()["excerpt"]=="Published summary"
+    assert public.json()["categories"][0]["name"]=="News"
+    assert public.json()["tags"][0]["name"]=="Campus"
+    for action in ("unpublish","restore"):
+        transition_with_site_role(post,action,_new_user("metadata-"+action))
+        post.refresh_from_db()
+    post.title="Revised identity"
+    post.slug="revised-identity"
+    post.excerpt="Revised summary"
+    post.save()
+    revised_category=_publish(Category.objects.create(site=site,code="META_RESEARCH",name="Research"))
+    revised_tag=Tag.objects.create(site=site,code="META_AWARDS",name="Awards")
+    post.categories.set([revised_category])
+    post.tags.set([revised_tag])
+    original.refresh_from_db()
+    assert original.payload==payload
+    assert client.get(PUBLIC_POSTS+post.slug+"/",HTTP_HOST=host).status_code==404
+    assert client.get(PUBLIC_POSTS+"published-identity/",HTTP_HOST=host).status_code==404
+    assert client.get(PUBLIC_POSTS,HTTP_HOST=host).json()["count"]==0
+    _publish(post)
+    current=client.get(PUBLIC_POSTS+post.slug+"/",HTTP_HOST=host)
+    assert current.status_code==200,current.content
+    assert current.json()["title"]=="Revised identity"
+    assert current.json()["excerpt"]=="Revised summary"
+    assert current.json()["categories"][0]["name"]=="Research"
+    assert current.json()["tags"][0]["name"]=="Awards"
+    original.refresh_from_db()
+    assert original.payload==payload
+    assert PublishedContentSnapshot.objects.filter(content_id=post.pk).count()==2

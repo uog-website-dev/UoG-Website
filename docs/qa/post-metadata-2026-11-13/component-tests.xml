@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="20" failures="0" errors="0" time="16.102759624">
+    <testsuite name="src/app/sites/post-actions.test.ts" timestamp="2026-11-13T10:46:20.436Z" hostname="4716cbe477ac" tests="1" failures="0" errors="0" skipped="0" time="0.005360564">
+        <testcase classname="src/app/sites/post-actions.test.ts" name="loads eligible taxonomy beyond the first page and filters foreign or inactive entries" time="0.003107504">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/post-rich-editor.test.tsx" timestamp="2026-11-13T10:46:20.438Z" hostname="4716cbe477ac" tests="1" failures="0" errors="0" skipped="0" time="0.550042858">
+        <testcase classname="src/sites/post-rich-editor.test.tsx" name="applies Paragraph even when the menu already displays Paragraph for an existing heading" time="0.548575114">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-posts.test.tsx" timestamp="2026-11-13T10:46:20.439Z" hostname="4716cbe477ac" tests="18" failures="0" errors="0" skipped="0" time="15.547356202">
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; loads only the selected Site and renders status, author, taxonomy and featured media" time="0.646288759">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; applies search, status, category and tag filters and resets them" time="1.216611794">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; resets filters on Site change and requests the new Site only" time="0.589031022">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; hides create/edit actions without permissions and blocks the disabled module" time="0.262501011">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; does not request or reveal Site Posts without view permission" time="0.008076077">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; creates drafts and edits with the detail ETag" time="2.283258707">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; shows empty and API error states" time="0.396541426">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; validates media scope and offers taxonomy creation only to authorized creators" time="2.283091952">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; previews the Site draft through the shared safe block renderer" time="0.623531676">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; runs submit, approve and publish only when the API offers that action for this Site" time="0.698529414">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; keeps unsaved formatting after failed saves and warns before discard" time="1.050312285">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; preserves a stale draft and displays explicit conflict guidance" time="0.752527772">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; refreshes the revision marker after a conflict while keeping unsaved text" time="1.377598854">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; surfaces editor_document field errors on the draft dialog" time="0.526738367">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; rejects reserved permalinks and shows the public path preview" time="0.661172629">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; surfaces duplicate slug API field errors on the settings panel" time="0.8524195">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; locks Post settings while the Post is published" time="0.393770034">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; lets an editor remove selected taxonomy that is no longer eligible" time="0.922530518">
+        </testcase>
+    </testsuite>
+</testsuites>

@@ -43,6 +43,6 @@ export interface MediaMetadataPatch {
 
 export interface MediaReferenceInventory {
   asset_id: string;
-  references: { id: string; scope: "DRAFT" | "PUBLIC" | "MANUAL"; page_id: string; revision_id: number; publication_id: number | null; node_id: string; field_path: string; repeater_item_id: string; detachable: boolean }[];
+  references: { id: string; scope: "DRAFT" | "PUBLIC" | "MANUAL" | "REVISION"; page_id: string; revision_id: number; publication_id: number | null; node_id: string; field_path: string; repeater_item_id: string; detachable: boolean }[];
 }
 export interface MediaDeletion { asset_id: string; state: "QUEUED" | "RETRY" | "DONE"; attempts: number; deleted_at: string }

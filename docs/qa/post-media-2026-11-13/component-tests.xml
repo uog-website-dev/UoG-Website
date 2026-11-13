@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="34" failures="0" errors="0" time="21.550671533">
+    <testsuite name="src/sites/media-picker.test.tsx" timestamp="2026-11-13T12:24:35.914Z" hostname="1b3723ea3fe1" tests="11" failures="0" errors="0" skipped="0" time="3.591671577">
+        <testcase classname="src/sites/media-picker.test.tsx" name="MediaPickerDialog &gt; filters, selects a ready Site asset and returns a stable asset ID payload" time="0.806212171">
+        </testcase>
+        <testcase classname="src/sites/media-picker.test.tsx" name="MediaPickerDialog &gt; Escape cancels without change and returns focus to the invoking control" time="0.192105288">
+        </testcase>
+        <testcase classname="src/sites/media-picker.test.tsx" name="MediaPickerDialog &gt; keeps the draft selection when confirm finds the asset ineligible" time="0.337218839">
+        </testcase>
+        <testcase classname="src/sites/media-picker.test.tsx" name="SiteImageField and repeater builder &gt; changes only the targeted Slider slide and restores focus after picking" time="0.806260184">
+        </testcase>
+        <testcase classname="src/sites/media-picker.test.tsx" name="SiteImageField and repeater builder &gt; keeps separate slide references after reorder and reopen" time="0.400876249">
+        </testcase>
+        <testcase classname="src/sites/media-picker.test.tsx" name="SiteImageField and repeater builder &gt; shows an eligibility error on the field while preserving the draft selection" time="0.057187902">
+        </testcase>
+        <testcase classname="src/sites/media-picker.test.tsx" name="Media picker audit regressions &gt; ignores pending confirmation after cancel" time="0.178629922">
+        </testcase>
+        <testcase classname="src/sites/media-picker.test.tsx" name="Media picker audit regressions &gt; ignores pending confirmation after site" time="0.218625561">
+        </testcase>
+        <testcase classname="src/sites/media-picker.test.tsx" name="Media picker audit regressions &gt; ignores pending confirmation after unmount" time="0.179712024">
+        </testcase>
+        <testcase classname="src/sites/media-picker.test.tsx" name="Media picker audit regressions &gt; reports a rejected confirmation request and allows retry" time="0.362037855">
+        </testcase>
+        <testcase classname="src/sites/media-picker.test.tsx" name="Media picker audit regressions &gt; retains the caption when editing an existing Image" time="0.047371021">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/post-media.test.tsx" timestamp="2026-11-13T12:24:35.921Z" hostname="1b3723ea3fe1" tests="4" failures="0" errors="0" skipped="0" time="3.018450959">
+        <testcase classname="src/sites/post-media.test.tsx" name="saves a featured asset identity and editable alternative text" time="1.648394638">
+        </testcase>
+        <testcase classname="src/sites/post-media.test.tsx" name="removes the featured reference and retains the article body" time="0.518393017">
+        </testcase>
+        <testcase classname="src/sites/post-media.test.tsx" name="hides attachment controls when MEDIA is disabled" time="0.257615043">
+        </testcase>
+        <testcase classname="src/sites/post-media.test.tsx" name="inserts inline images with a stable placement ID and requires alternative text" time="0.591512492">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/post-rich-editor.test.tsx" timestamp="2026-11-13T12:24:35.923Z" hostname="1b3723ea3fe1" tests="1" failures="0" errors="0" skipped="0" time="0.745345316">
+        <testcase classname="src/sites/post-rich-editor.test.tsx" name="applies Paragraph even when the menu already displays Paragraph for an existing heading" time="0.743041259">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-posts.test.tsx" timestamp="2026-11-13T12:24:35.924Z" hostname="1b3723ea3fe1" tests="18" failures="0" errors="0" skipped="0" time="14.195203681">
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; loads only the selected Site and renders status, author, taxonomy and featured media" time="0.667874534">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; applies search, status, category and tag filters and resets them" time="1.40588909">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; links Create and Edit to dedicated editor routes" time="0.18265876">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; hides create/edit actions without permissions and blocks the disabled module" time="0.320557814">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; does not request or reveal Site Posts without view permission" time="0.018157269">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; shows empty and API error states" time="0.409759523">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; runs submit, approve and publish only when the API offers that action for this Site" time="0.939812906">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; creates drafts and edits with the detail ETag on the full-page editor" time="1.405793307">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; validates media scope and offers taxonomy creation only to authorized creators" time="2.744873229">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; previews the Site draft through the shared safe block renderer" time="0.487425309">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; keeps unsaved formatting after failed saves and warns before discard" time="1.077280176">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; preserves a stale draft and displays explicit conflict guidance" time="0.72374295">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; refreshes the revision marker after a conflict while keeping unsaved text" time="1.09184529">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; surfaces editor_document field errors on the draft editor" time="0.471036423">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; rejects reserved permalinks and shows the public path preview" time="0.853353955">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; surfaces duplicate slug API field errors on the settings panel" time="0.533829935">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; locks Post settings while the Post is published" time="0.216474862">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; lets an editor remove selected taxonomy that is no longer eligible" time="0.641041871">
+        </testcase>
+    </testsuite>
+</testsuites>
