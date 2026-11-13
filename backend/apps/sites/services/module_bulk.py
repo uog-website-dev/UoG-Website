@@ -23,7 +23,6 @@ from .modules import disable_module_for_site, enable_module_for_site
 
 PREVIEW_SALT = "sites.module-bulk"
 PREVIEW_MAX_AGE_SECONDS = 15 * 60
-MAX_SITES_PER_OPERATION = 1000
 MAX_MODULES_PER_OPERATION = 20
 HIGH_IMPACT_SITE_COUNT = 5
 
@@ -212,9 +211,7 @@ def resolve_sites(scope, *, using=DEFAULT_DB_ALIAS, lock=False):
         queryset = filter_sites(queryset, scope["filters"], using=using)
     if lock:
         queryset = queryset.select_for_update(of=("self",))
-    sites = list(queryset[: MAX_SITES_PER_OPERATION + 1])
-    if len(sites) > MAX_SITES_PER_OPERATION:
-        raise BulkOperationError("scope_too_large", f"An operation can change at most {MAX_SITES_PER_OPERATION} Sites. Narrow the scope.")
+    sites = list(queryset)
     if kind in {SiteModuleOperation.ScopeType.SITE, SiteModuleOperation.ScopeType.SELECTED}:
         missing = sorted(set(scope["site_ids"]) - {site.pk for site in sites})
         if missing:

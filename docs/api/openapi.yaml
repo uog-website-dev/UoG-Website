@@ -8932,7 +8932,7 @@ paths:
   /api/v1/site-modules/bulk-apply/:
     post:
       operationId: v1_site_modules_bulk_apply_create
-      description: Platform admin only, behind the development write gate. Recomputes
+      description: Platform admin only. Recomputes
         the plan under row locks and commits every expected change, its history rows
         and audit events in one transaction, or nothing. Blocked pairs are skipped.
         A plan that differs from the preview returns 409 stale_preview. High-impact
@@ -33137,7 +33137,6 @@ components:
         preview_token:
           type: string
           minLength: 1
-          maxLength: 8192
         reason:
           type: string
           default: ''
@@ -36927,7 +36926,6 @@ components:
           items:
             type: integer
             minimum: 1
-          maxItems: 1000
         organization:
           type: integer
           minimum: 1

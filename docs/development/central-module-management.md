@@ -6,10 +6,10 @@ this console; their delegated Site controls remain separate.
 
 The backend reuses `platform.sites.manage_registry`, an existing platform-scoped
 permission. No new role, token claim or Django staff bypass grants central access.
-The existing development write policy also applies: bulk apply requires both
-`DEBUG` and `ORGANIZATIONS_DEV_WRITES_ENABLED`. Preview and history remain readable
-to authorized administrators while that write gate is closed. This feature does
-not authorize a production write release.
+Central preview, apply and history require that platform permission in both
+development and production. Bulk apply does not depend on `DEBUG` or
+`ORGANIZATIONS_DEV_WRITES_ENABLED`. Other administration endpoints retain their
+existing write policy.
 
 ## Workflow and API
 
@@ -45,6 +45,11 @@ Configuration/schema changes, dependency changes, target changes and ownership
 or lifecycle changes require a fresh preview. Eligible pairs commit together;
 previously blocked pairs are explicitly skipped as shown in the preview.
 
+Scopes resolve the complete matching Site set, including more than 1,000 Sites.
+Operations remain synchronous and transactional; there is no silent truncation
+or independent per-Site frontend request. Size infrastructure timeouts for the
+deployment workload before rollout.
+
 Completed requests replay with the same actor, key, token and reason, even after
 preview expiry. A reused key with a different request returns a conflict. A new
 operation always requires a valid preview. An uncertain frontend retry retains
@@ -64,6 +69,9 @@ delivery without deleting assignments. Disabling preserves configuration,
 Pages/Posts/Menus, publication states and history. Existing Site/public endpoint
 policies continue to enforce authorization, active Site resolution and module
 availability. Re-enabling restores access according to those policies.
+Deactivation with unchanged retained settings is allowed after schema evolution;
+activation and settings edits must still satisfy the current schema, including
+when writes bypass the Python model.
 
 Operation history is append-only in PostgreSQL. Each committed state transition
 records actor/system context, Site, module, before/after, operation, scope, reason
@@ -75,3 +83,19 @@ Migration `sites.0008_module_operations` adds dependency/history records;
 `sites.0009_module_integrity` adds serialization and integrity triggers. Run
 migrations using the configured migration role, never the runtime application
 role. Keep developer volumes intact.
+Migration `sites.0010_retained_module_deactivation` permits safe deactivation
+without rewriting outdated retained settings.
+
+## Writable browser acceptance
+
+With the local Compose stack running, POSTS available platform-wide, development
+administration writes enabled, and the configured development platform account
+authorized, run `scripts/qa-module-lifecycle.ps1 -PlaywrightRoot <playwright-core-directory>`.
+The harness uses Edge and creates three synthetic Sites plus separate author,
+reviewer and publisher accounts. It checks selected rollout, unselected isolation,
+navigation, publishing, public API and rendered delivery, disable/restore,
+operation details and unauthorized central access. Credentials are passed on
+stdin and kept only in a mode-0600 container session file. Cleanup disables the
+test accounts, revokes their grants, archives the synthetic Sites, removes the
+private session and retains content/audit history. Existing Site assignments,
+global module switches and developer volumes are preserved.

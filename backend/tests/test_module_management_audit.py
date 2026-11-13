@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError, close_old_connections, connections, transaction
 
 from apps.audit.models import AuditEvent
-from apps.sites.models import Module, ModuleDependency, SiteModule, SiteModuleOperation
+from apps.sites.models import Module, ModuleDependency, Site, SiteModule, SiteModuleOperation
 from apps.sites.selectors.modules import available_module_codes
 from apps.sites.services import module_bulk
 from apps.sites.services.modules import enable_module_for_site, disable_module_for_site
@@ -18,6 +18,58 @@ from tests.test_central_module_management import (
 )
 
 pytestmark = pytest.mark.django_db(transaction=True)
+
+
+def test_disable_retains_outdated_settings_but_activation_and_edits_still_validate(world):
+    _enable_posts_globally()
+    posts = Module.objects.get(code="POSTS")
+    row = enable_module_for_site(world.sites.informatics.pk, posts.pk)
+    posts.configuration_schema = {"schema_version": 1, "properties": [
+        {"code": "SHOW_DATE", "label": "Show date", "type": "boolean", "required": True},
+    ]}
+    posts.save()
+    body = _preview(world.admin, "DISABLE", ["POSTS"], _selected(world.sites.informatics))
+    assert body["summary"]["expected_changes"] == 1
+    _apply(world.admin, body["preview_token"], reason="Deactivate outdated settings", confirmation="DISABLE")
+    row.refresh_from_db()
+    assert row.is_enabled is False and row.configuration == {}
+    # Both direct database writes and the service must reject invalid activation.
+    with pytest.raises(IntegrityError), transaction.atomic():
+        SiteModule.objects.filter(pk=row.pk).update(is_enabled=True)
+    with pytest.raises(ValidationError):
+        enable_module_for_site(row.site_id, posts.pk)
+    with pytest.raises(IntegrityError), transaction.atomic():
+        SiteModule.objects.filter(pk=row.pk).update(configuration={"UNKNOWN": True})
+    row.configuration = {"UNKNOWN": True}
+    with pytest.raises(ValidationError):
+        row.save()
+    restored = enable_module_for_site(row.site_id, posts.pk, configuration={"SHOW_DATE": True})
+    assert restored.is_enabled and restored.configuration == {"SHOW_DATE": True}
+
+
+@pytest.mark.parametrize("kind", ["ALL", "ORGANIZATION", "FILTER", "SELECTED"])
+def test_scope_is_not_truncated_or_rejected_above_one_thousand_sites(world, kind):
+    # Real database scope resolution with an eligible target beyond the former
+    # limit. The other matches are unchanged, so apply still exercises the full
+    # signed target snapshot without thousands of redundant writes.
+    Site.objects.bulk_create([
+        Site(organization_unit=world.orgs.informatics, code=f"LARGE-{i:04}", name=f"Large Site {i}")
+        for i in range(1001)
+    ])
+    target = Site.objects.order_by("pk").last()
+    enable_module_for_site(target.pk, Module.objects.get(code="MENUS").pk)
+    scope = {"type": kind}
+    if kind == "ORGANIZATION":
+        scope.update(organization=world.orgs.informatics.pk, include_descendants=False)
+    elif kind == "FILTER":
+        scope["filters"] = {"search": "Large Site"}
+    elif kind == "SELECTED":
+        scope["site_ids"] = list(Site.objects.filter(code__startswith="LARGE-").values_list("pk", flat=True))
+    body = _preview(world.admin, "DISABLE", ["MENUS"], scope)
+    assert body["summary"]["matched_sites"] >= 1001
+    assert body["summary"]["expected_changes"] == 1
+    _apply(world.admin, body["preview_token"], reason="Full scope deactivation", confirmation="DISABLE")
+    assert not SiteModule.objects.get(site=target, module__code="MENUS").is_enabled
 
 
 def test_completed_operation_replays_after_preview_expiry_without_duplicate_changes(world, monkeypatch):
