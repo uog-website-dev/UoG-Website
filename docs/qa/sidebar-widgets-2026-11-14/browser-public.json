@@ -1,0 +1,64 @@
+{
+  "run": "widgetsidebar-4fc0e72065",
+  "browser": "157.0.4341.46",
+  "results": [
+    {
+      "path": "full-width",
+      "layout": "LEFT_SIDEBAR",
+      "width": 1440,
+      "status": "PASS",
+      "keyboard": "PASS",
+      "violations": [],
+      "incomplete": 0
+    },
+    {
+      "path": "shared-sidebar",
+      "layout": "RIGHT_SIDEBAR",
+      "width": 1440,
+      "status": "PASS",
+      "keyboard": "PASS",
+      "violations": [],
+      "incomplete": 0
+    },
+    {
+      "path": "full-width",
+      "layout": "LEFT_SIDEBAR",
+      "width": 768,
+      "status": "PASS",
+      "keyboard": "PASS",
+      "violations": [],
+      "incomplete": 0
+    },
+    {
+      "path": "shared-sidebar",
+      "layout": "RIGHT_SIDEBAR",
+      "width": 768,
+      "status": "PASS",
+      "keyboard": "PASS",
+      "violations": [],
+      "incomplete": 0
+    },
+    {
+      "path": "full-width",
+      "layout": "LEFT_SIDEBAR",
+      "width": 390,
+      "status": "PASS",
+      "keyboard": "PASS",
+      "violations": [],
+      "incomplete": 0
+    },
+    {
+      "path": "shared-sidebar",
+      "layout": "RIGHT_SIDEBAR",
+      "width": 390,
+      "status": "PASS",
+      "keyboard": "PASS",
+      "violations": [],
+      "incomplete": 0
+    },
+    {
+      "name": "Independent Site is unchanged",
+      "status": "PASS"
+    }
+  ]
+}

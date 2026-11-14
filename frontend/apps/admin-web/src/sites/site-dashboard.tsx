@@ -82,7 +82,7 @@ async function userSummary(siteId: number): Promise<Metric[]> {
   return [{ label: "Assigned users", value: directory.count }];
 }
 
-type SummarySectionKey = Exclude<SiteSection["key"], "dashboard" | "builder" | "homepage">;
+type SummarySectionKey = Exclude<SiteSection["key"], "dashboard" | "builder" | "homepage" | "sidebars">;
 
 const SUMMARIES: Record<SummarySectionKey, {
   icon: SvgIconComponent;
@@ -185,7 +185,7 @@ export function SiteDashboard() {
   const siteId = admin.site.id;
   const contentSections = SITE_SECTIONS.filter(
     (section): section is SiteSection & { key: SummarySectionKey } =>
-      section.key !== "dashboard" && section.key !== "builder" && section.key !== "homepage",
+      section.key !== "dashboard" && section.key !== "builder" && section.key !== "homepage" && section.key !== "sidebars",
   );
   const visible = contentSections.filter((section) => sectionDecision(section, admin) === "visible");
   const disabled = contentSections.filter(

@@ -1,0 +1,13 @@
+{
+  "django_system_check": "PASS, 0 issues",
+  "migration_drift": "PASS, no changes detected",
+  "openapi_validate_fail_on_warn": "PASS",
+  "workspace_typecheck": "PASS",
+  "admin_production_build": "PASS",
+  "public_production_build": "PASS",
+  "backend_tests_passed": 47,
+  "frontend_tests_passed": 41,
+  "browser_checks_passed": 12,
+  "accessibility_layout_viewport_checks_passed": 9,
+  "schema_migration_required": false
+}

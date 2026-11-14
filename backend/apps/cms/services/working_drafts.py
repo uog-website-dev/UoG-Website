@@ -94,6 +94,8 @@ def open_working_draft(page, *, actor, using=None, if_match=None):
             slug=f"wip-{uuid4().hex[:12]}",
             parent=None,
             layout=payload["layout"],
+            sidebar_id=payload["sidebar_id"],
+            sidebar_snapshot=payload["sidebar_snapshot"],
             seo=payload["seo"],
             visibility=payload["visibility"],
             position=0,
@@ -133,5 +135,7 @@ def _serving_payload(page, *, using):
         "metadata": payload.get("metadata") or {},
         "seo": payload.get("seo") or {},
         "layout": payload.get("layout") or "",
+        "sidebar_id": payload.get("sidebar_id"),
+        "sidebar_snapshot": payload.get("sidebar_snapshot") or {},
         "visibility": payload.get("visibility") or page.visibility,
     }

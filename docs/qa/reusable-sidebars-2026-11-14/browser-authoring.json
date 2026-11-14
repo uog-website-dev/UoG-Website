@@ -1,0 +1,22 @@
+{
+  "run": "sidebar-ba2cff8b41",
+  "browser": "157.0.4341.46",
+  "results": [
+    {
+      "name": "Site Editor creates a named sidebar referencing the existing Site Menu",
+      "status": "PASS"
+    },
+    {
+      "name": "Sidebar management remains usable without phone-width overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "Sidebar assignment previews, saves and reopens without replacing builder content",
+      "status": "PASS"
+    },
+    {
+      "name": "Unpublished assignment leaves the original public Page unchanged",
+      "status": "PASS"
+    }
+  ]
+}

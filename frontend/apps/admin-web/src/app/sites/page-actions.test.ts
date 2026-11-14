@@ -151,6 +151,7 @@ describe("Site Page API actions", () => {
     });
 
     expect(api.postDetailed).toHaveBeenCalledWith("/v1/sites/11/pages/", {
+      layout: "FULL_WIDTH",
       title: "Admissions",
       slug: "admissions",
       parent: null,

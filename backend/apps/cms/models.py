@@ -579,6 +579,10 @@ class Page(SiteContent):
                   "/about/people. Recomputed on every save and unique per "
                   "(site, locale).",
     )
+    sidebar = models.ForeignKey(
+        "cms.Sidebar", null=True, blank=True, on_delete=models.PROTECT, related_name="pages",
+    )
+    sidebar_snapshot = models.JSONField(default=dict, blank=True, editable=False)
     layout = models.CharField(
         max_length=64, blank=True, default="",
         validators=[RegexValidator(
@@ -666,6 +670,9 @@ class Page(SiteContent):
             self.slug = normalize_slug(self.slug)
         if isinstance(self.layout, str) and self.layout.strip():
             self.layout = self.layout.strip().upper()
+        from .page_layouts import PAGE_LAYOUTS, LEGACY_LAYOUTS
+        if not isinstance(self.layout, str) or self.layout not in {*PAGE_LAYOUTS, *LEGACY_LAYOUTS}:
+            raise ValidationError({"layout": "Choose Full Width, Left Sidebar or Right Sidebar."})
         return super().full_clean(*args, **kwargs)
 
     def clean(self):
@@ -694,7 +701,7 @@ class Page(SiteContent):
                     )
                     .filter(pk=self.pk)
                     .values(
-                        "parent_id", "title", "slug", "layout", "seo",
+                        "parent_id", "title", "slug", "layout", "sidebar_id", "sidebar_snapshot", "seo",
                         "visibility", "position", "is_homepage",
                     )
                     .first()
@@ -702,7 +709,7 @@ class Page(SiteContent):
                 if previous_page and any(
                     previous_page[name] != getattr(self, name)
                     for name in (
-                        "parent_id", "title", "slug", "layout", "seo",
+                        "parent_id", "title", "slug", "layout", "sidebar_id", "sidebar_snapshot", "seo",
                         "visibility", "position", "is_homepage",
                     )
                 ):
@@ -735,6 +742,8 @@ class Page(SiteContent):
                     "seo": f"{key} must be at most {SEO_KEYS[key]} characters.",
                 })
 
+        from .services.sidebars import validate_page
+        validate_page(self)
         self._validate_working_draft()
         self._validate_route()
         # Blocks last, after the route is settled (see _validate_blocks):
@@ -1146,3 +1155,5 @@ class SitePublicationVersion(models.Model):
 from apps.cms.menu_models import Menu, MenuDeliveryVersion, MenuInheritance, MenuItem  # noqa: E402,F401
 from apps.cms.contact_models import ContactSubmission  # noqa: E402,F401
 from apps.cms.section_template_models import SectionTemplate, SectionTemplateStatus  # noqa: E402,F401
+
+from apps.cms.sidebar_models import Sidebar  # noqa: E402,F401

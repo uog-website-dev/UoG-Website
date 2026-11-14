@@ -1,0 +1,22 @@
+{
+  "backend_regression_passed": 50,
+  "backend_final_passed": 21,
+  "backend_counts_overlap": true,
+  "frontend_workspace_passed": 906,
+  "workspace_typecheck": "PASS",
+  "admin_production_build": "PASS",
+  "public_production_build": "PASS",
+  "django_check": "PASS, zero issues",
+  "migration_drift": "PASS, no changes",
+  "openapi_validate_fail_on_warn": "PASS",
+  "visual_contract_generator_check": "PASS",
+  "migration_rehearsal": "PASS; retained-snapshot downgrade guard tested",
+  "browser_authoring_passed": 4,
+  "browser_public_passed": 7,
+  "browser_negative_passed": 4,
+  "accessibility_scans": 6,
+  "accessibility_violations": 0,
+  "accessibility_incomplete": 0,
+  "temporary_identity_cleanup": "PASS",
+  "unresolved_identified_defects": 0
+}

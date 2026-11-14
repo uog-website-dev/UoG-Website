@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="5" failures="0" errors="0" time="2.325620907">
+    <testsuite name="src/sites/site-sidebars.test.tsx" timestamp="2026-11-14T06:01:07.902Z" hostname="f52a2508f805" tests="5" failures="0" errors="0" skipped="0" time="2.325620907">
+        <testcase classname="src/sites/site-sidebars.test.tsx" name="creates a named sidebar using an existing Menu reference" time="1.332004984">
+        </testcase>
+        <testcase classname="src/sites/site-sidebars.test.tsx" name="requires a name and component, without discarding the form" time="0.228947371">
+        </testcase>
+        <testcase classname="src/sites/site-sidebars.test.tsx" name="retains edits after a rejected save and supplies the current version" time="0.457565041">
+        </testcase>
+        <testcase classname="src/sites/site-sidebars.test.tsx" name="excludes stale results after a Site change" time="0.209486947">
+        </testcase>
+        <testcase classname="src/sites/site-sidebars.test.tsx" name="offers no write controls to a read-only user and gates Menu use" time="0.094661313">
+        </testcase>
+    </testsuite>
+</testsuites>

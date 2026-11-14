@@ -5,6 +5,8 @@ import layoutFixtures from "../../../../packages/types/src/layout/fixtures.json"
 
 import type { SitePageRecord, SitePageStatus } from "@/app/sites/page-actions";
 
+vi.mock("@/app/sites/sidebar-actions", () => ({ listSiteSidebars: vi.fn(async () => ({ ok: true, data: [] })) }));
+
 const { push } = vi.hoisted(() => ({ push: vi.fn() }));
 const loadSitePages = vi.fn();
 const loadSitePageStatusCounts = vi.fn();
@@ -45,6 +47,7 @@ vi.mock("next/link", () => ({
   ),
 }));
 
+import { listSiteSidebars } from "@/app/sites/sidebar-actions";
 import { SitePagesPanel } from "./site-pages";
 import { SitePageEditor } from "./site-page-editor";
 import { SiteAdminFrame, SiteSection } from "./site-admin-frame";
@@ -169,6 +172,18 @@ beforeEach(() => {
 });
 
 describe("SitePagesPanel", () => {
+  it("saves a shell-only change without resending builder blocks or metadata",async()=>{
+    const metadata={visual_layout:layoutFixtures[0].layout};
+    getSitePage.mockResolvedValue({ok:true,data:draft({layout:"FULL_WIDTH",metadata,blocks:[]})});
+    renderEditor("edit",{pageId:"page-1"});
+    const selector=await screen.findByRole("combobox",{name:"Page layout"});
+    await waitFor(()=>expect(screen.getByRole("button",{name:"Save changes"}).hasAttribute("disabled")).toBe(false));
+    fireEvent.mouseDown(selector);fireEvent.click(await screen.findByRole("option",{name:"Left Sidebar"}));
+    fireEvent.click(screen.getByRole("button",{name:"Save changes"}));
+    await waitFor(()=>expect(updateSitePage).toHaveBeenCalledWith(11,"page-1",'"cms-content-page-1-r1"',{layout:"LEFT_SIDEBAR"}));
+    expect(metadata.visual_layout).toEqual(layoutFixtures[0].layout);
+  });
+
   it("assigns only published Pages allowed by the backend as the homepage", async () => {
     loadSitePages.mockResolvedValue(pageResult([
       draft({status:"PUBLISHED",can_set_homepage:true}),
@@ -374,6 +389,7 @@ describe("SitePagesPanel", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: "Create Page" }));
     await waitFor(() => expect(createSitePage).toHaveBeenCalledWith(11, {
+      layout:"FULL_WIDTH",
       title: "Admissions",
       slug: "admissions",
       parent: null,
@@ -397,10 +413,28 @@ describe("SitePagesPanel", () => {
       "page-1",
       '"cms-content-page-1-r1"',
       {
-        title: "Admissions updated", slug: "admissions", visibility: "PUBLIC",
+        layout: "FULL_WIDTH", title: "Admissions updated", slug: "admissions", visibility: "PUBLIC",
         parent: null, metadata: {}, seo: {}, blocks: draft().blocks,
       },
     ));
+  });
+
+  it("assigns a Site sidebar without replacing the builder document", async () => {
+    const snapshot = { id: "sidebar-1", site: 11, version: 1, name: "Department navigation", components: [{ id: "links", type: "menu" as const, menu_id: "menu-1", items: [{ label: "Student support", href: "/support", children: [] }] }] };
+    vi.mocked(listSiteSidebars).mockResolvedValueOnce({ ok: true, data: [
+      { id: "sidebar-1", site: 11, name: "Department navigation", version: 1, status: "ACTIVE", components: [], snapshot },
+      { id: "foreign", site: 12, name: "Foreign navigation", version: 1, status: "ACTIVE", components: [] },
+    ] });
+    getSitePage.mockResolvedValue({ ok: true, data: draft({ layout: "LEFT_SIDEBAR", sidebar: null, blocks: [], metadata: { visual_layout: layoutFixtures[0].layout } }) });
+    renderEditor("edit", { pageId: "page-1" });
+    await waitFor(() => expect((screen.getByRole("button", { name: "Save changes" }) as HTMLButtonElement).disabled).toBe(false));
+    fireEvent.mouseDown(screen.getByRole("combobox", { name: "Reusable sidebar" }));
+    expect(screen.queryByRole("option", { name: "Foreign navigation" })).toBeNull();
+    fireEvent.click(await screen.findByRole("option", { name: "Department navigation" }));
+    fireEvent.click(screen.getByRole("button", { name: "Preview draft" }));
+    await screen.findByRole("link", { name: "Student support" });
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+    await waitFor(() => expect(updateSitePage).toHaveBeenCalledWith(11, "page-1", '\"cms-content-page-1-r1\"', { layout: "LEFT_SIDEBAR", sidebar: "sidebar-1" }));
   });
 
   it("surfaces stale edit conflicts without losing the form", async () => {

@@ -10,6 +10,7 @@ does not expose unrestricted content CRUD or public serving.
 from django.core.exceptions import ValidationError as DjangoValidationError
 
 from drf_spectacular.utils import extend_schema_field, extend_schema_serializer
+from ..page_layouts import PAGE_LAYOUTS, LEGACY_LAYOUTS
 from rest_framework import serializers
 
 from apps.sites.api.serializers import StrictFields
@@ -95,6 +96,15 @@ class PageSerializer(
         ),
     )
     available_actions = serializers.SerializerMethodField()
+    layout = serializers.ChoiceField(
+        choices=[*PAGE_LAYOUTS, *sorted(LEGACY_LAYOUTS)],
+        required=False, allow_blank=True,
+        help_text=(
+            "Page shell: FULL_WIDTH, LEFT_SIDEBAR or RIGHT_SIDEBAR. "
+            "Empty, STANDARD and LANDING are legacy full-width aliases. "
+            "Builder content is independent."
+        ),
+    )
     is_homepage = serializers.SerializerMethodField()
     can_set_homepage = serializers.SerializerMethodField()
     draft_of = serializers.PrimaryKeyRelatedField(read_only=True)
@@ -105,7 +115,7 @@ class PageSerializer(
         model = Page
         fields = (
             "id", "site", "parent", "locale", "title", "slug", "path",
-            "layout", "seo", "visibility", "position", "is_homepage",
+            "layout", "sidebar", "sidebar_snapshot", "seo", "visibility", "position", "is_homepage",
             "status", "published_at", "blocks", "blocks_version",
             "revision_number", "draft_of",
             "created_by", "updated_by", "submitted_by", "reviewed_by",
@@ -114,11 +124,34 @@ class PageSerializer(
             "can_set_homepage",
         )
         read_only_fields = (
-            "id", "site", "path", "is_homepage", "status", "published_at",
+            "id", "site", "path", "sidebar_snapshot", "is_homepage", "status", "published_at",
             "blocks_version", "created_by", "updated_by", "submitted_by",
             "revision_number", "draft_of", "reviewed_by", "review_comment",
             "created_at", "updated_at",
         )
+
+    def get_fields(self):
+        fields = super().get_fields()
+        from ..sidebar_models import Sidebar
+        site_id = getattr(self.instance, "site_id", None) or getattr(self.context.get("site"), "pk", None)
+        fields["sidebar"].queryset = Sidebar.objects.filter(site_id=site_id, status="ACTIVE") if site_id else Sidebar.objects.none()
+        return fields
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        assigned = attrs.get("sidebar", getattr(self.instance, "sidebar", None))
+        layout = attrs.get("layout", getattr(self.instance, "layout", ""))
+        if assigned is not None and layout not in ("LEFT_SIDEBAR", "RIGHT_SIDEBAR"):
+            raise serializers.ValidationError({"sidebar": "Choose Left Sidebar or Right Sidebar before assigning a sidebar."})
+        if "sidebar" in attrs:
+            from ..services.sidebars import freeze
+            sidebar = attrs["sidebar"]
+            site_id = getattr(self.instance, "site_id", None) or getattr(self.context.get("site"), "pk", None)
+            try:
+                attrs["sidebar_snapshot"] = freeze(sidebar, site_id=site_id, strict=True) if sidebar else {}
+            except DjangoValidationError as error:
+                raise serializers.ValidationError(error.message_dict) from error
+        return attrs
 
     def validate_parent(self, value):
         site_id = getattr(self.instance, "site_id", None)

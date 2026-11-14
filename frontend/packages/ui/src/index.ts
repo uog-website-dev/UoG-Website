@@ -19,7 +19,7 @@ export {
   websitePathFromRedirect,
 } from "./public-site";
 export type { PublicSiteContext } from "./public-site";
-export type { PublicBlock, PublicPageDocument } from "./public-page";
+export type { PublicBlock, PublicPageDocument, SidebarSnapshot, SidebarLink } from "./public-page";
 export { PublicPostFeed, PublicPostDetail, postsFromResponse, postsPageFromResponse, postFromResponse } from "./public-post";
 export type { PublicPostDocument, PublicPostSummary, PublicPostPageResult } from "./public-post";
 

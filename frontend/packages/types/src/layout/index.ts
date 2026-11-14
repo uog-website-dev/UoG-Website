@@ -15,6 +15,12 @@ export type { ResolvedSectionPresentation, ResolvedWidgetPresentation } from "./
 type Schema = { type?: string; const?: unknown; enum?: unknown[]; oneOf?: Schema[]; properties?: Record<string, Schema>; required?: string[]; items?: Schema; minItems?: number; maxItems?: number; minLength?: number; maxLength?: number; pattern?: string; minimum?: number; maximum?: number };
 export const layoutSchema = schemaData;
 export const widgetRegistry = schemaData["x-registry"];
+/** Sidebar adapters reuse approved Menu, Loop Grid and Recent Posts sources. */
+export const sidebarWidgetRegistry = [
+  { type: "menu", registryType: "menu", label: widgetRegistry.find(row => row.type === "menu")!.label },
+  { type: "related_pages", registryType: "loop_grid", label: "Related Pages" },
+  { type: "recent_posts", registryType: "recent_posts", label: widgetRegistry.find(row => row.type === "recent_posts")!.label },
+] as const;
 export type LayoutValidation = { ok: true; value: VisualLayout } | { ok: false; errors: Record<string, string[]> };
 export interface VisualDraftErrorLocation {
   path: string;

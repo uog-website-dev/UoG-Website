@@ -1,0 +1,29 @@
+{
+  "backend_broad_run": {
+    "passed": 1070,
+    "skipped": 5,
+    "failures": 1,
+    "disposition": "Approved CMS model catalog needed Sidebar; corrected and passing in final focused run."
+  },
+  "backend_final_run": {
+    "tests": 64,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1
+  },
+  "frontend_tests_passed": 904,
+  "workspace_typecheck": "PASS",
+  "admin_production_build": "PASS",
+  "public_production_build": "PASS",
+  "openapi_validate_fail_on_warn": "PASS",
+  "django_check": "PASS, zero issues",
+  "migration_drift": "PASS, no changes",
+  "migration_rehearsal": "PASS, 31 Pages and 65 publication snapshots retained",
+  "browser_authoring_checks_passed": 4,
+  "browser_public_checks_passed": 7,
+  "accessibility_scans": 6,
+  "accessibility_violations": 0,
+  "accessibility_incomplete": 0,
+  "temporary_identity_cleanup": "PASS",
+  "unresolved_identified_failures": 0
+}

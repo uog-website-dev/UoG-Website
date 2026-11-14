@@ -1,0 +1,22 @@
+{
+  "base_commit": "f232ee5b11b77896c9a0c498c3a0afdc89a5a0f6",
+  "sha256": {
+    "backend/apps/cms/api/preview.py": "3accf6b2488079be1df7096aaf6be159ca1200a207691fd0179716162946d622",
+    "backend/apps/cms/api/serializers.py": "81f44b829948d0f7ce47bb47068523c05abc06c570059d4c5bad46524eb561e8",
+    "backend/apps/cms/models.py": "6e9d02e03a01cc182c8e8ac842f270af03d6e7173bf62909bbbe41cc758aa00c",
+    "backend/apps/cms/page_layouts.py": "ae01e336cd3c55bd52ed2f351d90d64338824fc2cd94109108700600cdc99c3d",
+    "backend/apps/cms/tests/test_page_shell_layouts.py": "2b17988ee68c8166da570e63a90f91577487f9a24bddcce9ab13c47f08777ca0",
+    "docs/api/openapi.yaml": "0adfd3222d0280505ba7b89af5be35d7cb0108ab9faf1565eb08c6f552e6180d",
+    "docs/page-layouts.md": "e33d4b52b202896b82f84d228e64838349a70f8795419ea14ee5ac52806108d9",
+    "frontend/apps/admin-web/src/app/sites/page-actions.ts": "ea6b87d82ce807a1c5217b8bfe1c7076705132473f67cf488ad275c382df20ed",
+    "frontend/apps/admin-web/src/sites/site-page-editor.tsx": "20a3dcd348557ee16309e53d76db297ae86bec7f672f6af86e7a8a5b5769dafc",
+    "frontend/apps/admin-web/src/sites/site-pages.test.tsx": "abedfddb01104bded3b355b5b0c107ddd03718a04c42ca6e995baa99ac0b5e23",
+    "frontend/apps/admin-web/src/sites/visual-builder.tsx": "d39c6f31499953c535d9d0d4b793ac0362f902a3f777b75aa4758dfe5a800125",
+    "frontend/packages/ui/src/page-shell.test.tsx": "d53c4d60acfad9c089e720db9905da8f17b51dbf0b86ecb93ca302a434278203",
+    "frontend/packages/ui/src/public-page.tsx": "15c32043b18e27b4171ca2c1a42482ee4b3451cdeadfbd07ddc99a69d00e2568",
+    "scripts/qa-page-layout-accessibility.cjs": "7822db760f60206b760f5c1491a3df39e4d5e1ae9a1986dde3b2bd5a58b361e5",
+    "scripts/qa-page-layout-browser.cjs": "034eb3db460752bc8302e4674a6d588c2520353722ed23708a9278a54c5713e6",
+    "scripts/qa-page-layout-cleanup.py": "7d46ab250abeb97227c5beaa529d686e3a226bc1eb57d70187ed7fd9ca8ac2a0",
+    "scripts/qa-page-layout-seed.py": "4d8c3af55fd211589a7b1d04a13476f3b2a04267e71860189cf0534f79e71afd"
+  }
+}

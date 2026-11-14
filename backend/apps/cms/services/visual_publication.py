@@ -6,7 +6,7 @@ from apps.cms.models import ContentRole, ContentRevision, ContentWorkflowTransit
 from apps.cms.layout_contract import iter_nodes, validate_layout_media
 
 PRESENTATION = ("title","blocks","blocks_version","metadata","seo","layout","visibility","locale",
-                "parent_id","slug","path","position","is_homepage")
+                "parent_id","slug","path","position","is_homepage","sidebar_id","sidebar_snapshot")
 
 
 def presentation(payload):
@@ -48,6 +48,9 @@ def approval_for(content, *, using):
 
 
 def validate_publication(content, *, using):
+    if isinstance(content, Page):
+        from .sidebars import validate_publication as validate_sidebar_publication
+        validate_sidebar_publication(content)
     if not isinstance(content,Page) or "visual_layout" not in content.metadata:
         return
     from apps.sites.selectors.modules import module_is_available

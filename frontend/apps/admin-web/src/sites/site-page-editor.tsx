@@ -31,6 +31,8 @@ import {
   parseMediaBlock,
   type MediaBlockValue,
 } from "@/sites/content-media-builder";
+import { listSiteSidebars } from "@/app/sites/sidebar-actions";
+import type { SidebarRecord } from "@/app/sites/sidebar-actions";
 import { MediaPickerDialog, type MediaPickerResult } from "@/sites/media-picker";
 import { imageRefForAsset } from "@/sites/site-image-field";
 import {
@@ -51,7 +53,18 @@ export interface PageLanguages {
   enabled: readonly string[];
 }
 
+const PAGE_LAYOUTS = {
+  FULL_WIDTH: "Full Width",
+  LEFT_SIDEBAR: "Left Sidebar",
+  RIGHT_SIDEBAR: "Right Sidebar",
+} as const;
+function shellLayout(value?: string) {
+  return value && Object.hasOwn(PAGE_LAYOUTS, value) ? value : "FULL_WIDTH";
+}
+
 interface PageForm {
+  sidebar: string;
+  layout: string;
   title: string;
   slug: string;
   parent: string;
@@ -79,7 +92,7 @@ function seoPreview(seo: Record<string, unknown> | undefined): PublicPageDocumen
 
 function emptyForm(locale = "en"): PageForm {
   return {
-    title: "", slug: "", parent: "", locale, visibility: "PUBLIC",
+    sidebar: "", layout:"FULL_WIDTH", title: "", slug: "", parent: "", locale, visibility: "PUBLIC",
     metadata: "{}", seoTitle: "", seoDescription: "", seoExtra: "{}",
     blocks: [],
   };
@@ -96,6 +109,8 @@ function formFromRecord(current: SitePageRecord, fallbackLocale: string): PageFo
   delete seo.meta_title;
   delete seo.meta_description;
   return {
+    sidebar: current.sidebar ?? "",
+    layout:shellLayout(current.layout),
     title: current.title,
     slug: current.slug,
     parent: current.parent ?? "",
@@ -226,6 +241,17 @@ function SitePageEditorContent({
   const [dialogError, setDialogError] = useState("");
   const [dialogConflict, setDialogConflict] = useState(false);
   const [showDraftPreview, setShowDraftPreview] = useState(false);
+  const [sidebars, setSidebars] = useState<SidebarRecord[]>([]);
+  const [sidebarError, setSidebarError] = useState("");
+  useEffect(() => {
+    let cancelled = false;
+    setSidebars([]); setSidebarError("");
+    if (pagesEnabled !== true || (mode === "edit" ? !canEdit : !canCreate)) return;
+    listSiteSidebars(siteId).then(result => {
+      if (!cancelled) setSidebars(unwrap(result).filter(row => row.site === siteId && row.status === "ACTIVE"));
+    }).catch(cause => { if (!cancelled) setSidebarError(cause instanceof Error ? cause.message : "Sidebar choices could not be loaded."); });
+    return () => { cancelled = true; };
+  }, [siteId, pagesEnabled, mode, canEdit, canCreate]);
   const [parentPages, setParentPages] = useState<SitePageRecord[]>([]);
   const [parentsReady, setParentsReady] = useState(false);
   const enabled = pagesEnabled === true && !saving && !loadingPage;
@@ -309,6 +335,8 @@ function SitePageEditorContent({
     try {
       if (mode === "create") {
         unwrap(await createSitePage(siteId, {
+          layout:form.layout,
+          ...(form.sidebar ? { sidebar: form.sidebar } : {}),
           title: form.title.trim(),
           slug: form.slug.trim(),
           parent: form.parent || null,
@@ -320,7 +348,11 @@ function SitePageEditorContent({
         }));
         toast.success("Page created.");
       } else if (activePage?.etag) {
-        unwrap(await updateSitePage(siteId, activePage.id, activePage.etag, {
+        const original=formFromRecord(activePage,defaultLocale);
+        const layoutOnly=JSON.stringify({...form,layout:original.layout,sidebar:original.sidebar})===JSON.stringify(original);
+        unwrap(await updateSitePage(siteId, activePage.id, activePage.etag, layoutOnly ? { layout: form.layout, ...(form.sidebar || activePage.sidebar ? { sidebar: form.sidebar || null } : {}) } : {
+          layout:form.layout,
+          ...(form.sidebar || activePage.sidebar ? { sidebar: form.sidebar || null } : {}),
           title: form.title.trim(),
           slug: activePage.draft_of ? activePage.slug : form.slug.trim(),
           parent: activePage.draft_of ? null : form.parent || null,
@@ -454,6 +486,17 @@ function SitePageEditorContent({
         autoFocus
         required
       />
+      <TextField select label="Page layout" value={form.layout} disabled={!enabled} onChange={event=>setForm(current=>({...current,layout:event.target.value,sidebar:event.target.value === "FULL_WIDTH" ? "" : current.sidebar}))} helperText="Changes are saved to this draft. Existing builder content is preserved. On mobile, content appears before navigation.">
+        {Object.entries(PAGE_LAYOUTS).map(([code,label])=><MenuItem key={code} value={code}>{label}</MenuItem>)}
+      </TextField>
+      <TextField select label="Reusable sidebar" value={form.sidebar} disabled={!enabled || form.layout === "FULL_WIDTH"} onChange={event => setForm(current => ({ ...current, sidebar: event.target.value }))} helperText="Choose a shared Site sidebar. Saving refreshes its Menu content in this draft; publication requires review.">
+        <MenuItem value="">Default Site navigation</MenuItem>
+        {form.sidebar && !sidebars.some(row => row.id === form.sidebar) ? <MenuItem value={form.sidebar}>Assigned sidebar (unavailable)</MenuItem> : null}
+        {sidebars.map(row => <MenuItem key={row.id} value={row.id}>{row.name}</MenuItem>)}
+      </TextField>
+      {sidebarError ? <Alert severity="warning">{sidebarError} Existing sidebar assignments are preserved.</Alert> : null}
+      <Button component={Link} href={`/sites/${siteId}/admin/sidebars`}>Manage reusable sidebars</Button>
+
       <TextField
         label="Slug"
         value={form.slug}
@@ -604,6 +647,9 @@ function SitePageEditorContent({
                 <PublicPageView
                   privateMediaBase={`${APP_BASE_PATH}/sites/${siteId}/media`}
                   page={{
+                    layout:form.layout,
+                    sidebar_id: form.sidebar || null,
+                    sidebar_snapshot: sidebars.find(row => row.id === form.sidebar)?.snapshot ?? activePage?.sidebar_snapshot,
                     title: form.title || "Untitled Page",
                     path: activePage?.path ?? `/${form.slug}`,
                     site: siteId,

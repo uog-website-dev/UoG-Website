@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="16" failures="0" errors="0" time="1.013436899">
+    <testsuite name="src/page-shell.test.tsx" timestamp="2026-11-14T05:26:21.073Z" hostname="f52a2508f805" tests="5" failures="0" errors="0" skipped="0" time="0.402738515">
+        <testcase classname="src/page-shell.test.tsx" name="defaults legacy and unknown layouts to a full-width shell" time="0.087422501">
+        </testcase>
+        <testcase classname="src/page-shell.test.tsx" name="renders LEFT_SIDEBAR without altering content and scopes published navigation" time="0.185525173">
+        </testcase>
+        <testcase classname="src/page-shell.test.tsx" name="renders RIGHT_SIDEBAR without altering content and scopes published navigation" time="0.073997793">
+        </testcase>
+        <testcase classname="src/page-shell.test.tsx" name="ignores foreign sidebar data and keeps the body usable on failure" time="0.034147333">
+        </testcase>
+        <testcase classname="src/page-shell.test.tsx" name="private preview does not query the admin hostname for public navigation" time="0.018613907">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/public-page.test.tsx" timestamp="2026-11-14T05:26:21.100Z" hostname="f52a2508f805" tests="11" failures="0" errors="0" skipped="0" time="0.610698384">
+        <testcase classname="src/public-page.test.tsx" name="pageFromResponse &gt; reads one published page and ignores a disabled module" time="0.004619083">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="paragraphParts &gt; drops script and javascript targets" time="0.005006875">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="PublicPageView &gt; renders the published page and does not mount unsafe markup" time="0.234754995">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="PublicPageView &gt; lets a keyboard user reach a safe link" time="0.081843145">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="PublicPageView &gt; states that a missing or unpublished page is not shown" time="0.020827171">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="PublicPageView &gt; can hide the automatic page title for builder canvas composition" time="0.04905755">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="Published media derivatives &gt; uses Host-scoped responsive variants and falls back to alt text on failure" time="0.020877092">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="Published media derivatives &gt; does not construct a public URL for a foreign Site reference" time="0.005986481">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="Published media derivatives &gt; resets a failed image when the asset or Site changes" time="0.035203998">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="renders nested Slider and Gallery uses independently for the same asset" time="0.137762505">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="renders historical compact UUID references through the canonical public route" time="0.00934071">
+        </testcase>
+    </testsuite>
+</testsuites>

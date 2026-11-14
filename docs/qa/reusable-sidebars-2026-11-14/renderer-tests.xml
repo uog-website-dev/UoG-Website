@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="21" failures="0" errors="0" time="1.150292072">
+    <testsuite name="src/page-shell.test.tsx" timestamp="2026-11-14T09:05:00.534Z" hostname="f52a2508f805" tests="5" failures="0" errors="0" skipped="0" time="0.324786295">
+        <testcase classname="src/page-shell.test.tsx" name="defaults legacy and unknown layouts to a full-width shell" time="0.071709313">
+        </testcase>
+        <testcase classname="src/page-shell.test.tsx" name="renders LEFT_SIDEBAR without altering content and scopes published navigation" time="0.162476405">
+        </testcase>
+        <testcase classname="src/page-shell.test.tsx" name="renders RIGHT_SIDEBAR without altering content and scopes published navigation" time="0.0517295">
+        </testcase>
+        <testcase classname="src/page-shell.test.tsx" name="ignores foreign sidebar data and keeps the body usable on failure" time="0.019848159">
+        </testcase>
+        <testcase classname="src/page-shell.test.tsx" name="private preview does not query the admin hostname for public navigation" time="0.01565729">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/public-page.test.tsx" timestamp="2026-11-14T09:05:00.552Z" hostname="f52a2508f805" tests="11" failures="0" errors="0" skipped="0" time="0.52033383">
+        <testcase classname="src/public-page.test.tsx" name="pageFromResponse &gt; reads one published page and ignores a disabled module" time="0.004227576">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="paragraphParts &gt; drops script and javascript targets" time="0.005582495">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="PublicPageView &gt; renders the published page and does not mount unsafe markup" time="0.213453372">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="PublicPageView &gt; lets a keyboard user reach a safe link" time="0.0597321">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="PublicPageView &gt; states that a missing or unpublished page is not shown" time="0.01441117">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="PublicPageView &gt; can hide the automatic page title for builder canvas composition" time="0.038614316">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="Published media derivatives &gt; uses Host-scoped responsive variants and falls back to alt text on failure" time="0.018840421">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="Published media derivatives &gt; does not construct a public URL for a foreign Site reference" time="0.005723468">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="Published media derivatives &gt; resets a failed image when the asset or Site changes" time="0.029288443">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="renders nested Slider and Gallery uses independently for the same asset" time="0.120031843">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="renders historical compact UUID references through the canonical public route" time="0.006905285">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/reusable-sidebar.test.tsx" timestamp="2026-11-14T09:05:00.564Z" hostname="f52a2508f805" tests="5" failures="0" errors="0" skipped="0" time="0.305171947">
+        <testcase classname="src/reusable-sidebar.test.tsx" name="renders frozen ordered menu links without fetching a live definition" time="0.233511822">
+        </testcase>
+        <testcase classname="src/reusable-sidebar.test.tsx" name="rejects foreign sidebar data and does not replace it with live Site navigation" time="0.017519702">
+        </testcase>
+        <testcase classname="src/reusable-sidebar.test.tsx" name="rejects script sidebar data and does not replace it with live Site navigation" time="0.017489782">
+        </testcase>
+        <testcase classname="src/reusable-sidebar.test.tsx" name="rejects unavailable sidebar data and does not replace it with live Site navigation" time="0.010081923">
+        </testcase>
+        <testcase classname="src/reusable-sidebar.test.tsx" name="escapes untrusted sidebar and link labels on public and private surfaces" time="0.02293009">
+        </testcase>
+    </testsuite>
+</testsuites>

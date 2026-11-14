@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 
 from apps.api.models import Category, Post
 from apps.api.serializers import ArticleDocumentField
-from apps.sites.selectors.modules import module_available_on_request
+from apps.sites.selectors.modules import module_available_on_request, module_is_available
 
 from ..models import (
     ContentStatus,
@@ -43,6 +43,8 @@ class PublicPageSerializer(serializers.Serializer):
     slug = serializers.CharField()
     path = serializers.CharField()
     layout = serializers.CharField(allow_blank=True)
+    sidebar_id = serializers.UUIDField(allow_null=True)
+    sidebar_snapshot = serializers.JSONField()
     seo = serializers.JSONField()
     visibility = serializers.ChoiceField(choices=Visibility.choices)
     position = serializers.IntegerField()
@@ -403,7 +405,7 @@ class PublicPageListView(APIView):
         if results is None:
             results = _snapshot_data(page)
             set_public_cache(site.pk, key, results)
-        response = paginator.get_paginated_response(results)
+        response = paginator.get_paginated_response(_sidebar_delivery(results, site.pk))
         response["Cache-Control"] = "public, max-age=0, must-revalidate"
         response["X-Publication-Version"] = str(version)
         response["Vary"] = "Host"
@@ -572,6 +574,8 @@ def _serialize_snapshot(snapshot):
         "slug": payload["slug"],
         "path": payload["path"],
         "layout": payload["layout"],
+        "sidebar_id": payload.get("sidebar_id"),
+        "sidebar_snapshot": payload.get("sidebar_snapshot", {}),
         "seo": payload["seo"],
         "visibility": payload["visibility"],
         "position": payload["position"],
@@ -596,13 +600,21 @@ def _cached_page_response(page):
             raise RuntimeError("A published Page is missing its serving snapshot.")
         data = _serialize_snapshot(snapshot)
         set_public_cache(page.site_id, key, data)
+    data = _sidebar_delivery([data], page.site_id)[0]
     response = Response(data)
     selected = homepage_of(page.site_id)
     response.data = {**data, "is_homepage": bool(selected and selected.pk == page.pk)}
     response["Cache-Control"] = "public, max-age=0, must-revalidate"
+    import hashlib, json
+    sidebar_etag = '-sidebar-'+hashlib.sha256(json.dumps(data.get('sidebar_snapshot'), sort_keys=True).encode()).hexdigest()[:16] if data.get('sidebar_id') else ''
     response["ETag"] = (
-        f'"cms-page-{page.pk}-publication-{data["publication_version"]}-site-{version}"'
+        f'"cms-page-{page.pk}-publication-{data["publication_version"]}-site-{version}{sidebar_etag}"'
     )
     response["X-Publication-Version"] = str(version)
     response["Vary"] = "Host"
     return response
+
+
+def _sidebar_delivery(documents, site_id):
+    from ..services.sidebars import delivery
+    return [{**row, 'sidebar_snapshot': delivery(row.get('sidebar_snapshot') or {}, site_id=site_id, locale=row['locale'])} for row in documents]

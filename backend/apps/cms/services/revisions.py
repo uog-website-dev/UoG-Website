@@ -54,6 +54,8 @@ def revision_snapshot(content):
             "slug": content.slug,
             "path": content.path,
             "layout": content.layout,
+            "sidebar_id": str(content.sidebar_id) if content.sidebar_id else None,
+            "sidebar_snapshot": content.sidebar_snapshot,
             "seo": content.seo,
             "visibility": content.visibility,
             "position": content.position,
@@ -291,6 +293,8 @@ def restore_content_revision(
                 )
             content.title = payload.get("title", content.title)
             content.layout = payload.get("layout", content.layout)
+            content.sidebar_id = payload.get("sidebar_id")
+            content.sidebar_snapshot = payload.get("sidebar_snapshot") or {}
             content.seo = payload.get("seo", content.seo)
             content.visibility = payload.get("visibility", content.visibility)
             content.position = payload.get("position", content.position)
