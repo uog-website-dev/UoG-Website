@@ -148,7 +148,7 @@ class PageSerializer(
             sidebar = attrs["sidebar"]
             site_id = getattr(self.instance, "site_id", None) or getattr(self.context.get("site"), "pk", None)
             try:
-                attrs["sidebar_snapshot"] = freeze(sidebar, site_id=site_id) if sidebar else {}
+                attrs["sidebar_snapshot"] = freeze(sidebar, site_id=site_id, strict=True) if sidebar else {}
             except DjangoValidationError as error:
                 raise serializers.ValidationError(error.message_dict) from error
         return attrs

@@ -1,0 +1,76 @@
+/* Real Keycloak Editor creates a shared region and assigns it to a visual draft. */
+const fs = require('node:fs'), assert = require('node:assert/strict');
+const { chromium } = require(process.env.UOG_QA_PLAYWRIGHT_ROOT);
+(async () => {
+  const seed = JSON.parse(fs.readFileSync(0, 'utf8'));
+  const output = 'docs/qa/sidebar-widgets-2026-11-14';
+  const browser = await chromium.launch({ executablePath: 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', headless: true, args: ['--no-proxy-server', '--host-resolver-rules=MAP *.uog.local 127.0.0.1'] });
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  page.setDefaultTimeout(90000);
+  const results = [], pass = name => { results.push({ name, status: 'PASS' }); console.log(name + ' PASS'); };
+  try {
+    await page.goto('http://localhost/admin', { waitUntil: 'domcontentloaded', timeout: 120000 });
+    await page.getByRole('button', { name: 'Sign in with Keycloak', exact: true }).click();
+    await page.locator('#username').fill(seed.member.username);
+    await page.locator('#password').fill(seed.member.password);
+    await page.locator('#kc-login').click();
+    await page.waitForURL(url => url.origin === 'http://localhost' && url.pathname.startsWith('/admin'), { timeout: 120000 });
+    await page.goto(`http://localhost/admin/sites/${seed.site}/admin/sidebars`, { waitUntil: 'domcontentloaded', timeout: 120000 });
+    const name = page.getByRole('textbox', { name: 'Sidebar name' });
+    await name.waitFor(); await name.fill('Content widgets');
+    await page.getByRole('combobox', { name: 'Menu component' }).click();
+    await page.getByRole('option', { name: 'Department navigation (sidebar)', exact: true }).click();
+    await page.getByRole('button', { name: 'Add Menu component', exact: true }).click();
+    await page.getByRole('combobox', {name:'Component type'}).click();
+    await page.getByRole('option', {name:'Related Pages', exact:true}).click();
+    await page.getByRole('textbox', {name:'Component title'}).fill('Related information');
+    await page.getByRole('combobox', {name:'Related Pages', exact:true}).click();
+    await page.getByRole('option', {name:'University Left Sidebar (PUBLISHED)',exact:true}).click();
+    await page.keyboard.press('Escape');
+    await page.getByRole('button', {name:'Add content component',exact:true}).click();
+    await page.getByRole('combobox', {name:'Component type'}).click();
+    await page.getByRole('option', {name:'Recent Posts',exact:true}).click();
+    await page.getByRole('textbox', {name:'Component title'}).fill('Latest Site news');
+    await page.getByRole('button', {name:'Add content component',exact:true}).click();
+    await page.getByRole('button', {name:'Move component 2 up'}).click();
+    await page.getByRole('button', { name: 'Save sidebar', exact: true }).click();
+    await Promise.race([page.getByText(/Sidebar saved\./).waitFor(), page.getByRole('alert').filter({ hasText: /\S/ }).waitFor().then(async () => { throw new Error(await page.getByRole('alert').filter({ hasText: /\S/ }).innerText()); })]);
+    await page.getByRole('navigation',{name:'Related information'}).getByRole('link',{name:'University Left Sidebar'}).waitFor();
+    await page.getByRole('navigation',{name:'Latest Site news'}).getByRole('link',{name:'Sidebar approved news'}).waitFor();
+    pass('Editor configures and previews all three registry-backed sidebar sources in a custom order');
+    await page.screenshot({ path: output + '/management-desktop.png', fullPage: true });
+    await page.setViewportSize({ width: 390, height: 1000 });
+    assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+    await page.screenshot({ path: output + '/management-mobile.png', fullPage: true });
+    pass('Sidebar management remains usable without phone-width overflow');
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    const edit = `http://localhost/admin/sites/${seed.site}/admin/pages/${seed.draft}/edit`;
+    await page.goto(edit, { waitUntil: 'domcontentloaded', timeout: 120000 });
+    await page.getByRole('combobox', { name: 'Page layout' }).click();
+    await page.getByRole('option', { name: 'Left Sidebar', exact: true }).click();
+    await page.getByRole('combobox', { name: 'Reusable sidebar' }).click();
+    await page.getByRole('option', { name: 'Content widgets', exact: true }).click();
+    await page.getByRole('button', { name: 'Preview draft', exact: true }).click();
+    await page.locator('aside[aria-label="Page navigation"]').getByRole('link', { name: 'Student support', exact: true }).waitFor();
+    await page.getByText('Retained builder content', { exact: true }).waitFor();
+    await page.locator('aside[aria-label="Page navigation"]').getByRole('link',{name:'Sidebar approved news'}).waitFor();
+    await page.screenshot({ path: output + '/assignment-private-preview.png', fullPage: true });
+    await page.getByRole('button', { name: 'Save changes', exact: true }).click();
+    await page.waitForURL(url => url.pathname.endsWith('/pages'), { timeout: 120000 });
+    await page.goto(edit, { waitUntil: 'domcontentloaded' });
+    await page.getByRole('combobox', { name: 'Reusable sidebar' }).filter({ hasText: 'Content widgets' }).waitFor();
+    pass('Sidebar assignment previews, saves and reopens without replacing builder content');
+    await page.goto(`http://${seed.host}/full-width`, { waitUntil: 'domcontentloaded' });
+    await page.locator('[data-page-layout="FULL_WIDTH"]').waitFor();
+    assert.equal(await page.getByRole('heading', { name: 'Content widgets' }).count(), 0);
+    pass('Unpublished assignment leaves the original public Page unchanged');
+  } catch (error) {
+    results.push({ name: 'Browser flow', status: 'FAIL', error: error.message.slice(0, 700) });
+    console.error(error.message.slice(0, 700));
+    await page.screenshot({ path: output + '/browser-failure.png', fullPage: true });
+    process.exitCode = 1;
+  } finally {
+    fs.writeFileSync(output + '/browser-authoring.json', JSON.stringify({ run: seed.run, browser: browser.version(), results }, null, 2));
+    await browser.close();
+  }
+})();

@@ -36746,7 +36746,73 @@ components:
         components:
           type: array
           items:
-            $ref: '#/components/schemas/SidebarComponentInputRequest'
+            oneOf:
+            - type: object
+              additionalProperties: false
+              required:
+              - id
+              - type
+              - menu_id
+              properties:
+                id:
+                  type: string
+                  pattern: ^[A-Za-z][A-Za-z0-9_-]{0,63}$
+                type:
+                  type: string
+                  enum:
+                  - menu
+                menu_id:
+                  type: string
+                  format: uuid
+            - type: object
+              additionalProperties: false
+              required:
+              - id
+              - type
+              - title
+              - page_ids
+              properties:
+                id:
+                  type: string
+                  pattern: ^[A-Za-z][A-Za-z0-9_-]{0,63}$
+                type:
+                  type: string
+                  enum:
+                  - related_pages
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 120
+                page_ids:
+                  type: array
+                  maxItems: 20
+                  uniqueItems: true
+                  items:
+                    type: string
+                    format: uuid
+            - type: object
+              additionalProperties: false
+              required:
+              - id
+              - type
+              - title
+              - limit
+              properties:
+                id:
+                  type: string
+                  pattern: ^[A-Za-z][A-Za-z0-9_-]{0,63}$
+                type:
+                  type: string
+                  enum:
+                  - recent_posts
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 120
+                limit:
+                  type: integer
+                  minimum: 1
+                  maximum: 10
           maxItems: 12
           minItems: 1
         status:
@@ -38251,48 +38317,6 @@ components:
       description: |-
         * `ACTIVE` - Active
         * `RETIRED` - Retired
-    SidebarComponentInput:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Stable component identity; unique within this sidebar.
-          pattern: ^[A-Za-z][A-Za-z0-9_-]{0,63}$
-        type:
-          $ref: '#/components/schemas/SidebarComponentInputTypeEnum'
-        menu_id:
-          type: string
-          format: uuid
-          description: Active local Menu owned by the same Site. A Menu may appear
-            once.
-      required:
-      - id
-      - menu_id
-      - type
-    SidebarComponentInputRequest:
-      type: object
-      properties:
-        id:
-          type: string
-          minLength: 1
-          description: Stable component identity; unique within this sidebar.
-          pattern: ^[A-Za-z][A-Za-z0-9_-]{0,63}$
-        type:
-          $ref: '#/components/schemas/SidebarComponentInputTypeEnum'
-        menu_id:
-          type: string
-          format: uuid
-          description: Active local Menu owned by the same Site. A Menu may appear
-            once.
-      required:
-      - id
-      - menu_id
-      - type
-    SidebarComponentInputTypeEnum:
-      enum:
-      - menu
-      type: string
-      description: '* `menu` - menu'
     SidebarInputRequest:
       type: object
       properties:
@@ -38303,7 +38327,73 @@ components:
         components:
           type: array
           items:
-            $ref: '#/components/schemas/SidebarComponentInputRequest'
+            oneOf:
+            - type: object
+              additionalProperties: false
+              required:
+              - id
+              - type
+              - menu_id
+              properties:
+                id:
+                  type: string
+                  pattern: ^[A-Za-z][A-Za-z0-9_-]{0,63}$
+                type:
+                  type: string
+                  enum:
+                  - menu
+                menu_id:
+                  type: string
+                  format: uuid
+            - type: object
+              additionalProperties: false
+              required:
+              - id
+              - type
+              - title
+              - page_ids
+              properties:
+                id:
+                  type: string
+                  pattern: ^[A-Za-z][A-Za-z0-9_-]{0,63}$
+                type:
+                  type: string
+                  enum:
+                  - related_pages
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 120
+                page_ids:
+                  type: array
+                  maxItems: 20
+                  uniqueItems: true
+                  items:
+                    type: string
+                    format: uuid
+            - type: object
+              additionalProperties: false
+              required:
+              - id
+              - type
+              - title
+              - limit
+              properties:
+                id:
+                  type: string
+                  pattern: ^[A-Za-z][A-Za-z0-9_-]{0,63}$
+                type:
+                  type: string
+                  enum:
+                  - recent_posts
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 120
+                limit:
+                  type: integer
+                  minimum: 1
+                  maximum: 10
           maxItems: 12
           minItems: 1
         status:
@@ -38339,7 +38429,73 @@ components:
         components:
           type: array
           items:
-            $ref: '#/components/schemas/SidebarComponentInput'
+            oneOf:
+            - type: object
+              additionalProperties: false
+              required:
+              - id
+              - type
+              - menu_id
+              properties:
+                id:
+                  type: string
+                  pattern: ^[A-Za-z][A-Za-z0-9_-]{0,63}$
+                type:
+                  type: string
+                  enum:
+                  - menu
+                menu_id:
+                  type: string
+                  format: uuid
+            - type: object
+              additionalProperties: false
+              required:
+              - id
+              - type
+              - title
+              - page_ids
+              properties:
+                id:
+                  type: string
+                  pattern: ^[A-Za-z][A-Za-z0-9_-]{0,63}$
+                type:
+                  type: string
+                  enum:
+                  - related_pages
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 120
+                page_ids:
+                  type: array
+                  maxItems: 20
+                  uniqueItems: true
+                  items:
+                    type: string
+                    format: uuid
+            - type: object
+              additionalProperties: false
+              required:
+              - id
+              - type
+              - title
+              - limit
+              properties:
+                id:
+                  type: string
+                  pattern: ^[A-Za-z][A-Za-z0-9_-]{0,63}$
+                type:
+                  type: string
+                  enum:
+                  - recent_posts
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 120
+                limit:
+                  type: integer
+                  minimum: 1
+                  maximum: 10
           readOnly: true
         snapshot:
           readOnly: true

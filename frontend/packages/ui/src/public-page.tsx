@@ -45,7 +45,7 @@ export interface PublicMediaItem { id: string; asset_id: string; alt: string; ca
 export interface SidebarLink { label: string; href: string; children: SidebarLink[] }
 export interface SidebarSnapshot {
   id: string; site: number; version: number; name: string;
-  components: { id: string; type: "menu"; menu_id: string; title?: string; items: SidebarLink[] }[];
+  components: { id: string; type: "menu" | "related_pages" | "recent_posts"; menu_id?: string; page_ids?: string[]; limit?: number; title?: string; state?: "ready" | "empty" | "unavailable"; items: SidebarLink[] }[];
 }
 
 /** Independently validate frozen navigation before using it on either surface. */
@@ -64,7 +64,9 @@ export function sidebarFromResponse(value: unknown, site: number | null, id: str
   }
   const ids = new Set<string>();
   return row.components.every(component => {
-    if (!component || component.type !== "menu" || typeof component.id !== "string" || (component.title !== undefined && (typeof component.title !== "string" || component.title.length > 255)) || ids.has(component.id)) return false;
+    if (!component || !["menu", "related_pages", "recent_posts"].includes(component.type) || typeof component.id !== "string" || (component.title !== undefined && (typeof component.title !== "string" || component.title.length > 255)) || ids.has(component.id)) return false;
+    if (component.state !== undefined && !["ready", "empty", "unavailable"].includes(component.state)) return false;
+    if (component.type !== "menu" && (typeof component.title !== "string" || !component.title.trim())) return false;
     ids.add(component.id);
     return validLinks(component.items, 1);
   }) ? row : undefined;
@@ -366,7 +368,10 @@ function PageSidebar({ page, preview }: { page: PublicPageDocument; preview: boo
     const snapshot = sidebarFromResponse(page.sidebar_snapshot, page.site, page.sidebar_id);
     return <Box component="aside" aria-label="Page navigation" sx={{ gridArea: "sidebar", minWidth: 0, p: 3, bgcolor: "action.hover", borderRadius: 2, alignSelf: "start", overflowWrap: "anywhere" }}>
       <Typography component="h2" variant="h6" sx={{ mb: 2 }}>{snapshot?.name ?? "Page navigation"}</Typography>
-      {snapshot ? snapshot.components.map(component => <Box component="nav" key={component.id} aria-label={component.title ?? snapshot.name} sx={{ mb: 2 }}><SidebarLinks items={component.items} /></Box>) : <Typography variant="body2">Navigation is currently unavailable.</Typography>}
+      {snapshot ? snapshot.components.map(component => <Box component="nav" key={component.id} aria-label={component.title ?? snapshot.name} sx={{ mb: 3 }}>
+        <Typography component="h3" variant="subtitle1" sx={{ mb: 1, fontWeight: 600 }}>{component.title ?? "Navigation"}</Typography>
+        {component.state === "unavailable" ? <Typography variant="body2">This content is currently unavailable.</Typography> : component.items.length ? <SidebarLinks items={component.items} /> : <Typography variant="body2">{component.type === "recent_posts" ? "No published news yet." : component.type === "related_pages" ? "No published related Pages yet." : "No published navigation links yet."}</Typography>}
+      </Box>) : <Typography variant="body2">Navigation is currently unavailable.</Typography>}
     </Box>;
   }
   return (

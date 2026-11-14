@@ -1,5 +1,7 @@
 # Reusable Page sidebars
 
+The initial Menu-only palette described here is extended by [approved sidebar content widgets](sidebar-content-widgets.md): related Pages and recent Posts. That guide defines current source-module gates, dynamic publication filtering, configuration and rollback policy.
+
 Site Administration → **Sidebars** manages shared navigation regions. This uses PAGES permissions and the existing Site Menu configuration, rather than introducing another navigation editor or copying builder sections.
 
 1. Create an active local Menu under **Menus**. Its existing target validation, ordering and publication eligibility rules apply.

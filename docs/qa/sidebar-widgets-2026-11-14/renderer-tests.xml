@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="6" failures="0" errors="0" time="0.167020292">
+    <testsuite name="src/reusable-sidebar.test.tsx" timestamp="2026-11-14T11:34:24.286Z" hostname="f52a2508f805" tests="6" failures="0" errors="0" skipped="0" time="0.167020292">
+        <testcase classname="src/reusable-sidebar.test.tsx" name="renders frozen ordered menu links without fetching a live definition" time="0.108305089">
+        </testcase>
+        <testcase classname="src/reusable-sidebar.test.tsx" name="rejects foreign sidebar data and does not replace it with live Site navigation" time="0.007927249">
+        </testcase>
+        <testcase classname="src/reusable-sidebar.test.tsx" name="rejects script sidebar data and does not replace it with live Site navigation" time="0.005116728">
+        </testcase>
+        <testcase classname="src/reusable-sidebar.test.tsx" name="rejects unavailable sidebar data and does not replace it with live Site navigation" time="0.004831202">
+        </testcase>
+        <testcase classname="src/reusable-sidebar.test.tsx" name="escapes untrusted sidebar and link labels on public and private surfaces" time="0.009429472">
+        </testcase>
+        <testcase classname="src/reusable-sidebar.test.tsx" name="renders mixed component order and accessible source-specific placeholders" time="0.030106965">
+        </testcase>
+    </testsuite>
+</testsuites>

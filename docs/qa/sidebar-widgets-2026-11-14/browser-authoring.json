@@ -1,0 +1,22 @@
+{
+  "run": "widgetsidebar-4fc0e72065",
+  "browser": "157.0.4341.46",
+  "results": [
+    {
+      "name": "Editor configures and previews all three registry-backed sidebar sources in a custom order",
+      "status": "PASS"
+    },
+    {
+      "name": "Sidebar management remains usable without phone-width overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "Sidebar assignment previews, saves and reopens without replacing builder content",
+      "status": "PASS"
+    },
+    {
+      "name": "Unpublished assignment leaves the original public Page unchanged",
+      "status": "PASS"
+    }
+  ]
+}

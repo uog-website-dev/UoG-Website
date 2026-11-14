@@ -605,7 +605,8 @@ def _cached_page_response(page):
     selected = homepage_of(page.site_id)
     response.data = {**data, "is_homepage": bool(selected and selected.pk == page.pk)}
     response["Cache-Control"] = "public, max-age=0, must-revalidate"
-    sidebar_etag = f'-sidebar-{bool(data.get("sidebar_snapshot"))}' if data.get("sidebar_id") else ""
+    import hashlib, json
+    sidebar_etag = '-sidebar-'+hashlib.sha256(json.dumps(data.get('sidebar_snapshot'), sort_keys=True).encode()).hexdigest()[:16] if data.get('sidebar_id') else ''
     response["ETag"] = (
         f'"cms-page-{page.pk}-publication-{data["publication_version"]}-site-{version}{sidebar_etag}"'
     )
@@ -615,21 +616,5 @@ def _cached_page_response(page):
 
 
 def _sidebar_delivery(documents, site_id):
-    from ..menu_models import Menu
-    if not module_is_available(site_id, "MENUS"):
-        return [{**row, "sidebar_snapshot": {}} for row in documents]
-    menu_ids = {
-        component["menu_id"] for row in documents
-        for component in (row.get("sidebar_snapshot") or {}).get("components", [])
-    }
-    active = set(str(pk) for pk in Menu.objects.filter(
-        pk__in=menu_ids, site_id=site_id, is_active=True, is_global=False,
-    ).values_list("pk", flat=True)) if menu_ids else set()
-    # Freeze presentation, but honour an explicit withdrawal of a dependency.
-    # Apply after every cache read so an inactive Menu cannot survive in Redis.
-    return [
-        {**row, "sidebar_snapshot": {}} if any(
-            component["menu_id"] not in active
-            for component in (row.get("sidebar_snapshot") or {}).get("components", [])
-        ) else row for row in documents
-    ]
+    from ..services.sidebars import delivery
+    return [{**row, 'sidebar_snapshot': delivery(row.get('sidebar_snapshot') or {}, site_id=site_id, locale=row['locale'])} for row in documents]

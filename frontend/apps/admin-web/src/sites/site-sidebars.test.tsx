@@ -3,6 +3,7 @@ import { beforeEach, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({ listSiteSidebars: vi.fn(), sidebarMenuOptions: vi.fn(), saveSiteSidebar: vi.fn(), deleteSiteSidebar: vi.fn() }));
 vi.mock("@/app/sites/sidebar-actions", () => mocks);
 vi.mock("next/link", () => ({ default: ({ children, href, ...props }: React.ComponentProps<'a'>) => <a href={href} {...props}>{children}</a> }));
+vi.mock("@/app/sites/page-actions", () => ({ loadSitePages: vi.fn(async () => ({ ok: true, data: {results: [],next: null} })) }));
 import { SiteSidebars } from "./site-sidebars";
 const record = { id: 'sidebar-1', site: 11, name: 'Department links', version: 1, status: 'ACTIVE', components: [{ id: 'menu-a', type: 'menu', menu_id: 'a' }] };
 beforeEach(() => {
@@ -26,7 +27,7 @@ it('requires a name and component, without discarding the form', async () => {
   render(<SiteSidebars siteId={11} permissions={['content.pages.update']} menusEnabled />);
   await waitFor(() => expect(screen.queryByText('Loading sidebars…')).toBeNull());
   fireEvent.submit(screen.getByRole('form', { name: 'Sidebar editor' }));
-  await screen.findByText('Enter a sidebar name and add at least one Menu component.');
+  await screen.findByText('Enter a sidebar name and add at least one sidebar component.');
   expect(mocks.saveSiteSidebar).not.toHaveBeenCalled();
 });
 it('retains edits after a rejected save and supplies the current version', async () => {
@@ -55,4 +56,26 @@ it('offers no write controls to a read-only user and gates Menu use', async () =
   expect(screen.queryByRole('button', { name: 'New sidebar' })).toBeNull();
   expect((screen.getByRole('button', { name: 'Save sidebar' }) as HTMLButtonElement).disabled).toBe(true);
   expect(mocks.sidebarMenuOptions).not.toHaveBeenCalled();
+});
+
+it('configures and reorders approved content sources without requiring MENUS', async () => {
+  render(<SiteSidebars siteId={11} permissions={['content.pages.update']} menusEnabled={false} postsEnabled />);
+  await waitFor(() => expect(screen.queryByText('Loading sidebars?')).toBeNull());
+  fireEvent.change(screen.getByRole('textbox', {name:'Sidebar name'}), {target:{value:'Mixed content'}});
+  fireEvent.mouseDown(screen.getByRole('combobox', {name:'Component type'}));
+  fireEvent.click(screen.getByRole('option', {name:'Recent Posts'}));
+  fireEvent.click(screen.getByRole('button', {name:'Add content component'}));
+  fireEvent.mouseDown(screen.getByRole('combobox', {name:'Component type'}));
+  fireEvent.click(screen.getByRole('option', {name:'Related Pages'}));
+  fireEvent.click(screen.getByRole('button', {name:'Add content component'}));
+  fireEvent.click(screen.getByRole('button', {name:'Move component 2 up'}));
+  fireEvent.click(screen.getByRole('button', {name:'Configure component 1'}));
+  fireEvent.change(screen.getByRole('textbox', {name:'Component title'}), {target:{value:'Related departments'}});
+  fireEvent.click(screen.getByRole('button', {name:'Update content component'}));
+  fireEvent.click(screen.getByRole('button', {name:'Save sidebar'}));
+  await waitFor(() => expect(mocks.saveSiteSidebar).toHaveBeenCalled());
+  const components = mocks.saveSiteSidebar.mock.calls[0][1].components;
+  expect(components.map((row: {type:string}) => row.type)).toEqual(['related_pages','recent_posts']);
+  expect(components[0].title).toBe('Related departments');
+  expect(components[1].limit).toBe(5);
 });

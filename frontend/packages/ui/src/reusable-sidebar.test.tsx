@@ -26,3 +26,16 @@ it('escapes untrusted sidebar and link labels on public and private surfaces', (
   expect(screen.getByText('<script>attack()</script>')).toBeTruthy();
   expect(document.querySelector('aside script, aside img')).toBeNull();
 });
+
+it('renders mixed component order and accessible source-specific placeholders', () => {
+  const value = {...snapshot, components:[
+    {id:'pages',type:'related_pages',title:'Related information',items:[],state:'empty'},
+    {id:'posts',type:'recent_posts',title:'News updates',items:[],state:'unavailable'},
+    snapshot.components[0],
+  ]};
+  render(<PublicPageView page={pageFromResponse(200,{...body,sidebar_snapshot:value})} />);
+  expect(screen.getByText('No published related Pages yet.')).toBeTruthy();
+  expect(screen.getByText('This content is currently unavailable.')).toBeTruthy();
+  expect(screen.getAllByRole('navigation').map(node => node.getAttribute('aria-label'))).toEqual(['Related information','News updates','Department links']);
+  expect(screen.getByRole('link',{name:'Students'})).toBeTruthy();
+});

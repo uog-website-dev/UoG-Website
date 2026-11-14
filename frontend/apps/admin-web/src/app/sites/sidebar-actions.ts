@@ -6,7 +6,10 @@ import { getAccessToken } from "@/access-token";
 import { serializeApiError } from "@/organizations/contract";
 import type { ActionResult } from "@/organizations/contract";
 
-export interface SidebarComponent { id: string; type: "menu"; menu_id: string }
+export type SidebarComponent =
+  | { id: string; type: "menu"; menu_id: string }
+  | { id: string; type: "related_pages"; title: string; page_ids: string[] }
+  | { id: string; type: "recent_posts"; title: string; limit: number };
 export interface SidebarRecord {
   id: string; site: number; name: string; status: "ACTIVE" | "ARCHIVED";
   version: number; components: SidebarComponent[]; snapshot?: SidebarSnapshot;

@@ -19,18 +19,48 @@ from .pages import SitePagePagination, SITE_PARAMETER
 
 class SidebarComponentInput(StrictFields, serializers.Serializer):
     id = serializers.RegexField(r"^[A-Za-z][A-Za-z0-9_-]{0,63}$", help_text="Stable component identity; unique within this sidebar.")
-    type = serializers.ChoiceField(choices=['menu'])
-    menu_id = serializers.UUIDField(help_text="Active local Menu owned by the same Site. A Menu may appear once.")
+    type = serializers.ChoiceField(choices=['menu', 'related_pages', 'recent_posts'])
+    menu_id = serializers.UUIDField(required=False, help_text="Active local Menu owned by the same Site. A Menu may appear once.")
+
+    title = serializers.CharField(max_length=120, required=False)
+    page_ids = serializers.ListField(child=serializers.UUIDField(), max_length=20, required=False)
+    limit = serializers.IntegerField(min_value=1, max_value=10, required=False)
+
+    def validate(self, attrs):
+        expected = {'menu': {'id','type','menu_id'}, 'related_pages': {'id','type','title','page_ids'}, 'recent_posts': {'id','type','title','limit'}}[attrs['type']]
+        if set(attrs) != expected:
+            raise serializers.ValidationError('Provide exactly the fields required by this component type.')
+        return attrs
+
+
+_COMPONENT_ID = {'type':'string','pattern':r'^[A-Za-z][A-Za-z0-9_-]{0,63}$'}
+_COMPONENT_TITLE = {'type':'string','minLength':1,'maxLength':120}
+_COMPONENT_SHAPES = [
+    {'type':'object','additionalProperties':False,'required':['id','type','menu_id'], 'properties':{'id':_COMPONENT_ID,'type':{'type':'string','enum':['menu']},'menu_id':{'type':'string','format':'uuid'}}},
+    {'type':'object','additionalProperties':False,'required':['id','type','title','page_ids'], 'properties':{'id':_COMPONENT_ID,'type':{'type':'string','enum':['related_pages']},'title':_COMPONENT_TITLE,'page_ids':{'type':'array','maxItems':20,'uniqueItems':True,'items':{'type':'string','format':'uuid'}}}},
+    {'type':'object','additionalProperties':False,'required':['id','type','title','limit'], 'properties':{'id':_COMPONENT_ID,'type':{'type':'string','enum':['recent_posts']},'title':_COMPONENT_TITLE,'limit':{'type':'integer','minimum':1,'maximum':10}}},
+]
+
+
+@extend_schema_field({'oneOf':_COMPONENT_SHAPES})
+class SidebarComponentField(serializers.Field):
+    def to_internal_value(self, value):
+        serializer = SidebarComponentInput(data=value)
+        serializer.is_valid(raise_exception=True)
+        return serializer.validated_data
+
+    def to_representation(self, value):
+        return SidebarComponentInput(value).data
 
 
 class SidebarInput(StrictFields, serializers.Serializer):
     name = serializers.CharField(max_length=120)
-    components = serializers.ListField(child=SidebarComponentInput(), min_length=1, max_length=12)
+    components = serializers.ListField(child=SidebarComponentField(), min_length=1, max_length=12)
     status = serializers.ChoiceField(choices=['ACTIVE', 'ARCHIVED'], required=False)
 
 
 class SidebarOutput(serializers.ModelSerializer):
-    components = SidebarComponentInput(many=True, read_only=True)
+    components = serializers.ListField(child=SidebarComponentField(), read_only=True)
     snapshot = serializers.SerializerMethodField()
 
     @extend_schema_field(serializers.JSONField())

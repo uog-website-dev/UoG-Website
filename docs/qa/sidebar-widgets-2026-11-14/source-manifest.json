@@ -1,0 +1,30 @@
+{
+  "base_commit": "da667a22d4647640438d2a97cf4759e2031916e4",
+  "sha256": {
+    "backend/apps/cms/api/preview.py": "a551fa1c3248c81bdeea25ab5420483c2a5d5b8413213a9d138adf29adbd80ea",
+    "backend/apps/cms/api/public.py": "8d4f54ec0570ac320f8af57cd9f664f3f7fe1c1e1833bdf5aaadf6dfdb20f6d7",
+    "backend/apps/cms/api/serializers.py": "6940fda52a059bd5a968b57978a1284a984adb1278e2331bb2c7e2abab65a569",
+    "backend/apps/cms/api/sidebars.py": "214903b4c205d12b6022a3efe929ba0767a508f7c1953d1e10b7639eced166c0",
+    "backend/apps/cms/migrations/0024_sidebar_content_components.py": "d7aac991547362878c9f1544c39748e9734cd24cc67b6c10103705a9a6289b08",
+    "backend/apps/cms/services/sidebars.py": "02f98f5404c6631a7cc1e869011af7d28d44909bdf5605269b1e11b5e50aae84",
+    "backend/apps/cms/tests/test_sidebar_widgets.py": "46563f96565e6be825d80496a08884e041b2952b8315c1f5faffd2156d18d897",
+    "docs/api/openapi.yaml": "6643d136ad07479b26695f5b1e33273c62502c31e8cb8599ccb83b5aea5079f7",
+    "docs/reusable-sidebars.md": "f06bf6be19f58ac7a2a1d408ac3b28abb3db0d2e29e8d10850f553f346b80374",
+    "docs/sidebar-content-widgets.md": "65c79b650b93e38e469e22a3a29eb62005fcbf6b2aae46cac2bb8435d393ded9",
+    "frontend/apps/admin-web/src/app/sites/[id]/admin/sidebars/page.tsx": "24ad9cd57bfdb76bc2387fb672163eb44791a7f862bbe038b1178c5a65f3338a",
+    "frontend/apps/admin-web/src/app/sites/sidebar-actions.ts": "4aa7b23e2f543d30a04846d8e4bea3c77af41de17ae6720f4d8a724b8b22bcd7",
+    "frontend/apps/admin-web/src/sites/site-sidebars.test.tsx": "28a4a05a946109c7cb25c0cee9cd3a4654c76be6ad3b94e15e2b31e0c3a890ad",
+    "frontend/apps/admin-web/src/sites/site-sidebars.tsx": "0562825725c920f5939bbf235f13ae36984916a66516955486d1c046e6d85572",
+    "frontend/packages/types/src/layout/index.ts": "461d2cd0cf6da0a0513c4248de1655738efc5e5eede6bf2be342a18c8cb90c7a",
+    "frontend/packages/ui/src/public-page.tsx": "c44712a103a6bb6faab56551e6cace12f8d9ae892e4edf125e27a78b946f05bf",
+    "frontend/packages/ui/src/reusable-sidebar.test.tsx": "ee1d80b083ecd8c92cb78131ef10e9ebecdc78b19c101d47a1f6c772d3db896b",
+    "scripts/qa-sidebar-widgets-browser.cjs": "0386d8af2b502cbe42235e57c4dcd6c838de16998ccd3bc328763bf6d8192eb4",
+    "scripts/qa-sidebar-widgets-cleanup.py": "f421f806d1c269affc52e684487990b878643cb187c7526f7f8c2ea4eee60ba4",
+    "scripts/qa-sidebar-widgets-migrations.py": "b576cbef2fd29b4319849d9c13c5f30e35b6fb77526bb15a8093d251c2283408",
+    "scripts/qa-sidebar-widgets-negative.cjs": "ca29f58037f370565ea103855ba4abd845778c0968c74a20ed765f97d559ff22",
+    "scripts/qa-sidebar-widgets-negative.py": "49d11f9962f1767d839cc9a333595e3d91551e5dfcde4c138772c59ce044fb31",
+    "scripts/qa-sidebar-widgets-public.cjs": "93e65c4c567dd70084fe7a318d624c70d9956a9664564214116432e56f8a7cae",
+    "scripts/qa-sidebar-widgets-publish.py": "57e87b316481393914f98ed363a9c20aef8c20534aa0502bf029395446ffb402",
+    "scripts/qa-sidebar-widgets-seed.py": "95d475393e4a7da814e71bd71c417a06e26fb57859711e4ebb57014061d19a8a"
+  }
+}

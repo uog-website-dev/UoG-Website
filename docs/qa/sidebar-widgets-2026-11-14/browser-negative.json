@@ -1,0 +1,10 @@
+{
+  "run": "widgetsidebar-4fc0e72065",
+  "result": "PASS",
+  "checks": [
+    "POSTS disabled: no article data in public JSON or UI",
+    "Unpublished related Page excluded with empty placeholder",
+    "Page body and local Menu remain usable",
+    "Ordered mobile sidebar survives source withdrawal"
+  ]
+}
