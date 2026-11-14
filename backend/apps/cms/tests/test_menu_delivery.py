@@ -47,6 +47,8 @@ def family(ready, settings):
     for site in (main, parent):
         enable_module_for_site(site.pk, module.pk)
     for site in (main, parent, child, sibling):
+        for code in ("PAGES","POSTS"):
+            enable_module_for_site(site.pk, Module.objects.get(code=code).pk)
         activate_site(site.pk)
         SiteDomain.objects.create(
             site=site, hostname=f"site-{site.pk}.uog.edu.et",

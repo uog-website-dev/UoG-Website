@@ -1,0 +1,20 @@
+{
+  "results": [
+    {
+      "name": "Editor adds published same-Site Page, news listing, category and safe external destinations",
+      "status": "PASS"
+    },
+    {
+      "name": "Keyboard reorder and nesting remain private; Editor cannot publish and second Site stays unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "Menu editor fits phone width without horizontal overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "Publisher promotes the reviewed ordered tree and public nested navigation without changing the other Site",
+      "status": "PASS"
+    }
+  ]
+}

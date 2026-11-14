@@ -78,10 +78,11 @@ def _cached_location(site_id, location):
     version = delivery_version(site_id, location)
     key = f"menu:{location}:delivery:{version}"
     cached = get_public_cache(site_id, key)
-    if cached is None:
-        cached = compose_location(site_id, location)
-        set_public_cache(site_id, key, cached)
-    return cached
+    # Eligibility can change after a draft removes its live FK or a module is disabled.
+    current = compose_location(site_id, location)
+    if cached != current:
+        set_public_cache(site_id, key, current)
+    return current
 
 
 class InheritanceOutput(serializers.ModelSerializer):

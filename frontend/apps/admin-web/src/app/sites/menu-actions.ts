@@ -13,8 +13,6 @@ import { getAccessToken } from "@/access-token";
 import { serializeApiError } from "@/organizations/contract";
 import type { ActionResult } from "@/organizations/contract";
 import { siteMenuInheritancePath, siteMenuPath } from "@/sites/menu-paths";
-import { sitePagePath } from "@/sites/page-paths";
-import { sitePostsPath } from "@/sites/post-paths";
 
 export interface MenuRecord {
   id: string;
@@ -22,12 +20,13 @@ export interface MenuRecord {
   location: string;
   code?: string;
   version?: number;
+  has_unpublished_changes?: boolean;
   name: string;
   is_active: boolean;
   is_global: boolean;
 }
 
-export type MenuItemKind = "page" | "post" | "external" | "custom";
+export type MenuItemKind = "page" | "post" | "external" | "custom" | "news" | "category";
 
 export interface MenuItemRecord {
   id: string;
@@ -38,6 +37,8 @@ export interface MenuItemRecord {
   item_type: MenuItemKind | string;
   page?: string | null;
   post?: string | null;
+  category?: string | null;
+  destination_status?: "ready" | "unavailable";
   is_active: boolean;
 }
 
@@ -47,6 +48,7 @@ export interface MenuItemInput {
   target?: string;
   page?: string | null;
   post?: string | null;
+  category?: string | null;
   parent?: string | null;
 }
 
@@ -58,6 +60,7 @@ export interface MenuTargetOption {
 export interface MenuTargets {
   pages: MenuTargetOption[];
   posts: MenuTargetOption[];
+  categories?: MenuTargetOption[];
   pagesAvailable: boolean;
   postsAvailable: boolean;
 }
@@ -186,7 +189,8 @@ function itemBody(input: MenuItemInput): Record<string, unknown> {
     item_type: kind,
     page: kind === "page" ? input.page ?? null : null,
     post: kind === "post" ? input.post ?? null : null,
-    target: kind === "page" || kind === "post" ? "" : input.target ?? "",
+    category: kind === "category" ? input.category ?? null : null,
+    target: ["page","post","category","news"].includes(kind) ? "" : input.target ?? "",
   };
   if (input.parent) body.parent = input.parent;
   return body;
@@ -195,24 +199,7 @@ function itemBody(input: MenuItemInput): Record<string, unknown> {
 export async function loadMenuTargets(siteId: number): Promise<ActionResult<MenuTargets>> {
   return attempt(async () => {
     const api = await client();
-    async function options(path: string): Promise<MenuTargetOption[] | null> {
-      try {
-        const page = await api.get<{ results: { id: string; title: string }[] }>(
-          `${path}?page_size=100`,
-        );
-        return page.results.map((row) => ({ id: row.id, label: row.title }));
-      } catch {
-        return null;
-      }
-    }
-    const pages = await options(sitePagePath(siteId));
-    const posts = await options(sitePostsPath(siteId));
-    return {
-      pages: pages ?? [],
-      posts: posts ?? [],
-      pagesAvailable: pages !== null,
-      postsAvailable: posts !== null,
-    };
+    return api.get<MenuTargets>(siteMenuPath(siteId, "targets/"));
   });
 }
 

@@ -24,7 +24,7 @@ from ..menu_models import Menu, MenuItem, require_menus_module
 MENU_FIELDS = frozenset({"code", "location", "name", "is_active", "is_global"})
 ITEM_FIELDS = frozenset({
     "label", "item_type", "page", "post", "target", "parent", "sort_order",
-    "is_active", "allow_cross_site", "page_id", "post_id", "parent_id",
+    "is_active", "allow_cross_site", "page_id", "post_id", "parent_id", "category", "category_id",
 })
 
 
@@ -47,6 +47,11 @@ def _check_version(menu, expected):
         raise MenuPreconditionRequired()
     if expected != menu_etag(menu):
         raise MenuConflict("version_conflict")
+    # Freeze a trusted legacy/imported menu before its first user-facing edit.
+    if menu.is_active and menu.published_items is None:
+        from ..menu_destinations import snapshot_items
+        menu.published_items = snapshot_items(menu)
+        menu.save(update_fields=["published_items"])
 
 
 @contextmanager
@@ -82,11 +87,11 @@ def authorize_central_menu(actor):
         raise PermissionDenied("Central menu changes require platform menu authority.")
 
 
-def _write_menu(menu, actor):
+def _write_menu(menu, actor, *, draft=False):
     authorize_menu(actor, menu.site_id, edit=True)
     if menu.is_global:
         authorize_central_menu(actor)
-    if menu.is_active:
+    if menu.is_active and not draft:
         authorize_menu(actor, menu.site_id, permission="menu.publish")
 
 
@@ -119,10 +124,8 @@ def _target_permission(item, actor):
     target_site = model.objects.filter(pk=target_id).values_list("site_id", flat=True).first()
     if target_site is None or target_site == item.site_id:
         return  # Missing/unscoped targets are rejected by model validation.
-    permission = "content.pages.view" if item.page_id else "content.posts.view"
-    if not permission_granted(actor, permission, site_id=target_site,
-        organization_id=effective_scope_for_site(target_site), audit=False):
-        raise PermissionDenied("Access to the target's Site is required for cross-site links.")
+    raise ValidationError({"target": "Menu destinations must belong to this Site."})
+
 
 
 def create_menu(*, actor, site_id, **fields):
@@ -157,7 +160,7 @@ def update_menu(menu_id, *, actor, expected=None, **fields):
 def create_menu_item(menu_id, *, actor, expected=None, **fields):
     with _operation(actor):
         menu = Menu.objects.get(pk=menu_id)
-        _write_menu(menu, actor)
+        _write_menu(menu, actor, draft=True)
         item = MenuItem(menu=menu, site_id=menu.site_id)
         _assign(item, fields, ITEM_FIELDS)
         _target_permission(item, actor)
@@ -177,7 +180,7 @@ def update_menu_item(item_id, *, actor, expected=None, **fields):
     with _operation(actor):
         item = MenuItem.objects.get(pk=item_id)
         menu = Menu.objects.get(pk=item.menu_id)
-        _write_menu(menu, actor)
+        _write_menu(menu, actor, draft=True)
         _assign(item, fields, ITEM_FIELDS)
         _target_permission(item, actor)
         _check_version(menu, expected)
@@ -189,7 +192,7 @@ def delete_menu_record(record_id, *, actor, expected=None, item=False):
     with _operation(actor):
         record = (MenuItem if item else Menu).objects.get(pk=record_id)
         menu = Menu.objects.get(pk=record.menu_id) if item else record
-        _write_menu(menu, actor)
+        _write_menu(menu, actor, draft=item)
         _check_version(menu, expected)
         if (record.children if item else record.items).exists():
             raise MenuConflict("children_present")
@@ -203,8 +206,17 @@ def set_menu_active(menu_id, *, actor, expected, active):
         if menu.is_global:
             authorize_central_menu(actor)
         _check_version(menu, expected)
+        if active:
+            from ..menu_destinations import destination_state, snapshot_items
+            for item in menu.items.filter(is_active=True):
+                if destination_state(item) != "ready":
+                    raise ValidationError({f"items.{item.pk}.target": "Destination is unavailable or unpublished. Update or disable this item before publishing."})
+            menu.published_items = snapshot_items(menu)
         menu.is_active = active
-        menu.save(update_fields=["is_active"])
+        menu.save(update_fields=["is_active", "published_items"])
+        if active:
+            record_event(action="MENU_PUBLISHED", entity_type="cms.menu", entity_id=menu.pk,
+                after={"site_id":menu.site_id,"version":menu.version,"item_count":len(menu.published_items)}, changed_fields=["published_items"])
         return menu
 
 
@@ -233,7 +245,7 @@ def _order_snapshot(menu, parent, ids):
 def reorder_menu(menu_id, *, actor, expected, parent_id, item_ids):
     with _operation(actor):
         menu = Menu.objects.get(pk=menu_id)
-        _write_menu(menu, actor)
+        _write_menu(menu, actor, draft=True)
         _check_version(menu, expected)
         if parent_id is not None and not menu.items.filter(pk=parent_id).exists():
             raise ValidationError({"parent": "The parent must belong to this menu."})
@@ -259,7 +271,7 @@ def move_menu_item(item_id, *, actor, expected, parent_id, position):
     with _operation(actor):
         item = MenuItem.objects.get(pk=item_id)
         menu = Menu.objects.get(pk=item.menu_id)
-        _write_menu(menu, actor)
+        _write_menu(menu, actor, draft=True)
         _check_version(menu, expected)
         if parent_id is not None and not menu.items.filter(pk=parent_id).exists():
             raise ValidationError({"parent": "The parent must belong to this menu."})

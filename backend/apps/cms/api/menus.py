@@ -5,7 +5,7 @@ from uuid import UUID
 from django.core.exceptions import ValidationError as DomainValidationError
 from django.db import DatabaseError
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
+from drf_spectacular.utils import inline_serializer, OpenApiExample, OpenApiParameter, extend_schema
 from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.exceptions import APIException
@@ -75,9 +75,15 @@ def menu_errors():
 
 
 class MenuOutput(serializers.ModelSerializer):
+    has_unpublished_changes = serializers.SerializerMethodField()
+
+    def get_has_unpublished_changes(self, menu) -> bool:
+        from ..menu_destinations import snapshot_items
+        return menu.published_items != snapshot_items(menu)
+
     class Meta:
         model = Menu
-        fields = ("id", "site", "code", "location", "name", "is_active", "is_global", "version", "created_at", "updated_at")
+        fields = ("id", "site", "code", "location", "name", "is_active", "is_global", "version", "has_unpublished_changes", "created_at", "updated_at")
         read_only_fields = fields
 
 
@@ -98,10 +104,16 @@ class MenuPatch(StrictFields, serializers.Serializer):
 
 
 class ItemOutput(serializers.ModelSerializer):
+    destination_status = serializers.SerializerMethodField()
+
+    def get_destination_status(self, item) -> str:
+        from ..menu_destinations import destination_state
+        return destination_state(item)
+
     class Meta:
         model = MenuItem
         fields = ("id", "menu", "site", "label", "item_type", "page", "post", "target", "parent",
-                  "sort_order", "is_active", "allow_cross_site", "created_at", "updated_at")
+                  "sort_order", "is_active", "allow_cross_site", "category", "destination_status", "created_at", "updated_at")
         read_only_fields = fields
 
 
@@ -110,6 +122,7 @@ class ItemInput(StrictFields, serializers.Serializer):
     item_type = serializers.ChoiceField(choices=MenuItem.ItemType.choices)
     page = serializers.UUIDField(required=False, allow_null=True)
     post = serializers.UUIDField(required=False, allow_null=True)
+    category = serializers.UUIDField(required=False, allow_null=True)
     target = serializers.CharField(required=False, allow_blank=True, max_length=2048, trim_whitespace=False)
     parent = serializers.UUIDField(required=False, allow_null=True)
     sort_order = serializers.IntegerField(required=False, min_value=0)
@@ -249,6 +262,29 @@ class MenuViewSet(MenuAPIBase):
     serializer_class = MenuOutput
     queryset = Menu.objects.none()
 
+    @extend_schema(responses=inline_serializer(name="MenuDestinationOptions", fields={
+        "pages": serializers.ListField(child=serializers.DictField()),
+        "posts": serializers.ListField(child=serializers.DictField()),
+        "categories": serializers.ListField(child=serializers.DictField()),
+        "pagesAvailable": serializers.BooleanField(), "postsAvailable": serializers.BooleanField(),
+    }), description="menu.read. Published eligible same-Site destination choices; disabled modules return empty choices.")
+    @action(detail=False, methods=["get"])
+    def targets(self, request, *args, **kwargs):
+        from apps.api.models import Post, Category
+        from ..models import Page, ContentStatus
+        from ..menu_destinations import resolve_destination
+        from apps.sites.selectors.modules import module_is_available
+        from types import SimpleNamespace
+        with menu_errors(), hierarchy_write():
+            site = self._site()
+            result = {"pages": [], "posts": [], "categories": [], "pagesAvailable": module_is_available(site.pk,"PAGES"), "postsAvailable": module_is_available(site.pk,"POSTS")}
+            for kind, model, output in (("page",Page,"pages"),("post",Post,"posts"),("category",Category,"categories")):
+                if not result["pagesAvailable" if kind == "page" else "postsAvailable"]: continue
+                for row in model.objects.filter(site=site,status=ContentStatus.PUBLISHED,**({} if kind=="category" else {"draft_of__isnull":True})).order_by("name" if kind=="category" else "title","pk"):
+                    item = SimpleNamespace(item_type=kind,site_id=site.pk,page_id=row.pk if kind=="page" else None,post_id=row.pk if kind=="post" else None,category_id=row.pk if kind=="category" else None)
+                    if resolve_destination(item): result[output].append({"id":str(row.pk),"label":row.name if kind=="category" else row.title})
+            return Response(result)
+
     @extend_schema(parameters=[ListQuery], responses=MenuOutput(many=True), description="menu.read; includes active and inactive menus. Ordered by name then UUID; search matches name or code. Page size 20, maximum 100.")
     def list(self, request, *args, **kwargs):
         with menu_errors(), hierarchy_write():
@@ -318,7 +354,7 @@ class MenuViewSet(MenuAPIBase):
             menu = domain.set_menu_active(menu.pk, actor=request.user, expected=self._expected(), active=active)
             return self._response(MenuOutput(menu).data, menu)
 
-    @extend_schema(parameters=[IF_MATCH], request=EmptyInput, responses=MenuOutput, description="menu.publish. Activate the Menu; this does not publish linked Pages or Posts.")
+    @extend_schema(parameters=[IF_MATCH], request=EmptyInput, responses=MenuOutput, description="menu.publish. Publish the current ordered item snapshot after destination eligibility checks; linked content is never published implicitly.")
     @action(detail=True, methods=["post"])
     def activate(self, request, *args, **kwargs):
         return self._activate(request, True)
@@ -339,7 +375,7 @@ class MenuItemViewSet(MenuAPIBase):
 
     @staticmethod
     def _fields(body):
-        return {key + "_id" if key in {"page", "post", "parent"} else key: value for key, value in body.items()}
+        return {key + "_id" if key in {"page", "post", "category", "parent"} else key: value for key, value in body.items()}
 
     @extend_schema(parameters=[ListQuery], responses=ItemOutput(many=True), description="menu.read. Paginated flat item inventory in sort_order/UUID order. The owning Menu ETag versions every item.")
     def list(self, request, *args, **kwargs):

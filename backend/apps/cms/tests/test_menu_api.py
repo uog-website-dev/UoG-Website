@@ -293,7 +293,7 @@ def test_disabled_module_blocks_api_mutations_but_not_admin_inspection(api):
     assert _tag(api, url) == token
 
 
-def test_page_post_targets_and_explicit_cross_site_policy_are_enforced(api):
+def test_page_post_targets_and_site_local_destination_policy_are_enforced(api):
     url = _menu(api)
     page = create_page(site=api.site, title="About", slug="about")
     post = Post.objects.create(site=api.site, title="News", slug="news", content="News")
@@ -303,11 +303,11 @@ def test_page_post_targets_and_explicit_cross_site_policy_are_enforced(api):
         assert response.status_code == 201, response.content
         assert response.json()[field] == pk
     body = {"label": "Foreign", "item_type": "page", "page": str(foreign.pk), "allow_cross_site": True}
-    assert _post(api, url + "items/", body, _tag(api, url)).status_code == 403
+    assert _post(api, url + "items/", body, _tag(api, url)).status_code == 400
     UserRoleAssignment.objects.create(user=api.user, role=Role.objects.get(code="viewer"), scope="SITE", site=api.other, organization=api.other.organization_unit)
     denied = _post(api, url + "items/", {**body, "allow_cross_site": False}, _tag(api, url))
     assert denied.status_code == 400 and denied.json()["error"]["details"]["reason"] == "invalid_target"
-    assert _post(api, url + "items/", body, _tag(api, url)).status_code == 201
+    assert _post(api, url + "items/", body, _tag(api, url)).status_code == 400
 
 
 def test_all_changes_have_shared_site_actor_request_audit_and_urls_are_not_logged(api):

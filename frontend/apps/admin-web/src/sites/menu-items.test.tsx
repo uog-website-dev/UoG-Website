@@ -128,6 +128,7 @@ describe("MenuItemTree", () => {
       target: "",
       page: "page-1",
       post: null,
+      category: null,
       parent: null,
     }));
 
@@ -177,4 +178,18 @@ describe("MenuItemTree", () => {
     const form = screen.getByRole("form", { name: "Add to Header" });
     expect(within(form).getByRole("option", { name: "Page" })).toHaveProperty("disabled", true);
   });
+});
+
+it("adds typed news and same-Site category destinations", async () => {
+  renderTree(state(), {...TARGETS,categories:[{id:"category-1",label:"Research"}]});
+  const form = screen.getByRole("form",{name:"Add to Header"});
+  fireEvent.change(within(form).getByLabelText(/Item label/),{target:{value:"Research news"}});
+  fireEvent.change(within(form).getByLabelText("Item target"),{target:{value:"category"}});
+  fireEvent.change(within(form).getByLabelText("News category"),{target:{value:"category-1"}});
+  fireEvent.click(within(form).getByRole("button",{name:"Add link"}));
+  await waitFor(()=>expect(createMenuLink).toHaveBeenCalledWith(11,"menu-1",'"menu-1-v3"',expect.objectContaining({item_type:"category",category:"category-1",target:""})));
+  fireEvent.change(within(form).getByLabelText(/Item label/),{target:{value:"All news"}});
+  fireEvent.change(within(form).getByLabelText("Item target"),{target:{value:"news"}});
+  fireEvent.click(within(form).getByRole("button",{name:"Add link"}));
+  await waitFor(()=>expect(createMenuLink).toHaveBeenCalledWith(11,"menu-1",'"menu-1-v3"',expect.objectContaining({item_type:"news",category:null,target:""})));
 });

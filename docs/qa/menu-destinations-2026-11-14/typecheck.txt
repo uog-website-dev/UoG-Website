@@ -1,0 +1,40 @@
+
+> uog-frontend@0.1.0 typecheck /workspace
+> turbo run typecheck
+
+
+   • turbo 2.11.10
+   • Packages in scope: @uog/admin-web, @uog/api-client, @uog/config, @uog/public-web, @uog/types, @uog/ui
+   • Running typecheck in 6 packages
+   • Remote caching disabled
+
+@uog/admin-web:typecheck: cache miss, executing dcbfe0b96a4e10a2
+@uog/types:typecheck: cache hit, replaying logs 50a5a454bb548dad
+@uog/api-client:typecheck: cache hit, replaying logs e91cf79774813f2d
+@uog/ui:typecheck: cache hit, replaying logs b00c332a0698b84f
+@uog/public-web:typecheck: cache hit, replaying logs a2caa7829339a4d7
+@uog/types:typecheck: 
+@uog/types:typecheck: > @uog/types@0.1.0 typecheck /workspace/packages/types
+@uog/types:typecheck: > tsc --noEmit
+@uog/types:typecheck: 
+@uog/public-web:typecheck: 
+@uog/public-web:typecheck: > @uog/public-web@0.1.0 typecheck /workspace/apps/public-web
+@uog/public-web:typecheck: > tsc --noEmit
+@uog/public-web:typecheck: 
+@uog/api-client:typecheck: 
+@uog/api-client:typecheck: > @uog/api-client@0.1.0 typecheck /workspace/packages/api-client
+@uog/api-client:typecheck: > tsc --noEmit
+@uog/api-client:typecheck: 
+@uog/ui:typecheck: 
+@uog/ui:typecheck: > @uog/ui@0.1.0 typecheck /workspace/packages/ui
+@uog/ui:typecheck: > tsc --noEmit
+@uog/ui:typecheck: 
+@uog/admin-web:typecheck: 
+@uog/admin-web:typecheck: > @uog/admin-web@0.1.0 typecheck /workspace/apps/admin-web
+@uog/admin-web:typecheck: > tsc --noEmit
+@uog/admin-web:typecheck: 
+
+ Tasks:    5 successful, 5 total
+Cached:    4 cached, 5 total
+  Time:    14.797s 
+

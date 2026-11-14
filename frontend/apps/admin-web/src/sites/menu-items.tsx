@@ -108,6 +108,9 @@ function externalUrlError(value: string): string | null {
 }
 
 function targetText(item: MenuItemRecord, targets: MenuTargets): string {
+  if (item.destination_status === "unavailable") return "Unavailable destination: update or disable before publishing";
+  if (item.item_type === "news") return "Site news listing";
+  if (item.item_type === "category") return (targets.categories ?? []).find(row => row.id === item.category)?.label ?? "Unavailable category";
   if (item.item_type === "page") {
     const page = targets.pages.find((row) => row.id === item.page);
     return page ? page.label : "Unavailable Page";
@@ -129,6 +132,8 @@ function targetError(kind: MenuItemKind, value: string, targets: MenuTargets): s
     return targets.pages.some((row) => row.id === value) ? null : "Choose a Page from this Site.";
   }
   if (!targets.postsAvailable) return "Posts are not available for this Site.";
+  if (kind === "news") return null;
+  if (kind === "category") return (targets.categories ?? []).some(row => row.id === value) ? null : "Choose a published category from this Site.";
   return targets.posts.some((row) => row.id === value) ? null : "Choose a Post from this Site.";
 }
 
@@ -392,7 +397,7 @@ function ItemForm({
   enabled: boolean;
   onSubmit: (input: MenuItemInput) => void;
 }) {
-  const initialKind: MenuItemKind = initial?.item_type === "page" || initial?.item_type === "post" || initial?.item_type === "external"
+  const initialKind: MenuItemKind = initial?.item_type === "page" || initial?.item_type === "post" || initial?.item_type === "category" || initial?.item_type === "news" || initial?.item_type === "external"
     ? initial.item_type
     : "custom";
   const [label, setLabel] = useState(initial?.label ?? "");
@@ -400,9 +405,10 @@ function ItemForm({
   const [target, setTarget] = useState(initial?.target || (initialKind === "custom" ? "/about" : ""));
   const [page, setPage] = useState(initial?.page ?? "");
   const [post, setPost] = useState(initial?.post ?? "");
+  const [category, setCategory] = useState(initial?.category ?? "");
   const [parent, setParent] = useState(initial?.parent ?? "");
   const [warning, setWarning] = useState<string | null>(null);
-  const value = kind === "page" ? page : kind === "post" ? post : target;
+  const value = kind === "page" ? page : kind === "post" ? post : kind === "category" ? category : target;
   const problem = targetError(kind, value, targets);
   const parents = items.filter((item) => (
     initial
@@ -428,6 +434,7 @@ function ItemForm({
       target: kind === "custom" || kind === "external" ? target.trim() : "",
       page: kind === "page" ? page : null,
       post: kind === "post" ? post : null,
+      category: kind === "category" ? category : null,
       parent: initial ? undefined : parent || null,
     });
     if (!initial) setLabel("");
@@ -463,6 +470,8 @@ function ItemForm({
         <option value="custom">Same-site path</option>
         <option value="page" disabled={!targets.pagesAvailable}>Page</option>
         <option value="post" disabled={!targets.postsAvailable}>Post</option>
+        <option value="news" disabled={!targets.postsAvailable}>News listing</option>
+        <option value="category" disabled={!targets.postsAvailable}>News category</option>
         <option value="external">External URL</option>
       </TextField>
       {kind === "page" ? (
@@ -477,6 +486,10 @@ function ItemForm({
           {targets.posts.map((row) => <option key={row.id} value={row.id}>{row.label}</option>)}
         </TextField>
       ) : null}
+      {kind === "category" ? <TextField select size="small" label="News category" value={category} disabled={!enabled || !targets.postsAvailable} onChange={event => setCategory(event.target.value)} slotProps={{select:{native:true},inputLabel:{shrink:true}}}>
+        <option value="">Choose a category</option>
+        {(targets.categories ?? []).map(row => <option key={row.id} value={row.id}>{row.label}</option>)}
+      </TextField> : null}
       {kind === "custom" ? (
         <TextField size="small" label="Path" value={target} disabled={!enabled} onChange={(event) => setTarget(event.target.value)} required />
       ) : null}

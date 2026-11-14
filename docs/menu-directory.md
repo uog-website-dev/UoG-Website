@@ -1,4 +1,4 @@
-﻿# Site menu directory
+# Site menu directory
 
 Site Administration > Menus uses the existing Site-owned Menu and MenuItem aggregates. Administrators can create multiple named menus, search by name or identifier, select a menu, rename it, edit its items, publish it and retire it. This applies equally to the Main Site and child Sites.
 
@@ -14,7 +14,7 @@ Publish and Retire reuse the existing `is_active` lifecycle and aggregate versio
 
 Create example: `{"name":"Student services","code":"student-services","location":""}`. Rename example: `{"name":"Student information"}` with the current `If-Match`. Codes and ownership cannot be reassigned. Existing `/tree/`, `/items/`, `/activate/` and `/deactivate/` contracts remain. `menu.read`, `menu.write`, `menu.publish`, canonical Site membership and MENUS gates are unchanged; editing an active menu also requires publication permission.
 
-Errors use `{error:{code,message,details},request_id}`. Invalid or duplicate codes return field-addressed validation errors; occupied locations return `409` with `duplicate_location`. Stale ETags return `412`, omitted required ETags `428`, and inaccessible foreign records `404`. The UI retains form values and shows server validation messages on failed creation. See [OpenAPI](api/openapi.yaml).
+Errors use `{error:{code,message,details},request_id}`. Invalid or duplicate codes return field-addressed validation errors; occupied locations return `409` with `duplicate_location`. Stale ETags return `409 version_conflict`, omitted required ETags `428`, and inaccessible foreign records `404`. The UI retains form values and shows server validation messages on failed creation. See [OpenAPI](api/openapi.yaml).
 
 ## Migration and rollback
 
@@ -23,3 +23,5 @@ CMS migration `0025_named_menu_directory` adds the code column, backfills legacy
 Use the migration database role for schema changes. Back up before deployment and apply migrations before restarting updated applications. Rollback to 0024 is guarded: unassigned menus or custom identifiers must be reconciled first. Do not force-drop the code column or delete menus to bypass the guard. Export those definitions and assignments, obtain a deliberate reconciliation decision, and rehearse rollback on a restored database. The rehearsal script records preservation and verifies rejection of an unsafe downgrade; run it only against a development rehearsal database before creating new unassigned menus.
 
 [Validation evidence](qa/menu-directory-2026-11-14/README.md).
+
+Ordered destination editing now uses a private item tree and explicit promotion; see [destination and publication policy](menu-destinations.md).

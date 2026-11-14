@@ -150,6 +150,11 @@ function LocalMenuEditor({
         <Typography variant="caption">Identifier: {menu.code ?? menu.id}</Typography>
       </Box>
       <Typography variant="body2" color="text.secondary">{ownershipText(menu)}</Typography>
+      {canPublish && menu.is_active && menu.has_unpublished_changes ? <Button variant="contained" disabled={!moduleOn || busy} onClick={() => {
+        setBusy(true);
+        void setMenuActive(siteId, menu.id, state.etag, true).then(result => { unwrap(result); onChanged(); }).catch(cause => toast.error(menuError(cause))).finally(() => setBusy(false));
+      }}>Publish changes to {menu.name}</Button> : null}
+      {menu.has_unpublished_changes ? <Typography variant="caption">Unpublished item changes. Public navigation keeps the last published order until Publish.</Typography> : null}
       {canPublish ? (
         <Button
           variant="outlined"
@@ -208,14 +213,14 @@ function LocalMenuEditor({
       ) : null}
       {menu.is_active && canWrite && !canPublish ? (
         <Typography variant="body2" color="text.secondary">
-          This menu is active. Changing it also needs menu publish permission.
+          Item edits remain private until a publisher selects Publish changes. Renaming or reassigning an active menu requires publish permission.
         </Typography>
       ) : null}
       <MenuItemTree
         siteId={siteId}
         state={state}
         targets={targets}
-        enabled={structural}
+        enabled={moduleOn && canWrite}
         onChanged={onChanged}
         showAvailability={false}
       />

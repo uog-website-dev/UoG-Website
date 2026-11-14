@@ -86,6 +86,7 @@ class Menu(MenuRecord):
         default=False,
         help_text="Centrally governed fragment. Only the main Site may own one, and only one global menu exists per location.",
     )
+    published_items = models.JSONField(null=True, blank=True, editable=False)
     version = models.PositiveBigIntegerField(default=0, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -169,6 +170,8 @@ class MenuItem(MenuRecord):
         POST = "post", "Post"
         EXTERNAL = "external", "External"
         CUSTOM = "custom", "Custom"
+        NEWS = "news", "News listing"
+        CATEGORY = "category", "News category"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     menu = models.ForeignKey(Menu, on_delete=models.PROTECT, related_name="items")
@@ -177,6 +180,7 @@ class MenuItem(MenuRecord):
     item_type = models.CharField(max_length=8, choices=ItemType.choices)
     page = models.ForeignKey("cms.Page", null=True, blank=True, on_delete=models.PROTECT, related_name="menu_items")
     post = models.ForeignKey("api.Post", null=True, blank=True, on_delete=models.PROTECT, related_name="menu_items")
+    category = models.ForeignKey("api.Category", null=True, blank=True, on_delete=models.PROTECT, related_name="navigation_items")
     target = models.CharField(max_length=2048, blank=True, default="")
     parent = models.ForeignKey("self", null=True, blank=True, on_delete=models.PROTECT, related_name="children")
     sort_order = models.PositiveIntegerField(default=0)
@@ -198,7 +202,7 @@ class MenuItem(MenuRecord):
                 deferrable=models.Deferrable.IMMEDIATE,
             ),
             models.CheckConstraint(condition=Q(label__gt=""), name="menu_item_label_required"),
-            models.CheckConstraint(condition=Q(item_type__in=["page", "post", "external", "custom"]), name="menu_item_type"),
+            models.CheckConstraint(condition=Q(item_type__in=["page", "post", "external", "custom", "news", "category"]), name="menu_item_type"),
             models.CheckConstraint(condition=Q(sort_order__gte=0), name="menu_item_sort_order"),
             models.CheckConstraint(
                 condition=~Q(target__contains="://") | Q(item_type="external"),
@@ -230,6 +234,21 @@ class MenuItem(MenuRecord):
 
     def _validate_target(self):
         kind = self.item_type
+        if kind in {self.ItemType.NEWS, self.ItemType.CATEGORY}:
+            from apps.sites.selectors.modules import module_is_available
+            if not module_is_available(self.site_id, "POSTS"):
+                raise ValidationError({"target": "The POSTS module is not enabled for this Site."})
+            if self.page_id or self.post_id or self.target or self.allow_cross_site:
+                raise ValidationError({"target": "News destinations must belong to this Site and cannot contain a URL."})
+            if kind == self.ItemType.NEWS and self.category_id:
+                raise ValidationError({"category": "A news listing cannot select a category."})
+            if kind == self.ItemType.CATEGORY:
+                from apps.api.models import Category
+                if not self.category_id or not Category.objects.filter(pk=self.category_id, site_id=self.site_id).exists():
+                    raise ValidationError({"category": "Choose a category from this Site."})
+            return
+        if self.category_id:
+            raise ValidationError({"category": "Only category destinations can reference a category."})
         if kind == self.ItemType.PAGE:
             if self.post_id or self.target or self.page_id is None:
                 raise ValidationError({"target": "A page item targets one Page and no URL."})
