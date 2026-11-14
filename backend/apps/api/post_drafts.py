@@ -2,17 +2,16 @@
 from uuid import uuid4
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
-from apps.organizations.hierarchy_lock import hierarchy_write
 from apps.cms.models import ContentRole, ContentStatus, PublishedContentSnapshot
 from apps.cms.authorization import require_cms_grant
-from apps.cms.services.working_drafts import content_etag
+from apps.cms.services.working_drafts import content_etag, draft_write
 from apps.cms.models import ContentEditConflict
 from .services import require_posts_module
 from .models import Post, Category, Tag
 
 
 def open_post_draft(*, site_id, post_id, actor, if_match):
-    with hierarchy_write():
+    with draft_write():
         require_cms_grant(actor,site_id,(ContentRole.AUTHOR,))
         require_posts_module(site_id)
         live = get_object_or_404(Post.objects.select_for_update(),pk=post_id,site_id=site_id)

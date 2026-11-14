@@ -1,0 +1,12 @@
+{
+  "baseline_commit": "6fcb047a521dfaa439562ec72dc8d4fffed6f058",
+  "sha256": {
+    "backend/apps/api/post_drafts.py": "0d5196d4cc6be70dedd8e299659b4afc32fbb64258484dc1d670956987c1548a",
+    "backend/apps/cms/services/working_drafts.py": "20682ccd508b42a54dc65565e927a7ec98246424c9a50b9b32032f16739ca207",
+    "backend/apps/organizations/tests/test_module.py": "05c64c1fa8bea2e98dfde31ddc0a33a52e762a62132ce1bef492c2b5b9a08f58",
+    "backend/apps/media/migrations/0014_restore_guarded_processing_deletion.py": "aefc3ce66499696ee70aa22e47d3dc7a48515b66f17f63fa22be825ce3e7da2b",
+    "backend/tests/test_site_foundation.py": "ef2ac08bf889a493c42bf6771f4907822b701b2307639dd6fb135b5cf2055402",
+    "backend/tests/test_media_fixes.py": "c49caa7429c267b001ecea05715da060cc7f3e2d31001069639e3b7dfe2fb28c",
+    "frontend/apps/admin-web/src/sites/media-picker-save.test.tsx": "9af0c968bea615ffb9e40f81df7006dd2635032e17bc354131bcc41b6a27a9a1"
+  }
+}

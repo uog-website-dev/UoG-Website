@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="1" failures="0" errors="0" time="1.199244222">
+    <testsuite name="src/sites/media-picker-save.test.tsx" timestamp="2026-11-14T03:18:01.602Z" hostname="f52a2508f805" tests="1" failures="0" errors="0" skipped="0" time="1.199244222">
+        <testcase classname="src/sites/media-picker-save.test.tsx" name="CMS media picker save integration &gt; keeps the draft image selection when save finds the asset ineligible" time="1.197384018">
+        </testcase>
+    </testsuite>
+</testsuites>
