@@ -169,6 +169,18 @@ beforeEach(() => {
 });
 
 describe("SitePagesPanel", () => {
+  it("saves a shell-only change without resending builder blocks or metadata",async()=>{
+    const metadata={visual_layout:layoutFixtures[0].layout};
+    getSitePage.mockResolvedValue({ok:true,data:draft({layout:"FULL_WIDTH",metadata,blocks:[]})});
+    renderEditor("edit",{pageId:"page-1"});
+    const selector=await screen.findByRole("combobox",{name:"Page layout"});
+    await waitFor(()=>expect(screen.getByRole("button",{name:"Save changes"}).hasAttribute("disabled")).toBe(false));
+    fireEvent.mouseDown(selector);fireEvent.click(await screen.findByRole("option",{name:"Left Sidebar"}));
+    fireEvent.click(screen.getByRole("button",{name:"Save changes"}));
+    await waitFor(()=>expect(updateSitePage).toHaveBeenCalledWith(11,"page-1",'"cms-content-page-1-r1"',{layout:"LEFT_SIDEBAR"}));
+    expect(metadata.visual_layout).toEqual(layoutFixtures[0].layout);
+  });
+
   it("assigns only published Pages allowed by the backend as the homepage", async () => {
     loadSitePages.mockResolvedValue(pageResult([
       draft({status:"PUBLISHED",can_set_homepage:true}),
@@ -374,6 +386,7 @@ describe("SitePagesPanel", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: "Create Page" }));
     await waitFor(() => expect(createSitePage).toHaveBeenCalledWith(11, {
+      layout:"FULL_WIDTH",
       title: "Admissions",
       slug: "admissions",
       parent: null,
@@ -397,7 +410,7 @@ describe("SitePagesPanel", () => {
       "page-1",
       '"cms-content-page-1-r1"',
       {
-        title: "Admissions updated", slug: "admissions", visibility: "PUBLIC",
+        layout: "FULL_WIDTH", title: "Admissions updated", slug: "admissions", visibility: "PUBLIC",
         parent: null, metadata: {}, seo: {}, blocks: draft().blocks,
       },
     ));

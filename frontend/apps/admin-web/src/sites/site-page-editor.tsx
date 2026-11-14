@@ -51,7 +51,17 @@ export interface PageLanguages {
   enabled: readonly string[];
 }
 
+const PAGE_LAYOUTS = {
+  FULL_WIDTH: "Full Width",
+  LEFT_SIDEBAR: "Left Sidebar",
+  RIGHT_SIDEBAR: "Right Sidebar",
+} as const;
+function shellLayout(value?: string) {
+  return value && Object.hasOwn(PAGE_LAYOUTS, value) ? value : "FULL_WIDTH";
+}
+
 interface PageForm {
+  layout: string;
   title: string;
   slug: string;
   parent: string;
@@ -79,7 +89,7 @@ function seoPreview(seo: Record<string, unknown> | undefined): PublicPageDocumen
 
 function emptyForm(locale = "en"): PageForm {
   return {
-    title: "", slug: "", parent: "", locale, visibility: "PUBLIC",
+    layout:"FULL_WIDTH", title: "", slug: "", parent: "", locale, visibility: "PUBLIC",
     metadata: "{}", seoTitle: "", seoDescription: "", seoExtra: "{}",
     blocks: [],
   };
@@ -96,6 +106,7 @@ function formFromRecord(current: SitePageRecord, fallbackLocale: string): PageFo
   delete seo.meta_title;
   delete seo.meta_description;
   return {
+    layout:shellLayout(current.layout),
     title: current.title,
     slug: current.slug,
     parent: current.parent ?? "",
@@ -309,6 +320,7 @@ function SitePageEditorContent({
     try {
       if (mode === "create") {
         unwrap(await createSitePage(siteId, {
+          layout:form.layout,
           title: form.title.trim(),
           slug: form.slug.trim(),
           parent: form.parent || null,
@@ -320,7 +332,10 @@ function SitePageEditorContent({
         }));
         toast.success("Page created.");
       } else if (activePage?.etag) {
-        unwrap(await updateSitePage(siteId, activePage.id, activePage.etag, {
+        const original=formFromRecord(activePage,defaultLocale);
+        const layoutOnly=JSON.stringify({...form,layout:original.layout})===JSON.stringify(original);
+        unwrap(await updateSitePage(siteId, activePage.id, activePage.etag, layoutOnly ? {layout:form.layout} : {
+          layout:form.layout,
           title: form.title.trim(),
           slug: activePage.draft_of ? activePage.slug : form.slug.trim(),
           parent: activePage.draft_of ? null : form.parent || null,
@@ -454,6 +469,9 @@ function SitePageEditorContent({
         autoFocus
         required
       />
+      <TextField select label="Page layout" value={form.layout} disabled={!enabled} onChange={event=>setForm(current=>({...current,layout:event.target.value}))} helperText="Changes are saved to this draft. Existing builder content is preserved. On mobile, content appears before navigation.">
+        {Object.entries(PAGE_LAYOUTS).map(([code,label])=><MenuItem key={code} value={code}>{label}</MenuItem>)}
+      </TextField>
       <TextField
         label="Slug"
         value={form.slug}
@@ -604,6 +622,7 @@ function SitePageEditorContent({
                 <PublicPageView
                   privateMediaBase={`${APP_BASE_PATH}/sites/${siteId}/media`}
                   page={{
+                    layout:form.layout,
                     title: form.title || "Untitled Page",
                     path: activePage?.path ?? `/${form.slug}`,
                     site: siteId,

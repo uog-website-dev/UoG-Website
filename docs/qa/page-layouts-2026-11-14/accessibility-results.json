@@ -1,0 +1,78 @@
+{
+  "browser": "157.0.4341.46",
+  "scope": "Page shell; automated WCAG A/AA scan and sidebar Tab traversal",
+  "results": [
+    {
+      "width": 1440,
+      "layout": "FULL_WIDTH",
+      "violations": [],
+      "passes": 7,
+      "incomplete": 0,
+      "status": "PASS"
+    },
+    {
+      "width": 1440,
+      "layout": "LEFT_SIDEBAR",
+      "violations": [],
+      "passes": 8,
+      "incomplete": 0,
+      "status": "PASS"
+    },
+    {
+      "width": 1440,
+      "layout": "RIGHT_SIDEBAR",
+      "violations": [],
+      "passes": 8,
+      "incomplete": 0,
+      "status": "PASS"
+    },
+    {
+      "width": 768,
+      "layout": "FULL_WIDTH",
+      "violations": [],
+      "passes": 7,
+      "incomplete": 0,
+      "status": "PASS"
+    },
+    {
+      "width": 768,
+      "layout": "LEFT_SIDEBAR",
+      "violations": [],
+      "passes": 8,
+      "incomplete": 0,
+      "status": "PASS"
+    },
+    {
+      "width": 768,
+      "layout": "RIGHT_SIDEBAR",
+      "violations": [],
+      "passes": 8,
+      "incomplete": 0,
+      "status": "PASS"
+    },
+    {
+      "width": 390,
+      "layout": "FULL_WIDTH",
+      "violations": [],
+      "passes": 7,
+      "incomplete": 0,
+      "status": "PASS"
+    },
+    {
+      "width": 390,
+      "layout": "LEFT_SIDEBAR",
+      "violations": [],
+      "passes": 8,
+      "incomplete": 0,
+      "status": "PASS"
+    },
+    {
+      "width": 390,
+      "layout": "RIGHT_SIDEBAR",
+      "violations": [],
+      "passes": 8,
+      "incomplete": 0,
+      "status": "PASS"
+    }
+  ]
+}

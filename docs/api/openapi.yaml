@@ -33781,6 +33781,9 @@ components:
         * `ALLOW` - Allow
         * `DENY` - Deny
         * `CHANGE` - Change
+    BlankEnum:
+      enum:
+      - ''
     BlockedReason:
       type: object
       properties:
@@ -34270,6 +34273,17 @@ components:
         * `post` - Post
         * `external` - External
         * `custom` - Custom
+    LayoutEnum:
+      enum:
+      - FULL_WIDTH
+      - LEFT_SIDEBAR
+      - RIGHT_SIDEBAR
+      - LANDING
+      - STANDARD
+      type: string
+      description: "* `FULL_WIDTH` - FULL_WIDTH\n* `LEFT_SIDEBAR` - LEFT_SIDEBAR\n*
+        `RIGHT_SIDEBAR` - RIGHT_SIDEBAR\n* `` - \n* `LANDING` - LANDING\n* `STANDARD`
+        - STANDARD"
     LocalPrecedenceEnum:
       enum:
       - override
@@ -35956,15 +35970,14 @@ components:
           pattern: ^[a-z0-9]+(?:-[a-z0-9]+)*$
           maxLength: 128
         layout:
-          description: Approved layout code the rendering layer resolves; empty uses
-            the Site's default layout. A reference, never a template file and never
-            a secret.
+          description: "Page shell: FULL_WIDTH, LEFT_SIDEBAR or RIGHT_SIDEBAR. Empty,
+            STANDARD and LANDING are legacy full-width aliases. Builder content is
+            independent.\n\n* `FULL_WIDTH` - FULL_WIDTH\n* `LEFT_SIDEBAR` - LEFT_SIDEBAR\n*
+            `RIGHT_SIDEBAR` - RIGHT_SIDEBAR\n* `` - \n* `LANDING` - LANDING\n* `STANDARD`
+            - STANDARD"
           oneOf:
-          - type: string
-            pattern: ^[A-Z][A-Z0-9_-]{0,63}$
-            maxLength: 64
-          - type: string
-            maxLength: 0
+          - $ref: '#/components/schemas/LayoutEnum'
+          - $ref: '#/components/schemas/BlankEnum'
         seo:
           description: 'Allowlisted SEO object: meta_title, meta_description, og_image_ref.
             Unsupported keys and non-string values are rejected; never a place for
@@ -38058,15 +38071,14 @@ components:
           description: Computed full route within this Site and locale, such as /about/people.
             Recomputed on every save and unique per (site, locale).
         layout:
-          description: Approved layout code the rendering layer resolves; empty uses
-            the Site's default layout. A reference, never a template file and never
-            a secret.
+          description: "Page shell: FULL_WIDTH, LEFT_SIDEBAR or RIGHT_SIDEBAR. Empty,
+            STANDARD and LANDING are legacy full-width aliases. Builder content is
+            independent.\n\n* `FULL_WIDTH` - FULL_WIDTH\n* `LEFT_SIDEBAR` - LEFT_SIDEBAR\n*
+            `RIGHT_SIDEBAR` - RIGHT_SIDEBAR\n* `` - \n* `LANDING` - LANDING\n* `STANDARD`
+            - STANDARD"
           oneOf:
-          - type: string
-            pattern: ^[A-Z][A-Z0-9_-]{0,63}$
-            maxLength: 64
-          - type: string
-            maxLength: 0
+          - $ref: '#/components/schemas/LayoutEnum'
+          - $ref: '#/components/schemas/BlankEnum'
         seo:
           description: 'Allowlisted SEO object: meta_title, meta_description, og_image_ref.
             Unsupported keys and non-string values are rejected; never a place for
@@ -38235,15 +38247,14 @@ components:
           pattern: ^[a-z0-9]+(?:-[a-z0-9]+)*$
           maxLength: 128
         layout:
-          description: Approved layout code the rendering layer resolves; empty uses
-            the Site's default layout. A reference, never a template file and never
-            a secret.
+          description: "Page shell: FULL_WIDTH, LEFT_SIDEBAR or RIGHT_SIDEBAR. Empty,
+            STANDARD and LANDING are legacy full-width aliases. Builder content is
+            independent.\n\n* `FULL_WIDTH` - FULL_WIDTH\n* `LEFT_SIDEBAR` - LEFT_SIDEBAR\n*
+            `RIGHT_SIDEBAR` - RIGHT_SIDEBAR\n* `` - \n* `LANDING` - LANDING\n* `STANDARD`
+            - STANDARD"
           oneOf:
-          - type: string
-            pattern: ^[A-Z][A-Z0-9_-]{0,63}$
-            maxLength: 64
-          - type: string
-            maxLength: 0
+          - $ref: '#/components/schemas/LayoutEnum'
+          - $ref: '#/components/schemas/BlankEnum'
         seo:
           description: 'Allowlisted SEO object: meta_title, meta_description, og_image_ref.
             Unsupported keys and non-string values are rejected; never a place for

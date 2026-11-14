@@ -18,6 +18,7 @@ import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 
+import { publicFetchInit } from "./public-site";
 import { safeMenuHref } from "./site-navigation";
 const PrivateMediaBase = createContext<string | null>(null);
 
@@ -44,6 +45,8 @@ export interface PublicMediaItem { id: string; asset_id: string; alt: string; ca
 export interface PublicPageDocument {
   id?: string;
   title: string;
+  layout?: string;
+  locale?: string;
   path: string;
   site: number | null;
   blocks: PublicBlock[];
@@ -68,7 +71,7 @@ export function pageFromResponse(status: number, body: unknown): PublicPageDocum
   if (status !== 200 || body == null || typeof body !== "object" || Array.isArray(body)) {
     return null;
   }
-  const row = body as { title?: unknown; path?: unknown; status?: unknown; blocks?: unknown; site?: unknown; metadata?: unknown; seo?: unknown };
+  const row = body as { title?: unknown; path?: unknown; status?: unknown; blocks?: unknown; site?: unknown; metadata?: unknown; seo?: unknown; layout?: unknown; locale?: unknown };
   if (row.status != null && row.status !== "PUBLISHED") return null;
   if (typeof row.title !== "string" || !row.title.trim()) return null;
   const path = typeof row.path === "string" && row.path.startsWith("/") ? row.path : "/";
@@ -79,6 +82,8 @@ export function pageFromResponse(status: number, body: unknown): PublicPageDocum
     ...(typeof (body as {id?:unknown}).id==="string" ? {id:(body as {id:string}).id}:{}),
     ...(visual ? visual.ok ? {visual_layout:visual.value} : {layout_unavailable:true} : {}),
     title: row.title.trim(),
+    layout: typeof row.layout === "string" ? row.layout : "FULL_WIDTH",
+    locale: typeof row.locale === "string" ? row.locale : undefined,
     path,
     site: typeof row.site === "number" ? row.site : null,
     blocks: normalizeBlocks(row.blocks),
@@ -282,6 +287,56 @@ function PublishedImage({ block, siteId }: { block: PublicBlock; siteId?: number
   </picture>;
 }
 
+function PageSidebar({ page, preview }: { page: PublicPageDocument; preview: boolean }) {
+  const [links, setLinks] = useState<{ title: string; path: string }[]>([]);
+  const [state, setState] = useState("loading");
+  useEffect(() => {
+    let cancelled = false;
+    const controller = new AbortController();
+    setLinks([]);
+    setState("loading");
+    if (preview) {
+      setState("preview");
+      return () => { cancelled = true; controller.abort(); };
+    }
+    const params = new URLSearchParams({ page_size: "20" });
+    if (page.locale) params.set("locale", page.locale);
+    fetch(`/api/v1/site-context/pages/?${params}`, {
+      ...publicFetchInit(), signal: controller.signal,
+    }).then(async response => {
+      if (!response.ok) throw new Error("Page navigation unavailable");
+      const body = await response.json();
+      if (!Array.isArray(body.results) || body.results.some((row: { site?: unknown }) => row.site !== page.site)) {
+        throw new Error("Page navigation scope mismatch");
+      }
+      const rows = body.results.map((row: unknown) => pageFromResponse(200, row))
+        .filter((row: PublicPageDocument | null): row is PublicPageDocument => Boolean(
+          row && row.path !== page.path && row.path.startsWith("/")
+          && !row.path.startsWith("//") && safeMenuHref(row.path),
+        ));
+      if (!cancelled) {
+        setLinks(rows.map((row: PublicPageDocument) => ({ title: row.title, path: row.path })));
+        setState("ready");
+      }
+    }).catch(() => { if (!cancelled) setState("error"); });
+    return () => { cancelled = true; controller.abort(); };
+  }, [page.site, page.path, page.locale, preview]);
+  return (
+    <Box component="aside" aria-label="Page navigation" sx={{
+      gridArea: "sidebar", minWidth: 0, p: 3, bgcolor: "action.hover",
+      borderRadius: 2, alignSelf: "start", overflowWrap: "anywhere",
+    }}>
+      <Typography component="h2" variant="h6" sx={{ mb: 2 }}>Explore this Site</Typography>
+      <Box component="nav" aria-label="Published Pages" sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+        {!preview ? <Link href="/">Site home</Link> : <Typography variant="body2">Published page navigation</Typography>}
+        {links.map(link => <Link key={link.path} href={link.path}>{link.title}</Link>)}
+      </Box>
+      {state === "loading" ? <Typography role="status" variant="body2" sx={{ mt: 2 }}>Loading page links...</Typography> : null}
+      {state === "error" ? <Typography variant="body2" sx={{ mt: 2 }}>Other page links are unavailable.</Typography> : null}
+    </Box>
+  );
+}
+
 export function PublicPageView({ page, privateMediaBase, viewportWidth, hideTitle = false }: { page: PublicPageDocument | null; privateMediaBase?: string; viewportWidth?: number; hideTitle?: boolean }): ReactNode {
   if (!page) {
     return (
@@ -290,18 +345,40 @@ export function PublicPageView({ page, privateMediaBase, viewportWidth, hideTitl
       </Typography>
     );
   }
-  const titleHidden=hideTitle || page.visual_layout?.settings?.show_title===false;
-  const contentWidth={full:"100%",wide:1280,reading:880}[page.visual_layout?.settings?.content_width??"full"];
+  const shell = page.layout === "LEFT_SIDEBAR" || page.layout === "RIGHT_SIDEBAR"
+    ? page.layout : "FULL_WIDTH";
+  const titleHidden = hideTitle || page.visual_layout?.settings?.show_title === false;
+  const contentWidth = { full: "100%", wide: 1280, reading: 880 }[page.visual_layout?.settings?.content_width ?? "full"];
+  // Device preview uses its explicit canvas width rather than the surrounding browser.
+  const stacked = viewportWidth !== undefined && viewportWidth < 900;
+  const columns = shell === "FULL_WIDTH" || stacked ? "minmax(0,1fr)" : {
+    xs: "minmax(0,1fr)",
+    md: shell === "LEFT_SIDEBAR"
+      ? "minmax(200px,260px) minmax(0,1fr)"
+      : "minmax(0,1fr) minmax(200px,260px)",
+  };
+  const areas = shell === "FULL_WIDTH" ? '"content"' : stacked ? '"content" "sidebar"' : {
+    xs: '"content" "sidebar"',
+    md: shell === "LEFT_SIDEBAR" ? '"sidebar content"' : '"content sidebar"',
+  };
   return (
-    <PrivateMediaBase.Provider value={privateMediaBase ?? null}><Box
-      component="article"
-      aria-labelledby="public-page-title"
-      sx={{ display: "flex", flexDirection: "column", gap: 2, minWidth:0, width:"100%", maxWidth: contentWidth, mx:"auto", overflowWrap:"anywhere" }}
-    >
-        <Typography id="public-page-title" variant="h3" component="h1" sx={titleHidden ? {position:"absolute",width:1,height:1,p:0,m:-1,overflow:"hidden",clipPath:"inset(50%)",whiteSpace:"nowrap"} : { overflowWrap: "anywhere" }}>
+    <PrivateMediaBase.Provider value={privateMediaBase ?? null}>
+      <Box data-page-layout={shell} sx={{
+        display: "grid", width: "100%", minWidth: 0, gap: { xs: 3, md: 4 },
+        gridTemplateColumns: columns, gridTemplateAreas: areas,
+      }}>
+        <Box
+          component="article"
+          aria-labelledby="public-page-title"
+          sx={{ gridArea: "content", display: "flex", flexDirection: "column", gap: 2, minWidth: 0, width: "100%", maxWidth: contentWidth, mx: "auto", overflowWrap: "anywhere" }}
+        >
+          <Typography id="public-page-title" variant="h3" component="h1" sx={titleHidden ? {position:"absolute",width:1,height:1,p:0,m:-1,overflow:"hidden",clipPath:"inset(50%)",whiteSpace:"nowrap"} : { overflowWrap: "anywhere" }}>
           {page.title}
         </Typography>
       {page.layout_unavailable ? <Typography role="status">This page content is currently unavailable.</Typography> : page.visual_layout ? <VisualLayoutView layout={page.visual_layout} siteId={page.site} pageTitle={page.title} pageId={page.id} preview={Boolean(privateMediaBase)} mediaBase={privateMediaBase} viewportWidth={viewportWidth} /> : <BlockList blocks={page.blocks} siteId={page.site} />}
-    </Box></PrivateMediaBase.Provider>
+        </Box>
+        {shell !== "FULL_WIDTH" ? <PageSidebar key={`${page.site}:${page.path}`} page={page} preview={Boolean(privateMediaBase)} /> : null}
+      </Box>
+    </PrivateMediaBase.Provider>
   );
 }

@@ -10,6 +10,7 @@ does not expose unrestricted content CRUD or public serving.
 from django.core.exceptions import ValidationError as DjangoValidationError
 
 from drf_spectacular.utils import extend_schema_field, extend_schema_serializer
+from ..page_layouts import PAGE_LAYOUTS, LEGACY_LAYOUTS
 from rest_framework import serializers
 
 from apps.sites.api.serializers import StrictFields
@@ -95,6 +96,15 @@ class PageSerializer(
         ),
     )
     available_actions = serializers.SerializerMethodField()
+    layout = serializers.ChoiceField(
+        choices=[*PAGE_LAYOUTS, *sorted(LEGACY_LAYOUTS)],
+        required=False, allow_blank=True,
+        help_text=(
+            "Page shell: FULL_WIDTH, LEFT_SIDEBAR or RIGHT_SIDEBAR. "
+            "Empty, STANDARD and LANDING are legacy full-width aliases. "
+            "Builder content is independent."
+        ),
+    )
     is_homepage = serializers.SerializerMethodField()
     can_set_homepage = serializers.SerializerMethodField()
     draft_of = serializers.PrimaryKeyRelatedField(read_only=True)

@@ -666,6 +666,9 @@ class Page(SiteContent):
             self.slug = normalize_slug(self.slug)
         if isinstance(self.layout, str) and self.layout.strip():
             self.layout = self.layout.strip().upper()
+        from .page_layouts import PAGE_LAYOUTS, LEGACY_LAYOUTS
+        if not isinstance(self.layout, str) or self.layout not in {*PAGE_LAYOUTS, *LEGACY_LAYOUTS}:
+            raise ValidationError({"layout": "Choose Full Width, Left Sidebar or Right Sidebar."})
         return super().full_clean(*args, **kwargs)
 
     def clean(self):

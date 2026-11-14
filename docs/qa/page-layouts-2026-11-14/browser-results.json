@@ -1,0 +1,54 @@
+{
+  "run": "layout-45dfd491f4",
+  "browser": "157.0.4341.46",
+  "results": [
+    {
+      "name": "FULL_WIDTH at 1440px: content, position, overflow and keyboard",
+      "status": "PASS"
+    },
+    {
+      "name": "LEFT_SIDEBAR at 1440px: content, position, overflow and keyboard",
+      "status": "PASS"
+    },
+    {
+      "name": "RIGHT_SIDEBAR at 1440px: content, position, overflow and keyboard",
+      "status": "PASS"
+    },
+    {
+      "name": "FULL_WIDTH at 768px: content, position, overflow and keyboard",
+      "status": "PASS"
+    },
+    {
+      "name": "LEFT_SIDEBAR at 768px: content, position, overflow and keyboard",
+      "status": "PASS"
+    },
+    {
+      "name": "RIGHT_SIDEBAR at 768px: content, position, overflow and keyboard",
+      "status": "PASS"
+    },
+    {
+      "name": "FULL_WIDTH at 390px: content, position, overflow and keyboard",
+      "status": "PASS"
+    },
+    {
+      "name": "LEFT_SIDEBAR at 390px: content, position, overflow and keyboard",
+      "status": "PASS"
+    },
+    {
+      "name": "RIGHT_SIDEBAR at 390px: content, position, overflow and keyboard",
+      "status": "PASS"
+    },
+    {
+      "name": "Independent Site keeps its full-width layout",
+      "status": "PASS"
+    },
+    {
+      "name": "Real Editor selects, previews, saves and reloads the visual draft",
+      "status": "PASS"
+    },
+    {
+      "name": "Saved draft layout does not replace published full-width snapshot",
+      "status": "PASS"
+    }
+  ]
+}
