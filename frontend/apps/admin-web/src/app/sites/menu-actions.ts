@@ -20,6 +20,8 @@ export interface MenuRecord {
   id: string;
   site: number;
   location: string;
+  code?: string;
+  version?: number;
   name: string;
   is_active: boolean;
   is_global: boolean;
@@ -64,6 +66,7 @@ export interface MenuLocationState {
   menu: MenuRecord;
   items: MenuItemRecord[];
   etag: string;
+  itemsLoaded?: boolean;
 }
 
 export interface MenuInheritanceRecord {
@@ -80,7 +83,7 @@ export interface SiteNavigation {
   inheritance: MenuInheritanceRecord[];
 }
 
-export type MenuPlace = "header" | "footer";
+export type MenuPlace = "" | "header" | "footer" | "sidebar" | "primary" | "secondary";
 
 function apiBaseUrl(): string {
   return process.env.API_BASE_URL ?? "http://backend:8000/api";
@@ -102,14 +105,22 @@ async function attempt<T>(run: () => Promise<T>): Promise<ActionResult<T>> {
   }
 }
 
-export async function loadSiteNavigation(siteId: number): Promise<ActionResult<SiteNavigation>> {
+export async function loadSiteNavigation(siteId: number, includeItems = true): Promise<ActionResult<SiteNavigation>> {
   return attempt(async () => {
     const api = await client();
-    const page = await api.get<{ results: MenuRecord[] }>(
-      `${siteMenuPath(siteId)}?page_size=100`,
-    );
+    const records: MenuRecord[] = [];
+    let pageNumber = 1, more = true;
+    while (more && pageNumber <= 100) {
+      const page = await api.get<{ results: MenuRecord[]; next?: string | null }>(`${siteMenuPath(siteId)}?page_size=100${pageNumber > 1 ? `&page=${pageNumber}` : ""}`);
+      records.push(...page.results.filter(menu => menu.site === siteId));
+      more = Boolean(page.next); pageNumber++;
+    }
     const menus: MenuLocationState[] = [];
-    for (const menu of page.results) {
+    for (const menu of records) {
+      if (!includeItems) {
+        menus.push({ menu, items: [], etag: `"menu-${menu.id}-v${menu.version ?? 0}"`, itemsLoaded: false });
+        continue;
+      }
       const tree = await api.getDetailed<{ items: MenuItemRecord[] }>(
         siteMenuPath(siteId, `${menu.id}/tree/`),
       );
@@ -126,16 +137,26 @@ export async function loadSiteNavigation(siteId: number): Promise<ActionResult<S
   });
 }
 
+export async function loadSiteMenu(siteId: number, menuId: string): Promise<ActionResult<MenuLocationState>> {
+  return attempt(async () => {
+    const response = await (await client()).getDetailed<{menu: MenuRecord; items: MenuItemRecord[]}>(siteMenuPath(siteId, `${encodeURIComponent(menuId)}/tree/`));
+    if (!response.etag || response.data.menu.site !== siteId || response.data.menu.id !== menuId) throw new Error("Menu is not available in this Site.");
+    return { menu: response.data.menu, items: response.data.items, etag: response.etag, itemsLoaded: true };
+  });
+}
+
 export async function createSiteMenu(
   siteId: number,
   location: MenuPlace,
   name?: string,
+  code?: string,
 ): Promise<ActionResult<MenuRecord>> {
   return attempt(async () => {
     const api = await client();
     const created = await api.postDetailed<MenuRecord>(siteMenuPath(siteId), {
       name: name?.trim() || (location === "header" ? "Header" : "Footer"),
       location,
+      ...(code ? { code } : {}),
     });
     return created.data;
   });
