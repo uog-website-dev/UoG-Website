@@ -17890,8 +17890,8 @@ paths:
   /api/v1/sites/{site_pk}/menus/{id}/activate/:
     post:
       operationId: v1_sites_menus_activate_create
-      description: menu.publish. Activate the Menu; this does not publish linked Pages
-        or Posts.
+      description: menu.publish. Publish the current ordered item snapshot after destination
+        eligibility checks; linked content is never published implicitly.
       parameters:
       - in: header
         name: If-Match
@@ -18547,6 +18547,121 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TreeOutput'
+          description: ''
+          headers:
+            ETag:
+              description: Menu-wide version token. Every semantic item change invalidates
+                it; stale If-Match returns 409.
+              schema:
+                type: string
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/sites/{site_pk}/menus/targets/:
+    get:
+      operationId: v1_sites_menus_targets_retrieve
+      description: menu.read. Published eligible same-Site destination choices; disabled
+        modules return empty choices.
+      parameters:
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        description: Owning Site; checked against application scope.
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Menus
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuDestinationOptions'
           description: ''
           headers:
             ETag:
@@ -34975,6 +35090,10 @@ components:
           type: string
           format: uuid
           nullable: true
+        category:
+          type: string
+          format: uuid
+          nullable: true
         target:
           type: string
           maxLength: 2048
@@ -35047,6 +35166,16 @@ components:
           readOnly: true
           description: Explicit opt-in for a page or post owned by a different Site.
             External and custom targets cannot set this.
+        category:
+          type: string
+          format: uuid
+          description: Immutable identifier. UUIDs are assigned once and can never
+            be changed or re-sequenced, so ids are not enumerable across Sites.
+          readOnly: true
+          nullable: true
+        destination_status:
+          type: string
+          readOnly: true
         created_at:
           type: string
           format: date-time
@@ -35057,7 +35186,9 @@ components:
           readOnly: true
       required:
       - allow_cross_site
+      - category
       - created_at
+      - destination_status
       - id
       - is_active
       - item_type
@@ -35076,12 +35207,16 @@ components:
       - post
       - external
       - custom
+      - news
+      - category
       type: string
       description: |-
         * `page` - Page
         * `post` - Post
         * `external` - External
         * `custom` - Custom
+        * `news` - News listing
+        * `category` - News category
     LayoutEnum:
       enum:
       - FULL_WIDTH
@@ -35123,6 +35258,34 @@ components:
         * `READY` - Ready
         * `REJECTED` - Rejected
         * `ARCHIVED` - Archived
+    MenuDestinationOptions:
+      type: object
+      properties:
+        pages:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        posts:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        categories:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        pagesAvailable:
+          type: boolean
+        postsAvailable:
+          type: boolean
+      required:
+      - categories
+      - pages
+      - pagesAvailable
+      - posts
+      - postsAvailable
     MenuInputRequest:
       type: object
       properties:
@@ -35178,6 +35341,9 @@ components:
         version:
           type: integer
           readOnly: true
+        has_unpublished_changes:
+          type: boolean
+          readOnly: true
         created_at:
           type: string
           format: date-time
@@ -35189,6 +35355,7 @@ components:
       required:
       - code
       - created_at
+      - has_unpublished_changes
       - id
       - is_active
       - is_global
@@ -36453,6 +36620,10 @@ components:
           format: uuid
           nullable: true
         post:
+          type: string
+          format: uuid
+          nullable: true
+        category:
           type: string
           format: uuid
           nullable: true

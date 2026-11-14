@@ -14,15 +14,12 @@ when it is published. Hidden, draft, unpublished and missing targets drop the
 item and its descendants. External and custom items stay. Inheritance copies
 the parent's local menu only, so a parent's own parent is not pulled in.
 """
-from apps.api.models import Post
 from apps.sites.models import Site
 from apps.sites.selectors.modules import module_is_available
 
-from ..menu_models import Menu, MenuInheritance, MenuItem
-from ..models import ContentStatus, Page, Visibility
+from ..menu_models import Menu, MenuInheritance
 
 
-_SHOWN_VISIBILITY = frozenset({Visibility.PUBLIC, Visibility.UNLISTED})
 
 
 def compose_location(site_id, location):
@@ -58,49 +55,21 @@ def _site_serves(site_id):
 def _project(menu, source):
     if menu is None:
         return []
-    rows = list(menu.items.order_by("sort_order", "id"))
-    pages = {
-        page.pk: page
-        for page in Page.objects.filter(pk__in=[row.page_id for row in rows if row.page_id])
-    }
-    posts = {
-        post.pk: post
-        for post in Post.objects.filter(pk__in=[row.post_id for row in rows if row.post_id])
-    }
+    from ..menu_destinations import published_rows, resolve_destination
+    rows = published_rows(menu)
     children = {}
     for row in rows:
         children.setdefault(row.parent_id, []).append(row)
 
-    def href(row):
-        if row.item_type == MenuItem.ItemType.PAGE:
-            return pages[row.page_id].path
-        if row.item_type == MenuItem.ItemType.POST:
-            return f"/posts/{posts[row.post_id].slug}"
-        return row.target
-
-    def available(row):
-        if row.item_type == MenuItem.ItemType.PAGE:
-            page = pages.get(row.page_id)
-            return bool(
-                page and page.status == ContentStatus.PUBLISHED and page.visibility in _SHOWN_VISIBILITY
-                and (page.site_id == row.site_id or row.allow_cross_site)
-            )
-        if row.item_type == MenuItem.ItemType.POST:
-            post = posts.get(row.post_id)
-            return bool(
-                post and post.status == ContentStatus.PUBLISHED
-                and (post.site_id == row.site_id or row.allow_cross_site)
-            )
-        return row.item_type in {MenuItem.ItemType.EXTERNAL, MenuItem.ItemType.CUSTOM}
-
     def branch(parent_id):
         rendered = []
         for row in children.get(parent_id, ()):
-            if not row.is_active or not available(row):
+            destination = resolve_destination(row)
+            if not row.is_active or destination is None:
                 continue
             rendered.append({
                 "label": row.label,
-                "href": href(row),
+                "href": destination,
                 "source": source,
                 "children": branch(row.pk),
             })

@@ -140,14 +140,17 @@ def test_authorized_services_deny_foreign_site_and_unsafe_cross_site_opt_in(read
     with pytest.raises(PermissionDenied):
         create_menu(actor=editor, site_id=other.pk, name="Header", location="header")
     foreign_page = create_page(site=other, title="Foreign", slug="foreign")
-    with pytest.raises(PermissionDenied):
+    with pytest.raises(ValidationError):
         create_menu_item(menu.pk, actor=editor, label="leak", item_type="page", page=foreign_page, allow_cross_site=True)
     UserRoleAssignment.objects.create(
         user=editor, role=Role.objects.get(code="viewer"), scope="SITE", site=other,
         organization=other.organization_unit,
     )
-    linked = create_menu_item(menu.pk, actor=editor, expected=menu_etag(menu), label="shared", item_type="page", page=foreign_page, allow_cross_site=True)
-    assert linked.page_id == foreign_page.pk
+    with pytest.raises(ValidationError):
+        create_menu_item(menu.pk, actor=editor, expected=menu_etag(menu), label="shared", item_type="page", page=foreign_page, allow_cross_site=True)
+    local_page = create_page(site=site,title="Local",slug="local")
+    linked = create_menu_item(menu.pk, actor=editor, expected=menu_etag(menu), label="local", item_type="page", page=local_page)
+    assert linked.page_id == local_page.pk
     with pytest.raises(ValidationError):
         update_menu(menu.pk, actor=editor, site_id=other.pk)
     with pytest.raises(PermissionDenied):
