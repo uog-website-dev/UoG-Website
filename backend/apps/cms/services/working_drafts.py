@@ -9,6 +9,11 @@ from django.shortcuts import get_object_or_404
 from ..models import ContentEditConflict, ContentRole, ContentStatus, Page, PublishedContentSnapshot
 
 
+def draft_write(*,using="default"):
+    """Shared CMS draft transaction/lock boundary for Pages and articles."""
+    return hierarchy_write(using=using)
+
+
 def content_etag(page):
     return f'"cms-content-{page.pk}-r{page.revision_number}"'
 

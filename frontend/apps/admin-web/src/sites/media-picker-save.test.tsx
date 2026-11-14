@@ -48,6 +48,7 @@ vi.mock("next/link", () => ({
 }));
 
 import { SitePagesPanel } from "./site-pages";
+import { SitePageEditor } from "./site-page-editor";
 
 const assetId = "11111111-1111-4111-8111-111111111111";
 const ready = {
@@ -119,7 +120,7 @@ beforeEach(() => {
 
 describe("CMS media picker save integration", () => {
   it("keeps the draft image selection when save finds the asset ineligible", async () => {
-    render(
+    const directory = render(
       <ToastProvider>
         <SitePagesPanel
           siteId={11}
@@ -128,7 +129,10 @@ describe("CMS media picker save integration", () => {
         />
       </ToastProvider>,
     );
-    fireEvent.click(await screen.findByRole("button", { name: "Edit Admissions" }));
+    const link = await screen.findByRole("link", { name: "Edit Admissions" });
+    expect(link.getAttribute("href")).toBe("/sites/11/admin/pages/page-1/edit");
+    directory.unmount();
+    render(<ToastProvider><SitePageEditor siteId={11} pageId="page-1" mode="edit" pagesEnabled permissions={["content.pages.view", "content.pages.update", "content.media.view", "content.media.upload"]} /></ToastProvider>);
     expect(await screen.findByText(`Asset ID: ${assetId}`)).toBeTruthy();
     expect(screen.getByDisplayValue("Campus green")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Save changes" }));

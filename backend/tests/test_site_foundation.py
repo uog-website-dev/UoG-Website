@@ -55,7 +55,7 @@ def test_public_demo_command_is_discoverable_idempotent_and_development_only(adm
     assert set(before) == expected_codes
     assert not Site.objects.exclude(status=Site.Status.ACTIVE).exists()
     for site in Site.objects.all():
-        assert set(site.site_modules.filter(is_enabled=True).values_list("module__code", flat=True)) == {"PAGES", "POSTS", "MENUS"}
+        assert set(site.site_modules.filter(is_enabled=True).values_list("module__code", flat=True)) == {"PAGES", "POSTS", "MENUS", "VISUAL_BUILDER"}
         assert site.domains.filter(is_primary=True, status="ACTIVE").count() == 1
     call_command("seed_public_demo", stdout=output)
     assert dict(Site.objects.values_list("code", "pk")) == before

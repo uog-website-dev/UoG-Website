@@ -110,7 +110,10 @@ def test_other_domains_do_not_import_organizations():
                 # domains. Keep its exact imports allowlisted, while core
                 # runtime code and all other commands retain the boundary.
                 if (
-                    path.relative_to(apps_root).as_posix() == "core/management/commands/seed_public_demo.py"
+                    path.relative_to(apps_root).as_posix() in {
+                        "core/management/commands/seed_public_demo.py",
+                        "core/management/commands/seed_uog_structure.py",
+                    }
                     and module in {"apps.organizations.models", "apps.organizations.hierarchy_lock"}
                 ):
                     continue

@@ -3,12 +3,13 @@ from concurrent.futures import ThreadPoolExecutor
 from threading import Event
 import io, uuid
 import pytest
-from django.db import connection, connections, transaction, close_old_connections
+from django.db import connection, connections, transaction, close_old_connections, IntegrityError
 from django.db.migrations.executor import MigrationExecutor
 from apps.cms.services.pages import create_page
 from apps.media.models import MediaUsage, MediaProcessing, MediaDerivative
 from apps.media.removal import remove_asset, cleanup_asset
 from apps.media.uploads import upload_asset, process_asset
+from apps.media.services import asset_write
 from apps.sites.api.access import Conflict
 from .test_media_assets import media_world
 from .test_media_derivatives import derivative_storage
@@ -35,16 +36,24 @@ def test_forward_migration_indexes_historical_compact_uuid_without_history_rewri
     leaves = executor.loader.graph.leaf_nodes()
     try:
         executor.migrate([("media", "0010_reference_inventory_and_removal")])
-        # Reproduce the old domain's accepted-but-unnormalized spelling.
-        monkeypatch.setattr("apps.cms.blocks.check_image_ref", lambda ref, **_: ref)
-        page = create_page(site=w.a, title="Historical UUID", slug="history", actor=w.actor, blocks=[
-          {"type":"image", "id":"image", "ref":f"sites/{w.a.pk}/assets/{row.pk.hex}", "alt":"Campus"}])
-        snapshot = page.revisions.latest("revision_number").snapshot
+        # Build data using baseline models; today's revision retention query
+        # legitimately refers to approved_revision_id added after this baseline.
+        loader=MigrationExecutor(connection).loader
+        old_apps=loader.project_state(list(loader.applied_migrations)).apps
+        OldPage=old_apps.get_model("cms","Page")
+        OldRevision=old_apps.get_model("cms","ContentRevision")
+        from apps.cms.services.revisions import content_revision_write
+        import hashlib,json
+        with content_revision_write(using="default"):
+            page=OldPage.objects.create(created_by_id=w.actor.pk,updated_by_id=w.actor.pk,site_id=w.a.pk,title="Historical UUID",slug="history",path="/history",locale="en-us",revision_number=1,blocks=[{"type":"image","id":"image","ref":f"sites/{w.a.pk}/assets/{row.pk.hex}","alt":"Campus"}])
+            snapshot={"content_id":str(page.pk),"site_id":w.a.pk,"title":page.title,"slug":page.slug,"path":page.path,"blocks":page.blocks,"metadata":{},"status":"DRAFT"}
+            revision=OldRevision.objects.create(content_id=page.pk,site_id=w.a.pk,revision_number=1,status="DRAFT",snapshot=snapshot,changed_fields=["__created__"],content_hash=hashlib.sha256(json.dumps(snapshot,sort_keys=True).encode()).hexdigest())
         assert not MediaUsage.objects.filter(asset=row).exists()
     finally:
         MigrationExecutor(connection).migrate(leaves)
     assert MediaUsage.objects.filter(asset=row, scope="DRAFT").count() == 1
-    assert page.revisions.latest("revision_number").snapshot == snapshot
+    from apps.cms.models import ContentRevision
+    assert ContentRevision.objects.get(pk=revision.pk).snapshot == snapshot
     with pytest.raises(Conflict): remove_asset(w.actor, w.a.pk, row.pk)
 
 
@@ -109,3 +118,23 @@ def test_deletion_during_derivative_put_waits_for_io_before_cleanup(media_world,
     assert not MediaDerivative.objects.filter(asset=row).exists()
     assert cleanup_asset(row.pk, storage=derivative_storage).state == "DONE"
     assert not derivative_storage.objects
+
+
+@pytest.mark.parametrize("state",["PENDING","REJECTED"])
+def test_non_ready_removal_requires_the_tombstone_service(media_world,derivative_storage,monkeypatch,state):
+    w=media_world
+    row=upload_asset(w.actor,w.a.pk,io.BytesIO(png()),filename="pending.png",request_key=uuid.uuid4(),storage=derivative_storage)
+    monkeypatch.setattr("apps.media.removal.enqueue_cleanup",lambda _:None)
+    if state=="REJECTED":
+        # Exercise the real worker rejection path; uploads cannot change
+        # lifecycle state through ordinary metadata writes.
+        derivative_storage.objects.pop(tuple(row.storage_reference.split(":",1)))
+        row=process_asset(row.pk,storage=derivative_storage)
+        assert row.status=="REJECTED"
+    with pytest.raises(IntegrityError),asset_write(w.actor,w.a.pk,"content.media.delete"):
+        row.status="ARCHIVED"
+        row.save(update_fields=["status","updated_at"])
+    row.refresh_from_db()
+    assert row.status==state and row.deleted_at is None
+    deleted,_=remove_asset(w.actor,w.a.pk,row.pk)
+    assert deleted.status=="ARCHIVED" and deleted.deleted_at is not None

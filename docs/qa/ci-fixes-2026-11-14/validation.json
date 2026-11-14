@@ -1,0 +1,51 @@
+{
+  "backend": {
+    "tests": 1056,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 5
+  },
+  "backend_passed": 1051,
+  "backend_skips": [
+    {
+      "class": "apps.cms.tests.test_blocks",
+      "test": "test_documented_block_contract_matches_the_domain",
+      "reason": "The runtime image ships code only; docs live in the checkout."
+    },
+    {
+      "class": "tests.test_media_derivatives",
+      "test": "test_real_minio_duplicate_and_missing_thumbnail_fallback",
+      "reason": "Requires private MinIO integration environment"
+    },
+    {
+      "class": "tests.test_media_removal",
+      "test": "test_real_minio_accepted_cleanup_removes_only_owned_objects",
+      "reason": "Requires private MinIO integration environment"
+    },
+    {
+      "class": "tests.test_media_uploads",
+      "test": "test_real_private_minio_interrupted_put_retry_worker_and_cleanup",
+      "reason": "Requires local private MinIO integration environment"
+    },
+    {
+      "class": "apps.cms.tests.test_module",
+      "test": "test_documented_strategy_matches_the_migration",
+      "reason": "The runtime image ships code only; docs live in the checkout."
+    }
+  ],
+  "frontend_packages": {
+    "@uog/api-client": 165,
+    "@uog/ui": 192,
+    "@uog/admin-web": 530
+  },
+  "frontend_total_passed": 887,
+  "typescript": true,
+  "django_check": "no issues",
+  "migration_drift": "no changes detected",
+  "installed_guard": {
+    "migration_applied": true,
+    "guarded_deletion_present": true,
+    "article_revision_guard_preserved": true
+  },
+  "remote_pipeline_rerun": false
+}
