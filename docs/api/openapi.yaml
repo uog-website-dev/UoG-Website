@@ -32538,6 +32538,804 @@ paths:
               schema:
                 type: string
                 format: uuid
+  /api/v1/sites/{site_pk}/sidebars/:
+    get:
+      operationId: v1_sites_sidebars_list
+      description: List Site-owned reusable sidebar definitions; PAGES and a canonical
+        CMS membership required. Deterministic name/ID pagination, default 20/max
+        100.
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        description: Owning Site id.
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - CMS sidebars
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSidebarOutputList'
+          description: ''
+          headers:
+            ETag:
+              description: Strong representation validator. Echo exactly in If-Match
+                for mutations.
+              schema:
+                type: string
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+    post:
+      operationId: v1_sites_sidebars_create
+      description: Create a named Site-owned sidebar with 1–12 ordered Menu references.
+        Component IDs and Menu IDs must be unique. Only active same-Site local Menus
+        are accepted.
+      parameters:
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        description: Owning Site id.
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - CMS sidebars
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SidebarInputRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SidebarInputRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SidebarInputRequest'
+        required: true
+      security:
+      - keycloakBearer: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SidebarOutput'
+          description: ''
+          headers:
+            ETag:
+              description: Strong representation validator. Echo exactly in If-Match
+                for mutations.
+              schema:
+                type: string
+            Location:
+              description: Created resource URL.
+              schema:
+                type: string
+                format: uri-reference
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          description: Invalid body, malformed input, or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    title:
+                    - This field is required.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '409':
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '412':
+          description: If-Match does not match the current strong ETag. Retrieve and
+            reconcile changes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '415':
+          description: Unsupported request content type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '428':
+          description: If-Match header is required for this mutation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '503':
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/sites/{site_pk}/sidebars/{id}/:
+    get:
+      operationId: v1_sites_sidebars_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
+        required: true
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        description: Owning Site id.
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - CMS sidebars
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SidebarOutput'
+          description: ''
+          headers:
+            ETag:
+              description: Strong representation validator. Echo exactly in If-Match
+                for mutations.
+              schema:
+                type: string
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+    patch:
+      operationId: v1_sites_sidebars_partial_update
+      description: Rename, reorder/replace components, or archive an unused sidebar.
+        Current ETag required; stale writes return 409. Published Page snapshots remain
+        unchanged.
+      parameters:
+      - in: header
+        name: If-Match
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
+        required: true
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        description: Owning Site id.
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - CMS sidebars
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSidebarInputRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSidebarInputRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSidebarInputRequest'
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SidebarOutput'
+          description: ''
+          headers:
+            ETag:
+              description: Strong representation validator. Echo exactly in If-Match
+                for mutations.
+              schema:
+                type: string
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          description: Invalid body, malformed input, or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    title:
+                    - This field is required.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '409':
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '412':
+          description: If-Match does not match the current strong ETag. Retrieve and
+            reconcile changes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '415':
+          description: Unsupported request content type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '428':
+          description: If-Match header is required for this mutation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '503':
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+    delete:
+      operationId: v1_sites_sidebars_destroy
+      description: Delete only an unassigned sidebar. All draft/live/archived Page
+        assignments guard deletion; detach and publish replacements first.
+      parameters:
+      - in: header
+        name: If-Match
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
+        required: true
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        description: Owning Site id.
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - CMS sidebars
+      security:
+      - keycloakBearer: []
+      responses:
+        '204':
+          description: No response body
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
   /api/v1/sites/{site_pk}/tags/:
     get:
       operationId: v1_sites_tags_list
@@ -35360,6 +36158,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SectionTemplateOutput'
+    PaginatedSidebarOutputList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SidebarOutput'
     PaginatedSiteActivationList:
       type: object
       required:
@@ -35915,6 +36736,21 @@ components:
           maxLength: 120
         status:
           $ref: '#/components/schemas/SectionTemplateStatusEnum'
+    PatchedSidebarInputRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/SidebarComponentInputRequest'
+          maxItems: 12
+          minItems: 1
+        status:
+          $ref: '#/components/schemas/SidebarInputStatusEnum'
     PatchedSiteDomainUpdateRequest:
       type: object
       properties:
@@ -35978,6 +36814,10 @@ components:
           oneOf:
           - $ref: '#/components/schemas/LayoutEnum'
           - $ref: '#/components/schemas/BlankEnum'
+        sidebar:
+          type: string
+          format: uuid
+          nullable: true
         seo:
           description: 'Allowlisted SEO object: meta_title, meta_description, og_image_ref.
             Unsupported keys and non-string values are rejected; never a place for
@@ -36895,6 +37735,11 @@ components:
           type: string
         layout:
           type: string
+        sidebar_id:
+          type: string
+          format: uuid
+          nullable: true
+        sidebar_snapshot: {}
         seo: {}
         visibility:
           $ref: '#/components/schemas/VisibilityEnum'
@@ -36920,6 +37765,8 @@ components:
       - publication_version
       - published_at
       - seo
+      - sidebar_id
+      - sidebar_snapshot
       - site
       - slug
       - status
@@ -37404,6 +38251,137 @@ components:
       description: |-
         * `ACTIVE` - Active
         * `RETIRED` - Retired
+    SidebarComponentInput:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Stable component identity; unique within this sidebar.
+          pattern: ^[A-Za-z][A-Za-z0-9_-]{0,63}$
+        type:
+          $ref: '#/components/schemas/SidebarComponentInputTypeEnum'
+        menu_id:
+          type: string
+          format: uuid
+          description: Active local Menu owned by the same Site. A Menu may appear
+            once.
+      required:
+      - id
+      - menu_id
+      - type
+    SidebarComponentInputRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          minLength: 1
+          description: Stable component identity; unique within this sidebar.
+          pattern: ^[A-Za-z][A-Za-z0-9_-]{0,63}$
+        type:
+          $ref: '#/components/schemas/SidebarComponentInputTypeEnum'
+        menu_id:
+          type: string
+          format: uuid
+          description: Active local Menu owned by the same Site. A Menu may appear
+            once.
+      required:
+      - id
+      - menu_id
+      - type
+    SidebarComponentInputTypeEnum:
+      enum:
+      - menu
+      type: string
+      description: '* `menu` - menu'
+    SidebarInputRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/SidebarComponentInputRequest'
+          maxItems: 12
+          minItems: 1
+        status:
+          $ref: '#/components/schemas/SidebarInputStatusEnum'
+      required:
+      - components
+      - name
+    SidebarInputStatusEnum:
+      enum:
+      - ACTIVE
+      - ARCHIVED
+      type: string
+      description: |-
+        * `ACTIVE` - ACTIVE
+        * `ARCHIVED` - ARCHIVED
+    SidebarOutput:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        site:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/SidebarOutputStatusEnum'
+          readOnly: true
+        components:
+          type: array
+          items:
+            $ref: '#/components/schemas/SidebarComponentInput'
+          readOnly: true
+        snapshot:
+          readOnly: true
+        version:
+          type: integer
+          readOnly: true
+        created_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        updated_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - components
+      - created_at
+      - created_by
+      - id
+      - name
+      - site
+      - snapshot
+      - status
+      - updated_at
+      - updated_by
+      - version
+    SidebarOutputStatusEnum:
+      enum:
+      - ACTIVE
+      - ARCHIVED
+      type: string
+      description: |-
+        * `ACTIVE` - Active
+        * `ARCHIVED` - Archived
     Site:
       type: object
       properties:
@@ -38079,6 +39057,12 @@ components:
           oneOf:
           - $ref: '#/components/schemas/LayoutEnum'
           - $ref: '#/components/schemas/BlankEnum'
+        sidebar:
+          type: string
+          format: uuid
+          nullable: true
+        sidebar_snapshot:
+          readOnly: true
         seo:
           description: 'Allowlisted SEO object: meta_title, meta_description, og_image_ref.
             Unsupported keys and non-string values are rejected; never a place for
@@ -38199,6 +39183,7 @@ components:
       - review_comment
       - reviewed_by
       - revision_number
+      - sidebar_snapshot
       - site
       - slug
       - status
@@ -38255,6 +39240,10 @@ components:
           oneOf:
           - $ref: '#/components/schemas/LayoutEnum'
           - $ref: '#/components/schemas/BlankEnum'
+        sidebar:
+          type: string
+          format: uuid
+          nullable: true
         seo:
           description: 'Allowlisted SEO object: meta_title, meta_description, og_image_ref.
             Unsupported keys and non-string values are rejected; never a place for

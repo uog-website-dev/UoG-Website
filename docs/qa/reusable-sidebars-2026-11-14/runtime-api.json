@@ -1,0 +1,8 @@
+{
+  "authentication": "Real Keycloak Site Editor access token",
+  "create_status": 201,
+  "delete_unused_status": 204,
+  "probe_name": "Runtime API probe",
+  "uuid_menu_references_normalized": true,
+  "temporary_probe_deleted": true
+}

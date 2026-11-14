@@ -42,10 +42,49 @@ export interface PublicBlock {
 
 export interface PublicMediaItem { id: string; asset_id: string; alt: string; caption?: string }
 
+export interface SidebarLink { label: string; href: string; children: SidebarLink[] }
+export interface SidebarSnapshot {
+  id: string; site: number; version: number; name: string;
+  components: { id: string; type: "menu"; menu_id: string; title?: string; items: SidebarLink[] }[];
+}
+
+/** Independently validate frozen navigation before using it on either surface. */
+export function sidebarFromResponse(value: unknown, site: number | null, id: string | null): SidebarSnapshot | undefined {
+  if (!value || typeof value !== "object" || !id || site === null) return undefined;
+  const row = value as SidebarSnapshot;
+  if (row.id !== id || row.site !== site || typeof row.name !== "string" || row.name.length > 120
+      || !Number.isInteger(row.version) || row.version < 1 || !Array.isArray(row.components) || row.components.length > 12) return undefined;
+  let count = 0;
+  function validLinks(links: SidebarLink[], depth: number): boolean {
+    return depth <= 4 && Array.isArray(links) && links.every(link => {
+      if (++count > 2000 || !link || typeof link.label !== "string" || link.label.length > 255
+          || typeof link.href !== "string" || link.href.length > 2048 || !safeMenuHref(link.href)) return false;
+      return link.children?.length ? validLinks(link.children, depth + 1) : Array.isArray(link.children);
+    });
+  }
+  const ids = new Set<string>();
+  return row.components.every(component => {
+    if (!component || component.type !== "menu" || typeof component.id !== "string" || (component.title !== undefined && (typeof component.title !== "string" || component.title.length > 255)) || ids.has(component.id)) return false;
+    ids.add(component.id);
+    return validLinks(component.items, 1);
+  }) ? row : undefined;
+}
+
+function SidebarLinks({ items }: { items: SidebarLink[] }) {
+  return <Box component="ul" sx={{ pl: 2, m: 0, display: "grid", gap: 1.25 }}>
+    {items.map((item, index) => <Box component="li" key={`${index}:${item.href}`}>
+      <Link href={item.href}>{item.label}</Link>
+      {item.children.length ? <SidebarLinks items={item.children} /> : null}
+    </Box>)}
+  </Box>;
+}
+
 export interface PublicPageDocument {
   id?: string;
   title: string;
   layout?: string;
+  sidebar_id?: string | null;
+  sidebar_snapshot?: SidebarSnapshot;
   locale?: string;
   path: string;
   site: number | null;
@@ -71,7 +110,7 @@ export function pageFromResponse(status: number, body: unknown): PublicPageDocum
   if (status !== 200 || body == null || typeof body !== "object" || Array.isArray(body)) {
     return null;
   }
-  const row = body as { title?: unknown; path?: unknown; status?: unknown; blocks?: unknown; site?: unknown; metadata?: unknown; seo?: unknown; layout?: unknown; locale?: unknown };
+  const row = body as { title?: unknown; path?: unknown; status?: unknown; blocks?: unknown; site?: unknown; metadata?: unknown; seo?: unknown; layout?: unknown; sidebar_id?: unknown; sidebar_snapshot?: unknown; locale?: unknown };
   if (row.status != null && row.status !== "PUBLISHED") return null;
   if (typeof row.title !== "string" || !row.title.trim()) return null;
   const path = typeof row.path === "string" && row.path.startsWith("/") ? row.path : "/";
@@ -83,6 +122,8 @@ export function pageFromResponse(status: number, body: unknown): PublicPageDocum
     ...(visual ? visual.ok ? {visual_layout:visual.value} : {layout_unavailable:true} : {}),
     title: row.title.trim(),
     layout: typeof row.layout === "string" ? row.layout : "FULL_WIDTH",
+    sidebar_id: typeof row.sidebar_id === "string" ? row.sidebar_id : null,
+    sidebar_snapshot: sidebarFromResponse(row.sidebar_snapshot, typeof row.site === "number" ? row.site : null, typeof row.sidebar_id === "string" ? row.sidebar_id : null),
     locale: typeof row.locale === "string" ? row.locale : undefined,
     path,
     site: typeof row.site === "number" ? row.site : null,
@@ -295,7 +336,7 @@ function PageSidebar({ page, preview }: { page: PublicPageDocument; preview: boo
     const controller = new AbortController();
     setLinks([]);
     setState("loading");
-    if (preview) {
+    if (preview || page.sidebar_id) {
       setState("preview");
       return () => { cancelled = true; controller.abort(); };
     }
@@ -320,7 +361,14 @@ function PageSidebar({ page, preview }: { page: PublicPageDocument; preview: boo
       }
     }).catch(() => { if (!cancelled) setState("error"); });
     return () => { cancelled = true; controller.abort(); };
-  }, [page.site, page.path, page.locale, preview]);
+  }, [page.site, page.path, page.locale, page.sidebar_id, preview]);
+  if (page.sidebar_id) {
+    const snapshot = sidebarFromResponse(page.sidebar_snapshot, page.site, page.sidebar_id);
+    return <Box component="aside" aria-label="Page navigation" sx={{ gridArea: "sidebar", minWidth: 0, p: 3, bgcolor: "action.hover", borderRadius: 2, alignSelf: "start", overflowWrap: "anywhere" }}>
+      <Typography component="h2" variant="h6" sx={{ mb: 2 }}>{snapshot?.name ?? "Page navigation"}</Typography>
+      {snapshot ? snapshot.components.map(component => <Box component="nav" key={component.id} aria-label={component.title ?? snapshot.name} sx={{ mb: 2 }}><SidebarLinks items={component.items} /></Box>) : <Typography variant="body2">Navigation is currently unavailable.</Typography>}
+    </Box>;
+  }
   return (
     <Box component="aside" aria-label="Page navigation" sx={{
       gridArea: "sidebar", minWidth: 0, p: 3, bgcolor: "action.hover",

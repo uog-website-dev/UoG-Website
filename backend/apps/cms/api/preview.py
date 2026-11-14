@@ -52,7 +52,7 @@ def preview_revision(request,page):
         asset=get_object_or_404(MediaAsset.objects.select_related("site","processing"),pk=asset_id,site_id=page.site_id,deleted_at__isnull=True)
         return image_response(asset,query.validated_data["variant"])
     approval=ContentWorkflowTransition.objects.filter(content_id=page.pk,to_status="APPROVED").filter(Q(revision=revision)|Q(reviewed_revision=revision)).order_by("-id").first()
-    frozen={key:payload.get(key) for key in ("title","path","blocks","blocks_version","metadata","seo","layout","locale","visibility")}
+    frozen={key:payload.get(key) for key in ("title","path","blocks","blocks_version","metadata","seo","layout","sidebar_id","sidebar_snapshot","locale","visibility")}
     frozen["site"]=page.site_id
     frozen["id"]=str(page.pk)
     return Response({"revision_id":revision.pk,"revision_number":revision.revision_number,"content_hash":revision.content_hash,

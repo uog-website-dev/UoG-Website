@@ -57,6 +57,7 @@ const DRAWER_WIDTH = 296;
 const SITE_SECTION_ICONS: Record<SiteSection["key"], SvgIconComponent> = {
   dashboard: DashboardIcon,
   pages: DescriptionIcon,
+  sidebars: AccountTreeIcon,
   builder: ViewQuiltIcon,
   homepage: HomeOutlinedIcon,
   posts: ArticleIcon,
@@ -68,6 +69,7 @@ const SITE_SECTION_ICONS: Record<SiteSection["key"], SvgIconComponent> = {
 const SITE_SECTION_DESCRIPTIONS: Record<SiteSection["key"], string> = {
   dashboard: "Site content overview",
   pages: "Site pages and workflow",
+  sidebars: "Reusable Page navigation regions",
   builder: "Compose a visual Page layout",
   homepage: "Assign the published Site root",
   posts: "News and announcements",

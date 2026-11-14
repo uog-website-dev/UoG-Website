@@ -598,7 +598,7 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
     finally{if(alive.current)setWorkflowBusy(false);}
   }
   const contextLabel=picker ? (()=>{const value=entries.find(item=>item.id===picker.columnId);const row=layout.rows.find(item=>item.columns.some(column=>column.id===picker.columnId));return `${entries.find(item=>item.id===row?.id)?.label??"Row"} / ${value?.label??"Column"}${picker.itemId?" / Layout item":""}`;})():"";
-  const preview=page && pageFromResponse(200,{id:page.id,title:page.title,path:page.path,site:page.site,layout:page.layout,seo:page.seo??{},blocks:[],metadata:{...page.metadata,visual_layout:layout}});
+  const preview=page && pageFromResponse(200,{id:page.id,title:page.title,path:page.path,site:page.site,layout:page.layout,sidebar_id:page.sidebar,sidebar_snapshot:page.sidebar_snapshot,seo:page.seo??{},blocks:[],metadata:{...page.metadata,visual_layout:layout}});
   const matchingWidgets=registry.filter(value=>`${value.label} ${value.type}`.toLowerCase().includes(widgetQuery.toLowerCase().trim()));
   const canvasWidth=PREVIEW_VIEWPORTS[previewViewport].width;
   const canMoveSelected=!!entry && entry.kind!=="column";

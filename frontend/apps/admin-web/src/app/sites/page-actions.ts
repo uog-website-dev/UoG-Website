@@ -66,6 +66,8 @@ export interface SitePageRecord {
   blocks: SitePageBlock[];
   metadata?: Record<string, unknown>;
   seo?: Record<string, unknown>;
+  sidebar?: string | null;
+  sidebar_snapshot?: import("@uog/ui").SidebarSnapshot;
   layout?: string;
   position?: number;
   draft_of?: string | null;
@@ -280,7 +282,7 @@ export async function createSitePage(
   siteId: number,
   input: {
     title: string; slug: string; parent: string | null;
-    locale: string; visibility: SitePageRecord["visibility"]; layout?: string;
+    locale: string; visibility: SitePageRecord["visibility"]; layout?: string; sidebar?: string | null;
     metadata: Record<string, unknown>; seo: Record<string, unknown>; blocks: SitePageBlock[];
   },
 ): Promise<ActionResult<SitePageRecord>> {
@@ -293,6 +295,7 @@ export async function createSitePage(
       locale: input.locale,
       visibility: input.visibility,
       layout: input.layout ?? "FULL_WIDTH",
+      ...(input.sidebar !== undefined ? { sidebar: input.sidebar } : {}),
       metadata: input.metadata,
       seo: input.seo,
       blocks: input.blocks,
@@ -325,7 +328,7 @@ export async function updateSitePage(
   pageId: string,
   ifMatch: string,
   input: {
-    title?: string; slug?: string; parent?: string | null; visibility?: SitePageRecord["visibility"]; layout?: string;
+    title?: string; slug?: string; parent?: string | null; visibility?: SitePageRecord["visibility"]; layout?: string; sidebar?: string | null;
     metadata?: Record<string, unknown>; seo?: Record<string, unknown>; blocks?: SitePageBlock[];
   },
 ): Promise<ActionResult<SitePageRecord>> {

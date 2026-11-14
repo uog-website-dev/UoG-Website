@@ -5,6 +5,8 @@ import layoutFixtures from "../../../../packages/types/src/layout/fixtures.json"
 
 import type { SitePageRecord, SitePageStatus } from "@/app/sites/page-actions";
 
+vi.mock("@/app/sites/sidebar-actions", () => ({ listSiteSidebars: vi.fn(async () => ({ ok: true, data: [] })) }));
+
 const { push } = vi.hoisted(() => ({ push: vi.fn() }));
 const loadSitePages = vi.fn();
 const loadSitePageStatusCounts = vi.fn();
@@ -45,6 +47,7 @@ vi.mock("next/link", () => ({
   ),
 }));
 
+import { listSiteSidebars } from "@/app/sites/sidebar-actions";
 import { SitePagesPanel } from "./site-pages";
 import { SitePageEditor } from "./site-page-editor";
 import { SiteAdminFrame, SiteSection } from "./site-admin-frame";
@@ -414,6 +417,24 @@ describe("SitePagesPanel", () => {
         parent: null, metadata: {}, seo: {}, blocks: draft().blocks,
       },
     ));
+  });
+
+  it("assigns a Site sidebar without replacing the builder document", async () => {
+    const snapshot = { id: "sidebar-1", site: 11, version: 1, name: "Department navigation", components: [{ id: "links", type: "menu" as const, menu_id: "menu-1", items: [{ label: "Student support", href: "/support", children: [] }] }] };
+    vi.mocked(listSiteSidebars).mockResolvedValueOnce({ ok: true, data: [
+      { id: "sidebar-1", site: 11, name: "Department navigation", version: 1, status: "ACTIVE", components: [], snapshot },
+      { id: "foreign", site: 12, name: "Foreign navigation", version: 1, status: "ACTIVE", components: [] },
+    ] });
+    getSitePage.mockResolvedValue({ ok: true, data: draft({ layout: "LEFT_SIDEBAR", sidebar: null, blocks: [], metadata: { visual_layout: layoutFixtures[0].layout } }) });
+    renderEditor("edit", { pageId: "page-1" });
+    await waitFor(() => expect((screen.getByRole("button", { name: "Save changes" }) as HTMLButtonElement).disabled).toBe(false));
+    fireEvent.mouseDown(screen.getByRole("combobox", { name: "Reusable sidebar" }));
+    expect(screen.queryByRole("option", { name: "Foreign navigation" })).toBeNull();
+    fireEvent.click(await screen.findByRole("option", { name: "Department navigation" }));
+    fireEvent.click(screen.getByRole("button", { name: "Preview draft" }));
+    await screen.findByRole("link", { name: "Student support" });
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+    await waitFor(() => expect(updateSitePage).toHaveBeenCalledWith(11, "page-1", '\"cms-content-page-1-r1\"', { layout: "LEFT_SIDEBAR", sidebar: "sidebar-1" }));
   });
 
   it("surfaces stale edit conflicts without losing the form", async () => {

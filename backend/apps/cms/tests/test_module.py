@@ -27,7 +27,7 @@ def test_cms_packages_import_and_application_loads():
         ".api", ".api.serializers", ".api.workflow", ".api.revisions",
         ".api.pages", ".api.public",
         ".api.menus", ".api.menu_delivery", ".menu_api_sql", ".menu_cache",
-        ".api.urls",
+        ".api.urls", ".api.sidebars", ".sidebar_models", ".services.sidebars",
         ".selectors", ".selectors.pages", ".services", ".services.pages",
         ".services.workflow", ".services.revisions",
         ".services.publication_cache", ".menu_models", ".migrations", ".tests",
@@ -43,7 +43,7 @@ def test_cms_packages_import_and_application_loads():
         "ContentWorkflowTransition", "PublishedContentSnapshot",
         "ContentRevision", "SitePublicationVersion",
         "Menu", "MenuItem", "MenuInheritance", "MenuDeliveryVersion",
-        "SectionTemplate", "ContactSubmission",
+        "SectionTemplate", "ContactSubmission", "Sidebar",
     }
 
 

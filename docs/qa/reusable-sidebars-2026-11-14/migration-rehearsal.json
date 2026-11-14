@@ -1,0 +1,1 @@
+{"baseline": "cms.0022 with existing legacy and visual Pages", "pages": 31, "publication_snapshots": 65, "content_hash": "f109a04a3d97d2d2f0e5bed2bd4f2941035b07765cb2c47b6d5437c171ff5c6f", "rollback_retains_content": true, "forward_retains_content": true, "sidebar_table_initially_empty": true, "result": "PASS"}

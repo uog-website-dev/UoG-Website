@@ -3,6 +3,7 @@ from django.urls import path
 from rest_framework.routers import SimpleRouter
 
 from apps.cms.api.pages import SitePageViewSet
+from apps.cms.api.sidebars import SidebarViewSet
 from apps.cms.api.menus import MenuViewSet, MenuItemViewSet
 from apps.cms.api.menu_delivery import MenuInheritanceDetailView, MenuInheritanceListView
 from apps.cms.api.section_templates import SectionTemplateViewSet
@@ -13,6 +14,7 @@ from .views import SiteDomainViewSet, SiteModuleViewSet, SiteViewSet
 app_name = "sites"
 
 router = SimpleRouter()
+router.register(r"(?P<site_pk>[0-9]+)/sidebars", SidebarViewSet, basename="sidebar")
 router.register(r"(?P<site_pk>[0-9]+)/menus/(?P<menu_pk>[0-9a-f-]{36})/items", MenuItemViewSet, basename="menu-item")
 router.register(r"(?P<site_pk>[0-9]+)/menus", MenuViewSet, basename="menu")
 router.register(r"(?P<site_pk>[0-9]+)/section-templates", SectionTemplateViewSet, basename="section-template")

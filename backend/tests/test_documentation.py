@@ -42,6 +42,8 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
     paths = schema["paths"]
     assert set(paths) == {
         "/api/pages/", "/api/pages/{id}/", "/api/pages/home/",
+        "/api/v1/sites/{site_pk}/sidebars/",
+        "/api/v1/sites/{site_pk}/sidebars/{id}/",
         "/api/v1/sites/{site_pk}/section-templates/",
         "/api/v1/sites/{site_pk}/section-templates/{id}/",
         "/api/v1/sites/{site_pk}/pages/{id}/visual-draft/insert-template/",

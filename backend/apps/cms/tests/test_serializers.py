@@ -122,14 +122,14 @@ def test_serialized_shape_matches_the_documented_contract(sites):
 
 PAGE_FIELDS = {
     "id", "site", "parent", "draft_of", "locale", "title", "slug", "path", "layout",
-    "seo", "visibility", "position", "is_homepage", "status",
+    "sidebar", "sidebar_snapshot", "seo", "visibility", "position", "is_homepage", "status",
     "published_at", "created_by", "updated_by", "submitted_by", "reviewed_by",
     "review_comment", "blocks", "blocks_version",
     "revision_number",
     "metadata", "created_at", "updated_at", "available_actions", "can_set_homepage",
 }
 PAGE_EDITABLES = {
-    "parent", "locale", "title", "slug", "layout", "seo", "visibility",
+    "parent", "locale", "title", "slug", "layout", "sidebar", "seo", "visibility",
     "position", "metadata", "blocks",
 }
 

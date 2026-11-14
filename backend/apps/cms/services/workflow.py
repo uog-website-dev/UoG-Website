@@ -249,6 +249,8 @@ def _publish_working_draft(draft, *, actor, comment, using, approval=None):
     target.metadata = draft.metadata
     target.seo = draft.seo
     target.layout = draft.layout
+    target.sidebar_id = draft.sidebar_id
+    target.sidebar_snapshot = draft.sidebar_snapshot
     target.visibility = draft.visibility
     target.updated_by = actor
     target.updated_at = timezone.now()
@@ -383,6 +385,8 @@ def _create_publication_snapshot(content, *, using, approval=None):
             "slug": content.slug,
             "path": content.path,
             "layout": content.layout,
+            "sidebar_id": str(content.sidebar_id) if content.sidebar_id else None,
+            "sidebar_snapshot": content.sidebar_snapshot,
             "seo": content.seo,
             "visibility": content.visibility,
             "position": content.position,

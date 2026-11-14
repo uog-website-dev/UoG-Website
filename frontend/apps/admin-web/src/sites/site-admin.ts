@@ -10,9 +10,9 @@
 export const CENTRAL_MODULE_PERMISSION = "platform.sites.manage_registry";
 
 export interface SiteSection {
-  key: "dashboard" | "pages" | "builder" | "homepage" | "posts" | "menus" | "media" | "users";
+  key: "dashboard" | "sidebars" | "pages" | "builder" | "homepage" | "posts" | "menus" | "media" | "users";
   label: string;
-  segment: "" | "pages" | "builder" | "homepage" | "posts" | "menus" | "media" | "users";
+  segment: "" | "sidebars" | "pages" | "builder" | "homepage" | "posts" | "menus" | "media" | "users";
   module: "PAGES" | "POSTS" | "MENUS" | "MEDIA" | "VISUAL_BUILDER" | null;
   permissions: readonly string[];
 }
@@ -37,6 +37,7 @@ export const SITE_SECTIONS: readonly SiteSection[] = [
       "content.pages.publish",
     ],
   },
+  { key: "sidebars", label: "Sidebars", segment: "sidebars", module: "PAGES", permissions: ["content.pages.update"] },
   {
     key: "builder",
     label: "Visual Builder",

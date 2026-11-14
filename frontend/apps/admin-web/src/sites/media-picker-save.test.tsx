@@ -2,6 +2,8 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ToastProvider } from "@uog/ui";
 
+vi.mock("@/app/sites/sidebar-actions", () => ({ listSiteSidebars: vi.fn(async () => ({ ok: true, data: [] })) }));
+
 const { push } = vi.hoisted(() => ({ push: vi.fn() }));
 const loadSitePages = vi.fn();
 const loadSitePageStatusCounts = vi.fn();
