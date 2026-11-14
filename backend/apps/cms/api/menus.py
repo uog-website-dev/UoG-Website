@@ -60,6 +60,7 @@ def menu_errors():
             raise  # The shared handler returns a sanitized 503; transaction rolls back.
         conflicts = {
             "menu_site_location_uniq": "duplicate_location",
+            "menu_site_code_unique": "duplicate_code",
             "menu_global_location_uniq": "duplicate_location",
             "menu_item_sibling_order": "duplicate_order",
         }
@@ -76,22 +77,24 @@ def menu_errors():
 class MenuOutput(serializers.ModelSerializer):
     class Meta:
         model = Menu
-        fields = ("id", "site", "location", "name", "is_active", "is_global", "version", "created_at", "updated_at")
+        fields = ("id", "site", "code", "location", "name", "is_active", "is_global", "version", "created_at", "updated_at")
         read_only_fields = fields
 
 
 class MenuInput(StrictFields, serializers.Serializer):
     name = serializers.CharField(max_length=255)
-    location = serializers.ChoiceField(choices=MENU_LOCATIONS)
+    code = serializers.RegexField(r"^[a-z0-9]+(?:-[a-z0-9]+)*$", max_length=64, required=False)
+    location = serializers.ChoiceField(choices=("", *MENU_LOCATIONS), required=False, default="")
     is_global = serializers.BooleanField(required=False)
 
     def validate_location(self, value):
         return value.strip().lower()
 
 
-class MenuPatch(MenuInput):
+class MenuPatch(StrictFields, serializers.Serializer):
+    is_global = serializers.BooleanField(required=False)
     name = serializers.CharField(max_length=255, required=False)
-    location = serializers.ChoiceField(choices=MENU_LOCATIONS, required=False)
+    location = serializers.ChoiceField(choices=("", *MENU_LOCATIONS), required=False)
 
 
 class ItemOutput(serializers.ModelSerializer):
@@ -150,6 +153,7 @@ class TreeQuery(StrictFields, serializers.Serializer):
 class ListQuery(StrictFields, serializers.Serializer):
     page = serializers.IntegerField(required=False, min_value=1)
     page_size = serializers.IntegerField(required=False, min_value=1, max_value=100)
+    search = serializers.CharField(required=False, allow_blank=True, max_length=255)
     is_active = serializers.BooleanField(required=False,
         help_text="Optional active-state filter. Omit to include both active and inactive records.")
 
@@ -245,12 +249,15 @@ class MenuViewSet(MenuAPIBase):
     serializer_class = MenuOutput
     queryset = Menu.objects.none()
 
-    @extend_schema(parameters=[ListQuery], responses=MenuOutput(many=True), description="menu.read; includes active and inactive menus. Ordered by location then UUID. Page size 20, maximum 100.")
+    @extend_schema(parameters=[ListQuery], responses=MenuOutput(many=True), description="menu.read; includes active and inactive menus. Ordered by name then UUID; search matches name or code. Page size 20, maximum 100.")
     def list(self, request, *args, **kwargs):
         with menu_errors(), hierarchy_write():
             site = self._site()
             query = self._query(ListQuery)
-            rows = Menu.objects.filter(site=site).order_by("location", "id")
+            rows = Menu.objects.filter(site=site).order_by("name", "id")
+            if query.get("search"):
+                from django.db.models import Q
+                rows = rows.filter(Q(name__icontains=query["search"]) | Q(code__icontains=query["search"]))
             if "is_active" in query:
                 rows = rows.filter(is_active=query["is_active"])
             return self.get_paginated_response(MenuOutput(self.paginate_queryset(rows), many=True).data)
@@ -262,7 +269,7 @@ class MenuViewSet(MenuAPIBase):
             return self._response(MenuOutput(menu).data, menu)
 
     @extend_schema(request=MenuInput, responses={201: MenuOutput}, examples=[OpenApiExample("Draft header", value={"name": "Main navigation", "location": "header"}, request_only=True)],
-        description="menu.write. Creates an inactive local draft. Locations are unique per Site even when inactive; duplicates return 409 duplicate_location. is_global requires platform-scoped menu.write and the main Site. No If-Match for creation.")
+        description="menu.write. Creates an inactive local draft. Stable codes are unique per Site. Optional non-empty locations remain unique per Site; multiple unassigned menus are supported. is_global requires platform-scoped menu.write and the main Site. No If-Match for creation.")
     def create(self, request, *args, **kwargs):
         with menu_errors(), hierarchy_write():
             site = self._site()

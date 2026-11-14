@@ -14,6 +14,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, URLValidator
 from django.db import models, router
 from django.db.models import Q
+from django.utils.text import slugify
 from apps.organizations.hierarchy_lock import hierarchy_write
 
 LOCATION_FORMAT = r"\A[a-z][a-z0-9-]{0,31}\Z"
@@ -73,10 +74,11 @@ class MenuRecord(models.Model):
 class Menu(MenuRecord):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     site = models.ForeignKey("sites.Site", on_delete=models.PROTECT, related_name="menus")
+    code = models.CharField(max_length=64, default="", db_default="", validators=[RegexValidator(r"^[a-z0-9]+(?:-[a-z0-9]+)*$", "Use a lower-case menu identifier.")])
     location = models.CharField(
-        max_length=32,
+        max_length=32, blank=True, default="",
         validators=[RegexValidator(LOCATION_FORMAT, "Use a location key such as header or footer.")],
-        help_text="Site-scoped location such as header or footer. One live key per Site.",
+        help_text="Optional navigation assignment. Empty means an unassigned reusable menu.",
     )
     name = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
@@ -93,7 +95,7 @@ class Menu(MenuRecord):
         constraints = [
             models.UniqueConstraint(
                 fields=("site", "location"),
-                condition=Q(is_global=False),
+                condition=Q(is_global=False) & ~Q(location=""),
                 name="menu_site_location_uniq",
             ),
             models.UniqueConstraint(
@@ -101,13 +103,22 @@ class Menu(MenuRecord):
                 condition=Q(is_global=True),
                 name="menu_global_location_uniq",
             ),
-            models.CheckConstraint(condition=Q(location__regex=LOCATION_FORMAT), name="menu_location_format"),
+            models.UniqueConstraint(fields=("site", "code"), name="menu_site_code_unique"),
+            models.CheckConstraint(condition=Q(code__regex=r"^[a-z0-9]+(?:-[a-z0-9]+)*$"), name="menu_code_format"),
+            models.CheckConstraint(condition=Q(location="") | Q(location__regex=LOCATION_FORMAT), name="menu_location_format"),
             models.CheckConstraint(condition=~Q(name=""), name="menu_name_required"),
-            models.CheckConstraint(condition=Q(location__in=MENU_LOCATIONS), name="menu_configured_location"),
+            models.CheckConstraint(condition=Q(location__in=("", *MENU_LOCATIONS)), name="menu_configured_location"),
         ]
         indexes = [models.Index(fields=["site", "location"], name="menu_site_location_idx")]
 
+    def normalize_code(self):
+        if isinstance(self.location, str): self.location = self.location.strip().lower()
+        if not self.code and self._state.adding:
+            self.code = (("global-" if self.is_global else "") + self.location) if self.location else (slugify(self.name)[:64].strip('-') or 'menu-'+self.pk.hex[:12])
+        if isinstance(self.code, str): self.code = self.code.strip().lower()
+
     def full_clean(self, *args, **kwargs):
+        self.normalize_code()
         if isinstance(self.location, str):
             self.location = self.location.strip().lower()
         if isinstance(self.name, str):
@@ -118,12 +129,14 @@ class Menu(MenuRecord):
         super().clean()
         if not self.name:
             raise ValidationError({"name": "A menu name is required."})
-        if self.location not in MENU_LOCATIONS:
+        if self.location not in ("", *MENU_LOCATIONS) or (self.is_global and not self.location):
             raise ValidationError({"location": "Choose a configured menu location."})
         if self.pk and not self._state.adding:
             previous = type(self).objects.filter(pk=self.pk).values_list("site_id", flat=True).first()
             if previous is not None and previous != self.site_id:
                 raise ValidationError({"site": "A menu cannot move to another Site."})
+        if not self._state.adding and type(self).objects.filter(pk=self.pk).exclude(code=self.code).exists():
+            raise ValidationError({"code": "Menu identifiers are immutable. Rename the menu using its name."})
         if self.is_global:
             from apps.sites.models import Site
             if not Site.objects.filter(pk=self.site_id, is_main=True).exists():

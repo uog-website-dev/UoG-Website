@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="19" failures="0" errors="0" time="5.710510741">
+    <testsuite name="src/sites/menu-items.test.tsx" timestamp="2026-11-14T16:27:55.049Z" hostname="f52a2508f805" tests="6" failures="0" errors="0" skipped="0" time="2.119246041">
+        <testcase classname="src/sites/menu-items.test.tsx" name="MenuItemTree &gt; moves, nests and lifts items from the keyboard for this Site only" time="0.819604138">
+        </testcase>
+        <testcase classname="src/sites/menu-items.test.tsx" name="MenuItemTree &gt; reorders by dropping an item onto a sibling" time="0.137033941">
+        </testcase>
+        <testcase classname="src/sites/menu-items.test.tsx" name="MenuItemTree &gt; blocks an unsafe external URL and an unavailable Page" time="0.241999691">
+        </testcase>
+        <testcase classname="src/sites/menu-items.test.tsx" name="MenuItemTree &gt; saves a Page target and removes a leaf" time="0.507591329">
+        </testcase>
+        <testcase classname="src/sites/menu-items.test.tsx" name="MenuItemTree &gt; reports a version conflict and does not send the stale change again" time="0.249205518">
+        </testcase>
+        <testcase classname="src/sites/menu-items.test.tsx" name="MenuItemTree &gt; warns when Pages cannot be loaded and keeps an unavailable target visible" time="0.161651484">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-menus.test.tsx" timestamp="2026-11-14T16:27:55.052Z" hostname="f52a2508f805" tests="13" failures="0" errors="0" skipped="0" time="3.5912647">
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; reorders the header with the keyboard-reachable move control and only for this Site" time="0.652672395">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; shows the reloaded menu order after a move" time="0.657319438">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; creates a local footer for this Site and edits its name and location" time="0.939739012">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; treats a missing inheritance field as no delivery policy" time="0.138907799">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; ignores malformed inheritance entries without crashing or inventing a policy" time="0.102758254">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; states that an empty inheritance list adds no parent menu" time="0.093391221">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; explains central and inherited ownership and does not edit a central menu" time="0.238397023">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; shows an empty list and hides writes without menu permission" time="0.017611776">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; shows the load error and keeps the selected Site on the request" time="0.014151564">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; blocks changes when the MENUS module is off" time="0.083464685">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="creates another named menu even after header and footer are occupied" time="0.225237165">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="selects and searches the directory without showing another Site&apos;s menu" time="0.213976067">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="loads only the selected item tree and ignores a late response for another menu" time="0.209494571">
+        </testcase>
+    </testsuite>
+</testsuites>

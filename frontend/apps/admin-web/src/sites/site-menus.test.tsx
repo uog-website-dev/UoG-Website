@@ -5,6 +5,7 @@ import { ToastProvider } from "@uog/ui";
 import type { MenuLocationState, SiteNavigation } from "@/app/sites/menu-actions";
 
 const loadSiteNavigation = vi.fn();
+const loadSiteMenu = vi.fn();
 const createSiteMenu = vi.fn();
 const createMenuLink = vi.fn();
 const reorderSiteMenu = vi.fn();
@@ -13,6 +14,7 @@ const updateSiteMenu = vi.fn();
 const loadMenuTargets = vi.fn();
 
 vi.mock("@/app/sites/menu-actions", () => ({
+  loadSiteMenu: (...args: unknown[]) => loadSiteMenu(...args),
   loadSiteNavigation: (...args: unknown[]) => loadSiteNavigation(...args),
   loadMenuTargets: (...args: unknown[]) => loadMenuTargets(...args),
   createSiteMenu: (...args: unknown[]) => createSiteMenu(...args),
@@ -92,7 +94,7 @@ describe("SiteMenusPanel", () => {
     fireEvent.click(moveDown);
     await waitFor(() => expect(reorderSiteMenu).toHaveBeenCalledTimes(1));
     expect(reorderSiteMenu).toHaveBeenCalledWith(11, "menu-1", '"menu-1-v3"', null, ["b", "a"]);
-    expect(loadSiteNavigation).toHaveBeenCalledWith(11);
+    expect(loadSiteNavigation).toHaveBeenCalledWith(11, false);
     expect(JSON.stringify(reorderSiteMenu.mock.calls)).not.toContain("22");
     expect(loadMenuTargets).toHaveBeenCalledWith(11);
     expect(screen.queryByText("Hospital")).toBeNull();
@@ -123,6 +125,7 @@ describe("SiteMenusPanel", () => {
     await waitFor(() => expect(createSiteMenu).toHaveBeenCalledWith(11, "footer", "Footer"));
     expect(JSON.stringify(createSiteMenu.mock.calls)).not.toContain("22");
 
+    await waitFor(() => expect(screen.getByRole("button", { name: "Edit Header" })).toHaveProperty("disabled", false));
     fireEvent.click(screen.getByRole("button", { name: "Edit Header" }));
     fireEvent.change(screen.getByLabelText(/Local menu name/), { target: { value: "Campus header" } });
     fireEvent.change(screen.getByLabelText(/Assigned location/), { target: { value: "footer" } });
@@ -174,7 +177,7 @@ describe("SiteMenusPanel", () => {
           {
             menu: {
               id: "global-1",
-              site: 1,
+              site: 11,
               location: "header",
               name: "University",
               is_active: true,
@@ -197,12 +200,14 @@ describe("SiteMenusPanel", () => {
       }),
     });
     renderPanel(11);
+    fireEvent.click(await screen.findByRole("button", { name: /University.*global-1/ }));
     expect(await screen.findByText(/The platform owns this menu/)).toBeTruthy();
     expect(screen.getByText("Central")).toBeTruthy();
     expect(screen.getByText(/copies Site 4's own local menu/)).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Edit University" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Move University down" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Unpublish University" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: /Header.*menu-1/ }));
     expect(screen.getByRole("button", { name: "Edit Header" })).toBeTruthy();
   });
 
@@ -222,7 +227,7 @@ describe("SiteMenusPanel", () => {
     });
     renderPanel(22);
     expect((await screen.findByRole("alert")).textContent).toContain("Menus could not be loaded.");
-    expect(loadSiteNavigation).toHaveBeenCalledWith(22);
+    expect(loadSiteNavigation).toHaveBeenCalledWith(22, false);
     expect(JSON.stringify(loadSiteNavigation.mock.calls)).not.toContain("[11]");
   });
 
@@ -236,4 +241,46 @@ describe("SiteMenusPanel", () => {
     fireEvent.click(moveDown);
     expect(reorderSiteMenu).not.toHaveBeenCalled();
   });
+});
+
+
+it("creates another named menu even after header and footer are occupied", async () => {
+  const header = headerState();
+  const footer = {...header, menu:{...header.menu,id:"footer",code:"footer",name:"Footer",location:"footer"},items:[]};
+  loadSiteNavigation.mockResolvedValue({ok:true,data:navigation({menus:[header,footer]})});
+  renderPanel();
+  fireEvent.change(await screen.findByRole("textbox",{name:"New menu name"}),{target:{value:"Student services"}});
+  fireEvent.click(screen.getByRole("button",{name:"Create menu"}));
+  await waitFor(()=>expect(createSiteMenu).toHaveBeenCalledWith(11,"","Student services"));
+});
+
+it("selects and searches the directory without showing another Site's menu", async () => {
+  const first=headerState();
+  const second={...first,menu:{...first.menu,id:"second",code:"research",name:"Research",location:""},items:[]};
+  const foreign={...first,menu:{...first.menu,id:"foreign",site:22,name:"Foreign menu"},items:[]};
+  loadSiteNavigation.mockResolvedValue({ok:true,data:navigation({menus:[first,second,foreign]})});
+  renderPanel();
+  fireEvent.click(await screen.findByRole("button",{name:/Research.*research/}));
+  expect(screen.getByRole("button",{name:"Edit Research"})).toBeTruthy();
+  expect(screen.queryByRole("button",{name:"Edit Header"})).toBeNull();
+  expect(screen.queryByText(/Foreign menu/)).toBeNull();
+  fireEvent.change(screen.getByRole("textbox",{name:"Search menu directory"}),{target:{value:"missing"}});
+  expect(screen.getByText(/No menus match your search/)).toBeTruthy();
+  expect(screen.queryByRole("button",{name:"Edit Research"})).toBeNull();
+});
+
+it("loads only the selected item tree and ignores a late response for another menu", async () => {
+  const first = headerState();
+  const second = {...first,menu:{...first.menu,id:"second",name:"Research",location:""},items:[]};
+  let resolveFirst!: (value: unknown) => void;
+  const delayed = new Promise(resolve => {resolveFirst = resolve;});
+  loadSiteNavigation.mockResolvedValue({ok:true,data:navigation({menus:[{...first,items:[],itemsLoaded:false},{...second,itemsLoaded:false}]})});
+  loadSiteMenu.mockImplementation((_site: number,id: string) => id === "menu-1" ? delayed : Promise.resolve({ok:true,data:second}));
+  renderPanel();
+  await waitFor(() => expect(loadSiteMenu).toHaveBeenCalledWith(11,"menu-1"));
+  fireEvent.click(screen.getByRole("button",{name:/Research.*second/}));
+  await waitFor(() => expect(screen.getByRole("button",{name:"Edit Research"})).toHaveProperty("disabled",false));
+  resolveFirst({ok:true,data:first});
+  await waitFor(() => expect(screen.queryByRole("button",{name:"Edit Header"})).toBeNull());
+  expect(screen.queryByText("About")).toBeNull();
 });

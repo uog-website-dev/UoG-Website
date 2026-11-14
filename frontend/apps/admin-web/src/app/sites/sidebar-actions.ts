@@ -43,8 +43,14 @@ export async function listSiteSidebars(site: number): Promise<ActionResult<Sideb
 export async function sidebarMenuOptions(site: number): Promise<ActionResult<SidebarMenuOption[]>> {
   return attempt(async () => {
     path(site);
-    const rows = await (await client()).get<{ results: (SidebarMenuOption & { site: number; is_active: boolean; is_global: boolean })[] }>(`/v1/sites/${site}/menus/?page_size=100`);
-    return rows.results.filter(row => row.site === site && row.is_active && !row.is_global);
+    const api = await client(), options: SidebarMenuOption[] = [];
+    let page = 1, more = true;
+    while (more && page <= 100) {
+      const rows = await api.get<{ results: (SidebarMenuOption & { site: number; is_active: boolean; is_global: boolean })[]; next: string | null }>(`/v1/sites/${site}/menus/?page_size=100&page=${page++}`);
+      options.push(...rows.results.filter(row => row.site === site && row.is_active && !row.is_global));
+      more = Boolean(rows.next);
+    }
+    return options;
   });
 }
 export async function saveSiteSidebar(site: number, input: { name: string; components: SidebarComponent[]; status: "ACTIVE" | "ARCHIVED" }, current?: { id: string; version: number }): Promise<ActionResult<SidebarRecord>> {

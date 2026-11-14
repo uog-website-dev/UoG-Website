@@ -8,7 +8,7 @@
  * Inherited menus stay on the parent Site; this screen only explains the
  * delivery policy returned for the selected Site.
  */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
@@ -18,11 +18,13 @@ import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { useAsync, useToast } from "@uog/ui";
+import { ApiError } from "@uog/api-client";
 
 import {
   createSiteMenu,
   loadMenuTargets,
   loadSiteNavigation,
+  loadSiteMenu,
   setMenuActive,
   updateSiteMenu,
 } from "@/app/sites/menu-actions";
@@ -36,10 +38,23 @@ import type {
 import { MenuItemTree } from "@/sites/menu-items";
 import { unwrap } from "@/organizations/contract";
 
-const PLACES: readonly MenuPlace[] = ["header", "footer"];
+const PLACES: readonly MenuPlace[] = ["", "header", "footer", "sidebar", "primary", "secondary"];
 const NO_TARGETS: MenuTargets = { pages: [], posts: [], pagesAvailable: true, postsAvailable: true };
 
+function menuError(cause: unknown): string {
+  if (cause instanceof ApiError && cause.details && typeof cause.details === "object") {
+    const fields = (cause.details as {fields?: unknown}).fields;
+    if (fields && typeof fields === "object") {
+      const messages = Object.entries(fields).flatMap(([field, value]) =>
+        (Array.isArray(value) ? value : [value]).filter((item): item is string => typeof item === "string").map(item => `${field}: ${item}`));
+      if (messages.length) return messages.join(" ");
+    }
+  }
+  return cause instanceof Error ? cause.message : "The menu could not be saved.";
+}
+
 function placeLabel(location: string): string {
+  if (!location) return "Unassigned";
   if (location === "header") return "Header";
   if (location === "footer") return "Footer";
   return location;
@@ -49,7 +64,7 @@ function ownershipText(menu: MenuRecord): string {
   if (menu.is_global) {
     return "Central. The platform owns this menu. A Site administrator can see it here and cannot change it.";
   }
-  return "Local. This Site owns this menu. Header and footer are assigned here.";
+  return "Local. This Site owns this menu. Navigation assignments are optional; unassigned menus can be reused in sidebars.";
 }
 
 /**
@@ -102,23 +117,24 @@ function LocalMenuEditor({
   const menu = state.menu;
   const structural = moduleOn && canWrite && (!menu.is_active || canPublish);
   const [editing, setEditing] = useState(false);
+  const [editingTag, setEditingTag] = useState(state.etag);
   const [name, setName] = useState(menu.name);
-  const [location, setLocation] = useState<MenuPlace>(menu.location === "footer" ? "footer" : "header");
+  const [location, setLocation] = useState<MenuPlace>(PLACES.includes(menu.location as MenuPlace) ? menu.location as MenuPlace : "");
   const [busy, setBusy] = useState(false);
 
   async function save(event: FormEvent) {
     event.preventDefault();
-    if (location !== menu.location && taken.has(location)) {
+    if (location && location !== menu.location && taken.has(location)) {
       toast.error("That location already has a local menu for this Site.");
       return;
     }
     setBusy(true);
     try {
-      unwrap(await updateSiteMenu(siteId, menu.id, state.etag, { name: name.trim(), location }));
+      unwrap(await updateSiteMenu(siteId, menu.id, editingTag, { name: name.trim(), location }));
       setEditing(false);
       onChanged();
     } catch (cause) {
-      toast.error(cause instanceof Error ? cause.message : "The menu could not be saved.");
+      toast.error(menuError(cause));
     } finally {
       setBusy(false);
     }
@@ -131,6 +147,7 @@ function LocalMenuEditor({
         <Chip size="small" label={placeLabel(menu.location)} variant="outlined" />
         <Chip size="small" label={menu.is_active ? "Active" : "Inactive"} variant="outlined" />
         <Chip size="small" label="Local" variant="outlined" />
+        <Typography variant="caption">Identifier: {menu.code ?? menu.id}</Typography>
       </Box>
       <Typography variant="body2" color="text.secondary">{ownershipText(menu)}</Typography>
       {canPublish ? (
@@ -145,16 +162,16 @@ function LocalMenuEditor({
                 onChanged();
               })
               .catch((cause: unknown) => {
-                toast.error(cause instanceof Error ? cause.message : "The menu could not be saved.");
+                toast.error(menuError(cause));
               })
               .finally(() => setBusy(false));
           }}
         >
-          {menu.is_active ? `Unpublish ${menu.name}` : `Publish ${menu.name}`}
+          {menu.is_active ? `Retire ${menu.name}` : `Publish ${menu.name}`}
         </Button>
       ) : null}
       {canWrite ? (
-        <Button variant="outlined" disabled={!structural || busy} onClick={() => setEditing((current) => !current)}>
+        <Button variant="outlined" disabled={!structural || busy} onClick={() => { if (!editing) { setName(menu.name); setLocation(menu.location as MenuPlace); setEditingTag(state.etag); } setEditing(current => !current); }}>
           {editing ? `Close ${menu.name}` : `Edit ${menu.name}`}
         </Button>
       ) : null}
@@ -177,11 +194,11 @@ function LocalMenuEditor({
             label="Assigned location"
             value={location}
             disabled={!structural || busy}
-            onChange={(event) => setLocation(event.target.value === "footer" ? "footer" : "header")}
+            onChange={(event) => setLocation(event.target.value as MenuPlace)}
             slotProps={{ select: { native: true } }}
           >
             {PLACES.map((place) => (
-              <option key={place} value={place} disabled={place !== menu.location && taken.has(place)}>
+              <option key={place} value={place} disabled={Boolean(place) && place !== menu.location && taken.has(place)}>
                 {placeLabel(place)}
               </option>
             ))}
@@ -217,7 +234,7 @@ export function SiteMenusPanel({
 }) {
   const toast = useToast();
   const navigation = useAsync(
-    async () => unwrap(await loadSiteNavigation(siteId)),
+    async () => unwrap(await loadSiteNavigation(siteId, false)),
     [siteId],
   );
   const targetState = useAsync(
@@ -228,14 +245,25 @@ export function SiteMenusPanel({
   const canWrite = permissions.includes("menu.write");
   const canPublish = permissions.includes("menu.publish");
   const moduleOn = menusEnabled === true;
-  const menus = navigation.data?.menus ?? [];
+  const menus = (navigation.data?.menus ?? []).filter(row => row.menu.site === siteId);
   const policies = navigation.data ? inheritancePolicies(navigation.data) : [];
   const taken = new Set(menus.filter((row) => !row.menu.is_global).map((row) => row.menu.location));
-  const openPlaces = PLACES.filter((place) => !taken.has(place));
+  const openPlaces = PLACES.filter((place) => !place || !taken.has(place));
   const [name, setName] = useState("");
-  const [location, setLocation] = useState<MenuPlace>("header");
+  const [location, setLocation] = useState<MenuPlace>("");
+  const [code, setCode] = useState("");
+  const [selectedId, setSelectedId] = useState("");
+  const [search, setSearch] = useState("");
+  useEffect(() => { setSelectedId(""); setSearch(""); setName(""); setCode(""); setLocation(""); }, [siteId]);
   const [busy, setBusy] = useState(false);
-  const selectedLocation = openPlaces.includes(location) ? location : (openPlaces[0] ?? "header");
+  const selectedLocation = openPlaces.includes(location) ? location : "";
+  const matches = menus.filter(row => `${row.menu.name} ${row.menu.code ?? ""}`.toLowerCase().includes(search.toLowerCase()));
+  const selected = matches.some(row => row.menu.id === selectedId) ? selectedId : (matches.find(row => !row.menu.is_global)?.menu.id ?? matches[0]?.menu.id);
+  const selectedRecord = menus.find(row => row.menu.id === selected);
+  const selectedTree = useAsync(async () => {
+    if (!selectedRecord || selectedRecord.itemsLoaded !== false) return selectedRecord ?? null;
+    return unwrap(await loadSiteMenu(siteId, selectedRecord.menu.id));
+  }, [siteId, selected, navigation.data]);
 
   return (
     <Paper variant="outlined" sx={{ overflow: "hidden", borderRadius: 3 }}>
@@ -243,7 +271,7 @@ export function SiteMenusPanel({
         <Box>
           <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>Navigation</Typography>
           <Typography variant="body2" color="text.secondary">
-            Menus for Site {siteId}. A local menu is created and edited here and assigned to the header or footer.
+            Menus for Site {siteId}. Create multiple named menus, choose one to manage its items, and optionally assign a navigation location.
             A central menu belongs to the platform. An inherited menu stays on its owning Site; this Site only records whether public delivery should include it.
           </Typography>
         </Box>
@@ -290,11 +318,18 @@ export function SiteMenusPanel({
                 </Box>
               )}
             </Box>
+            <TextField size="small" label="Search menu directory" value={search} onChange={event => setSearch(event.target.value)} />
+            <Box role="group" aria-label="Select a menu" sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+              {matches.map(row => <Button key={row.menu.id} aria-pressed={selected === row.menu.id} onClick={() => setSelectedId(row.menu.id)} sx={{ maxWidth: "100%", overflowWrap: "anywhere", textAlign: "left" }}>{row.menu.name} / {row.menu.code ?? row.menu.id} / {row.menu.is_active ? "Published" : "Draft / retired"}</Button>)}
+            </Box>
+            {menus.length > 0 && !menus.some(row => `${row.menu.name} ${row.menu.code ?? ""}`.toLowerCase().includes(search.toLowerCase())) ? <Typography>No menus match your search. Clear the search or create a new menu.</Typography> : null}
+            {selectedRecord?.itemsLoaded === false && selectedTree.loading ? <Typography role="status">Loading selected menu...</Typography> : null}
+            {selectedTree.error ? <Alert severity="error" action={<Button onClick={selectedTree.reload}>Retry</Button>}>{selectedTree.error.message}</Alert> : null}
             {menus.length === 0 ? (
               <Typography variant="body2" color="text.secondary">This Site has no menus yet.</Typography>
             ) : (
               <Box component="ul" aria-label="Menus for this Site" sx={{ listStyle: "none", m: 0, p: 0, display: "flex", flexDirection: "column", gap: 2 }}>
-                {menus.map((state) => state.menu.is_global ? (
+                {menus.filter(state => state.menu.id === selected).map((state) => state.menu.is_global ? (
                   <Box component="li" key={state.menu.id} sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
                     <Box sx={{ display: "flex", gap: 1, alignItems: "center", flexWrap: "wrap" }}>
                       <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{state.menu.name}</Typography>
@@ -308,11 +343,11 @@ export function SiteMenusPanel({
                   <LocalMenuEditor
                     key={state.menu.id}
                     siteId={siteId}
-                    state={state}
+                    state={selectedTree.data?.menu.id === state.menu.id && selectedTree.data.menu.site === siteId ? selectedTree.data : state}
                     taken={taken}
                     canWrite={canWrite}
                     canPublish={canPublish}
-                    moduleOn={moduleOn}
+                    moduleOn={moduleOn && !navigation.loading && (state.itemsLoaded !== false || selectedTree.data?.menu.id === state.menu.id)}
                     targets={targets}
                     onChanged={navigation.reload}
                   />
@@ -337,29 +372,31 @@ export function SiteMenusPanel({
                 onSubmit={(event) => {
                 event.preventDefault();
                 setBusy(true);
-                void createSiteMenu(siteId, selectedLocation, name)
+                void (code.trim() ? createSiteMenu(siteId, selectedLocation, name, code.trim()) : createSiteMenu(siteId, selectedLocation, name))
                   .then((result) => {
-                    unwrap(result);
-                    setName("");
+                    const created = unwrap(result);
+                    setSelectedId(created.id);
+                    setName(""); setCode("");
                     navigation.reload();
                   })
                   .catch((cause: unknown) => {
-                    toast.error(cause instanceof Error ? cause.message : "The menu could not be saved.");
+                    toast.error(menuError(cause));
                   })
                   .finally(() => setBusy(false));
               }}>
                 <TextField size="small" label="New menu name" value={name} disabled={!moduleOn || busy} onChange={(event) => setName(event.target.value)} required />
+                <TextField size="small" label="Menu identifier (optional)" value={code} onChange={event => setCode(event.target.value)} disabled={!moduleOn || busy} helperText="Unique within this Site and immutable. Leave blank to generate it from the name." inputProps={{ maxLength: 64, pattern: "[a-z0-9]+(-[a-z0-9]+)*" }} />
                 <TextField
                   select
                   size="small"
                   label="New menu location"
                   value={selectedLocation}
                   disabled={!moduleOn || busy}
-                  onChange={(event) => setLocation(event.target.value === "footer" ? "footer" : "header")}
+                  onChange={(event) => setLocation(event.target.value as MenuPlace)}
                   slotProps={{ select: { native: true } }}
                 >
                   {PLACES.map((place) => (
-                    <option key={place} value={place} disabled={taken.has(place)}>
+                    <option key={place} value={place} disabled={Boolean(place) && taken.has(place)}>
                       {placeLabel(place)}
                     </option>
                   ))}

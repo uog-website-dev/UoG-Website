@@ -1,0 +1,20 @@
+{
+  "backend/apps/cms/api/menus.py": "302ca10886b04caf1541c4596a67c6830aef6a260c3b5d8ec1d1cdf4be940a99",
+  "backend/apps/cms/menu_cache.py": "903bfbbf9814188d6d67ae82221d1ca0e89feea4ad887e0f5c176cfb4e725ce5",
+  "backend/apps/cms/menu_models.py": "e06aa3126116ba2a09892646c9bb7348dd2067be546fb69cdb92c7c784ba4aa4",
+  "backend/apps/cms/migrations/0025_named_menu_directory.py": "ede4e44b87d21a82920688d7db80e0b1397de8e7bf4e19518d4090fc34fa6531",
+  "backend/apps/cms/services/menus.py": "bd157b409f75aa1738f3732884f72af51c4f90db1ab28d3d14babc27fe800b98",
+  "backend/apps/cms/tests/test_menu_api.py": "ee62dbaf28de50d751406dc7218625166ffa3b42d5306e650e4fe2f02f2597ec",
+  "backend/apps/cms/tests/test_menu_directory.py": "70a50eebfb69e836272e043da9f3d90a53dcec58077ad1314a6d6f83f0ece186",
+  "docs/api/openapi.yaml": "8ed781b774a37392f4eaf195428a19ab35d6e327287276e6e61b00b8523af802",
+  "docs/menu-directory.md": "2c926893d871a4ea0e3980718a045429d6181a1825e9a08366d9805f20e6cdbe",
+  "frontend/apps/admin-web/src/app/sites/menu-actions.ts": "06f217ac9b4953769847183d2f328a931340d06bb06f63af07be638fb617a990",
+  "frontend/apps/admin-web/src/app/sites/sidebar-actions.ts": "df10b965bff1f12c9cd22fd857ca0bdccfaa5c5bb28f961e4c27ac3b8ded7e12",
+  "frontend/apps/admin-web/src/sites/site-menus.test.tsx": "174c871c371d2406c4445ad8d30760d788789e31c468a57b582af8be5aa42a73",
+  "frontend/apps/admin-web/src/sites/site-menus.tsx": "ccee5d5500d878f73784eb27553c5dedd505906b686e58ab3ca457eb83ff830f",
+  "frontend/apps/admin-web/src/sites/site-sidebars.tsx": "e2d15b124f0adbfb2e2b0473fcfe0d62a4b34758b67417c9ba9118fed195f89b",
+  "scripts/qa-menu-directory-browser.cjs": "241b7a7a64c5b6391c802606a88b6f0c1aec089e815a1b955997c222a419d1fb",
+  "scripts/qa-menu-directory-cleanup.py": "f6c01565986774bbf6430c961b6dba4d9ecf25cdd395e195501f931e0f22027e",
+  "scripts/qa-menu-directory-migrations.py": "e6699c298e9f6330145f1d6bfb77920ca2f6a85428839bfd67bb107339421e0b",
+  "scripts/qa-menu-directory-seed.py": "99f75b38d432c46ac5430b4eb3623794689d2bd51a8d9b79f6fbed9e84f35567"
+}

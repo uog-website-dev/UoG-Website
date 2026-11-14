@@ -1,0 +1,24 @@
+{
+  "results": [
+    {
+      "name": "Site Administrator creates two unassigned named menus alongside existing navigation",
+      "status": "PASS"
+    },
+    {
+      "name": "Rename retains the stable identifier and directory selection",
+      "status": "PASS"
+    },
+    {
+      "name": "Publish and retire retain the menu in the directory",
+      "status": "PASS"
+    },
+    {
+      "name": "Directory search selects the matching menu",
+      "status": "PASS"
+    },
+    {
+      "name": "Phone-width directory has no overflow and menu choices are keyboard reachable",
+      "status": "PASS"
+    }
+  ]
+}

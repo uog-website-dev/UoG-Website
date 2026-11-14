@@ -103,7 +103,7 @@ def test_inventory_optional_active_filter_preserves_both_states(api, inventory):
         url = api.base
         active_id = api.client.get(menu_url, **api.header).json()["id"]
         inactive_id = api.client.get(inactive_menu, **api.header).json()["id"]
-        ordered_ids = [inactive_id, active_id]  # location, then UUID
+        ordered_ids = sorted([inactive_id, active_id])  # name (both Navigation), then UUID
     else:
         url = menu_url + "items/"
         active_id = api.client.get(active_item, **api.header).json()["id"]

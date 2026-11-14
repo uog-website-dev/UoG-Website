@@ -13,6 +13,7 @@ def invalidate_menu_state(
     site_id, location, is_global, *, using=DEFAULT_DB_ALIAS,
 ):
     from .menu_models import MenuInheritance
+    if not location: return
 
     affected = {site_id}
     if is_global:

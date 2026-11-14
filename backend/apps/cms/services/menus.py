@@ -21,7 +21,7 @@ from apps.organizations.hierarchy_lock import hierarchy_write
 from ..menu_models import Menu, MenuItem, require_menus_module
 
 
-MENU_FIELDS = frozenset({"location", "name", "is_active", "is_global"})
+MENU_FIELDS = frozenset({"code", "location", "name", "is_active", "is_global"})
 ITEM_FIELDS = frozenset({
     "label", "item_type", "page", "post", "target", "parent", "sort_order",
     "is_active", "allow_cross_site", "page_id", "post_id", "parent_id",
@@ -91,14 +91,13 @@ def _write_menu(menu, actor):
 
 
 def _unique_location(menu):
-    if isinstance(menu.location, str):
-        menu.location = menu.location.strip().lower()
-    if menu.is_global:
-        clash = Menu.objects.filter(is_global=True, location=menu.location)
-    else:
-        clash = Menu.objects.filter(site_id=menu.site_id, location=menu.location, is_global=False)
-    if clash.exclude(pk=menu.pk).exists():
-        raise MenuConflict("duplicate_location")
+    menu.normalize_code()
+    if isinstance(menu.location, str): menu.location = menu.location.strip().lower()
+    if menu.location or menu.is_global:
+        clash = Menu.objects.filter(is_global=True, location=menu.location) if menu.is_global else Menu.objects.filter(site_id=menu.site_id, location=menu.location, is_global=False)
+        if clash.exclude(pk=menu.pk).exists(): raise MenuConflict("duplicate_location")
+    if Menu.objects.filter(site_id=menu.site_id, code=menu.code).exclude(pk=menu.pk).exists():
+        raise ValidationError({"code": "This menu identifier is already used in this Site."})
 
 
 def _assign(instance, fields, allowed):

@@ -15930,8 +15930,8 @@ paths:
   /api/v1/sites/{site_pk}/menus/:
     get:
       operationId: v1_sites_menus_list
-      description: menu.read; includes active and inactive menus. Ordered by location
-        then UUID. Page size 20, maximum 100.
+      description: menu.read; includes active and inactive menus. Ordered by name
+        then UUID; search matches name or code. Page size 20, maximum 100.
       parameters:
       - in: query
         name: is_active
@@ -15950,6 +15950,11 @@ paths:
           type: integer
           maximum: 100
           minimum: 1
+      - in: query
+        name: search
+        schema:
+          type: string
+          maxLength: 255
       - in: path
         name: site_pk
         schema:
@@ -16061,9 +16066,10 @@ paths:
                 format: uuid
     post:
       operationId: v1_sites_menus_create
-      description: menu.write. Creates an inactive local draft. Locations are unique
-        per Site even when inactive; duplicates return 409 duplicate_location. is_global
-        requires platform-scoped menu.write and the main Site. No If-Match for creation.
+      description: menu.write. Creates an inactive local draft. Stable codes are unique
+        per Site. Optional non-empty locations remain unique per Site; multiple unassigned
+        menus are supported. is_global requires platform-scoped menu.write and the
+        main Site. No If-Match for creation.
       parameters:
       - in: path
         name: site_pk
@@ -16285,6 +16291,11 @@ paths:
           type: integer
           maximum: 100
           minimum: 1
+      - in: query
+        name: search
+        schema:
+          type: string
+          maxLength: 255
       - in: path
         name: site_pk
         schema:
@@ -35098,12 +35109,8 @@ components:
       - primary
       - secondary
       type: string
-      description: |-
-        * `header` - header
-        * `footer` - footer
-        * `sidebar` - sidebar
-        * `primary` - primary
-        * `secondary` - secondary
+      description: "* `` - \n* `header` - header\n* `footer` - footer\n* `sidebar`
+        - sidebar\n* `primary` - primary\n* `secondary` - secondary"
     MediaAssetStatusEnum:
       enum:
       - PENDING
@@ -35123,12 +35130,19 @@ components:
           type: string
           minLength: 1
           maxLength: 255
+        code:
+          type: string
+          minLength: 1
+          maxLength: 64
+          pattern: ^[a-z0-9]+(?:-[a-z0-9]+)*$
         location:
-          $ref: '#/components/schemas/LocationEnum'
+          default: ''
+          oneOf:
+          - $ref: '#/components/schemas/LocationEnum'
+          - $ref: '#/components/schemas/BlankEnum'
         is_global:
           type: boolean
       required:
-      - location
       - name
     MenuOutput:
       type: object
@@ -35140,11 +35154,16 @@ components:
         site:
           type: integer
           readOnly: true
+        code:
+          type: string
+          readOnly: true
+          default: ''
         location:
           type: string
           readOnly: true
-          description: Site-scoped location such as header or footer. One live key
-            per Site.
+          default: ''
+          description: Optional navigation assignment. Empty means an unassigned reusable
+            menu.
         name:
           type: string
           readOnly: true
@@ -35168,6 +35187,7 @@ components:
           format: date-time
           readOnly: true
       required:
+      - code
       - created_at
       - id
       - is_active
@@ -36446,14 +36466,16 @@ components:
     PatchedMenuPatchRequest:
       type: object
       properties:
+        is_global:
+          type: boolean
         name:
           type: string
           minLength: 1
           maxLength: 255
         location:
-          $ref: '#/components/schemas/LocationEnum'
-        is_global:
-          type: boolean
+          oneOf:
+          - $ref: '#/components/schemas/LocationEnum'
+          - $ref: '#/components/schemas/BlankEnum'
     PatchedMetadataInputRequest:
       type: object
       properties:
