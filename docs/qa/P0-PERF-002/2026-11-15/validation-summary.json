@@ -1,0 +1,19 @@
+{
+  "frontend": {
+    "tests_passed": 572,
+    "files_passed": 80,
+    "failures": 0,
+    "source": "frontend-full.txt"
+  },
+  "cms_regression": {
+    "tests": 499,
+    "failures": 0,
+    "skipped": 1
+  },
+  "focused_backend": {
+    "tests_passed": 37,
+    "failures": 0,
+    "source": "backend-focused.xml"
+  },
+  "note": "Initial backend report retains two test expectation failures corrected and passed in focused rerun; unrelated CMS cases all passed."
+}

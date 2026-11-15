@@ -117,13 +117,41 @@ def Q_expiry(now):
 
 def effective_permissions(user, *, organization_id=None, site_id=None):
     """Return registered active capability codes granted at a given scope."""
-    granted = []
-    for permission_code in sorted(Permission.objects.filter(is_active=True, is_system=True).values_list("code", flat=True)):
-        if capability_for(permission_code) and permission_granted(
-            user, permission_code, organization_id=organization_id, site_id=site_id, audit=False,
-        ):
-            granted.append(permission_code)
-    return granted
+    return effective_permission_sets(user, [(organization_id, site_id)])[0]
+
+
+def effective_permission_sets(user, scopes):
+    """One live assignment snapshot for several scopes; never a persistent auth cache.
+
+    Uses the same capability, bypass and scope rules as permission_granted.
+    Prefetch once rather than executing a permission check per catalog entry.
+    """
+    if not user or not getattr(user, "is_authenticated", False) or not user.is_active:
+        return [[] for _ in scopes]
+    from django.db.models import Prefetch
+    from .models import RolePermission
+    registered = {code for code in Permission.objects.filter(is_active=True, is_system=True)
+                  .values_list("code", flat=True) if capability_for(code)}
+    assignments = list(UserRoleAssignment.objects.select_related("role").filter(
+        user=user, revoked_at__isnull=True, role__is_active=True,
+    ).filter(Q_expiry(timezone.now())).prefetch_related(Prefetch(
+        "role__permission_links", queryset=RolePermission.objects.select_related("permission").filter(
+            permission__is_active=True, permission__is_system=True,
+        ), to_attr="live_permission_links",
+    )))
+    bypass = any(a.scope == UserRoleAssignment.Scope.PLATFORM and a.role.is_system
+                 and a.role.code == "platform-administrator" for a in assignments)
+    results = []
+    for organization_id, site_id in scopes:
+        granted = registered.intersection(PLATFORM_ADMIN) if bypass else set()
+        for assignment in assignments:
+            if organization_id is None and site_id is None and assignment.scope != UserRoleAssignment.Scope.PLATFORM:
+                continue
+            if assignment_matches(assignment, organization_id=organization_id, site_id=site_id):
+                granted.update(link.permission.code for link in assignment.role.live_permission_links
+                               if link.permission.code in registered)
+        results.append(sorted(granted))
+    return results
 
 
 def assignment_target_scope(*, scope, organization=None, site=None):

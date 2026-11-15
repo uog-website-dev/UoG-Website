@@ -22,6 +22,7 @@ export function NavigationTiming(){
   };
   const click=(event:MouseEvent)=>{if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;const anchor=(event.target as Element)?.closest?.("a[href]") as HTMLAnchorElement|null;if(anchor&&anchor.origin===location.origin&&anchor.pathname.startsWith("/admin/")&&!current)start(new CustomEvent("navigation",{detail:{target:anchor.pathname}}));};
   const change=(event:Event)=>{const select=event.target as HTMLSelectElement;if(select?.matches?.("select")&&!current&&/^site:[0-9]+$/.test(select.value))start(new CustomEvent("navigation",{detail:{target:`/admin/sites/${select.value.slice(5)}/admin`}}));};
+  const request=(event:Event)=>{if(!current)start(event);};
   const checkReady=()=>{
    if(!current||!target||location.pathname.replace(/\/$/,"")!==target.replace(/\/$/,""))return;
    const expected=/^\/admin\/sites\/([0-9]+)\/admin(?:\/(pages|posts|menus))?\/?$/.exec(target);
@@ -34,7 +35,7 @@ export function NavigationTiming(){
   checkReady();
   window.fetch=(input,init)=>{const url=new URL(input instanceof Request?input.url:String(input),location.href);if(current&&url.origin===location.origin&&url.pathname.startsWith("/admin")&&!url.pathname.includes("/api/auth")){
    const headers=new Headers(input instanceof Request?input.headers:undefined);new Headers(init?.headers).forEach((v,k)=>headers.set(k,v));headers.set("X-Navigation-ID",current);if(!headers.has("X-Request-ID"))headers.set("X-Request-ID",crypto.randomUUID());return original(input,{...init,headers});}return original(input,init);};
-  window.addEventListener("uog:navigation:start",start);window.addEventListener("uog:navigation:usable",finish);document.addEventListener("click",click,true);document.addEventListener("change",change,true);
-  return()=>{observer.disconnect();window.fetch=original;window.removeEventListener("uog:navigation:start",start);window.removeEventListener("uog:navigation:usable",finish);document.removeEventListener("click",click,true);document.removeEventListener("change",change,true);};
+  window.addEventListener("uog:navigation:request",request);window.addEventListener("uog:navigation:start",start);window.addEventListener("uog:navigation:usable",finish);document.addEventListener("click",click,true);document.addEventListener("change",change,true);
+  return()=>{observer.disconnect();window.fetch=original;window.removeEventListener("uog:navigation:request",request);window.removeEventListener("uog:navigation:start",start);window.removeEventListener("uog:navigation:usable",finish);document.removeEventListener("click",click,true);document.removeEventListener("change",change,true);};
  },[]);return null;
 }

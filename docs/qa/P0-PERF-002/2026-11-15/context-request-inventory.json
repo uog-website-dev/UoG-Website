@@ -1,0 +1,305 @@
+{
+  "pass": true,
+  "samples": [
+    {
+      "scenario": "cold_site_switch",
+      "navigation_id": "6ed449ca-65c8-469f-85e3-47df8ffb83ed",
+      "bootstrap_count": 1,
+      "discovery_count": 1
+    },
+    {
+      "scenario": "warm_site_switch",
+      "navigation_id": "0fcdd072-fa51-4693-aae4-956f91b7923f",
+      "bootstrap_count": 1,
+      "discovery_count": 1
+    },
+    {
+      "scenario": "same_site_menu_navigation",
+      "navigation_id": "84c05047-ff4b-4ff1-9e0e-46ca92d5dae7",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    },
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "d5d40004-8744-4e77-a3d5-b9f5f451fc4a",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "df4ed672-5c08-4d77-84c5-d851fa606f5c",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    },
+    {
+      "scenario": "cold_site_switch",
+      "navigation_id": "f83de923-b380-48fd-acb2-693ebbdb8371",
+      "bootstrap_count": 1,
+      "discovery_count": 1
+    },
+    {
+      "scenario": "warm_site_switch",
+      "navigation_id": "e8eb7e34-828b-41e8-a57b-42bca58d44f8",
+      "bootstrap_count": 1,
+      "discovery_count": 1
+    },
+    {
+      "scenario": "same_site_menu_navigation",
+      "navigation_id": "dad71b36-4520-48c7-b616-bfd396a35577",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    },
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "ac315eff-7500-4ad2-8c85-18b87b9eff49",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "dbd30438-edc4-432a-98ec-778ad6314fc9",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    },
+    {
+      "scenario": "cold_site_switch",
+      "navigation_id": "bb12842f-8a8a-40f3-898d-5e04b1c4af09",
+      "bootstrap_count": 1,
+      "discovery_count": 1
+    },
+    {
+      "scenario": "warm_site_switch",
+      "navigation_id": "51e48f89-8b93-40ad-a7ce-cc89aa3e1515",
+      "bootstrap_count": 1,
+      "discovery_count": 1
+    },
+    {
+      "scenario": "same_site_menu_navigation",
+      "navigation_id": "bb9a2200-fae6-4486-ad2d-ba124bbde0e0",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    },
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "6b5bf308-60c3-4c39-bd0f-2df27481c634",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "4d3b6ddf-00bf-4882-9230-aa6d159048c4",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    },
+    {
+      "scenario": "cold_site_switch",
+      "navigation_id": "38bcd68e-1bda-49a7-8f60-4be3f78c039d",
+      "bootstrap_count": 1,
+      "discovery_count": 1
+    },
+    {
+      "scenario": "warm_site_switch",
+      "navigation_id": "be06ccd5-4aa7-4602-bb7d-7abe07bb9f84",
+      "bootstrap_count": 1,
+      "discovery_count": 1
+    },
+    {
+      "scenario": "same_site_menu_navigation",
+      "navigation_id": "d6f8fcca-d234-468c-96f2-3d076bb04f5d",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    },
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "0242d632-a077-4634-bc06-068aeb4379a5",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "eb4d29d3-a712-426c-a93b-bcd69a215767",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    },
+    {
+      "scenario": "cold_site_switch",
+      "navigation_id": "701fbe0f-88d7-449b-a995-96b53e8757cc",
+      "bootstrap_count": 1,
+      "discovery_count": 1
+    },
+    {
+      "scenario": "warm_site_switch",
+      "navigation_id": "d7f10ffc-22f6-489f-92b0-fdcb3af5a7b1",
+      "bootstrap_count": 1,
+      "discovery_count": 1
+    },
+    {
+      "scenario": "same_site_menu_navigation",
+      "navigation_id": "f0852931-2413-4c5c-8875-2e7ae8d682d2",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    },
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "5cb06405-a815-48cb-93c4-6319e6960322",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "fff43b18-6a06-4326-ba3f-a9efa2c5f3df",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    },
+    {
+      "scenario": "cold_site_switch",
+      "navigation_id": "8efbbd37-8be3-4748-9ad3-1232befd4730",
+      "bootstrap_count": 1,
+      "discovery_count": 1
+    },
+    {
+      "scenario": "warm_site_switch",
+      "navigation_id": "d0ff79cf-a159-47dd-9521-6100ddf55007",
+      "bootstrap_count": 1,
+      "discovery_count": 1
+    },
+    {
+      "scenario": "same_site_menu_navigation",
+      "navigation_id": "8f9b0e24-e75c-4377-8bb1-f8fb28de313f",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    },
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "31a88126-6e7b-4325-95de-bb54f30ce851",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "44a74177-5820-444d-805e-4f895f956dac",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    },
+    {
+      "scenario": "cold_site_switch",
+      "navigation_id": "099924b3-93b1-4e55-9919-d2fe4ac020d3",
+      "bootstrap_count": 1,
+      "discovery_count": 1
+    },
+    {
+      "scenario": "warm_site_switch",
+      "navigation_id": "877ee4f9-870a-43cb-b6b9-d14baa730438",
+      "bootstrap_count": 1,
+      "discovery_count": 1
+    },
+    {
+      "scenario": "same_site_menu_navigation",
+      "navigation_id": "278f2aac-28ed-4ed1-bb84-2009e7010ad6",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    },
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "8eb6eaa5-1edd-48a9-b853-a5548581547f",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "69d63b8d-40d5-43be-aedb-304e61478211",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    },
+    {
+      "scenario": "cold_site_switch",
+      "navigation_id": "6538d7d6-e7f0-4ee7-aa88-5a80bd210ba9",
+      "bootstrap_count": 1,
+      "discovery_count": 1
+    },
+    {
+      "scenario": "warm_site_switch",
+      "navigation_id": "0a2a9715-ccaa-4fdf-a810-7a74c11b09c4",
+      "bootstrap_count": 1,
+      "discovery_count": 1
+    },
+    {
+      "scenario": "same_site_menu_navigation",
+      "navigation_id": "c1e302e3-c946-4206-9488-5ded0f0f019b",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    },
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "1c5b778b-444f-4a82-ad42-e5196323015e",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "d0756f21-ddd2-442a-bb78-e1196ec4924b",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    },
+    {
+      "scenario": "cold_site_switch",
+      "navigation_id": "1cfdb5c6-bb4d-4a70-85f4-e2f0ed3b9b1f",
+      "bootstrap_count": 1,
+      "discovery_count": 1
+    },
+    {
+      "scenario": "warm_site_switch",
+      "navigation_id": "4c905320-4714-4e81-9bf5-05ff1b8d0c19",
+      "bootstrap_count": 1,
+      "discovery_count": 1
+    },
+    {
+      "scenario": "same_site_menu_navigation",
+      "navigation_id": "b6e08f7a-24eb-484c-8c5e-15dd06c63879",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    },
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "b8be1683-a45a-41ce-b7c3-d427e0cf38b6",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "e2884216-ed7f-4bb6-a46f-05f89c6cf74f",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    },
+    {
+      "scenario": "cold_site_switch",
+      "navigation_id": "860ee3e0-55bc-40f8-a6dc-bf87781f8153",
+      "bootstrap_count": 1,
+      "discovery_count": 1
+    },
+    {
+      "scenario": "warm_site_switch",
+      "navigation_id": "eefdf976-0562-46c8-88dd-4684274b672f",
+      "bootstrap_count": 1,
+      "discovery_count": 1
+    },
+    {
+      "scenario": "same_site_menu_navigation",
+      "navigation_id": "4f63482d-f583-458c-b91a-34113cdc57ad",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    },
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "f7883bd8-3bfb-44f7-98f4-f55091311088",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "f87527e8-4fc5-4e5a-8cb5-7ecf1c7bbb0c",
+      "bootstrap_count": 0,
+      "discovery_count": 0
+    }
+  ]
+}

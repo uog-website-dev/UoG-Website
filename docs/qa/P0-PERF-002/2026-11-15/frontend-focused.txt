@@ -1,0 +1,24 @@
+
+ RUN  v5.0.5 /workspace/apps/admin-web
+
+ ✓ src/workspace.test.tsx (5 tests) 986ms
+   ✓ loads discovery only on open, pages explicitly and rejects stale search results 871ms
+ ✓ src/sidebar.test.tsx (10 tests) 913ms
+   ✓ DesktopSidebar — platform workspace (7)
+     ✓ renders platform sections as base-path-relative links for a platform administrator 312ms
+ ✓ src/performance/navigation-timing.test.tsx (3 tests) 104ms
+ ✓ src/app/api/workspace/route.test.ts (10 tests) 20ms
+ ✓ src/admin-shell.test.tsx (3 tests) 589ms
+   ✓ AdminShell (3)
+     ✓ opens and closes the mobile navigation drawer from the header toggle 395ms
+
+ Test Files  5 passed (5)
+      Tests  31 passed (31)
+   Start at  11:09:08
+   Duration  5.21s (tests 29%, environment 26%, import 23%, transform 14%, setup 7%)
+
+Environment  jsdom was created 5 times · 2.33s total, 26% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+JUNIT report written to /workspace/perf002-final-focused.xml

@@ -1,3 +1,8 @@
+// PERF-002: lazy discovery is included in measured Site switches.
+async function chooseSite(page,id){
+ await page.getByRole('button',{name:'Workspace',exact:true}).first().click();
+ await page.locator(`[data-workspace-site="${id}"]`).click();
+}
 /* Real-browser measurements; the private session enters on stdin and is never persisted. */
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),crypto=require('node:crypto');
 const {chromium}=require(process.env.UOG_QA_PLAYWRIGHT_ROOT||'playwright-core');
@@ -12,8 +17,9 @@ const {spawnSync}=require('node:child_process');
  const run=crypto.randomUUID(),samples=[],failures=[],browser=await chromium.launch({executablePath:process.env.PERF_BROWSER_PATH||'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true,args:['--no-proxy-server']});
  let observedPage=null;
  const metadata={run,mode,release_baseline:mode==='production',budgets_status:'PROPOSED',method:'nearest-rank percentiles',samples_per_scenario:n,sites:seed.sites,counts_per_site:seed.counts_per_site,api_cache_definition:'First versus immediate repeat per Site/resource; server caches retained',automatic_prefetch:'Normal Next prefetch is retained; pre-initiation traffic is outside a measured navigation window',network:{profile:'loopback, unthrottled',cpu_slowdown:1,viewport:[1440,1000]},browser:browser.version(),started_at:new Date().toISOString(),cold_definition:'fresh browser context and HTTP cache; target Site absent from Next router cache; application/database caches retained',warm_definition:'same browser context; previously visited target; no forced invalidation',session_policy:'Independent real Keycloak browser sign-in before every cold/warm iteration; login is excluded from timings; each pair uses one active session',authentication_role:'Site Administrator on the 10 benchmark Sites; no platform role',sampling_warning:n<20?'SMOKE: p95 is a small-sample diagnostic; use >=30 per scenario for acceptance.':null};
+ metadata.interaction='PERF-002 searchable Workspace dialog; discovery is included in switch timing';
  metadata.source={commit:spawnSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).stdout.trim(),files:{}};
- for(const file of ['frontend/pnpm-lock.yaml','frontend/apps/admin-web/next.config.ts','frontend/apps/admin-web/src/performance/navigation-timing.tsx','frontend/apps/admin-web/src/performance/server-fetch.ts','backend/apps/core/middleware.py','backend/config/settings.py','docker-compose.perf.yml','infrastructure/nginx/performance.conf','scripts/perf/benchmark.cjs','scripts/perf/metrics.cjs','scripts/perf/package-lock.json'])metadata.source.files[file]=crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+ for(const file of ['frontend/pnpm-lock.yaml','frontend/apps/admin-web/next.config.ts','frontend/apps/admin-web/src/performance/navigation-timing.tsx','frontend/apps/admin-web/src/performance/server-fetch.ts','backend/apps/core/middleware.py','backend/config/settings.py','docker-compose.perf.yml','infrastructure/nginx/performance.conf','scripts/perf/benchmark.cjs','scripts/perf/metrics.cjs','scripts/perf/package-lock.json','backend/apps/sites/api/workspace.py','backend/apps/authorization/services.py','frontend/apps/admin-web/src/workspace.ts','frontend/apps/admin-web/src/workspace-switcher.tsx','frontend/apps/admin-web/src/workspace-proxy.ts','frontend/apps/admin-web/src/sites/site-workspace.tsx','frontend/apps/admin-web/src/app/sites/[id]/admin/layout.tsx'])metadata.source.files[file]=crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
  function persist(){const result={metadata,summary:summarize(samples),by_cache_state:{cold:summarize(samples.filter(s=>s.cache_state==='cold')),warm:summarize(samples.filter(s=>s.cache_state==='warm'))},samples,failures};const file=path.join(out,'results.json');fs.writeFileSync(file+'.tmp',JSON.stringify(result,null,2));fs.renameSync(file+'.tmp',file);}
  function addSample(sample){samples.push(sample);persist();}
  metadata.run_status='running';persist();
@@ -67,8 +73,8 @@ const {spawnSync}=require('node:child_process');
   await page.getByRole('button',{name:'Sign in with Keycloak',exact:true}).click();await page.locator('#username').fill(seed.actor.username);await page.locator('#password').fill(seed.actor.password);await page.locator('#kc-login').click();console.log(JSON.stringify({phase:'auth_redirect',origin:new URL(page.url()).origin,path:new URL(page.url()).pathname}));await page.waitForURL(u=>u.origin===origin&&/^\/admin\/?$/.test(u.pathname),{waitUntil:'domcontentloaded',timeout:30000});await page.waitForLoadState('domcontentloaded');
   metadata.authentication={landing_path:new URL(page.url()).pathname,error_code:new URL(page.url()).searchParams.get('error'),session_cookie_present:(await login.cookies()).some(c=>c.name.includes('session-token'))};console.log(JSON.stringify(metadata.authentication));assert(metadata.authentication.session_cookie_present&&!metadata.authentication.error_code,'Real browser sign-in did not establish a usable session');
 
-  await page.getByRole('combobox',{name:'Workspace',exact:true}).first().waitFor();
-  await measure(login,page,'first_site_visit',seed.sites[0].id,'dashboard',()=>page.getByRole('combobox',{name:'Workspace',exact:true}).first().selectOption(`site:${seed.sites[0].id}`),'cold');
+  await page.getByRole('button',{name:'Workspace',exact:true}).first().waitFor();
+  await measure(login,page,'first_site_visit',seed.sites[0].id,'dashboard',()=>chooseSite(page,seed.sites[0].id),'cold');
   // Direct Django API timings come first, while the separately issued token is fresh.
   for(let i=0;i<n;i++)for(const resource of ['pages','posts','assets'])for(const cache of ['cold','warm']){
    const site=seed.sites[i%seed.sites.length].id,id=crypto.randomUUID(),url=`${origin}/api/v1/sites/${site}/${resource}/?page=1&page_size=20`;
@@ -86,7 +92,7 @@ const {spawnSync}=require('node:child_process');
    assert((await context.cookies()).some(c=>c.name.includes('session-token')),'Fresh real browser authentication failed');
    const source=seed.sites[i%seed.sites.length].id,target=seed.sites[(i+1)%seed.sites.length].id;
    await page.goto(`${origin}/admin/sites/${source}/admin`,{waitUntil:'domcontentloaded'});await usable(page,source,'dashboard');
-   const switchSite=id=>page.getByRole('combobox',{name:'Workspace',exact:true}).first().selectOption(`site:${id}`);
+   const switchSite=id=>chooseSite(page,id);
    const navigate=label=>page.getByRole('navigation',{name:'Site sections',exact:true}).getByRole('link').filter({hasText:label}).click();
    await measure(context,page,'cold_site_switch',target,'dashboard',()=>switchSite(target),'cold');
    await switchSite(source);await usable(page,source,'dashboard');

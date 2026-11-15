@@ -1,3 +1,4 @@
+"use client";
 /**
  * Admin dashboard — console entry point.
  *
@@ -20,12 +21,10 @@ import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 import NextLink from "next/link";
 
-import { getEffectivePermissions } from "@/access-control";
-import { listAllSites } from "@/app/sites/actions";
+import {useWorkspace, refreshWorkspace} from "@/workspace";
+import Button from "@mui/material/Button";
 import { Breadcrumb } from "@/breadcrumb";
 import { hasPlatformWorkspace } from "@/navigation";
-import { siteAdminHref } from "@/sites/site-admin";
-import { siteStatusChip } from "@/sites/validation";
 import HealthCheck from "./health-check";
 
 const sections = [
@@ -55,68 +54,17 @@ const sections = [
   },
 ];
 
-function SiteWorkspaceChooser({ sites }: { sites: Awaited<ReturnType<typeof listAllSites>> }) {
-  return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-      <Box>
-        <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Workspaces" }]} />
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 700 }}>
-          Your Site workspaces
-        </Typography>
-        <Typography color="text.secondary" sx={{ mt: 0.5 }}>
-          Choose a Site to manage its content. Platform administration is not
-          assigned to this account.
-        </Typography>
-      </Box>
-      {!sites.ok ? (
-        <Alert severity="error" variant="outlined">
-          Your Sites could not be loaded: {sites.error.message}
-        </Alert>
-      ) : sites.data.length === 0 ? (
-        <Alert severity="info" variant="outlined" role="status">
-          No Site is assigned to this account yet. Ask a platform administrator for a Site role.
-        </Alert>
-      ) : (
-        <Box
-          component="ul"
-          aria-label="Site workspaces"
-          sx={{ listStyle: "none", m: 0, p: 0, display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", md: "repeat(3, 1fr)" } }}
-        >
-          {sites.data.map((site) => {
-            const chip = siteStatusChip(site.status);
-            return (
-              <Card component="li" key={site.id} variant="outlined">
-                <CardActionArea component={NextLink} href={siteAdminHref(site.id)} sx={{ p: 2.5, height: "100%" }}>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap", mb: 0.5 }}>
-                    <Typography variant="h6" sx={{ fontWeight: 700 }}>{site.name}</Typography>
-                    {chip ? <Chip size="small" variant="outlined" color={chip.color} label={chip.label} /> : null}
-                  </Box>
-                  <Typography variant="body2" color="text.secondary" sx={{ fontFamily: "monospace" }}>
-                    {site.code}
-                  </Typography>
-                </CardActionArea>
-              </Card>
-            );
-          })}
-        </Box>
-      )}
-    </Box>
-  );
-}
-
-export default async function AdminDashboard() {
-  const [platformPermissions, sites] = await Promise.all([getEffectivePermissions(), listAllSites()]);
-  if (!sites.ok && sites.error.status === 401) {
-    return (
-      <Alert severity="warning" variant="outlined" role="alert">
-        <Typography component="h1" variant="h6" sx={{ fontWeight: 700 }}>Sign-in required</Typography>
-        Your session has expired or you are not signed in. Sign out and sign in again to continue.
-      </Alert>
-    );
-  }
-  if (!hasPlatformWorkspace(platformPermissions)) {
-    return <SiteWorkspaceChooser sites={sites} />;
-  }
+export default function AdminDashboard() {
+  const state = useWorkspace(null);
+  if (state.status === "loading") return <p role="status">Loading workspace...</p>;
+  if (state.status === "error") return <Alert severity="warning" action={<Button onClick={refreshWorkspace}>Retry</Button>}>
+    {state.signedOut ? "Your session has expired. Sign in again." : "Workspace could not be loaded."}
+  </Alert>;
+  const platformPermissions = state.data.platformPermissions;
+  if (!hasPlatformWorkspace(platformPermissions)) return <Box>
+    <Typography variant="h4" component="h1">Your Site workspaces</Typography>
+    <Typography>Use Workspace in the navigation to search and choose a Site.</Typography>
+  </Box>;
   const visibleSections = sections.filter((section) =>
     section.requiresAny.some((code) => platformPermissions.includes(code)),
   );

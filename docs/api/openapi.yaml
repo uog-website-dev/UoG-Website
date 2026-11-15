@@ -35366,6 +35366,217 @@ paths:
               schema:
                 type: string
                 format: uuid
+  /api/workspace/:
+    get:
+      operationId: workspace_retrieve
+      description: 'Live scoped context; no Site enumeration. Unknown and unauthorized
+        Sites both return 404. Version/ETag is informational: access is always revalidated,
+        never 304.'
+      parameters:
+      - in: query
+        name: site
+        schema:
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+          format: int64
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Workspace
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BootstrapResponse'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/workspace/sites/:
+    get:
+      operationId: workspace_sites_retrieve
+      description: Authorized Site summaries only. Search name/code; order name then
+        ID. Page size 20, maximum 50. Discovery is separate from bootstrap.
+      parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+          maximum: 1000000
+          minimum: 1
+          default: 1
+      - in: query
+        name: page_size
+        schema:
+          type: integer
+          maximum: 50
+          minimum: 1
+          default: 20
+      - in: query
+        name: search
+        schema:
+          type: string
+          maxLength: 100
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Workspace
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SwitcherResponse'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
 components:
   schemas:
     ActivationEnum:
@@ -35818,6 +36029,26 @@ components:
       - code
       - count
       - message
+    BootstrapResponse:
+      type: object
+      properties:
+        schemaVersion:
+          type: integer
+        version:
+          type: string
+        platformPermissions:
+          type: array
+          items:
+            type: string
+        site:
+          allOf:
+          - $ref: '#/components/schemas/WorkspaceSite'
+          nullable: true
+      required:
+      - platformPermissions
+      - schemaVersion
+      - site
+      - version
     Change:
       type: object
       properties:
@@ -45304,6 +45535,16 @@ components:
         * `ACTIVE` - Active
         * `INACTIVE` - Inactive
         * `ARCHIVED` - Archived
+    OrganizationSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+      - id
+      - name
     OrganizationUpdate:
       type: object
       properties:
@@ -57842,6 +58083,24 @@ components:
       - expected_changes
       - matched_sites
       - unchanged_pairs
+    SwitcherResponse:
+      type: object
+      properties:
+        count:
+          type: integer
+        page:
+          type: integer
+        page_size:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkspaceChoice'
+      required:
+      - count
+      - page
+      - page_size
+      - results
     ThemeEnum:
       enum:
       - institutional
@@ -58108,6 +58367,67 @@ components:
       - reviewed_revision
       - revision
       - to_status
+    WorkspaceChoice:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        code:
+          type: string
+        status:
+          type: string
+      required:
+      - code
+      - id
+      - name
+      - status
+    WorkspaceSite:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        code:
+          type: string
+        status:
+          type: string
+        organization:
+          $ref: '#/components/schemas/OrganizationSummary'
+        defaultLanguage:
+          type: string
+        enabledLanguages:
+          type: array
+          items:
+            type: string
+        primaryDomain:
+          nullable: true
+        homepageId:
+          type: string
+          format: uuid
+          nullable: true
+        permissions:
+          type: array
+          items:
+            type: string
+        enabledModuleCodes:
+          type: array
+          items:
+            type: string
+      required:
+      - code
+      - defaultLanguage
+      - enabledLanguages
+      - enabledModuleCodes
+      - homepageId
+      - id
+      - name
+      - organization
+      - permissions
+      - primaryDomain
+      - status
     APIError:
       type: object
       required:

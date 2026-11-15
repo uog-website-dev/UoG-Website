@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { WorkspacePayload } from "@/workspace";
+import {WorkspaceProvider, type WorkspacePayload} from "@/workspace";
 
 const pathname = vi.fn(() => "/");
 const push = vi.fn();
@@ -26,7 +26,8 @@ vi.mock("next/link", () => ({
 const signInAgainIfExpired = vi.fn(async () => true);
 vi.mock("@/session-watch", () => ({ signInAgainIfExpired: () => signInAgainIfExpired() }));
 
-import { DesktopSidebar } from "@/sidebar";
+import { DesktopSidebar as Sidebar } from "@/sidebar";
+function DesktopSidebar(){return <WorkspaceProvider><Sidebar/></WorkspaceProvider>;}
 
 const SITES = [
   { id: 2, name: "Informatics", code: "INFORMATICS", status: "ACTIVE" as const },
@@ -44,15 +45,16 @@ const PLATFORM_ADMIN: string[] = [
 let payload: WorkspacePayload;
 let fetchMock: ReturnType<typeof vi.fn>;
 
-function respond(next: Partial<WorkspacePayload>) {
-  payload = { platformPermissions: [], sites: SITES, sitesError: null, site: null, ...next };
+function respond(next: {platformPermissions?: string[]; site?: {id: number; enabledModuleCodes: string[]; permissions: string[]}}) {
+  const current = next.site;
+  payload = {schemaVersion: 1, version: "fixture-v1", platformPermissions: next.platformPermissions ?? [], site: current ? {...SITES.find(row => row.id === current.id)!, ...current, organization: {id: 1, name: "University"}, defaultLanguage: "en-us", enabledLanguages: ["en-us"], primaryDomain: null, homepageId: null} : null};
 }
 
 beforeEach(() => {
   pathname.mockReturnValue("/");
   push.mockReset();
   respond({ platformPermissions: PLATFORM_ADMIN });
-  fetchMock = vi.fn(async () => ({ ok: true, json: async () => payload }));
+  fetchMock = vi.fn(async (url: string) => ({ ok: true, json: async () => url.includes("/sites/?") ? {results: SITES, count: 2} : payload }));
   vi.stubGlobal("fetch", fetchMock);
 });
 
@@ -76,7 +78,7 @@ describe("DesktopSidebar — platform workspace", () => {
     expect(linkNamed("Organizations")?.getAttribute("href")).toBe("/organizations");
     expect(linkNamed("Sites")?.getAttribute("href")).toBe("/sites");
     expect(linkNamed("Modules")?.getAttribute("href")).toBe("/modules");
-    expect(fetchMock).toHaveBeenCalledWith("/admin/api/workspace/", { cache: "no-store" });
+    expect(fetchMock).toHaveBeenCalledWith("/admin/api/workspace/", expect.objectContaining({ cache: "no-store" }));
   });
 
   it("marks the current section with aria-current, with or without the base path", async () => {
@@ -95,17 +97,18 @@ describe("DesktopSidebar — platform workspace", () => {
     for (const label of ["Dashboard", "Organizations", "Sites", "Domains", "Modules", "Access control"]) {
       expect(linkNamed(label)).toBeUndefined();
     }
-    const selector = screen.getByRole("combobox", { name: "Workspace" });
-    const options = Array.from(selector.querySelectorAll("option:not([disabled])")).map((row) => row.textContent);
-    expect(options).toEqual(["Informatics", "Medicine"]);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole("button", {name: "Workspace"}));
+    expect(await screen.findByRole("button", {name: "Medicine"})).toBeTruthy();
+
   });
 
   it("switches to a Site workspace from the keyboard-operable selector", async () => {
     render(<DesktopSidebar />);
-    const selector = await screen.findByRole("combobox", { name: "Workspace" });
+    const selector = await screen.findByRole("button", {name: "Workspace"});
     await waitFor(() => expect(selector).toHaveProperty("disabled", false));
-    expect(selector).toHaveProperty("value", "platform");
-    fireEvent.change(selector, { target: { value: "site:3" } });
+    fireEvent.click(selector);
+    fireEvent.click(await screen.findByRole("button", {name: "Medicine"}));
     expect(push).toHaveBeenCalledWith("/sites/3/admin");
   });
 
@@ -113,14 +116,6 @@ describe("DesktopSidebar — platform workspace", () => {
     fetchMock.mockResolvedValueOnce({ ok: false, status: 500, json: async () => ({}) });
     render(<DesktopSidebar />);
     expect(await screen.findByText(/Navigation could not be loaded/)).toBeTruthy();
-  });
-
-  it("reports Site list failures without claiming that no workspace is assigned", async () => {
-    respond({ platformPermissions: [], sites: [], sitesError: "Service unavailable" });
-    render(<DesktopSidebar />);
-    expect(await screen.findByText(/Site workspaces could not be loaded: Service unavailable/)).toBeTruthy();
-    expect(screen.queryByText(/No administration workspace is assigned/)).toBeNull();
-    expect(screen.getByRole("combobox", { name: "Workspace" })).toHaveProperty("disabled", true);
   });
 
   it("tells a signed-out user to sign in again instead of hiding navigation silently", async () => {
@@ -170,15 +165,15 @@ describe("DesktopSidebar — Site workspace", () => {
     // MENUS is enabled but menu.read was not granted; POSTS is not enabled.
     expect(within(nav).queryAllByRole("link").some((link) => link.textContent?.includes("Menus"))).toBe(false);
     expect(within(nav).queryAllByRole("link").some((link) => link.textContent?.includes("Posts"))).toBe(false);
-    expect(screen.getByRole("combobox", { name: "Workspace" })).toHaveProperty("value", "site:2");
-    expect(fetchMock).toHaveBeenCalledWith("/admin/api/workspace/?site=2", { cache: "no-store" });
+    expect(screen.getByRole("button", {name: "Workspace"}).textContent).toContain("Informatics");
+    expect(fetchMock).toHaveBeenCalledWith("/admin/api/workspace/?site=2", expect.objectContaining({ cache: "no-store" }));
   });
 
-  it("does not render sections for a Site outside the authorized list", async () => {
+  it("rejects an invalid active-Site payload rather than rendering sections", async () => {
     pathname.mockReturnValue("/sites/99/admin");
-    respond({ platformPermissions: [], site: null });
-    render(<DesktopSidebar />);
-    expect(await screen.findByText("This Site is not available to your account.")).toBeTruthy();
+    respond({platformPermissions: []});
+    render(<DesktopSidebar/>);
+    expect(await screen.findByText(/Navigation could not be loaded/)).toBeTruthy();
     expect(linkNamed("Pages")).toBeUndefined();
   });
 });
