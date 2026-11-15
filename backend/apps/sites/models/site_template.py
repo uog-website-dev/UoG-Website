@@ -8,6 +8,9 @@ from django.db.models.lookups import Exact
 from ..configuration import default_configuration, normalize_site_configuration
 
 
+from ..menu_locations import default_menu_locations, validate_menu_locations
+
+
 class SiteTemplate(models.Model):
     class Status(models.TextChoices):
         ACTIVE = "ACTIVE", "Active"
@@ -23,6 +26,7 @@ class SiteTemplate(models.Model):
         default=default_configuration, blank=True,
         help_text="Approved configuration copied onto a new Site. Later edits do not change existing Sites.",
     )
+    menu_locations = models.JSONField(default=default_menu_locations, blank=True, validators=[validate_menu_locations], help_text="Navigation slots supported by this template renderer.")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -42,6 +46,7 @@ class SiteTemplate(models.Model):
 
     def clean(self):
         super().clean()
+        validate_menu_locations(self.menu_locations)
         if isinstance(self.name, str) and not self.name.strip():
             raise ValidationError({"name": "A template name is required."})
         if isinstance(self.description, str) and not self.description.strip():

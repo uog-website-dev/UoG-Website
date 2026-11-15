@@ -93,3 +93,10 @@ describe("PublicMenuFrame", () => {
     await waitFor(() => expect(document.querySelector(".MuiDrawer-paper")).toBeNull());
   });
 });
+
+it('resolves utility navigation independently of primary and footer menus', () => {
+  const parsed=menusFromResponse(200,{locations:{header:[{label:'Primary',href:'/primary'}],secondary:[{label:'Utility',href:'/utility'}],footer:[{label:'Footer',href:'/footer'}]}});
+  expect(parsed.utility?.[0]?.label).toBe('Utility');
+  expect(parsed.header[0]?.label).toBe('Primary');
+  expect(parsed.footer[0]?.label).toBe('Footer');
+});

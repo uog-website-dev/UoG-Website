@@ -3,6 +3,7 @@ from rest_framework import serializers
 from drf_spectacular.utils import extend_schema_field
 
 from ..models import Module, Site, SiteDomain, SiteModule, SiteTemplate
+from ..menu_locations import MENU_SLOTS, validate_menu_locations
 
 
 class StrictFields:
@@ -96,9 +97,10 @@ class SiteDomainUpdateSerializer(SiteDomainSerializer):
 
 
 class SiteTemplateSerializer(StrictFields, serializers.ModelSerializer):
+    menu_locations = serializers.ListField(child=serializers.ChoiceField(choices=tuple(MENU_SLOTS)),max_length=4,required=False,allow_empty=True,validators=[validate_menu_locations])
     class Meta:
         model = SiteTemplate
-        fields = ("id", "code", "name", "description", "status", "default_configuration", "created_at", "updated_at")
+        fields = ("id", "code", "name", "description", "status", "default_configuration", "menu_locations", "created_at", "updated_at")
         read_only_fields = ("id", "created_at", "updated_at")
         extra_kwargs = {"code": {"validators": []}}
 

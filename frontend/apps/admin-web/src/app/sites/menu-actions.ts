@@ -307,3 +307,18 @@ export async function setMenuActive(
     return result.data;
   });
 }
+
+export interface MenuLocationRecord {
+  location: string; label: string; version: number;
+  draft_menu: string | null; published_menu: string | null;
+  is_published: boolean; has_changes: boolean;
+}
+export async function loadMenuLocations(site: number): Promise<ActionResult<MenuLocationRecord[]>> {
+  return attempt(async () => (await client()).get<MenuLocationRecord[]>(siteMenuPath(site,"locations/")));
+}
+export async function saveMenuLocation(site: number, location: string, version: number, menu: string | null, replace: boolean): Promise<ActionResult<MenuLocationRecord>> {
+  return attempt(async () => (await client()).post<MenuLocationRecord>(siteMenuPath(site,`locations/${encodeURIComponent(location)}/draft/`),{version,menu,replace}));
+}
+export async function publishMenuLocation(site: number, location: string, version: number): Promise<ActionResult<MenuLocationRecord>> {
+  return attempt(async () => (await client()).post<MenuLocationRecord>(siteMenuPath(site,`locations/${encodeURIComponent(location)}/publish/`),{version}));
+}

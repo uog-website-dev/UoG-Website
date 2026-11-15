@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="36" failures="0" errors="0" time="5.595144693">
+    <testsuite name="src/public-page.test.tsx" timestamp="2026-11-14T18:27:34.958Z" hostname="ed2ed00499be" tests="11" failures="0" errors="0" skipped="0" time="1.415790354">
+        <testcase classname="src/public-page.test.tsx" name="pageFromResponse &gt; reads one published page and ignores a disabled module" time="0.009421268">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="paragraphParts &gt; drops script and javascript targets" time="0.0118499">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="PublicPageView &gt; renders the published page and does not mount unsafe markup" time="0.599969286">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="PublicPageView &gt; lets a keyboard user reach a safe link" time="0.141149285">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="PublicPageView &gt; states that a missing or unpublished page is not shown" time="0.028619809">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="PublicPageView &gt; can hide the automatic page title for builder canvas composition" time="0.085981984">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="Published media derivatives &gt; uses Host-scoped responsive variants and falls back to alt text on failure" time="0.038994711">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="Published media derivatives &gt; does not construct a public URL for a foreign Site reference" time="0.008109404">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="Published media derivatives &gt; resets a failed image when the asset or Site changes" time="0.064624476">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="renders nested Slider and Gallery uses independently for the same asset" time="0.385899521">
+        </testcase>
+        <testcase classname="src/public-page.test.tsx" name="renders historical compact UUID references through the canonical public route" time="0.024018619">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/responsive-layout.test.tsx" timestamp="2026-11-14T18:27:34.995Z" hostname="ed2ed00499be" tests="9" failures="0" errors="0" skipped="0" time="1.030546205">
+        <testcase classname="src/responsive-layout.test.tsx" name="breakpoint precedence matrix &gt; classifies preview widths and boundaries" time="0.011805962">
+        </testcase>
+        <testcase classname="src/responsive-layout.test.tsx" name="shared resolution inheritance and reset &gt; keeps legacy stack/gap defaults when override fields are absent" time="0.011932759">
+        </testcase>
+        <testcase classname="src/responsive-layout.test.tsx" name="shared resolution inheritance and reset &gt; applies mobile-only spacing and restores inheritance after reset" time="0.001826712">
+        </testcase>
+        <testcase classname="src/responsive-layout.test.tsx" name="shared resolution inheritance and reset &gt; lets mobile win over tablet and tablet win over desktop base" time="0.003353739">
+        </testcase>
+        <testcase classname="src/responsive-layout.test.tsx" name="shared resolution inheritance and reset &gt; resolves widget spacing without accepting stack" time="0.001641493">
+        </testcase>
+        <testcase classname="src/responsive-layout.test.tsx" name="contract validation for responsive fields &gt; accepts approved overrides and rejects unknown breakpoint or property tokens" time="0.015038811">
+        </testcase>
+        <testcase classname="src/responsive-layout.test.tsx" name="preview and public parity at viewport boundaries &gt; emits the same resolved gap/stack attributes for preview and public at each width" time="0.845245123">
+        </testcase>
+        <testcase classname="src/responsive-layout.test.tsx" name="preview and public parity at viewport boundaries &gt; keeps legacy three-column defaults identical without override fields" time="0.035406774">
+        </testcase>
+        <testcase classname="src/responsive-layout.test.tsx" name="preview and public parity at viewport boundaries &gt; applies mobile spacing override only below the tablet floor" time="0.092993323">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/reusable-sidebar.test.tsx" timestamp="2026-11-14T18:27:35.024Z" hostname="ed2ed00499be" tests="8" failures="0" errors="0" skipped="0" time="1.325570635">
+        <testcase classname="src/reusable-sidebar.test.tsx" name="renders frozen ordered menu links without fetching a live definition" time="0.74531332">
+        </testcase>
+        <testcase classname="src/reusable-sidebar.test.tsx" name="rejects foreign sidebar data and does not replace it with live Site navigation" time="0.051865836">
+        </testcase>
+        <testcase classname="src/reusable-sidebar.test.tsx" name="rejects script sidebar data and does not replace it with live Site navigation" time="0.033570276">
+        </testcase>
+        <testcase classname="src/reusable-sidebar.test.tsx" name="rejects unavailable sidebar data and does not replace it with live Site navigation" time="0.04082002">
+        </testcase>
+        <testcase classname="src/reusable-sidebar.test.tsx" name="escapes untrusted sidebar and link labels on public and private surfaces" time="0.052486887">
+        </testcase>
+        <testcase classname="src/reusable-sidebar.test.tsx" name="renders mixed component order and accessible source-specific placeholders" time="0.193068922">
+        </testcase>
+        <testcase classname="src/reusable-sidebar.test.tsx" name="renders a published template sidebar slot without replacing an explicit Page sidebar" time="0.153556616">
+        </testcase>
+        <testcase classname="src/reusable-sidebar.test.tsx" name="honors a published empty sidebar assignment rather than restoring automatic links" time="0.044066445">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/site-navigation.test.tsx" timestamp="2026-11-14T18:27:35.032Z" hostname="ed2ed00499be" tests="8" failures="0" errors="0" skipped="0" time="1.823237499">
+        <testcase classname="src/site-navigation.test.tsx" name="safeMenuHref &gt; keeps same-site paths and http(s) URLs" time="0.007487985">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="safeMenuHref &gt; rejects scriptable, protocol-relative and credentialed targets" time="0.001916025">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="menusFromResponse &gt; reads only the resolved Site header and footer" time="0.006364476">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="menusFromResponse &gt; treats a disabled module as an empty menu" time="0.001374546">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="PublicMenuFrame &gt; shows this Site&apos;s header and footer and does not link unsafe URLs" time="0.573020082">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="PublicMenuFrame &gt; opens the mobile header from the keyboard and closes it with Escape" time="0.89224502">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="PublicMenuFrame &gt; closes the mobile header from its close button" time="0.327144906">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="resolves utility navigation independently of primary and footer menus" time="0.000608274">
+        </testcase>
+    </testsuite>
+</testsuites>

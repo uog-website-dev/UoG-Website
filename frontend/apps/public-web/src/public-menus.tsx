@@ -11,7 +11,7 @@ import type { ReactNode } from "react";
 import { PublicMenuFrame, menusFromResponse, publicFetchInit } from "@uog/ui";
 import type { PublicMenuNode } from "@uog/ui";
 
-const EMPTY: { header: PublicMenuNode[]; footer: PublicMenuNode[] } = {
+const EMPTY: { header: PublicMenuNode[]; footer: PublicMenuNode[]; utility?: PublicMenuNode[] } = {
   header: [],
   footer: [],
 };
@@ -37,7 +37,7 @@ export function PublicMenus({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <PublicMenuFrame header={menus.header} footer={menus.footer}>
+    <PublicMenuFrame header={menus.header} footer={menus.footer} utility={menus.utility}>
       {children}
     </PublicMenuFrame>
   );

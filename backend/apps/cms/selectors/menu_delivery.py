@@ -23,6 +23,13 @@ from ..menu_models import Menu, MenuInheritance
 
 
 def compose_location(site_id, location):
+    from apps.sites.menu_locations import locations_for_site,MENU_SLOTS
+    from ..menu_assignment_models import MenuLocationAssignment
+    site=Site.objects.select_related('template').get(pk=site_id)
+    if location in MENU_SLOTS and location not in locations_for_site(site):return []
+    assigned=MenuLocationAssignment.objects.filter(site_id=site_id,location=location,is_published=True).select_related('published_menu').first()
+    if assigned:
+        return _project(assigned.published_menu,'local') if assigned.published_menu and not assigned.published_menu.is_global and assigned.published_menu.is_active and _site_serves(site_id) else []
     policy = MenuInheritance.objects.filter(site_id=site_id, location=location).first()
     include_global = bool(policy and policy.include_global)
     inherit_from_id = policy.inherit_from_id if policy else None

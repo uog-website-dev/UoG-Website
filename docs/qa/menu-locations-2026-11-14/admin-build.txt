@@ -1,0 +1,69 @@
+
+> @uog/admin-web@0.1.0 build /tmp/sprint3-build-jACFNc/apps/admin-web
+> next build
+
+   ▲ Next.js 15.5.28
+   - Experiments (use with caution):
+     · serverActions
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 41s
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/15) ...
+   Generating static pages (3/15) 
+   Generating static pages (7/15) 
+   Generating static pages (11/15) 
+ ✓ Generating static pages (15/15)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                                                 Size  First Load JS
+┌ ƒ /                                                                    4.37 kB         160 kB
+├ ƒ /_not-found                                                            154 B         103 kB
+├ ƒ /access                                                               5.6 kB         186 kB
+├ ƒ /api/access                                                            154 B         103 kB
+├ ƒ /api/auth/[...nextauth]                                                154 B         103 kB
+├ ƒ /api/session                                                           154 B         103 kB
+├ ƒ /api/session/expired                                                   154 B         103 kB
+├ ƒ /api/workspace                                                         154 B         103 kB
+├ ƒ /domains                                                              9.8 kB         292 kB
+├ ƒ /modules                                                             18.7 kB         306 kB
+├ ƒ /organizations                                                       5.84 kB         304 kB
+├ ƒ /organizations/[id]                                                  7.37 kB         289 kB
+├ ƒ /organizations/[id]/edit                                               913 B         286 kB
+├ ƒ /organizations/hierarchy                                              5.2 kB         288 kB
+├ ƒ /organizations/new                                                     220 B         285 kB
+├ ƒ /sites                                                               7.96 kB         306 kB
+├ ƒ /sites/[id]                                                            11 kB         325 kB
+├ ƒ /sites/[id]/admin                                                    6.67 kB         294 kB
+├ ƒ /sites/[id]/admin/builder                                             3.1 kB         297 kB
+├ ƒ /sites/[id]/admin/homepage                                           6.28 kB         293 kB
+├ ƒ /sites/[id]/admin/media                                                412 B         306 kB
+├ ƒ /sites/[id]/admin/menus                                               2.2 kB         300 kB
+├ ƒ /sites/[id]/admin/pages                                              3.08 kB         297 kB
+├ ƒ /sites/[id]/admin/pages/[pageId]/builder                             27.7 kB         351 kB
+├ ƒ /sites/[id]/admin/pages/[pageId]/edit                                  501 B         319 kB
+├ ƒ /sites/[id]/admin/pages/[pageId]/preview                             4.79 kB         292 kB
+├ ƒ /sites/[id]/admin/pages/new                                            475 B         319 kB
+├ ƒ /sites/[id]/admin/posts                                              5.08 kB         296 kB
+├ ƒ /sites/[id]/admin/posts/[postId]/edit                                  467 B         335 kB
+├ ƒ /sites/[id]/admin/posts/[postId]/preview                             4.79 kB         292 kB
+├ ƒ /sites/[id]/admin/posts/new                                            444 B         335 kB
+├ ƒ /sites/[id]/admin/sidebars                                           7.32 kB         294 kB
+├ ƒ /sites/[id]/admin/users                                              16.8 kB         222 kB
+├ ƒ /sites/[id]/edit                                                       862 B         289 kB
+├ ƒ /sites/[id]/media-upload                                               154 B         103 kB
+├ ƒ /sites/[id]/media/[assetId]/image                                      154 B         103 kB
+├ ƒ /sites/[id]/modules                                                  8.43 kB         293 kB
+├ ƒ /sites/[id]/pages/[pageId]/preview-media/[revision]/[assetId]/image    154 B         103 kB
+├ ƒ /sites/[id]/pages/[pageId]/widget-data                                 154 B         103 kB
+└ ƒ /sites/new                                                             223 B         289 kB
++ First Load JS shared by all                                             103 kB
+  ├ chunks/5870-6c8b2471b40f71aa.js                                      46.9 kB
+  ├ chunks/fd9bffea-61bce6436ccff5b9.js                                  54.2 kB
+  └ other shared chunks (total)                                          1.94 kB
+
+
+ƒ  (Dynamic)  server-rendered on demand
+

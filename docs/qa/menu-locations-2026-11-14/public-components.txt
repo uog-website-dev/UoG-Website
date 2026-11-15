@@ -1,0 +1,5 @@
+
+> @uog/ui@0.1.0 test /workspace/packages/ui
+> vitest run src/site-navigation.test.tsx src/reusable-sidebar.test.tsx src/public-page.test.tsx src/responsive-layout.test.tsx --reporter\=junit --outputFile\=/tmp/menu-locations-ui.xml
+
+JUNIT report written to /tmp/menu-locations-ui.xml

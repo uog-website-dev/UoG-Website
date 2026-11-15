@@ -1157,3 +1157,5 @@ from apps.cms.contact_models import ContactSubmission  # noqa: E402,F401
 from apps.cms.section_template_models import SectionTemplate, SectionTemplateStatus  # noqa: E402,F401
 
 from apps.cms.sidebar_models import Sidebar  # noqa: E402,F401
+
+from apps.cms.menu_assignment_models import MenuLocationAssignment  # noqa: E402,F401

@@ -1,0 +1,212 @@
+[
+    {
+        "Service":  "backend",
+        "State":  "running",
+        "Health":  "healthy",
+        "Publishers":  [
+                           {
+                               "URL":  "0.0.0.0",
+                               "TargetPort":  8000,
+                               "PublishedPort":  8000,
+                               "Protocol":  "tcp"
+                           },
+                           {
+                               "URL":  "::",
+                               "TargetPort":  8000,
+                               "PublishedPort":  8000,
+                               "Protocol":  "tcp"
+                           }
+                       ]
+    },
+    {
+        "Service":  "celery-beat",
+        "State":  "running",
+        "Health":  "",
+        "Publishers":  [
+                           {
+                               "URL":  "",
+                               "TargetPort":  8000,
+                               "PublishedPort":  0,
+                               "Protocol":  "tcp"
+                           }
+                       ]
+    },
+    {
+        "Service":  "celery-worker",
+        "State":  "running",
+        "Health":  "healthy",
+        "Publishers":  [
+                           {
+                               "URL":  "",
+                               "TargetPort":  8000,
+                               "PublishedPort":  0,
+                               "Protocol":  "tcp"
+                           }
+                       ]
+    },
+    {
+        "Service":  "frontend-admin",
+        "State":  "running",
+        "Health":  "healthy",
+        "Publishers":  [
+                           {
+                               "URL":  "0.0.0.0",
+                               "TargetPort":  3000,
+                               "PublishedPort":  3001,
+                               "Protocol":  "tcp"
+                           },
+                           {
+                               "URL":  "::",
+                               "TargetPort":  3000,
+                               "PublishedPort":  3001,
+                               "Protocol":  "tcp"
+                           }
+                       ]
+    },
+    {
+        "Service":  "frontend-public",
+        "State":  "running",
+        "Health":  "healthy",
+        "Publishers":  [
+                           {
+                               "URL":  "0.0.0.0",
+                               "TargetPort":  3000,
+                               "PublishedPort":  3000,
+                               "Protocol":  "tcp"
+                           },
+                           {
+                               "URL":  "::",
+                               "TargetPort":  3000,
+                               "PublishedPort":  3000,
+                               "Protocol":  "tcp"
+                           }
+                       ]
+    },
+    {
+        "Service":  "keycloak",
+        "State":  "running",
+        "Health":  "healthy",
+        "Publishers":  [
+                           {
+                               "URL":  "0.0.0.0",
+                               "TargetPort":  8080,
+                               "PublishedPort":  8080,
+                               "Protocol":  "tcp"
+                           },
+                           {
+                               "URL":  "::",
+                               "TargetPort":  8080,
+                               "PublishedPort":  8080,
+                               "Protocol":  "tcp"
+                           }
+                       ]
+    },
+    {
+        "Service":  "keycloak-db",
+        "State":  "running",
+        "Health":  "healthy",
+        "Publishers":  [
+                           {
+                               "URL":  "",
+                               "TargetPort":  5432,
+                               "PublishedPort":  0,
+                               "Protocol":  "tcp"
+                           }
+                       ]
+    },
+    {
+        "Service":  "minio",
+        "State":  "running",
+        "Health":  "healthy",
+        "Publishers":  [
+                           {
+                               "URL":  "0.0.0.0",
+                               "TargetPort":  9000,
+                               "PublishedPort":  9000,
+                               "Protocol":  "tcp"
+                           },
+                           {
+                               "URL":  "::",
+                               "TargetPort":  9000,
+                               "PublishedPort":  9000,
+                               "Protocol":  "tcp"
+                           },
+                           {
+                               "URL":  "0.0.0.0",
+                               "TargetPort":  9001,
+                               "PublishedPort":  9001,
+                               "Protocol":  "tcp"
+                           },
+                           {
+                               "URL":  "::",
+                               "TargetPort":  9001,
+                               "PublishedPort":  9001,
+                               "Protocol":  "tcp"
+                           }
+                       ]
+    },
+    {
+        "Service":  "nginx",
+        "State":  "running",
+        "Health":  "healthy",
+        "Publishers":  [
+                           {
+                               "URL":  "0.0.0.0",
+                               "TargetPort":  80,
+                               "PublishedPort":  80,
+                               "Protocol":  "tcp"
+                           },
+                           {
+                               "URL":  "::",
+                               "TargetPort":  80,
+                               "PublishedPort":  80,
+                               "Protocol":  "tcp"
+                           }
+                       ]
+    },
+    {
+        "Service":  "postgres",
+        "State":  "running",
+        "Health":  "healthy",
+        "Publishers":  [
+                           {
+                               "URL":  "0.0.0.0",
+                               "TargetPort":  5432,
+                               "PublishedPort":  5432,
+                               "Protocol":  "tcp"
+                           },
+                           {
+                               "URL":  "::",
+                               "TargetPort":  5432,
+                               "PublishedPort":  5432,
+                               "Protocol":  "tcp"
+                           }
+                       ]
+    },
+    {
+        "Service":  "redis-broker",
+        "State":  "running",
+        "Health":  "healthy",
+        "Publishers":  [
+                           {
+                               "URL":  "",
+                               "TargetPort":  6379,
+                               "PublishedPort":  0,
+                               "Protocol":  "tcp"
+                           }
+                       ]
+    },
+    {
+        "Service":  "redis-cache",
+        "State":  "running",
+        "Health":  "healthy",
+        "Publishers":  [
+                           {
+                               "URL":  "",
+                               "TargetPort":  6379,
+                               "PublishedPort":  0,
+                               "Protocol":  "tcp"
+                           }
+                       ]
+    }
+]

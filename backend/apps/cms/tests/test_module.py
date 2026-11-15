@@ -42,7 +42,7 @@ def test_cms_packages_import_and_application_loads():
         "SiteContent", "Page", "PageRedirect", "LegacyCMSRoleReconciliation",
         "ContentWorkflowTransition", "PublishedContentSnapshot",
         "ContentRevision", "SitePublicationVersion",
-        "Menu", "MenuItem", "MenuInheritance", "MenuDeliveryVersion",
+        "Menu", "MenuItem", "MenuInheritance", "MenuDeliveryVersion", "MenuLocationAssignment",
         "SectionTemplate", "ContactSubmission", "Sidebar",
     }
 

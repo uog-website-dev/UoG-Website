@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "origin": "http://localhost",
+  "admin": "http://localhost/admin/",
+  "issuer": "http://localhost:8080/realms/uog",
+  "real_login_and_scoped_locations": "PASS"
+}
