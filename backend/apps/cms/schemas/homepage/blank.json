@@ -1,0 +1,15 @@
+{
+  "manifest_version": 1,
+  "id": "blank",
+  "version": 1,
+  "name": "Blank",
+  "description": "A clean canvas with no sections or sample content.",
+  "required_modules": [
+    "PAGES",
+    "VISUAL_BUILDER"
+  ],
+  "layout": {
+    "schema_version": 1,
+    "rows": []
+  }
+}

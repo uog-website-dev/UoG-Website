@@ -1,0 +1,17 @@
+﻿[
+    {
+        "title":  "Build log #L19",
+        "message":  "There are one or more test failures detected in result files. Detailed summary of published test results can be viewed in the Tests tab.",
+        "path":  "Build log "
+    },
+    {
+        "title":  "Build log #L340",
+        "message":  "Bash exited with code \u00271\u0027.",
+        "path":  "Build log "
+    },
+    {
+        "title":  "test_schema_validates_without_warnings_and_describes_live_contract",
+        "message":  "AssertionError: assert {\u0027/api/admin/...nments/\u0027, ...} == {\u0027/api/admin/...nments/\u0027, ...}\n  \n  Extra items in the left set:\n  \u0027/api/v1/sites/{site_pk}/homepage-templates/\u0027\n  \u0027/api/v1/sites/{site_pk}/menus/locations/\u0027\n  \u0027/api/v1/sites/{site_pk}/homepage-templates/prepare/\u0027\n  \u0027/api/v1/sites/{site_pk}/menus/preview-navigation/\u0027\n  \u0027/api/v1/sites/{site_pk}/menus/locations/{location}/draft/\u0027...\n  \n  ...Full output truncated (4 lines hidden), use \u0027-vv\u0027 to show",
+        "path":  "test_schema_validates_without_warnings_and_describes_live_contract"
+    }
+]

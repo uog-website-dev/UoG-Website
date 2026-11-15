@@ -1,0 +1,130 @@
+{
+  "manifest_version": 1,
+  "id": "university-main",
+  "version": 1,
+  "name": "University Main",
+  "description": "An institutional welcome, academic priorities and a clear invitation to explore.",
+  "required_modules": [
+    "PAGES",
+    "VISUAL_BUILDER"
+  ],
+  "layout": {
+    "schema_version": 1,
+    "rows": [
+      {
+        "id": "university-main-section-0",
+        "type": "section",
+        "ratios": [
+          100
+        ],
+        "columns": [
+          {
+            "id": "university-main-section-0-column",
+            "type": "column",
+            "children": [
+              {
+                "id": "university-main-title-0",
+                "type": "headline",
+                "props": {
+                  "text": "Learning that transforms lives",
+                  "level": 2
+                }
+              },
+              {
+                "id": "university-main-body-0",
+                "type": "editor",
+                "props": {
+                  "html": "<p>Discover our university, our people and our contribution to society.</p>"
+                }
+              }
+            ]
+          }
+        ],
+        "style": {
+          "padding": "md",
+          "background": "navy",
+          "text_color": "inverse",
+          "radius": "lg",
+          "gap": "md",
+          "text_size": "xl"
+        }
+      },
+      {
+        "id": "university-main-section-1",
+        "type": "section",
+        "ratios": [
+          100
+        ],
+        "columns": [
+          {
+            "id": "university-main-section-1-column",
+            "type": "column",
+            "children": [
+              {
+                "id": "university-main-title-1",
+                "type": "headline",
+                "props": {
+                  "text": "Explore our university",
+                  "level": 2
+                }
+              },
+              {
+                "id": "university-main-body-1",
+                "type": "editor",
+                "props": {
+                  "html": "<p>Education, research and community partnership.</p>"
+                }
+              }
+            ]
+          }
+        ],
+        "style": {
+          "padding": "md",
+          "background": "paper",
+          "text_color": "default",
+          "radius": "lg",
+          "gap": "md",
+          "text_size": "lg"
+        }
+      },
+      {
+        "id": "university-main-section-2",
+        "type": "section",
+        "ratios": [
+          100
+        ],
+        "columns": [
+          {
+            "id": "university-main-section-2-column",
+            "type": "column",
+            "children": [
+              {
+                "id": "university-main-title-2",
+                "type": "headline",
+                "props": {
+                  "text": "Shape your future",
+                  "level": 2
+                }
+              },
+              {
+                "id": "university-main-body-2",
+                "type": "editor",
+                "props": {
+                  "html": "<p>Discover opportunities to learn, collaborate and make a difference.</p>"
+                }
+              }
+            ]
+          }
+        ],
+        "style": {
+          "padding": "md",
+          "background": "mist",
+          "text_color": "default",
+          "radius": "lg",
+          "gap": "md",
+          "text_size": "lg"
+        }
+      }
+    ]
+  }
+}

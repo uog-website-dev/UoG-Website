@@ -24,6 +24,7 @@ import type { SitePageRecord } from "@/app/sites/page-actions";
 import { unwrap } from "@/organizations/contract";
 import { siteAdminHref } from "@/sites/site-admin";
 import { useSiteAdmin } from "@/sites/site-admin-frame";
+import { HomepageTemplateCatalogue } from "./homepage-template-catalogue";
 import { ViewPublicSite } from "@/sites/view-public-site";
 
 function eligibleCandidate(page: SitePageRecord): boolean {
@@ -173,6 +174,7 @@ export function SiteHomepagePanel() {
         </Box>
       </Paper>
 
+      <HomepageTemplateCatalogue siteId={siteId} canEdit={admin.permissions.includes("content.pages.update")} />
       {error ? <Alert severity="error" role="alert">{error}</Alert> : null}
       {message ? <Alert severity="success" role="status">{message}</Alert> : null}
 
