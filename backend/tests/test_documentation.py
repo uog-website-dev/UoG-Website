@@ -44,6 +44,8 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
         "/api/pages/", "/api/pages/{id}/", "/api/pages/home/",
         "/api/v1/sites/{site_pk}/sidebars/",
         "/api/v1/sites/{site_pk}/sidebars/{id}/",
+        "/api/v1/sites/{site_pk}/homepage-templates/",
+        "/api/v1/sites/{site_pk}/homepage-templates/prepare/",
         "/api/v1/sites/{site_pk}/section-templates/",
         "/api/v1/sites/{site_pk}/section-templates/{id}/",
         "/api/v1/sites/{site_pk}/pages/{id}/visual-draft/insert-template/",
@@ -101,6 +103,12 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
         "/api/v1/sites/{site_pk}/tags/",
         "/api/v1/sites/{site_pk}/tags/{id}/",
         "/api/v1/sites/{site_pk}/menus/",
+        "/api/v1/sites/{site_pk}/menus/locations/",
+        "/api/v1/sites/{site_pk}/menus/locations/{location}/draft/",
+        "/api/v1/sites/{site_pk}/menus/locations/{location}/publish/",
+        "/api/v1/sites/{site_pk}/menus/preview-navigation/",
+        "/api/v1/sites/{site_pk}/menus/targets/",
+        "/api/v1/sites/{site_pk}/menus/{id}/preview/",
         "/api/v1/sites/{site_pk}/menus/{id}/",
         "/api/v1/sites/{site_pk}/menus/{id}/activate/",
         "/api/v1/sites/{site_pk}/menus/{id}/deactivate/",
@@ -139,6 +147,27 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
         "/api/v1/site-context/pages/{page_path}/",
         "/api/v1/site-context/menus/",
     }
+    # These routes prepare/preview private content; they must not accidentally
+    # acquire anonymous access or expose additional write methods.
+    private_methods = {
+        "/api/v1/sites/{site_pk}/homepage-templates/": {"get"},
+        "/api/v1/sites/{site_pk}/homepage-templates/prepare/": {"post"},
+        "/api/v1/sites/{site_pk}/menus/locations/": {"get"},
+        "/api/v1/sites/{site_pk}/menus/locations/{location}/draft/": {"post"},
+        "/api/v1/sites/{site_pk}/menus/locations/{location}/publish/": {"post"},
+        "/api/v1/sites/{site_pk}/menus/preview-navigation/": {"get"},
+        "/api/v1/sites/{site_pk}/menus/targets/": {"get"},
+        "/api/v1/sites/{site_pk}/menus/{id}/preview/": {"get"},
+    }
+    for route, methods in private_methods.items():
+        assert set(paths[route]) == methods, route
+        for method in methods:
+            assert paths[route][method]["security"] == [{"keycloakBearer": []}], route
+    prepare = paths["/api/v1/sites/{site_pk}/homepage-templates/prepare/"]["post"]
+    prepare_ref = prepare["requestBody"]["content"]["application/json"]["schema"]["$ref"].rsplit("/", 1)[-1]
+    prepare_input = schema["components"]["schemas"][prepare_ref]
+    assert set(prepare_input["required"]) == {"template_id", "version"}
+    assert set(prepare_input["properties"]) == {"template_id", "version"}
     post_list = paths["/api/v1/sites/{site_pk}/posts/"]["get"]
     assert {
         "status", "category", "tag", "author", "created_after",

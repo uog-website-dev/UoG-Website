@@ -1,0 +1,14 @@
+{
+  "backend": {
+    "tests": 1130,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 4
+  },
+  "openapi": {
+    "paths": 121,
+    "validation": "PASS",
+    "baseline_matches": true
+  },
+  "changed_test_sha256": "16e137e88c77e4f81ff5c029a2c8f01e733dde097b6a4fcc2e7c249302662c13"
+}
