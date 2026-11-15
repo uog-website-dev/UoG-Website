@@ -42,3 +42,10 @@ def resolve_destination(item):
 
 def destination_state(item):
     return 'ready' if resolve_destination(item) else 'unavailable'
+
+
+def menu_origin(site_id):
+    from django.conf import settings
+    from apps.sites.models import SiteDomain
+    domain=SiteDomain.objects.filter(site_id=site_id,status='ACTIVE',is_primary=True).first()
+    return f"{'http' if settings.DEBUG else 'https'}://{domain.hostname}" if domain else None

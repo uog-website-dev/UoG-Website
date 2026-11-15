@@ -1,0 +1,24 @@
+{
+  "results": [
+    {
+      "name": "Editor opens an authenticated full-page saved-draft preview in a new tab with Site-correct URLs",
+      "status": "PASS"
+    },
+    {
+      "name": "Nested links are reachable by keyboard and expose visible focus and current-page state",
+      "status": "PASS"
+    },
+    {
+      "name": "Mobile navigation opens, closes with Escape, restores focus and closes after following a nested link without overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "Anonymous navigation and independent Site remain unchanged; direct anonymous preview is denied",
+      "status": "PASS"
+    },
+    {
+      "name": "Forged foreign-Site preview route displays no private menu",
+      "status": "PASS"
+    }
+  ]
+}

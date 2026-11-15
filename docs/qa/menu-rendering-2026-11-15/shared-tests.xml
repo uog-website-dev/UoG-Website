@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="88" failures="0" errors="0" time="5.589519429">
+    <testsuite name="src/reusable-sidebar.test.tsx" timestamp="2026-11-15T04:53:25.041Z" hostname="6462f36c70dc" tests="8" failures="0" errors="0" skipped="0" time="0.589271682">
+        <testcase classname="src/reusable-sidebar.test.tsx" name="renders frozen ordered menu links without fetching a live definition" time="0.27728841">
+        </testcase>
+        <testcase classname="src/reusable-sidebar.test.tsx" name="rejects foreign sidebar data and does not replace it with live Site navigation" time="0.021522631">
+        </testcase>
+        <testcase classname="src/reusable-sidebar.test.tsx" name="rejects script sidebar data and does not replace it with live Site navigation" time="0.015205401">
+        </testcase>
+        <testcase classname="src/reusable-sidebar.test.tsx" name="rejects unavailable sidebar data and does not replace it with live Site navigation" time="0.010146617">
+        </testcase>
+        <testcase classname="src/reusable-sidebar.test.tsx" name="escapes untrusted sidebar and link labels on public and private surfaces" time="0.016245464">
+        </testcase>
+        <testcase classname="src/reusable-sidebar.test.tsx" name="renders mixed component order and accessible source-specific placeholders" time="0.08242408">
+        </testcase>
+        <testcase classname="src/reusable-sidebar.test.tsx" name="renders a published template sidebar slot without replacing an explicit Page sidebar" time="0.099646888">
+        </testcase>
+        <testcase classname="src/reusable-sidebar.test.tsx" name="honors a published empty sidebar assignment rather than restoring automatic links" time="0.063314108">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/site-navigation.test.tsx" timestamp="2026-11-15T04:53:25.053Z" hostname="6462f36c70dc" tests="14" failures="0" errors="0" skipped="0" time="1.983882666">
+        <testcase classname="src/site-navigation.test.tsx" name="safeMenuHref &gt; keeps same-site paths and http(s) URLs" time="0.005825985">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="safeMenuHref &gt; rejects scriptable, protocol-relative and credentialed targets" time="0.001686117">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="menusFromResponse &gt; reads only the resolved Site header and footer" time="0.002615673">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="menusFromResponse &gt; treats a disabled module as an empty menu" time="0.001145746">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="PublicMenuFrame &gt; shows this Site&apos;s header and footer and does not link unsafe URLs" time="0.444217374">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="PublicMenuFrame &gt; opens the mobile header from the keyboard and closes it with Escape" time="0.61205392">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="PublicMenuFrame &gt; closes the mobile header from its close button" time="0.322411088">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="resolves utility navigation independently of primary and footer menus" time="0.000959528">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="marks only the exact same-origin current destination and qualifies private preview links" time="0.090791302">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="closes the mobile menu after activating a nested link and restores the trigger" time="0.324738274">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="bounds malformed trees and rejects encoded controls and error response trees" time="0.000986207">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="supports native nested disclosure by keyboard and returns focus on Escape" time="0.041189313">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="escapes hostile labels on public and preview surfaces and keeps empty frames stable" time="0.021512673">
+        </testcase>
+        <testcase classname="src/site-navigation.test.tsx" name="tracks the actual public browser pathname and history navigation" time="0.10740532">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/visual-layout.test.tsx" timestamp="2026-11-15T04:53:25.069Z" hostname="6462f36c70dc" tests="66" failures="0" errors="0" skipped="0" time="3.016365081">
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; three-column-slider" time="0.00575726">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; unknown-widget" time="0.002631095">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; duplicate-id" time="0.001026636">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; nested-section" time="0.003714161">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; excessive-items" time="0.001121833">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; unsupported-version" time="0.001022647">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; ratio-column-mismatch" time="0.001472093">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; unsafe-link" time="0.001050281">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; unsafe-style" time="0.001184004">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; unknown-breakpoint" time="0.00055713">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; unknown-responsive-property" time="0.000683429">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; widget-stack-forbidden" time="0.000535819">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; responsive-spacing-stack" time="0.000857599">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-hero_image" time="0.000727551">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-image_slider" time="0.000716478">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-image_grid" time="0.000662386">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-layout_slider" time="0.000782157">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-simple_masonry" time="0.000966122">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-anything_carousel" time="0.000663745">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-lottie_player" time="0.000550126">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-video_player" time="0.000639733">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-image" time="0.000634467">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-button" time="0.0006219">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-button_grid" time="0.000566224">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-contact_form" time="0.001286708">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-tabs" time="0.000710424">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-accordion" time="0.000239591">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-call_to_action" time="0.000241473">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-headline" time="0.000142377">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-editor" time="0.000120118">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-blog" time="0.000130693">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-recent_posts" time="0.000120649">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-post_carousel" time="0.000216624">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-testimonials" time="0.00016549">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-author_box" time="0.000176961">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-features" time="0.000137358">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-taxonomy" time="0.000136927">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-icon" time="0.000129717">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-price_table" time="0.000139584">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-google_maps" time="0.0001115">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-social_media_buttons" time="0.000111328">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-site_logo" time="0.000103277">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-site_title" time="0.000095977">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-page_title" time="0.00009304">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-menu" time="0.00014907">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-breadcrumbs" time="0.000161567">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-loop_grid" time="0.000119659">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-loop_carousel" time="0.000103804">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-taxonomy_filter" time="0.000155089">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-post_title" time="0.000225175">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-post_excerpt" time="0.000121608">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-featured_image" time="0.000103401">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-alert" time="0.000115851">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-table_of_contents" time="0.000107614">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-menu_anchor" time="0.000228267">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; catalog-countdown" time="0.000194943">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; exports exactly the product&apos;s 43 typed widgets" time="0.000226744">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; renders three ordered columns and the scoped Slider without mutating IDs" time="0.367947158">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; keeps the existing renderer for legacy Pages and fails closed for unknown visual versions" time="0.058044096">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; imports legacy flat blocks deterministically without editing the source" time="0.016477032">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared visual layout fixtures &gt; rejects duplicate item identity, over-node limits and oversized payloads" time="0.012012309">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="imports a full 100-block legacy document within the new contract bounds" time="0.007600007">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="isolates private revision image URLs from public rendering and retries a changed preview" time="0.150538661">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared renderer preview/public parity &gt; produces the same content structure for approved fixtures on both surfaces" time="1.659979259">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared renderer preview/public parity &gt; keeps Slider, Tabs and Accordion behavior equivalent across surfaces" time="0.635292317">
+        </testcase>
+        <testcase classname="src/visual-layout.test.tsx" name="shared renderer preview/public parity &gt; fails closed for malformed nodes without breaking sibling content or leaking private URLs" time="0.066544214">
+        </testcase>
+    </testsuite>
+</testsuites>

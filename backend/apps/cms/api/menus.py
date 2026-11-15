@@ -74,6 +74,15 @@ def menu_errors():
         raise
 
 
+class NavigationPreviewOutput(serializers.Serializer):
+    theme = serializers.ChoiceField(choices=("institutional","high-contrast"))
+    site = serializers.IntegerField()
+    name = serializers.CharField()
+    public_origin = serializers.URLField(allow_null=True)
+    preview = serializers.BooleanField()
+    locations = serializers.DictField(child=serializers.ListField(child=serializers.JSONField()))
+    menu_version = serializers.IntegerField(required=False)
+
 class LocationInput(StrictFields, serializers.Serializer):
     version = serializers.IntegerField(min_value=0)
     menu = serializers.UUIDField(allow_null=True)
@@ -278,6 +287,29 @@ class MenuAPIBase(GenericViewSet):
 class MenuViewSet(MenuAPIBase):
     serializer_class = MenuOutput
     queryset = Menu.objects.none()
+
+    def _preview_response(self,menu=None):
+        from ..services.menu_preview import preview_navigation
+        with menu_errors(),hierarchy_write():
+            site=self._site()
+            self._query(EmptyInput)
+            data=preview_navigation(site,actor=self.request.user,menu=menu)
+            response=Response(data)
+            response['Vary']='Authorization, Cookie'
+            response['X-Robots-Tag']='noindex, nofollow'
+            response['Pragma']='no-cache'
+            return response
+
+    @extend_schema(responses=NavigationPreviewOutput,description="menu.write and MENUS required. Private, no-store preview of saved draft assignments and local working item trees. Public navigation is not changed; foreign/global fragments retain their published projection.")
+    @action(detail=False,methods=["get"],url_path="preview-navigation",pagination_class=None)
+    def preview_navigation(self,request,*args,**kwargs):
+        return self._preview_response()
+
+    @extend_schema(responses=NavigationPreviewOutput,description="Authorized same-Site working menu preview, including inactive menus. Unavailable targets are unlinked warnings. No shared cache or publication side effects.")
+    @action(detail=True,methods=["get"],url_path="preview",pagination_class=None)
+    def preview(self,request,*args,**kwargs):
+        with menu_errors(),hierarchy_write():
+            return self._preview_response(self._menu())
 
     @extend_schema(responses=LocationOutput(many=True),description="Supported active-template slots and current draft/public assignments; version 0 denotes legacy fallback without an explicit mapping.")
     @action(detail=False,methods=["get"],pagination_class=None)

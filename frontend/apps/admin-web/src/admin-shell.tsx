@@ -59,7 +59,7 @@ export function AdminShell({
   const [navOpen, setNavOpen] = useState(false);
   useSessionWatch();
   const currentPath=normalizeAdminPathname(usePathname());
-  if(/^\/sites\/[1-9][0-9]*\/admin\/pages\/[^/]+\/(builder|preview)\/?$/.test(currentPath)){
+  if(/^\/sites\/[1-9][0-9]*\/admin\/pages\/[^/]+\/(builder|preview)\/?$/.test(currentPath) || /^\/sites\/[1-9][0-9]*\/admin\/menus\/preview\/?$/.test(currentPath)){
     return <Box component="main" id="main-content" sx={{minHeight:"100dvh",bgcolor:"background.paper"}}>{children}</Box>;
   }
 

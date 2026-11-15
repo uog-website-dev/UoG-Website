@@ -171,6 +171,34 @@ then run `ipconfig /flushdns` in Windows Terminal. Nginx already accepts
 `*.uog.local` and forwards the original `Host` to the public app and API; all
 requests still resolve through the database Domain/Site registry.
 
+### Sites whose primary is a production hostname (for example `coi.uog.edu.et`)
+
+Local nginx **does not admit** `*.uog.edu.et`. Opening `http://coi.uog.edu.et/`
+from your laptop will not reach the Docker stack. Use a development alias
+instead:
+
+1. In **Sites → Domains**, add an ACTIVE hostname such as `coi.uog.local`
+   for that Site. Leave **redirect to primary** off so the browser stays on
+   the `.uog.local` name (a redirect would send you to the production host).
+2. Map it in the hosts file:
+   ```text
+   127.0.0.1 coi.uog.local
+   ```
+3. Flush DNS (`ipconfig /flushdns`), then open `http://coi.uog.local/`
+   through nginx (port 80), or use **View Public Website** once the local
+   domain is ACTIVE — the Admin Console prefers `*.uog.local` when you are
+   browsing on localhost.
+
+Quick API check without editing the hosts file:
+
+```bash
+curl -si -H "Host: coi.uog.local" http://localhost/api/v1/site-context/
+```
+
+Draft content can also be checked in the authenticated admin **Page/Post
+preview** tabs; those are private and do not replace Host-based public
+delivery.
+
 ## 4. Site-scoped access and authorisation
 
 - Domains are nested under `/api/v1/sites/{site_pk}/domains/…`; a row of

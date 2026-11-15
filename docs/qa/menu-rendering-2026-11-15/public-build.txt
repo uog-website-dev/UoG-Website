@@ -1,0 +1,35 @@
+
+> @uog/public-web@0.1.0 build /tmp/sprint3-build-CnBgMC/apps/public-web
+> next build
+
+   ▲ Next.js 15.5.28
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 52s
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/6) ...
+   Generating static pages (1/6) 
+   Generating static pages (2/6) 
+   Generating static pages (4/6) 
+ ✓ Generating static pages (6/6)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                 Size  First Load JS
+┌ ○ /                                     5.2 kB         254 kB
+├ ○ /_not-found                            125 B         102 kB
+├ ƒ /[...path]                             829 B         250 kB
+├ ƒ /api/auth/[...nextauth]                125 B         102 kB
+├ ○ /posts                                 175 B         253 kB
+├ ƒ /posts/[slug]                          166 B         253 kB
+└ ƒ /posts/categories/[slug]               167 B         253 kB
++ First Load JS shared by all             102 kB
+  ├ chunks/870-31f5d4027dd5cd83.js       45.7 kB
+  ├ chunks/fd9bffea-50c8c9172af8315e.js  54.2 kB
+  └ other shared chunks (total)          1.92 kB
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

@@ -18294,6 +18294,128 @@ paths:
               schema:
                 type: string
                 format: uuid
+  /api/v1/sites/{site_pk}/menus/{id}/preview/:
+    get:
+      operationId: v1_sites_menus_preview_retrieve
+      description: Authorized same-Site working menu preview, including inactive menus.
+        Unavailable targets are unlinked warnings. No shared cache or publication
+        side effects.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
+        required: true
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        description: Owning Site; checked against application scope.
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Menus
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NavigationPreviewOutput'
+          description: ''
+          headers:
+            ETag:
+              description: Menu-wide version token. Every semantic item change invalidates
+                it; stale If-Match returns 409.
+              schema:
+                type: string
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
   /api/v1/sites/{site_pk}/menus/{id}/reorder/:
     post:
       operationId: v1_sites_menus_reorder_create
@@ -19156,6 +19278,122 @@ paths:
         '503':
           description: Required storage or audit infrastructure is unavailable. Failed
             mutations are rolled back; no provider or SQL details are exposed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/sites/{site_pk}/menus/preview-navigation/:
+    get:
+      operationId: v1_sites_menus_preview_navigation_retrieve
+      description: menu.write and MENUS required. Private, no-store preview of saved
+        draft assignments and local working item trees. Public navigation is not changed;
+        foreign/global fragments retain their published projection.
+      parameters:
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        description: Owning Site; checked against application scope.
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Menus
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NavigationPreviewOutput'
+          description: ''
+          headers:
+            ETag:
+              description: Menu-wide version token. Every semantic item change invalidates
+                it; stale If-Match returns 409.
+              schema:
+                type: string
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
           content:
             application/json:
               schema:
@@ -36108,6 +36346,35 @@ components:
       required:
       - parent
       - position
+    NavigationPreviewOutput:
+      type: object
+      properties:
+        theme:
+          $ref: '#/components/schemas/ThemeEnum'
+        site:
+          type: integer
+        name:
+          type: string
+        public_origin:
+          type: string
+          format: uri
+          nullable: true
+        preview:
+          type: boolean
+        locations:
+          type: object
+          additionalProperties:
+            type: array
+            items: {}
+        menu_version:
+          type: integer
+      required:
+      - locations
+      - name
+      - preview
+      - public_origin
+      - site
+      - theme
     Operation:
       type: object
       properties:
@@ -40522,6 +40789,14 @@ components:
       - expected_changes
       - matched_sites
       - unchanged_pairs
+    ThemeEnum:
+      enum:
+      - institutional
+      - high-contrast
+      type: string
+      description: |-
+        * `institutional` - institutional
+        * `high-contrast` - high-contrast
     ThumbnailStatusEnum:
       type: string
       enum:

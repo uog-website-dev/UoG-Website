@@ -1,4 +1,5 @@
 "use client";
+import {APP_BASE_PATH} from "@/base-path";
 import {useState} from "react";
 import {useAsync} from "@uog/ui";
 import {ApiError} from "@uog/api-client";
@@ -43,6 +44,7 @@ export function MenuLocationPanel({site,menus,enabled,canWrite,canPublish}:{site
  return <Box component="section" aria-label="Template menu locations" sx={{display:"grid",gap:2}}>
   <Typography component="h2" variant="h6">Template menu locations</Typography>
   <Typography variant="body2">Save an assignment draft, then publish it to change public navigation. Unassigning a location keeps the menu and its items.</Typography>
+  {canWrite?<Button component="a" href={enabled?`${APP_BASE_PATH}/sites/${site}/admin/menus/preview`:undefined} target="_blank" rel="noopener noreferrer" disabled={!enabled}>Preview draft navigation</Button>:null}
   <Button onClick={state.reload}>Refresh locations</Button>
   {state.loading?<Typography role="status">Loading menu locations...</Typography>:null}
   {state.error?<Alert severity="error">{state.error.message}</Alert>:null}

@@ -471,7 +471,10 @@ export function SiteDomainsPanel({ site, onChanged }: SiteDomainsPanelProps) {
             Hostnames registered for this site, with their lifecycle. A domain
             row is routing data only — it does not claim that DNS records or
             TLS certificates exist, and this platform does not provision
-            them.
+            them. For local Docker browsing, add an ACTIVE *.uog.local hostname
+            (without redirect to primary) and map it to 127.0.0.1 in your hosts
+            file — production names such as *.uog.edu.et are not admitted by
+            the development nginx.
           </Typography>
         </Box>
         <Divider />

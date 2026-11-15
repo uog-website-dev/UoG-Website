@@ -8,6 +8,7 @@
  * Inherited menus stay on the parent Site; this screen only explains the
  * delivery policy returned for the selected Site.
  */
+import {APP_BASE_PATH} from "@/base-path";
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import Alert from "@mui/material/Alert";
@@ -203,6 +204,7 @@ function LocalMenuEditor({
           Item edits remain private until a publisher selects Publish changes. Renaming or reassigning an active menu requires publish permission.
         </Typography>
       ) : null}
+      {canWrite?<Button component="a" href={moduleOn?`${APP_BASE_PATH}/sites/${siteId}/admin/menus/preview?menu=${encodeURIComponent(menu.id)}`:undefined} target="_blank" rel="noopener noreferrer" disabled={!moduleOn}>Preview draft {menu.name}</Button>:null}
       <MenuItemTree
         siteId={siteId}
         state={state}
