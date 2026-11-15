@@ -1,5 +1,7 @@
 "use server";
 
+import {serverApiFetch} from "@/performance/server-fetch";
+
 /**
  * Central module management reads and the confirmed bulk operation.
  *
@@ -49,7 +51,7 @@ function apiBaseUrl(): string {
 
 async function client(timeoutMs?: number) {
   const accessToken = await getAccessToken();
-  return createApiClient({
+  return createApiClient({fetchFn:serverApiFetch,
     baseUrl: apiBaseUrl(),
     accessToken: accessToken ?? undefined,
     ...(timeoutMs ? { timeoutMs } : {}),

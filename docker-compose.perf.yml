@@ -1,0 +1,43 @@
+# Opt-in, isolated measurement services. Uses the existing development data services.
+# docker compose -f docker-compose.yml -f docker-compose.perf.yml --profile performance up -d perf-backend perf-admin perf-gateway
+services:
+  perf-backend:
+    extends:
+      file: docker-compose.yml
+      service: backend
+    container_name: uog-perf-backend
+    profiles: [performance]
+    ports: !override []
+    command: [gunicorn, config.wsgi:application, --bind, '0.0.0.0:8000', --workers, '2', --threads, '1', --timeout, '120', --access-logfile, /dev/null]
+    environment:
+      DEBUG: 'False'
+      DEV_PLATFORM_ADMIN_BOOTSTRAP: 'False'
+      RUN_MIGRATIONS: 'false'
+      PERF_INSTRUMENTATION_ENABLED: 'True'
+      ALLOWED_HOSTS: localhost,127.0.0.1,backend,perf-backend,perf-gateway,.uog.local
+  perf-admin:
+    extends:
+      file: docker-compose.yml
+      service: frontend-admin
+    container_name: uog-perf-admin
+    profiles: [performance]
+    ports: !override []
+    command: [node, /workspace/scripts/perf/serve.mjs]
+    environment:
+      API_MODE: live
+      API_BASE_URL: http://perf-backend:8000/api
+      PERF_INSTRUMENTATION_ENABLED: '1'
+      PERF_NEXT_MODE: ${PERF_NEXT_MODE:-production}
+      AUTH_URL: http://localhost:8088
+      SITE_ORIGIN: http://localhost:8088
+    healthcheck:
+      start_period: 600s
+  perf-gateway:
+    image: nginx:1.31.7-alpine
+    container_name: uog-perf-gateway
+    profiles: [performance]
+    ports: ['127.0.0.1:8088:80']
+    volumes:
+      - ./infrastructure/nginx/performance.conf:/etc/nginx/conf.d/default.conf:ro
+    networks: [uog_network]
+    depends_on: [perf-backend, perf-admin]

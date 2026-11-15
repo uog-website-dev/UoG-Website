@@ -1,0 +1,9 @@
+{
+  "initial_result": {
+    "tests": 567,
+    "failures": 2,
+    "errors": 0,
+    "skipped": 0
+  },
+  "cause": "Auth unit test expects the canonical localhost origin; measurement container correctly uses localhost:8088. Re-running the unchanged suite with its canonical test environment; no application auth behavior changed."
+}

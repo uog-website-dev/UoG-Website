@@ -448,7 +448,7 @@ function SitePagesPanelContent({
   }
 
   return (
-    <Paper
+    <Paper data-perf-section="pages" data-perf-pending={pages.loading || statusCounts.loading || !pages.data || !statusCounts.data?"true":"false"}
       variant="outlined"
       sx={{ borderRadius: 3, p: { xs: 2, sm: 3 }, display: "flex", flexDirection: "column", gap: 2 }}
     >

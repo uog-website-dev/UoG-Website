@@ -1,5 +1,7 @@
 "use server";
 
+import {serverApiFetch} from "@/performance/server-fetch";
+
 import type { SidebarSnapshot } from "@uog/ui";
 import { createApiClient } from "@uog/api-client";
 import { getAccessToken } from "@/access-token";
@@ -17,7 +19,7 @@ export interface SidebarRecord {
 export interface SidebarMenuOption { id: string; name: string; location: string }
 
 async function client() {
-  return createApiClient({ baseUrl: process.env.API_BASE_URL ?? "http://backend:8000/api", accessToken: (await getAccessToken()) ?? undefined });
+  return createApiClient({fetchFn:serverApiFetch, baseUrl: process.env.API_BASE_URL ?? "http://backend:8000/api", accessToken: (await getAccessToken()) ?? undefined });
 }
 async function attempt<T>(operation: () => Promise<T>): Promise<ActionResult<T>> {
   try { return { ok: true, data: await operation() }; }

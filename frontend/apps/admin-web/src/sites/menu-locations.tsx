@@ -41,7 +41,7 @@ function Slot({site,row,menus,enabled,canWrite,canPublish,onChanged}:{site:numbe
 export function MenuLocationPanel({site,menus,enabled,canWrite,canPublish}:{site:number;menus:MenuRecord[];enabled:boolean;canWrite:boolean;canPublish:boolean}){
  const state=useAsync(async()=>({site,rows:unwrap(await loadMenuLocations(site))}),[site]);
  const current=state.data?.site===site?state.data.rows:[];
- return <Box component="section" aria-label="Template menu locations" sx={{display:"grid",gap:2}}>
+ return <Box data-perf-pending={state.loading?"true":"false"} component="section" aria-label="Template menu locations" sx={{display:"grid",gap:2}}>
   <Typography component="h2" variant="h6">Template menu locations</Typography>
   <Typography variant="body2">Save an assignment draft, then publish it to change public navigation. Unassigning a location keeps the menu and its items.</Typography>
   {canWrite?<Button component="a" href={enabled?`${APP_BASE_PATH}/sites/${site}/admin/menus/preview`:undefined} target="_blank" rel="noopener noreferrer" disabled={!enabled}>Preview draft navigation</Button>:null}

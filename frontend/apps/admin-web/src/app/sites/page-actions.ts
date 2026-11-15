@@ -1,5 +1,7 @@
 "use server";
 
+import {serverApiFetch} from "@/performance/server-fetch";
+
 /**
  * Site-scoped Page authoring.
  *
@@ -121,7 +123,7 @@ function apiBaseUrl(): string {
 
 async function client() {
   const accessToken = await getAccessToken();
-  return createApiClient({
+  return createApiClient({fetchFn:serverApiFetch,
     baseUrl: apiBaseUrl(),
     accessToken: accessToken ?? undefined,
   });

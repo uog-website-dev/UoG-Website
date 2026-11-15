@@ -1,0 +1,21 @@
+{
+  "reference": "P0-PERF-001",
+  "status": "PROPOSED",
+  "approved_by": null,
+  "approved_at": null,
+  "methodology_status": "AWAITING_PRODUCT_QA_ACCEPTANCE",
+  "conditions": {
+    "profile": "Desktop Chromium/Edge 1440x1000; loopback unthrottled; CPU slowdown 1; dedicated Next production process; Gunicorn 2 sync workers; 10 benchmark Sites; profiling enabled; one sequential browser user",
+    "cold": "Fresh browser/router context and target Site not visited; retain server/DB caches",
+    "warm": "Visited target in the same browser context; normal Next prefetch; data is not assumed cached"
+  },
+  "p95_budgets_ms": {
+    "warm_site_switch": 1000,
+    "cold_site_switch": 2000,
+    "cached_section_return": 300,
+    "cached_section_transition": 500,
+    "workspace_api": 500,
+    "paginated_list_api": 400,
+    "dashboard_usable": 1500
+  }
+}

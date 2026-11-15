@@ -1,0 +1,23 @@
+
+ RUN  v5.0.5 /workspace/apps/admin-web
+
+ ✓ src/performance/navigation-timing.test.tsx (3 tests) 108ms
+ ✓ src/sidebar.test.tsx (11 tests) 1026ms
+   ✓ DesktopSidebar — platform workspace (8)
+     ✓ renders platform sections as base-path-relative links for a platform administrator 354ms
+ ✓ src/app/api/workspace/route.test.ts (9 tests) 15ms
+ ✓ src/sites/site-dashboard.test.tsx (6 tests) 778ms
+   ✓ SiteDashboard (6)
+     ✓ summarizes this Site's Pages, Posts and Menus from the API 369ms
+ ✓ src/performance/server-fetch.test.ts (3 tests) 16ms
+
+ Test Files  5 passed (5)
+      Tests  32 passed (32)
+   Start at  09:26:38
+   Duration  4.72s (environment 31%, tests 23%, import 23%, transform 15%, setup 8%)
+
+Environment  jsdom was created 5 times · 2.67s total, 31% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+JUNIT report written to /tmp/perf-admin.xml

@@ -1,0 +1,13 @@
+{"phase":"auth_redirect","origin":"http://localhost:8088","path":"/admin"}
+{"landing_path":"/admin","error_code":null,"session_cookie_present":true}
+{"scenario":"first_site_visit","cache_state":"cold","sample":1,"duration_ms":11795,"requests":16}
+{"scenario":"cold_site_switch","cache_state":"cold","sample":1,"duration_ms":2324,"requests":11}
+{"scenario":"warm_site_switch","cache_state":"warm","sample":1,"duration_ms":3053,"requests":11}
+{"scenario":"same_site_menu_navigation","cache_state":"cold","sample":1,"duration_ms":9744,"requests":5}
+{"scenario":"cached_section_return","cache_state":"warm","sample":1,"duration_ms":2350,"requests":10}
+{"scenario":"cached_section_transition","cache_state":"warm","sample":1,"duration_ms":1843,"requests":4}
+{"scenario":"cold_site_switch","cache_state":"cold","sample":2,"duration_ms":2477,"requests":11}
+{"scenario":"warm_site_switch","cache_state":"warm","sample":2,"duration_ms":2563,"requests":11}
+{"scenario":"same_site_menu_navigation","cache_state":"cold","sample":2,"duration_ms":5904,"requests":6}
+{"scenario":"cached_section_return","cache_state":"warm","sample":2,"duration_ms":4146,"requests":10}
+{"scenario":"cached_section_transition","cache_state":"warm","sample":2,"duration_ms":1721,"requests":5}

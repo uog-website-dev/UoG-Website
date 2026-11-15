@@ -101,7 +101,7 @@ export function SiteAdminFrame({
 
   return (
     <SiteAdminContext.Provider value={value}>
-    <Box key={site.id} sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+    <Box key={site.id} data-perf-site-id={site.id} sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
       <Box sx={{ position: "sticky", top: 0, zIndex: 10, bgcolor: "grey.50", pb: 1 }}>
         <Breadcrumb
           items={[

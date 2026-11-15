@@ -1,3 +1,5 @@
+
+import {serverApiFetch} from "@/performance/server-fetch";
 import { getAccessToken } from "@/access-token";
 
 const endpoint = process.env.API_BASE_URL ?? "http://backend:8000/api";
@@ -8,7 +10,7 @@ export async function getEffectivePermissions(siteId?: number): Promise<string[]
   const query = siteId == null ? "" : `?site=${siteId}`;
 
   try {
-    const response = await fetch(`${endpoint}/v1/authorization/me/permissions/${query}`, {
+    const response = await serverApiFetch(`${endpoint}/v1/authorization/me/permissions/${query}`, {
       headers: { Authorization: `Bearer ${token}` },
       cache: "no-store",
     });

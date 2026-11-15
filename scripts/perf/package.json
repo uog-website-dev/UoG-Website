@@ -1,0 +1,14 @@
+{
+    "name":  "uog-performance-harness",
+    "version":  "0.1.0",
+    "private":  true,
+    "scripts":  {
+                    "test":  "node --test metrics.test.cjs"
+                },
+    "dependencies":  {
+                         "playwright-core":  "1.65.0"
+                     },
+    "engines":  {
+                    "node":  "\u003e=22"
+                }
+}

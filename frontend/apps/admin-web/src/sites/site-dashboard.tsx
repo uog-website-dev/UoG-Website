@@ -147,6 +147,8 @@ function SummaryCard({
   return (
     <Paper
       component="section"
+      data-perf-pending={state.loading || !state.data ? "true" : "false"}
+      data-perf-error={state.error ? "true" : "false"}
       aria-labelledby={headingId}
       variant="outlined"
       sx={{ p: 2.5, borderRadius: 3, display: "flex", flexDirection: "column", gap: 1.5 }}
@@ -200,7 +202,7 @@ export function SiteDashboard() {
   const canOpenBuilder = sectionDecision(sectionByKey("builder"), admin) === "visible";
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+    <Box data-perf-section="dashboard" sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
       {canCreatePage || canManageMenus || canManageHomepage || canOpenBuilder ? (
         <Box component="section" aria-labelledby="site-quick-actions" sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
           <Typography id="site-quick-actions" variant="h6" component="h2" sx={{ fontWeight: 700 }}>

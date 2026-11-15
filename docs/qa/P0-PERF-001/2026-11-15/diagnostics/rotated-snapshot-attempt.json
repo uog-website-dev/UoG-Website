@@ -1,0 +1,118 @@
+{
+  "metadata": {
+    "run": "632c3b67-6e4c-4985-8a33-6fb6965cc4c9",
+    "mode": "development",
+    "release_baseline": false,
+    "budgets_status": "PROPOSED",
+    "method": "nearest-rank percentiles",
+    "samples_per_scenario": 10,
+    "sites": [
+      {
+        "id": 81,
+        "name": "Performance Site 01",
+        "code": "PERF001-01"
+      },
+      {
+        "id": 82,
+        "name": "Performance Site 02",
+        "code": "PERF001-02"
+      },
+      {
+        "id": 83,
+        "name": "Performance Site 03",
+        "code": "PERF001-03"
+      },
+      {
+        "id": 84,
+        "name": "Performance Site 04",
+        "code": "PERF001-04"
+      },
+      {
+        "id": 85,
+        "name": "Performance Site 05",
+        "code": "PERF001-05"
+      },
+      {
+        "id": 86,
+        "name": "Performance Site 06",
+        "code": "PERF001-06"
+      },
+      {
+        "id": 87,
+        "name": "Performance Site 07",
+        "code": "PERF001-07"
+      },
+      {
+        "id": 88,
+        "name": "Performance Site 08",
+        "code": "PERF001-08"
+      },
+      {
+        "id": 89,
+        "name": "Performance Site 09",
+        "code": "PERF001-09"
+      },
+      {
+        "id": 90,
+        "name": "Performance Site 10",
+        "code": "PERF001-10"
+      }
+    ],
+    "counts_per_site": {
+      "sites": 10,
+      "pages": 40,
+      "posts": 100,
+      "media": 80
+    },
+    "api_cache_definition": "First versus immediate repeat per Site/resource; server caches retained",
+    "automatic_prefetch": "Normal Next prefetch is retained; pre-initiation traffic is outside a measured navigation window",
+    "network": {
+      "profile": "loopback, unthrottled",
+      "cpu_slowdown": 1,
+      "viewport": [
+        1440,
+        1000
+      ]
+    },
+    "browser": "157.0.4341.46",
+    "started_at": "2026-11-15T09:55:19.913Z",
+    "cold_definition": "fresh browser context and HTTP cache; target Site absent from Next router cache; application/database caches retained",
+    "warm_definition": "same browser context; previously visited target; no forced invalidation",
+    "session_policy": "Propagate the latest rotated session cookies after setup and each browser iteration; never resurrect the original expired snapshot",
+    "authentication_role": "Site Administrator on the 10 benchmark Sites; no platform role",
+    "sampling_warning": "SMOKE: p95 is a small-sample diagnostic; use >=30 per scenario for acceptance.",
+    "source": {
+      "commit": "5c101cfcc408236395650a30e4e284ca190ca442",
+      "files": {
+        "frontend/pnpm-lock.yaml": "996a68142e8d850c298d0557b4d6fe9c01468064c4bdb8bf11b158637464860c",
+        "frontend/apps/admin-web/next.config.ts": "292a42554fe4d43f4c4af0b8d8faf97b9021488f77a46b31a0f8763c8df2abd7",
+        "frontend/apps/admin-web/src/performance/navigation-timing.tsx": "23027c5700d5b1a7e46ca3e6b4043b43943ee92134625bfdb94fab106b70b917",
+        "frontend/apps/admin-web/src/performance/server-fetch.ts": "6df44067d627d99965b38d20d14fc709c83994221a10e0af77f7d0b27870c6fc",
+        "backend/apps/core/middleware.py": "aef9dbf6543c43586be96366acf6f65694e6403bbbbb0a360398a73283c3e115",
+        "backend/config/settings.py": "0845176fe73e0e620de506e9152d58050aa61825126f447036a26cd56e3ee6ba",
+        "docker-compose.perf.yml": "3e385919e8be0123f0d054289d1b9aecc5b1e72d1787d79f3f8eb30dd9138924",
+        "infrastructure/nginx/performance.conf": "ec724e71f51b3c294b99f446a894a894ebe14215becb34d8559c9b3f7b9b3187",
+        "scripts/perf/benchmark.cjs": "c63f39c50c92ad11a3514537479bbdeb4f221ca723d0651de9eebfdb3cc0a764",
+        "scripts/perf/metrics.cjs": "5ca99245b754fa52a8e10f8bd89bbd9bfc4fbc59fc173a2e6de73ebb8697bd2f",
+        "scripts/perf/package-lock.json": "33fd08047cf72c63ff406030f7b2240bec02f7c3f3027a13f25a889e2f5695cb"
+      }
+    },
+    "run_status": "failed",
+    "authentication": {
+      "landing_path": "/admin",
+      "error_code": null,
+      "session_cookie_present": true
+    },
+    "completed_at": "2026-11-15T10:00:47.278Z"
+  },
+  "failures": [
+    {
+      "page_origin": "http://localhost:8088",
+      "page_pathname": "/admin/sites/86/admin",
+      "type": "TimeoutError",
+      "message": "page.waitForFunction: Timeout 120000ms exceeded."
+    }
+  ],
+  "completed_samples": 101,
+  "disposition": "Excluded failed long-lived snapshot run. Proposed baseline now establishes a new real Keycloak browser session per iteration; login is outside timed navigation and auth-expiry soak remains a separate check."
+}

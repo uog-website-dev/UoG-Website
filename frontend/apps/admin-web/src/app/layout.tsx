@@ -9,6 +9,7 @@ import { UogFooter, UogHeader, UogThemeProvider, ToastProvider } from "@uog/ui";
 import { redirect } from "next/navigation";
 
 import { getAccessToken } from "@/access-token";
+import { NavigationTiming } from "@/performance/navigation-timing";
 import { AdminShell } from "@/admin-shell";
 import { auth, siteOrigin } from "@/auth";
 import { signInWithKeycloak, signOutFromSite } from "@/app/actions";
@@ -101,6 +102,7 @@ export default async function AdminLayout({
           {/* ToastProvider backs useToast() for success/failure notices on
               mutation screens (create/edit/lifecycle). */}
           <ToastProvider>
+            {process.env.PERF_INSTRUMENTATION_ENABLED==="1"?<NavigationTiming/>:null}
             <AdminShell actions={actions}>{children}</AdminShell>
           </ToastProvider>
         </UogThemeProvider>

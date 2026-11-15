@@ -1,4 +1,6 @@
 "use server";
+
+import {serverApiFetch} from "@/performance/server-fetch";
 import { createApiClient, createLiveMediaAdapter } from "@uog/api-client";
 import type { MediaAsset, MediaDeletion, MediaReferenceInventory, MediaListQuery, MediaMetadataPatch, PaginatedResponse } from "@uog/types";
 import { getAccessToken } from "@/access-token";
@@ -8,7 +10,7 @@ import type { ActionResult } from "@/organizations/contract";
 export type MediaAssetRecord = MediaAsset;
 export interface UploadPolicy { image_max_bytes: number; text_max_bytes: number; pdf_max_bytes: number; mime_types: string[] }
 async function client() {
-  return createApiClient({ baseUrl: process.env.API_BASE_URL ?? "http://backend:8000/api", accessToken: (await getAccessToken()) ?? undefined });
+  return createApiClient({fetchFn:serverApiFetch, baseUrl: process.env.API_BASE_URL ?? "http://backend:8000/api", accessToken: (await getAccessToken()) ?? undefined });
 }
 async function adapter() {
   return createLiveMediaAdapter({ baseUrl: process.env.API_BASE_URL ?? "http://backend:8000/api", accessToken: (await getAccessToken()) ?? undefined });

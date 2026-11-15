@@ -260,7 +260,7 @@ export function SiteMenusPanel({
   }, [siteId, selected, navigation.data]);
 
   return (
-    <Paper variant="outlined" sx={{ overflow: "hidden", borderRadius: 3 }}>
+    <Paper data-perf-section="menus" data-perf-pending={navigation.loading || targetState.loading || selectedTree.loading?"true":"false"} variant="outlined" sx={{ overflow: "hidden", borderRadius: 3 }}>
       <Box sx={{ px: { xs: 2, sm: 3 }, py: 2, display: "flex", flexDirection: "column", gap: 2 }}>
         <Box>
           <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>Navigation</Typography>

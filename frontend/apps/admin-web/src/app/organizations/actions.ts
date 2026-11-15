@@ -1,4 +1,5 @@
 "use server";
+import {serverApiFetch} from "@/performance/server-fetch";
 
 /**
  * Organization mutations and reads, executed on the server.
@@ -64,6 +65,7 @@ async function buildAdapter() {
 
   const accessToken = await getAccessToken();
   return createOrganizationsAdapter({
+    fetchFn:serverApiFetch,
     baseUrl: apiBaseUrl(),
     accessToken: accessToken ?? undefined,
     mode,

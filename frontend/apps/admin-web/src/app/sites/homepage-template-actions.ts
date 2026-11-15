@@ -1,4 +1,6 @@
 "use server";
+
+import {serverApiFetch} from "@/performance/server-fetch";
 import {createApiClient} from "@uog/api-client";
 import {validateVisualLayout} from "@uog/types";
 import type {VisualLayout} from "@uog/types";
@@ -9,7 +11,7 @@ export interface HomepageTemplate {
  manifest_version:number;id:string;version:number;name:string;description:string;
  required_modules:string[];layout:VisualLayout|null;available:boolean;unavailable_reasons:string[];
 }
-async function client(){return createApiClient({baseUrl:process.env.API_BASE_URL??"http://backend:8000/api",accessToken:(await getAccessToken())??undefined});}
+async function client(){return createApiClient({fetchFn:serverApiFetch,baseUrl:process.env.API_BASE_URL??"http://backend:8000/api",accessToken:(await getAccessToken())??undefined});}
 export async function loadHomepageTemplates(siteId:number):Promise<ActionResult<HomepageTemplate[]>>{
  try{const api=await client();const data=await api.get<HomepageTemplate[]>(`/v1/sites/${siteId}/homepage-templates/`);
  return {ok:true,data:data.map(entry=>({...entry,available:entry.available && entry.manifest_version===1 && !!entry.layout && validateVisualLayout(entry.layout).ok,unavailable_reasons:entry.manifest_version===1?entry.unavailable_reasons:["Unsupported template manifest version."]}))};

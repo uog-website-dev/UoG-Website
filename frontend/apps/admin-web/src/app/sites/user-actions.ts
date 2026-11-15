@@ -1,5 +1,7 @@
 "use server";
 
+import {serverApiFetch} from "@/performance/server-fetch";
+
 import { getAccessToken } from "@/access-token";
 
 const api = process.env.API_BASE_URL ?? "http://backend:8000/api";
@@ -7,7 +9,7 @@ const api = process.env.API_BASE_URL ?? "http://backend:8000/api";
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const token = await getAccessToken();
   if (!token) throw new Error("Your session has expired. Sign in again.");
-  const response = await fetch(`${api}${path}`, {
+  const response = await serverApiFetch(`${api}${path}`, {
     ...init,
     cache: "no-store",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json", ...init?.headers },
@@ -75,7 +77,7 @@ export async function createSiteUser(siteId: number, form: FormData): Promise<{o
     values.profile_picture=Buffer.from(await picture.arrayBuffer()).toString("base64");
   }
   try {
-    const response=await fetch(`${api}/v1/authorization/assignments/site-create-user/`,{method:"POST",cache:"no-store",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},body:JSON.stringify(values)});
+    const response=await serverApiFetch(`${api}/v1/authorization/assignments/site-create-user/`,{method:"POST",cache:"no-store",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},body:JSON.stringify(values)});
     const body=await response.json().catch(()=>null);
     if (response.ok) return {ok:true,username:body.user_name};
     const detail=body?.error?.details ?? body;
