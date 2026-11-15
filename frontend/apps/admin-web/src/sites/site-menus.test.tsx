@@ -14,6 +14,8 @@ const updateSiteMenu = vi.fn();
 const loadMenuTargets = vi.fn();
 
 vi.mock("@/app/sites/menu-actions", () => ({
+  loadMenuLocations: vi.fn().mockResolvedValue({ok:true,data:[]}),
+  saveMenuLocation: vi.fn(), publishMenuLocation: vi.fn(),
   loadSiteMenu: (...args: unknown[]) => loadSiteMenu(...args),
   loadSiteNavigation: (...args: unknown[]) => loadSiteNavigation(...args),
   loadMenuTargets: (...args: unknown[]) => loadMenuTargets(...args),
@@ -117,21 +119,19 @@ describe("SiteMenusPanel", () => {
     });
   });
 
-  it("creates a local footer for this Site and edits its name and location", async () => {
+  it("creates an unassigned local menu and renames it without changing placement", async () => {
     renderPanel(11);
     fireEvent.change(await screen.findByLabelText(/New menu name/), { target: { value: "Footer" } });
-    fireEvent.change(screen.getByLabelText(/New menu location/), { target: { value: "footer" } });
     fireEvent.click(screen.getByRole("button", { name: "Create menu" }));
-    await waitFor(() => expect(createSiteMenu).toHaveBeenCalledWith(11, "footer", "Footer"));
+    await waitFor(() => expect(createSiteMenu).toHaveBeenCalledWith(11, "", "Footer"));
     expect(JSON.stringify(createSiteMenu.mock.calls)).not.toContain("22");
 
     await waitFor(() => expect(screen.getByRole("button", { name: "Edit Header" })).toHaveProperty("disabled", false));
     fireEvent.click(screen.getByRole("button", { name: "Edit Header" }));
     fireEvent.change(screen.getByLabelText(/Local menu name/), { target: { value: "Campus header" } });
-    fireEvent.change(screen.getByLabelText(/Assigned location/), { target: { value: "footer" } });
     fireEvent.click(screen.getByRole("button", { name: "Save menu" }));
     await waitFor(() => expect(updateSiteMenu).toHaveBeenCalledWith(
-      11, "menu-1", '"menu-1-v3"', { name: "Campus header", location: "footer" },
+      11, "menu-1", '"menu-1-v3"', { name: "Campus header", location: "header" },
     ));
     expect(JSON.stringify(updateSiteMenu.mock.calls)).not.toContain("22");
   });

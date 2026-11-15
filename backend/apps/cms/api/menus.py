@@ -74,6 +74,23 @@ def menu_errors():
         raise
 
 
+class LocationInput(StrictFields, serializers.Serializer):
+    version = serializers.IntegerField(min_value=0)
+    menu = serializers.UUIDField(allow_null=True)
+    replace = serializers.BooleanField(default=False)
+
+class LocationPublishInput(StrictFields, serializers.Serializer):
+    version = serializers.IntegerField(min_value=0)
+
+class LocationOutput(serializers.Serializer):
+    location = serializers.CharField()
+    label = serializers.CharField()
+    version = serializers.IntegerField()
+    draft_menu = serializers.UUIDField(allow_null=True)
+    published_menu = serializers.UUIDField(allow_null=True)
+    is_published = serializers.BooleanField()
+    has_changes = serializers.BooleanField()
+
 class MenuOutput(serializers.ModelSerializer):
     has_unpublished_changes = serializers.SerializerMethodField()
 
@@ -198,7 +215,7 @@ class MenuAPIBase(GenericViewSet):
 
     def _site(self):
         site = get_object_or_404(Site, pk=self.kwargs["site_pk"])
-        permission = "menu.publish" if self.action in {"activate", "deactivate"} else (
+        permission = "menu.publish" if self.action in {"activate", "deactivate", "location_publish"} else (
             "menu.read" if self.request.method in {"GET", "HEAD", "OPTIONS"} else "menu.write"
         )
         domain.authorize_menu(self.request.user, site.pk, edit=permission == "menu.write", permission=permission)
@@ -261,6 +278,29 @@ class MenuAPIBase(GenericViewSet):
 class MenuViewSet(MenuAPIBase):
     serializer_class = MenuOutput
     queryset = Menu.objects.none()
+
+    @extend_schema(responses=LocationOutput(many=True),description="Supported active-template slots and current draft/public assignments; version 0 denotes legacy fallback without an explicit mapping.")
+    @action(detail=False,methods=["get"],pagination_class=None)
+    def locations(self,request,*args,**kwargs):
+        from ..services.menu_locations import location_state
+        with menu_errors(),hierarchy_write():
+            return Response(location_state(self._site()))
+
+    @extend_schema(parameters=[OpenApiParameter("location",str,OpenApiParameter.PATH,enum=["header","secondary","footer","sidebar"])],request=LocationInput,responses=LocationOutput,description="menu.write. Save a Site-local assignment draft. version is required; occupied-slot changes require replace=true. menu=null saves an explicit unassignment draft.")
+    @action(detail=False,methods=["post"],url_path=r"locations/(?P<location>[a-z-]+)/draft")
+    def location_draft(self,request,*args,**kwargs):
+        from ..services.menu_locations import write_location
+        with menu_errors(),hierarchy_write():
+            site=self._site();body=self._input(LocationInput)
+            return Response(write_location(site.pk,kwargs['location'],actor=request.user,expected=body['version'],menu_id=body['menu'],replace=body['replace']))
+
+    @extend_schema(parameters=[OpenApiParameter("location",str,OpenApiParameter.PATH,enum=["header","secondary","footer","sidebar"])],request=LocationPublishInput,responses=LocationOutput,description="menu.publish. Atomically promote the slot draft; selected menus must already be published. Null promotion suppresses legacy fallback without deleting menus. Stale versions return 409.")
+    @action(detail=False,methods=["post"],url_path=r"locations/(?P<location>[a-z-]+)/publish")
+    def location_publish(self,request,*args,**kwargs):
+        from ..services.menu_locations import write_location
+        with menu_errors(),hierarchy_write():
+            site=self._site();body=self._input(LocationPublishInput)
+            return Response(write_location(site.pk,kwargs['location'],actor=request.user,expected=body['version'],publish=True))
 
     @extend_schema(responses=inline_serializer(name="MenuDestinationOptions", fields={
         "pages": serializers.ListField(child=serializers.DictField()),

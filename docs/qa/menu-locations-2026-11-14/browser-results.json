@@ -1,0 +1,28 @@
+{
+  "results": [
+    {
+      "name": "Saving an explicit header replacement leaves the public assignment unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "Publishing the location switches Primary Header to the selected published menu",
+      "status": "PASS"
+    },
+    {
+      "name": "Footer, Utility Header and Page Sidebar publish independently with no second-Site change",
+      "status": "PASS"
+    },
+    {
+      "name": "Location controls fit phone width",
+      "status": "PASS"
+    },
+    {
+      "name": "Public Page renders all four locations with responsive sidebar and keyboard links",
+      "status": "PASS"
+    },
+    {
+      "name": "Publishing unassignment hides the header without changing other slots or deleting its menu",
+      "status": "PASS"
+    }
+  ]
+}

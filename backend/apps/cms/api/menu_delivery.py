@@ -32,6 +32,7 @@ class PublicMenuNodeSerializer(serializers.Serializer):
 
 
 class PublicMenusSerializer(serializers.Serializer):
+    configured_locations = serializers.ListField(child=serializers.CharField())
     site = serializers.IntegerField()
     locations = serializers.DictField(child=serializers.ListField(child=PublicMenuNodeSerializer()))
 
@@ -68,7 +69,10 @@ class PublicMenusView(APIView):
         query.is_valid(raise_exception=True)
         locations = (query.validated_data["location"],) if "location" in query.validated_data else MENU_LOCATIONS
         payload = {location: _cached_location(site.pk, location) for location in locations}
-        response = Response({"site": site.pk, "locations": payload})
+        from ..menu_assignment_models import MenuLocationAssignment
+        from apps.sites.menu_locations import locations_for_site
+        configured=list(MenuLocationAssignment.objects.filter(site=site,is_published=True,location__in=locations_for_site(site)).values_list('location',flat=True))
+        response = Response({"site": site.pk, "locations": payload, "configured_locations": configured})
         response["Cache-Control"] = "public, max-age=0, must-revalidate"
         response["Vary"] = "Host"
         return response

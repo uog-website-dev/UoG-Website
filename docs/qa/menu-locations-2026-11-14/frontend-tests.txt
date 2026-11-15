@@ -1,0 +1,5 @@
+
+> @uog/admin-web@0.1.0 test /workspace/apps/admin-web
+> vitest run src/sites/menu-locations.test.tsx src/sites/site-menus.test.tsx --reporter\=junit --outputFile\=/tmp/menu-locations-admin.xml
+
+JUNIT report written to /tmp/menu-locations-admin.xml

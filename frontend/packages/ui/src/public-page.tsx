@@ -19,7 +19,8 @@ import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 
 import { publicFetchInit } from "./public-site";
-import { safeMenuHref } from "./site-navigation";
+import type {PublicMenuNode} from "./site-navigation";
+import { menusFromResponse, SiteNavigation, safeMenuHref } from "./site-navigation";
 const PrivateMediaBase = createContext<string | null>(null);
 
 export interface PublicBlock {
@@ -333,11 +334,14 @@ function PublishedImage({ block, siteId }: { block: PublicBlock; siteId?: number
 function PageSidebar({ page, preview }: { page: PublicPageDocument; preview: boolean }) {
   const [links, setLinks] = useState<{ title: string; path: string }[]>([]);
   const [state, setState] = useState("loading");
+  const [slot,setSlot]=useState<{site:number|null;path:string;items:PublicMenuNode[]}|null>(null);
   useEffect(() => {
     let cancelled = false;
     const controller = new AbortController();
     setLinks([]);
     setState("loading");
+    setSlot(null);
+
     if (preview || page.sidebar_id) {
       setState("preview");
       return () => { cancelled = true; controller.abort(); };
@@ -362,6 +366,15 @@ function PageSidebar({ page, preview }: { page: PublicPageDocument; preview: boo
         setState("ready");
       }
     }).catch(() => { if (!cancelled) setState("error"); });
+    if (!preview && !page.sidebar_id) {
+      fetch('/api/v1/site-context/menus/?location=sidebar',{...publicFetchInit(),signal:controller.signal}).then(async response=>{
+        const body=response.ok?await response.json():null;
+        if (!cancelled && body?.site===page.site && (body?.locations?.sidebar?.length || body?.configured_locations?.includes('sidebar'))) {
+          setSlot({site:page.site,path:page.path,items:menusFromResponse(200,{locations:{header:body.locations.sidebar}}).header});
+        }
+      }).catch(()=>{});
+    }
+
     return () => { cancelled = true; controller.abort(); };
   }, [page.site, page.path, page.locale, page.sidebar_id, preview]);
   if (page.sidebar_id) {
@@ -374,6 +387,10 @@ function PageSidebar({ page, preview }: { page: PublicPageDocument; preview: boo
       </Box>) : <Typography variant="body2">Navigation is currently unavailable.</Typography>}
     </Box>;
   }
+  if (slot?.site===page.site && slot?.path===page.path) return <Box component="aside" aria-label="Page navigation" sx={{gridArea:"sidebar",minWidth:0,p:3,bgcolor:"action.hover",borderRadius:2,overflowWrap:"anywhere"}}>
+    <Typography component="h2" variant="h6">Page navigation</Typography>
+    {slot.items.length?<SiteNavigation items={slot.items} label="Page sidebar"/>:<Typography>No navigation is assigned to this location.</Typography>}
+  </Box>;
   return (
     <Box component="aside" aria-label="Page navigation" sx={{
       gridArea: "sidebar", minWidth: 0, p: 3, bgcolor: "action.hover",

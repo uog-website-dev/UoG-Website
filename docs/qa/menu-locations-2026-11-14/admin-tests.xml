@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="18" failures="0" errors="0" time="4.414047726">
+    <testsuite name="src/sites/menu-locations.test.tsx" timestamp="2026-11-14T18:39:05.867Z" hostname="6462f36c70dc" tests="5" failures="0" errors="0" skipped="0" time="0.974624574">
+        <testcase classname="src/sites/menu-locations.test.tsx" name="requires explicit replacement and keeps separate save and publish actions" time="0.392396475">
+        </testcase>
+        <testcase classname="src/sites/menu-locations.test.tsx" name="publishes the backend-confirmed version, and supports unassignment drafts" time="0.226027853">
+        </testcase>
+        <testcase classname="src/sites/menu-locations.test.tsx" name="hides unauthorized writes and clears the old Site while a new request is pending" time="0.042623301">
+        </testcase>
+        <testcase classname="src/sites/menu-locations.test.tsx" name="retains a selection after a conflict and offers a refresh action" time="0.162545811">
+        </testcase>
+        <testcase classname="src/sites/menu-locations.test.tsx" name="shows the backend destination validation without losing the saved draft choice" time="0.14878085">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-menus.test.tsx" timestamp="2026-11-14T18:39:05.871Z" hostname="6462f36c70dc" tests="13" failures="0" errors="0" skipped="0" time="3.439423152">
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; reorders the header with the keyboard-reachable move control and only for this Site" time="0.722040523">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; shows the reloaded menu order after a move" time="0.718508359">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; creates an unassigned local menu and renames it without changing placement" time="0.510324363">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; treats a missing inheritance field as no delivery policy" time="0.099563931">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; ignores malformed inheritance entries without crashing or inventing a policy" time="0.093357821">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; states that an empty inheritance list adds no parent menu" time="0.077411187">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; explains central and inherited ownership and does not edit a central menu" time="0.300194378">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; shows an empty list and hides writes without menu permission" time="0.031386489">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; shows the load error and keeps the selected Site on the request" time="0.019008052">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; blocks changes when the MENUS module is off" time="0.136792079">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="creates another named menu even after header and footer are occupied" time="0.265251019">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="selects and searches the directory without showing another Site&apos;s menu" time="0.202783464">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="loads only the selected item tree and ignores a late response for another menu" time="0.260745863">
+        </testcase>
+    </testsuite>
+</testsuites>

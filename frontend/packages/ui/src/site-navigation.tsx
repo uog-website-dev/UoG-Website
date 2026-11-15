@@ -49,13 +49,14 @@ export function safeMenuHref(value: string): string | null {
 export function menusFromResponse(
   status: number,
   body: unknown,
-): { header: PublicMenuNode[]; footer: PublicMenuNode[] } {
+): { header: PublicMenuNode[]; footer: PublicMenuNode[]; utility?: PublicMenuNode[] } {
   if (status === 404 || body == null || typeof body !== "object") {
     return { header: [], footer: [] };
   }
   const locations = (body as { locations?: unknown }).locations;
   const record = locations != null && typeof locations === "object" ? locations as Record<string, unknown> : {};
   return {
+    ...(Array.isArray(record.secondary)?{utility:normalizeNodes(record.secondary)}:{}),
     header: normalizeNodes(record.header),
     footer: normalizeNodes(record.footer),
   };
@@ -164,16 +165,19 @@ export function SiteNavigation({
 }
 
 export function PublicMenuFrame({
+  utility = [],
   header,
   footer,
   children,
 }: {
   header: PublicMenuNode[];
   footer: PublicMenuNode[];
+  utility?: PublicMenuNode[];
   children: ReactNode;
 }) {
   return (
     <>
+      <SiteNavigation items={utility} label="Site utility" mobile />
       <SiteNavigation items={header} label="Site header" mobile />
       {children}
       <SiteNavigation items={footer} label="Site footer" />

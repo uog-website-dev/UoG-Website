@@ -35,6 +35,7 @@ import type {
   MenuRecord,
   MenuTargets,
 } from "@/app/sites/menu-actions";
+import {MenuLocationPanel} from "@/sites/menu-locations";
 import { MenuItemTree } from "@/sites/menu-items";
 import { unwrap } from "@/organizations/contract";
 
@@ -193,21 +194,7 @@ function LocalMenuEditor({
           onSubmit={save}
         >
           <TextField size="small" label="Local menu name" value={name} disabled={!structural || busy} onChange={(event) => setName(event.target.value)} required />
-          <TextField
-            select
-            size="small"
-            label="Assigned location"
-            value={location}
-            disabled={!structural || busy}
-            onChange={(event) => setLocation(event.target.value as MenuPlace)}
-            slotProps={{ select: { native: true } }}
-          >
-            {PLACES.map((place) => (
-              <option key={place} value={place} disabled={Boolean(place) && place !== menu.location && taken.has(place)}>
-                {placeLabel(place)}
-              </option>
-            ))}
-          </TextField>
+          <Typography variant="caption">Manage navigation placement in Template menu locations above.</Typography>
           <Button type="submit" variant="contained" disabled={!structural || busy || !name.trim()} sx={{ justifySelf: "start" }}>Save menu</Button>
         </Box>
       ) : null}
@@ -305,6 +292,7 @@ export function SiteMenusPanel({
         {navigation.error ? (
           <Alert severity="error">{navigation.error.message}</Alert>
         ) : null}
+        {navigation.data ? <MenuLocationPanel key={siteId} site={siteId} menus={menus.map(row=>row.menu)} enabled={moduleOn} canWrite={canWrite} canPublish={canPublish}/> : null}
         {navigation.data ? (
           <>
             <Box>
@@ -391,21 +379,7 @@ export function SiteMenusPanel({
               }}>
                 <TextField size="small" label="New menu name" value={name} disabled={!moduleOn || busy} onChange={(event) => setName(event.target.value)} required />
                 <TextField size="small" label="Menu identifier (optional)" value={code} onChange={event => setCode(event.target.value)} disabled={!moduleOn || busy} helperText="Unique within this Site and immutable. Leave blank to generate it from the name." inputProps={{ maxLength: 64, pattern: "[a-z0-9]+(-[a-z0-9]+)*" }} />
-                <TextField
-                  select
-                  size="small"
-                  label="New menu location"
-                  value={selectedLocation}
-                  disabled={!moduleOn || busy}
-                  onChange={(event) => setLocation(event.target.value as MenuPlace)}
-                  slotProps={{ select: { native: true } }}
-                >
-                  {PLACES.map((place) => (
-                    <option key={place} value={place} disabled={Boolean(place) && taken.has(place)}>
-                      {placeLabel(place)}
-                    </option>
-                  ))}
-                </TextField>
+                <Typography variant="caption">New menus start unassigned. Publish their items, then assign them to a template location above.</Typography>
                 <Button type="submit" variant="contained" disabled={!moduleOn || busy || !name.trim()} sx={{ justifySelf: "start" }}>Create menu</Button>
               </Box>
             ) : null}

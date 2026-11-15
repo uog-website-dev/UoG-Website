@@ -39,3 +39,15 @@ it('renders mixed component order and accessible source-specific placeholders', 
   expect(screen.getAllByRole('navigation').map(node => node.getAttribute('aria-label'))).toEqual(['Related information','News updates','Department links']);
   expect(screen.getByRole('link',{name:'Students'})).toBeTruthy();
 });
+
+it('renders a published template sidebar slot without replacing an explicit Page sidebar', async () => {
+  vi.stubGlobal('fetch',vi.fn(async (url: string) => ({ok:true,json:async()=>url.includes('/menus/')?{site:11,configured_locations:['sidebar'],locations:{sidebar:[{label:'Template contacts',href:'/contacts',children:[]}]}}:{results:[]}})));
+  render(<PublicPageView page={pageFromResponse(200,{...body,sidebar_id:null,sidebar_snapshot:undefined})}/>);
+  expect(await screen.findByRole('link',{name:'Template contacts'})).toBeTruthy();
+});
+it('honors a published empty sidebar assignment rather than restoring automatic links', async () => {
+  vi.stubGlobal('fetch',vi.fn(async (url: string) => ({ok:true,json:async()=>url.includes('/menus/')?{site:11,configured_locations:['sidebar'],locations:{sidebar:[]}}:{results:[]}})));
+  render(<PublicPageView page={pageFromResponse(200,{...body,sidebar_id:null,sidebar_snapshot:undefined})}/>);
+  expect(await screen.findByText('No navigation is assigned to this location.')).toBeTruthy();
+  expect(screen.queryByRole('link',{name:'Site home'})).toBeNull();
+});
