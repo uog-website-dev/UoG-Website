@@ -1,0 +1,18 @@
+
+ RUN  v5.0.5 /workspace/apps/admin-web
+
+ ✓ src/sites/homepage-template-catalogue.test.tsx (7 tests) 2345ms
+   ✓ browses three templates and responsive non-mutating previews with keyboard focus 1105ms
+   ✓ requires explicit selection and confirmation and returns a prepared unsaved document 388ms
+   ✓ keeps the canvas unchanged on prepare failure and supports retry 438ms
+ ✓ src/sites/site-homepage.test.tsx (4 tests) 2047ms
+   ✓ Homepage Settings (4)
+     ✓ lists only eligible same-Site published Pages and assigns with authoritative success 1295ms
+     ✓ resets assignment context when switching Sites 306ms
+
+ Test Files  2 passed (2)
+      Tests  11 passed (11)
+   Start at  05:33:33
+   Duration  9.47s (import 37%, tests 25%, environment 19%, transform 13%, setup 6%)
+
+JUNIT report written to /tmp/homepage-template-admin.xml

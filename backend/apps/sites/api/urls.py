@@ -1,5 +1,6 @@
 """Site, domain and per-site module endpoints under /api/v1/sites/."""
 from django.urls import path
+from apps.cms.api.homepage_templates import HomepageTemplateCatalogue, HomepageTemplatePrepare
 from rest_framework.routers import SimpleRouter
 
 from apps.cms.api.pages import SitePageViewSet
@@ -26,6 +27,8 @@ router.register(r"(?P<site_pk>[^/.]+)/domains", SiteDomainViewSet, basename="sit
 router.register(r"(?P<site_pk>[^/.]+)/modules", SiteModuleViewSet, basename="sitemodule")
 router.register("", SiteViewSet, basename="site")
 urlpatterns = [
+    path("<int:site_pk>/homepage-templates/", HomepageTemplateCatalogue.as_view(), name="homepage-template-catalogue"),
+    path("<int:site_pk>/homepage-templates/prepare/", HomepageTemplatePrepare.as_view(), name="homepage-template-prepare"),
     path(
         "<int:site_pk>/menu-inheritance/",
         MenuInheritanceListView.as_view(),

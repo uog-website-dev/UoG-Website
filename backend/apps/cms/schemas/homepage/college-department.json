@@ -1,0 +1,130 @@
+{
+  "manifest_version": 1,
+  "id": "college-department",
+  "version": 1,
+  "name": "College/Department",
+  "description": "A focused introduction, areas of study and community information for any academic unit.",
+  "required_modules": [
+    "PAGES",
+    "VISUAL_BUILDER"
+  ],
+  "layout": {
+    "schema_version": 1,
+    "rows": [
+      {
+        "id": "college-department-section-0",
+        "type": "section",
+        "ratios": [
+          100
+        ],
+        "columns": [
+          {
+            "id": "college-department-section-0-column",
+            "type": "column",
+            "children": [
+              {
+                "id": "college-department-title-0",
+                "type": "headline",
+                "props": {
+                  "text": "Welcome to our academic community",
+                  "level": 2
+                }
+              },
+              {
+                "id": "college-department-body-0",
+                "type": "editor",
+                "props": {
+                  "html": "<p>Learn about our teaching, research and service.</p>"
+                }
+              }
+            ]
+          }
+        ],
+        "style": {
+          "padding": "md",
+          "background": "navy",
+          "text_color": "inverse",
+          "radius": "lg",
+          "gap": "md",
+          "text_size": "xl"
+        }
+      },
+      {
+        "id": "college-department-section-1",
+        "type": "section",
+        "ratios": [
+          100
+        ],
+        "columns": [
+          {
+            "id": "college-department-section-1-column",
+            "type": "column",
+            "children": [
+              {
+                "id": "college-department-title-1",
+                "type": "headline",
+                "props": {
+                  "text": "Discover our areas of study",
+                  "level": 2
+                }
+              },
+              {
+                "id": "college-department-body-1",
+                "type": "editor",
+                "props": {
+                  "html": "<p>Explore programmes, meet our people and find opportunities to collaborate.</p>"
+                }
+              }
+            ]
+          }
+        ],
+        "style": {
+          "padding": "md",
+          "background": "paper",
+          "text_color": "default",
+          "radius": "lg",
+          "gap": "md",
+          "text_size": "lg"
+        }
+      },
+      {
+        "id": "college-department-section-2",
+        "type": "section",
+        "ratios": [
+          100
+        ],
+        "columns": [
+          {
+            "id": "college-department-section-2-column",
+            "type": "column",
+            "children": [
+              {
+                "id": "college-department-title-2",
+                "type": "headline",
+                "props": {
+                  "text": "Connect with our community",
+                  "level": 2
+                }
+              },
+              {
+                "id": "college-department-body-2",
+                "type": "editor",
+                "props": {
+                  "html": "<p>Replace this introduction with approved departmental information.</p>"
+                }
+              }
+            ]
+          }
+        ],
+        "style": {
+          "padding": "md",
+          "background": "mist",
+          "text_color": "default",
+          "radius": "lg",
+          "gap": "md",
+          "text_size": "lg"
+        }
+      }
+    ]
+  }
+}

@@ -1,3 +1,4 @@
+vi.mock("./homepage-template-catalogue",()=>({HomepageTemplateCatalogue:()=>null}));
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { SitePageRecord } from "@/app/sites/page-actions";
@@ -168,6 +169,6 @@ describe("Homepage Settings", () => {
     expect(await screen.findByText(/Medicine · CM · medicine.example.test/)).toBeTruthy();
     expect(await screen.findByText((content, element) => element?.tagName === "STRONG" && content === "Medicine Home")).toBeTruthy();
     expect(screen.queryByText((content, element) => element?.tagName === "STRONG" && content === "Informatics Home")).toBeNull();
-    expect(screen.getByRole("link", { name: /Public Preview for Medicine/ })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Public Preview for Medicine/ }).getAttribute("aria-disabled")).toBe("true");
   });
 });

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="11" failures="0" errors="0" time="4.3921412">
+    <testsuite name="src/sites/homepage-template-catalogue.test.tsx" timestamp="2026-11-15T05:33:43.156Z" hostname="6462f36c70dc" tests="7" failures="0" errors="0" skipped="0" time="2.344722715">
+        <testcase classname="src/sites/homepage-template-catalogue.test.tsx" name="browses three templates and responsive non-mutating previews with keyboard focus" time="1.105257397">
+        </testcase>
+        <testcase classname="src/sites/homepage-template-catalogue.test.tsx" name="requires explicit selection and confirmation and returns a prepared unsaved document" time="0.38767132">
+        </testcase>
+        <testcase classname="src/sites/homepage-template-catalogue.test.tsx" name="shows unavailable reasons and never enables incompatible template selection" time="0.074669487">
+        </testcase>
+        <testcase classname="src/sites/homepage-template-catalogue.test.tsx" name="blocks unauthorized users before fetching" time="0.014933732">
+        </testcase>
+        <testcase classname="src/sites/homepage-template-catalogue.test.tsx" name="clears former Site data and ignores stale responses" time="0.13952032">
+        </testcase>
+        <testcase classname="src/sites/homepage-template-catalogue.test.tsx" name="keeps the canvas unchanged on prepare failure and supports retry" time="0.437946678">
+        </testcase>
+        <testcase classname="src/sites/homepage-template-catalogue.test.tsx" name="loads a real approved layout through the shared renderer" time="0.177799509">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-homepage.test.tsx" timestamp="2026-11-15T05:33:43.166Z" hostname="6462f36c70dc" tests="4" failures="0" errors="0" skipped="0" time="2.047418485">
+        <testcase classname="src/sites/site-homepage.test.tsx" name="Homepage Settings &gt; lists only eligible same-Site published Pages and assigns with authoritative success" time="1.295223145">
+        </testcase>
+        <testcase classname="src/sites/site-homepage.test.tsx" name="Homepage Settings &gt; keeps the confirmed selection when eligibility is lost between list and submit" time="0.263137511">
+        </testcase>
+        <testcase classname="src/sites/site-homepage.test.tsx" name="Homepage Settings &gt; shows fallback state when the assigned Page is no longer published" time="0.177068946">
+        </testcase>
+        <testcase classname="src/sites/site-homepage.test.tsx" name="Homepage Settings &gt; resets assignment context when switching Sites" time="0.30605326">
+        </testcase>
+    </testsuite>
+</testsuites>

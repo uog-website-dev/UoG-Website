@@ -1,0 +1,24 @@
+{
+  "results": [
+    {
+      "name": "Editor browses all three templates with keyboard selection and real builder rendering",
+      "status": "PASS"
+    },
+    {
+      "name": "Mobile cards and preview fit 390px without horizontal overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "Preview leaves Page rows, revisions, public snapshots and both Site settings unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "Confirmed selection changes only the unsaved canvas",
+      "status": "PASS"
+    },
+    {
+      "name": "Selected layout saves and reloads through the existing Page draft workflow without publishing",
+      "status": "PASS"
+    }
+  ]
+}

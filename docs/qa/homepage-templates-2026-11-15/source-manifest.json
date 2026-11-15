@@ -1,0 +1,25 @@
+{
+  "algorithm": "sha256",
+  "files": {
+    "backend/apps/cms/api/homepage_templates.py": "4b406f10459c8aac103ddc5d2075480c1ec60d4e03f1ccccfdc3a02f22291e82",
+    "backend/apps/cms/homepage_templates.py": "af8657145ef4b043b60a73fb4c266c84cf49af07a7ebb112b6bc1c27c4c4afef",
+    "backend/apps/cms/schemas/homepage/blank.json": "266666fb16284d4ab81cb48fe9d4d95ed296b38a2d83ea3d2f230dfc81f8ac24",
+    "backend/apps/cms/schemas/homepage/college-department.json": "3cdce88687db1f25d2148441d71afee5037ae62298381ae5b97f55cad373692a",
+    "backend/apps/cms/schemas/homepage/manifest-v1.schema.json": "0d81cbbe3e017a7b0b21aadcc6727b52c79802fceef5a28100cfa159d6fb64a9",
+    "backend/apps/cms/schemas/homepage/university-main.json": "45e1a7fc8dd46aa21fa2bb13f7e7c382eb5108611237227d784aa1408ffeffed",
+    "backend/apps/cms/tests/test_homepage_templates.py": "cbd7beb11c5e7cb7570276af6cbd1d9fb1dbd1b8d465962f5744ff611201ffa9",
+    "backend/apps/sites/api/urls.py": "bab47d81c922b6fea8b76800237d3deb5e2697e227bb1ae2d0c5c9b6fe6b605c",
+    "docs/api/openapi.yaml": "91f0f2339a0ff4f9510c8580f4ce16b483cd25917abc1f1147d8bbef2e6f6681",
+    "docs/homepage-starting-templates.md": "ea1d34b7c1956fb75976a6cb30d1201dc63c84dcd3391e75a662b0a87f0b802b",
+    "frontend/apps/admin-web/src/app/sites/homepage-template-actions.ts": "202e706d8114963634e5637c1d6fb119656b43fd65a4b94c773cb31d9b9f953e",
+    "frontend/apps/admin-web/src/sites/homepage-template-catalogue.test.tsx": "92cdecb46c72bfd4f463352737253ab46c2afefab442e9c40d16b9c046756751",
+    "frontend/apps/admin-web/src/sites/homepage-template-catalogue.tsx": "df8ad9c77770a575207cdc9824e31bf4eb5a407939d6617414f230f3b090c0bc",
+    "frontend/apps/admin-web/src/sites/site-homepage.test.tsx": "12c85e2b41d2a6246da44be51cb000289e0f38fed0903734134ce816956ec4a4",
+    "frontend/apps/admin-web/src/sites/site-homepage.tsx": "9d5cb81b2c500415ee1c3d9f23eca8de5ff92e3deaed49afe3ebf33c39283a58",
+    "frontend/apps/admin-web/src/sites/visual-builder.tsx": "4bfe1d77425b265a10d53a8a2e145fee791b5b3838d3a440cf4b367eadf695b9",
+    "scripts/qa-homepage-template-browser.cjs": "48797b48746c165aaf8d09afacd2ebbf85888a7100aac34c243899e0e66ae804",
+    "scripts/qa-homepage-template-check.py": "ffc5f278a4e2170e9547cd24fb6cfe00163aec4ce70176e8afb09313183cf3ec",
+    "scripts/qa-homepage-template-cleanup.py": "a78e663864448354dbe2dab21f57a0f1f08003c03fbaa89f1b9147b7b4bc3737",
+    "scripts/qa-homepage-template-seed.py": "e5941927de4828f8694c9e90c77c5515d60953bd4655c6af7b864113ef3e67f0"
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:uog:homepage-template:1",
+  "title": "Approved homepage starting template v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "manifest_version",
+    "id",
+    "version",
+    "name",
+    "description",
+    "required_modules",
+    "layout"
+  ],
+  "properties": {
+    "manifest_version": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "required_modules": {
+      "const": [
+        "PAGES",
+        "VISUAL_BUILDER"
+      ]
+    },
+    "layout": {
+      "$ref": "../layout/layout-v1.schema.json"
+    }
+  }
+}

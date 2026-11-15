@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { KeyboardEvent } from "react";
 import Link from "next/link";
+import { HomepageTemplateCatalogue } from "./homepage-template-catalogue";
 import { useRouter } from "next/navigation";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
@@ -208,6 +209,7 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
   const [saving,setSaving]=useState(false);
   const [message,setMessage]=useState("");
   const [focusMode,setFocusMode]=useState(false);
+  const [showHomepageTemplates,setShowHomepageTemplates]=useState(false);
   const [leftTab,setLeftTab]=useState<"widgets"|"structure"|"templates">("widgets");
   const [widgetQuery,setWidgetQuery]=useState("");
   const [templates,setTemplates]=useState<SiteSectionTemplate[]>([]);
@@ -635,10 +637,12 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
       <Button size="small" onClick={()=>setSelected(null)}>Page settings</Button>
       <ContentWorkflowButtons title={page.title} available={page.available_actions??[]} disabled={saving || workflowBusy || dirty || !page.etag} onAction={(action)=>void queueWorkflow(action)}/>
       {editable?<>
+        <Button aria-expanded={showHomepageTemplates} disabled={saving || workflowBusy} onClick={()=>setShowHomepageTemplates(value=>!value)}>Homepage templates</Button>
         <Button ref={focusButton} startIcon={focusMode?<FullscreenExit/>:<Fullscreen/>} aria-pressed={focusMode} onClick={()=>setFocusMode(value=>!value)}>{focusMode?"Exit focus mode":"Focus mode"}</Button>
         <Button variant="contained" startIcon={saving?<CircularProgress size={16} color="inherit"/>:<SaveOutlined/>} disabled={!dirty || saving || !checked.ok} onClick={()=>void save()}>{saving?"Saving…":"Save draft"}</Button>
       </>:null}
     </Paper>
+    {editable && showHomepageTemplates?<Box sx={{p:2,overflow:"auto",maxHeight:"70vh",flexShrink:0}}><HomepageTemplateCatalogue siteId={siteId} canEdit onChoose={(value,name)=>{change(value,{selection:null});setShowHomepageTemplates(false);setMessage(`${name} loaded into the unsaved draft. Save to retain it; publication is unchanged.`);}}/></Box>:null}
     {error?<Alert severity={conflict?"warning":"error"} role="alert" action={conflict?<Box sx={{display:"flex",gap:1,flexWrap:"wrap"}}>
       <Button color="inherit" size="small" disabled={saving} onClick={()=>void reloadServerDraft()}>Reload server draft</Button>
       <Button color="inherit" size="small" disabled={saving} onClick={()=>void adoptServerDraft()}>Adopt server draft</Button>
