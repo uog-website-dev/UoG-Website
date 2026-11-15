@@ -322,3 +322,15 @@ export async function saveMenuLocation(site: number, location: string, version: 
 export async function publishMenuLocation(site: number, location: string, version: number): Promise<ActionResult<MenuLocationRecord>> {
   return attempt(async () => (await client()).post<MenuLocationRecord>(siteMenuPath(site,`locations/${encodeURIComponent(location)}/publish/`),{version}));
 }
+
+export interface NavigationPreview {
+ site:number;name:string;public_origin:string|null;preview:boolean;menu_version?:number;theme?:"institutional"|"high-contrast";
+ locations:Record<string,unknown[]>;
+}
+export async function loadNavigationPreview(site:number,menu?:string):Promise<ActionResult<NavigationPreview>> {
+ return attempt(async()=> {
+  const data=await (await client()).get<NavigationPreview>(siteMenuPath(site,menu?`${encodeURIComponent(menu)}/preview/`:"preview-navigation/"));
+  if(!data||data.site!==site||data.preview!==true||!data.locations||typeof data.locations!=="object"||Array.isArray(data.locations))throw new Error("Preview is not available in this Site.");
+  return data;
+ });
+}

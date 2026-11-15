@@ -1,0 +1,28 @@
+{
+  "results": [
+    {
+      "name": "Explicit Publisher promotion renders approved header, utility, footer and Page sidebar",
+      "status": "PASS"
+    },
+    {
+      "name": "Public navigation at 1440px has current-page cues and no horizontal overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "Public navigation at 768px has current-page cues and no horizontal overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "Public navigation at 390px has current-page cues and no horizontal overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "Activating a published internal link stays on the Site hostname and closes mobile navigation",
+      "status": "PASS"
+    },
+    {
+      "name": "Main Site uses the shared public shell with a stable empty-slot fallback",
+      "status": "PASS"
+    }
+  ]
+}

@@ -55,6 +55,7 @@ import {
   archiveSite,
   getSiteTemplate,
   listPlatformModules,
+  listAllSiteDomains,
   listSiteDomains,
   listSiteModuleAssignments,
   suspendSite,
@@ -190,6 +191,10 @@ export function SiteDetail({ site, permissions = [], error }: SiteDetailProps) {
   const primaryDomain = useAsync<PaginatedResponse<SiteDomain> | null>(
     async () =>
       site ? unwrap(await listSiteDomains(site.id, { is_primary: true })) : null,
+    [site?.id],
+  );
+  const allDomains = useAsync<SiteDomain[] | null>(
+    async () => (site ? unwrap(await listAllSiteDomains(site.id)) : null),
     [site?.id],
   );
   // Modules are a per-site read; a failure degrades to an explicit "could
@@ -523,7 +528,12 @@ export function SiteDetail({ site, permissions = [], error }: SiteDetailProps) {
               </Box>
             </Box>
             <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-              <ViewPublicSite siteName={site.name} siteStatus={site.status} primaryDomain={site.primary_domain} />
+              <ViewPublicSite
+                siteName={site.name}
+                siteStatus={site.status}
+                primaryDomain={site.primary_domain}
+                domains={(allDomains.data ?? []).map((row) => ({ hostname: row.hostname, status: row.status }))}
+              />
               <Button component={Link} href="/sites" startIcon={<ArrowBackIcon />} variant="outlined">
                 Directory
               </Button>
@@ -729,6 +739,7 @@ export function SiteDetail({ site, permissions = [], error }: SiteDetailProps) {
           // to the site row (e.g. timestamps) comes from the RSC tree —
           // refresh both after a lifecycle change.
           primaryDomain.reload();
+          allDomains.reload();
           router.refresh();
         }}
       />

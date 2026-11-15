@@ -93,6 +93,7 @@ export function SiteAdminFrame({
   const onDashboard = currentPath === dashboardHref || currentPath === `${dashboardHref}/`;
   if(
     /^\/sites\/[1-9][0-9]*\/admin\/pages\/[^/]+\/(builder|preview)\/?$/.test(currentPath)
+    || /^\/sites\/[1-9][0-9]*\/admin\/menus\/preview\/?$/.test(currentPath)
     || /^\/sites\/[1-9][0-9]*\/admin\/posts\/[^/]+\/preview\/?$/.test(currentPath)
   ){
     return <SiteAdminContext.Provider value={value}>{children}</SiteAdminContext.Provider>;

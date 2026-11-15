@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 
-import { menusFromResponse, PublicMenuFrame, safeMenuHref } from "./site-navigation";
+import { menusFromResponse, PublicMenuFrame, safeMenuHref, SiteNavigation } from "./site-navigation";
 
 const header = [
   { label: "Department", href: "/about", children: [{ label: "People", href: "/about/people" }] },
@@ -99,4 +99,54 @@ it('resolves utility navigation independently of primary and footer menus', () =
   expect(parsed.utility?.[0]?.label).toBe('Utility');
   expect(parsed.header[0]?.label).toBe('Primary');
   expect(parsed.footer[0]?.label).toBe('Footer');
+});
+
+it('marks only the exact same-origin current destination and qualifies private preview links', () => {
+ render(<SiteNavigation label="Preview header" items={[...header,{label:'External same path',href:'https://other.example/about/people'}]} currentPath="/about/people" siteOrigin="https://informatics.example"/>);
+ const person=screen.getByRole('link',{name:'People'});
+ expect(person.getAttribute('href')).toBe('https://informatics.example/about/people');
+ expect(person.getAttribute('aria-current')).toBe('page');
+ expect(screen.getByRole('link',{name:'Department'}).getAttribute('aria-current')).toBeNull();
+ expect(screen.getByRole('link',{name:'External same path'}).getAttribute('aria-current')).toBeNull();
+});
+it('closes the mobile menu after activating a nested link and restores the trigger', async () => {
+ render(<SiteNavigation label="Test navigation" items={header} mobile/>);
+ const open=screen.getByRole('button',{name:'Open test navigation'});fireEvent.click(open);
+ const drawer=within(document.querySelector('.MuiDrawer-paper') as HTMLElement);
+ const link=drawer.getByRole('link',{name:'People'});link.addEventListener('click',event=>event.preventDefault());fireEvent.click(link);
+ await waitFor(()=>expect(document.querySelector('.MuiDrawer-paper')).toBeNull());
+ expect(open.getAttribute('aria-expanded')).toBe('false');
+});
+it('bounds malformed trees and rejects encoded controls and error response trees', () => {
+ const tree={label:'Root',href:'/root',children:[] as unknown[]};let cursor=tree;
+ for(let i=0;i<100;i++){const child={label:'Nested',href:'/nested',children:[] as unknown[]};cursor.children.push(child);cursor=child;}
+ const parsed=menusFromResponse(200,{locations:{header:[tree]}});expect(JSON.stringify(parsed).match(/Nested/g)?.length).toBe(3);
+ expect(menusFromResponse(500,{locations:{header}})).toEqual({header:[],footer:[]});
+ for(const href of ['/bad%0aheader','https://example.com/%5cpath','/bad%ZZ'])expect(safeMenuHref(href)).toBeNull();
+});
+it('supports native nested disclosure by keyboard and returns focus on Escape', async () => {
+ const user=userEvent.setup();render(<SiteNavigation label="Dropdown" items={header} dropdown/>);
+ const summary=screen.getByText('Department');summary.focus();await user.keyboard('{Enter}');
+ // Native browser toggling is verified in E2E; the component handles Escape explicitly.
+ const details=summary.closest('details')!;details.open=true;fireEvent.keyDown(details,{key:'Escape'});
+ expect(details.open).toBe(false);expect(document.activeElement).toBe(summary);
+});
+
+it('escapes hostile labels on public and preview surfaces and keeps empty frames stable', () => {
+ const text='<img src=x onerror="window.menuInjected=1">';
+ const view=render(<PublicMenuFrame header={[{label:text,href:'javascript:alert(1)'}]} footer={[]}><p>Readable body</p></PublicMenuFrame>);
+ expect(screen.getByText(text)).toBeTruthy();expect(screen.queryByRole('link',{name:text})).toBeNull();expect(document.querySelector('img[src="x"]')).toBeNull();
+ view.rerender(<PublicMenuFrame header={[]} footer={[]}><p>Readable body</p></PublicMenuFrame>);
+ expect(screen.getByText('Readable body')).toBeTruthy();expect(screen.queryByRole('navigation')).toBeNull();
+});
+
+it('tracks the actual public browser pathname and history navigation',async()=>{
+ const previous=window.location.href;
+ try{
+  window.history.replaceState({},'', '/about/people');render(<SiteNavigation items={[...header,...footer]} label="Public navigation"/>);
+  await waitFor(()=>expect(screen.getByRole('link',{name:'People'}).getAttribute('aria-current')).toBe('page'));
+  window.history.replaceState({},'', '/contacts');fireEvent(window,new PopStateEvent('popstate'));
+  await waitFor(()=>expect(screen.getByRole('link',{name:'Contacts'}).getAttribute('aria-current')).toBe('page'));
+  expect(screen.getByRole('link',{name:'People'}).getAttribute('aria-current')).toBeNull();
+ }finally{window.history.replaceState({},'',previous);}
 });
