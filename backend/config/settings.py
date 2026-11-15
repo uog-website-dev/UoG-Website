@@ -81,6 +81,7 @@ if "pytest" in sys.modules:
 
 MIDDLEWARE = [
     "apps.core.middleware.RequestIDMiddleware",
+    "apps.core.middleware.PerformanceMiddleware",
     "apps.sites.middleware.SiteResolutionMiddleware",
     "apps.audit.middleware.AuditContextMiddleware",
     "django.middleware.security.SecurityMiddleware",
@@ -546,3 +547,6 @@ MEDIA_DERIVATIVE_MAX_BYTES = config("MEDIA_DERIVATIVE_MAX_BYTES", default=8 * 10
 
 # Recover worker connections when Redis is still starting after a host restart.
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
+# Explicit opt-in for controlled performance rehearsals; default deployments do not profile SQL.
+PERF_INSTRUMENTATION_ENABLED = config("PERF_INSTRUMENTATION_ENABLED", default=False, cast=bool)

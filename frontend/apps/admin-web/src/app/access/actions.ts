@@ -1,5 +1,7 @@
 "use server";
 
+import {serverApiFetch} from "@/performance/server-fetch";
+
 import { ApiError, apiErrorFromResponse, createApiClient } from "@uog/api-client";
 import type {
   AssignmentAuditEvent,
@@ -140,7 +142,7 @@ async function send(path: string, method = "GET", body?: unknown): Promise<Call<
   const requestId = crypto.randomUUID();
   try {
     if (method === "GET" || method === "POST") {
-      const api = createApiClient({
+      const api = createApiClient({fetchFn:serverApiFetch,
         baseUrl: apiBaseUrl(),
         accessToken: token,
         requestIdFactory: () => requestId,
@@ -151,7 +153,7 @@ async function send(path: string, method = "GET", body?: unknown): Promise<Call<
       return { ok: true, data: result.data, requestId: result.requestId };
     }
 
-    const response = await fetch(`${apiBaseUrl()}${path}`, {
+    const response = await serverApiFetch(`${apiBaseUrl()}${path}`, {
       method,
       headers: {
         Accept: "application/json",

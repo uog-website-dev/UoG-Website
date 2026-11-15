@@ -5,6 +5,8 @@ import { APP_BASE_PATH } from "./src/base-path";
 const nextConfig: NextConfig = {
   // The admin console is served under /admin by the nginx reverse proxy.
   basePath: APP_BASE_PATH,
+  // OAuth callback query values must not enter benchmark container logs.
+  ...(process.env.PERF_INSTRUMENTATION_ENABLED === "1" ? { logging: { incomingRequests: false } } : {}),
   experimental: { serverActions: { bodySizeLimit: "4mb" } },
   // Dev compiles each screen the first time it is opened. The default cache
   // keeps only a couple of those screens, so moving between menus compiles

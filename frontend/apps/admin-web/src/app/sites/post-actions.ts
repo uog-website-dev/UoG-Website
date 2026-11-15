@@ -1,5 +1,7 @@
 "use server";
 
+import {serverApiFetch} from "@/performance/server-fetch";
+
 /** Site-scoped Post and taxonomy actions. The access token remains server-side. */
 import { createApiClient } from "@uog/api-client";
 
@@ -92,7 +94,7 @@ function apiBaseUrl(): string {
 
 async function client() {
   const accessToken = await getAccessToken();
-  return createApiClient({ baseUrl: apiBaseUrl(), accessToken: accessToken ?? undefined });
+  return createApiClient({fetchFn:serverApiFetch, baseUrl: apiBaseUrl(), accessToken: accessToken ?? undefined });
 }
 
 async function attempt<T>(run: () => Promise<T>): Promise<ActionResult<T>> {

@@ -240,7 +240,7 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const state = useWorkspace(siteId);
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+    <Box data-perf-navigation-ready={state.status === "ready" ? "true" : "false"} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       <Box sx={{ px: 2.75 }}>
         <WorkspaceSwitcher state={state} siteId={siteId} onNavigate={onNavigate} />
         {state.status === "ready" && state.data.sitesError ? (
