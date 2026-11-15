@@ -28,6 +28,7 @@ import { useSessionWatch } from "@/session-watch";
 import { DesktopSidebar, MobileNavDrawer } from "@/sidebar";
 import { usePathname } from "next/navigation";
 import { normalizeAdminPathname } from "@/navigation";
+import {WorkspaceProvider} from "@/workspace";
 
 /** Visually hidden until focused — first tab stop on every page. */
 const skipLinkSx = {
@@ -50,6 +51,13 @@ const skipLinkSx = {
 } as const;
 
 export function AdminShell({
+  actions,
+  children,
+}: {actions?: ReactNode; children: ReactNode}) {
+  return <WorkspaceProvider><ShellContent actions={actions}>{children}</ShellContent></WorkspaceProvider>;
+}
+
+function ShellContent({
   actions,
   children,
 }: {

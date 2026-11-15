@@ -41,6 +41,7 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
     assert schema["openapi"] == "3.0.3"
     paths = schema["paths"]
     assert set(paths) == {
+        "/api/workspace/", "/api/workspace/sites/",
         "/api/pages/", "/api/pages/{id}/", "/api/pages/home/",
         "/api/v1/sites/{site_pk}/sidebars/",
         "/api/v1/sites/{site_pk}/sidebars/{id}/",
@@ -150,6 +151,8 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
     # These routes prepare/preview private content; they must not accidentally
     # acquire anonymous access or expose additional write methods.
     private_methods = {
+        "/api/workspace/": {"get"},
+        "/api/workspace/sites/": {"get"},
         "/api/v1/sites/{site_pk}/homepage-templates/": {"get"},
         "/api/v1/sites/{site_pk}/homepage-templates/prepare/": {"post"},
         "/api/v1/sites/{site_pk}/menus/locations/": {"get"},

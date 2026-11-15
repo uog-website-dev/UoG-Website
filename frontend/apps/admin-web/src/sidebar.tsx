@@ -29,13 +29,11 @@ import IconButton from "@mui/material/IconButton";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 
 import {
-  hasPlatformWorkspace,
   isNavItemActive,
   normalizeAdminPathname,
   siteWorkspaceId,
@@ -45,12 +43,10 @@ import { siteAdminHref, visibleSiteSections, isSiteSectionActive } from "@/sites
 import type { SiteSection } from "@/sites/site-admin";
 import { siteStatusChip } from "@/sites/validation";
 import {
-  PLATFORM_WORKSPACE,
   useWorkspace,
-  workspaceHref,
-  workspaceValue,
 } from "@/workspace";
 import type { WorkspaceState } from "@/workspace";
+import {WorkspaceSwitcher} from "@/workspace-switcher";
 
 const DRAWER_WIDTH = 296;
 
@@ -187,52 +183,6 @@ function NavItem({
   );
 }
 
-function WorkspaceSwitcher({
-  state,
-  siteId,
-  onNavigate,
-}: {
-  state: WorkspaceState;
-  siteId: number | null;
-  onNavigate?: () => void;
-}) {
-  const router = useRouter();
-  const data = state.status === "ready" ? state.data : null;
-  const platform = data ? hasPlatformWorkspace(data.platformPermissions) : false;
-  const sites = data?.sites ?? [];
-  const value = workspaceValue(siteId);
-  const known = (value === PLATFORM_WORKSPACE && platform) || sites.some((row) => workspaceValue(row.id) === value);
-
-  return (
-    <TextField
-      select
-      fullWidth
-      size="small"
-      label="Workspace"
-      value={known ? value : ""}
-      disabled={!data || (!platform && sites.length === 0)}
-      onChange={(event) => {
-        const href = workspaceHref(event.target.value);
-        if (!href || event.target.value === value) return;
-        onNavigate?.();
-        router.push(href);
-      }}
-      slotProps={{ select: { native: true }, inputLabel: { shrink: true } }}
-      helperText={state.status === "loading" ? "Loading workspaces…" : undefined}
-    >
-      {!known ? <option value="" disabled>Choose a workspace</option> : null}
-      {platform ? <option value={PLATFORM_WORKSPACE}>Platform administration</option> : null}
-      {sites.length > 0 ? (
-        <optgroup label="Sites">
-          {sites.map((row) => (
-            <option key={row.id} value={workspaceValue(row.id)}>{row.name}</option>
-          ))}
-        </optgroup>
-      ) : null}
-    </TextField>
-  );
-}
-
 function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   const currentPath = normalizeAdminPathname(pathname);
@@ -242,12 +192,8 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <Box data-perf-navigation-ready={state.status === "ready" ? "true" : "false"} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       <Box sx={{ px: 2.75 }}>
-        <WorkspaceSwitcher state={state} siteId={siteId} onNavigate={onNavigate} />
-        {state.status === "ready" && state.data.sitesError ? (
-          <Alert severity="warning" variant="outlined" sx={{ mt: 1 }}>
-            Site workspaces could not be loaded: {state.data.sitesError}
-          </Alert>
-        ) : null}
+        <WorkspaceSwitcher state={state} onNavigate={onNavigate} />
+
       </Box>
       {siteId == null ? (
         <PlatformNav state={state} currentPath={currentPath} onNavigate={onNavigate} />
@@ -298,11 +244,9 @@ function PlatformNav({
         Platform administration
       </Typography>
       {state.status !== "ready" ? <NavStatus state={state} /> : null}
-      {state.status === "ready" && items.length === 0 && !state.data.sitesError ? (
-        <Typography variant="body2" color="text.secondary" sx={{ px: 1.25 }}>
-          {state.data.sites.length > 0
-            ? "Platform administration is not assigned to this account. Choose a Site workspace above."
-            : "No administration workspace is assigned to this account."}
+      {state.status === "ready" && items.length === 0 ? (
+        <Typography variant="body2" color="text.secondary" sx={{px: 1.25}}>
+          Platform administration is not assigned to this account. Choose a Site workspace above.
         </Typography>
       ) : null}
       {items.map((item) => (
@@ -332,7 +276,7 @@ function SiteNav({
   onNavigate?: () => void;
 }) {
   const data = state.status === "ready" ? state.data : null;
-  const site = data?.sites.find((row) => row.id === siteId) ?? null;
+  const site = data?.site?.id === siteId ? data.site : null;
   const access = data?.site;
   const sections = access ? visibleSiteSections(access) : [];
   const chip = site ? siteStatusChip(site.status) : null;
@@ -350,7 +294,7 @@ function SiteNav({
         Site administration
       </Typography>
       {state.status !== "ready" ? <NavStatus state={state} /> : null}
-      {data && !data.sitesError && (!site || !access) ? (
+      {data && (!site || !access) ? (
         <Typography variant="body2" color="text.secondary" sx={{ px: 1.25 }}>
           This Site is not available to your account.
         </Typography>

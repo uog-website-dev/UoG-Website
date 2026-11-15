@@ -1,0 +1,32 @@
+{
+  "head": "6a3ef65f025bfa24f21d6ce3d95813ccdf3b0e36",
+  "working_tree_changes": true,
+  "files": {
+    "backend/apps/authorization/services.py": "0e9da518a888f1222a46a804eade340285f8f9658d5d47d89fc916cdc27d6002",
+    "backend/apps/sites/api/workspace.py": "b81f4eec4f331f29f72033f0312a8598e6a6c8cfc5b4e0b2ae9ed51ba3953274",
+    "backend/config/urls.py": "9b73ddb2f1ce6b501d09d9ff491e05e4ccf4d588bc8ee7e5295d5919e36a4fd5",
+    "backend/tests/test_documentation.py": "b1a365c6afe2d1f45717598516df9ab97a16e6872eb3a13110bd0df13df0aac9",
+    "backend/tests/test_workspace.py": "fb1ddbd926b577f89d14033285124d19df5edaf0f17c57ff72eb46217fab6a8e",
+    "docs/api/openapi.yaml": "a8a7a63d000b2f08412f0f6c464790fdf3479806a5cb81eb107a588aa52e287a",
+    "docs/performance/P0-PERF-002.md": "22803a0e88f4abad547a1e6876305917a462669f6d73f228984148102344640d",
+    "frontend/apps/admin-web/src/admin-shell.test.tsx": "b2fe008630bf7596731e9c023e8d655ec4ed991cd8dbdbeaf2b99d890d578bc7",
+    "frontend/apps/admin-web/src/admin-shell.tsx": "9eb44bdd88af849f9fdd3e2a5b13a800404825f56d6db16b069b85068f623d0d",
+    "frontend/apps/admin-web/src/app/api/workspace/route.test.ts": "1c79b591f097673c295fd0329fa8400cfefe5887d61a464565a33a2967401d51",
+    "frontend/apps/admin-web/src/app/api/workspace/route.ts": "e850dfcf4f9e7f2d2c8c3cfbad16c595f0a62aab90a7e33225c889996846775a",
+    "frontend/apps/admin-web/src/app/api/workspace/sites/route.ts": "27c6c9ef9c6995fc4dce30cf199ecebb01a0ec57dd9a2a9f882cf982ae64f90e",
+    "frontend/apps/admin-web/src/app/page.tsx": "8a05ce6ee8c834ce5edbb858d03ac60c6e026f1360dfbd4056faa7c331aae515",
+    "frontend/apps/admin-web/src/app/sites/[id]/admin/layout.tsx": "986af14214d9c0531d74dd7a81e32ba7aa1b1b12c2ac9be4e37423a9f70c1258",
+    "frontend/apps/admin-web/src/performance/navigation-timing.test.tsx": "98be525f2efcdb87ae78ca54454bfe02329031a0ef0f60a399ad58cbe1cd8e1f",
+    "frontend/apps/admin-web/src/performance/navigation-timing.tsx": "593680b286312740f14088d682a63a17b25758d6986ba63ac7d82027106534c9",
+    "frontend/apps/admin-web/src/sidebar.test.tsx": "a63426694a73de918ae3bd5cba1001660a665c67fbbdbb145b6d0087047834ea",
+    "frontend/apps/admin-web/src/sidebar.tsx": "bb65f5f1f458c14c19598da78940a0c9da57fba73f768b3a7d9a91cbca869af9",
+    "frontend/apps/admin-web/src/sites/site-workspace.tsx": "b071dc9155c651c462691e6d55b5d0cab2496e287147d9231d3218de285527db",
+    "frontend/apps/admin-web/src/workspace-proxy.ts": "3c1d14e183ecbd0633e1205fd8fc3df2db7a6cc9da8b69beaccae24b6942ec02",
+    "frontend/apps/admin-web/src/workspace-switcher.tsx": "7b3f9b2530b99f32583f077459bbe6c6e6f5735b9ab71cd6794e4dfa99317f37",
+    "frontend/apps/admin-web/src/workspace.test.tsx": "7b5956e9255fe7a9b4b02df92f3fd91dbfe428213f743e2dabe266c352c2aa65",
+    "frontend/apps/admin-web/src/workspace.ts": "70e16df0d15dfc6d0d548438bd370325f8eba561f872c52aaa5dabcc9f65ca3e",
+    "scripts/perf/benchmark.cjs": "bf1f2b457e876adaa8d4c1976e20a318a4e4e0f11c4144a576eb2d531882cd16",
+    "scripts/perf/compare-workspace.cjs": "b5fdedc80520affa65778c1ec989ed766c78f0878a37209c233d42bbeb8a5b7f",
+    "scripts/perf/workspace-check.cjs": "f12b2f21f37a4f46d2622823c9ccabac3c6ae1b95c924dc3ab37247d5da34618"
+  }
+}

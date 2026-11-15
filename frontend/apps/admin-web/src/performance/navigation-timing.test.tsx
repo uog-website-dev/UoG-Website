@@ -12,6 +12,7 @@ beforeEach(()=>{
 afterEach(()=>{vi.unstubAllGlobals();vi.restoreAllMocks();sessionStorage.clear();clock.clearMarks();clock.clearMeasures();});
 it('marks a navigation and propagates correlation only to same-origin non-auth fetches',async()=>{
  render(<NavigationTiming/>);fireEvent(window,new CustomEvent('uog:navigation:start',{detail:{id}}));
+ fireEvent(window,new CustomEvent('uog:navigation:request',{detail:{target:'/admin/sites/12/admin'}}));
  await window.fetch('/admin/api/workspace/');const init=transport.mock.calls[0][1];expect(init.headers.get('X-Navigation-ID')).toBe(id);expect(init.headers.get('X-Request-ID')).toMatch(/^[0-9a-f-]{36}$/);
  await window.fetch('/admin/api/auth/session');await window.fetch('https://external.example/data');expect(transport.mock.calls[1][1]).toBeUndefined();expect(transport.mock.calls[2][1]).toBeUndefined();
  fireEvent(window,new CustomEvent('uog:navigation:usable',{detail:{id}}));expect(measures()).toHaveLength(1);expect(sessionStorage.getItem('uog:performance:active-navigation')).toBeNull();

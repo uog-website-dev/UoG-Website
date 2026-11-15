@@ -5,9 +5,9 @@ beforeEach(() => {
   vi.stubGlobal("fetch", vi.fn(async () => ({
     ok: true,
     json: async () => ({
+      schemaVersion: 1,
+      version: "fixture-v1",
       platformPermissions: ["platform.dashboard.view", "platform.organizations.view", "sites.view"],
-      sites: [],
-      sitesError: null,
       site: null,
     }),
   })));
@@ -90,6 +90,7 @@ describe("AdminShell", () => {
       drawer.getByRole("navigation", { name: "Admin sections" }),
     ).toBeTruthy();
     expect(await drawer.findByRole("link", { name: /Organizations/ })).toBeTruthy();
+    expect(fetch).toHaveBeenCalledTimes(1); // desktop and mobile share the provider
     expect(
       // The toggle lives in the app root, which the open Modal aria-hides.
       screen

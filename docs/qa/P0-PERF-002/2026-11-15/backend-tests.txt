@@ -1,0 +1,161 @@
+.F.......................................s.............................. [ 13%]
+........................................................................ [ 26%]
+........................................................................ [ 40%]
+........................................................................ [ 53%]
+........................................................................ [ 67%]
+........................................................................ [ 80%]
+.................................F...................................... [ 94%]
+...............................                                          [100%]
+=================================== FAILURES ===================================
+_____________ test_foreign_unknown_anonymous_and_ambiguous_context _____________
+
+world = (<rest_framework.test.APIClient object at 0x7f349b2f07d0>, <User: workspace-member>, <Site: Same name>, <Site: Same name>, <UserRoleAssignment: 34:site-administrator:SITE>)
+
+    def test_foreign_unknown_anonymous_and_ambiguous_context(world):
+        client, _, a, b, _ = world
+        foreign = client.get(f"/api/workspace/?site={b.pk}")
+        missing = client.get("/api/workspace/?site=99999999")
+        assert foreign.status_code == missing.status_code == 404
+>       assert foreign.json() == missing.json()
+E       AssertionError: assert {'error': {'c...7ac53c3e424a'} == {'error': {'c...b200348e9ef3'}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'request_id': '1368ddfd-5e51-46f5-9685-7ac53c3e424a'} != {'request_id': '03ffa950-42f2-4340-b7d5-b200348e9ef3'}
+E         Use -v to get more diff
+
+tests/test_workspace.py:60: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+Seeded 38 registered permissions and 7 standard roles. No user assignments were created.
+----------------------------- Captured stderr call -----------------------------
+2026-11-15 10:55:16,996 WARNING [django.request] Not Found: /api/workspace/
+2026-11-15 10:55:17,000 WARNING [django.request] Not Found: /api/workspace/
+______ test_schema_validates_without_warnings_and_describes_live_contract ______
+
+    def test_schema_validates_without_warnings_and_describes_live_contract():
+        output = io.StringIO()
+        call_command("spectacular", stdout=output, validate=True, fail_on_warn=True)
+        schema = yaml.safe_load(output.getvalue())
+        assert schema["openapi"] == "3.0.3"
+        paths = schema["paths"]
+>       assert set(paths) == {
+            "/api/workspace/", "/api/workspace/sites/",
+            "/api/pages/", "/api/pages/{id}/", "/api/pages/home/",
+            "/api/v1/sites/{site_pk}/sidebars/",
+            "/api/v1/sites/{site_pk}/sidebars/{id}/",
+            "/api/v1/sites/{site_pk}/homepage-templates/",
+            "/api/v1/sites/{site_pk}/homepage-templates/prepare/",
+            "/api/v1/sites/{site_pk}/section-templates/",
+            "/api/v1/sites/{site_pk}/section-templates/{id}/",
+            "/api/v1/sites/{site_pk}/pages/{id}/visual-draft/insert-template/",
+            "/api/me/", "/api/admin/overview/",
+            "/api/v1/authorization/assignments/",
+            "/api/v1/authorization/assignments/site-roles/",
+            "/api/v1/authorization/assignments/site-users/",
+            "/api/v1/authorization/assignments/site-create-user/",
+            "/api/v1/authorization/assignments/site-user-search/",
+            "/api/v1/authorization/assignments/users/{user_id}/effective/",
+            "/api/v1/authorization/assignments/{id}/revoke/",
+            "/api/v1/authorization/assignments/{id}/scope/",
+            "/api/v1/authorization/audit/",
+            "/api/v1/authorization/me/permissions/",
+            "/api/v1/authorization/permissions/",
+            "/api/v1/authorization/permissions/{id}/",
+            "/api/v1/authorization/roles/",
+            "/api/v1/authorization/roles/{code}/",
+            "/api/v1/authorization/roles/{code}/permissions/",
+            "/api/v1/organizations/", "/api/v1/organizations/{id}/",
+            "/api/v1/organizations/{id}/archive/", "/api/v1/organizations/{id}/deactivate/",
+            "/api/v1/organizations/tree/", "/api/v1/organizations/{id}/children/",
+            "/api/v1/organizations/{id}/ancestors/", "/api/v1/organizations/{id}/descendants/",
+            "/api/v1/organizations/{id}/subtree/",
+            "/api/v1/sites/", "/api/v1/sites/{id}/",
+            "/api/v1/sites/{site_pk}/assets/",
+            "/api/v1/sites/{site_pk}/assets/upload/",
+            "/api/v1/sites/{site_pk}/assets/upload-policy/",
+            "/api/v1/sites/{site_pk}/assets/{asset_id}/",
+            "/api/v1/sites/{site_pk}/assets/{asset_id}/image/",
+            "/api/v1/sites/{site_pk}/assets/{asset_id}/references/",
+            "/api/v1/sites/{site_pk}/assets/{asset_id}/deletion/",
+            "/api/v1/sites/{site_pk}/asset-references/",
+            "/api/v1/sites/{site_pk}/asset-references/{reference_id}/",
+            "/api/v1/sites/{id}/activate/", "/api/v1/sites/{id}/suspend/",
+            "/api/v1/sites/{id}/archive/", "/api/v1/sites/{id}/configuration/",
+            "/api/v1/sites/{site_pk}/domains/", "/api/v1/sites/{site_pk}/domains/{id}/",
+            "/api/v1/sites/{site_pk}/domains/{id}/activate/",
+            "/api/v1/sites/{site_pk}/domains/{id}/deactivate/",
+            "/api/v1/sites/{site_pk}/domains/{id}/set-primary/",
+            "/api/v1/sites/{site_pk}/pages/",
+            "/api/v1/sites/{site_pk}/pages/{id}/",
+            "/api/v1/sites/{site_pk}/pages/{id}/workflow/",
+            "/api/v1/sites/{site_pk}/pages/{id}/homepage/",
+            "/api/v1/sites/{site_pk}/pages/{id}/workflow-history/",
+            "/api/v1/sites/{site_pk}/pages/{id}/working-draft/",
+            "/api/v1/sites/{site_pk}/pages/{id}/visual-draft/",
+            "/api/v1/sites/{site_pk}/pages/{id}/preview/",
+            "/api/v1/sites/{site_pk}/posts/",
+            "/api/v1/sites/{site_pk}/posts/{id}/",
+            "/api/v1/sites/{site_pk}/posts/{id}/preview/",
+            "/api/v1/sites/{site_pk}/posts/{id}/working-draft/",
+            "/api/v1/sites/{site_pk}/categories/",
+            "/api/v1/sites/{site_pk}/categories/{id}/",
+            "/api/v1/sites/{site_pk}/tags/",
+            "/api/v1/sites/{site_pk}/tags/{id}/",
+            "/api/v1/sites/{site_pk}/menus/",
+            "/api/v1/sites/{site_pk}/menus/locations/",
+            "/api/v1/sites/{site_pk}/menus/locations/{location}/draft/",
+            "/api/v1/sites/{site_pk}/menus/locations/{location}/publish/",
+            "/api/v1/sites/{site_pk}/menus/preview-navigation/",
+            "/api/v1/sites/{site_pk}/menus/targets/",
+            "/api/v1/sites/{site_pk}/menus/{id}/preview/",
+            "/api/v1/sites/{site_pk}/menus/{id}/",
+            "/api/v1/sites/{site_pk}/menus/{id}/activate/",
+            "/api/v1/sites/{site_pk}/menus/{id}/deactivate/",
+            "/api/v1/sites/{site_pk}/menus/{id}/reorder/",
+            "/api/v1/sites/{site_pk}/menus/{id}/tree/",
+            "/api/v1/sites/{site_pk}/menus/{menu_pk}/items/",
+            "/api/v1/sites/{site_pk}/menus/{menu_pk}/items/{id}/",
+            "/api/v1/sites/{site_pk}/menus/{menu_pk}/items/{id}/move/",
+            "/api/v1/sites/{site_pk}/menu-inheritance/",
+            "/api/v1/sites/{site_pk}/menu-inheritance/{location}/",
+            "/api/v1/sites/{site_pk}/modules/", "/api/v1/sites/{site_pk}/modules/{id}/",
+            "/api/v1/sites/{site_pk}/modules/{id}/enable/",
+            "/api/v1/sites/{site_pk}/modules/{id}/disable/",
+            "/api/v1/cms/sites/{site_pk}/content/{content_id}/workflow/",
+            "/api/v1/cms/sites/{site_pk}/content/{content_id}/workflow-history/",
+            "/api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/",
+            "/api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/{revision_number}/",
+            "/api/v1/cms/sites/{site_pk}/content/{content_id}/revisions/{revision_number}/restore/",
+            "/api/v1/site-templates/", "/api/v1/site-templates/{id}/",
+            "/api/v1/modules/", "/api/v1/modules/{id}/",
+            "/api/v1/modules/activation-summary/",
+            "/api/v1/site-modules/", "/api/v1/site-modules/bulk-preview/",
+            "/api/v1/site-modules/bulk-apply/",
+            "/api/v1/site-modules/operations/", "/api/v1/site-modules/operations/{id}/",
+            "/api/v1/site-context/",
+            "/api/v1/site-context/media/{asset_id}/",
+            "/api/v1/site-context/pages/",
+            "/api/v1/site-context/posts/",
+            "/api/v1/site-context/posts/categories/{category_slug}/",
+            "/api/v1/site-context/posts/{post_slug}/",
+            "/api/v1/site-context/homepage/",
+            "/api/v1/site-context/widgets/",
+            "/api/v1/site-context/identity/logo/",
+            "/api/v1/site-context/contact/{page_id}/{form_code}/",
+            "/api/v1/sites/{site_pk}/pages/{id}/widget-data/",
+            "/api/v1/site-context/pages/{page_path}/",
+            "/api/v1/site-context/menus/",
+        }
+E       AssertionError: assert {'/api/admin/...nments/', ...} == {'/api/admin/...nments/', ...}
+E         
+E         Extra items in the left set:
+E         '/api/workspace/sites/'
+E         '/api/workspace/'
+E         Use -v to get more diff
+
+tests/test_documentation.py:43: AssertionError
+----------------- generated xml file: /tmp/perf002-backend.xml -----------------
+=========================== short test summary info ============================
+FAILED tests/test_workspace.py::test_foreign_unknown_anonymous_and_ambiguous_context
+FAILED tests/test_documentation.py::test_schema_validates_without_warnings_and_describes_live_contract
+2 failed, 532 passed, 1 skipped in 536.55s (0:08:56)

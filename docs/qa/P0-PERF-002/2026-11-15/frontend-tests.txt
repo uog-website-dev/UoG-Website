@@ -1,0 +1,18 @@
+
+ RUN  v5.0.5 /workspace/apps/admin-web
+
+ ✓ src/workspace.test.tsx (4 tests) 895ms
+   ✓ loads discovery only on open, pages explicitly and rejects stale search results 832ms
+ ✓ src/sidebar.test.tsx (10 tests) 987ms
+ ✓ src/app/api/workspace/route.test.ts (10 tests) 16ms
+
+ Test Files  3 passed (3)
+      Tests  24 passed (24)
+   Start at  10:54:23
+   Duration  4.33s (environment 28%, tests 26%, import 20%, transform 18%, setup 8%)
+
+Environment  jsdom was created 3 times · 2.04s total, 28% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+JUNIT report written to /tmp/perf002-frontend.xml

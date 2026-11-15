@@ -6,8 +6,11 @@ from django.urls import include, path
 
 from apps.core import views as core_views
 from apps.core.documentation import RedocView, SchemaView, SwaggerView
+from apps.sites.api.workspace import WorkspaceBootstrap, WorkspaceSites
 
 urlpatterns = [
+    path("api/workspace/", WorkspaceBootstrap.as_view(), name="workspace-bootstrap"),
+    path("api/workspace/sites/", WorkspaceSites.as_view(), name="workspace-sites"),
     path("admin/", admin.site.urls),
     path("api/schema/", SchemaView.as_view(), name="schema"),
     path("api/docs/", SwaggerView.as_view(url_name="schema"), name="swagger-ui"),

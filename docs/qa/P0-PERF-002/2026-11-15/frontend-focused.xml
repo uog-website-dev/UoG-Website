@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="31" failures="0" errors="0" time="2.610998874">
+    <testsuite name="src/admin-shell.test.tsx" timestamp="2026-11-15T11:09:14.148Z" hostname="45b15f3f3484" tests="3" failures="0" errors="0" skipped="0" time="0.588563881">
+        <testcase classname="src/admin-shell.test.tsx" name="AdminShell &gt; renders the console chrome around the page content" time="0.165897122">
+        </testcase>
+        <testcase classname="src/admin-shell.test.tsx" name="AdminShell &gt; pins the footer and header outside the scroll isolation: main owns the scrolling column" time="0.026474397">
+        </testcase>
+        <testcase classname="src/admin-shell.test.tsx" name="AdminShell &gt; opens and closes the mobile navigation drawer from the header toggle" time="0.394763861">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/workspace/route.test.ts" timestamp="2026-11-15T11:09:14.155Z" hostname="45b15f3f3484" tests="10" failures="0" errors="0" skipped="0" time="0.019559004">
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; makes exactly one authenticated upstream call and forwards the private version" time="0.005909363">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; rejects ambiguous query site=0" time="0.000921287">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; rejects ambiguous query site=abc" time="0.000641839">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; rejects ambiguous query site=" time="0.003535175">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; rejects ambiguous query site=9007199254740993" time="0.002617321">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; rejects ambiguous query site=11&amp;site=22" time="0.000631209">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; rejects ambiguous query organization=1" time="0.000479918">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; requires a session" time="0.000527422">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; preserves denial and handles service failure without an empty success" time="0.001884014">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; proxies paginated search separately" time="0.001001683">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/performance/navigation-timing.test.tsx" timestamp="2026-11-15T11:09:14.164Z" hostname="45b15f3f3484" tests="3" failures="0" errors="0" skipped="0" time="0.104014891">
+        <testcase classname="src/performance/navigation-timing.test.tsx" name="marks a navigation and propagates correlation only to same-origin non-auth fetches" time="0.032846061">
+        </testcase>
+        <testcase classname="src/performance/navigation-timing.test.tsx" name="restores a remounted/reloaded development navigation and labels document-local marks" time="0.007052054">
+        </testcase>
+        <testcase classname="src/performance/navigation-timing.test.tsx" name="does not declare the former Site usable when a switch has changed the URL" time="0.06073084">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sidebar.test.tsx" timestamp="2026-11-15T11:09:14.168Z" hostname="45b15f3f3484" tests="10" failures="0" errors="0" skipped="0" time="0.912581387">
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — platform workspace &gt; renders platform sections as base-path-relative links for a platform administrator" time="0.311725626">
+        </testcase>
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — platform workspace &gt; marks the current section with aria-current, with or without the base path" time="0.072315009">
+        </testcase>
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — platform workspace &gt; hides platform navigation from a Site-only account and offers its Sites" time="0.157786765">
+        </testcase>
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — platform workspace &gt; switches to a Site workspace from the keyboard-operable selector" time="0.115261294">
+        </testcase>
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — platform workspace &gt; reports a failed workspace read instead of an empty menu" time="0.023740395">
+        </testcase>
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — platform workspace &gt; tells a signed-out user to sign in again instead of hiding navigation silently" time="0.020239718">
+        </testcase>
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — platform workspace &gt; does not start a new sign-in for other failures" time="0.01463434">
+        </testcase>
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — Site workspace &gt; shows the Visual Builder menu and keeps it active while editing a Page canvas" time="0.125537207">
+        </testcase>
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — Site workspace &gt; shows the active Site and only its enabled, authorized sections" time="0.04995834">
+        </testcase>
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — Site workspace &gt; rejects an invalid active-Site payload rather than rendering sections" time="0.018415612">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/workspace.test.tsx" timestamp="2026-11-15T11:09:14.178Z" hostname="45b15f3f3484" tests="5" failures="0" errors="0" skipped="0" time="0.986279711">
+        <testcase classname="src/workspace.test.tsx" name="shares one bootstrap across simultaneous consumers and same-Site sections" time="0.031338298">
+        </testcase>
+        <testcase classname="src/workspace.test.tsx" name="clears old Site immediately and ignores a late response even if transport ignores abort" time="0.00679999">
+        </testcase>
+        <testcase classname="src/workspace.test.tsx" name="fails closed for a mismatched/version-invalid response and recovers explicitly" time="0.014118486">
+        </testcase>
+        <testcase classname="src/workspace.test.tsx" name="keeps an unsaved editor mounted during successful same-Site revalidation" time="0.061333773">
+        </testcase>
+        <testcase classname="src/workspace.test.tsx" name="loads discovery only on open, pages explicitly and rejects stale search results" time="0.871096312">
+        </testcase>
+    </testsuite>
+</testsuites>
