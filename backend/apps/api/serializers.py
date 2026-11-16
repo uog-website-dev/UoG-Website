@@ -185,6 +185,9 @@ class PostSerializer(StrictContentFields, serializers.ModelSerializer):
 
     @extend_schema_field(serializers.DateTimeField(allow_null=True))
     def get_last_publication_at(self, post):
+        if hasattr(post, "latest_publication_at"):
+            date = post.latest_publication_at
+            return date.isoformat() if date else None
         from apps.cms.models import PublishedContentSnapshot
         date = PublishedContentSnapshot.objects.filter(content_id=post.draft_of_id or post.pk).order_by("-version").values_list("published_at",flat=True).first()
         return date.isoformat() if date else None
@@ -196,7 +199,7 @@ class PostSerializer(StrictContentFields, serializers.ModelSerializer):
     @extend_schema_field(serializers.ListField(child=serializers.CharField()))
     def get_available_actions(self, post):
         """Return workflow actions the current caller may attempt for this Post."""
-        return available_workflow_actions(post, self.context.get("request"))
+        return available_workflow_actions(post, self.context.get("request"), context=self.context)
 
     def _site_id(self):
         if self.instance is not None:

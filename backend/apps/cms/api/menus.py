@@ -362,7 +362,12 @@ class MenuViewSet(MenuAPIBase):
         with menu_errors(), hierarchy_write():
             site = self._site()
             query = self._query(ListQuery)
-            rows = Menu.objects.filter(site=site).order_by("name", "id")
+            from django.db.models import Prefetch
+            from ..menu_destinations import SNAPSHOT_FIELDS
+            rows = Menu.objects.filter(site=site).order_by("name", "id").prefetch_related(Prefetch(
+                "items", queryset=MenuItem.objects.only("menu_id", *SNAPSHOT_FIELDS).order_by("sort_order", "id"),
+                to_attr="snapshot_item_rows",
+            ))
             if query.get("search"):
                 from django.db.models import Q
                 rows = rows.filter(Q(name__icontains=query["search"]) | Q(code__icontains=query["search"]))

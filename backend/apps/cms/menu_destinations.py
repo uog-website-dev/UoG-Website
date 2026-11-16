@@ -9,7 +9,11 @@ from .menu_models import validate_external_url, CUSTOM_PATH
 SNAPSHOT_FIELDS = ('id','site_id','label','item_type','page_id','post_id','category_id','target','parent_id','sort_order','is_active','allow_cross_site')
 
 def snapshot_items(menu):
-    return [{key: str(value) if value is not None and (key.endswith('_id') and key != 'site_id' or key == 'id') else value for key,value in row.items()} for row in menu.items.order_by('sort_order','id').values(*SNAPSHOT_FIELDS)]
+    if hasattr(menu, 'snapshot_item_rows'):
+        rows = ({key: getattr(item, key) for key in SNAPSHOT_FIELDS} for item in menu.snapshot_item_rows)
+    else:
+        rows = menu.items.order_by('sort_order','id').values(*SNAPSHOT_FIELDS)
+    return [{key: str(value) if value is not None and (key.endswith('_id') and key != 'site_id' or key == 'id') else value for key,value in row.items()} for row in rows]
 
 def published_rows(menu):
     if menu.published_items is None:  # Trusted legacy system-created menus, until first publication.

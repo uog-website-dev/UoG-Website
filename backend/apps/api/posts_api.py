@@ -331,6 +331,20 @@ def content_etag(instance):
 class PostViewSet(SiteContentAdminViewSet):
     """Author and administer Posts inside the Site named in the URL."""
 
+    def get_queryset(self):
+        rows = super().get_queryset()
+        if self.action == "list":
+            from django.db.models import OuterRef, Subquery
+            from django.db.models.functions import Coalesce
+            from apps.cms.models import PublishedContentSnapshot
+            latest = PublishedContentSnapshot.objects.filter(
+                content_id=Coalesce(OuterRef("draft_of_id"), OuterRef("pk")),
+            ).order_by("-version").values("published_at")[:1]
+            rows = rows.select_related("draft_of").prefetch_related("categories", "tags").annotate(
+                latest_publication_at=Subquery(latest),
+            )
+        return rows
+
     @extend_schema(responses=PostSerializer, description="Authorized, Site-scoped saved revision preview. Session/bearer authentication and POSTS are required. Private no-store response with its ETag.")
     @action(detail=True,methods=["get"])
     def preview(self,request,site_pk=None,pk=None):

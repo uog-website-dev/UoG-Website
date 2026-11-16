@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "tests": {
+    "tests": 155,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "before_requests": 420,
+  "after_requests": 420,
+  "all_proposed_budgets_met": true,
+  "migrations": "None; check and makemigrations --check --dry-run passed",
+  "scope": "Backend-only; existing frontend/API contracts unchanged",
+  "qa_approval": "Pending"
+}

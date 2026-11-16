@@ -3,7 +3,7 @@ from .models import ContentRole, ContentStatus
 from .authorization import cms_grant_allows
 
 
-def available_workflow_actions(content, request):
+def available_workflow_actions(content, request, *, context=None):
     """Return actions the authenticated caller may attempt for this content.
 
     The workflow service stays authoritative. This list only drives controls
@@ -13,7 +13,13 @@ def available_workflow_actions(content, request):
     user = getattr(request, "user", None) if request is not None else None
     if not getattr(user, "is_authenticated", False):
         return []
-    content_roles = {role for role in ContentRole.values if cms_grant_allows(user,content.site_id,[role])}
+    # A serializer's context lives for one response only. Do not persist this
+    # snapshot on the user/request or reuse it for a subsequent write decision.
+    key = (user.pk, content.site_id)
+    snapshots = context.setdefault("workflow_role_snapshots", {}) if context is not None else {}
+    if key not in snapshots:
+        snapshots[key] = {role for role in ContentRole.values if cms_grant_allows(user, content.site_id, [role])}
+    content_roles = snapshots[key]
 
     actions = []
     if content.status == ContentStatus.APPROVED and "visual_layout" in content.metadata and ContentRole.AUTHOR in content_roles:

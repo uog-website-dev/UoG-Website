@@ -166,7 +166,7 @@ class PageSerializer(
     @extend_schema_field(serializers.ListField(child=serializers.CharField()))
     def get_available_actions(self, page):
         """Return workflow actions the current authenticated user may attempt."""
-        return available_workflow_actions(page, self.context.get("request"))
+        return available_workflow_actions(page, self.context.get("request"), context=self.context)
 
     @extend_schema_field(serializers.BooleanField())
     def get_is_homepage(self, page):
@@ -177,6 +177,12 @@ class PageSerializer(
         from ..services.homepage import can_assign_homepage
         from ..models import ContentStatus, Visibility
         request = self.context.get("request")
-        return bool(request and page.status == ContentStatus.PUBLISHED
-                    and page.visibility in (Visibility.PUBLIC, Visibility.UNLISTED)
-                    and not page.draft_of_id and can_assign_homepage(request.user, page.site))
+        eligible = bool(request and page.status == ContentStatus.PUBLISHED
+                        and page.visibility in (Visibility.PUBLIC, Visibility.UNLISTED) and not page.draft_of_id)
+        if not eligible:
+            return False
+        snapshots = self.context.setdefault("homepage_permission_snapshots", {})
+        key = (request.user.pk, page.site_id)
+        if key not in snapshots:
+            snapshots[key] = can_assign_homepage(request.user, page.site)
+        return snapshots[key]

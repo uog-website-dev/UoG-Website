@@ -131,7 +131,7 @@ class WorkspaceSites(PrivateWorkspaceView):
         rows = Site.objects.all() if allowed is None else Site.objects.filter(pk__in=allowed)
         if data.get("search"):
             rows = rows.filter(Q(name__icontains=data["search"]) | Q(code__icontains=data["search"]))
-        rows = rows.order_by("name", "pk")
+        rows = rows.only("id", "name", "code", "status").order_by("name", "pk")
         count = rows.count()
         offset = (data["page"] - 1) * data["page_size"]
         return Response({"count": count, "page": data["page"], "page_size": data["page_size"],
