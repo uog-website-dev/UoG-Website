@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@/test/render";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ToastProvider } from "@uog/ui";
 
@@ -231,16 +231,14 @@ describe("SiteMenusPanel", () => {
     expect(JSON.stringify(loadSiteNavigation.mock.calls)).not.toContain("[11]");
   });
 
-  it("blocks changes when the MENUS module is off", async () => {
+  it("blocks protected reads and changes when the MENUS module is off", async () => {
     renderPanel(11, false);
-    const moveDown = await screen.findByRole("button", { name: "Move About down" });
-    expect(moveDown).toHaveProperty("disabled", true);
-    expect(screen.getByRole("button", { name: "Create menu" })).toHaveProperty("disabled", true);
-    expect(screen.getByRole("button", { name: "Edit Header" })).toHaveProperty("disabled", true);
     expect(screen.getByText(/public website does not serve navigation/)).toBeTruthy();
-    fireEvent.click(moveDown);
+    expect(loadSiteNavigation).not.toHaveBeenCalled();
+    expect(screen.queryByRole("button", {name: "Move About down"})).toBeNull();
     expect(reorderSiteMenu).not.toHaveBeenCalled();
   });
+
 });
 
 

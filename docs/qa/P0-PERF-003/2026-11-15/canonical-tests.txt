@@ -1,0 +1,51 @@
+
+> @uog/admin-web@0.1.0 typecheck /workspace/apps/admin-web
+> tsc --noEmit
+
+
+ RUN  v5.0.5 /workspace/apps/admin-web
+
+ ✓ src/sites/media-library.test.tsx (26 tests) 9534ms
+   ✓ MediaLibrary (16)
+     ✓ keeps cached images visible but pauses selection while eligibility is refreshing 348ms
+     ✓ shows processing state in the library and preserves the retry key after transfer failure 520ms
+     ✓ keeps the selected file after a failed upload and never invents a ready row 338ms
+     ✓ loads scoped details and saves only persisted alt text 598ms
+     ✓ shows readonly metadata without a save control 337ms
+     ✓ blocks deletion for a live reference and confirms unused removal 788ms
+     ✓ keeps the library card and metadata after a delete conflict 715ms
+     ✓ preserves edited alt text after a recoverable save failure 612ms
+     ✓ keeps a Gallery-referenced asset, saves alt text, and reloads persisted details 902ms
+     ✓ keeps deletion disabled if the reference inventory cannot be verified 337ms
+   ✓ Site-isolated media browsing (4)
+     ✓ offers recovery for empty search and transport failure 337ms
+     ✓ supports keyboard pagination and grid/list controls 376ms
+   ✓ Quiet processing updates and previews (2)
+     ✓ refreshes a processing image without a loading flash and updates its open details preview 319ms
+   ✓ renames and categorizes an asset without changing its original filename 618ms
+   ✓ keeps unsaved metadata when expanding and closing the image 596ms
+ ✓ src/sites/site-pages.test.tsx (25 tests) 9483ms
+   ✓ SitePagesPanel (25)
+     ✓ saves a shell-only change without resending builder blocks or metadata 837ms
+     ✓ assigns only published Pages allowed by the backend as the homepage 497ms
+     ✓ applies server search and status filters and resets pagination 443ms
+     ✓ opens full-page preview in a new tab and submits this Site's draft for review 321ms
+     ✓ shows review controls only from backend-authorized actions and requires a rejection comment 502ms
+     ✓ defaults a new Page to the Site language 398ms
+     ✓ starts a new Page blank and fills the slug from the title until it is edited 360ms
+     ✓ creates and edits only with the matching permission and current ETag 1006ms
+     ✓ assigns a Site sidebar without replacing the builder document 654ms
+     ✓ surfaces stale edit conflicts without losing the form 618ms
+     ✓ previews private draft content and blocks malformed block JSON 579ms
+     ✓ shows the frozen private revision and sends its exact ETag when publishing 351ms
+     ✓ previews the shared visual fixture and rejects unsupported layout versions before saving 606ms
+     ✓ asks before discarding unsaved editor changes 318ms
+     ✓ opens a working draft of a published Page and keeps the live route fixed 539ms
+ ✓ src/sites/site-dashboard.test.tsx (7 tests) 530ms
+
+ Test Files  3 passed (3)
+      Tests  58 passed (58)
+   Start at  17:58:58
+   Duration  14.02s (tests 75%, import 11%, transform 7%, environment 5%, setup 1%)
+
+JUNIT report written to /workspace/perf003-canonical.xml

@@ -100,6 +100,7 @@ export function MediaUploadPanel({siteId, policy, inputRef, onAccepted, onBusyCh
         }
         if (!mounted.current) return;
         if (body.site !== siteId || typeof body.id !== "string") throw new Error("Upload response could not be verified for this Site.");
+        window.dispatchEvent(new CustomEvent("uog:data:changed", {detail: {site: siteId, domain: "media"}}));
         asset = body as MediaAssetRecord;
         patch(entry.key,{asset,phase:"metadata"}); onAccepted(asset);
       }

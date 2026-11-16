@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="8" failures="0" errors="0" time="0.616665067">
+    <testsuite name="src/sites/site-dashboard.test.tsx" timestamp="2026-11-15T18:00:18.780Z" hostname="93b1fc1a39a5" tests="8" failures="0" errors="0" skipped="0" time="0.616665067">
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="SiteDashboard &gt; keeps confirmed totals visible when a background refresh fails and offers retry" time="0.246910763">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="SiteDashboard &gt; shares the canonical Page counts read with concurrent section consumers" time="0.045783126">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="SiteDashboard &gt; summarizes this Site&apos;s Pages, Posts and Menus from the API" time="0.082871574">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="SiteDashboard &gt; offers create-page and navigation quick actions within the Site" time="0.051094331">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="SiteDashboard &gt; omits disabled or unauthorized sections and does not call their APIs" time="0.036821098">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="SiteDashboard &gt; shows an empty state when the Site has no Pages" time="0.032742875">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="SiteDashboard &gt; reports a failed summary and retries it" time="0.076461944">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="SiteDashboard &gt; says so when no content module is available" time="0.041522197">
+        </testcase>
+    </testsuite>
+</testsuites>

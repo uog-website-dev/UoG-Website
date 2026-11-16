@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="65" failures="0" errors="0" time="36.32623903">
+    <testsuite name="src/app/api/workspace/route.test.ts" timestamp="2026-11-15T17:44:08.541Z" hostname="4946b5c63baa" tests="10" failures="0" errors="0" skipped="0" time="0.013066424">
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; makes exactly one authenticated upstream call and forwards the private version" time="0.00546655">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; rejects ambiguous query site=0" time="0.000892761">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; rejects ambiguous query site=abc" time="0.000629786">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; rejects ambiguous query site=" time="0.000510334">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; rejects ambiguous query site=9007199254740993" time="0.000743879">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; rejects ambiguous query site=11&amp;site=22" time="0.000334031">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; rejects ambiguous query organization=1" time="0.000266317">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; requires a session" time="0.000300214">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; preserves denial and handles service failure without an empty success" time="0.001379438">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; proxies paginated search separately" time="0.001184407">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/layout.test.tsx" timestamp="2026-11-15T17:44:08.556Z" hostname="4946b5c63baa" tests="5" failures="0" errors="0" skipped="0" time="0.085409237">
+        <testcase classname="src/app/layout.test.tsx" name="admin session gate &gt; shows the sign-in screen and renders none of the protected routes when signed out" time="0.029016958">
+        </testcase>
+        <testcase classname="src/app/layout.test.tsx" name="admin session gate &gt; explains a failed sign-in callback on the sign-in screen instead of a server error" time="0.0107252">
+        </testcase>
+        <testcase classname="src/app/layout.test.tsx" name="admin session gate &gt; renders the protected routes and the verified identity when signed in" time="0.025406478">
+        </testcase>
+        <testcase classname="src/app/layout.test.tsx" name="admin session gate &gt; sends an expired session to sign out and sign in again instead of rendering the console" time="0.002650816">
+        </testcase>
+        <testcase classname="src/app/layout.test.tsx" name="admin session gate &gt; falls back to the session name when no email claim is present" time="0.015627126">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/cache-identity.test.ts" timestamp="2026-11-15T17:44:08.561Z" hostname="4946b5c63baa" tests="2" failures="0" errors="0" skipped="0" time="0.005188024">
+        <testcase classname="src/cache-identity.test.ts" name="returns only the non-credential session nonce and denies an unidentified session" time="0.002963109">
+        </testcase>
+        <testcase classname="src/cache-identity.test.ts" name="isolates legacy users and logins without returning subject IDs or bearer credentials" time="0.000942714">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/data/query-cache.test.tsx" timestamp="2026-11-15T17:44:08.563Z" hostname="4946b5c63baa" tests="13" failures="0" errors="0" skipped="0" time="0.251051586">
+        <testcase classname="src/data/query-cache.test.tsx" name="deduplicates simultaneous reads and reuses the same section across navigation without a loading flash" time="0.050115517">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="partitions keys by user/session, Site, permissions, resource, filters, sort and page" time="0.000388883">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="shows stale valid data while refreshing, reports failure and recovers without discarding cached rows" time="0.031720242">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="invalidates only the mutated Site/domain, including other mounted consumers; failed writes leave cache intact" time="0.013580212">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="cancels a slow obsolete filter and cannot replace the newer query with its late response" time="0.006843224">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="clears the previous session and Site client on rapid boundary changes, even when requests finish late" time="0.009697323">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="purges protected entries when authorization changes or a refreshed workspace revokes access" time="0.022587006">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="uses finite defaults and garbage-collects unobserved entries" time="0.057435077">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="does not reuse data after an identity-change event even when Site and permissions are identical" time="0.011887384">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="automatically refreshes an expired entry on return while keeping its valid rows visible" time="0.013196336">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="a successful mutation cancels the pre-save read and coalesces duplicate invalidations" time="0.013401649">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="settles after development StrictMode effect replay" time="0.005120688">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="clears protected content on logout while still invoking the sign-out action" time="0.013748166">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/media-upload-panel.test.tsx" timestamp="2026-11-15T17:44:08.572Z" hostname="4946b5c63baa" tests="5" failures="0" errors="0" skipped="0" time="0.951610925">
+        <testcase classname="src/sites/media-upload-panel.test.tsx" name="Media upload queue &gt; drops multiple files and persists each file&apos;s name, categories and alt text" time="0.451127929">
+        </testcase>
+        <testcase classname="src/sites/media-upload-panel.test.tsx" name="Media upload queue &gt; retries metadata without resending stored bytes" time="0.161549134">
+        </testcase>
+        <testcase classname="src/sites/media-upload-panel.test.tsx" name="Media upload queue &gt; rejects oversized and unsupported files before sending and keeps valid peers" time="0.175371024">
+        </testcase>
+        <testcase classname="src/sites/media-upload-panel.test.tsx" name="Media upload queue &gt; bounds concurrent uploads to two and aborts pending requests on Site change" time="0.125735495">
+        </testcase>
+        <testcase classname="src/sites/media-upload-panel.test.tsx" name="releases local preview URLs and replaces unreadable local images with a safe placeholder" time="0.035794117">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/visual-builder.test.tsx" timestamp="2026-11-15T17:44:08.575Z" hostname="4946b5c63baa" tests="25" failures="0" errors="0" skipped="0" time="34.018768387">
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; keeps the selected device layout width while fitting a narrow workspace" time="1.464323201">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; mounts the actual Page route inside Site Administration and guards disabled/view-only direct navigation" time="0.242269696">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; blocks unavailable, disabled, unauthorized and invalid direct contexts before loading a Page" time="0.022463765">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; renders loading, empty and initial keyboard focus with explicit Page and Site context" time="0.273648293">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; searches the 43-card picker, supports arrow/Enter selection and restores invoking focus" time="3.102089817">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; provides a meaningful empty palette search and Escape restores focus" time="1.562803477">
+            <system-err>
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(ButtonBase) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() =&gt; {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you&apos;re testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+A component suspended inside an `act` scope, but the `act` call was not awaited. When testing React components that depend on asynchronous data, you must await the result:
+
+await act(() =&gt; ...)
+
+            </system-err>
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; exposes Widgets and Structure docks with canvas viewport chrome" time="0.490141976">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; saves the complete valid tree with the last loaded ETag and reports conflicts without losing edits" time="1.136679205">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; keeps local edits on conflict and lets Reload refresh the ETag for reconciliation" time="1.863326531">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; warns before discarding unsaved edits when leaving the builder" time="0.888302702">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; saves current edits and opens a revision-bound preview in a new tab" time="0.866043117">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; keeps the editor and closes the preview tab when saving conflicts" time="0.833729335">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; offers server-advertised workflow actions after a saved draft and reports authoritative status" time="1.287976216">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; uses the canonical saved tree/revision and keeps local undo distinct from CMS history" time="2.239725897">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; undo and redo restore layout order and selection, and a divergent edit clears redo" time="4.337255416">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; keeps Ctrl+Z for the builder outside inspector fields and clears history on Page switch" time="3.407384457">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; ignores late Page results and clears selection, picker, focus mode and inspector on Site/Page changes" time="1.861131114">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; shows backend denial and retryable transport errors without exposing a former canvas" time="0.040504929">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; opens the existing private working draft for a published Page before allowing canvas edits" time="0.08800018">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; keeps the canvas visible in focus mode and Escape returns to the full workspace" time="1.215013911">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; shows selection chrome actions for the active canvas widget" time="1.148041851">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; exposes drag handles for Structure and row editor widget reordering" time="0.753174487">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; makes palette widgets draggable onto the canvas drop targets and hides the automatic page title" time="0.911215438">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; accepts a palette drop on the empty canvas to create the first section" time="0.42171407">
+        </testcase>
+        <testcase classname="src/sites/visual-builder.test.tsx" name="Visual Builder workspace &gt; sets a mobile spacing override, resets it to inherit, and keeps viewport chrome" time="3.559585064">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/workspace.test.tsx" timestamp="2026-11-15T17:44:08.595Z" hostname="4946b5c63baa" tests="5" failures="0" errors="0" skipped="0" time="1.001144447">
+        <testcase classname="src/workspace.test.tsx" name="shares one bootstrap across simultaneous consumers and same-Site sections" time="0.036731475">
+        </testcase>
+        <testcase classname="src/workspace.test.tsx" name="clears old Site immediately and ignores a late response even if transport ignores abort" time="0.010415166">
+        </testcase>
+        <testcase classname="src/workspace.test.tsx" name="fails closed for a mismatched/version-invalid response and recovers explicitly" time="0.012354263">
+        </testcase>
+        <testcase classname="src/workspace.test.tsx" name="keeps an unsaved editor mounted during successful same-Site revalidation" time="0.058691568">
+        </testcase>
+        <testcase classname="src/workspace.test.tsx" name="loads discovery only on open, pages explicitly and rejects stale search results" time="0.881518377">
+        </testcase>
+    </testsuite>
+</testsuites>

@@ -1,0 +1,1730 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="129" failures="5" errors="0" time="42.553835255">
+    <testsuite name="src/admin-shell.test.tsx" timestamp="2026-11-15T17:29:10.794Z" hostname="4946b5c63baa" tests="3" failures="0" errors="0" skipped="0" time="0.668232278">
+        <testcase classname="src/admin-shell.test.tsx" name="AdminShell &gt; renders the console chrome around the page content" time="0.188045311">
+        </testcase>
+        <testcase classname="src/admin-shell.test.tsx" name="AdminShell &gt; pins the footer and header outside the scroll isolation: main owns the scrolling column" time="0.040801711">
+        </testcase>
+        <testcase classname="src/admin-shell.test.tsx" name="AdminShell &gt; opens and closes the mobile navigation drawer from the header toggle" time="0.437470898">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/api/workspace/route.test.ts" timestamp="2026-11-15T17:29:10.797Z" hostname="4946b5c63baa" tests="10" failures="0" errors="0" skipped="0" time="0.014574566">
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; makes exactly one authenticated upstream call and forwards the private version" time="0.006218242">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; rejects ambiguous query site=0" time="0.000965303">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; rejects ambiguous query site=abc" time="0.000786949">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; rejects ambiguous query site=" time="0.000828057">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; rejects ambiguous query site=9007199254740993" time="0.000831835">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; rejects ambiguous query site=11&amp;site=22" time="0.000374168">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; rejects ambiguous query organization=1" time="0.000320179">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; requires a session" time="0.000412003">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; preserves denial and handles service failure without an empty success" time="0.001529302">
+        </testcase>
+        <testcase classname="src/app/api/workspace/route.test.ts" name="workspace proxy &gt; proxies paginated search separately" time="0.000896552">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/data/query-cache.test.tsx" timestamp="2026-11-15T17:29:10.806Z" hostname="4946b5c63baa" tests="8" failures="0" errors="0" skipped="0" time="0.184003983">
+        <testcase classname="src/data/query-cache.test.tsx" name="deduplicates simultaneous reads and reuses the same section across navigation without a loading flash" time="0.048606825">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="partitions keys by user/session, Site, permissions, resource, filters, sort and page" time="0.000404284">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="shows stale valid data while refreshing, reports failure and recovers without discarding cached rows" time="0.023958737">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="invalidates only the mutated Site/domain, including other mounted consumers; failed writes leave cache intact" time="0.014033779">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="cancels a slow obsolete filter and cannot replace the newer query with its late response" time="0.007142622">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="clears the previous session and Site client on rapid boundary changes, even when requests finish late" time="0.009271531">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="purges protected entries when authorization changes or a refreshed workspace revokes access" time="0.021535934">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="uses finite defaults and garbage-collects unobserved entries" time="0.057639548">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sidebar.test.tsx" timestamp="2026-11-15T17:29:10.813Z" hostname="4946b5c63baa" tests="10" failures="0" errors="0" skipped="0" time="0.783041439">
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — platform workspace &gt; renders platform sections as base-path-relative links for a platform administrator" time="0.247520554">
+        </testcase>
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — platform workspace &gt; marks the current section with aria-current, with or without the base path" time="0.053720982">
+        </testcase>
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — platform workspace &gt; hides platform navigation from a Site-only account and offers its Sites" time="0.176059694">
+        </testcase>
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — platform workspace &gt; switches to a Site workspace from the keyboard-operable selector" time="0.094868259">
+        </testcase>
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — platform workspace &gt; reports a failed workspace read instead of an empty menu" time="0.021793801">
+        </testcase>
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — platform workspace &gt; tells a signed-out user to sign in again instead of hiding navigation silently" time="0.016271159">
+        </testcase>
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — platform workspace &gt; does not start a new sign-in for other failures" time="0.020733557">
+        </testcase>
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — Site workspace &gt; shows the Visual Builder menu and keeps it active while editing a Page canvas" time="0.086710879">
+        </testcase>
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — Site workspace &gt; shows the active Site and only its enabled, authorized sections" time="0.045884871">
+        </testcase>
+        <testcase classname="src/sidebar.test.tsx" name="DesktopSidebar — Site workspace &gt; rejects an invalid active-Site payload rather than rendering sections" time="0.017414916">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/media-library.test.tsx" timestamp="2026-11-15T17:29:10.821Z" hostname="4946b5c63baa" tests="25" failures="3" errors="0" skipped="0" time="12.551920901">
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; excludes processing images then picks the worker-completed identity on refresh" time="0.351006113">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; shows processing state in the library and preserves the retry key after transfer failure" time="0.563906977">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; keeps the selected file after a failed upload and never invents a ready row" time="0.366314462">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; never offers upload to a read-only account" time="0.07233828">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; applies filename search before paging and resets to the first page" time="1.243581438">
+            <failure message="expected last &quot;vi.fn()&quot; call to have been called with [ 11, { page: 1 } ]
+
+Ignored nodes: comments, script, style
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta
+      content=&quot;&quot;
+      name=&quot;emotion-insertion-point&quot;
+    /&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div&gt;
+      &lt;section
+        aria-label=&quot;Site media library&quot;
+        class=&quot;MuiBox-root css-e9v5e8&quot;
+      &gt;
+        &lt;div
+          class=&quot;MuiBox-root css-1lqt9yq&quot;
+        &gt;
+          &lt;div
+            class=&quot;MuiBox-root css-0&quot;
+          &gt;
+            &lt;h2
+              class=&quot;MuiTypography-root MuiTypography-h5 css-kwxs7k-MuiTypography-root&quot;
+            &gt;
+              Media Library
+            &lt;/h2&gt;
+            &lt;p
+              class=&quot;MuiTypography-root MuiTypography-body2 css-1sa4kq8-MuiTypography-root&quot;
+            &gt;
+              Your Site&apos;s images and documents, in one place.
+            &lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;form
+          aria-label=&quot;Search Site media&quot;
+          class=&quot;MuiBox-root css-isdcpr&quot;
+          role=&quot;search&quot;
+        &gt;
+          &lt;div
+            class=&quot;MuiFormControl-root MuiTextField-root css-xo13e1-MuiFormControl-root-MuiTextField-root&quot;
+          &gt;
+            &lt;label
+              class=&quot;MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeSmall MuiInputLabel-outlined css-1kfabtt-MuiFormLabel-root-MuiInputLabel-root&quot;
+              data-shrink=&quot;false&quot;
+              for=&quot;_r_24_&quot;
+              id=&quot;_r_24_-label&quot;
+            &gt;
+              Search media
+            &lt;/label&gt;
+            &lt;div
+              class=&quot;MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-sizeSmall css-quhxjy-MuiInputBase-root-MuiOutlinedInput-root&quot;
+            &gt;
+              &lt;input
+                aria-invalid=&quot;false&quot;
+                class=&quot;MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputSizeSmall css-1pzfmz2-MuiInputBase-input-MuiOutlinedInput-input&quot;
+                id=&quot;_r_24_&quot;
+                maxlength=&quot;255&quot;
+                type=&quot;text&quot;
+                value=&quot;&quot;
+              /&gt;
+              &lt;fieldset
+                aria-hidden=&quot;true&quot;
+                class=&quot;MuiOutlinedInput-notchedOutline css-18p5xg2-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline&quot;
+              &gt;
+                &lt;legend
+                  class=&quot;css-1n64csd-MuiNotchedOutlined-root&quot;
+                &gt;
+                  &lt;span&gt;
+                    Search media
+                  &lt;/span&gt;
+                &lt;/legend&gt;
+              &lt;/fieldset&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div
+            class=&quot;MuiFormControl-root MuiTextField-root css-1ovfe1o-MuiFormControl-root-MuiTextField-root&quot;
+          &gt;
+            &lt;label
+              class=&quot;MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeSmall MuiInputLabel-outlined css-1kfabtt-MuiFormLabel-root-MuiInputLabel-root&quot;
+              data-shrink=&quot;false&quot;
+              for=&quot;_r_25_&quot;
+              id=&quot;_r_25_-label&quot;
+            &gt;
+              Media status
+            &lt;/label&gt;
+            &lt;div
+              class=&quot;MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-sizeSmall MuiSelect-root css-quhxjy-MuiInputBase-root-MuiOutlinedInput-root&quot;
+            &gt;
+              &lt;div
+                aria-expanded=&quot;false&quot;
+                aria-haspopup=&quot;listbox&quot;
+                aria-labelledby=&quot;_r_25_-label _r_25_&quot;
+                class=&quot;MuiSelect-select MuiSelect-outlined MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputSizeSmall css-trm6af-MuiNativeSelect-root-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input&quot;
+                id=&quot;_r_25_&quot;
+                role=&quot;combobox&quot;
+                tabindex=&quot;0&quot;
+              &gt;
+                &lt;span
+                  aria-hidden=&quot;true&quot;
+                  class=&quot;notranslate&quot;
+                &gt;
+                  ​
+                &lt;/span&gt;
+              &lt;/div&gt;
+              &lt;input
+                aria-hidden=&quot;true&quot;
+                aria-invalid=&quot;false&quot;
+                class=&quot;MuiSelect-nativeInput css-j0riat-MuiSelect-nativeInput&quot;
+                tabindex=&quot;-1&quot;
+                value=&quot;&quot;
+              /&gt;
+              &lt;svg
+                aria-hidden=&quot;true&quot;
+                class=&quot;MuiSvgIcon-root MuiSvgIcon-fontSizeMedium MuiSelect-icon MuiSelect-iconOutlined css-1rfqz7c-MuiSvgIcon-root-MuiNativeSelect-root-MuiSelect-icon&quot;
+                data-testid=&quot;ArrowDropDownIcon&quot;
+                focusable=&quot;false&quot;
+                viewBox=&quot;0 0 24 24&quot;
+              &gt;
+                &lt;path
+                  d=&quot;M7 10l5 5 5-5z&quot;
+                /&gt;
+              &lt;/svg&gt;
+              &lt;fieldset
+                aria-hidden=&quot;true&quot;
+                class=&quot;MuiOutlinedInput-notchedOutline css-18p5xg2-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline&quot;
+              &gt;
+                &lt;legend
+                  class=&quot;css-1n64csd-MuiNotchedOutlined-root&quot;
+                &gt;
+                  &lt;span&gt;
+                    Media status
+              ..." type="AssertionError">
+AssertionError: expected last &quot;vi.fn()&quot; call to have been called with [ 11, { page: 1 } ]
+
+Ignored nodes: comments, script, style
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta
+      content=&quot;&quot;
+      name=&quot;emotion-insertion-point&quot;
+    /&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div&gt;
+      &lt;section
+        aria-label=&quot;Site media library&quot;
+        class=&quot;MuiBox-root css-e9v5e8&quot;
+      &gt;
+        &lt;div
+          class=&quot;MuiBox-root css-1lqt9yq&quot;
+        &gt;
+          &lt;div
+            class=&quot;MuiBox-root css-0&quot;
+          &gt;
+            &lt;h2
+              class=&quot;MuiTypography-root MuiTypography-h5 css-kwxs7k-MuiTypography-root&quot;
+            &gt;
+              Media Library
+            &lt;/h2&gt;
+            &lt;p
+              class=&quot;MuiTypography-root MuiTypography-body2 css-1sa4kq8-MuiTypography-root&quot;
+            &gt;
+              Your Site&apos;s images and documents, in one place.
+            &lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;form
+          aria-label=&quot;Search Site media&quot;
+          class=&quot;MuiBox-root css-isdcpr&quot;
+          role=&quot;search&quot;
+        &gt;
+          &lt;div
+            class=&quot;MuiFormControl-root MuiTextField-root css-xo13e1-MuiFormControl-root-MuiTextField-root&quot;
+          &gt;
+            &lt;label
+              class=&quot;MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeSmall MuiInputLabel-outlined css-1kfabtt-MuiFormLabel-root-MuiInputLabel-root&quot;
+              data-shrink=&quot;false&quot;
+              for=&quot;_r_24_&quot;
+              id=&quot;_r_24_-label&quot;
+            &gt;
+              Search media
+            &lt;/label&gt;
+            &lt;div
+              class=&quot;MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-sizeSmall css-quhxjy-MuiInputBase-root-MuiOutlinedInput-root&quot;
+            &gt;
+              &lt;input
+                aria-invalid=&quot;false&quot;
+                class=&quot;MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputSizeSmall css-1pzfmz2-MuiInputBase-input-MuiOutlinedInput-input&quot;
+                id=&quot;_r_24_&quot;
+                maxlength=&quot;255&quot;
+                type=&quot;text&quot;
+                value=&quot;&quot;
+              /&gt;
+              &lt;fieldset
+                aria-hidden=&quot;true&quot;
+                class=&quot;MuiOutlinedInput-notchedOutline css-18p5xg2-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline&quot;
+              &gt;
+                &lt;legend
+                  class=&quot;css-1n64csd-MuiNotchedOutlined-root&quot;
+                &gt;
+                  &lt;span&gt;
+                    Search media
+                  &lt;/span&gt;
+                &lt;/legend&gt;
+              &lt;/fieldset&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div
+            class=&quot;MuiFormControl-root MuiTextField-root css-1ovfe1o-MuiFormControl-root-MuiTextField-root&quot;
+          &gt;
+            &lt;label
+              class=&quot;MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeSmall MuiInputLabel-outlined css-1kfabtt-MuiFormLabel-root-MuiInputLabel-root&quot;
+              data-shrink=&quot;false&quot;
+              for=&quot;_r_25_&quot;
+              id=&quot;_r_25_-label&quot;
+            &gt;
+              Media status
+            &lt;/label&gt;
+            &lt;div
+              class=&quot;MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-sizeSmall MuiSelect-root css-quhxjy-MuiInputBase-root-MuiOutlinedInput-root&quot;
+            &gt;
+              &lt;div
+                aria-expanded=&quot;false&quot;
+                aria-haspopup=&quot;listbox&quot;
+                aria-labelledby=&quot;_r_25_-label _r_25_&quot;
+                class=&quot;MuiSelect-select MuiSelect-outlined MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputSizeSmall css-trm6af-MuiNativeSelect-root-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input&quot;
+                id=&quot;_r_25_&quot;
+                role=&quot;combobox&quot;
+                tabindex=&quot;0&quot;
+              &gt;
+                &lt;span
+                  aria-hidden=&quot;true&quot;
+                  class=&quot;notranslate&quot;
+                &gt;
+                  ​
+                &lt;/span&gt;
+              &lt;/div&gt;
+              &lt;input
+                aria-hidden=&quot;true&quot;
+                aria-invalid=&quot;false&quot;
+                class=&quot;MuiSelect-nativeInput css-j0riat-MuiSelect-nativeInput&quot;
+                tabindex=&quot;-1&quot;
+                value=&quot;&quot;
+              /&gt;
+              &lt;svg
+                aria-hidden=&quot;true&quot;
+                class=&quot;MuiSvgIcon-root MuiSvgIcon-fontSizeMedium MuiSelect-icon MuiSelect-iconOutlined css-1rfqz7c-MuiSvgIcon-root-MuiNativeSelect-root-MuiSelect-icon&quot;
+                data-testid=&quot;ArrowDropDownIcon&quot;
+                focusable=&quot;false&quot;
+                viewBox=&quot;0 0 24 24&quot;
+              &gt;
+                &lt;path
+                  d=&quot;M7 10l5 5 5-5z&quot;
+                /&gt;
+              &lt;/svg&gt;
+              &lt;fieldset
+                aria-hidden=&quot;true&quot;
+                class=&quot;MuiOutlinedInput-notchedOutline css-18p5xg2-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline&quot;
+              &gt;
+                &lt;legend
+                  class=&quot;css-1n64csd-MuiNotchedOutlined-root&quot;
+                &gt;
+                  &lt;span&gt;
+                    Media status
+              ...
+
+- Expected
++ Received
+
+  [
+    11,
+    {
+      &quot;page&quot;: 1,
++     &quot;search&quot;: &quot;campus&quot;,
+    },
+  ]
+
+ ❯ src/sites/media-library.test.tsx:85:47
+ ❯ runWithExpensiveErrorDiagnosticsDisabled ../../node_modules/.pnpm/@testing-library+dom@10.4.0/node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback ../../node_modules/.pnpm/@testing-library+dom@10.4.0/node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback ../../node_modules/.pnpm/@testing-library+dom@10.4.0/node_modules/@testing-library/dom/dist/wait-for.js:118:16
+            </failure>
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; loads scoped details and saves only persisted alt text" time="0.889899166">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; shows readonly metadata without a save control" time="0.473736709">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; sends the selected status and type filters to the server" time="0.3135335">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; shows scoped thumbnails and disables a broken preview until retry" time="0.117332741">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; reports terminal image processing without offering selection" time="0.144206556">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; blocks deletion for a live reference and confirms unused removal" time="0.821280036">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; keeps the library card and metadata after a delete conflict" time="0.726356432">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; preserves edited alt text after a recoverable save failure" time="0.56857465">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; keeps a Gallery-referenced asset, saves alt text, and reloads persisted details" time="0.786368122">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="MediaLibrary &gt; keeps deletion disabled if the reference inventory cannot be verified" time="0.233602197">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Site-isolated media browsing &gt; ignores a delayed Informatics search after switching to Medicine and resets all query state" time="0.144527285">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Site-isolated media browsing &gt; uses responsive grid columns and keeps list layout usable" time="0.128705659">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Site-isolated media browsing &gt; offers recovery for empty search and transport failure" time="1.220626744">
+            <failure message="expected last &quot;vi.fn()&quot; call to have been called with [ 11, { page: 1 } ]
+
+Ignored nodes: comments, script, style
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta
+      content=&quot;&quot;
+      name=&quot;emotion-insertion-point&quot;
+    /&gt;
+  &lt;/head&gt;
+  &lt;body
+    style=&quot;&quot;
+  &gt;
+    &lt;div&gt;
+      &lt;section
+        aria-label=&quot;Site media library&quot;
+        class=&quot;MuiBox-root css-e9v5e8&quot;
+      &gt;
+        &lt;div
+          class=&quot;MuiBox-root css-1lqt9yq&quot;
+        &gt;
+          &lt;div
+            class=&quot;MuiBox-root css-0&quot;
+          &gt;
+            &lt;h2
+              class=&quot;MuiTypography-root MuiTypography-h5 css-kwxs7k-MuiTypography-root&quot;
+            &gt;
+              Media Library
+            &lt;/h2&gt;
+            &lt;p
+              class=&quot;MuiTypography-root MuiTypography-body2 css-1sa4kq8-MuiTypography-root&quot;
+            &gt;
+              Your Site&apos;s images and documents, in one place.
+            &lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;form
+          aria-label=&quot;Search Site media&quot;
+          class=&quot;MuiBox-root css-isdcpr&quot;
+          role=&quot;search&quot;
+        &gt;
+          &lt;div
+            class=&quot;MuiFormControl-root MuiTextField-root css-xo13e1-MuiFormControl-root-MuiTextField-root&quot;
+          &gt;
+            &lt;label
+              class=&quot;MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeSmall MuiInputLabel-outlined css-1kfabtt-MuiFormLabel-root-MuiInputLabel-root&quot;
+              data-shrink=&quot;false&quot;
+              for=&quot;_r_bn_&quot;
+              id=&quot;_r_bn_-label&quot;
+            &gt;
+              Search media
+            &lt;/label&gt;
+            &lt;div
+              class=&quot;MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-sizeSmall css-quhxjy-MuiInputBase-root-MuiOutlinedInput-root&quot;
+            &gt;
+              &lt;input
+                aria-invalid=&quot;false&quot;
+                class=&quot;MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputSizeSmall css-1pzfmz2-MuiInputBase-input-MuiOutlinedInput-input&quot;
+                id=&quot;_r_bn_&quot;
+                maxlength=&quot;255&quot;
+                type=&quot;text&quot;
+                value=&quot;&quot;
+              /&gt;
+              &lt;fieldset
+                aria-hidden=&quot;true&quot;
+                class=&quot;MuiOutlinedInput-notchedOutline css-18p5xg2-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline&quot;
+              &gt;
+                &lt;legend
+                  class=&quot;css-1n64csd-MuiNotchedOutlined-root&quot;
+                &gt;
+                  &lt;span&gt;
+                    Search media
+                  &lt;/span&gt;
+                &lt;/legend&gt;
+              &lt;/fieldset&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div
+            class=&quot;MuiFormControl-root MuiTextField-root css-1ovfe1o-MuiFormControl-root-MuiTextField-root&quot;
+          &gt;
+            &lt;label
+              class=&quot;MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeSmall MuiInputLabel-outlined css-1kfabtt-MuiFormLabel-root-MuiInputLabel-root&quot;
+              data-shrink=&quot;false&quot;
+              for=&quot;_r_bo_&quot;
+              id=&quot;_r_bo_-label&quot;
+            &gt;
+              Media status
+            &lt;/label&gt;
+            &lt;div
+              class=&quot;MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-sizeSmall MuiSelect-root css-quhxjy-MuiInputBase-root-MuiOutlinedInput-root&quot;
+            &gt;
+              &lt;div
+                aria-expanded=&quot;false&quot;
+                aria-haspopup=&quot;listbox&quot;
+                aria-labelledby=&quot;_r_bo_-label _r_bo_&quot;
+                class=&quot;MuiSelect-select MuiSelect-outlined MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputSizeSmall css-trm6af-MuiNativeSelect-root-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input&quot;
+                id=&quot;_r_bo_&quot;
+                role=&quot;combobox&quot;
+                tabindex=&quot;0&quot;
+              &gt;
+                &lt;span
+                  aria-hidden=&quot;true&quot;
+                  class=&quot;notranslate&quot;
+                &gt;
+                  ​
+                &lt;/span&gt;
+              &lt;/div&gt;
+              &lt;input
+                aria-hidden=&quot;true&quot;
+                aria-invalid=&quot;false&quot;
+                class=&quot;MuiSelect-nativeInput css-j0riat-MuiSelect-nativeInput&quot;
+                tabindex=&quot;-1&quot;
+                value=&quot;&quot;
+              /&gt;
+              &lt;svg
+                aria-hidden=&quot;true&quot;
+                class=&quot;MuiSvgIcon-root MuiSvgIcon-fontSizeMedium MuiSelect-icon MuiSelect-iconOutlined css-1rfqz7c-MuiSvgIcon-root-MuiNativeSelect-root-MuiSelect-icon&quot;
+                data-testid=&quot;ArrowDropDownIcon&quot;
+                focusable=&quot;false&quot;
+                viewBox=&quot;0 0 24 24&quot;
+              &gt;
+                &lt;path
+                  d=&quot;M7 10l5 5 5-5z&quot;
+                /&gt;
+              &lt;/svg&gt;
+              &lt;fieldset
+                aria-hidden=&quot;true&quot;
+                class=&quot;MuiOutlinedInput-notchedOutline css-18p5xg2-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline&quot;
+              &gt;
+                &lt;legend
+                  class=&quot;css-1n64csd-MuiNotchedOutlined-root&quot;
+                &gt;
+                  &lt;span&gt;
+         ..." type="AssertionError">
+AssertionError: expected last &quot;vi.fn()&quot; call to have been called with [ 11, { page: 1 } ]
+
+Ignored nodes: comments, script, style
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta
+      content=&quot;&quot;
+      name=&quot;emotion-insertion-point&quot;
+    /&gt;
+  &lt;/head&gt;
+  &lt;body
+    style=&quot;&quot;
+  &gt;
+    &lt;div&gt;
+      &lt;section
+        aria-label=&quot;Site media library&quot;
+        class=&quot;MuiBox-root css-e9v5e8&quot;
+      &gt;
+        &lt;div
+          class=&quot;MuiBox-root css-1lqt9yq&quot;
+        &gt;
+          &lt;div
+            class=&quot;MuiBox-root css-0&quot;
+          &gt;
+            &lt;h2
+              class=&quot;MuiTypography-root MuiTypography-h5 css-kwxs7k-MuiTypography-root&quot;
+            &gt;
+              Media Library
+            &lt;/h2&gt;
+            &lt;p
+              class=&quot;MuiTypography-root MuiTypography-body2 css-1sa4kq8-MuiTypography-root&quot;
+            &gt;
+              Your Site&apos;s images and documents, in one place.
+            &lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;form
+          aria-label=&quot;Search Site media&quot;
+          class=&quot;MuiBox-root css-isdcpr&quot;
+          role=&quot;search&quot;
+        &gt;
+          &lt;div
+            class=&quot;MuiFormControl-root MuiTextField-root css-xo13e1-MuiFormControl-root-MuiTextField-root&quot;
+          &gt;
+            &lt;label
+              class=&quot;MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeSmall MuiInputLabel-outlined css-1kfabtt-MuiFormLabel-root-MuiInputLabel-root&quot;
+              data-shrink=&quot;false&quot;
+              for=&quot;_r_bn_&quot;
+              id=&quot;_r_bn_-label&quot;
+            &gt;
+              Search media
+            &lt;/label&gt;
+            &lt;div
+              class=&quot;MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-sizeSmall css-quhxjy-MuiInputBase-root-MuiOutlinedInput-root&quot;
+            &gt;
+              &lt;input
+                aria-invalid=&quot;false&quot;
+                class=&quot;MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputSizeSmall css-1pzfmz2-MuiInputBase-input-MuiOutlinedInput-input&quot;
+                id=&quot;_r_bn_&quot;
+                maxlength=&quot;255&quot;
+                type=&quot;text&quot;
+                value=&quot;&quot;
+              /&gt;
+              &lt;fieldset
+                aria-hidden=&quot;true&quot;
+                class=&quot;MuiOutlinedInput-notchedOutline css-18p5xg2-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline&quot;
+              &gt;
+                &lt;legend
+                  class=&quot;css-1n64csd-MuiNotchedOutlined-root&quot;
+                &gt;
+                  &lt;span&gt;
+                    Search media
+                  &lt;/span&gt;
+                &lt;/legend&gt;
+              &lt;/fieldset&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div
+            class=&quot;MuiFormControl-root MuiTextField-root css-1ovfe1o-MuiFormControl-root-MuiTextField-root&quot;
+          &gt;
+            &lt;label
+              class=&quot;MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeSmall MuiInputLabel-outlined css-1kfabtt-MuiFormLabel-root-MuiInputLabel-root&quot;
+              data-shrink=&quot;false&quot;
+              for=&quot;_r_bo_&quot;
+              id=&quot;_r_bo_-label&quot;
+            &gt;
+              Media status
+            &lt;/label&gt;
+            &lt;div
+              class=&quot;MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-sizeSmall MuiSelect-root css-quhxjy-MuiInputBase-root-MuiOutlinedInput-root&quot;
+            &gt;
+              &lt;div
+                aria-expanded=&quot;false&quot;
+                aria-haspopup=&quot;listbox&quot;
+                aria-labelledby=&quot;_r_bo_-label _r_bo_&quot;
+                class=&quot;MuiSelect-select MuiSelect-outlined MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputSizeSmall css-trm6af-MuiNativeSelect-root-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input&quot;
+                id=&quot;_r_bo_&quot;
+                role=&quot;combobox&quot;
+                tabindex=&quot;0&quot;
+              &gt;
+                &lt;span
+                  aria-hidden=&quot;true&quot;
+                  class=&quot;notranslate&quot;
+                &gt;
+                  ​
+                &lt;/span&gt;
+              &lt;/div&gt;
+              &lt;input
+                aria-hidden=&quot;true&quot;
+                aria-invalid=&quot;false&quot;
+                class=&quot;MuiSelect-nativeInput css-j0riat-MuiSelect-nativeInput&quot;
+                tabindex=&quot;-1&quot;
+                value=&quot;&quot;
+              /&gt;
+              &lt;svg
+                aria-hidden=&quot;true&quot;
+                class=&quot;MuiSvgIcon-root MuiSvgIcon-fontSizeMedium MuiSelect-icon MuiSelect-iconOutlined css-1rfqz7c-MuiSvgIcon-root-MuiNativeSelect-root-MuiSelect-icon&quot;
+                data-testid=&quot;ArrowDropDownIcon&quot;
+                focusable=&quot;false&quot;
+                viewBox=&quot;0 0 24 24&quot;
+              &gt;
+                &lt;path
+                  d=&quot;M7 10l5 5 5-5z&quot;
+                /&gt;
+              &lt;/svg&gt;
+              &lt;fieldset
+                aria-hidden=&quot;true&quot;
+                class=&quot;MuiOutlinedInput-notchedOutline css-18p5xg2-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline&quot;
+              &gt;
+                &lt;legend
+                  class=&quot;css-1n64csd-MuiNotchedOutlined-root&quot;
+                &gt;
+                  &lt;span&gt;
+         ...
+
+- Expected
++ Received
+
+  [
+    11,
+    {
+      &quot;page&quot;: 1,
++     &quot;search&quot;: &quot;missing&quot;,
+    },
+  ]
+
+ ❯ src/sites/media-library.test.tsx:279:47
+ ❯ runWithExpensiveErrorDiagnosticsDisabled ../../node_modules/.pnpm/@testing-library+dom@10.4.0/node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback ../../node_modules/.pnpm/@testing-library+dom@10.4.0/node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback ../../node_modules/.pnpm/@testing-library+dom@10.4.0/node_modules/@testing-library/dom/dist/wait-for.js:118:16
+            </failure>
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Site-isolated media browsing &gt; supports keyboard pagination and grid/list controls" time="1.232625596">
+            <failure message="expected last &quot;vi.fn()&quot; call to have been called with [ 11, { page: 1 } ]
+
+Ignored nodes: comments, script, style
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta
+      content=&quot;&quot;
+      name=&quot;emotion-insertion-point&quot;
+    /&gt;
+  &lt;/head&gt;
+  &lt;body
+    style=&quot;&quot;
+  &gt;
+    &lt;div&gt;
+      &lt;section
+        aria-label=&quot;Site media library&quot;
+        class=&quot;MuiBox-root css-e9v5e8&quot;
+      &gt;
+        &lt;div
+          class=&quot;MuiBox-root css-1lqt9yq&quot;
+        &gt;
+          &lt;div
+            class=&quot;MuiBox-root css-0&quot;
+          &gt;
+            &lt;h2
+              class=&quot;MuiTypography-root MuiTypography-h5 css-kwxs7k-MuiTypography-root&quot;
+            &gt;
+              Media Library
+            &lt;/h2&gt;
+            &lt;p
+              class=&quot;MuiTypography-root MuiTypography-body2 css-1sa4kq8-MuiTypography-root&quot;
+            &gt;
+              Your Site&apos;s images and documents, in one place.
+            &lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;form
+          aria-label=&quot;Search Site media&quot;
+          class=&quot;MuiBox-root css-isdcpr&quot;
+          role=&quot;search&quot;
+        &gt;
+          &lt;div
+            class=&quot;MuiFormControl-root MuiTextField-root css-xo13e1-MuiFormControl-root-MuiTextField-root&quot;
+          &gt;
+            &lt;label
+              class=&quot;MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeSmall MuiInputLabel-outlined css-1kfabtt-MuiFormLabel-root-MuiInputLabel-root&quot;
+              data-shrink=&quot;false&quot;
+              for=&quot;_r_c6_&quot;
+              id=&quot;_r_c6_-label&quot;
+            &gt;
+              Search media
+            &lt;/label&gt;
+            &lt;div
+              class=&quot;MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-sizeSmall css-quhxjy-MuiInputBase-root-MuiOutlinedInput-root&quot;
+            &gt;
+              &lt;input
+                aria-invalid=&quot;false&quot;
+                class=&quot;MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputSizeSmall css-1pzfmz2-MuiInputBase-input-MuiOutlinedInput-input&quot;
+                id=&quot;_r_c6_&quot;
+                maxlength=&quot;255&quot;
+                type=&quot;text&quot;
+                value=&quot;&quot;
+              /&gt;
+              &lt;fieldset
+                aria-hidden=&quot;true&quot;
+                class=&quot;MuiOutlinedInput-notchedOutline css-18p5xg2-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline&quot;
+              &gt;
+                &lt;legend
+                  class=&quot;css-1n64csd-MuiNotchedOutlined-root&quot;
+                &gt;
+                  &lt;span&gt;
+                    Search media
+                  &lt;/span&gt;
+                &lt;/legend&gt;
+              &lt;/fieldset&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div
+            class=&quot;MuiFormControl-root MuiTextField-root css-1ovfe1o-MuiFormControl-root-MuiTextField-root&quot;
+          &gt;
+            &lt;label
+              class=&quot;MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeSmall MuiInputLabel-outlined css-1kfabtt-MuiFormLabel-root-MuiInputLabel-root&quot;
+              data-shrink=&quot;false&quot;
+              for=&quot;_r_c7_&quot;
+              id=&quot;_r_c7_-label&quot;
+            &gt;
+              Media status
+            &lt;/label&gt;
+            &lt;div
+              class=&quot;MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-sizeSmall MuiSelect-root css-quhxjy-MuiInputBase-root-MuiOutlinedInput-root&quot;
+            &gt;
+              &lt;div
+                aria-expanded=&quot;false&quot;
+                aria-haspopup=&quot;listbox&quot;
+                aria-labelledby=&quot;_r_c7_-label _r_c7_&quot;
+                class=&quot;MuiSelect-select MuiSelect-outlined MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputSizeSmall css-trm6af-MuiNativeSelect-root-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input&quot;
+                id=&quot;_r_c7_&quot;
+                role=&quot;combobox&quot;
+                tabindex=&quot;0&quot;
+              &gt;
+                &lt;span
+                  aria-hidden=&quot;true&quot;
+                  class=&quot;notranslate&quot;
+                &gt;
+                  ​
+                &lt;/span&gt;
+              &lt;/div&gt;
+              &lt;input
+                aria-hidden=&quot;true&quot;
+                aria-invalid=&quot;false&quot;
+                class=&quot;MuiSelect-nativeInput css-j0riat-MuiSelect-nativeInput&quot;
+                tabindex=&quot;-1&quot;
+                value=&quot;&quot;
+              /&gt;
+              &lt;svg
+                aria-hidden=&quot;true&quot;
+                class=&quot;MuiSvgIcon-root MuiSvgIcon-fontSizeMedium MuiSelect-icon MuiSelect-iconOutlined css-1rfqz7c-MuiSvgIcon-root-MuiNativeSelect-root-MuiSelect-icon&quot;
+                data-testid=&quot;ArrowDropDownIcon&quot;
+                focusable=&quot;false&quot;
+                viewBox=&quot;0 0 24 24&quot;
+              &gt;
+                &lt;path
+                  d=&quot;M7 10l5 5 5-5z&quot;
+                /&gt;
+              &lt;/svg&gt;
+              &lt;fieldset
+                aria-hidden=&quot;true&quot;
+                class=&quot;MuiOutlinedInput-notchedOutline css-18p5xg2-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline&quot;
+              &gt;
+                &lt;legend
+                  class=&quot;css-1n64csd-MuiNotchedOutlined-root&quot;
+                &gt;
+                  &lt;span&gt;
+         ..." type="AssertionError">
+AssertionError: expected last &quot;vi.fn()&quot; call to have been called with [ 11, { page: 1 } ]
+
+Ignored nodes: comments, script, style
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta
+      content=&quot;&quot;
+      name=&quot;emotion-insertion-point&quot;
+    /&gt;
+  &lt;/head&gt;
+  &lt;body
+    style=&quot;&quot;
+  &gt;
+    &lt;div&gt;
+      &lt;section
+        aria-label=&quot;Site media library&quot;
+        class=&quot;MuiBox-root css-e9v5e8&quot;
+      &gt;
+        &lt;div
+          class=&quot;MuiBox-root css-1lqt9yq&quot;
+        &gt;
+          &lt;div
+            class=&quot;MuiBox-root css-0&quot;
+          &gt;
+            &lt;h2
+              class=&quot;MuiTypography-root MuiTypography-h5 css-kwxs7k-MuiTypography-root&quot;
+            &gt;
+              Media Library
+            &lt;/h2&gt;
+            &lt;p
+              class=&quot;MuiTypography-root MuiTypography-body2 css-1sa4kq8-MuiTypography-root&quot;
+            &gt;
+              Your Site&apos;s images and documents, in one place.
+            &lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;form
+          aria-label=&quot;Search Site media&quot;
+          class=&quot;MuiBox-root css-isdcpr&quot;
+          role=&quot;search&quot;
+        &gt;
+          &lt;div
+            class=&quot;MuiFormControl-root MuiTextField-root css-xo13e1-MuiFormControl-root-MuiTextField-root&quot;
+          &gt;
+            &lt;label
+              class=&quot;MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeSmall MuiInputLabel-outlined css-1kfabtt-MuiFormLabel-root-MuiInputLabel-root&quot;
+              data-shrink=&quot;false&quot;
+              for=&quot;_r_c6_&quot;
+              id=&quot;_r_c6_-label&quot;
+            &gt;
+              Search media
+            &lt;/label&gt;
+            &lt;div
+              class=&quot;MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-sizeSmall css-quhxjy-MuiInputBase-root-MuiOutlinedInput-root&quot;
+            &gt;
+              &lt;input
+                aria-invalid=&quot;false&quot;
+                class=&quot;MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputSizeSmall css-1pzfmz2-MuiInputBase-input-MuiOutlinedInput-input&quot;
+                id=&quot;_r_c6_&quot;
+                maxlength=&quot;255&quot;
+                type=&quot;text&quot;
+                value=&quot;&quot;
+              /&gt;
+              &lt;fieldset
+                aria-hidden=&quot;true&quot;
+                class=&quot;MuiOutlinedInput-notchedOutline css-18p5xg2-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline&quot;
+              &gt;
+                &lt;legend
+                  class=&quot;css-1n64csd-MuiNotchedOutlined-root&quot;
+                &gt;
+                  &lt;span&gt;
+                    Search media
+                  &lt;/span&gt;
+                &lt;/legend&gt;
+              &lt;/fieldset&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div
+            class=&quot;MuiFormControl-root MuiTextField-root css-1ovfe1o-MuiFormControl-root-MuiTextField-root&quot;
+          &gt;
+            &lt;label
+              class=&quot;MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-sizeSmall MuiInputLabel-outlined css-1kfabtt-MuiFormLabel-root-MuiInputLabel-root&quot;
+              data-shrink=&quot;false&quot;
+              for=&quot;_r_c7_&quot;
+              id=&quot;_r_c7_-label&quot;
+            &gt;
+              Media status
+            &lt;/label&gt;
+            &lt;div
+              class=&quot;MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-sizeSmall MuiSelect-root css-quhxjy-MuiInputBase-root-MuiOutlinedInput-root&quot;
+            &gt;
+              &lt;div
+                aria-expanded=&quot;false&quot;
+                aria-haspopup=&quot;listbox&quot;
+                aria-labelledby=&quot;_r_c7_-label _r_c7_&quot;
+                class=&quot;MuiSelect-select MuiSelect-outlined MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputSizeSmall css-trm6af-MuiNativeSelect-root-MuiSelect-select-MuiInputBase-input-MuiOutlinedInput-input&quot;
+                id=&quot;_r_c7_&quot;
+                role=&quot;combobox&quot;
+                tabindex=&quot;0&quot;
+              &gt;
+                &lt;span
+                  aria-hidden=&quot;true&quot;
+                  class=&quot;notranslate&quot;
+                &gt;
+                  ​
+                &lt;/span&gt;
+              &lt;/div&gt;
+              &lt;input
+                aria-hidden=&quot;true&quot;
+                aria-invalid=&quot;false&quot;
+                class=&quot;MuiSelect-nativeInput css-j0riat-MuiSelect-nativeInput&quot;
+                tabindex=&quot;-1&quot;
+                value=&quot;&quot;
+              /&gt;
+              &lt;svg
+                aria-hidden=&quot;true&quot;
+                class=&quot;MuiSvgIcon-root MuiSvgIcon-fontSizeMedium MuiSelect-icon MuiSelect-iconOutlined css-1rfqz7c-MuiSvgIcon-root-MuiNativeSelect-root-MuiSelect-icon&quot;
+                data-testid=&quot;ArrowDropDownIcon&quot;
+                focusable=&quot;false&quot;
+                viewBox=&quot;0 0 24 24&quot;
+              &gt;
+                &lt;path
+                  d=&quot;M7 10l5 5 5-5z&quot;
+                /&gt;
+              &lt;/svg&gt;
+              &lt;fieldset
+                aria-hidden=&quot;true&quot;
+                class=&quot;MuiOutlinedInput-notchedOutline css-18p5xg2-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline&quot;
+              &gt;
+                &lt;legend
+                  class=&quot;css-1n64csd-MuiNotchedOutlined-root&quot;
+                &gt;
+                  &lt;span&gt;
+         ...
+
+- Expected
++ Received
+
+  [
+    11,
+    {
+-     &quot;page&quot;: 1,
++     &quot;page&quot;: 2,
+    },
+  ]
+
+ ❯ src/sites/media-library.test.tsx:303:47
+ ❯ runWithExpensiveErrorDiagnosticsDisabled ../../node_modules/.pnpm/@testing-library+dom@10.4.0/node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback ../../node_modules/.pnpm/@testing-library+dom@10.4.0/node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback ../../node_modules/.pnpm/@testing-library+dom@10.4.0/node_modules/@testing-library/dom/dist/wait-for.js:118:16
+            </failure>
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Quiet processing updates and previews &gt; refreshes a processing image without a loading flash and updates its open details preview" time="0.346468263">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="Quiet processing updates and previews &gt; does not continuously poll a completed catalog" time="0.056402833">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="renames and categorizes an asset without changing its original filename" time="0.558230494">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="opens the scoped display image in an immersive viewer and clears it on Site change" time="0.302424147">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="keeps unsaved metadata when expanding and closing the image" time="0.716498909">
+        </testcase>
+        <testcase classname="src/sites/media-library.test.tsx" name="hides ready badges in both layouts while keeping processing visible" time="0.169732888">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/menu-locations.test.tsx" timestamp="2026-11-15T17:29:10.863Z" hostname="4946b5c63baa" tests="5" failures="0" errors="0" skipped="0" time="0.639647644">
+        <testcase classname="src/sites/menu-locations.test.tsx" name="requires explicit replacement and keeps separate save and publish actions" time="0.340849351">
+        </testcase>
+        <testcase classname="src/sites/menu-locations.test.tsx" name="publishes the backend-confirmed version, and supports unassignment drafts" time="0.117330745">
+        </testcase>
+        <testcase classname="src/sites/menu-locations.test.tsx" name="hides unauthorized writes and clears the old Site while a new request is pending" time="0.02699451">
+        </testcase>
+        <testcase classname="src/sites/menu-locations.test.tsx" name="retains a selection after a conflict and offers a refresh action" time="0.081709975">
+        </testcase>
+        <testcase classname="src/sites/menu-locations.test.tsx" name="shows the backend destination validation without losing the saved draft choice" time="0.070688583">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-dashboard.test.tsx" timestamp="2026-11-15T17:29:10.871Z" hostname="4946b5c63baa" tests="6" failures="0" errors="0" skipped="0" time="0.593188566">
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="SiteDashboard &gt; summarizes this Site&apos;s Pages, Posts and Menus from the API" time="0.339567546">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="SiteDashboard &gt; offers create-page and navigation quick actions within the Site" time="0.060211006">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="SiteDashboard &gt; omits disabled or unauthorized sections and does not call their APIs" time="0.052366674">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="SiteDashboard &gt; shows an empty state when the Site has no Pages" time="0.031505107">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="SiteDashboard &gt; reports a failed summary and retries it" time="0.080302761">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="SiteDashboard &gt; says so when no content module is available" time="0.027526593">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-menus.test.tsx" timestamp="2026-11-15T17:29:10.892Z" hostname="4946b5c63baa" tests="13" failures="0" errors="0" skipped="0" time="2.687504228">
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; reorders the header with the keyboard-reachable move control and only for this Site" time="0.437334766">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; shows the reloaded menu order after a move" time="0.261991395">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; creates an unassigned local menu and renames it without changing placement" time="0.403668217">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; treats a missing inheritance field as no delivery policy" time="0.092662008">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; ignores malformed inheritance entries without crashing or inventing a policy" time="0.11973943">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; states that an empty inheritance list adds no parent menu" time="0.100949097">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; explains central and inherited ownership and does not edit a central menu" time="0.352495899">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; shows an empty list and hides writes without menu permission" time="0.053004595">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; shows the load error and keeps the selected Site on the request" time="0.019378731">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; blocks protected reads and changes when the MENUS module is off" time="0.007392172">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="creates another named menu even after header and footer are occupied" time="0.280015259">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="selects and searches the directory without showing another Site&apos;s menu" time="0.304925549">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="loads only the selected item tree and ignores a late response for another menu" time="0.250056613">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-pages.test.tsx" timestamp="2026-11-15T17:29:10.919Z" hostname="4946b5c63baa" tests="25" failures="1" errors="0" skipped="0" time="11.126560069">
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; saves a shell-only change without resending builder blocks or metadata" time="0.79708608">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; assigns only published Pages allowed by the backend as the homepage" time="0.44952008">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; renders a site-scoped accessible table and status dashboard" time="0.148394694">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; announces empty and failed API list states" time="0.229965563">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; applies server search and status filters and resets pagination" time="1.485995211">
+            <failure message="expected &lt;input id=&quot;_r_2u_&quot; …(4)&gt;&lt;/input&gt; to have property &quot;value&quot; with value &apos;&apos;
+
+Ignored nodes: comments, script, style
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta
+      content=&quot;&quot;
+      name=&quot;emotion-insertion-point&quot;
+    /&gt;
+  &lt;/head&gt;
+  &lt;body
+    style=&quot;&quot;
+  &gt;
+    &lt;div&gt;
+      &lt;div
+        class=&quot;MuiPaper-root MuiPaper-outlined MuiPaper-rounded css-1z0akjj-MuiPaper-root&quot;
+        data-perf-pending=&quot;false&quot;
+        data-perf-section=&quot;pages&quot;
+      &gt;
+        &lt;div
+          class=&quot;MuiBox-root css-jcw9be&quot;
+        &gt;
+          &lt;div
+            class=&quot;MuiBox-root css-0&quot;
+          &gt;
+            &lt;h2
+              class=&quot;MuiTypography-root MuiTypography-h2 css-ky3l4p-MuiTypography-root&quot;
+            &gt;
+              Pages
+            &lt;/h2&gt;
+            &lt;p
+              class=&quot;MuiTypography-root MuiTypography-body2 css-1wle3ir-MuiTypography-root&quot;
+            &gt;
+              Manage the Pages belonging to this Site.
+            &lt;/p&gt;
+          &lt;/div&gt;
+          &lt;div
+            class=&quot;MuiBox-root css-1mcghfl&quot;
+          &gt;
+            &lt;a
+              class=&quot;MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary css-74d805-MuiButtonBase-root-MuiButton-root&quot;
+              href=&quot;/sites/11/admin/pages/new&quot;
+              tabindex=&quot;0&quot;
+            &gt;
+              &lt;span
+                class=&quot;MuiButton-icon MuiButton-startIcon MuiButton-iconSizeMedium css-1sh91j5-MuiButton-startIcon&quot;
+              &gt;
+                &lt;svg
+                  aria-hidden=&quot;true&quot;
+                  class=&quot;MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1umw9bq-MuiSvgIcon-root&quot;
+                  data-testid=&quot;AddIcon&quot;
+                  focusable=&quot;false&quot;
+                  viewBox=&quot;0 0 24 24&quot;
+                &gt;
+                  &lt;path
+                    d=&quot;M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z&quot;
+                  /&gt;
+                &lt;/svg&gt;
+              &lt;/span&gt;
+              Create page
+            &lt;/a&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;section
+          aria-labelledby=&quot;page-status-heading&quot;
+          class=&quot;MuiBox-root css-0&quot;
+        &gt;
+          &lt;h3
+            class=&quot;MuiTypography-root MuiTypography-subtitle2 css-1k7msii-MuiTypography-root&quot;
+            id=&quot;page-status-heading&quot;
+          &gt;
+            Page status dashboard
+          &lt;/h3&gt;
+          &lt;div
+            class=&quot;MuiBox-root css-3xg946&quot;
+          &gt;
+            &lt;div
+              class=&quot;MuiPaper-root MuiPaper-outlined MuiPaper-rounded css-1frr0gk-MuiPaper-root&quot;
+            &gt;
+              &lt;span
+                class=&quot;MuiTypography-root MuiTypography-caption css-1374baf-MuiTypography-root&quot;
+              &gt;
+                Total
+              &lt;/span&gt;
+              &lt;h6
+                class=&quot;MuiTypography-root MuiTypography-h6 css-1miy0lu-MuiTypography-root&quot;
+              &gt;
+                1
+              &lt;/h6&gt;
+            &lt;/div&gt;
+            &lt;div
+              class=&quot;MuiPaper-root MuiPaper-outlined MuiPaper-rounded css-1frr0gk-MuiPaper-root&quot;
+            &gt;
+              &lt;span
+                class=&quot;MuiTypography-root MuiTypography-caption css-1374baf-MuiTypography-root&quot;
+              &gt;
+                Draft
+              &lt;/span&gt;
+              &lt;h6
+                class=&quot;MuiTypography-root MuiTypography-h6 css-1miy0lu-MuiTypography-root&quot;
+              &gt;
+                1
+              &lt;/h6&gt;
+            &lt;/div&gt;
+            &lt;div
+              class=&quot;MuiPaper-root MuiPaper-outlined MuiPaper-rounded css-1frr0gk-MuiPaper-root&quot;
+            &gt;
+              &lt;span
+                class=&quot;MuiTypography-root MuiTypography-caption css-1374baf-MuiTypography-root&quot;
+              &gt;
+                In review
+              &lt;/span&gt;
+              &lt;h6
+                class=&quot;MuiTypography-root MuiTypography-h6 css-1miy0lu-MuiTypography-root&quot;
+              &gt;
+                0
+              &lt;/h6&gt;
+            &lt;/div&gt;
+            &lt;div
+              class=&quot;MuiPaper-root MuiPaper-outlined MuiPaper-rounded css-1frr0gk-MuiPaper-root&quot;
+            &gt;
+              &lt;span
+                class=&quot;MuiTypography-root MuiTypography-caption css-1374baf-MuiTypography-root&quot;
+              &gt;
+                Approved
+              &lt;/span&gt;
+              &lt;h6
+                class=&quot;MuiTypography-root MuiTypography-h6 css-1miy0lu-MuiTypography-root&quot;
+              &gt;
+                0
+              &lt;/h6&gt;
+            &lt;/div&gt;
+            &lt;div
+              class=&quot;MuiPaper-root MuiPaper-outlined MuiPaper-rounded css-1frr0gk-MuiPaper-root&quot;
+            &gt;
+              &lt;span
+                class=&quot;MuiTypography-root MuiTypography-caption css-1374baf-MuiTypography-root&quot;
+              &gt;
+                Published
+              &lt;/span&gt;
+              &lt;h6
+                class=&quot;MuiTypography-root MuiTypography-h6 css-1miy0lu-MuiTypography-root&quot;
+              &gt;
+                0
+              &lt;/h6&gt;
+            &lt;/div&gt;
+            &lt;div
+              class=&quot;MuiPaper-root MuiPaper-outlined MuiPaper-rounded css-1frr0gk-MuiPaper-root&quot;
+            &gt;
+              &lt;span
+                class=&quot;MuiTypography-root MuiTypography-caption css-1374baf-MuiTypography-root&quot;
+              &gt;
+                U..." type="AssertionError">
+AssertionError: expected &lt;input id=&quot;_r_2u_&quot; …(4)&gt;&lt;/input&gt; to have property &quot;value&quot; with value &apos;&apos;
+
+Ignored nodes: comments, script, style
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta
+      content=&quot;&quot;
+      name=&quot;emotion-insertion-point&quot;
+    /&gt;
+  &lt;/head&gt;
+  &lt;body
+    style=&quot;&quot;
+  &gt;
+    &lt;div&gt;
+      &lt;div
+        class=&quot;MuiPaper-root MuiPaper-outlined MuiPaper-rounded css-1z0akjj-MuiPaper-root&quot;
+        data-perf-pending=&quot;false&quot;
+        data-perf-section=&quot;pages&quot;
+      &gt;
+        &lt;div
+          class=&quot;MuiBox-root css-jcw9be&quot;
+        &gt;
+          &lt;div
+            class=&quot;MuiBox-root css-0&quot;
+          &gt;
+            &lt;h2
+              class=&quot;MuiTypography-root MuiTypography-h2 css-ky3l4p-MuiTypography-root&quot;
+            &gt;
+              Pages
+            &lt;/h2&gt;
+            &lt;p
+              class=&quot;MuiTypography-root MuiTypography-body2 css-1wle3ir-MuiTypography-root&quot;
+            &gt;
+              Manage the Pages belonging to this Site.
+            &lt;/p&gt;
+          &lt;/div&gt;
+          &lt;div
+            class=&quot;MuiBox-root css-1mcghfl&quot;
+          &gt;
+            &lt;a
+              class=&quot;MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary css-74d805-MuiButtonBase-root-MuiButton-root&quot;
+              href=&quot;/sites/11/admin/pages/new&quot;
+              tabindex=&quot;0&quot;
+            &gt;
+              &lt;span
+                class=&quot;MuiButton-icon MuiButton-startIcon MuiButton-iconSizeMedium css-1sh91j5-MuiButton-startIcon&quot;
+              &gt;
+                &lt;svg
+                  aria-hidden=&quot;true&quot;
+                  class=&quot;MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1umw9bq-MuiSvgIcon-root&quot;
+                  data-testid=&quot;AddIcon&quot;
+                  focusable=&quot;false&quot;
+                  viewBox=&quot;0 0 24 24&quot;
+                &gt;
+                  &lt;path
+                    d=&quot;M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z&quot;
+                  /&gt;
+                &lt;/svg&gt;
+              &lt;/span&gt;
+              Create page
+            &lt;/a&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;section
+          aria-labelledby=&quot;page-status-heading&quot;
+          class=&quot;MuiBox-root css-0&quot;
+        &gt;
+          &lt;h3
+            class=&quot;MuiTypography-root MuiTypography-subtitle2 css-1k7msii-MuiTypography-root&quot;
+            id=&quot;page-status-heading&quot;
+          &gt;
+            Page status dashboard
+          &lt;/h3&gt;
+          &lt;div
+            class=&quot;MuiBox-root css-3xg946&quot;
+          &gt;
+            &lt;div
+              class=&quot;MuiPaper-root MuiPaper-outlined MuiPaper-rounded css-1frr0gk-MuiPaper-root&quot;
+            &gt;
+              &lt;span
+                class=&quot;MuiTypography-root MuiTypography-caption css-1374baf-MuiTypography-root&quot;
+              &gt;
+                Total
+              &lt;/span&gt;
+              &lt;h6
+                class=&quot;MuiTypography-root MuiTypography-h6 css-1miy0lu-MuiTypography-root&quot;
+              &gt;
+                1
+              &lt;/h6&gt;
+            &lt;/div&gt;
+            &lt;div
+              class=&quot;MuiPaper-root MuiPaper-outlined MuiPaper-rounded css-1frr0gk-MuiPaper-root&quot;
+            &gt;
+              &lt;span
+                class=&quot;MuiTypography-root MuiTypography-caption css-1374baf-MuiTypography-root&quot;
+              &gt;
+                Draft
+              &lt;/span&gt;
+              &lt;h6
+                class=&quot;MuiTypography-root MuiTypography-h6 css-1miy0lu-MuiTypography-root&quot;
+              &gt;
+                1
+              &lt;/h6&gt;
+            &lt;/div&gt;
+            &lt;div
+              class=&quot;MuiPaper-root MuiPaper-outlined MuiPaper-rounded css-1frr0gk-MuiPaper-root&quot;
+            &gt;
+              &lt;span
+                class=&quot;MuiTypography-root MuiTypography-caption css-1374baf-MuiTypography-root&quot;
+              &gt;
+                In review
+              &lt;/span&gt;
+              &lt;h6
+                class=&quot;MuiTypography-root MuiTypography-h6 css-1miy0lu-MuiTypography-root&quot;
+              &gt;
+                0
+              &lt;/h6&gt;
+            &lt;/div&gt;
+            &lt;div
+              class=&quot;MuiPaper-root MuiPaper-outlined MuiPaper-rounded css-1frr0gk-MuiPaper-root&quot;
+            &gt;
+              &lt;span
+                class=&quot;MuiTypography-root MuiTypography-caption css-1374baf-MuiTypography-root&quot;
+              &gt;
+                Approved
+              &lt;/span&gt;
+              &lt;h6
+                class=&quot;MuiTypography-root MuiTypography-h6 css-1miy0lu-MuiTypography-root&quot;
+              &gt;
+                0
+              &lt;/h6&gt;
+            &lt;/div&gt;
+            &lt;div
+              class=&quot;MuiPaper-root MuiPaper-outlined MuiPaper-rounded css-1frr0gk-MuiPaper-root&quot;
+            &gt;
+              &lt;span
+                class=&quot;MuiTypography-root MuiTypography-caption css-1374baf-MuiTypography-root&quot;
+              &gt;
+                Published
+              &lt;/span&gt;
+              &lt;h6
+                class=&quot;MuiTypography-root MuiTypography-h6 css-1miy0lu-MuiTypography-root&quot;
+              &gt;
+                0
+              &lt;/h6&gt;
+            &lt;/div&gt;
+            &lt;div
+              class=&quot;MuiPaper-root MuiPaper-outlined MuiPaper-rounded css-1frr0gk-MuiPaper-root&quot;
+            &gt;
+              &lt;span
+                class=&quot;MuiTypography-root MuiTypography-caption css-1374baf-MuiTypography-root&quot;
+              &gt;
+                U...
+
+- Expected
++ Received
+
++   admissions  
+
+ ❯ src/sites/site-pages.test.tsx:262:85
+ ❯ runWithExpensiveErrorDiagnosticsDisabled ../../node_modules/.pnpm/@testing-library+dom@10.4.0/node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback ../../node_modules/.pnpm/@testing-library+dom@10.4.0/node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback ../../node_modules/.pnpm/@testing-library+dom@10.4.0/node_modules/@testing-library/dom/dist/wait-for.js:118:16
+            </failure>
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; uses API pagination and resets to the first page when sorting changes" time="0.276144769">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; opens full-page preview in a new tab and submits this Site&apos;s draft for review" time="0.292846836">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; shows review controls only from backend-authorized actions and requires a rejection comment" time="0.591248802">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; shows append-only workflow history and reviewer feedback in a timeline" time="0.220954875">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; defaults a new Page to the Site language" time="0.445074409">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; links Create page to the dedicated create screen" time="0.142527544">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; starts a new Page blank and fills the slug from the title until it is edited" time="0.468872423">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; blocks create without create permission on the editor screen" time="0.032960641">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; creates and edits only with the matching permission and current ETag" time="0.903147178">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; assigns a Site sidebar without replacing the builder document" time="0.683941106">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; surfaces stale edit conflicts without losing the form" time="0.67638244">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; previews private draft content and blocks malformed block JSON" time="0.548825567">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; shows the frozen private revision and sends its exact ETag when publishing" time="0.385168387">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; previews the shared visual fixture and rejects unsupported layout versions before saving" time="0.675841608">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; asks before discarding unsaved editor changes" time="0.407737148">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; blocks management and protected reads when the PAGES module is off" time="0.045158087">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; clears filter and page state when the selected Site changes" time="0.258090092">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; does not fetch or expose Pages without view permission" time="0.006046255">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; switches Site scope and enforces view-only access across the admin workspace" time="0.256298586">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; opens a working draft of a published Page and keeps the live route fixed" time="0.695820774">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-posts.test.tsx" timestamp="2026-11-15T17:29:10.953Z" hostname="4946b5c63baa" tests="19" failures="1" errors="0" skipped="0" time="12.348368891">
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; loads only the selected Site and renders status, author, taxonomy and featured media" time="0.402476207">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; applies search, status, category and tag filters and resets them" time="1.722748285">
+            <failure message="expected &lt;input id=&quot;_r_i_&quot; …(4)&gt;&lt;/input&gt; to have property &quot;value&quot; with value &apos;&apos;
+
+Ignored nodes: comments, script, style
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta
+      content=&quot;&quot;
+      name=&quot;emotion-insertion-point&quot;
+    /&gt;
+  &lt;/head&gt;
+  &lt;body
+    style=&quot;&quot;
+  &gt;
+    &lt;div&gt;
+      &lt;div
+        class=&quot;MuiPaper-root MuiPaper-outlined MuiPaper-rounded css-1z0akjj-MuiPaper-root&quot;
+        data-perf-pending=&quot;false&quot;
+        data-perf-section=&quot;posts&quot;
+      &gt;
+        &lt;div
+          class=&quot;MuiBox-root css-jcw9be&quot;
+        &gt;
+          &lt;div
+            class=&quot;MuiBox-root css-0&quot;
+          &gt;
+            &lt;h2
+              class=&quot;MuiTypography-root MuiTypography-h2 css-ky3l4p-MuiTypography-root&quot;
+            &gt;
+              Posts
+            &lt;/h2&gt;
+            &lt;p
+              class=&quot;MuiTypography-root MuiTypography-body2 css-1wle3ir-MuiTypography-root&quot;
+            &gt;
+              Search and manage Posts belonging to this Site.
+            &lt;/p&gt;
+          &lt;/div&gt;
+          &lt;a
+            class=&quot;MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary css-74d805-MuiButtonBase-root-MuiButton-root&quot;
+            href=&quot;/sites/11/admin/posts/new&quot;
+            tabindex=&quot;0&quot;
+          &gt;
+            &lt;span
+              class=&quot;MuiButton-icon MuiButton-startIcon MuiButton-iconSizeMedium css-1sh91j5-MuiButton-startIcon&quot;
+            &gt;
+              &lt;svg
+                aria-hidden=&quot;true&quot;
+                class=&quot;MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1umw9bq-MuiSvgIcon-root&quot;
+                data-testid=&quot;AddIcon&quot;
+                focusable=&quot;false&quot;
+                viewBox=&quot;0 0 24 24&quot;
+              &gt;
+                &lt;path
+                  d=&quot;M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z&quot;
+                /&gt;
+              &lt;/svg&gt;
+            &lt;/span&gt;
+            Create Post
+          &lt;/a&gt;
+        &lt;/div&gt;
+        &lt;form
+          aria-label=&quot;Post filters&quot;
+          class=&quot;MuiBox-root css-4eps4d&quot;
+          role=&quot;search&quot;
+        &gt;
+          &lt;span
+            class=&quot;MuiBox-root css-1b5bbfw&quot;
+          &gt;
+            &lt;svg
+              aria-hidden=&quot;true&quot;
+              class=&quot;MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-120dh41-MuiSvgIcon-root&quot;
+              data-testid=&quot;FilterListIcon&quot;
+              focusable=&quot;false&quot;
+              viewBox=&quot;0 0 24 24&quot;
+            &gt;
+              &lt;path
+                d=&quot;M10 18h4v-2h-4zM3 6v2h18V6zm3 7h12v-2H6z&quot;
+              /&gt;
+            &lt;/svg&gt;
+            &lt;span
+              class=&quot;MuiBox-root css-1em96jp&quot;
+            &gt;
+              Post filters
+               (4)
+            &lt;/span&gt;
+          &lt;/span&gt;
+          &lt;div
+            class=&quot;MuiFormControl-root MuiTextField-root css-vzphw3-MuiFormControl-root-MuiTextField-root&quot;
+          &gt;
+            &lt;label
+              class=&quot;MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiFormLabel-filled MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined css-hvjq6j-MuiFormLabel-root-MuiInputLabel-root&quot;
+              data-shrink=&quot;true&quot;
+              for=&quot;_r_i_&quot;
+              id=&quot;_r_i_-label&quot;
+            &gt;
+              Search Posts
+            &lt;/label&gt;
+            &lt;div
+              class=&quot;MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-sizeSmall css-quhxjy-MuiInputBase-root-MuiOutlinedInput-root&quot;
+            &gt;
+              &lt;input
+                class=&quot;MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputSizeSmall css-1pzfmz2-MuiInputBase-input-MuiOutlinedInput-input&quot;
+                id=&quot;_r_i_&quot;
+                placeholder=&quot;Title, slug, excerpt or content&quot;
+                type=&quot;text&quot;
+                value=&quot;  campus  &quot;
+              /&gt;
+              &lt;fieldset
+                aria-hidden=&quot;true&quot;
+                class=&quot;MuiOutlinedInput-notchedOutline css-18p5xg2-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline&quot;
+              &gt;
+                &lt;legend
+                  class=&quot;css-ex8a5f-MuiNotchedOutlined-root&quot;
+                &gt;
+                  &lt;span&gt;
+                    Search Posts
+                  &lt;/span&gt;
+                &lt;/legend&gt;
+              &lt;/fieldset&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div
+            class=&quot;MuiFormControl-root css-fi9q4j-MuiFormControl-root&quot;
+          &gt;
+            &lt;label
+              class=&quot;MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiFormLabel-filled MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined css-hvjq6j-MuiFormLabel-root-MuiInputLabel-root&quot;
+              data-shrink=&quot;true&quot;
+              id=&quot;_r_k_-label&quot;
+            &gt;
+              Status
+            &lt;/label&gt;
+            &lt;div
+              class=&quot;MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-sizeSmall MuiSelect-root css-quhxjy-MuiInputBase-root-MuiOutlinedInput-root&quot;
+          ..." type="AssertionError">
+AssertionError: expected &lt;input id=&quot;_r_i_&quot; …(4)&gt;&lt;/input&gt; to have property &quot;value&quot; with value &apos;&apos;
+
+Ignored nodes: comments, script, style
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta
+      content=&quot;&quot;
+      name=&quot;emotion-insertion-point&quot;
+    /&gt;
+  &lt;/head&gt;
+  &lt;body
+    style=&quot;&quot;
+  &gt;
+    &lt;div&gt;
+      &lt;div
+        class=&quot;MuiPaper-root MuiPaper-outlined MuiPaper-rounded css-1z0akjj-MuiPaper-root&quot;
+        data-perf-pending=&quot;false&quot;
+        data-perf-section=&quot;posts&quot;
+      &gt;
+        &lt;div
+          class=&quot;MuiBox-root css-jcw9be&quot;
+        &gt;
+          &lt;div
+            class=&quot;MuiBox-root css-0&quot;
+          &gt;
+            &lt;h2
+              class=&quot;MuiTypography-root MuiTypography-h2 css-ky3l4p-MuiTypography-root&quot;
+            &gt;
+              Posts
+            &lt;/h2&gt;
+            &lt;p
+              class=&quot;MuiTypography-root MuiTypography-body2 css-1wle3ir-MuiTypography-root&quot;
+            &gt;
+              Search and manage Posts belonging to this Site.
+            &lt;/p&gt;
+          &lt;/div&gt;
+          &lt;a
+            class=&quot;MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary css-74d805-MuiButtonBase-root-MuiButton-root&quot;
+            href=&quot;/sites/11/admin/posts/new&quot;
+            tabindex=&quot;0&quot;
+          &gt;
+            &lt;span
+              class=&quot;MuiButton-icon MuiButton-startIcon MuiButton-iconSizeMedium css-1sh91j5-MuiButton-startIcon&quot;
+            &gt;
+              &lt;svg
+                aria-hidden=&quot;true&quot;
+                class=&quot;MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1umw9bq-MuiSvgIcon-root&quot;
+                data-testid=&quot;AddIcon&quot;
+                focusable=&quot;false&quot;
+                viewBox=&quot;0 0 24 24&quot;
+              &gt;
+                &lt;path
+                  d=&quot;M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z&quot;
+                /&gt;
+              &lt;/svg&gt;
+            &lt;/span&gt;
+            Create Post
+          &lt;/a&gt;
+        &lt;/div&gt;
+        &lt;form
+          aria-label=&quot;Post filters&quot;
+          class=&quot;MuiBox-root css-4eps4d&quot;
+          role=&quot;search&quot;
+        &gt;
+          &lt;span
+            class=&quot;MuiBox-root css-1b5bbfw&quot;
+          &gt;
+            &lt;svg
+              aria-hidden=&quot;true&quot;
+              class=&quot;MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-120dh41-MuiSvgIcon-root&quot;
+              data-testid=&quot;FilterListIcon&quot;
+              focusable=&quot;false&quot;
+              viewBox=&quot;0 0 24 24&quot;
+            &gt;
+              &lt;path
+                d=&quot;M10 18h4v-2h-4zM3 6v2h18V6zm3 7h12v-2H6z&quot;
+              /&gt;
+            &lt;/svg&gt;
+            &lt;span
+              class=&quot;MuiBox-root css-1em96jp&quot;
+            &gt;
+              Post filters
+               (4)
+            &lt;/span&gt;
+          &lt;/span&gt;
+          &lt;div
+            class=&quot;MuiFormControl-root MuiTextField-root css-vzphw3-MuiFormControl-root-MuiTextField-root&quot;
+          &gt;
+            &lt;label
+              class=&quot;MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiFormLabel-filled MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined css-hvjq6j-MuiFormLabel-root-MuiInputLabel-root&quot;
+              data-shrink=&quot;true&quot;
+              for=&quot;_r_i_&quot;
+              id=&quot;_r_i_-label&quot;
+            &gt;
+              Search Posts
+            &lt;/label&gt;
+            &lt;div
+              class=&quot;MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-sizeSmall css-quhxjy-MuiInputBase-root-MuiOutlinedInput-root&quot;
+            &gt;
+              &lt;input
+                class=&quot;MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputSizeSmall css-1pzfmz2-MuiInputBase-input-MuiOutlinedInput-input&quot;
+                id=&quot;_r_i_&quot;
+                placeholder=&quot;Title, slug, excerpt or content&quot;
+                type=&quot;text&quot;
+                value=&quot;  campus  &quot;
+              /&gt;
+              &lt;fieldset
+                aria-hidden=&quot;true&quot;
+                class=&quot;MuiOutlinedInput-notchedOutline css-18p5xg2-MuiNotchedOutlined-root-MuiOutlinedInput-notchedOutline&quot;
+              &gt;
+                &lt;legend
+                  class=&quot;css-ex8a5f-MuiNotchedOutlined-root&quot;
+                &gt;
+                  &lt;span&gt;
+                    Search Posts
+                  &lt;/span&gt;
+                &lt;/legend&gt;
+              &lt;/fieldset&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div
+            class=&quot;MuiFormControl-root css-fi9q4j-MuiFormControl-root&quot;
+          &gt;
+            &lt;label
+              class=&quot;MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiFormLabel-filled MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-sizeSmall MuiInputLabel-outlined css-hvjq6j-MuiFormLabel-root-MuiInputLabel-root&quot;
+              data-shrink=&quot;true&quot;
+              id=&quot;_r_k_-label&quot;
+            &gt;
+              Status
+            &lt;/label&gt;
+            &lt;div
+              class=&quot;MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-sizeSmall MuiSelect-root css-quhxjy-MuiInputBase-root-MuiOutlinedInput-root&quot;
+          ...
+
+- Expected
++ Received
+
++   campus  
+
+ ❯ src/sites/site-posts.test.tsx:158:85
+ ❯ runWithExpensiveErrorDiagnosticsDisabled ../../node_modules/.pnpm/@testing-library+dom@10.4.0/node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback ../../node_modules/.pnpm/@testing-library+dom@10.4.0/node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback ../../node_modules/.pnpm/@testing-library+dom@10.4.0/node_modules/@testing-library/dom/dist/wait-for.js:118:16
+            </failure>
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; links Create and Edit to dedicated editor routes" time="0.144219177">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; hides create/edit actions without permissions and blocks the disabled module" time="0.145705319">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; does not request or reveal Site Posts without view permission" time="0.006458921">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; shows empty and API error states" time="0.222906817">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostsPanel &gt; runs submit, approve and publish only when the API offers that action for this Site" time="0.615195098">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; creates drafts and edits with the detail ETag on the full-page editor" time="1.165713528">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; validates media scope and offers taxonomy creation only to authorized creators" time="1.951631511">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; previews the Site draft through the shared safe block renderer" time="0.425620429">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; keeps unsaved formatting after failed saves and warns before discard" time="0.698811363">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; preserves a stale draft and displays explicit conflict guidance" time="0.554743268">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; refreshes the revision marker after a conflict while keeping unsaved text" time="0.796783274">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; surfaces editor_document field errors on the draft editor" time="0.424256361">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; fills the permalink from the title until the slug is edited" time="0.457266115">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; rejects reserved permalinks and shows the public path preview" time="0.69395282">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; surfaces duplicate slug API field errors on the settings panel" time="0.81920154">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; locks Post settings while the Post is published" time="0.281487268">
+        </testcase>
+        <testcase classname="src/sites/site-posts.test.tsx" name="SitePostEditor &gt; lets an editor remove selected taxonomy that is no longer eligible" time="0.815905979">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/workspace.test.tsx" timestamp="2026-11-15T17:29:10.969Z" hostname="4946b5c63baa" tests="5" failures="0" errors="0" skipped="0" time="0.95679269">
+        <testcase classname="src/workspace.test.tsx" name="shares one bootstrap across simultaneous consumers and same-Site sections" time="0.04117362">
+        </testcase>
+        <testcase classname="src/workspace.test.tsx" name="clears old Site immediately and ignores a late response even if transport ignores abort" time="0.013793564">
+        </testcase>
+        <testcase classname="src/workspace.test.tsx" name="fails closed for a mismatched/version-invalid response and recovers explicitly" time="0.019415466">
+        </testcase>
+        <testcase classname="src/workspace.test.tsx" name="keeps an unsaved editor mounted during successful same-Site revalidation" time="0.070851405">
+        </testcase>
+        <testcase classname="src/workspace.test.tsx" name="loads discovery only on open, pages explicitly and rejects stale search results" time="0.809355948">
+        </testcase>
+    </testsuite>
+</testsuites>

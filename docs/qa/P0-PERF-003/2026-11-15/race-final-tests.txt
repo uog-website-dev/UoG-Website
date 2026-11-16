@@ -1,0 +1,16 @@
+
+> @uog/admin-web@0.1.0 typecheck /workspace/apps/admin-web
+> tsc --noEmit
+
+
+ RUN  v5.0.5 /workspace/apps/admin-web
+
+ ✓ src/app/sites/page-actions.test.ts (8 tests) 18ms
+ ✓ src/data/query-cache.test.tsx (15 tests) 280ms
+
+ Test Files  2 passed (2)
+      Tests  23 passed (23)
+   Start at  18:18:53
+   Duration  2.08s (transform 41%, environment 28%, import 15%, tests 9%, setup 7%)
+
+JUNIT report written to /workspace/perf003-race-final.xml

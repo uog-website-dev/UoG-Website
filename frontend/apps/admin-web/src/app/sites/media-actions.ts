@@ -1,4 +1,5 @@
 "use server";
+import {invalidated} from "@/data/mutation-receipt";
 
 import {serverApiFetch} from "@/performance/server-fetch";
 import { createApiClient, createLiveMediaAdapter } from "@uog/api-client";
@@ -13,7 +14,7 @@ async function client() {
   return createApiClient({fetchFn:serverApiFetch, baseUrl: process.env.API_BASE_URL ?? "http://backend:8000/api", accessToken: (await getAccessToken()) ?? undefined });
 }
 async function adapter() {
-  return createLiveMediaAdapter({ baseUrl: process.env.API_BASE_URL ?? "http://backend:8000/api", accessToken: (await getAccessToken()) ?? undefined });
+  return createLiveMediaAdapter({ fetchFn: serverApiFetch, baseUrl: process.env.API_BASE_URL ?? "http://backend:8000/api", accessToken: (await getAccessToken()) ?? undefined });
 }
 export async function listSiteMedia(siteId: number, query: MediaListQuery = {}): Promise<ActionResult<PaginatedResponse<MediaAssetRecord>>> {
   try { return { ok: true, data: await (await adapter()).list(siteId, query) }; }
@@ -24,7 +25,7 @@ export async function getSiteMedia(siteId: number, assetId: string): Promise<Act
   catch (cause) { return { ok: false, error: serializeApiError(cause) }; }
 }
 export async function updateSiteMedia(siteId: number, assetId: string, changes: MediaMetadataPatch): Promise<ActionResult<MediaAssetRecord>> {
-  try { return { ok: true, data: await (await adapter()).update(siteId, assetId, changes) }; }
+  try { return invalidated(siteId, "media", Promise.resolve({ ok: true, data: await (await adapter()).update(siteId, assetId, changes) })); }
   catch (cause) { return { ok: false, error: serializeApiError(cause) }; }
 }
 export async function getMediaUploadPolicy(siteId: number): Promise<ActionResult<UploadPolicy>> {
@@ -37,6 +38,6 @@ export async function getMediaReferences(siteId: number, assetId: string): Promi
   catch(cause) { return { ok: false, error: serializeApiError(cause) }; }
 }
 export async function removeSiteMedia(siteId: number, assetId: string): Promise<ActionResult<MediaDeletion>> {
-  try { return { ok: true, data: await (await adapter()).remove(siteId,assetId) }; }
+  try { return invalidated(siteId, "media", Promise.resolve({ ok: true, data: await (await adapter()).remove(siteId,assetId) })); }
   catch(cause) { return { ok: false, error: serializeApiError(cause) }; }
 }

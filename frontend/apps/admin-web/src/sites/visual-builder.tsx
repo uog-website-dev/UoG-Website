@@ -61,7 +61,7 @@ import {
   listSiteSectionTemplates, createSiteSectionTemplate, insertSiteSectionTemplate,
 } from "@/app/sites/page-actions";
 import type { SitePagePreview, SitePageRecord, SiteSectionTemplate } from "@/app/sites/page-actions";
-import { unwrap } from "@/organizations/contract";
+import { unwrap, reportActionResult } from "@/organizations/contract";
 import { APP_BASE_PATH } from "@/base-path";
 import { MediaPickerDialog } from "@/sites/media-picker";
 import type { MediaPickerResult } from "@/sites/media-picker";
@@ -466,6 +466,7 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
     setSaving(true);setError(null);setMessage("");setConflict(false);
     try {
       const result=await insertSiteSectionTemplate(siteId,pageId,page.etag,templateId);
+      reportActionResult(result);
       if(!alive.current)return;
       if(!result.ok){
         const details=result.error.details as {fields?:Record<string,string[]>}|null;
@@ -492,6 +493,7 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
     setSaving(true);setError(null);setMessage("");setConflict(false);
     try {
       const result=await saveSiteVisualDraft(siteId,pageId,page.etag,checked.value);
+      reportActionResult(result);
       if(!alive.current)return;
       if(!result.ok){
         const details=result.error.details as {fields?:Record<string,string[]>}|null;
@@ -583,6 +585,7 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
     setWorkflowBusy(true);setWorkflowError("");
     try {
       const result=await transitionSitePage(siteId,page.id,pendingWorkflow.action,workflowComment.trim(),pendingWorkflow.etag);
+      reportActionResult(result);
       if(!alive.current)return;
       if(!result.ok){
         if(result.error.status===409){

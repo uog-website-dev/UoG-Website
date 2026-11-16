@@ -1,4 +1,5 @@
 "use client";
+import {useSiteQuery} from "@/data/query-cache";
 
 import { useMemo, useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
@@ -11,7 +12,7 @@ import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { ApiError } from "@uog/api-client";
 import {
-  DataTable, FilterBar, Pagination, SelectFilter, TextFilter, useAsync, useToast,
+  DataTable, FilterBar, Pagination, SelectFilter, TextFilter, useToast,
 } from "@uog/ui";
 import type { SortState, TableColumn } from "@uog/ui";
 import Link from "next/link";
@@ -134,7 +135,7 @@ function SitePostsPanelContent({
   const [historyLoading, setHistoryLoading] = useState(false);
 
   const ordering = orderingForSort(sort);
-  const posts = useAsync<SitePostListResponse>(
+  const posts = useSiteQuery<SitePostListResponse>(siteId, "posts", {search: appliedFilters.search, status: appliedFilters.status, page, page_size: PAGE_SIZE, ordering, category: appliedFilters.category, tag: appliedFilters.tag},
     async () => canView && postsEnabled === true
       ? unwrap(await loadSitePosts(siteId, {
           search: appliedFilters.search || undefined,
@@ -146,17 +147,16 @@ function SitePostsPanelContent({
           ordering,
         }))
       : EMPTY_LIST,
-    [siteId, canView, postsEnabled, appliedFilters.search, appliedFilters.status, appliedFilters.category, appliedFilters.tag, page, ordering],
-    { isEmpty: (data) => data.count === 0 },
+    {enabled: canView && postsEnabled === true, isEmpty: (data) => data.count === 0},
   );
-  const taxonomy = useAsync<{ categories: SiteTaxonomyRecord[]; tags: SiteTaxonomyRecord[] }>(
+  const taxonomy = useSiteQuery<{ categories: SiteTaxonomyRecord[]; tags: SiteTaxonomyRecord[] }>(siteId, "taxonomy", {},
     async () => canView && postsEnabled === true
       ? {
           categories: unwrap(await loadSiteTaxonomy(siteId, "categories")),
           tags: unwrap(await loadSiteTaxonomy(siteId, "tags")),
         }
       : { categories: EMPTY_TAXONOMY, tags: EMPTY_TAXONOMY },
-    [siteId, canView, postsEnabled],
+    {enabled: canView && postsEnabled === true},
   );
 
   const categories = taxonomy.data?.categories ?? EMPTY_TAXONOMY;
@@ -261,6 +261,8 @@ function SitePostsPanelContent({
 
   return (
     <Paper data-perf-section="posts" data-perf-pending={posts.loading || taxonomy.loading?"true":"false"} variant="outlined" sx={{ borderRadius: 3, p: { xs: 2, sm: 3 }, display: "flex", flexDirection: "column", gap: 2 }}>
+      {posts.error && posts.data ? <Alert severity="warning" action={<Button onClick={posts.reload}>Retry refresh</Button>}>Refresh failed. Showing previously loaded posts.</Alert> : null}
+      {posts.refreshing || taxonomy.refreshing ? <Typography role="status" variant="caption">Refreshing Posts?</Typography> : null}
       <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 2 }}>
         <Box>
           <Typography variant="h2" component="h2" sx={{ fontSize: "1.25rem", fontWeight: 700 }}>Posts</Typography>
@@ -326,7 +328,7 @@ function SitePostsPanelContent({
               sort={sort}
               onSortChange={(next) => { setSort(next); setPage(1); }}
               loading={posts.loading}
-              error={posts.error}
+              error={posts.data ? null : posts.error}
               onRetry={posts.reload}
               emptyState={<Typography role="status" color="text.secondary" sx={{ p: 3 }}>{activeFilterCount ? "No Posts match these filters." : "This Site does not have any Posts yet."}</Typography>}
             />

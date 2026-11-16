@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@/test/render";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ToastProvider } from "@uog/ui";
 
@@ -127,6 +127,7 @@ describe("SitePostsPanel", () => {
     loadSitePosts.mockResolvedValue(list([post(), post({ id: "foreign", site: 22, slug: "foreign" })]));
     renderPanel();
     const table = await screen.findByRole("table", { name: "Posts for this Site" });
+    await waitFor(() => expect(document.querySelector('[data-perf-section="posts"]')?.getAttribute("data-perf-pending")).toBe("false"));
     expect(within(table).getByText("Campus update")).toBeTruthy();
     expect(within(table).getByText("Draft")).toBeTruthy();
     expect(within(table).getByText("User 42")).toBeTruthy();
@@ -141,6 +142,7 @@ describe("SitePostsPanel", () => {
   it("applies search, status, category and tag filters and resets them", async () => {
     renderPanel();
     await screen.findByRole("table", { name: "Posts for this Site" });
+    await waitFor(() => expect(document.querySelector('[data-perf-section="posts"]')?.getAttribute("data-perf-pending")).toBe("false"));
     fireEvent.change(screen.getByRole("textbox", { name: "Search Posts" }), { target: { value: "  campus  " } });
     for (const [label, option] of [["Status", "Draft"], ["Category", "News"], ["Tag", "Campus"]] as const) {
       fireEvent.mouseDown(screen.getByRole("combobox", { name: label }));
@@ -151,16 +153,19 @@ describe("SitePostsPanel", () => {
       search: "campus", status: "DRAFT", category: category.id, tag: tag.id,
     })));
 
+    await waitFor(() => expect(screen.getByRole("button", {name: "Reset"})).toHaveProperty("disabled", false));
+    const calls = loadSitePosts.mock.calls.length;
     fireEvent.click(screen.getByRole("button", { name: "Reset" }));
-    await waitFor(() => expect(loadSitePosts).toHaveBeenLastCalledWith(11, expect.objectContaining({
-      search: undefined, status: undefined, category: undefined, tag: undefined,
-    })));
-    expect((screen.getByRole("textbox", { name: "Search Posts" }) as HTMLInputElement).value).toBe("");
+    await waitFor(() => expect(screen.getByRole("textbox", {name: "Search Posts"})).toHaveProperty("value", ""));
+    expect(await screen.findByText("Campus update")).toBeTruthy();
+    expect(loadSitePosts).toHaveBeenCalledTimes(calls); // initial list remains fresh
+
   });
 
   it("links Create and Edit to dedicated editor routes", async () => {
     renderPanel();
     await screen.findByRole("table", { name: "Posts for this Site" });
+    await waitFor(() => expect(document.querySelector('[data-perf-section="posts"]')?.getAttribute("data-perf-pending")).toBe("false"));
     expect(screen.getByRole("link", { name: "Create Post" }).getAttribute("href")).toBe("/sites/11/admin/posts/new");
     expect(screen.getByRole("link", { name: "Edit Campus update" }).getAttribute("href")).toBe("/sites/11/admin/posts/post-1/edit");
   });
@@ -168,6 +173,7 @@ describe("SitePostsPanel", () => {
   it("hides create/edit actions without permissions and blocks the disabled module", async () => {
     renderPanel(11, true, ["content.posts.view"]);
     await screen.findByRole("table", { name: "Posts for this Site" });
+    await waitFor(() => expect(document.querySelector('[data-perf-section="posts"]')?.getAttribute("data-perf-pending")).toBe("false"));
     expect(screen.queryByRole("link", { name: "Create Post" })).toBeNull();
     expect(screen.queryByRole("link", { name: "Edit Campus update" })).toBeNull();
 
@@ -209,6 +215,7 @@ describe("SitePostsPanel", () => {
     ]));
     const view = renderPanel();
     const table = await screen.findByRole("table", { name: "Posts for this Site" });
+    await waitFor(() => expect(document.querySelector('[data-perf-section="posts"]')?.getAttribute("data-perf-pending")).toBe("false"));
     expect(within(table).queryByText("Other Site")).toBeNull();
     fireEvent.click(within(table).getByRole("button", { name: "Submit Campus update for review" }));
     expect(screen.getByRole("dialog", { name: "Submit Post?" })).toBeTruthy();

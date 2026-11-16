@@ -39,7 +39,7 @@ import { AdminShell } from "@/admin-shell";
 describe("AdminShell", () => {
   it("renders the console chrome around the page content", () => {
     render(
-      <AdminShell actions={<span>Sign in</span>}>
+      <AdminShell identity="test-shell" actions={<span>Sign in</span>}>
         <p>Page content</p>
       </AdminShell>,
     );
@@ -58,7 +58,7 @@ describe("AdminShell", () => {
 
   it("pins the footer and header outside the scroll isolation: main owns the scrolling column", () => {
     render(
-      <AdminShell>
+      <AdminShell identity="test-shell">
         <p>Page content</p>
       </AdminShell>,
     );
@@ -74,7 +74,7 @@ describe("AdminShell", () => {
 
   it("opens and closes the mobile navigation drawer from the header toggle", async () => {
     render(
-      <AdminShell>
+      <AdminShell identity="test-shell">
         <p>Page content</p>
       </AdminShell>,
     );

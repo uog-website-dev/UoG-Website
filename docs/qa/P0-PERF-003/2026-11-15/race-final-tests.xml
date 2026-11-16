@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="23" failures="0" errors="0" time="0.298043781">
+    <testsuite name="src/app/sites/page-actions.test.ts" timestamp="2026-11-15T18:18:55.230Z" hostname="153127581d17" tests="8" failures="0" errors="0" skipped="0" time="0.018490005">
+        <testcase classname="src/app/sites/page-actions.test.ts" name="Site Page API actions &gt; uses the site-scoped list contract with encoded filters and returns pagination" time="0.003900886">
+        </testcase>
+        <testcase classname="src/app/sites/page-actions.test.ts" name="Site Page API actions &gt; builds full-site status totals from the API&apos;s filtered count contract" time="0.002038706">
+        </testcase>
+        <testcase classname="src/app/sites/page-actions.test.ts" name="Site Page API actions &gt; loads a scoped detail with its ETag and sends that ETag for updates" time="0.001506035">
+        </testcase>
+        <testcase classname="src/app/sites/page-actions.test.ts" name="Site Page API actions &gt; sends structured blocks and same-site hierarchy in the create contract" time="0.001677436">
+        </testcase>
+        <testcase classname="src/app/sites/page-actions.test.ts" name="Site Page API actions &gt; reloads a visual draft through its scoped endpoint and preserves the returned ETag" time="0.001488792">
+        </testcase>
+        <testcase classname="src/app/sites/page-actions.test.ts" name="Site Page API actions &gt; submits complete trees from two editors without retrying the stale Slider" time="0.004273589">
+        </testcase>
+        <testcase classname="src/app/sites/page-actions.test.ts" name="Site Page API actions &gt; preserves node and numeric item-position error bindings" time="0.001007414">
+        </testcase>
+        <testcase classname="src/app/sites/page-actions.test.ts" name="Site Page API actions &gt; loads an immutable revision preview and uses its ETag for approval" time="0.00072291">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/data/query-cache.test.tsx" timestamp="2026-11-15T18:18:55.241Z" hostname="153127581d17" tests="15" failures="0" errors="0" skipped="0" time="0.279553776">
+        <testcase classname="src/data/query-cache.test.tsx" name="deduplicates simultaneous reads and reuses the same section across navigation without a loading flash" time="0.041679454">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="partitions keys by user/session, Site, permissions, resource, filters, sort and page" time="0.0003882">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="shows stale valid data while refreshing, reports failure and recovers without discarding cached rows" time="0.02150094">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="invalidates only the mutated Site/domain, including other mounted consumers; failed writes leave cache intact" time="0.01271127">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="cancels a slow obsolete filter and cannot replace the newer query with its late response" time="0.006972175">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="clears the previous session and Site client on rapid boundary changes, even when requests finish late" time="0.008563098">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="purges protected entries when authorization changes or a refreshed workspace revokes access" time="0.021910666">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="uses finite defaults and garbage-collects unobserved entries" time="0.05756961">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="does not reuse data after an identity-change event even when Site and permissions are identical" time="0.010939567">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="automatically refreshes an expired entry on return while keeping its valid rows visible" time="0.012677605">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="a successful mutation cancels the pre-save read and coalesces duplicate invalidations" time="0.015169085">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="settles after development StrictMode effect replay" time="0.004904899">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="clears protected content on logout while still invoking the sign-out action" time="0.011501072">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="revalidates an unchanged forbidden resource once instead of looping workspace bootstraps" time="0.044017215">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="a late denied read from an abandoned Site cannot reset the new Site&apos;s cache" time="0.006899099">
+        </testcase>
+    </testsuite>
+</testsuites>

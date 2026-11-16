@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@/test/render";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 const { listSiteMedia, getMediaUploadPolicy, getSiteMedia, updateSiteMedia, getMediaReferences, removeSiteMedia } = vi.hoisted(() => ({ listSiteMedia: vi.fn(), getMediaUploadPolicy: vi.fn(), getSiteMedia: vi.fn(), updateSiteMedia: vi.fn(), getMediaReferences: vi.fn(), removeSiteMedia: vi.fn() }));
@@ -18,6 +18,18 @@ beforeEach(() => {
 });
 afterEach(() => vi.restoreAllMocks());
 describe("MediaLibrary", () => {
+  it("keeps cached images visible but pauses selection while eligibility is refreshing", async () => {
+    listSiteMedia.mockResolvedValue(page([asset]));
+    render(<MediaLibrary siteId={11} canUpload={false} onSelect={vi.fn()} imagesOnly />);
+    const select = await screen.findByRole("button", {name: "Select campus.png"});
+    let release!: (value: unknown) => void;
+    listSiteMedia.mockImplementationOnce(() => new Promise(resolve => {release = resolve;}));
+    fireEvent.click(screen.getByRole("button", {name: "Refresh media"}));
+    await waitFor(() => expect(select).toHaveProperty("disabled", true));
+    expect(screen.queryByText("Loading media…")).toBeNull();
+    await act(async () => release(page([])));
+    await waitFor(() => expect(screen.queryByRole("button", {name: "Select campus.png"})).toBeNull());
+  });
   it("excludes processing images then picks the worker-completed identity on refresh", async () => {
     const select = vi.fn();
     let poll: (() => void) | undefined;
@@ -82,7 +94,7 @@ describe("MediaLibrary", () => {
     fireEvent.submit(screen.getByRole("search", { name: "Search Site media" }));
     await waitFor(() => expect(listSiteMedia).toHaveBeenLastCalledWith(11, { page: 1, search: "campus" }));
     fireEvent.click(screen.getByRole("button", { name: "Clear filters" }));
-    await waitFor(() => expect(listSiteMedia).toHaveBeenLastCalledWith(11, { page: 1 }));
+    await waitFor(() => expect(screen.getByLabelText("Search media")).toHaveProperty("value", ""));
   });
 
   it("loads scoped details and saves only persisted alt text", async () => {
@@ -276,7 +288,7 @@ describe("Site-isolated media browsing", () => {
     const showAll = await screen.findByRole("button", { name: "Show all media" });
     showAll.focus();
     await user.keyboard("{Enter}");
-    await waitFor(() => expect(listSiteMedia).toHaveBeenLastCalledWith(11, { page: 1 }));
+    await waitFor(() => expect(screen.getByLabelText("Search media")).toHaveProperty("value", ""));
     listSiteMedia.mockResolvedValue({ ok: false, error: { message: "Connection interrupted", status: 503 } });
     fireEvent.click(screen.getByRole("button", { name: "Refresh media" }));
     await screen.findByText(/Media could not be loaded/);
@@ -298,9 +310,12 @@ describe("Site-isolated media browsing", () => {
     await user.keyboard("{Enter}");
     await waitFor(() => expect(listSiteMedia).toHaveBeenLastCalledWith(11, { page: 2 }));
     const previous = screen.getByRole("button", { name: "Previous" });
+    await waitFor(() => expect(previous).toHaveProperty("disabled", false));
     previous.focus();
+    const callsBeforeReturn = listSiteMedia.mock.calls.length;
     await user.keyboard(" ");
-    await waitFor(() => expect(listSiteMedia).toHaveBeenLastCalledWith(11, { page: 1 }));
+    await waitFor(() => expect(screen.getByText(/Page 1/)).toBeTruthy());
+    expect(listSiteMedia).toHaveBeenCalledTimes(callsBeforeReturn);
     screen.getByRole("button", { name: "List view" }).focus();
     await user.keyboard("{Enter}");
     expect(screen.getByRole("button", { name: "List view" }).getAttribute("aria-pressed")).toBe("true");

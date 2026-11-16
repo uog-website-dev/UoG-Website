@@ -11,6 +11,8 @@ import DialogActions from "@mui/material/DialogActions";
 import TextField from "@mui/material/TextField";
 import {APP_BASE_PATH} from "@/base-path";
 import {hasPlatformWorkspace} from "@/navigation";
+import {useQuery} from "@tanstack/react-query";
+import {queryKey, useQueryEnvironment} from "@/data/query-cache";
 import type {WorkspaceSite, WorkspaceState} from "@/workspace";
 
 export function WorkspaceSwitcher({state, onNavigate}: {state: WorkspaceState; onNavigate?: () => void}) {
@@ -39,28 +41,24 @@ export function WorkspaceSwitcher({state, onNavigate}: {state: WorkspaceState; o
 function SiteChoices({select}: {select: (href: string) => void}) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
-  const [retry, setRetry] = useState(0);
-  const key = `${search}:${page}:${retry}`;
-  const [response, setResponse] = useState<{key: string; rows: WorkspaceSite[]; count: number; error: boolean} | null>(null);
-  useEffect(() => {
-    const controller = new AbortController();
-    let active = true;
-    const timer = setTimeout(() => {
+  const environment = useQueryEnvironment();
+  const [appliedSearch, setAppliedSearch] = useState("");
+  useEffect(() => {const timer = setTimeout(() => setAppliedSearch(search), search ? 250 : 0); return () => clearTimeout(timer);}, [search]);
+  const result = useQuery<{results: WorkspaceSite[]; count: number}>({
+    queryKey: queryKey(environment, "site-switcher", {search, page, page_size: 20}), enabled: search === appliedSearch,
+    queryFn: async ({signal}) => {
       const query = new URLSearchParams({search, page: String(page), page_size: "20"});
-      void fetch(`${APP_BASE_PATH}/api/workspace/sites/?${query}`, {cache: "no-store", signal: controller.signal})
-        .then(async result => {
-          if (!result.ok) throw new Error("Discovery unavailable");
-          const data = await result.json();
-          if (!Array.isArray(data.results) || !Number.isInteger(data.count) || data.count < 0 || !data.results.every((row: WorkspaceSite) => Number.isSafeInteger(row.id) && typeof row.name === "string")) throw new Error("Invalid discovery");
-          if (active) setResponse({key, rows: data.results, count: data.count, error: false});
-        }).catch(() => {if (active) setResponse({key, rows: [], count: 0, error: true});});
-    }, search ? 250 : 0);
-    return () => {active = false; clearTimeout(timer); controller.abort();};
-  }, [key, page, search]);
-  const current = response?.key === key ? response : null;
+      const response = await fetch(`${APP_BASE_PATH}/api/workspace/sites/?${query}`, {cache: "no-store", signal});
+      if (!response.ok) throw new Error("Sites unavailable");
+      const data = await response.json();
+      if (!Array.isArray(data.results) || !Number.isInteger(data.count) || data.count < 0 || !data.results.every((row: WorkspaceSite) => Number.isSafeInteger(row.id) && typeof row.name === "string")) throw new Error("Invalid discovery");
+      return data;
+    },
+  });
+  const current = result.isError ? {error: true, rows: [], count: 0} : result.data ? {error: false, rows: result.data.results, count: result.data.count} : null;
   return <Box sx={{display: "flex", flexDirection: "column", gap: 1.5, pt: 1}}>
     <TextField autoFocus label="Search Sites" value={search} onChange={event => {setSearch(event.target.value); setPage(1);}} slotProps={{htmlInput: {maxLength: 100}}}/>
-    {!current ? <p role="status">Loading Sites…</p> : current.error ? <Alert severity="error" action={<Button onClick={() => setRetry(value => value + 1)}>Retry</Button>}>Sites could not be loaded.</Alert> : <>
+    {!current ? <p role="status">Loading Sites…</p> : current.error ? <Alert severity="error" action={<Button onClick={() => void result.refetch()}>Retry</Button>}>Sites could not be loaded.</Alert> : <>
       {current.rows.length === 0 ? <p role="status">No Sites found. Try another search or ask for a Site membership.</p> : null}
       {current.rows.map(site => <Button key={site.id} data-workspace-site={site.id} sx={{justifyContent: "flex-start"}} onClick={() => select(`/sites/${site.id}/admin`)}>{site.name}</Button>)}
       <Box sx={{display: "flex", alignItems: "center", justifyContent: "space-between"}}>

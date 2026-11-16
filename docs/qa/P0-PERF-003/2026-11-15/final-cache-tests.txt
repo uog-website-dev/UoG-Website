@@ -1,0 +1,23 @@
+
+> @uog/admin-web@0.1.0 typecheck /workspace/apps/admin-web
+> tsc --noEmit
+
+
+ RUN  v5.0.5 /workspace/apps/admin-web
+
+ ✓ src/sites/site-dashboard.test.tsx (8 tests) 636ms
+   ✓ SiteDashboard (8)
+     ✓ keeps confirmed totals visible when a background refresh fails and offers retry 310ms
+ ✓ src/workspace.test.tsx (5 tests) 914ms
+   ✓ loads discovery only on open, pages explicitly and rejects stale search results 798ms
+ ✓ src/data/query-cache.test.tsx (14 tests) 340ms
+
+ Test Files  3 passed (3)
+      Tests  27 passed (27)
+   Start at  18:07:15
+   Duration  4.10s (tests 29%, transform 24%, import 21%, environment 20%, setup 6%)
+
+    Isolate  3 workers spawned · ~547ms startup each (spawn + environment, per file)
+             at least ~273ms faster with isolate: false — reuses workers across files instead of one per file
+
+JUNIT report written to /workspace/perf003-final-cache.xml

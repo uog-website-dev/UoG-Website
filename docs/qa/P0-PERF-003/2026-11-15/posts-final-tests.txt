@@ -1,0 +1,30 @@
+
+> @uog/admin-web@0.1.0 typecheck /workspace/apps/admin-web
+> tsc --noEmit
+
+
+ RUN  v5.0.5 /workspace/apps/admin-web
+
+ ✓ src/sites/site-posts.test.tsx (19 tests) 8749ms
+   ✓ SitePostsPanel (7)
+     ✓ loads only the selected Site and renders status, author, taxonomy and featured media 314ms
+     ✓ applies search, status, category and tag filters and resets them 678ms
+     ✓ runs submit, approve and publish only when the API offers that action for this Site 433ms
+   ✓ SitePostEditor (12)
+     ✓ creates drafts and edits with the detail ETag on the full-page editor 913ms
+     ✓ validates media scope and offers taxonomy creation only to authorized creators 1397ms
+     ✓ previews the Site draft through the shared safe block renderer 313ms
+     ✓ keeps unsaved formatting after failed saves and warns before discard 483ms
+     ✓ preserves a stale draft and displays explicit conflict guidance 410ms
+     ✓ refreshes the revision marker after a conflict while keeping unsaved text 843ms
+     ✓ fills the permalink from the title until the slug is edited 327ms
+     ✓ rejects reserved permalinks and shows the public path preview 462ms
+     ✓ surfaces duplicate slug API field errors on the settings panel 587ms
+     ✓ lets an editor remove selected taxonomy that is no longer eligible 647ms
+
+ Test Files  1 passed (1)
+      Tests  19 passed (19)
+   Start at  18:26:38
+   Duration  11.53s (tests 77%, transform 10%, import 9%, environment 3%, setup 1%)
+
+JUNIT report written to /workspace/perf003-posts-final.xml

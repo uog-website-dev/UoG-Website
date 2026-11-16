@@ -6,7 +6,9 @@ for (const run of [before, after]) {
  if (run.metadata.run_status !== 'complete' || run.metadata.verified_server_mode !== 'production' || run.failures.length || !run.trace_summary?.all_api_samples_correlated) throw new Error('Comparison requires complete, correlated production runs');
 }
 const round = number => Math.round(number);
-const lines = ['# PERF-002 versus PERF-001 production', '', '**Budgets and methodology remain PROPOSED; product/QA approval is pending.**', '', '| Scenario | Before p50 / p95 ms | After p50 / p95 ms | p95 reduction |', '| --- | ---: | ---: | ---: |'];
+const beforeRef = beforeFile.match(/P0-PERF-\d+/i)?.[0] ?? 'Before';
+const afterRef = afterFile.match(/P0-PERF-\d+/i)?.[0] ?? 'After';
+const lines = [`# ${afterRef} versus ${beforeRef} production`, '', '**Budgets and methodology remain PROPOSED; product/QA approval is pending.**', '', '| Scenario | Before p50 / p95 ms | After p50 / p95 ms | p95 reduction |', '| --- | ---: | ---: | ---: |'];
 for (const name of ['workspace_api', 'cold_site_switch', 'warm_site_switch', 'dashboard_usable', 'same_site_menu_navigation', 'cached_section_return', 'cached_section_transition']) {
  const a = before.summary[name], b = after.summary[name];
  lines.push(`| ${name} | ${round(a.p50_ms)} / ${round(a.p95_ms)} (n=${a.n}) | ${round(b.p50_ms)} / ${round(b.p95_ms)} (n=${b.n}) | ${(100 * (a.p95_ms - b.p95_ms) / a.p95_ms).toFixed(1)}% |`);
@@ -16,5 +18,5 @@ for (const name of ['workspace_api', 'cold_site_switch', 'warm_site_switch', 'sa
  const median = (run, key) => round(percentile(run.samples.filter(sample => sample.scenario === name).map(sample => sample.server[key]), .5));
  lines.push(`| ${name} | ${median(before, 'django_requests')} / ${median(after, 'django_requests')} | ${median(before, 'sql_count')} / ${median(after, 'sql_count')} |`);
 }
-lines.push('', 'The direct workspace API probe uses the same authenticated Next URL in both runs. Site-switch interaction now includes opening and loading the lazy searchable dialog; PERF-001 used an already populated native selector. Same host/dataset/profile, sequential local runs, retained database/server caches and small samples do not establish causal attribution for every timing difference.', '', 'Raw samples preserve browser request counts, endpoint duplication, transferred bytes and waterfalls; correlated traces preserve SQL aggregates. The dedicated browser regression separately asserts one bootstrap per selection and no discovery before opening the switcher.', '');
+lines.push('', `The direct workspace API probe uses the same authenticated Next URL in both runs. ${beforeRef === 'P0-PERF-001' ? 'Site switches now include opening/loading the searchable dialog; PERF-001 used a populated native selector.' : 'Both runs use the searchable Workspace dialog and include discovery in Site-switch timing.'} Same host/dataset/profile, sequential local runs, retained database/server caches and small samples do not establish causal attribution for every timing difference.`, '', 'Raw samples preserve browser request counts, endpoint duplication, transferred bytes and waterfalls; correlated traces preserve SQL aggregates. Dedicated browser/component regressions verify cache reuse, scope isolation and shared context requests.', '');
 console.log(lines.join('\n'));

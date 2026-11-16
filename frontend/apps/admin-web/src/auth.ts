@@ -111,6 +111,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
      */
     async jwt({ token, account }) {
       if (account?.access_token) {
+        token.cacheSessionId = crypto.randomUUID();
         token.accessToken = account.access_token;
         token.accessTokenExpires = account.expires_at ?? null;
         token.refreshToken = account.refresh_token ?? null;

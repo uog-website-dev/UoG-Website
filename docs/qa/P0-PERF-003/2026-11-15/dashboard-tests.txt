@@ -1,0 +1,15 @@
+
+> @uog/admin-web@0.1.0 typecheck /workspace/apps/admin-web
+> tsc --noEmit
+
+
+ RUN  v5.0.5 /workspace/apps/admin-web
+
+ ✓ src/sites/site-dashboard.test.tsx (8 tests) 617ms
+
+ Test Files  1 passed (1)
+      Tests  8 passed (8)
+   Start at  18:00:16
+   Duration  2.52s (transform 31%, tests 26%, environment 22%, import 16%, setup 4%)
+
+JUNIT report written to /workspace/perf003-dashboard.xml

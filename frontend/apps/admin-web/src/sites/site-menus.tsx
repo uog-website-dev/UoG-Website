@@ -1,4 +1,5 @@
 "use client";
+import {useSiteQuery, useInvalidateSite} from "@/data/query-cache";
 
 /**
  * Local navigation for one Site.
@@ -18,7 +19,7 @@ import Chip from "@mui/material/Chip";
 import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { useAsync, useToast } from "@uog/ui";
+import { useToast } from "@uog/ui";
 import { ApiError } from "@uog/api-client";
 
 import {
@@ -227,13 +228,15 @@ export function SiteMenusPanel({
   permissions: readonly string[];
 }) {
   const toast = useToast();
-  const navigation = useAsync(
+  const invalidateSite = useInvalidateSite();
+  const reloadMenus = () => invalidateSite(siteId, "menus");
+  const navigation = useSiteQuery(siteId, "menus", {includeItems: false},
     async () => unwrap(await loadSiteNavigation(siteId, false)),
-    [siteId],
+    {enabled: menusEnabled === true},
   );
-  const targetState = useAsync(
+  const targetState = useSiteQuery(siteId, "menu-targets", {},
     async () => unwrap(await loadMenuTargets(siteId)),
-    [siteId],
+    {enabled: menusEnabled === true},
   );
   const targets = targetState.data ?? NO_TARGETS;
   const canWrite = permissions.includes("menu.write");
@@ -254,10 +257,11 @@ export function SiteMenusPanel({
   const matches = menus.filter(row => `${row.menu.name} ${row.menu.code ?? ""}`.toLowerCase().includes(search.toLowerCase()));
   const selected = matches.some(row => row.menu.id === selectedId) ? selectedId : (matches.find(row => !row.menu.is_global)?.menu.id ?? matches[0]?.menu.id);
   const selectedRecord = menus.find(row => row.menu.id === selected);
-  const selectedTree = useAsync(async () => {
-    if (!selectedRecord || selectedRecord.itemsLoaded !== false) return selectedRecord ?? null;
+  const detailTree = useSiteQuery(siteId, "menu-detail", {id: selected}, async () => {
+    if (!selectedRecord) return null;
     return unwrap(await loadSiteMenu(siteId, selectedRecord.menu.id));
-  }, [siteId, selected, navigation.data]);
+  }, {enabled: menusEnabled === true && selectedRecord?.itemsLoaded === false});
+  const selectedTree = selectedRecord?.itemsLoaded === false ? detailTree : {...detailTree, data: selectedRecord ?? null, loading: false, refreshing: false};
 
   return (
     <Paper data-perf-section="menus" data-perf-pending={navigation.loading || targetState.loading || selectedTree.loading?"true":"false"} variant="outlined" sx={{ overflow: "hidden", borderRadius: 3 }}>
@@ -269,6 +273,7 @@ export function SiteMenusPanel({
             A central menu belongs to the platform. An inherited menu stays on its owning Site; this Site only records whether public delivery should include it.
           </Typography>
         </Box>
+        {navigation.refreshing || targetState.refreshing || selectedTree.refreshing ? <Typography role="status" variant="caption">Refreshing menus?</Typography> : null}
         {menusEnabled === null ? (
           <Typography variant="body2" color="text.secondary">Checking the MENUS module…</Typography>
         ) : null}
@@ -344,7 +349,7 @@ export function SiteMenusPanel({
                     canPublish={canPublish}
                     moduleOn={moduleOn && !navigation.loading && (state.itemsLoaded !== false || selectedTree.data?.menu.id === state.menu.id)}
                     targets={targets}
-                    onChanged={navigation.reload}
+                    onChanged={reloadMenus}
                   />
                 ))}
               </Box>
@@ -372,7 +377,7 @@ export function SiteMenusPanel({
                     const created = unwrap(result);
                     setSelectedId(created.id);
                     setName(""); setCode("");
-                    navigation.reload();
+                    reloadMenus();
                   })
                   .catch((cause: unknown) => {
                     toast.error(menuError(cause));
