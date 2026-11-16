@@ -1,4 +1,5 @@
 "use client";
+import {useSiteDraftGuard, useSiteOperationGuard} from "./site-draft-guard";
 import {useSiteQuery} from "@/data/query-cache";
 
 /**
@@ -289,6 +290,7 @@ function SitePostEditorContent({
   const [loadingPost, setLoadingPost] = useState(mode === "edit");
   const [loadError, setLoadError] = useState("");
   const [saving, setSaving] = useState(false);
+  const isCurrentOperation = useSiteOperationGuard(siteId);
   const [attemptedSave, setAttemptedSave] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState<number | null>(null);
   const [dialogError, setDialogError] = useState("");
@@ -310,6 +312,7 @@ function SitePostEditorContent({
   const [taxonomyDialogError, setTaxonomyDialogError] = useState("");
   const [taxonomySaving, setTaxonomySaving] = useState(false);
 
+  useSiteDraftGuard(dirty);
   useEffect(() => {
     const warn = (event: BeforeUnloadEvent) => { if (dirty) { event.preventDefault(); event.returnValue = ""; } };
     window.addEventListener("beforeunload", warn);
@@ -404,8 +407,10 @@ function SitePostEditorContent({
     setSaving(true); setWorkflowError("");
     try {
       const result = unwrap(await transitionSitePost(siteId,activePost.id,workflowAction,workflowComment,activePost.etag));
+      if (!isCurrentOperation()) return;
       const confirmed = workflowAction === "publish" && result.draft_of
         ? unwrap(await getSitePost(siteId,result.draft_of)) : result;
+      if (!isCurrentOperation()) return;
       setActivePost(confirmed);
       const next = formFromRecord(confirmed);
       baseline.current = JSON.stringify(next); setForm(next);
@@ -413,8 +418,9 @@ function SitePostEditorContent({
       toast.success(`Article status is ${confirmed.status.replaceAll("_"," ").toLowerCase()}.`);
       if (confirmed.id !== activePost.id) router.replace(`/sites/${siteId}/admin/posts/${confirmed.id}/edit`);
     } catch (cause) {
+      if (!isCurrentOperation()) return;
       setWorkflowError(apiErrorText(cause,"The transition was rejected. Reload the current revision and retry."));
-    } finally { setSaving(false); }
+    } finally { if (isCurrentOperation()) setSaving(false); }
   }
 
   async function openWorkingDraft() {
@@ -422,9 +428,9 @@ function SitePostEditorContent({
     setSaving(true); setDialogError("");
     try {
       const draft = unwrap(await openSitePostWorkingDraft(siteId,activePost.id,activePost.etag));
-      router.push(`/sites/${siteId}/admin/posts/${draft.id}/edit`);
-    } catch (cause) { setDialogError(apiErrorText(cause,"The working draft could not be opened.")); }
-    finally { setSaving(false); }
+      if (isCurrentOperation()) router.push(`/sites/${siteId}/admin/posts/${draft.id}/edit`);
+    } catch (cause) { if (isCurrentOperation()) setDialogError(apiErrorText(cause,"The working draft could not be opened.")); }
+    finally { if (isCurrentOperation()) setSaving(false); }
   }
 
   function leaveEditor() {
@@ -460,6 +466,7 @@ function SitePostEditorContent({
           })()
         : createSitePost(siteId, input);
       const current = unwrap(await saved);
+      if (!isCurrentOperation()) return null;
       const nextForm = formFromRecord(current);
       baseline.current = JSON.stringify(nextForm);
       setForm(nextForm);
@@ -472,6 +479,7 @@ function SitePostEditorContent({
       }
       return current;
     } catch (cause) {
+      if (!isCurrentOperation()) return null;
       if (cause instanceof ApiError) setFieldErrors(cause.fieldErrors ?? {});
       if (cause instanceof ApiError && cause.status === 409) {
         setConflict(true);
@@ -483,7 +491,7 @@ function SitePostEditorContent({
       }
       return null;
     } finally {
-      setSaving(false);
+      if (isCurrentOperation()) setSaving(false);
     }
   }
 
@@ -513,14 +521,16 @@ function SitePostEditorContent({
     setDialogError("");
     try {
       const current = unwrap(await getSitePost(siteId, activePost.id));
+      if (!isCurrentOperation()) return;
       if (!current.etag) throw new Error("The latest Post revision marker is unavailable.");
       setActivePost(current);
       setConflict(false);
       toast.success("Revision marker refreshed. Your unsaved text is still in the editor — save again when ready.");
     } catch (cause) {
+      if (!isCurrentOperation()) return;
       setDialogError(apiErrorText(cause, "The latest revision could not be loaded."));
     } finally {
-      setSaving(false);
+      if (isCurrentOperation()) setSaving(false);
     }
   }
 
@@ -532,6 +542,7 @@ function SitePostEditorContent({
     setFieldErrors({});
     try {
       const current = unwrap(await getSitePost(siteId, activePost.id));
+      if (!isCurrentOperation()) return;
       setActivePost(current);
       const nextForm = formFromRecord(current);
       baseline.current = JSON.stringify(nextForm);
@@ -539,9 +550,10 @@ function SitePostEditorContent({
       setConflict(false);
       toast.success("Loaded the latest saved revision.");
     } catch (cause) {
+      if (!isCurrentOperation()) return;
       setDialogError(apiErrorText(cause, "The latest revision could not be loaded."));
     } finally {
-      setSaving(false);
+      if (isCurrentOperation()) setSaving(false);
     }
   }
 

@@ -1,16 +1,16 @@
-import { fireEvent, render, screen, waitFor } from "@/test/render";
+import { act, fireEvent, render, screen, waitFor } from "@/test/render";
 import { beforeEach, expect, it, vi } from "vitest";
 import { ToastProvider } from "@uog/ui";
 import { SitePostEditor } from "./site-post-editor";
 
-const { get, transition, openDraft, push, replace } = vi.hoisted(() => ({get:vi.fn(),transition:vi.fn(),openDraft:vi.fn(),push:vi.fn(),replace:vi.fn()}));
+const { get, transition, openDraft, save, push, replace } = vi.hoisted(() => ({get:vi.fn(),transition:vi.fn(),openDraft:vi.fn(),save:vi.fn(),push:vi.fn(),replace:vi.fn()}));
 vi.mock("next/navigation", () => ({useRouter:() => ({push,replace})}));
 vi.mock("@/app/sites/post-actions", () => ({
   getSitePost:(...args:unknown[]) => get(...args),
   transitionSitePost:(...args:unknown[]) => transition(...args),
   openSitePostWorkingDraft:(...args:unknown[]) => openDraft(...args),
   loadSiteTaxonomy:async () => ({ok:true,data:[]}),
-  createSiteTaxonomy:vi.fn(),createSitePost:vi.fn(),updateSitePost:vi.fn(),
+  createSiteTaxonomy:vi.fn(),createSitePost:vi.fn(),updateSitePost:(...args:unknown[]) => save(...args),
 }));
 
 const record = {
@@ -26,6 +26,27 @@ beforeEach(() => {
   vi.clearAllMocks();
   get.mockResolvedValue({ok:true,data:record});
   transition.mockResolvedValue({ok:true,data:{...record,status:"IN_REVIEW",revision_number:2,etag:'"r2"',available_actions:[]}});
+});
+
+it("ignores a former Site's completed save after its editor unmounts", async () => {
+  let release!: (value: unknown) => void;
+  save.mockImplementationOnce(() => new Promise(resolve => {release = resolve;}));
+  const view = editor();
+  fireEvent.click(await screen.findByRole("button", {name: "Save Draft"}));
+  await waitFor(() => expect(save).toHaveBeenCalled()); view.unmount();
+  await act(async () => release({ok: true, data: {...record, id: "saved-old-site"}}));
+  expect(replace).not.toHaveBeenCalled(); expect(push).not.toHaveBeenCalled();
+});
+
+it("ignores a former Site's late working-draft redirect", async () => {
+  get.mockResolvedValue({ok: true, data: {...record, status: "PUBLISHED", available_actions: []}});
+  let release!: (value: unknown) => void;
+  openDraft.mockImplementationOnce(() => new Promise(resolve => {release = resolve;}));
+  const view = editor();
+  fireEvent.click(await screen.findByRole("button", {name: "Edit working draft"}));
+  await waitFor(() => expect(openDraft).toHaveBeenCalled()); view.unmount();
+  await act(async () => release({ok: true, data: {...record, id: "old-working-draft"}}));
+  expect(push).not.toHaveBeenCalled();
 });
 
 it("submits the saved revision and displays the backend-confirmed status", async () => {

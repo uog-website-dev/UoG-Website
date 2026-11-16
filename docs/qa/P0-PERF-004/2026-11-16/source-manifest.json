@@ -1,0 +1,26 @@
+{
+  "base_commit": "d27e25dc61b9af4273e43fc076b96b437fcadc7f",
+  "sha256": {
+    "docs/performance/P0-PERF-004.md": "2a3e5ab7703cb17e8eae2c6d1df6aca5034827c9f72dc0936da173c5d18c83ea",
+    "frontend/apps/admin-web/src/data/admin-query-provider.tsx": "d20fedf4f2368c197eca202233cd16d0b959a90a4c7eb2b36b8633acc920ec77",
+    "frontend/apps/admin-web/src/data/query-cache.test.tsx": "9563a965fb4e5e2e95fa7469e2a20b8f9813746d3208828390786a3d31a143ce",
+    "frontend/apps/admin-web/src/data/query-cache.tsx": "8940469f0623cee7a08635910d32754670af0da13030f4ffe3549374c3c5eebb",
+    "frontend/apps/admin-web/src/site-switching.test.tsx": "19d839f5224ad575f785b308a0dda59d3f072ea0ac6c61d96067b9e4d2df2d07",
+    "frontend/apps/admin-web/src/sites/post-workflow.test.tsx": "26a457e98e8d3ecc738a87c8ef3ed0116253e0bac786d1c04337395ce035f330",
+    "frontend/apps/admin-web/src/sites/site-admin-frame.tsx": "e843a635176e1964989da89ed9b758b22fa441cacc4f59ebe453218b2e443206",
+    "frontend/apps/admin-web/src/sites/site-admin.ts": "daaa05f12fc21e927883cefc1b8d2203fbbc6565c4e3854762ae9a4a6b3fcc8b",
+    "frontend/apps/admin-web/src/sites/site-draft-guard.ts": "13570d99e0d27d1927cfc6faf8364069bcb67215a352cfbd1ac3573b7865d05d",
+    "frontend/apps/admin-web/src/sites/site-page-editor.tsx": "26be571d7f79c8fd821886d4c20e178ecba070046dbe4710e5b823134c087f38",
+    "frontend/apps/admin-web/src/sites/site-pages.test.tsx": "1067f1503c488e6b7aeeaa86f174553961f6b5a27abe40884ad4703bf2cab52d",
+    "frontend/apps/admin-web/src/sites/site-post-editor.tsx": "5480bfed56af9b5b4eaff43acf21fa58ffa826c34c791ae0d6a6dca7011bdab4",
+    "frontend/apps/admin-web/src/sites/site-workspace.tsx": "6f8f8adff4022f5416a519a836683a46ccdba4635cc70e5ad8c0b89ed1655aea",
+    "frontend/apps/admin-web/src/sites/visual-builder.tsx": "5ce188e06f8134474e52c7c1043b73c760aecb3aa71b726c146dc590a74e05b2",
+    "frontend/apps/admin-web/src/workspace-switcher.tsx": "3fd56e744556030fe9d0aae976706c73c7010b4ec5cb97262a44a739c3c2c2a8",
+    "frontend/apps/admin-web/src/workspace.ts": "24ff80af250d129a0dcec2fbc13fa001dffab275df5fc8201301497d79b41527",
+    "scripts/perf/benchmark.cjs": "87ab12e833705dacf3e52c21927587b3cb5be1a69f0ecc564cfc03c65ea7159a",
+    "scripts/perf/cache-check.cjs": "51f3030e020cd4cf8f6d5812243e4fb4312e1fcf9f19881bf57cbefa9d4d83d7",
+    "scripts/perf/compare-workspace.cjs": "3de3f9b1a792c082eb39ef2a170029d7e94082b5b5afe4cfbc2038eaa0440137",
+    "scripts/perf/run.ps1": "63dd4f8a70524dc1a8c075d6ea10242b76b940f4b592f4e30b5c028e333ad11d",
+    "scripts/perf/site-switch-check.cjs": "cefe615891a667b927d7b68497d6cf9fae3c685991d53c3bd8d121b1d785e038"
+  }
+}

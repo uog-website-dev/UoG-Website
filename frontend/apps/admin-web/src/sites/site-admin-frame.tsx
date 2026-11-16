@@ -5,10 +5,9 @@
  *
  * Section navigation and the workspace selector live in the console rail,
  * so this frame only keeps the active Site visible: name, status, code and
- * owning organization. The workspace remounts per Site so a draft form
- * cannot follow the user to another Site.
+ * owning organization. Only the editable content boundary remounts per Site.
  */
-import { createContext, useContext } from "react";
+import { createContext, useContext, useEffect, useRef } from "react";
 import type { ReactNode } from "react";
 import BusinessIcon from "@mui/icons-material/Business";
 import LanguageRoundedIcon from "@mui/icons-material/LanguageRounded";
@@ -36,6 +35,26 @@ import {
 import type { SectionDecision, SiteAccessInput, SiteSection } from "@/sites/site-admin";
 import { siteStatusChip } from "@/sites/validation";
 import { ViewPublicSite } from "@/sites/view-public-site";
+
+function SiteEditableContent({children}: {children: ReactNode}) {
+  const changedForms = useRef(new Set<HTMLFormElement>());
+  useEffect(() => {
+    const guard = (event: Event) => {
+      const detail = (event as CustomEvent<{dirty: boolean}>).detail;
+      for (const form of changedForms.current) {
+        if (!form.isConnected) changedForms.current.delete(form);
+        else if (detail) detail.dirty = true;
+      }
+    };
+    window.addEventListener("uog:site:before-switch", guard);
+    return () => window.removeEventListener("uog:site:before-switch", guard);
+  }, []);
+  return <Box sx={{minWidth: 0}} onChange={event => {
+    // Filters are not drafts. Forms (including portalled dialogs) are isolated.
+    const form = (event.target as HTMLElement).closest("form");
+    if (form) changedForms.current.add(form);
+  }}>{children}</Box>;
+}
 
 export interface SiteAdminSite {
   id: number;
@@ -96,12 +115,12 @@ export function SiteAdminFrame({
     || /^\/sites\/[1-9][0-9]*\/admin\/menus\/preview\/?$/.test(currentPath)
     || /^\/sites\/[1-9][0-9]*\/admin\/posts\/[^/]+\/preview\/?$/.test(currentPath)
   ){
-    return <SiteAdminContext.Provider value={value}>{children}</SiteAdminContext.Provider>;
+    return <SiteAdminContext.Provider value={value}><SiteEditableContent key={site.id}>{children}</SiteEditableContent></SiteAdminContext.Provider>;
   }
 
   return (
     <SiteAdminContext.Provider value={value}>
-    <Box key={site.id} data-perf-site-id={site.id} sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+    <Box data-perf-site-id={site.id} sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
       <Box sx={{ position: "sticky", top: 0, zIndex: 10, bgcolor: "grey.50", pb: 1 }}>
         <Breadcrumb
           items={[
@@ -152,7 +171,7 @@ export function SiteAdminFrame({
           </Paper>
         ) : null}
       </Box>
-      <Box sx={{ minWidth: 0 }}>{children}</Box>
+      <SiteEditableContent key={site.id}>{children}</SiteEditableContent>
       {canActivateCentralModules(permissions) ? (
         <Button component={Link} href="/modules" size="small" sx={{ alignSelf: "flex-start" }}>
           Central module registry

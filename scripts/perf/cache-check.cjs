@@ -62,7 +62,8 @@ const {chromium} = require(process.env.UOG_QA_PLAYWRIGHT_ROOT || 'playwright-cor
   assert.equal(await page.locator(`[data-perf-site-id="${a}"]`).count(), 0);
   assert((await page.getByRole('link', {name: /^Edit /}).first().getAttribute('href')).startsWith(`/admin/sites/${b}/admin/pages/`));
   const beforeReturn = actions; await choose(a); await section(a, 'pages');
-  assert(actions > beforeReturn); result.checks.push('Site switch removes old context; returning to that Site performs fresh authorized reads');
+  assert((await page.getByRole('link', {name: /^Edit /}).first().getAttribute('href')).startsWith(`/admin/sites/${a}/admin/pages/`));
+  result.return_site_reads = actions - beforeReturn; result.checks.push('Return view is Site-scoped; reuse or refresh follows the bounded workspace lease');
   phase = 'Logout'; await page.getByRole('button', {name: 'Sign out', exact: true}).click();
   await page.waitForTimeout(1000);
   const session = await context.request.get(origin + '/admin/api/session'); assert.equal(session.status(), 401);

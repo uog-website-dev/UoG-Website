@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor, within } from "@/test/render";
+import { act, fireEvent, render, screen, waitFor, within } from "@/test/render";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ToastProvider } from "@uog/ui";
 import layoutFixtures from "../../../../packages/types/src/layout/fixtures.json";
@@ -50,6 +50,7 @@ vi.mock("next/link", () => ({
 import { listSiteSidebars } from "@/app/sites/sidebar-actions";
 import { SitePagesPanel } from "./site-pages";
 import { SitePageEditor } from "./site-page-editor";
+import {confirmSiteSwitch} from "./site-draft-guard";
 import { SiteAdminFrame, SiteSection } from "./site-admin-frame";
 import type { SiteAdminSite } from "./site-admin-frame";
 
@@ -420,6 +421,18 @@ describe("SitePagesPanel", () => {
     ));
   });
 
+  it("does not navigate back to the former Site when its save completes after unmount", async () => {
+    let release!: (value: unknown) => void;
+    updateSitePage.mockImplementationOnce(() => new Promise(resolve => {release = resolve;}));
+    const view = renderEditor("edit", {pageId: "page-1"});
+    fireEvent.change(await screen.findByRole("textbox", {name: "Title"}), {target: {value: "Old Site write"}});
+    fireEvent.click(screen.getByRole("button", {name: "Save changes"}));
+    await waitFor(() => expect(updateSitePage).toHaveBeenCalled());
+    view.unmount();
+    await act(async () => release({ok: true, data: draft({title: "Old Site write"})}));
+    expect(push).not.toHaveBeenCalled();
+  });
+
   it("assigns a Site sidebar without replacing the builder document", async () => {
     const snapshot = { id: "sidebar-1", site: 11, version: 1, name: "Department navigation", components: [{ id: "links", type: "menu" as const, menu_id: "menu-1", items: [{ label: "Student support", href: "/support", children: [] }] }] };
     vi.mocked(listSiteSidebars).mockResolvedValueOnce({ ok: true, data: [
@@ -493,6 +506,17 @@ describe("SitePagesPanel", () => {
     fireEvent.change(field,{target:{value:JSON.stringify({visual_layout:{schema_version:99,rows:[]}})}});
     expect(screen.getByRole("button",{name:"Create Page"})).toHaveProperty("disabled",true);
     expect(createSitePage).not.toHaveBeenCalled();
+  });
+
+  it("uses the Page editor dirty state for Site switches even outside a form element", async () => {
+    const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
+    renderEditor("create");
+    const title = await screen.findByRole("textbox", {name: "Title"});
+    expect(confirmSiteSwitch(22)).toBe(true);
+    fireEvent.change(title, {target: {value: "Private unsaved page"}});
+    expect(confirmSiteSwitch(22)).toBe(false);
+    expect(title).toHaveProperty("value", "Private unsaved page");
+    confirm.mockReturnValue(true); expect(confirmSiteSwitch(22)).toBe(true);
   });
 
   it("asks before discarding unsaved editor changes", async () => {

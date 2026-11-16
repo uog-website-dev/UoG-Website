@@ -1,6 +1,7 @@
 param(
  [ValidateSet("production","development")][string]$Mode="production",
  [ValidateRange(2,100)][int]$Samples=10,
+ [ValidateRange(10,30)][int]$Sites=10,
  [string]$Output="docs/qa/P0-PERF-001/local",
  [switch]$SkipSeed
 )
@@ -8,6 +9,7 @@ $ErrorActionPreference="Stop"
 # Run from the repository root. Secrets remain in memory/stdin, never evidence.
 $privateConfig=@{}
 Get-Content .env | ForEach-Object {if($_ -match '^([^#=]+)=(.*)$'){$privateConfig[$matches[1]]=$matches[2].Trim('"')}}
+$privateConfig['PERF_SITES']=$Sites
 $compose=@("compose","-f","docker-compose.yml","-f","docker-compose.perf.yml","--profile","performance")
 New-Item -ItemType Directory -Force "$Output/$Mode" | Out-Null
 foreach($file in @("scripts/sprint3_live_review.py","scripts/perf/seed.py","scripts/perf/prepare-session.py")){

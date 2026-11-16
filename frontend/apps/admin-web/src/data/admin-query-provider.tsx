@@ -37,5 +37,5 @@ export function AdminQueryProvider({identity, children}: {identity: string; chil
     return () => {window.removeEventListener("uog:session:changed", changed); window.removeEventListener("uog:session:clear", clear); window.removeEventListener("uog:access:denied", denied); window.removeEventListener("uog:authorization:context", context);};
   }, [identity, current, siteId]);
   if (signedOut) return <p role="status">Signing out…</p>;
-  return <QueryScope key={`${current}:${siteId}:${epoch}`} identity={current} siteId={siteId} onDenied={denied}>{children}</QueryScope>;
+  return <QueryScope key={`${current}:${epoch}`} identity={current} siteId={siteId} onDenied={denied}>{children}</QueryScope>;
 }

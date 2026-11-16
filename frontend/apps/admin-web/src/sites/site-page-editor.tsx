@@ -3,6 +3,7 @@
 /**
  * Full-page Page create/edit screen (WordPress-style, not a modal).
  */
+import {useSiteDraftGuard, useSiteOperationGuard} from "./site-draft-guard";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -236,6 +237,11 @@ function SitePageEditorContent({
   const [activePage, setActivePage] = useState<SitePageRecord | null>(null);
   const [form, setForm] = useState<PageForm>(() => emptyForm(defaultLocale));
   const [saving, setSaving] = useState(false);
+  const isCurrentOperation = useSiteOperationGuard(siteId);
+  const dirty = mode === "create"
+    ? JSON.stringify(form) !== JSON.stringify(emptyForm(defaultLocale))
+    : activePage !== null && JSON.stringify(form) !== JSON.stringify(formFromRecord(activePage, defaultLocale));
+  useSiteDraftGuard(dirty);
   const [loadingPage, setLoadingPage] = useState(mode === "edit");
   const [loadError, setLoadError] = useState("");
   const [dialogError, setDialogError] = useState("");
@@ -318,9 +324,6 @@ function SitePageEditorContent({
 
   function leaveEditor() {
     if (saving) return;
-    const dirty = mode === "create"
-      ? JSON.stringify(form) !== JSON.stringify(emptyForm(defaultLocale))
-      : activePage !== null && JSON.stringify(form) !== JSON.stringify(formFromRecord(activePage, defaultLocale));
     if (!dirty || window.confirm("Discard your unsaved Page changes?")) {
       router.push(listHref);
     }
@@ -346,6 +349,7 @@ function SitePageEditorContent({
           seo: seoInput(form),
           blocks: blockInputs(form),
         }));
+        if (!isCurrentOperation()) return;
         toast.success("Page created.");
       } else if (activePage?.etag) {
         const original=formFromRecord(activePage,defaultLocale);
@@ -361,12 +365,14 @@ function SitePageEditorContent({
           seo: seoInput(form),
           blocks: blockInputs(form),
         }));
+        if (!isCurrentOperation()) return;
         toast.success("Page updated.");
       } else {
         throw new Error("The Page revision is unavailable. Close and reopen the editor.");
       }
       router.push(listHref);
     } catch (cause) {
+      if (!isCurrentOperation()) return;
       if (cause instanceof ApiError && cause.status === 409) {
         setDialogConflict(true);
         setDialogError(`${cause.message} Your edits are still here. Reload the latest version to continue.`);
@@ -374,7 +380,7 @@ function SitePageEditorContent({
         setDialogError(cause instanceof Error ? cause.message : "The Page could not be saved.");
       }
     } finally {
-      setSaving(false);
+      if (isCurrentOperation()) setSaving(false);
     }
   }
 
@@ -383,14 +389,16 @@ function SitePageEditorContent({
     setSaving(true);
     try {
       const current = unwrap(await getSitePage(siteId, activePage.id));
+      if (!isCurrentOperation()) return;
       setActivePage(current);
       setForm(formFromRecord(current, defaultLocale));
       setDialogConflict(false);
       setDialogError("");
     } catch (cause) {
+      if (!isCurrentOperation()) return;
       setDialogError(cause instanceof Error ? cause.message : "The latest Page could not be loaded.");
     } finally {
-      setSaving(false);
+      if (isCurrentOperation()) setSaving(false);
     }
   }
 
