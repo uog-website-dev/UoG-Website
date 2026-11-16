@@ -1,0 +1,101 @@
+powershell :  uog-backend Copying scripts/sprint3_live_review.py to uog-backend:/tmp/sprint3_live_review.py
+At line:3 char:1
++ powershell -NoProfile -File scripts/perf/run.ps1 -Mode production -Si ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ( uog-backend Co..._live_review.py:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+ uog-backend Copied scripts/sprint3_live_review.py to uog-backend:/tmp/sprint3_live_review.py
+ uog-backend Copying scripts/perf/seed.py to uog-backend:/tmp/seed.py
+ uog-backend Copied scripts/perf/seed.py to uog-backend:/tmp/seed.py
+ uog-backend Copying scripts/perf/prepare-session.py to uog-backend:/tmp/prepare-session.py
+ uog-backend Copied scripts/perf/prepare-session.py to uog-backend:/tmp/prepare-session.py
+Seeded 38 registered permissions and 7 standard roles. No user assignments were created.
+{"event": "perf.seed.progress", "site": 81, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.progress", "site": 82, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.progress", "site": 83, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.progress", "site": 84, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.progress", "site": 85, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.progress", "site": 86, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.progress", "site": 87, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.progress", "site": 88, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.progress", "site": 89, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.progress", "site": 90, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.progress", "site": 91, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.progress", "site": 92, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.progress", "site": 93, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.progress", "site": 94, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.progress", "site": 95, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.progress", "site": 96, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.progress", "site": 97, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.progress", "site": 98, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.progress", "site": 99, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.progress", "site": 100, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.progress", "site": 101, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.complete", "sites": 21, "counts_per_site": {"sites": 21, "pages": 40, "posts": 100, "media": 80}, "private_session": "/tmp/perf001-session.json"}
+ Container uog-perf-admin Recreate 
+ Container uog-perf-backend Recreate 
+ Container uog-perf-backend Recreated 
+ Container uog-perf-admin Recreated 
+ Container uog-perf-gateway Recreate 
+ Container uog-perf-gateway Recreated 
+ Container uog-perf-admin Starting 
+ Container uog-perf-backend Starting 
+ Container uog-perf-admin Started 
+ Container uog-perf-backend Started 
+ Container uog-perf-gateway Starting 
+ Container uog-perf-gateway Started 
+{"phase":"auth_redirect","origin":"http://localhost:8088","path":"/admin"}
+{"landing_path":"/admin","error_code":null,"session_cookie_present":true}
+{"scenario":"first_site_visit","cache_state":"cold","sample":1,"duration_ms":711,"requests":21}
+{"scenario":"cold_site_switch","cache_state":"cold","sample":1,"duration_ms":333,"requests":16}
+{"scenario":"warm_site_switch","cache_state":"warm","sample":1,"duration_ms":125,"requests":1}
+{"scenario":"same_site_menu_navigation","cache_state":"cold","sample":1,"duration_ms":216,"requests":22}
+{"scenario":"cached_section_return","cache_state":"warm","sample":1,"duration_ms":99,"requests":2}
+{"scenario":"cached_section_transition","cache_state":"warm","sample":1,"duration_ms":80,"requests":1}
+{"scenario":"cold_site_switch","cache_state":"cold","sample":2,"duration_ms":319,"requests":16}
+{"scenario":"warm_site_switch","cache_state":"warm","sample":2,"duration_ms":102,"requests":1}
+{"scenario":"same_site_menu_navigation","cache_state":"cold","sample":2,"duration_ms":277,"requests":10}
+{"scenario":"cached_section_return","cache_state":"warm","sample":2,"duration_ms":77,"requests":2}
+{"scenario":"cached_section_transition","cache_state":"warm","sample":2,"duration_ms":83,"requests":1}
+{"scenario":"cold_site_switch","cache_state":"cold","sample":3,"duration_ms":281,"requests":16}
+{"scenario":"warm_site_switch","cache_state":"warm","sample":3,"duration_ms":141,"requests":1}
+{"scenario":"same_site_menu_navigation","cache_state":"cold","sample":3,"duration_ms":483,"requests":10}
+{"scenario":"cached_section_return","cache_state":"warm","sample":3,"duration_ms":79,"requests":2}
+{"scenario":"cached_section_transition","cache_state":"warm","sample":3,"duration_ms":91,"requests":1}
+{"scenario":"cold_site_switch","cache_state":"cold","sample":4,"duration_ms":324,"requests":16}
+{"scenario":"warm_site_switch","cache_state":"warm","sample":4,"duration_ms":99,"requests":1}
+{"scenario":"same_site_menu_navigation","cache_state":"cold","sample":4,"duration_ms":195,"requests":22}
+{"scenario":"cached_section_return","cache_state":"warm","sample":4,"duration_ms":81,"requests":2}
+{"scenario":"cached_section_transition","cache_state":"warm","sample":4,"duration_ms":89,"requests":1}
+{"scenario":"cold_site_switch","cache_state":"cold","sample":5,"duration_ms":340,"requests":16}
+{"scenario":"warm_site_switch","cache_state":"warm","sample":5,"duration_ms":94,"requests":1}
+{"scenario":"same_site_menu_navigation","cache_state":"cold","sample":5,"duration_ms":293,"requests":10}
+{"scenario":"cached_section_return","cache_state":"warm","sample":5,"duration_ms":110,"requests":2}
+{"scenario":"cached_section_transition","cache_state":"warm","sample":5,"duration_ms":85,"requests":1}
+{"scenario":"cold_site_switch","cache_state":"cold","sample":6,"duration_ms":336,"requests":16}
+{"scenario":"warm_site_switch","cache_state":"warm","sample":6,"duration_ms":94,"requests":1}
+{"scenario":"same_site_menu_navigation","cache_state":"cold","sample":6,"duration_ms":437,"requests":10}
+{"scenario":"cached_section_return","cache_state":"warm","sample":6,"duration_ms":68,"requests":2}
+{"scenario":"cached_section_transition","cache_state":"warm","sample":6,"duration_ms":77,"requests":1}
+{"scenario":"cold_site_switch","cache_state":"cold","sample":7,"duration_ms":325,"requests":16}
+{"scenario":"warm_site_switch","cache_state":"warm","sample":7,"duration_ms":114,"requests":1}
+{"scenario":"same_site_menu_navigation","cache_state":"cold","sample":7,"duration_ms":203,"requests":22}
+{"scenario":"cached_section_return","cache_state":"warm","sample":7,"duration_ms":95,"requests":2}
+{"scenario":"cached_section_transition","cache_state":"warm","sample":7,"duration_ms":81,"requests":1}
+{"scenario":"cold_site_switch","cache_state":"cold","sample":8,"duration_ms":320,"requests":16}
+{"scenario":"warm_site_switch","cache_state":"warm","sample":8,"duration_ms":134,"requests":1}
+{"scenario":"same_site_menu_navigation","cache_state":"cold","sample":8,"duration_ms":324,"requests":10}
+{"scenario":"cached_section_return","cache_state":"warm","sample":8,"duration_ms":77,"requests":2}
+{"scenario":"cached_section_transition","cache_state":"warm","sample":8,"duration_ms":90,"requests":1}
+{"scenario":"cold_site_switch","cache_state":"cold","sample":9,"duration_ms":263,"requests":16}
+{"scenario":"warm_site_switch","cache_state":"warm","sample":9,"duration_ms":116,"requests":1}
+{"scenario":"same_site_menu_navigation","cache_state":"cold","sample":9,"duration_ms":412,"requests":10}
+{"scenario":"cached_section_return","cache_state":"warm","sample":9,"duration_ms":82,"requests":2}
+{"scenario":"cached_section_transition","cache_state":"warm","sample":9,"duration_ms":74,"requests":1}
+{"scenario":"cold_site_switch","cache_state":"cold","sample":10,"duration_ms":334,"requests":16}
+{"scenario":"warm_site_switch","cache_state":"warm","sample":10,"duration_ms":97,"requests":1}
+{"scenario":"same_site_menu_navigation","cache_state":"cold","sample":10,"duration_ms":201,"requests":22}
+{"scenario":"cached_section_return","cache_state":"warm","sample":10,"duration_ms":87,"requests":2}
+{"scenario":"cached_section_transition","cache_state":"warm","sample":10,"duration_ms":79,"requests":1}
+{"all_api_samples_correlated":true,"django_requests":172,"next_api_spans":92,"navigation_samples_missing_django_spans":["cb9c9ed1-96e2-4909-b195-7a9015eedfbe","f6d29d52-634d-481f-969d-53f0264cc380","607df60c-4bd6-4f20-bf43-93467376ba3f","ea3ceb99-8910-47a9-b833-2b420ca09285","6a6b9546-2fe1-4805-8782-874e86b00b46","b7603737-913d-420f-bedb-fefe7f02d981","50efe7b8-41da-483a-890f-97f47de442f2","cecbc7b2-0cc6-4862-9f36-0481f5232e55","abb720ee-262b-4d17-b3f8-f115fa38bafd","86793536-c441-4b3b-969b-4c71086a36c9","5b3eb2df-7caa-4ae2-a2ff-38742133ca32","3279aed0-0e10-4d96-8f58-5a200db4a68e","f3b24ee4-2561-4a42-8d2c-3d8970d5c79a","7f2f3e81-fd53-43d5-a2e9-e17bfa28f1ce","fd234d82-4517-452b-bcde-106c0e22bb77","68aa4f45-d09b-4baf-b741-248fae08486d","b9670026-ee03-4f6b-9879-dfcf5ad0bee9","bc0dad81-674a-470e-a48e-dfff7baf9e16","37b70378-3291-4e37-9f9f-e503aae9bb94","cb41bee3-f283-45eb-bfff-c491b9fe5f3b","8a37f2be-83a6-49b8-817e-46485a864219","4e4d393c-1658-44e6-884e-e3a17b3487ea","051892fa-f843-4781-98ec-5e1186f35da4","df80264e-b1a0-403c-ab01-6ea62509c8e9","7fb8a6d3-7add-4a87-8406-17c7ccf13d12","be3553f3-3549-4bb5-a8a6-e00e71a446fd","acd0426c-be7b-4e04-ac8a-a242021121b9","bbd9e8b3-5147-410e-94a8-b8e5411e4b0f","2957a29c-435e-4240-a35b-137f83049b33","a2b44156-fa4b-41a2-bb1a-3d47380c38b6"],"note":"No upstream requests may be legitimate for a fully cached transition; inspect browser waterfall before interpreting missing spans."}

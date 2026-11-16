@@ -459,3 +459,5 @@ describe("SiteDetail — unavailable site", () => {
     );
   });
 });
+
+vi.mock("@/data/read-client", async()=>{const menus=await import("@/app/sites/menu-actions");const source0=await import("@/app/sites/page-actions");const source1=await import("@/app/sites/post-actions");return {loadSiteNavigation:(...args:unknown[])=>(menus.loadSiteNavigation as (...values:unknown[])=>unknown)(...args.slice(0,2)),loadSitePages:(...args:unknown[])=>(source0.loadSitePages as (...values:unknown[])=>unknown)(...args.slice(0,2)),loadSitePageStatusCounts:(...args:unknown[])=>(source0.loadSitePageStatusCounts as (...values:unknown[])=>unknown)(...args.slice(0,1)),loadSitePosts:(...args:unknown[])=>(source1.loadSitePosts as (...values:unknown[])=>unknown)(...args.slice(0,2))};});

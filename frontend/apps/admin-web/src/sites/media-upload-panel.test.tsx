@@ -81,3 +81,5 @@ it("releases local preview URLs and replaces unreadable local images with a safe
  fireEvent.error(preview);expect(screen.queryByRole("img",{name:"Selected preview.png"})).toBeNull();
  view.unmount();expect(revoke).toHaveBeenCalledWith("blob:media-preview");
 });
+
+vi.mock("@/data/read-client", async()=>{const source0=await import("@/app/sites/media-actions");return {listSiteMedia:(...args:unknown[])=>(source0.listSiteMedia as (...values:unknown[])=>unknown)(...args.slice(0,2))};});

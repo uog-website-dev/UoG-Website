@@ -265,3 +265,5 @@ describe("Media picker audit regressions", () => {
     expect(save).toHaveBeenCalledWith({ ...original, alt: "Updated description" });
   });
 });
+
+vi.mock("@/data/read-client", async()=>{const source0=await import("@/app/sites/media-actions");return {listSiteMedia:(...args:unknown[])=>(source0.listSiteMedia as (...values:unknown[])=>unknown)(...args.slice(0,2))};});

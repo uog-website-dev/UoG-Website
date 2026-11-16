@@ -193,3 +193,5 @@ it("adds typed news and same-Site category destinations", async () => {
   fireEvent.click(within(form).getByRole("button",{name:"Add link"}));
   await waitFor(()=>expect(createMenuLink).toHaveBeenCalledWith(11,"menu-1",'"menu-1-v3"',expect.objectContaining({item_type:"news",category:null,target:""})));
 });
+
+vi.mock("@/data/read-client",async()=>{const menus=await import("@/app/sites/menu-actions");return {loadSiteNavigation:(...args:unknown[])=>(menus.loadSiteNavigation as (...values:unknown[])=>unknown)(...args.slice(0,2))};});

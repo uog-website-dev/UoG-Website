@@ -34,3 +34,5 @@ it('clears a rendered private preview when refresh is denied',async()=>{
  expect(await screen.findByText('Access revoked')).toBeTruthy();
  expect(screen.queryByRole('link',{name:'Private draft label'})).toBeNull();
 });
+
+vi.mock("@/data/read-client",async()=>{const menus=await import("@/app/sites/menu-actions");return {loadSiteNavigation:(...args:unknown[])=>(menus.loadSiteNavigation as (...values:unknown[])=>unknown)(...args.slice(0,2))};});

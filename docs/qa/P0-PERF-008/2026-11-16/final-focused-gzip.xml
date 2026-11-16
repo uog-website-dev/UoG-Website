@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="21" failures="0" errors="0" time="0.150973325">
+    <testsuite name="src/data/read-client.test.ts" timestamp="2026-11-16T11:30:06.521Z" hostname="2a4ffc8ba6a4" tests="5" failures="0" errors="0" skipped="0" time="0.042133954">
+        <testcase classname="src/data/read-client.test.ts" name="projects only lifecycle counts so the Page total is not counted twice" time="0.03223444">
+        </testcase>
+        <testcase classname="src/data/read-client.test.ts" name="uses same-origin credentialed GET without tokens, forwards filters and aborts obsolete reads" time="0.002797941">
+        </testcase>
+        <testcase classname="src/data/read-client.test.ts" name="keeps backend field errors and validates dashboard Site/schema" time="0.00253335">
+        </testcase>
+        <testcase classname="src/data/read-client.test.ts" name="fetches directory and policy in parallel with bounded pages" time="0.001808716">
+        </testcase>
+        <testcase classname="src/data/read-client.test.ts" name="does not follow upstream next URLs or truncate taxonomy pages" time="0.001370331">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/data/read-proxy.test.ts" timestamp="2026-11-16T11:30:06.529Z" hostname="2a4ffc8ba6a4" tests="16" failures="0" errors="0" skipped="0" time="0.108839371">
+        <testcase classname="src/data/read-proxy.test.ts" name="uses one fixed GET, server-side bearer, private JSON and trace IDs without reflecting tokens or cookies" time="0.027672806">
+        </testcase>
+        <testcase classname="src/data/read-proxy.test.ts" name="uses distinct upstream IDs when parallel reads share a root ID" time="0.002488445">
+        </testcase>
+        <testcase classname="src/data/read-proxy.test.ts" name="negotiates gzip for JSON without mixing credentials into the compressed body" time="0.011888398">
+        </testcase>
+        <testcase classname="src/data/read-proxy.test.ts" name="does not send unaccepted gzip for br" time="0.001777545">
+        </testcase>
+        <testcase classname="src/data/read-proxy.test.ts" name="does not send unaccepted gzip for gzip;q=0, br" time="0.001045895">
+        </testcase>
+        <testcase classname="src/data/read-proxy.test.ts" name="rejects unsafe target/query site=11&amp;resource=http://evil.test before auth or upstream" time="0.00065208">
+        </testcase>
+        <testcase classname="src/data/read-proxy.test.ts" name="rejects unsafe target/query site=11&amp;resource=__proto__ before auth or upstream" time="0.000328071">
+        </testcase>
+        <testcase classname="src/data/read-proxy.test.ts" name="rejects unsafe target/query site=11&amp;site=22&amp;resource=pages before auth or upstream" time="0.000576281">
+        </testcase>
+        <testcase classname="src/data/read-proxy.test.ts" name="rejects unsafe target/query site=0&amp;resource=pages before auth or upstream" time="0.000738424">
+        </testcase>
+        <testcase classname="src/data/read-proxy.test.ts" name="rejects unsafe target/query site=9007199254740992&amp;resource=posts before auth or upstream" time="0.000453269">
+        </testcase>
+        <testcase classname="src/data/read-proxy.test.ts" name="rejects unsafe target/query site=11&amp;resource=pages&amp;url=http://evil.test before auth or upstream" time="0.000400853">
+        </testcase>
+        <testcase classname="src/data/read-proxy.test.ts" name="rejects unsafe target/query site=11&amp;resource=pages&amp;site_id=22 before auth or upstream" time="0.000264127">
+        </testcase>
+        <testcase classname="src/data/read-proxy.test.ts" name="denies anonymous, cross-origin and write attempts without an upstream request" time="0.001522227">
+        </testcase>
+        <testcase classname="src/data/read-proxy.test.ts" name="preserves field-addressed backend errors and rejects foreign or malformed success" time="0.002531377">
+        </testcase>
+        <testcase classname="src/data/read-proxy.test.ts" name="maps session/network failures generically and propagates cancellation" time="0.052151659">
+        </testcase>
+        <testcase classname="src/data/read-proxy.test.ts" name="bounds upstream timeout even when the request has its own signal" time="0.002674644">
+        </testcase>
+    </testsuite>
+</testsuites>

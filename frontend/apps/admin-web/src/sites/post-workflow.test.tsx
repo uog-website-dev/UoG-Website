@@ -108,3 +108,5 @@ it("opens a working draft from the published revision and previews in a new tab 
   expect(push).toHaveBeenCalledWith("/sites/11/admin/posts/working-1/edit");
   vi.unstubAllGlobals();
 });
+
+vi.mock("@/data/read-client", async()=>{const source0=await import("@/app/sites/post-actions");return {loadSiteTaxonomy:(...args:unknown[])=>(source0.loadSiteTaxonomy as (...values:unknown[])=>unknown)(...args.slice(0,2)),loadSitePosts:(...args:unknown[])=>(source0.loadSitePosts as (...values:unknown[])=>unknown)(...args.slice(0,2))};});

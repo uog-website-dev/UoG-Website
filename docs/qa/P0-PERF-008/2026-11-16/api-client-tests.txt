@@ -1,0 +1,21 @@
+
+> @uog/api-client@0.1.0 test /workspace/packages/api-client
+> vitest run
+
+
+ RUN  v5.0.5 /workspace/packages/api-client
+
+ ✓ src/hostname.test.ts (8 tests) 17ms
+ ✓ src/errors.test.ts (16 tests) 121ms
+ ✓ src/adapters/media.test.ts (5 tests) 129ms
+ ✓ src/adapters/sites-modules.test.ts (15 tests) 111ms
+ ✓ src/index.test.ts (6 tests) 135ms
+ ✓ src/adapters/adapters.test.ts (59 tests) 156ms
+ ✓ src/adapters/iam.test.ts (30 tests) 194ms
+ ✓ src/adapters/sites-domains.test.ts (27 tests) 315ms
+
+ Test Files  8 passed (8)
+      Tests  166 passed (166)
+   Start at  11:14:45
+   Duration  992ms (transform 48%, tests 29%, import 21%, worker 2%)
+

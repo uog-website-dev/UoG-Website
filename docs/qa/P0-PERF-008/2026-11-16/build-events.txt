@@ -1,0 +1,9 @@
+uog-perf-admin  |  ✓ Compiled successfully in 32.6s
+uog-perf-admin  |    Generating static pages (0/16) ...
+uog-perf-admin  |    Generating static pages (4/16) 
+uog-perf-admin  |    Generating static pages (8/16) 
+uog-perf-admin  |    Generating static pages (12/16) 
+uog-perf-admin  |  ✓ Generating static pages (16/16)
+uog-perf-admin  |    Finalizing page optimization ...
+uog-perf-admin  |    Collecting build traces ...
+uog-perf-admin  |  ✓ Ready in 677ms

@@ -41,3 +41,5 @@ it('shows the backend destination validation without losing the saved draft choi
  expect((await screen.findByRole('alert')).textContent).toContain('Publish the selected menu first.');
  expect(screen.getByRole('combobox',{name:'Primary Header draft menu'})).toHaveProperty('value','two');
 });
+
+vi.mock("@/data/read-client",async()=>{const menus=await import("@/app/sites/menu-actions");return {loadSiteNavigation:(...args:unknown[])=>(menus.loadSiteNavigation as (...values:unknown[])=>unknown)(...args.slice(0,2))};});

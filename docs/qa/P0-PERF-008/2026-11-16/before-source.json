@@ -1,0 +1,35 @@
+{
+  "files": [
+    {
+      "file": "src/sites/site-dashboard.tsx",
+      "sha256": "2ec63866801d9f8e270011533abf3c670328f36399ac7d31d57170664e85eaf6",
+      "usesNewReadClient": false,
+      "matches_base_commit": true
+    },
+    {
+      "file": "src/sites/site-pages.tsx",
+      "sha256": "6f61a69c376d60a40e8c4264e2556acf502255b3d9ce9a1fceefcf4d43919c02",
+      "usesNewReadClient": false,
+      "matches_base_commit": true
+    },
+    {
+      "file": "src/sites/site-posts.tsx",
+      "sha256": "68573c3f58fa4806d2a8ed72577aa7a9b8d71cecc0162af14a22d3907e62507a",
+      "usesNewReadClient": false,
+      "matches_base_commit": true
+    },
+    {
+      "file": "src/sites/site-menus.tsx",
+      "sha256": "f31fcada3083e9577d564da05dc3db3fef32c682df33f43178c29c5a87884fdb",
+      "usesNewReadClient": false,
+      "matches_base_commit": true
+    },
+    {
+      "file": "src/sites/media-library.tsx",
+      "sha256": "9b4dbae001b9cf3d41d853e3345818ed044f4426a9bb8ccb4e55cfbbd8dddc15",
+      "usesNewReadClient": false,
+      "matches_base_commit": true
+    }
+  ],
+  "comparison_note": "Accepts checkout LF/CRLF conversion only; runtime hashes are original bytes."
+}

@@ -1,4 +1,5 @@
 "use client";
+import {loadSitePosts, loadSiteTaxonomy} from "@/data/read-client";
 import {usePageBoundary} from "@/data/page-boundary";
 import {useSectionState} from "@/data/section-state";
 import {useSiteQuery} from "@/data/query-cache";
@@ -21,8 +22,6 @@ import Link from "next/link";
 
 import {
   loadSitePostWorkflowHistory,
-  loadSitePosts,
-  loadSiteTaxonomy,
   transitionSitePost,
 } from "@/app/sites/post-actions";
 import type {
@@ -138,7 +137,7 @@ function SitePostsPanelContent({
 
   const ordering = orderingForSort(sort);
   const posts = useSiteQuery<SitePostListResponse>(siteId, "posts", {search: appliedFilters.search, status: appliedFilters.status, page, page_size: PAGE_SIZE, ordering, category: appliedFilters.category, tag: appliedFilters.tag},
-    async () => canView && postsEnabled === true
+    async (signal) => canView && postsEnabled === true
       ? unwrap(await loadSitePosts(siteId, {
           search: appliedFilters.search || undefined,
           status: appliedFilters.status || undefined,
@@ -147,17 +146,14 @@ function SitePostsPanelContent({
           page,
           page_size: PAGE_SIZE,
           ordering,
-        }))
+        }, signal))
       : EMPTY_LIST,
     {enabled: canView && postsEnabled === true, isEmpty: (data) => data.count === 0},
   );
   usePageBoundary(page, setPage, posts.data, posts.error);
   const taxonomy = useSiteQuery<{ categories: SiteTaxonomyRecord[]; tags: SiteTaxonomyRecord[] }>(siteId, "taxonomy", {},
-    async () => canView && postsEnabled === true
-      ? {
-          categories: unwrap(await loadSiteTaxonomy(siteId, "categories")),
-          tags: unwrap(await loadSiteTaxonomy(siteId, "tags")),
-        }
+    async (signal) => canView && postsEnabled === true
+      ? await Promise.all([loadSiteTaxonomy(siteId, "categories", signal), loadSiteTaxonomy(siteId, "tags", signal)]).then(([categories,tags])=>({categories:unwrap(categories),tags:unwrap(tags)}))
       : { categories: EMPTY_TAXONOMY, tags: EMPTY_TAXONOMY },
     {enabled: canView && postsEnabled === true},
   );

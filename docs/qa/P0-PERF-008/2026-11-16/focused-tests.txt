@@ -1,0 +1,104 @@
+
+> @uog/admin-web@0.1.0 test /workspace/apps/admin-web
+> vitest run src/data/read-proxy.test.ts src/data/read-client.test.ts src/data/query-cache.test.tsx src/sites/site-dashboard.test.tsx src/sites/site-pages.test.tsx src/sites/site-posts.test.tsx src/sites/site-menus.test.tsx src/sites/media-library.test.tsx src/sites/media-picker.test.tsx src/data/section-navigation.test.tsx src/access-token.test.ts
+
+
+ RUN  v5.0.5 /workspace/apps/admin-web
+
+ ✓ src/sites/media-library.test.tsx (26 tests) 11373ms
+   ✓ MediaLibrary (16)
+     ✓ keeps cached images visible but pauses selection while eligibility is refreshing 435ms
+     ✓ shows processing state in the library and preserves the retry key after transfer failure 567ms
+     ✓ keeps the selected file after a failed upload and never invents a ready row 380ms
+     ✓ applies filename search before paging and resets to the first page 327ms
+     ✓ loads scoped details and saves only persisted alt text 690ms
+     ✓ shows readonly metadata without a save control 392ms
+     ✓ sends the selected status and type filters to the server 379ms
+     ✓ blocks deletion for a live reference and confirms unused removal 899ms
+     ✓ keeps the library card and metadata after a delete conflict 891ms
+     ✓ preserves edited alt text after a recoverable save failure 728ms
+     ✓ keeps a Gallery-referenced asset, saves alt text, and reloads persisted details 962ms
+     ✓ keeps deletion disabled if the reference inventory cannot be verified 396ms
+   ✓ Site-isolated media browsing (4)
+     ✓ offers recovery for empty search and transport failure 405ms
+     ✓ supports keyboard pagination and grid/list controls 468ms
+   ✓ Quiet processing updates and previews (2)
+     ✓ refreshes a processing image without a loading flash and updates its open details preview 399ms
+   ✓ renames and categorizes an asset without changing its original filename 731ms
+   ✓ opens the scoped display image in an immersive viewer and clears it on Site change 304ms
+   ✓ keeps unsaved metadata when expanding and closing the image 843ms
+ ✓ src/sites/site-posts.test.tsx (19 tests) 13192ms
+   ✓ SitePostsPanel (7)
+     ✓ loads only the selected Site and renders status, author, taxonomy and featured media 465ms
+     ✓ applies search, status, category and tag filters and resets them 978ms
+     ✓ runs submit, approve and publish only when the API offers that action for this Site 791ms
+   ✓ SitePostEditor (12)
+     ✓ creates drafts and edits with the detail ETag on the full-page editor 1169ms
+     ✓ validates media scope and offers taxonomy creation only to authorized creators 2167ms
+     ✓ previews the Site draft through the shared safe block renderer 560ms
+     ✓ keeps unsaved formatting after failed saves and warns before discard 771ms
+     ✓ preserves a stale draft and displays explicit conflict guidance 705ms
+     ✓ refreshes the revision marker after a conflict while keeping unsaved text 1032ms
+     ✓ surfaces editor_document field errors on the draft editor 394ms
+     ✓ fills the permalink from the title until the slug is edited 470ms
+     ✓ rejects reserved permalinks and shows the public path preview 850ms
+     ✓ surfaces duplicate slug API field errors on the settings panel 876ms
+     ✓ locks Post settings while the Post is published 362ms
+     ✓ lets an editor remove selected taxonomy that is no longer eligible 978ms
+ ✓ src/sites/site-menus.test.tsx (13 tests) 3737ms
+   ✓ SiteMenusPanel (10)
+     ✓ reorders the header with the keyboard-reachable move control and only for this Site 683ms
+     ✓ shows the reloaded menu order after a move 385ms
+     ✓ creates an unassigned local menu and renames it without changing placement 642ms
+     ✓ explains central and inherited ownership and does not edit a central menu 461ms
+   ✓ creates another named menu even after header and footer are occupied 389ms
+   ✓ selects and searches the directory without showing another Site's menu 354ms
+ ✓ src/sites/media-picker.test.tsx (11 tests) 3206ms
+   ✓ MediaPickerDialog (3)
+     ✓ filters, selects a ready Site asset and returns a stable asset ID payload 762ms
+     ✓ keeps the draft selection when confirm finds the asset ineligible 314ms
+   ✓ SiteImageField and repeater builder (3)
+     ✓ changes only the targeted Slider slide and restores focus after picking 615ms
+     ✓ keeps separate slide references after reorder and reopen 407ms
+   ✓ Media picker audit regressions (5)
+     ✓ reports a rejected confirmation request and allows retry 334ms
+ ✓ src/sites/site-dashboard.test.tsx (11 tests) 1556ms
+   ✓ renders five domains using one aggregate request without list fan-out 523ms
+ ✓ src/sites/site-pages.test.tsx (27 tests) 15290ms
+   ✓ SitePagesPanel (27)
+     ✓ saves a shell-only change without resending builder blocks or metadata 1104ms
+     ✓ assigns only published Pages allowed by the backend as the homepage 839ms
+     ✓ announces empty and failed API list states 305ms
+     ✓ applies server search and status filters and resets pagination 682ms
+     ✓ uses API pagination and resets to the first page when sorting changes 334ms
+     ✓ opens full-page preview in a new tab and submits this Site's draft for review 402ms
+     ✓ shows review controls only from backend-authorized actions and requires a rejection comment 950ms
+     ✓ shows append-only workflow history and reviewer feedback in a timeline 400ms
+     ✓ defaults a new Page to the Site language 718ms
+     ✓ starts a new Page blank and fills the slug from the title until it is edited 615ms
+     ✓ creates and edits only with the matching permission and current ETag 1187ms
+     ✓ does not navigate back to the former Site when its save completes after unmount 617ms
+     ✓ assigns a Site sidebar without replacing the builder document 917ms
+     ✓ surfaces stale edit conflicts without losing the form 870ms
+     ✓ previews private draft content and blocks malformed block JSON 793ms
+     ✓ shows the frozen private revision and sends its exact ETag when publishing 605ms
+     ✓ previews the shared visual fixture and rejects unsupported layout versions before saving 970ms
+     ✓ uses the Page editor dirty state for Site switches even outside a form element 433ms
+     ✓ asks before discarding unsaved editor changes 448ms
+     ✓ clears filter and page state when the selected Site changes 378ms
+     ✓ switches Site scope and enforces view-only access across the admin workspace 329ms
+     ✓ opens a working draft of a published Page and keeps the live route fixed 935ms
+ ✓ src/data/section-navigation.test.tsx (13 tests) 163ms
+ ✓ src/data/query-cache.test.tsx (15 tests) 435ms
+ ✓ src/access-token.test.ts (12 tests) 24ms
+ ✓ src/data/read-proxy.test.ts (12 tests) 123ms
+ ✓ src/data/read-client.test.ts (4 tests) 36ms
+
+ Test Files  11 passed (11)
+      Tests  163 passed (163)
+   Start at  11:09:02
+   Duration  36.11s (tests 71%, import 12%, environment 8%, transform 7%, setup 3%)
+
+    Isolate  11 workers spawned · ~631ms startup each (spawn + environment, per file)
+             at least ~2.84s faster with isolate: false — reuses workers across files instead of one per file
+

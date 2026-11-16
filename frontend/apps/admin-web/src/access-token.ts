@@ -197,6 +197,7 @@ async function requestRefresh(refreshToken: string): Promise<RefreshedTokens | n
 
   try {
     const response = await fetch(endpoint, {
+      signal: AbortSignal.timeout(8_000),
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({

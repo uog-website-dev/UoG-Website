@@ -1,0 +1,74 @@
+{
+  "files": [
+    {
+      "file": "apps/admin-web/src/data/read-proxy.ts",
+      "sha256": "1d6860791a9be89e3cd8e3e96ac9d6cd22ad6b71fcc8c30db8e94bea76d9f6fc",
+      "matches_checkout": true
+    },
+    {
+      "file": "apps/admin-web/src/data/read-client.ts",
+      "sha256": "796f5a933d80615d8debabff2a7c1d4568c98794b6e73794eb08bff1c8f71912",
+      "matches_checkout": true
+    },
+    {
+      "file": "apps/admin-web/src/data/dashboard-contract.ts",
+      "sha256": "d02495765f0ba793c57e9d33b157c1b033b497a1ab5765f4ec0aefad5a7df550",
+      "matches_checkout": true
+    },
+    {
+      "file": "apps/admin-web/src/data/query-cache.tsx",
+      "sha256": "3fe2097e4fad6065b4a7948c8f266f65d71cc0d78f71745b360273969ae22222",
+      "matches_checkout": true
+    },
+    {
+      "file": "apps/admin-web/src/data/section-prefetch.ts",
+      "sha256": "ac23fa05cf01086ddf46203bc220f6f0b5f6f18b5f591e9978646fa318c7251c",
+      "matches_checkout": true
+    },
+    {
+      "file": "apps/admin-web/src/app/api/reads/route.ts",
+      "sha256": "f31a44e60b48324f4953cc0ba3c98c61ef01a08bfb19893f2e1dbe504cc49ebe",
+      "matches_checkout": true
+    },
+    {
+      "file": "apps/admin-web/src/app/sites/dashboard-actions.ts",
+      "sha256": "d485327242ab72b988a4b3ff047b520287ef9250d0c66056cc85a70477c86f97",
+      "matches_checkout": true
+    },
+    {
+      "file": "apps/admin-web/src/sites/site-dashboard.tsx",
+      "sha256": "f437584ff0a2e15bd135803743eaa355640ed732293274821329f966f8a65f6d",
+      "matches_checkout": true
+    },
+    {
+      "file": "apps/admin-web/src/sites/site-pages.tsx",
+      "sha256": "f1c99b95ba1b2a0c4498c7c34170f15303d7020091eb6c30400b1e275a1fb2ea",
+      "matches_checkout": true
+    },
+    {
+      "file": "apps/admin-web/src/sites/site-posts.tsx",
+      "sha256": "7cfd8fd7ca462a659eae1e037cb362fc77c64a92383498b1608eb05a77a1842f",
+      "matches_checkout": true
+    },
+    {
+      "file": "apps/admin-web/src/sites/site-menus.tsx",
+      "sha256": "e104bdeb72774e3164421a77215a074b96e4ff9ca6b6902570fb29e62cc6701c",
+      "matches_checkout": true
+    },
+    {
+      "file": "apps/admin-web/src/sites/media-library.tsx",
+      "sha256": "33f9172907a34c1e195d1bf853b70a357cbdefe310701cbe17dfe97faa4f699f",
+      "matches_checkout": true
+    },
+    {
+      "file": "apps/admin-web/src/access-token.ts",
+      "sha256": "08716477138b6d88d7cb0aba3c6b26eda0e78f0e954a90190d14c3433c3ea87b",
+      "matches_checkout": true
+    },
+    {
+      "file": "packages/api-client/src/client.ts",
+      "sha256": "6537ac6588316866f8d55e57a0fbb9b2fba2b44e92569a4e30db1e439dda5499",
+      "matches_checkout": true
+    }
+  ]
+}

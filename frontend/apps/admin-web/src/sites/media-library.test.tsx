@@ -417,3 +417,5 @@ it("hides ready badges in both layouts while keeping processing visible",async()
  expect(screen.getByRole("button",{name:"Preview campus.png"}).querySelector("img")?.getAttribute("src")).toContain("/sites/11/media/asset-1/image?variant=thumbnail");
  expect(screen.getByText("PROCESSING")).toBeTruthy();
 });
+
+vi.mock("@/data/read-client", async()=>{const source0=await import("@/app/sites/media-actions");return {listSiteMedia:(...args:unknown[])=>(source0.listSiteMedia as (...values:unknown[])=>unknown)(...args.slice(0,2))};});

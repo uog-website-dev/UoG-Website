@@ -2,7 +2,7 @@
 import {useEffect, useRef} from "react";
 import {useRouter} from "next/navigation";
 import type {QueryClient} from "@tanstack/react-query";
-import {loadSitePageStatusCounts} from "@/app/sites/page-actions";
+import {loadSitePageStatusCounts} from "./read-client";
 import {unwrap} from "@/organizations/contract";
 import {findSiteSection, sectionDecision, siteAdminHref} from "@/sites/site-admin";
 import type {WorkspacePayload} from "@/workspace";
@@ -44,7 +44,7 @@ export function useSectionPrefetch(siteId: number) {
       try {void Promise.resolve(router.prefetch(href)).catch(() => undefined);} catch { /* intent is optional */ }
       if (sectionKey === "pages" && site.permissions.includes("content.pages.view") && environment.client.getQueryState(queryKey({...environment, siteId}, "dashboard-summary"))?.fetchStatus !== "fetching") {
         void environment.client.prefetchQuery({queryKey: queryKey({...environment, siteId}, "page-counts"), staleTime: STALE_MS, gcTime: GC_MS, meta: {scopeProtected: true},
-          queryFn: async ({signal}) => {const counts = unwrap(await loadSitePageStatusCounts(siteId)); signal.throwIfAborted(); return counts;},
+          queryFn: async ({signal}) => {const counts = unwrap(await loadSitePageStatusCounts(siteId, signal)); signal.throwIfAborted(); return counts;},
         });
       }
     }, PREFETCH_DWELL_MS);

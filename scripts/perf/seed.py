@@ -40,6 +40,10 @@ for i in range(counts['sites']):
  SiteDomain.objects.get_or_create(site=site,hostname=f'perf001-{i+1:02}.uog.local',defaults={'is_primary':True,'status':'ACTIVE'})
  sites.append(site)
 review=Review.__new__(Review);review.run='perf001-'+uuid.uuid4().hex[:8];review.config=lambda key,default=None:config.get(key,default)
+# Bootstrap the managed identity directly through the same authenticated Django
+# endpoint; seeding must not require the ordinary frontend/nginx containers.
+review_http=review.http
+review.http=lambda method,url,**kwargs: review_http(method,url.replace('http://nginx/','http://backend:8000/',1),**kwargs)
 review.rows,review.users,review.profiles=[],[],{};review.seed={'profiles':{}}
 review.kc_admin=review.token(config['KC_ADMIN_USERNAME'],config['KC_ADMIN_PASSWORD'],client='admin-cli',realm='master')
 if session.exists():

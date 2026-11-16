@@ -73,7 +73,7 @@ export function AuthorizationScope({authorization, siteId, children}: {authoriza
   return <Environment.Provider value={{...environment, authorization}}>{children}</Environment.Provider>;
 }
 
-export function useSiteQuery<T>(siteId: number, resource: string, params: unknown, read: () => Promise<T>, options: {
+export function useSiteQuery<T>(siteId: number, resource: string, params: unknown, read: (signal: AbortSignal) => Promise<T>, options: {
   enabled?: boolean; isEmpty?: (data: T) => boolean; staleTime?: number; gcTime?: number; refetchInterval?: number; scopeProtected?: boolean;
 } = {}) {
   const environment = useQueryEnvironment();
@@ -83,9 +83,9 @@ export function useSiteQuery<T>(siteId: number, resource: string, params: unknow
   const result = useQuery({queryKey: key, enabled, staleTime: options.staleTime ?? STALE_MS, gcTime: options.gcTime ?? GC_MS,
     refetchInterval: options.refetchInterval, meta: {scopeProtected: options.scopeProtected === true},
     queryFn: async ({signal}) => {
-      // Server Actions cannot carry AbortSignal. Consuming it still cancels the
-      // query and prevents a late read from populating an obsolete cache entry.
-      const data = await read(); signal.throwIfAborted(); return data;
+      // GET reads propagate cancellation to the BFF and upstream. Older action
+      // callbacks can ignore the argument; the logical stale-result guard stays.
+      const data = await read(signal); signal.throwIfAborted(); return data;
     },
   });
   const prefix = key.slice(0, 5);

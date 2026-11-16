@@ -646,3 +646,5 @@ describe("SitePagesPanel", () => {
     expect(screen.getByRole("combobox", { name: "Parent Page" }).getAttribute("aria-disabled")).toBe("true");
   });
 });
+
+vi.mock("@/data/read-client", async()=>{const source0=await import("@/app/sites/page-actions");return {loadSitePages:(...args:unknown[])=>(source0.loadSitePages as (...values:unknown[])=>unknown)(...args.slice(0,2)),loadSitePageStatusCounts:(...args:unknown[])=>(source0.loadSitePageStatusCounts as (...values:unknown[])=>unknown)(...args.slice(0,1))};});
