@@ -1,4 +1,6 @@
 "use client";
+import {usePageBoundary} from "@/data/page-boundary";
+import {useSectionState} from "@/data/section-state";
 import {useSiteQuery} from "@/data/query-cache";
 
 import { useRef, useState } from "react";
@@ -175,11 +177,11 @@ function SitePagesPanelContent({
   const canView = permissions.includes(PERMISSIONS.view);
   const canCreate = permissions.includes(PERMISSIONS.create);
   const canEdit = permissions.includes(PERMISSIONS.update);
-  const [draftFilters, setDraftFilters] = useState<PageFilters>({ search: "", status: "" });
-  const [appliedFilters, setAppliedFilters] = useState<PageFilters>({ search: "", status: "" });
-  const [page, setPage] = useState(1);
-  const [sort, setSort] = useState<SortState>({ field: "updated_at", direction: "desc" });
-  const [reviewQueue, setReviewQueue] = useState(false);
+  const [draftFilters, setDraftFilters] = useSectionState<PageFilters>(siteId, visualBuilderMode ? "builder" : "pages", "draftFilters", { search: "", status: "" });
+  const [appliedFilters, setAppliedFilters] = useSectionState<PageFilters>(siteId, visualBuilderMode ? "builder" : "pages", "appliedFilters", { search: "", status: "" });
+  const [page, setPage] = useSectionState(siteId, visualBuilderMode ? "builder" : "pages", "page", 1);
+  const [sort, setSort] = useSectionState<SortState>(siteId, visualBuilderMode ? "builder" : "pages", "sort", { field: "updated_at", direction: "desc" });
+  const [reviewQueue, setReviewQueue] = useSectionState(siteId, visualBuilderMode ? "builder" : "pages", "reviewQueue", false);
   const [pendingWorkflow, setPendingWorkflow] = useState<{ page: SitePageRecord; action: SitePageWorkflowAction } | null>(null);
   const [workflowComment, setWorkflowComment] = useState("");
   const [workflowError, setWorkflowError] = useState("");
@@ -205,6 +207,7 @@ function SitePagesPanelContent({
       : EMPTY_PAGE_LIST,
     {enabled: canView && pagesEnabled === true, isEmpty: (data) => data.count === 0},
   );
+  usePageBoundary(page, setPage, pages.data, pages.error);
   const statusCounts = useSiteQuery<Record<SitePageStatus, number>>(siteId, "page-counts", {},
     async () => canView
       ? unwrap(await loadSitePageStatusCounts(siteId))

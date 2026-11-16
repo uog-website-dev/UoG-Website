@@ -1,0 +1,88 @@
+
+ RUN  v5.0.5 /workspace/apps/admin-web
+
+ ✓ src/sites/media-library.test.tsx (26 tests) 13852ms
+   ✓ MediaLibrary (16)
+     ✓ keeps cached images visible but pauses selection while eligibility is refreshing 486ms
+     ✓ shows processing state in the library and preserves the retry key after transfer failure 676ms
+     ✓ keeps the selected file after a failed upload and never invents a ready row 371ms
+     ✓ applies filename search before paging and resets to the first page 444ms
+     ✓ loads scoped details and saves only persisted alt text 928ms
+     ✓ shows readonly metadata without a save control 416ms
+     ✓ sends the selected status and type filters to the server 446ms
+     ✓ reports terminal image processing without offering selection 486ms
+     ✓ blocks deletion for a live reference and confirms unused removal 1876ms
+     ✓ keeps the library card and metadata after a delete conflict 993ms
+     ✓ preserves edited alt text after a recoverable save failure 800ms
+     ✓ keeps a Gallery-referenced asset, saves alt text, and reloads persisted details 1419ms
+     ✓ keeps deletion disabled if the reference inventory cannot be verified 389ms
+   ✓ Site-isolated media browsing (4)
+     ✓ offers recovery for empty search and transport failure 403ms
+     ✓ supports keyboard pagination and grid/list controls 514ms
+   ✓ Quiet processing updates and previews (2)
+     ✓ refreshes a processing image without a loading flash and updates its open details preview 475ms
+   ✓ renames and categorizes an asset without changing its original filename 611ms
+   ✓ keeps unsaved metadata when expanding and closing the image 665ms
+ ✓ src/sites/site-posts.test.tsx (19 tests) 15627ms
+   ✓ SitePostsPanel (7)
+     ✓ loads only the selected Site and renders status, author, taxonomy and featured media 579ms
+     ✓ applies search, status, category and tag filters and resets them 1359ms
+     ✓ shows empty and API error states 368ms
+     ✓ runs submit, approve and publish only when the API offers that action for this Site 1212ms
+   ✓ SitePostEditor (12)
+     ✓ creates drafts and edits with the detail ETag on the full-page editor 2400ms
+     ✓ validates media scope and offers taxonomy creation only to authorized creators 2688ms
+     ✓ previews the Site draft through the shared safe block renderer 510ms
+     ✓ keeps unsaved formatting after failed saves and warns before discard 783ms
+     ✓ preserves a stale draft and displays explicit conflict guidance 787ms
+     ✓ refreshes the revision marker after a conflict while keeping unsaved text 941ms
+     ✓ surfaces editor_document field errors on the draft editor 370ms
+     ✓ fills the permalink from the title until the slug is edited 421ms
+     ✓ rejects reserved permalinks and shows the public path preview 608ms
+     ✓ surfaces duplicate slug API field errors on the settings panel 625ms
+     ✓ locks Post settings while the Post is published 344ms
+     ✓ lets an editor remove selected taxonomy that is no longer eligible 1177ms
+ ✓ src/sites/site-menus.test.tsx (13 tests) 2582ms
+   ✓ SiteMenusPanel (10)
+     ✓ reorders the header with the keyboard-reachable move control and only for this Site 512ms
+     ✓ shows the reloaded menu order after a move 307ms
+     ✓ creates an unassigned local menu and renames it without changing placement 500ms
+docker : stderr | src/sidebar.test.tsx > DesktopSidebar — Site workspace > shows 
+the Visual Builder menu and keeps it active while editing a Page canvas
+At line:2 char:80
++ ... | Out-Null; docker compose -f docker-compose.yml -f docker-compose.pe ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr...g a Page canvas:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Received `false` for a non-boolean attribute `prefetch`.
+
+If you want to write it to the DOM, pass a string instead: prefetch="false" or prefetch={value.toString()}.
+
+If you used to conditionally omit it with prefetch={condition && value}, pass prefetch={condition ? value : undefined} 
+instead.
+
+ ✓ src/sidebar.test.tsx (10 tests) 844ms
+ ✓ src/sites/site-pages.test.tsx (27 tests) 10742ms
+   ✓ SitePagesPanel (27)
+     ✓ saves a shell-only change without resending builder blocks or metadata 1255ms
+     ✓ assigns only published Pages allowed by the backend as the homepage 505ms
+     ✓ applies server search and status filters and resets pagination 534ms
+     ✓ shows review controls only from backend-authorized actions and requires a rejection comment 619ms
+     ✓ defaults a new Page to the Site language 451ms
+     ✓ starts a new Page blank and fills the slug from the title until it is edited 384ms
+     ✓ creates and edits only with the matching permission and current ETag 900ms
+     ✓ does not navigate back to the former Site when its save completes after unmount 433ms
+     ✓ assigns a Site sidebar without replacing the builder document 621ms
+     ✓ surfaces stale edit conflicts without losing the form 556ms
+     ✓ previews private draft content and blocks malformed block JSON 486ms
+     ✓ shows the frozen private revision and sends its exact ETag when publishing 333ms
+     ✓ previews the shared visual fixture and rejects unsupported layout versions before saving 786ms
+     ✓ asks before discarding unsaved editor changes 307ms
+     ✓ opens a working draft of a published Page and keeps the live route fixed 506ms
+
+ Test Files  5 passed (5)
+      Tests  95 passed (95)
+   Start at  02:53:22
+   Duration  30.49s (tests 77%, import 11%, transform 5%, environment 5%, setup 1%)
+

@@ -1,4 +1,6 @@
 "use client";
+import {usePageBoundary} from "@/data/page-boundary";
+import {useSectionState} from "@/data/section-state";
 import { useEffect, useRef, useState } from "react";
 import { Alert, Box, Button, Chip, Typography, TextField, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Paper, ToggleButton, ToggleButtonGroup, Skeleton, IconButton } from "@mui/material";
 import { ApiError } from "@uog/api-client";
@@ -28,20 +30,20 @@ interface MediaLibraryProps {
   siteId: number; canUpload: boolean; canDelete?: boolean; onSelect?: (asset: MediaAssetRecord) => void; imagesOnly?: boolean;
 }
 
-/** A Site change unmounts all query, dialog, upload and filter state synchronously. */
+/** Site changes reset editable state; library controls restore only in their scoped cache. */
 export function MediaLibrary(props: MediaLibraryProps) {
-  return <SiteMediaLibrary key={props.siteId} {...props} />;
+  return <SiteMediaLibrary key={`${props.siteId}:${Boolean(props.onSelect)}:${Boolean(props.imagesOnly)}`} {...props} />;
 }
 
 function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, imagesOnly = false }: MediaLibraryProps) {
-  const [layout, setLayout] = useState<"grid" | "list">("grid");
-  const [page, setPage] = useState(1);
+  const [layout, setLayout] = useSectionState<"grid" | "list">(siteId, imagesOnly ? "media-images" : "media", "layout", "grid", !onSelect);
+  const [page, setPage] = useSectionState(siteId, imagesOnly ? "media-images" : "media", "page", 1, !onSelect);
   const [failedPreviews, setFailedPreviews] = useState<Set<string>>(new Set());
   const [previewVersion, setPreviewVersion] = useState(0);
-  const [filters, setFilters] = useState<MediaListQuery>({});
-  const [search, setSearch] = useState("");
-  const [status, setStatus] = useState<MediaStatus | "">("");
-  const [type, setType] = useState<"image" | "document" | "">("");
+  const [filters, setFilters] = useSectionState<MediaListQuery>(siteId, imagesOnly ? "media-images" : "media", "filters", {}, !onSelect);
+  const [search, setSearch] = useSectionState(siteId, imagesOnly ? "media-images" : "media", "search", "", !onSelect);
+  const [status, setStatus] = useSectionState<MediaStatus | "">(siteId, imagesOnly ? "media-images" : "media", "status", "", !onSelect);
+  const [type, setType] = useSectionState<"image" | "document" | "">(siteId, imagesOnly ? "media-images" : "media", "type", "", !onSelect);
   const [confirmDeletion, setConfirmDeletion] = useState(false);
   const [removalNotice, setRemovalNotice] = useState<string | null>(null);
   const [viewerAsset, setViewerAsset] = useState<MediaAssetRecord | null>(null);
@@ -70,6 +72,7 @@ function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, imag
     ...filters, page,
     ...(onSelect ? imagesOnly ? { ready_images: true } : { status: "READY" as const } : imagesOnly ? { type: "image" as const } : {}),
   })));
+  usePageBoundary(page, setPage, rows.data, rows.error);
   const policy = useSiteQuery(siteId, "media-policy", {}, async () => unwrap(await getMediaUploadPolicy(siteId)), {enabled: canUpload});
   const [pollError, setPollError] = useState(false);
   const [watchUntil, setWatchUntil] = useState(() => onSelect ? Date.now() + 120000 : 0);

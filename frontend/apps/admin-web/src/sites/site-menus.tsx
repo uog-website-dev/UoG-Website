@@ -1,4 +1,5 @@
 "use client";
+import {useSectionState} from "@/data/section-state";
 import {useSiteQuery, useInvalidateSite} from "@/data/query-cache";
 
 /**
@@ -249,9 +250,9 @@ export function SiteMenusPanel({
   const [name, setName] = useState("");
   const [location, setLocation] = useState<MenuPlace>("");
   const [code, setCode] = useState("");
-  const [selectedId, setSelectedId] = useState("");
-  const [search, setSearch] = useState("");
-  useEffect(() => { setSelectedId(""); setSearch(""); setName(""); setCode(""); setLocation(""); }, [siteId]);
+  const [selectedId, setSelectedId] = useSectionState(siteId, "menus", "selectedId", "");
+  const [search, setSearch] = useSectionState(siteId, "menus", "search", "");
+  useEffect(() => { setName(""); setCode(""); setLocation(""); }, [siteId]);
   const [busy, setBusy] = useState(false);
   const selectedLocation = openPlaces.includes(location) ? location : "";
   const matches = menus.filter(row => `${row.menu.name} ${row.menu.code ?? ""}`.toLowerCase().includes(search.toLowerCase()));

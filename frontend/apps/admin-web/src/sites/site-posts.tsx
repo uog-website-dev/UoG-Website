@@ -1,4 +1,6 @@
 "use client";
+import {usePageBoundary} from "@/data/page-boundary";
+import {useSectionState} from "@/data/section-state";
 import {useSiteQuery} from "@/data/query-cache";
 
 import { useMemo, useState } from "react";
@@ -121,10 +123,10 @@ function SitePostsPanelContent({
   const canView = permissions.includes(PERMISSIONS.view);
   const canCreate = permissions.includes(PERMISSIONS.create);
   const canEdit = permissions.includes(PERMISSIONS.update);
-  const [draftFilters, setDraftFilters] = useState<PostFilters>({ search: "", status: "", category: "", tag: "" });
-  const [appliedFilters, setAppliedFilters] = useState<PostFilters>({ search: "", status: "", category: "", tag: "" });
-  const [page, setPage] = useState(1);
-  const [sort, setSort] = useState<SortState>({ field: "created_at", direction: "desc" });
+  const [draftFilters, setDraftFilters] = useSectionState<PostFilters>(siteId, "posts", "draftFilters", { search: "", status: "", category: "", tag: "" });
+  const [appliedFilters, setAppliedFilters] = useSectionState<PostFilters>(siteId, "posts", "appliedFilters", { search: "", status: "", category: "", tag: "" });
+  const [page, setPage] = useSectionState(siteId, "posts", "page", 1);
+  const [sort, setSort] = useSectionState<SortState>(siteId, "posts", "sort", { field: "created_at", direction: "desc" });
   const [pendingWorkflow, setPendingWorkflow] = useState<{ post: SitePostRecord; action: SitePostWorkflowAction } | null>(null);
   const [workflowComment, setWorkflowComment] = useState("");
   const [workflowError, setWorkflowError] = useState("");
@@ -149,6 +151,7 @@ function SitePostsPanelContent({
       : EMPTY_LIST,
     {enabled: canView && postsEnabled === true, isEmpty: (data) => data.count === 0},
   );
+  usePageBoundary(page, setPage, posts.data, posts.error);
   const taxonomy = useSiteQuery<{ categories: SiteTaxonomyRecord[]; tags: SiteTaxonomyRecord[] }>(siteId, "taxonomy", {},
     async () => canView && postsEnabled === true
       ? {
