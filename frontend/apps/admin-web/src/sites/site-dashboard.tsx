@@ -25,7 +25,8 @@ import Link from "next/link";
 import {useEffect, useRef, useState, type ReactNode} from "react";
 import {queryKey, useQueryEnvironment, useSiteQuery} from "@/data/query-cache";
 
-import {getSiteDashboardSummary, getSiteDashboardActivity, type DashboardSummary, type DashboardSection} from "@/app/sites/dashboard-actions";
+import {getSiteDashboardSummary, getSiteDashboardActivity} from "@/data/read-client";
+import type {DashboardSummary, DashboardSection} from "@/data/dashboard-contract";
 import { unwrap } from "@/organizations/contract";
 import { SITE_SECTIONS, sectionByKey, sectionDecision, siteAdminHref } from "@/sites/site-admin";
 import type { SiteSection } from "@/sites/site-admin";
@@ -65,7 +66,7 @@ function Freshness({data}: {data: DashboardSummary}) {
   </Typography>;
 }
 function RecentActivity({siteId, allowed}: {siteId: number; allowed: string[]}) {
-  const activity = useSiteQuery(siteId, "dashboard-activity", {allowed}, async () => unwrap(await getSiteDashboardActivity(siteId)), {staleTime:15_000, refetchInterval:30_000, scopeProtected:true});
+  const activity = useSiteQuery(siteId, "dashboard-activity", {allowed}, async (signal) => unwrap(await getSiteDashboardActivity(siteId, signal)), {staleTime:15_000, refetchInterval:30_000, scopeProtected:true});
   return <Paper component="section" data-dashboard-secondary-pending={activity.loading || activity.refreshing ? "true" : "false"} aria-labelledby="dashboard-recent" variant="outlined" sx={{p:2.5,borderRadius:3}}>
     <Typography id="dashboard-recent" variant="h6" component="h2">Recent content activity</Typography>
     {activity.error ? <Alert severity="warning" action={<Button onClick={activity.reload}>Retry activity</Button>}>Recent activity is unavailable. Summary counts remain available.</Alert>
@@ -157,7 +158,7 @@ export function SiteDashboard() {
   const admin = useSiteAdmin();
   const siteId = admin.site.id;
   const environment = useQueryEnvironment();
-  const summary = useSiteQuery(siteId, "dashboard-summary", {}, async () => unwrap(await getSiteDashboardSummary(siteId)), {staleTime:15_000, refetchInterval:15_000, scopeProtected:true});
+  const summary = useSiteQuery(siteId, "dashboard-summary", {}, async (signal) => unwrap(await getSiteDashboardSummary(siteId, signal)), {staleTime:15_000, refetchInterval:15_000, scopeProtected:true});
   // Warm the existing Page-counts contract without a second six-list read.
   useEffect(() => {
     const section = summary.data?.sections.pages;

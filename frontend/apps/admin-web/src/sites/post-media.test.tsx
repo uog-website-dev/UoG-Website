@@ -83,3 +83,5 @@ it("inserts inline images with a stable placement ID and requires alternative te
     else Reflect.deleteProperty(document,"execCommand");
   }
 });
+
+vi.mock("@/data/read-client", async()=>{const source0=await import("@/app/sites/post-actions");return {loadSiteTaxonomy:(...args:unknown[])=>(source0.loadSiteTaxonomy as (...values:unknown[])=>unknown)(...args.slice(0,2)),loadSitePosts:(...args:unknown[])=>(source0.loadSitePosts as (...values:unknown[])=>unknown)(...args.slice(0,2))};});

@@ -434,3 +434,5 @@ describe("SitePostEditor", () => {
     await waitFor(() => expect(updateSitePost).toHaveBeenCalledWith(11, "post-1", '"post-v1"', expect.objectContaining({ categories: [], tags: [] })));
   });
 });
+
+vi.mock("@/data/read-client", async()=>{const source0=await import("@/app/sites/post-actions");return {loadSiteTaxonomy:(...args:unknown[])=>(source0.loadSiteTaxonomy as (...values:unknown[])=>unknown)(...args.slice(0,2)),loadSitePosts:(...args:unknown[])=>(source0.loadSitePosts as (...values:unknown[])=>unknown)(...args.slice(0,2))};});

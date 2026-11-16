@@ -1,0 +1,200 @@
+{
+  "method": "All exported async get/load/list/search/read/preview functions in Site action modules; mutation exports excluded by name. Workspace bootstrap/discovery already use GET BFF.",
+  "reads": [
+    {
+      "file": "src/app/sites/actions.ts",
+      "export": "listSites",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/actions.ts",
+      "export": "getSite",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/actions.ts",
+      "export": "listSiteDomains",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/actions.ts",
+      "export": "getSiteDomain",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/actions.ts",
+      "export": "listAllSiteDomains",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/actions.ts",
+      "export": "listAllDomains",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/actions.ts",
+      "export": "listAllSites",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/actions.ts",
+      "export": "listSiteModuleAssignments",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/actions.ts",
+      "export": "listPlatformModules",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/actions.ts",
+      "export": "listSiteTemplates",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/actions.ts",
+      "export": "getSiteTemplate",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/dashboard-actions.ts",
+      "export": "getSiteDashboardSummary",
+      "common_read_transport": "same-origin GET in common cached readers; compatibility action retained"
+    },
+    {
+      "file": "src/app/sites/dashboard-actions.ts",
+      "export": "getSiteDashboardActivity",
+      "common_read_transport": "same-origin GET in common cached readers; compatibility action retained"
+    },
+    {
+      "file": "src/app/sites/homepage-template-actions.ts",
+      "export": "loadHomepageTemplates",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/media-actions.ts",
+      "export": "listSiteMedia",
+      "common_read_transport": "same-origin GET in common cached readers; compatibility action retained"
+    },
+    {
+      "file": "src/app/sites/media-actions.ts",
+      "export": "getSiteMedia",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/media-actions.ts",
+      "export": "getMediaUploadPolicy",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/media-actions.ts",
+      "export": "getMediaReferences",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/menu-actions.ts",
+      "export": "loadSiteNavigation",
+      "common_read_transport": "same-origin GET in common cached readers; compatibility action retained"
+    },
+    {
+      "file": "src/app/sites/menu-actions.ts",
+      "export": "loadSiteMenu",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/menu-actions.ts",
+      "export": "loadMenuTargets",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/menu-actions.ts",
+      "export": "loadMenuLocations",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/menu-actions.ts",
+      "export": "loadNavigationPreview",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/page-actions.ts",
+      "export": "loadSitePages",
+      "common_read_transport": "same-origin GET in common cached readers; compatibility action retained"
+    },
+    {
+      "file": "src/app/sites/page-actions.ts",
+      "export": "loadSitePageStatusCounts",
+      "common_read_transport": "same-origin GET in common cached readers; compatibility action retained"
+    },
+    {
+      "file": "src/app/sites/page-actions.ts",
+      "export": "getSitePage",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/page-actions.ts",
+      "export": "getSiteVisualDraft",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/page-actions.ts",
+      "export": "listSiteSectionTemplates",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/page-actions.ts",
+      "export": "getSitePagePreview",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/page-actions.ts",
+      "export": "loadSitePageWorkflowHistory",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/post-actions.ts",
+      "export": "loadSitePosts",
+      "common_read_transport": "same-origin GET in common cached readers; compatibility action retained"
+    },
+    {
+      "file": "src/app/sites/post-actions.ts",
+      "export": "loadSiteTaxonomy",
+      "common_read_transport": "same-origin GET in common cached readers; compatibility action retained"
+    },
+    {
+      "file": "src/app/sites/post-actions.ts",
+      "export": "getSitePost",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/post-actions.ts",
+      "export": "loadSitePostWorkflowHistory",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/post-actions.ts",
+      "export": "getSitePostPreview",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/sidebar-actions.ts",
+      "export": "listSiteSidebars",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/user-actions.ts",
+      "export": "getSiteUsers",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/user-actions.ts",
+      "export": "searchSiteUsers",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    },
+    {
+      "file": "src/app/sites/user-actions.ts",
+      "export": "getSiteRoles",
+      "common_read_transport": "Server Action retained for editor/detail/specialized reads; not on migrated list critical path"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+
+ RUN  v5.0.5 /workspace/apps/admin-web
+
+ ✓ src/data/read-proxy.test.ts (16 tests) 109ms
+ ✓ src/data/read-client.test.ts (5 tests) 42ms
+
+ Test Files  2 passed (2)
+      Tests  21 passed (21)
+   Start at  11:30:05
+   Duration  697ms (transform 53%, setup 24%, tests 13%, import 10%, worker 1%)
+
+JUNIT report written to /workspace/perf008-focused-gzip.xml

@@ -68,3 +68,5 @@ it("purges other cached views when a live summary reveals a removed read grant",
  await screen.findByText(/Pages could not be summarized/);
  expect(client!.getQueryCache().getAll().some(query=>query.queryKey[4]==="pages")).toBe(false);
 });
+
+vi.mock("@/data/read-client", async()=>{const source0=await import("@/app/sites/dashboard-actions");return {getSiteDashboardSummary:(...args:unknown[])=>(source0.getSiteDashboardSummary as (...values:unknown[])=>unknown)(...args.slice(0,1)),getSiteDashboardActivity:(...args:unknown[])=>(source0.getSiteDashboardActivity as (...values:unknown[])=>unknown)(...args.slice(0,1))};});

@@ -372,3 +372,5 @@ describe("Visual Builder workspace",()=>{
     expect(screen.getByRole("group",{name:"Canvas viewport"})).toBeTruthy();
   });
 });
+
+vi.mock("@/data/read-client", async()=>{const source0=await import("@/app/sites/page-actions");return {loadSitePages:(...args:unknown[])=>(source0.loadSitePages as (...values:unknown[])=>unknown)(...args.slice(0,2)),loadSitePageStatusCounts:(...args:unknown[])=>(source0.loadSitePageStatusCounts as (...values:unknown[])=>unknown)(...args.slice(0,1))};});

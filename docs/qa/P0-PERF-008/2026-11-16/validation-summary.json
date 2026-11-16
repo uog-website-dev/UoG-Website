@@ -1,0 +1,22 @@
+{
+  "status": "PASS",
+  "admin_full_suite": {
+    "name": "vitest tests",
+    "tests": "642",
+    "failures": "0",
+    "errors": "0",
+    "time": "249.695219808"
+  },
+  "final_transport_suite": {
+    "name": "vitest tests",
+    "tests": "21",
+    "failures": "0",
+    "errors": "0",
+    "time": "0.150973325"
+  },
+  "api_client_tests": 166,
+  "typecheck": "PASS",
+  "production_build": "PASS; build source matches checkout",
+  "approval": "Product/QA pending; budgets proposed",
+  "note": "Full admin suite precedes final trace-ID/compression refinements; final focused transport tests and production build verify those changes."
+}

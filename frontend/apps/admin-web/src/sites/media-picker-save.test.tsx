@@ -144,3 +144,5 @@ describe("CMS media picker save integration", () => {
     expect((screen.getByLabelText("Block 1 JSON") as HTMLInputElement).value).toContain(assetId);
   });
 });
+
+vi.mock("@/data/read-client", async()=>{const source0=await import("@/app/sites/page-actions");const source1=await import("@/app/sites/media-actions");return {loadSitePages:(...args:unknown[])=>(source0.loadSitePages as (...values:unknown[])=>unknown)(...args.slice(0,2)),loadSitePageStatusCounts:(...args:unknown[])=>(source0.loadSitePageStatusCounts as (...values:unknown[])=>unknown)(...args.slice(0,1)),listSiteMedia:(...args:unknown[])=>(source1.listSiteMedia as (...values:unknown[])=>unknown)(...args.slice(0,2))};});

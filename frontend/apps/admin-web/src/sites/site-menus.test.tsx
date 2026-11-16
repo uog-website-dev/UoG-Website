@@ -282,3 +282,5 @@ it("loads only the selected item tree and ignores a late response for another me
   await waitFor(() => expect(screen.queryByRole("button",{name:"Edit Header"})).toBeNull());
   expect(screen.queryByText("About")).toBeNull();
 });
+
+vi.mock("@/data/read-client",async()=>{const menus=await import("@/app/sites/menu-actions");return {loadSiteNavigation:(...args:unknown[])=>(menus.loadSiteNavigation as (...values:unknown[])=>unknown)(...args.slice(0,2))};});

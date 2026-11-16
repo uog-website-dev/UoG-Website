@@ -10,6 +10,20 @@ function jsonResponse(body: unknown, status = 200): Response {
 }
 
 describe("createApiClient", () => {
+  it("enforces its deadline when a caller also supplies a cancellation signal", async () => {
+    vi.useFakeTimers();
+    try {
+      const external = new AbortController();
+      const fetchFn: typeof fetch = async (_input, init) => new Promise<Response>((_resolve, reject) => {
+        init!.signal!.addEventListener("abort", () => reject(new DOMException("Aborted", "AbortError")));
+      });
+      const client = createApiClient({baseUrl: "/api", fetchFn, timeoutMs: 50});
+      const result = client.get("/pages/", {signal: external.signal}).catch(error => error);
+      await vi.advanceTimersByTimeAsync(51);
+      expect(await result).toMatchObject({code: "timeout", status: 0});
+      expect(external.signal.aborted).toBe(false);
+    } finally {vi.useRealTimers();}
+  });
   it("performs GET requests against the configured base URL", async () => {
     const fetchFn = vi.fn().mockResolvedValue(jsonResponse({ status: "ok" }));
     const client = createApiClient({

@@ -118,7 +118,7 @@ export function createApiClient(options: ApiClientOptions): ApiClient {
       try {
         response = await fetchFn(url, {
           ...init,
-          signal: init?.signal ?? controller.signal,
+          signal: init?.signal ? AbortSignal.any([init.signal, controller.signal]) : controller.signal,
           headers: {
             Accept: "application/json",
             // Correlation id: the backend echoes it in X-Request-ID and in

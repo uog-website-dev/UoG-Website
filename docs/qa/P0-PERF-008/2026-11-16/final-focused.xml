@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="18" failures="0" errors="0" time="0.147460886">
+    <testsuite name="src/data/read-client.test.ts" timestamp="2026-11-16T11:24:07.290Z" hostname="8b82ea655395" tests="5" failures="0" errors="0" skipped="0" time="0.039140223">
+        <testcase classname="src/data/read-client.test.ts" name="projects only lifecycle counts so the Page total is not counted twice" time="0.029731592">
+        </testcase>
+        <testcase classname="src/data/read-client.test.ts" name="uses same-origin credentialed GET without tokens, forwards filters and aborts obsolete reads" time="0.002641002">
+        </testcase>
+        <testcase classname="src/data/read-client.test.ts" name="keeps backend field errors and validates dashboard Site/schema" time="0.002414646">
+        </testcase>
+        <testcase classname="src/data/read-client.test.ts" name="fetches directory and policy in parallel with bounded pages" time="0.001592553">
+        </testcase>
+        <testcase classname="src/data/read-client.test.ts" name="does not follow upstream next URLs or truncate taxonomy pages" time="0.001327153">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/data/read-proxy.test.ts" timestamp="2026-11-16T11:24:07.297Z" hostname="8b82ea655395" tests="13" failures="0" errors="0" skipped="0" time="0.108320663">
+        <testcase classname="src/data/read-proxy.test.ts" name="uses one fixed GET, server-side bearer, private JSON and trace IDs without reflecting tokens or cookies" time="0.038151275">
+        </testcase>
+        <testcase classname="src/data/read-proxy.test.ts" name="uses distinct upstream IDs when parallel reads share a root ID" time="0.002380852">
+        </testcase>
+        <testcase classname="src/data/read-proxy.test.ts" name="rejects unsafe target/query site=11&amp;resource=http://evil.test before auth or upstream" time="0.001168671">
+        </testcase>
+        <testcase classname="src/data/read-proxy.test.ts" name="rejects unsafe target/query site=11&amp;resource=__proto__ before auth or upstream" time="0.001177236">
+        </testcase>
+        <testcase classname="src/data/read-proxy.test.ts" name="rejects unsafe target/query site=11&amp;site=22&amp;resource=pages before auth or upstream" time="0.000542936">
+        </testcase>
+        <testcase classname="src/data/read-proxy.test.ts" name="rejects unsafe target/query site=0&amp;resource=pages before auth or upstream" time="0.000305279">
+        </testcase>
+        <testcase classname="src/data/read-proxy.test.ts" name="rejects unsafe target/query site=9007199254740992&amp;resource=posts before auth or upstream" time="0.000361875">
+        </testcase>
+        <testcase classname="src/data/read-proxy.test.ts" name="rejects unsafe target/query site=11&amp;resource=pages&amp;url=http://evil.test before auth or upstream" time="0.000581551">
+        </testcase>
+        <testcase classname="src/data/read-proxy.test.ts" name="rejects unsafe target/query site=11&amp;resource=pages&amp;site_id=22 before auth or upstream" time="0.000536733">
+        </testcase>
+        <testcase classname="src/data/read-proxy.test.ts" name="denies anonymous, cross-origin and write attempts without an upstream request" time="0.000870667">
+        </testcase>
+        <testcase classname="src/data/read-proxy.test.ts" name="preserves field-addressed backend errors and rejects foreign or malformed success" time="0.002125852">
+        </testcase>
+        <testcase classname="src/data/read-proxy.test.ts" name="maps session/network failures generically and propagates cancellation" time="0.052646484">
+        </testcase>
+        <testcase classname="src/data/read-proxy.test.ts" name="bounds upstream timeout even when the request has its own signal" time="0.004636337">
+        </testcase>
+    </testsuite>
+</testsuites>

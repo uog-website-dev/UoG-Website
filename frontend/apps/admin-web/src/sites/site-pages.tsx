@@ -1,4 +1,5 @@
 "use client";
+import {loadSitePages, loadSitePageStatusCounts} from "@/data/read-client";
 import {usePageBoundary} from "@/data/page-boundary";
 import {useSectionState} from "@/data/section-state";
 import {useSiteQuery} from "@/data/query-cache";
@@ -36,8 +37,6 @@ import type {
 import {
   getSitePage,
   getSitePagePreview,
-  loadSitePages,
-  loadSitePageStatusCounts,
   loadSitePageWorkflowHistory,
   openWorkingDraft,
   setSiteHomepage,
@@ -196,21 +195,21 @@ function SitePagesPanelContent({
 
   const ordering = orderingForSort(sort);
   const pages = useSiteQuery<SitePageListResponse>(siteId, "pages", {search: appliedFilters.search, status: appliedFilters.status, page, page_size: PAGE_SIZE, ordering},
-    async () => canView
+    async (signal) => canView
       ? unwrap(await loadSitePages(siteId, {
           search: appliedFilters.search || undefined,
           status: appliedFilters.status || undefined,
           page,
           page_size: PAGE_SIZE,
           ordering,
-        }))
+        }, signal))
       : EMPTY_PAGE_LIST,
     {enabled: canView && pagesEnabled === true, isEmpty: (data) => data.count === 0},
   );
   usePageBoundary(page, setPage, pages.data, pages.error);
   const statusCounts = useSiteQuery<Record<SitePageStatus, number>>(siteId, "page-counts", {},
-    async () => canView
-      ? unwrap(await loadSitePageStatusCounts(siteId))
+    async (signal) => canView
+      ? unwrap(await loadSitePageStatusCounts(siteId, signal))
       : EMPTY_STATUS_COUNTS,
     {enabled: canView && pagesEnabled === true, scopeProtected: true},
   );

@@ -90,3 +90,5 @@ it.each([{status: 404, message: "Invalid page.", expected: 1}, {status: 404, mes
   function Boundary() {const [page, setPage] = useSectionState(11, "posts", "page", 2); usePageBoundary(page, setPage, null, new ApiError(message, status)); return <p>Boundary {page}</p>;}
   render(<Scope><Boundary/></Scope>); expect(screen.getByText(`Boundary ${expected}`)).toBeTruthy();
 });
+
+vi.mock("@/data/read-client", async()=>{const source0=await import("@/app/sites/page-actions");return {loadSitePages:(...args:unknown[])=>(source0.loadSitePages as (...values:unknown[])=>unknown)(...args.slice(0,2)),loadSitePageStatusCounts:(...args:unknown[])=>(source0.loadSitePageStatusCounts as (...values:unknown[])=>unknown)(...args.slice(0,1))};});

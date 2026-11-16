@@ -1,11 +1,12 @@
 "use client";
+import {listSiteMedia} from "@/data/read-client";
 import {usePageBoundary} from "@/data/page-boundary";
 import {useSectionState} from "@/data/section-state";
 import { useEffect, useRef, useState } from "react";
 import { Alert, Box, Button, Chip, Typography, TextField, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Paper, ToggleButton, ToggleButtonGroup, Skeleton, IconButton } from "@mui/material";
 import { ApiError } from "@uog/api-client";
 import {useSiteQuery} from "@/data/query-cache";
-import { listSiteMedia, getMediaUploadPolicy, getSiteMedia, updateSiteMedia, getMediaReferences, removeSiteMedia } from "@/app/sites/media-actions";
+import { getMediaUploadPolicy, getSiteMedia, updateSiteMedia, getMediaReferences, removeSiteMedia } from "@/app/sites/media-actions";
 import type { MediaAssetRecord } from "@/app/sites/media-actions";
 import { unwrap } from "@/organizations/contract";
 import type { MediaListQuery, MediaReferenceInventory, MediaStatus } from "@uog/types";
@@ -68,10 +69,10 @@ function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, imag
 
   const uploadInput = useRef<HTMLInputElement | null>(null);
   const [uploadBusy, setUploadBusy] = useState(false);
-  const rows = useSiteQuery(siteId, "media", {filters, page, picker: Boolean(onSelect), imagesOnly}, async () => unwrap(await listSiteMedia(siteId, {
+  const rows = useSiteQuery(siteId, "media", {filters, page, picker: Boolean(onSelect), imagesOnly}, async (signal) => unwrap(await listSiteMedia(siteId, {
     ...filters, page,
     ...(onSelect ? imagesOnly ? { ready_images: true } : { status: "READY" as const } : imagesOnly ? { type: "image" as const } : {}),
-  })));
+  }, signal)));
   usePageBoundary(page, setPage, rows.data, rows.error);
   const policy = useSiteQuery(siteId, "media-policy", {}, async () => unwrap(await getMediaUploadPolicy(siteId)), {enabled: canUpload});
   const [pollError, setPollError] = useState(false);

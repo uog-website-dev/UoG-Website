@@ -1,5 +1,6 @@
 "use client";
 import {useSectionState} from "@/data/section-state";
+import {loadSiteNavigation} from "@/data/read-client";
 import {useSiteQuery, useInvalidateSite} from "@/data/query-cache";
 
 /**
@@ -26,7 +27,6 @@ import { ApiError } from "@uog/api-client";
 import {
   createSiteMenu,
   loadMenuTargets,
-  loadSiteNavigation,
   loadSiteMenu,
   setMenuActive,
   updateSiteMenu,
@@ -232,7 +232,7 @@ export function SiteMenusPanel({
   const invalidateSite = useInvalidateSite();
   const reloadMenus = () => invalidateSite(siteId, "menus");
   const navigation = useSiteQuery(siteId, "menus", {includeItems: false},
-    async () => unwrap(await loadSiteNavigation(siteId, false)),
+    async (signal) => unwrap(await loadSiteNavigation(siteId, false, signal)),
     {enabled: menusEnabled === true},
   );
   const targetState = useSiteQuery(siteId, "menu-targets", {},

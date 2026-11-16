@@ -31,3 +31,5 @@ it("requires preview permission and rejects foreign Site content",async()=>{
   await waitFor(()=>expect(screen.getByRole("alert").textContent).toContain("another Site"));
   expect(screen.queryByText("Foreign")).toBeNull();
 });
+
+vi.mock("@/data/read-client", async()=>{const source0=await import("@/app/sites/page-actions");return {loadSitePages:(...args:unknown[])=>(source0.loadSitePages as (...values:unknown[])=>unknown)(...args.slice(0,2)),loadSitePageStatusCounts:(...args:unknown[])=>(source0.loadSitePageStatusCounts as (...values:unknown[])=>unknown)(...args.slice(0,1))};});
