@@ -1,0 +1,18 @@
+
+ RUN  v5.0.5 /workspace/apps/admin-web
+
+ ✓ src/site-switching.test.tsx (6 tests) 290ms
+ ✓ src/workspace.test.tsx (5 tests) 939ms
+   ✓ loads discovery only on open, pages explicitly and rejects stale search results 811ms
+ ✓ src/sites/site-admin-frame.test.tsx (10 tests) 395ms
+ ✓ src/data/query-cache.test.tsx (15 tests) 278ms
+
+ Test Files  4 passed (4)
+      Tests  36 passed (36)
+   Start at  01:55:24
+   Duration  3.76s (tests 30%, environment 26%, import 23%, transform 15%, setup 7%)
+
+    Isolate  4 workers spawned · ~524ms startup each (spawn + environment, per file)
+             at least ~524ms faster with isolate: false — reuses workers across files instead of one per file
+
+JUNIT report written to /workspace/perf004-focused.xml

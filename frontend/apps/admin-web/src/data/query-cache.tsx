@@ -1,5 +1,5 @@
 "use client";
-import {createContext, useContext, useEffect, useState, type ReactNode} from "react";
+import {createContext, useContext, useEffect, useRef, useState, type ReactNode} from "react";
 import {QueryCache, QueryClient, QueryClientProvider, useQuery} from "@tanstack/react-query";
 import {ApiError} from "@uog/api-client";
 import {accessFailureWasReported} from "@/organizations/contract";
@@ -30,17 +30,26 @@ export function isAccessFailure(error: unknown) {
   return error instanceof ApiError && [401, 403].includes(error.status);
 }
 
-/** One in-memory client per authenticated Site visit. No module singleton/persistence. */
+/** One in-memory client per authenticated session. No module singleton/persistence. */
 export function QueryScope({identity, siteId, children, onDenied, authorization = "bootstrap"}: {
   identity: string; siteId: number | null; children: ReactNode; authorization?: string; onDenied?: () => void;
 }) {
+  const current = useRef({siteId, onDenied});
+  current.current = {siteId, onDenied};
   const [client] = useState(() => new QueryClient({
     queryCache: new QueryCache({onError: (error, query) => {
-      if (query.queryKey[4] !== "workspace" && isAccessFailure(error) && !accessFailureWasReported(error)) onDenied?.();
+      if (query.queryKey[2] === current.current.siteId && query.queryKey[4] !== "workspace" && isAccessFailure(error) && !accessFailureWasReported(error)) current.current.onDenied?.();
     }}),
     defaultOptions: {queries: {staleTime: STALE_MS, gcTime: typeof window === "undefined" ? Infinity : GC_MS, retry: false, refetchOnWindowFocus: true, refetchOnReconnect: true}},
   }));
   useEffect(() => () => {void client.cancelQueries(); client.clear();}, [client]);
+  const previousSite = useRef(siteId);
+  useEffect(() => {
+    // Cancel obsolete transport/logical work, retain only bounded read caches.
+    const previous = previousSite.current;
+    previousSite.current = siteId;
+    if (previous !== siteId) void client.cancelQueries({predicate: query => query.queryKey[2] === previous});
+  }, [client, siteId]);
   return <QueryClientProvider client={client}><Environment.Provider value={{client, identity, siteId, authorization}}><MutationInvalidation/>{children}</Environment.Provider></QueryClientProvider>;
 }
 
@@ -50,13 +59,14 @@ export function useQueryEnvironment() {
   return value;
 }
 
-export function AuthorizationScope({authorization, children}: {authorization: string; children: ReactNode}) {
-  const environment = useQueryEnvironment();
+export function AuthorizationScope({authorization, siteId, children}: {authorization: string; siteId?: number | null; children: ReactNode}) {
+  const parent = useQueryEnvironment();
+  const environment = {...parent, siteId: siteId === undefined ? parent.siteId : siteId};
   useEffect(() => {
     if (authorization !== "blocked") window.dispatchEvent(new CustomEvent("uog:authorization:context", {
       detail: {identity: environment.identity, site: environment.siteId, authorization},
     }));
-    const obsolete = {predicate: (query: {queryKey: readonly unknown[]}) => query.queryKey[4] !== "workspace" && query.queryKey[3] !== authorization};
+    const obsolete = {predicate: (query: {queryKey: readonly unknown[]}) => query.queryKey[2] === environment.siteId && query.queryKey[4] !== "workspace" && query.queryKey[3] !== authorization};
     void environment.client.cancelQueries(obsolete);
     environment.client.removeQueries(obsolete);
   }, [authorization, environment.client, environment.identity, environment.siteId]);

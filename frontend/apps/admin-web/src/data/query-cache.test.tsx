@@ -11,7 +11,7 @@ import {invalidated} from "./mutation-receipt";
 import {SessionSignOutForm} from "@/session-sign-out-form";
 
 const path = vi.fn(() => "/sites/11/admin");
-vi.mock("next/navigation", () => ({usePathname: () => path()}));
+vi.mock("next/navigation", () => ({usePathname: () => path(), useRouter: () => ({push: vi.fn(), replace: vi.fn()})}));
 vi.mock("@/session-watch", () => ({signInAgainIfExpired: vi.fn()}));
 afterEach(() => {vi.restoreAllMocks(); vi.unstubAllGlobals(); path.mockReturnValue("/sites/11/admin");});
 

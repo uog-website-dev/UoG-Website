@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "checks": [
+    "21 authorized Sites: keyboard pagination, debounced search and keyboard selection",
+    "Pages section preserved; shell DOM retained; fresh A return has zero list RPCs and no B content",
+    "Cancel preserves unsaved Page text; confirmed switch resets it and strips foreign Page IDs",
+    "Rapid A-B-A ignores injected delayed forbidden B response; A remains readable",
+    "Real Django membership revocation removes protected A data; switcher still recovers to permitted B"
+  ],
+  "sites": 21,
+  "browser": "157.0.4341.46",
+  "warm_return_reads": 0
+}

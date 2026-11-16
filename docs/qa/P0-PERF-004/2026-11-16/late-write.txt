@@ -1,0 +1,38 @@
+
+ RUN  v5.0.5 /workspace/apps/admin-web
+
+ ✓ src/sites/post-workflow.test.tsx (6 tests) 4072ms
+   ✓ ignores a former Site's completed save after its editor unmounts 776ms
+   ✓ ignores a former Site's late working-draft redirect 404ms
+   ✓ submits the saved revision and displays the backend-confirmed status 734ms
+   ✓ prevents transitions while unsaved text exists and retains text after a rejected transition 951ms
+   ✓ lets a scoped reviewer read and reject with a required comment 846ms
+   ✓ opens a working draft from the published revision and previews in a new tab from the sticky bar 361ms
+ ✓ src/site-switching.test.tsx (8 tests) 1062ms
+   ✓ returning near lease expiry does not grant another 30 seconds and timer/focus refreshes share transport 566ms
+ ✓ src/sites/site-pages.test.tsx (27 tests) 12848ms
+   ✓ SitePagesPanel (27)
+     ✓ saves a shell-only change without resending builder blocks or metadata 1111ms
+     ✓ assigns only published Pages allowed by the backend as the homepage 598ms
+     ✓ applies server search and status filters and resets pagination 671ms
+     ✓ uses API pagination and resets to the first page when sorting changes 353ms
+     ✓ opens full-page preview in a new tab and submits this Site's draft for review 385ms
+     ✓ shows review controls only from backend-authorized actions and requires a rejection comment 805ms
+     ✓ defaults a new Page to the Site language 575ms
+     ✓ starts a new Page blank and fills the slug from the title until it is edited 560ms
+     ✓ creates and edits only with the matching permission and current ETag 1114ms
+     ✓ does not navigate back to the former Site when its save completes after unmount 551ms
+     ✓ assigns a Site sidebar without replacing the builder document 657ms
+     ✓ surfaces stale edit conflicts without losing the form 627ms
+     ✓ previews private draft content and blocks malformed block JSON 664ms
+     ✓ shows the frozen private revision and sends its exact ETag when publishing 430ms
+     ✓ previews the shared visual fixture and rejects unsupported layout versions before saving 646ms
+     ✓ asks before discarding unsaved editor changes 461ms
+     ✓ clears filter and page state when the selected Site changes 375ms
+     ✓ opens a working draft of a published Page and keeps the live route fixed 750ms
+
+ Test Files  3 passed (3)
+      Tests  41 passed (41)
+   Start at  02:25:50
+   Duration  16.26s (tests 70%, import 12%, transform 11%, environment 6%, setup 2%)
+

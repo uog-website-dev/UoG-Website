@@ -1,5 +1,6 @@
 "use client";
 
+import {useSiteDraftGuard} from "./site-draft-guard";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { KeyboardEvent } from "react";
 import Link from "next/link";
@@ -274,6 +275,7 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
     }).finally(()=>{if(current)setTemplatesLoading(false);});
     return ()=>{current=false;};
   },[siteId,pageId]);
+  useSiteDraftGuard(dirty);
   useEffect(()=>{
     if(!dirty)return;
     const warn=(event:BeforeUnloadEvent)=>{event.preventDefault();event.returnValue="";};

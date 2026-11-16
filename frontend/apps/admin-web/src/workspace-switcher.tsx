@@ -13,32 +13,39 @@ import {APP_BASE_PATH} from "@/base-path";
 import {hasPlatformWorkspace} from "@/navigation";
 import {useQuery} from "@tanstack/react-query";
 import {queryKey, useQueryEnvironment} from "@/data/query-cache";
-import type {WorkspaceSite, WorkspaceState} from "@/workspace";
+import {useWorkspaceNavigation, type WorkspaceSite, type WorkspaceState} from "@/workspace";
+import {confirmSiteSwitch} from "@/sites/site-draft-guard";
 
 export function WorkspaceSwitcher({state, onNavigate}: {state: WorkspaceState; onNavigate?: () => void}) {
   const [open, setOpen] = useState(false);
   const data = state.status === "ready" ? state.data : null;
+  const navigation = useWorkspaceNavigation();
   const router = useRouter();
   const select = (href: string) => {
+    if (!confirmSiteSwitch()) return;
+    navigation?.cancel();
     window.dispatchEvent(new CustomEvent("uog:navigation:request", {detail: {target: `${APP_BASE_PATH}${href}`}}));
     setOpen(false); onNavigate?.(); router.push(href);
   };
   return <>
-    <Button aria-label="Workspace" variant="outlined" fullWidth disabled={!data} onClick={() => setOpen(true)}>
-      {data?.site?.name ?? "Choose workspace"}
+    <Button aria-label="Workspace" variant="outlined" fullWidth disabled={!data && !navigation?.pending && state.status !== "error"} onClick={() => setOpen(true)} aria-busy={!!navigation?.pending}>
+      {navigation?.pending?.site.name ?? data?.site?.name ?? "Choose workspace"}
     </Button>
-    {open && data ? <Dialog open onClose={() => setOpen(false)} fullWidth maxWidth="sm" aria-labelledby="workspace-title">
+    {open ? <Dialog open onClose={() => setOpen(false)} fullWidth maxWidth="sm" aria-labelledby="workspace-title">
       <DialogTitle id="workspace-title">Choose workspace</DialogTitle>
       <DialogContent>
-        {hasPlatformWorkspace(data.platformPermissions) ? <Button onClick={() => select("/")}>Platform administration</Button> : null}
-        <SiteChoices key={data.site?.id ?? "platform"} select={select}/>
+        {data && hasPlatformWorkspace(data.platformPermissions) ? <Button onClick={() => select("/")}>Platform administration</Button> : null}
+        <SiteChoices select={site => {
+          if (navigation) {if (navigation.select(site)) {setOpen(false); onNavigate?.();}}
+          else select(`/sites/${site.id}/admin`);
+        }}/>
       </DialogContent>
       <DialogActions><Button onClick={() => setOpen(false)}>Close</Button></DialogActions>
     </Dialog> : null}
   </>;
 }
 
-function SiteChoices({select}: {select: (href: string) => void}) {
+function SiteChoices({select}: {select: (site: WorkspaceSite) => void}) {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const environment = useQueryEnvironment();
@@ -60,7 +67,7 @@ function SiteChoices({select}: {select: (href: string) => void}) {
     <TextField autoFocus label="Search Sites" value={search} onChange={event => {setSearch(event.target.value); setPage(1);}} slotProps={{htmlInput: {maxLength: 100}}}/>
     {!current ? <p role="status">Loading Sites…</p> : current.error ? <Alert severity="error" action={<Button onClick={() => void result.refetch()}>Retry</Button>}>Sites could not be loaded.</Alert> : <>
       {current.rows.length === 0 ? <p role="status">No Sites found. Try another search or ask for a Site membership.</p> : null}
-      {current.rows.map(site => <Button key={site.id} data-workspace-site={site.id} sx={{justifyContent: "flex-start"}} onClick={() => select(`/sites/${site.id}/admin`)}>{site.name}</Button>)}
+      {current.rows.map(site => <Button key={site.id} data-workspace-site={site.id} sx={{justifyContent: "flex-start"}} onClick={() => select(site)}>{site.name}</Button>)}
       <Box sx={{display: "flex", alignItems: "center", justifyContent: "space-between"}}>
         <Button disabled={page === 1} onClick={() => setPage(value => value - 1)}>Previous Sites</Button>
         <span aria-live="polite">Page {page} · {current.count} Sites</span>

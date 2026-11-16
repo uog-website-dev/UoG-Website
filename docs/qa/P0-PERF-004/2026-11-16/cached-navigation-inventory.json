@@ -1,0 +1,215 @@
+{
+  "status": "PASS",
+  "samples": [
+    {
+      "scenario": "warm_site_switch",
+      "navigation_id": "fac55bb2-f40a-4268-b3d2-fef137e6a835",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    },
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "b1b97ff6-84af-400b-8773-137aa729f699",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "1338989c-3fcd-43a8-93b1-c1f3850bf77d",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    },
+    {
+      "scenario": "warm_site_switch",
+      "navigation_id": "6c283172-67ca-4259-a7c7-f59a29f8cc9a",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    },
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "2d26d8dd-188a-4c55-a4bb-85cfa181812d",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "4f296c15-cc36-416d-b836-56686a17e2ac",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    },
+    {
+      "scenario": "warm_site_switch",
+      "navigation_id": "880c56e5-15ef-4e0a-8642-519c235ac7f1",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    },
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "d52441c6-bea8-4c70-a9f2-a7e639ec3b93",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "93221eb9-653d-4a52-af29-301afe65a06d",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    },
+    {
+      "scenario": "warm_site_switch",
+      "navigation_id": "d66fe0d4-7f5f-4a7e-bcec-28fb7c872795",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    },
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "21f00ffa-5caf-45b6-9522-0c0e526e0d8e",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "7702a115-515b-4eac-a1f3-5602066f6198",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    },
+    {
+      "scenario": "warm_site_switch",
+      "navigation_id": "06b50489-b1ed-40f0-a117-5368d44da37f",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    },
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "31a87518-53ad-46cd-bd43-02012f7a25e2",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "762b0912-31cd-4b81-a8bc-c8ac1c5dc4da",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    },
+    {
+      "scenario": "warm_site_switch",
+      "navigation_id": "73e9cf00-f2ce-4fe8-a19d-893404b724a9",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    },
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "dfa9fc34-1db3-45f5-9c9c-cbd1c4c70a65",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "2cc770ea-2863-44d1-8406-ee83ffc8fdfb",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    },
+    {
+      "scenario": "warm_site_switch",
+      "navigation_id": "35e1f3d0-b208-46d8-8891-ff917d1ef98e",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    },
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "4bcc8583-029a-4d1b-bd99-1da417a1c364",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "181bdb2a-7eee-4401-828f-f4b0d8f926bd",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    },
+    {
+      "scenario": "warm_site_switch",
+      "navigation_id": "00078d16-1562-4771-b143-ce6eff70d370",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    },
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "d1c1cf0e-cda6-4020-b6c0-ee6fba2155c3",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "5e2c8528-aac4-43fe-b75b-08bcfde2da9d",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    },
+    {
+      "scenario": "warm_site_switch",
+      "navigation_id": "c94d36ed-1dbd-4eb0-8f1a-632a8b83a9cb",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    },
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "a002537b-dbb5-4c80-ada5-57f88b37ab63",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "945ce287-9b31-4c96-9aa5-42102690a61f",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    },
+    {
+      "scenario": "warm_site_switch",
+      "navigation_id": "67ea1980-9f9d-4aac-ace7-809924830f57",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    },
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "66b36d07-fcda-4981-bb2d-d3f015a04fee",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "9a18c185-611f-4ed3-8367-f6ca35555e5f",
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_reads": 0
+    }
+  ]
+}

@@ -129,9 +129,15 @@ export function isSiteSectionActive(section:SiteSection,siteId:number,path:strin
   return path===href || Boolean(section.segment && path.startsWith(`${href}/`));
 }
 
-/** Switching Sites always opens that Site's dashboard so forms are not carried over. */
-export function siteSwitchHref(siteId: number): string {
-  return siteAdminHref(siteId);
+/** Preserve only a section, never another Site's object ID, query or draft. */
+export function siteSwitchHref(siteId: number, path = "", access?: SiteAccessInput): string {
+  const source = /^\/sites\/[1-9]\d*\/admin(?:\/([^/?#]+))?/.exec(path);
+  const section = SITE_SECTIONS.find(item => item.segment === (source?.[1] ?? ""));
+  if (!section) return siteAdminHref(siteId);
+  // A Page-specific visual canvas returns to the Builder directory, not Pages.
+  const canvas = source?.[1] === "pages" && /\/pages\/[^/]+\/builder\/?$/.test(path);
+  const destination = canvas ? sectionByKey("builder") : section;
+  return access && sectionDecision(destination, access) !== "visible" ? siteAdminHref(siteId) : siteAdminHref(siteId, destination.segment);
 }
 
 export function accessibleSiteOptions<T extends { id: number }>(sites: readonly T[]): T[] {

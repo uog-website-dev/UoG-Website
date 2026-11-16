@@ -5,8 +5,8 @@
  * Platform Administration or one authorized Site. Discovery is lazy and
  * separate; Django still decides every request.
  */
-import { createContext, createElement, useContext, useEffect, useState, type ReactNode } from "react";
-import { usePathname } from "next/navigation";
+import { createContext, createElement, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { normalizeAdminPathname, siteWorkspaceId } from "@/navigation";
 import type { SiteStatus } from "@uog/types";
 
@@ -14,7 +14,9 @@ import { APP_BASE_PATH } from "@/base-path";
 import { signInAgainIfExpired } from "@/session-watch";
 import {ApiError} from "@uog/api-client";
 import {useQuery} from "@tanstack/react-query";
-import {AuthorizationScope, queryKey, useQueryEnvironment} from "@/data/query-cache";
+import {AuthorizationScope, queryKey, STALE_MS, useQueryEnvironment} from "@/data/query-cache";
+import {siteSwitchHref} from "@/sites/site-admin";
+import {confirmSiteSwitch} from "@/sites/site-draft-guard";
 
 export interface WorkspaceSite {
   id: number;
@@ -58,12 +60,28 @@ export function workspaceHref(value: string): string | null {
 }
 
 const WorkspaceContext = createContext<{siteId: number | null; state: WorkspaceState} | null>(null);
+interface SiteSwitch {
+  site: Pick<WorkspaceSite, "id" | "name">;
+  href: string;
+}
+const NavigationContext = createContext<{pending: SiteSwitch | null; cancel: () => void; select: (site: Pick<WorkspaceSite, "id" | "name">) => boolean} | null>(null);
+export function useWorkspaceNavigation() {return useContext(NavigationContext);}
 
 /** Drop all old-Site data synchronously, including while the new request is pending. */
 export function WorkspaceProvider({children}: {children: ReactNode}) {
-  const siteId = siteWorkspaceId(normalizeAdminPathname(usePathname()));
+  const path = normalizeAdminPathname(usePathname());
+  const routeSite = siteWorkspaceId(path);
+  const router = useRouter();
+  const [pending, setPending] = useState<SiteSwitch | null>(null);
+  const reachedTarget = useRef(false);
+  const siteId = pending?.site.id ?? routeSite;
   const environment = useQueryEnvironment();
   const key = queryKey({...environment, siteId, authorization: "bootstrap"}, "workspace", {site: siteId});
+  const visit = useRef<{site: number | null; after: number}>({site: siteId, after: 0});
+  if (visit.current.site !== siteId) {
+    const cached = environment.client.getQueryState(key);
+    visit.current = {site: siteId, after: cached?.dataUpdatedAt && (cached.isInvalidated || Date.now() - cached.dataUpdatedAt >= STALE_MS) ? cached.dataUpdatedAt : 0};
+  }
   const result = useQuery({queryKey: key, refetchOnWindowFocus: false, queryFn: async ({signal}) => {
     const query = siteId == null ? "" : `?site=${siteId}`;
     const response = await fetch(`${APP_BASE_PATH}/api/workspace/${query}`, {cache: "no-store", signal});
@@ -80,18 +98,49 @@ export function WorkspaceProvider({children}: {children: ReactNode}) {
     return data;
   }});
   useEffect(() => {
-    const refresh = () => {void environment.client.invalidateQueries({queryKey: key});};
+    if (!pending) return;
+    if (routeSite === pending.site.id) reachedTarget.current = true;
+    else if (reachedTarget.current) setPending(null); // Back/forward supersedes a failed switch.
+  }, [pending, routeSite]);
+  useEffect(() => {
+    const refresh = () => {void environment.client.invalidateQueries({queryKey: key}, {cancelRefetch: false});};
     window.addEventListener("uog:workspace:refresh", refresh);
     window.addEventListener("focus", refresh);
-    const timer = window.setInterval(() => {if (document.visibilityState === "visible") refresh();}, 30_000);
-    return () => {window.clearInterval(timer); window.removeEventListener("uog:workspace:refresh", refresh); window.removeEventListener("focus", refresh);};
-  }, [environment.client, environment.identity, siteId]);
+    // Returning just before expiry must not restart a new 30-second lease.
+    const expires = result.dataUpdatedAt ? Math.max(1, STALE_MS - (Date.now() - result.dataUpdatedAt)) : STALE_MS;
+    const timer = window.setTimeout(() => {if (document.visibilityState === "visible") refresh();}, expires);
+    const visible = () => {if (document.visibilityState === "visible" && Date.now() - result.dataUpdatedAt >= STALE_MS) refresh();};
+    document.addEventListener("visibilitychange", visible);
+    return () => {window.clearTimeout(timer); window.removeEventListener("uog:workspace:refresh", refresh); window.removeEventListener("focus", refresh); document.removeEventListener("visibilitychange", visible);};
+  }, [environment.client, environment.identity, siteId, result.dataUpdatedAt]);
   const data = result.data;
+  const awaitingValidation = visit.current.after > 0 && result.dataUpdatedAt <= visit.current.after;
   const state: WorkspaceState = result.isError ? {status: "error", signedOut: result.error instanceof ApiError && result.error.status === 401}
-    : data ? {status: "ready", data, refreshing: result.isFetching} : {status: "loading"};
+    : data && !awaitingValidation ? {status: "ready", data, refreshing: result.isFetching} : {status: "loading"};
+  useEffect(() => {
+    // A selection hides the previous editor immediately, before the RSC route arrives.
+    void environment.client.cancelQueries({predicate: query => query.queryKey[2] !== siteId});
+  }, [siteId, environment.client]);
+  useEffect(() => {
+    if (!pending || state.status !== "ready" || state.data.site?.id !== pending.site.id || routeSite !== pending.site.id) return;
+    const href = siteSwitchHref(pending.site.id, pending.href, state.data.site);
+    if (path !== href) {router.replace(href); return;}
+    setPending(null);
+  }, [pending, state.status, data, routeSite, path, router]);
+  const select = (site: Pick<WorkspaceSite, "id" | "name">) => {
+    if (!Number.isSafeInteger(site.id) || site.id < 1) return false;
+    if (!confirmSiteSwitch(site.id)) return false;
+    const href = siteSwitchHref(site.id, path);
+    window.dispatchEvent(new CustomEvent("uog:navigation:request", {detail: {target: `${APP_BASE_PATH}${href}`}}));
+    reachedTarget.current = false;
+    setPending({site, href});
+    router.push(href);
+    return true;
+  };
   const authorization = state.status === "ready" ? JSON.stringify({platform: data?.platformPermissions, permissions: data?.site?.permissions, modules: data?.site?.enabledModuleCodes, status: data?.site?.status}) : "blocked";
-  return createElement(WorkspaceContext.Provider, {value: {siteId, state}},
-    createElement(AuthorizationScope, {authorization, children}));
+  return createElement(NavigationContext.Provider, {value: {pending, select, cancel: () => setPending(null)}},
+    createElement(WorkspaceContext.Provider, {value: {siteId, state}},
+      createElement(AuthorizationScope, {authorization, siteId, children})));
 }
 
 function validWorkspace(value: unknown, siteId: number | null): value is WorkspacePayload {
