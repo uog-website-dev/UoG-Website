@@ -86,28 +86,12 @@ describe("Site Page API actions", () => {
     });
   });
 
-  it("builds full-site status totals from the API's filtered count contract", async () => {
-    api.get.mockImplementation(async (path: string) => {
-      const status = new URL(`http://backend${path}`).searchParams.get("status");
-      return { count: status === "PUBLISHED" ? 9 : 0, results: [] };
-    });
-
+  it("builds status totals from one scoped summary instead of six list calls", async () => {
+    api.get.mockResolvedValue({schema_version:1,site:11,generated_at:new Date().toISOString(),expires_at:new Date(Date.now()+15000).toISOString(),partial:false,cache:{hit:false,available:true,ttl_seconds:15}, sections:{pages:{status:"ready",counts:{total:9,DRAFT:0,IN_REVIEW:0,APPROVED:0,PUBLISHED:9,UNPUBLISHED:0,ARCHIVED:0}}}});
     const result = await loadSitePageStatusCounts(11);
-
-    expect(api.get).toHaveBeenCalledTimes(6);
-    expect(api.get).toHaveBeenCalledWith("/v1/sites/11/pages/?status=DRAFT&page=1&page_size=1");
-    expect(api.get).toHaveBeenCalledWith("/v1/sites/11/pages/?status=ARCHIVED&page=1&page_size=1");
-    expect(result).toEqual({
-      ok: true,
-      data: {
-        DRAFT: 0,
-        IN_REVIEW: 0,
-        APPROVED: 0,
-        PUBLISHED: 9,
-        UNPUBLISHED: 0,
-        ARCHIVED: 0,
-      },
-    });
+    expect(api.get).toHaveBeenCalledTimes(1);
+    expect(api.get).toHaveBeenCalledWith("/workspace/dashboard/?site=11");
+    expect(result).toEqual({ok:true,data:{DRAFT:0,IN_REVIEW:0,APPROVED:0,PUBLISHED:9,UNPUBLISHED:0,ARCHIVED:0}});
   });
 
   it("loads a scoped detail with its ETag and sends that ETag for updates", async () => {

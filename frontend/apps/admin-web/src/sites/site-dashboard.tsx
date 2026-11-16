@@ -2,7 +2,7 @@
 
 /**
  * Site Dashboard: content summaries for the active Site, read from the
- * Site-scoped Page, Post and Menu APIs. A section is summarized only when
+ * one scoped aggregate API. A section is summarized only when
  * the Site has its module enabled and this account may open it; Django
  * still filters every count by Site scope.
  */
@@ -22,15 +22,10 @@ import Paper from "@mui/material/Paper";
 import Skeleton from "@mui/material/Skeleton";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
-import type { ReactNode } from "react";
-import {useSiteQuery} from "@/data/query-cache";
+import {useEffect, useRef, useState, type ReactNode} from "react";
+import {queryKey, useQueryEnvironment, useSiteQuery} from "@/data/query-cache";
 
-import { loadSiteNavigation } from "@/app/sites/menu-actions";
-import { loadSitePageStatusCounts } from "@/app/sites/page-actions";
-import { loadSitePosts } from "@/app/sites/post-actions";
-import { listSiteMedia } from "@/app/sites/media-actions";
-import { getSiteUsers } from "@/app/sites/user-actions";
-import type { SitePostStatus } from "@/app/sites/post-actions";
+import {getSiteDashboardSummary, getSiteDashboardActivity, type DashboardSummary, type DashboardSection} from "@/app/sites/dashboard-actions";
 import { unwrap } from "@/organizations/contract";
 import { SITE_SECTIONS, sectionByKey, sectionDecision, siteAdminHref } from "@/sites/site-admin";
 import type { SiteSection } from "@/sites/site-admin";
@@ -41,72 +36,42 @@ interface Metric {
   value: number;
 }
 
-const POST_SUMMARY_STATUSES: readonly SitePostStatus[] = ["DRAFT", "IN_REVIEW", "PUBLISHED"];
-
-async function postSummary(siteId: number): Promise<Metric[]> {
-  const [total, ...byStatus] = await Promise.all([
-    loadSitePosts(siteId, { page: 1, page_size: 1 }),
-    ...POST_SUMMARY_STATUSES.map((status) => loadSitePosts(siteId, { status, page: 1, page_size: 1 })),
-  ]);
-  return [
-    { label: "Total", value: unwrap(total!).count },
-    { label: "Draft", value: unwrap(byStatus[0]!).count },
-    { label: "In review", value: unwrap(byStatus[1]!).count },
-    { label: "Published", value: unwrap(byStatus[2]!).count },
-  ];
-}
-
-async function menuSummary(siteId: number): Promise<Metric[]> {
-  const navigation = unwrap(await loadSiteNavigation(siteId));
-  const local = navigation.menus.filter((row) => !row.menu.is_global && row.menu.site === siteId);
-  return [
-    { label: "Local menus", value: local.length },
-    { label: "Active", value: local.filter((row) => row.menu.is_active).length },
-    { label: "Menu items", value: local.reduce((sum, row) => sum + row.items.length, 0) },
-  ];
-}
-
-async function userSummary(siteId: number): Promise<Metric[]> {
-  const directory = await getSiteUsers(siteId, "", 1);
-  return [{ label: "Assigned users", value: directory.count }];
-}
-
-type SummarySectionKey = Exclude<SiteSection["key"], "dashboard" | "builder" | "homepage" | "sidebars">;
-
+type SummarySectionKey = "pages" | "posts" | "menus" | "media" | "users";
 const SUMMARIES = {
-  pages: { icon: DescriptionIcon, title: "Pages", empty: "This Site has no Pages yet." },
-  posts: { icon: ArticleIcon, title: "Posts", empty: "This Site has no Posts yet.", load: postSummary },
-  menus: { icon: AccountTreeIcon, title: "Menus", empty: "This Site has no local menus yet.", load: menuSummary },
-  media: { icon: PhotoLibraryIcon, title: "Media", empty: "This Site has no media yet." },
-  users: { icon: GroupIcon, title: "Users", empty: "No users are assigned to this Site yet.", load: userSummary },
-} satisfies Record<SummarySectionKey, {icon: SvgIconComponent; title: string; empty: string; load?: (siteId: number) => Promise<Metric[]>}>;
-
+  pages: {icon: DescriptionIcon, title: "Pages", empty: "This Site has no Pages yet."},
+  posts: {icon: ArticleIcon, title: "Posts", empty: "This Site has no Posts yet."},
+  menus: {icon: AccountTreeIcon, title: "Menus", empty: "This Site has no local menus yet."},
+  media: {icon: PhotoLibraryIcon, title: "Media", empty: "This Site has no media yet."},
+  users: {icon: GroupIcon, title: "Users", empty: "No active members are assigned to this Site yet."},
+};
 interface SummaryState {
   status: "idle" | "loading" | "success" | "error";
   data: Metric[] | null; error: Error | null; loading: boolean; refreshing: boolean; reload: () => void;
 }
-function SummaryCard({sectionKey, siteId}: {sectionKey: SummarySectionKey; siteId: number}) {
-  if (sectionKey === "pages") return <PageSummaryCard siteId={siteId}/>;
-  if (sectionKey === "media") return <MediaSummaryCard siteId={siteId}/>;
-  return <AggregateSummaryCard sectionKey={sectionKey} siteId={siteId}/>;
+function metrics(kind: SummarySectionKey, section: DashboardSection | undefined): Metric[] | null {
+  if (section?.status !== "ready" || !section.counts) return null;
+  const count = section.counts;
+  if (kind === "pages" || kind === "posts") return [{label:"Total",value:count.total!},{label:"Draft",value:count.DRAFT!},{label:"In review",value:count.IN_REVIEW!},{label:"Published",value:count.PUBLISHED!}];
+  if (kind === "menus") return [{label:"Local menus",value:count.total!},{label:"Active",value:count.active!},{label:"Menu items",value:count.items!}];
+  return [{label:kind === "media" ? "Assets" : "Active members",value:count.total!}];
 }
-function PageSummaryCard({siteId}: {siteId: number}) {
-  // Same raw contract/key as the Pages status dashboard, not a second metric cache.
-  const state = useSiteQuery(siteId, "page-counts", {}, async () => unwrap(await loadSitePageStatusCounts(siteId)));
-  const counts = state.data;
-  const data = counts ? [{label: "Total", value: Object.values(counts).reduce((sum, count) => sum + count, 0)},
-    {label: "Draft", value: counts.DRAFT}, {label: "In review", value: counts.IN_REVIEW}, {label: "Published", value: counts.PUBLISHED}] : null;
-  return <SummaryCardView sectionKey="pages" siteId={siteId} state={{...state, data}}/>;
+function Freshness({data}: {data: DashboardSummary}) {
+  const [now, setNow] = useState(Date.now);
+  useEffect(() => {const timer = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(timer);}, []);
+  return <Typography variant="caption" color="text.secondary">
+    <time dateTime={data.generated_at}>Updated {new Date(data.generated_at).toLocaleTimeString()}</time>
+    {data.cache.hit ? " | Cached snapshot" : " | Snapshot"}{!data.cache.available ? " | Cache unavailable" : ""}
+    {now >= Date.parse(data.expires_at) ? " | Refresh due" : ""}
+  </Typography>;
 }
-function MediaSummaryCard({siteId}: {siteId: number}) {
-  // Identical first-page query to the unrestricted library; cards derive the count.
-  const state = useSiteQuery(siteId, "media", {filters: {}, page: 1, picker: false, imagesOnly: false}, async () => unwrap(await listSiteMedia(siteId, {page: 1})));
-  return <SummaryCardView sectionKey="media" siteId={siteId} state={{...state, data: state.data ? [{label: "Assets", value: state.data.count}] : null}}/>;
-}
-function AggregateSummaryCard({sectionKey, siteId}: {sectionKey: Exclude<SummarySectionKey, "pages" | "media">; siteId: number}) {
-  const summary = SUMMARIES[sectionKey];
-  const state = useSiteQuery(siteId, `dashboard-${sectionKey}`, {}, () => summary.load(siteId));
-  return <SummaryCardView sectionKey={sectionKey} siteId={siteId} state={state}/>;
+function RecentActivity({siteId, allowed}: {siteId: number; allowed: string[]}) {
+  const activity = useSiteQuery(siteId, "dashboard-activity", {allowed}, async () => unwrap(await getSiteDashboardActivity(siteId)), {staleTime:15_000, refetchInterval:30_000, scopeProtected:true});
+  return <Paper component="section" data-dashboard-secondary-pending={activity.loading || activity.refreshing ? "true" : "false"} aria-labelledby="dashboard-recent" variant="outlined" sx={{p:2.5,borderRadius:3}}>
+    <Typography id="dashboard-recent" variant="h6" component="h2">Recent content activity</Typography>
+    {activity.error ? <Alert severity="warning" action={<Button onClick={activity.reload}>Retry activity</Button>}>Recent activity is unavailable. Summary counts remain available.</Alert>
+      : activity.data ? activity.data.results.filter(row => allowed.includes(row.kind)).length ? <Box component="ul">{activity.data.results.filter(row => allowed.includes(row.kind)).map(row => <li key={row.id}>{row.title} | {row.kind === "pages" ? "Page" : "Post"} | {row.status.replaceAll("_", " ")}</li>)}</Box> : <Typography>No recent content activity.</Typography>
+      : <Typography role="status">Loading recent activity...</Typography>}
+  </Paper>;
 }
 function SummaryCardView({sectionKey, siteId, state}: {sectionKey: SummarySectionKey; siteId: number; state: SummaryState}) {
   const summary = SUMMARIES[sectionKey];
@@ -176,7 +141,7 @@ function SummaryCardView({sectionKey, siteId, state}: {sectionKey: SummarySectio
           {summary.title}
         </Typography>
       </Box>
-      {state.refreshing ? <Typography role="status" variant="caption">Refreshing {summary.title.toLowerCase()}?</Typography> : null}
+      {state.refreshing ? <Typography role="status" variant="caption">Refreshing {summary.title.toLowerCase()}...</Typography> : null}
       {state.error && state.data ? <Alert severity="warning" action={<Button onClick={state.reload}>Retry summary</Button>}>Refresh failed. Previously loaded totals are shown.</Alert> : null}
       {body}
       <Box sx={{ mt: "auto" }}>
@@ -191,24 +156,55 @@ function SummaryCardView({sectionKey, siteId, state}: {sectionKey: SummarySectio
 export function SiteDashboard() {
   const admin = useSiteAdmin();
   const siteId = admin.site.id;
+  const environment = useQueryEnvironment();
+  const summary = useSiteQuery(siteId, "dashboard-summary", {}, async () => unwrap(await getSiteDashboardSummary(siteId)), {staleTime:15_000, refetchInterval:15_000, scopeProtected:true});
+  // Warm the existing Page-counts contract without a second six-list read.
+  useEffect(() => {
+    const section = summary.data?.sections.pages;
+    if (section?.status !== "ready" || !section.counts || !admin.enabledModuleCodes.includes("PAGES") || !admin.permissions.includes("content.pages.view")) return;
+    const {total: _, ...counts} = section.counts;
+    let current = true;
+    const key = queryKey({...environment,siteId}, "page-counts");
+    const generated = Date.parse(summary.data!.generated_at);
+    void environment.client.cancelQueries({queryKey:key, exact:true}).then(() => {
+      if (current) environment.client.setQueryData(key, counts, {updatedAt:generated});
+    });
+    return () => {current = false;};
+  }, [summary.data, environment.client, environment.identity, environment.authorization, siteId]);
   const contentSections = SITE_SECTIONS.filter(
     (section): section is SiteSection & { key: SummarySectionKey } =>
       section.key !== "dashboard" && section.key !== "builder" && section.key !== "homepage" && section.key !== "sidebars",
   );
-  const visible = contentSections.filter((section) => sectionDecision(section, admin) === "visible");
+  const countPermissions: Record<SummarySectionKey,string> = {pages:"content.pages.view",posts:"content.posts.view",menus:"menu.read",media:"content.media.view",users:"platform.users.view"};
+  const accessible = contentSections.filter((section) => sectionDecision(section, admin) === "visible");
+  const visible = accessible.filter(section => admin.permissions.includes(countPermissions[section.key]));
+  const scopeMismatch = useRef<string | null>(null);
+  const missing = summary.data ? visible.filter(section => !(section.key in summary.data!.sections)).map(section => section.key).sort().join(",") : "";
+  useEffect(() => {
+    if (!missing) {scopeMismatch.current = null; return;}
+    const signature = `${siteId}:${environment.authorization}:${missing}`;
+    if (scopeMismatch.current === signature) return;
+    scopeMismatch.current = signature;
+    // A live response can reveal a module/read grant removal before the next
+    // workspace lease refresh. Do not allow other cached views to restore it.
+    const obsolete = {predicate: (query: {queryKey: readonly unknown[]}) => query.queryKey[1] === environment.identity && query.queryKey[2] === siteId && !["workspace", "dashboard-summary"].includes(String(query.queryKey[4]))};
+    void environment.client.cancelQueries(obsolete);
+    environment.client.removeQueries(obsolete);
+    window.dispatchEvent(new Event("uog:workspace:refresh"));
+  }, [missing, siteId, environment.client, environment.identity, environment.authorization]);
   const disabled = contentSections.filter(
     (section) =>
       sectionDecision(section, admin) === "module_disabled" &&
       section.permissions.some((code) => admin.permissions.includes(code)),
   );
-  const canCreatePage = visible.some((section) => section.key === "pages") &&
+  const canCreatePage = accessible.some((section) => section.key === "pages") &&
     admin.permissions.includes("content.pages.create");
-  const canManageMenus = visible.some((section) => section.key === "menus");
+  const canManageMenus = accessible.some((section) => section.key === "menus");
   const canManageHomepage = sectionDecision(sectionByKey("homepage"), admin) === "visible";
   const canOpenBuilder = sectionDecision(sectionByKey("builder"), admin) === "visible";
 
   return (
-    <Box data-perf-section="dashboard" sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+    <Box data-perf-section="dashboard" data-dashboard-summary-refreshing={summary.refreshing ? "true" : "false"} sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
       {canCreatePage || canManageMenus || canManageHomepage || canOpenBuilder ? (
         <Box component="section" aria-labelledby="site-quick-actions" sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
           <Typography id="site-quick-actions" variant="h6" component="h2" sx={{ fontWeight: 700 }}>
@@ -248,6 +244,7 @@ export function SiteDashboard() {
         <Typography id="site-content-summary" variant="h6" component="h2" sx={{ fontWeight: 700 }}>
           Content summary
         </Typography>
+        {summary.data ? <Freshness data={summary.data}/> : null}
         {visible.length === 0 ? (
           <Alert severity="info" variant="outlined" role="status">
             No content modules are available to you for this Site.
@@ -255,7 +252,12 @@ export function SiteDashboard() {
         ) : (
           <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: { xs: "1fr", sm: "repeat(2, minmax(0, 1fr))", lg: "repeat(3, minmax(0, 1fr))" } }}>
             {visible.map((section) => (
-              <SummaryCard key={section.key} sectionKey={section.key} siteId={siteId} />
+              <SummaryCardView key={section.key} sectionKey={section.key} siteId={siteId} state={{
+                ...summary, data: metrics(section.key, summary.data?.sections[section.key]),
+                status: summary.data && summary.data.sections[section.key]?.status !== "ready" ? "error" : summary.status,
+                loading: summary.loading,
+                error: summary.error ?? (summary.data && summary.data.sections[section.key]?.status !== "ready" ? new Error("Counts are not available for this section. Retry later.") : null),
+              }} />
             ))}
           </Box>
         )}
@@ -266,6 +268,7 @@ export function SiteDashboard() {
           </Typography>
         ) : null}
       </Box>
+      {summary.data && (summary.data.sections.pages || summary.data.sections.posts) ? <RecentActivity siteId={siteId} allowed={["pages", "posts"].filter(key => key in summary.data!.sections)}/> : null}
     </Box>
   );
 }

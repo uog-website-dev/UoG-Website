@@ -1,0 +1,28 @@
+﻿TAP version 13
+# Subtest: nearest-rank p50/p95 includes slow samples and never marks budgets approved
+ok 1 - nearest-rank p50/p95 includes slow samples and never marks budgets approved
+  ---
+  duration_ms: 3.0751
+  type: 'test'
+  ...
+# Subtest: URL recording drops tokens, arbitrary search and cache-busting query values
+ok 2 - URL recording drops tokens, arbitrary search and cache-busting query values
+  ---
+  duration_ms: 1.1505
+  type: 'test'
+  ...
+# Subtest: duplicate endpoint and transfer totals preserve action identity
+ok 3 - duplicate endpoint and transfer totals preserve action identity
+  ---
+  duration_ms: 0.9101
+  type: 'test'
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 3
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 263.4114

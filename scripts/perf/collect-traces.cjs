@@ -1,7 +1,7 @@
 /* Collect only allowlisted structured events; never persist raw container logs. */
 const fs=require('node:fs'),{spawnSync}=require('node:child_process'),path=require('node:path');
 const file=process.argv[2];if(!file)throw new Error('Provide results.json');const data=JSON.parse(fs.readFileSync(file,'utf8')),ids=new Set(data.samples.map(s=>s.navigation_id));
-if(data.metadata.run_status!=='complete'||data.failures.length||data.samples.length!==1+(data.metadata.section_matrix?17:13)*data.metadata.samples_per_scenario)throw new Error('Cannot publish incomplete or failed benchmark evidence');
+if(data.metadata.run_status!=='complete'||data.failures.length||data.samples.length!==1+(13+(data.metadata.section_matrix?4:0)+(data.metadata.dashboard_probes?2:0))*data.metadata.samples_per_scenario)throw new Error('Cannot publish incomplete or failed benchmark evidence');
 const actualMode=spawnSync('docker',['compose','-f','docker-compose.yml','-f','docker-compose.perf.yml','exec','-T','perf-admin','printenv','PERF_NEXT_MODE'],{encoding:'utf8'});
 if(actualMode.status!==0||actualMode.stdout.trim()!==data.metadata.mode)throw new Error('Measured frontend mode does not match the evidence label');
 data.metadata.verified_server_mode=actualMode.stdout.trim();
@@ -12,6 +12,6 @@ for(const sample of data.samples){const requests=[...unique.values()].filter(e=>
  const next=events.filter(e=>e.event==='uog.next.upstream'&&e.navigation_id===sample.navigation_id);
  sample.server={django_requests:requests.length,next_api_spans:next.length,sql_count:requests.reduce((n,e)=>n+e.sql_count,0),sql_ms:requests.reduce((n,e)=>n+e.sql_ms,0),duplicate_endpoints:Object.entries(fanout).filter(([,n])=>n>1).map(([endpoint,count])=>({endpoint,count})),request_ids:requests.map(e=>e.request_id),browser_parent_matches:requests.filter(e=>e.parent_request_id&&(sample.waterfall??[]).some(row=>row.request_id===e.parent_request_id)).length};
 }
-data.trace_summary={all_api_samples_correlated:data.samples.filter(s=>['workspace_api','paginated_list_api'].includes(s.scenario)).every(s=>s.server.django_requests>0),django_requests:unique.size,next_api_spans:events.filter(e=>e.event==='uog.next.upstream').length,navigation_samples_missing_django_spans:data.samples.filter(s=>!s.server.django_requests).map(s=>s.navigation_id),note:'No upstream requests may be legitimate for a fully cached transition; inspect browser waterfall before interpreting missing spans.'};
+data.trace_summary={all_api_samples_correlated:data.samples.filter(s=>['workspace_api','paginated_list_api','dashboard_summary_api'].includes(s.scenario)).every(s=>s.server.django_requests>0),django_requests:unique.size,next_api_spans:events.filter(e=>e.event==='uog.next.upstream').length,navigation_samples_missing_django_spans:data.samples.filter(s=>!s.server.django_requests).map(s=>s.navigation_id),note:'No upstream requests may be legitimate for a fully cached transition; inspect browser waterfall before interpreting missing spans.'};
 if(!data.trace_summary.all_api_samples_correlated)throw new Error('API measurements are missing correlated Django spans');
 fs.writeFileSync(file,JSON.stringify(data,null,2));fs.writeFileSync(path.join(path.dirname(file),'traces.jsonl'),events.map(e=>JSON.stringify(e)).join('\n')+'\n');console.log(JSON.stringify(data.trace_summary));

@@ -1,0 +1,47 @@
+docker :  Container uog-digital-platform-perf-admin-run-52ea3c16b76e Creating 
+At line:2 char:1
++ docker compose -f docker-compose.yml -f docker-compose.perf.yml run - ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ( Container uog-...6b76e Creating :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+ Container uog-digital-platform-perf-admin-run-52ea3c16b76e Created 
+==> UoG frontend entrypoint
+==> Installing workspace dependencies (pnpm)...
+Scope: all 7 workspace projects
+Lockfile is up to date, resolution step is skipped
+Already up to date
+
+   ╭───────────────────────────────────────────────────────────────────╮
+   │                                                                   │
+   │                Update available! 9.15.9 → 12.21.0.                │
+   │   Changelog: https://github.com/pnpm/pnpm/releases/tag/v12.21.0   │
+   │                 Run "pnpm add -g pnpm" to update.                 │
+   │                                                                   │
+   ╰───────────────────────────────────────────────────────────────────╯
+
+
+Done in 2.1s using pnpm v9.15.9
+==> Starting: sh -c cd /workspace && pnpm --filter @uog/admin-web typecheck && pnpm --filter @uog/admin-web exec vitest run src/app/sites/dashboard-actions.test.ts src/sites/site-dashboard.test.tsx src/app/sites/page-actions.test.ts src/data/section-navigation.test.tsx --maxWorkers=2
+
+> @uog/admin-web@0.1.0 typecheck /workspace/apps/admin-web
+> tsc --noEmit
+
+
+ RUN  v5.0.5 /workspace/apps/admin-web
+
+ ✓ src/data/section-navigation.test.tsx (13 tests) 252ms
+ ✓ src/app/sites/page-actions.test.ts (8 tests) 35ms
+ ✓ src/sites/site-dashboard.test.tsx (9 tests) 2163ms
+   ✓ renders five domains using one aggregate request without list fan-out 791ms
+ ✓ src/app/sites/dashboard-actions.test.ts (5 tests) 12ms
+
+ Test Files  4 passed (4)
+      Tests  35 passed (35)
+   Start at  03:52:38
+   Duration  6.59s (environment 33%, tests 23%, transform 20%, import 15%, setup 9%)
+
+Environment  jsdom was created 4 times · 3.53s total, 33% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+

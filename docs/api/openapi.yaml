@@ -35466,6 +35466,213 @@ paths:
               schema:
                 type: string
                 format: uuid
+  /api/workspace/dashboard/:
+    get:
+      operationId: workspace_dashboard_retrieve
+      description: Essential Site counts. Live membership/capability and module checks
+        precede each cache lookup. Unauthorized and unknown Sites both return 404.
+        Omitted sections are not readable/enabled. Existing CMS readers may inspect
+        all draft statuses, matching scoped list policy. No titles, storage references
+        or user profiles. Redis TTL defaults to 15 seconds (maximum 60); committed
+        model writes bump a Site generation; bulk SQL/expiry changes rely on bounded
+        TTL. Failed sections are unavailable, never zero or cached.
+      parameters:
+      - in: query
+        name: site
+        schema:
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+          format: int64
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Workspace
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardResponse'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/workspace/dashboard/activity/:
+    get:
+      operationId: workspace_dashboard_activity_retrieve
+      description: Optional secondary widget. Five most recently modified readable
+        Page/Post records, ordered updated_at descending then UUID. Same live Site/CMS/module
+        gates as counts. No bodies, private media paths or user profiles. No shared
+        activity cache.
+      parameters:
+      - in: query
+        name: site
+        schema:
+          type: integer
+          maximum: 9007199254740991
+          minimum: 1
+          format: int64
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Workspace
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivityResponse'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
   /api/workspace/sites/:
     get:
       operationId: workspace_sites_retrieve
@@ -35653,6 +35860,43 @@ components:
       description: |-
         * `ACTIVE` - Active
         * `INACTIVE` - Inactive
+    ActivityItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        kind:
+          $ref: '#/components/schemas/KindEnum'
+        title:
+          type: string
+        status:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - kind
+      - status
+      - title
+      - updated_at
+    ActivityResponse:
+      type: object
+      properties:
+        site:
+          type: integer
+        generated_at:
+          type: string
+          format: date-time
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActivityItem'
+      required:
+      - generated_at
+      - results
+      - site
     AdminOverview:
       type: object
       properties:
@@ -36049,6 +36293,19 @@ components:
       - schemaVersion
       - site
       - version
+    CacheInfo:
+      type: object
+      properties:
+        hit:
+          type: boolean
+        available:
+          type: boolean
+        ttl_seconds:
+          type: integer
+      required:
+      - available
+      - hit
+      - ttl_seconds
     Change:
       type: object
       properties:
@@ -36222,6 +36479,35 @@ components:
         * `PUBLISHED` - Published
         * `UNPUBLISHED` - Unpublished
         * `ARCHIVED` - Archived
+    DashboardResponse:
+      type: object
+      properties:
+        schema_version:
+          type: integer
+        site:
+          type: integer
+        generated_at:
+          type: string
+          format: date-time
+        expires_at:
+          type: string
+          format: date-time
+        partial:
+          type: boolean
+        sections:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/SectionSummary'
+        cache:
+          $ref: '#/components/schemas/CacheInfo'
+      required:
+      - cache
+      - expires_at
+      - generated_at
+      - partial
+      - schema_version
+      - sections
+      - site
     Deletion:
       type: object
       properties:
@@ -44913,6 +45199,14 @@ components:
         * `custom` - Custom
         * `news` - News listing
         * `category` - News category
+    KindEnum:
+      enum:
+      - pages
+      - posts
+      type: string
+      description: |-
+        * `pages` - pages
+        * `posts` - posts
     LayoutEnum:
       enum:
       - FULL_WIDTH
@@ -56609,6 +56903,26 @@ components:
           $ref: '#/components/schemas/ScopeFilterRequest'
       required:
       - type
+    SectionSummary:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/SectionSummaryStatusEnum'
+        counts:
+          type: object
+          additionalProperties:
+            type: integer
+            minimum: 0
+      required:
+      - status
+    SectionSummaryStatusEnum:
+      enum:
+      - ready
+      - unavailable
+      type: string
+      description: |-
+        * `ready` - ready
+        * `unavailable` - unavailable
     SectionTemplateCreateInputRequest:
       type: object
       properties:

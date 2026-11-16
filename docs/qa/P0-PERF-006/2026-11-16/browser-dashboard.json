@@ -1,0 +1,87 @@
+{
+  "status": "PASS",
+  "checks": [
+    "Two-Site API counts reconcile with independent grouped/source queries; real Redis repeat hits",
+    "Five summary cards use one essential action; activity is a separate action",
+    "Held secondary leaves all essentials visible; transport failure shows independent retry UI",
+    "Slow essential request retains quick actions and honest first-load skeletons, then recovers",
+    "Disabling POSTS hides its card/counts on Site B without changing Site A; managed module restored"
+  ],
+  "browser": "157.0.4341.46",
+  "reconciliation": [
+    {
+      "site": 81,
+      "counts_match": true,
+      "redis_hit": true,
+      "counts": {
+        "pages": {
+          "DRAFT": 32,
+          "IN_REVIEW": 0,
+          "APPROVED": 0,
+          "PUBLISHED": 8,
+          "UNPUBLISHED": 0,
+          "ARCHIVED": 0,
+          "total": 40
+        },
+        "posts": {
+          "DRAFT": 80,
+          "IN_REVIEW": 0,
+          "APPROVED": 0,
+          "PUBLISHED": 20,
+          "UNPUBLISHED": 0,
+          "ARCHIVED": 0,
+          "total": 100
+        },
+        "menus": {
+          "total": 4,
+          "active": 4,
+          "items": 48
+        },
+        "media": {
+          "total": 80
+        },
+        "users": {
+          "total": 1
+        }
+      }
+    },
+    {
+      "site": 82,
+      "counts_match": true,
+      "redis_hit": true,
+      "counts": {
+        "pages": {
+          "DRAFT": 32,
+          "IN_REVIEW": 0,
+          "APPROVED": 0,
+          "PUBLISHED": 8,
+          "UNPUBLISHED": 0,
+          "ARCHIVED": 0,
+          "total": 40
+        },
+        "posts": {
+          "DRAFT": 80,
+          "IN_REVIEW": 0,
+          "APPROVED": 0,
+          "PUBLISHED": 20,
+          "UNPUBLISHED": 0,
+          "ARCHIVED": 0,
+          "total": 100
+        },
+        "menus": {
+          "total": 4,
+          "active": 4,
+          "items": 48
+        },
+        "media": {
+          "total": 80
+        },
+        "users": {
+          "total": 1
+        }
+      }
+    }
+  ],
+  "essential_actions": 1,
+  "secondary_actions": 1
+}

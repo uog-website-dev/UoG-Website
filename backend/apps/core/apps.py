@@ -10,3 +10,5 @@ class CoreConfig(AppConfig):
     def ready(self):  # pragma: no cover - signal wiring
         from . import handlers  # noqa: F401
         from . import openapi  # noqa: F401 - register authentication extension
+        from .dashboard_cache import register_signals
+        register_signals()

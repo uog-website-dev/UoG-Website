@@ -38,7 +38,7 @@ export function QueryScope({identity, siteId, children, onDenied, authorization 
   current.current = {siteId, onDenied};
   const [client] = useState(() => new QueryClient({
     queryCache: new QueryCache({onError: (error, query) => {
-      if (query.queryKey[2] === current.current.siteId && query.queryKey[4] !== "workspace" && isAccessFailure(error) && !accessFailureWasReported(error)) current.current.onDenied?.();
+      if (query.queryKey[2] === current.current.siteId && query.queryKey[4] !== "workspace" && (isAccessFailure(error) || (query.meta?.scopeProtected && error instanceof ApiError && error.status === 404)) && !accessFailureWasReported(error)) current.current.onDenied?.();
     }}),
     defaultOptions: {queries: {staleTime: STALE_MS, gcTime: typeof window === "undefined" ? Infinity : GC_MS, retry: false, refetchOnWindowFocus: true, refetchOnReconnect: true}},
   }));
@@ -74,13 +74,14 @@ export function AuthorizationScope({authorization, siteId, children}: {authoriza
 }
 
 export function useSiteQuery<T>(siteId: number, resource: string, params: unknown, read: () => Promise<T>, options: {
-  enabled?: boolean; isEmpty?: (data: T) => boolean; staleTime?: number; gcTime?: number;
+  enabled?: boolean; isEmpty?: (data: T) => boolean; staleTime?: number; gcTime?: number; refetchInterval?: number; scopeProtected?: boolean;
 } = {}) {
   const environment = useQueryEnvironment();
   const scope = {...environment, siteId};
   const key = queryKey(scope, resource, params);
   const enabled = options.enabled !== false && !["blocked", "bootstrap"].includes(environment.authorization);
   const result = useQuery({queryKey: key, enabled, staleTime: options.staleTime ?? STALE_MS, gcTime: options.gcTime ?? GC_MS,
+    refetchInterval: options.refetchInterval, meta: {scopeProtected: options.scopeProtected === true},
     queryFn: async ({signal}) => {
       // Server Actions cannot carry AbortSignal. Consuming it still cancels the
       // query and prevents a late read from populating an obsolete cache entry.
@@ -89,7 +90,7 @@ export function useSiteQuery<T>(siteId: number, resource: string, params: unknow
   });
   const prefix = key.slice(0, 5);
   const reload = () => invalidate(environment.client, query => prefix.every((part, index) => query.queryKey[index] === part));
-  const data = enabled && !isAccessFailure(result.error) ? result.data ?? null : null;
+  const data = enabled && !isAccessFailure(result.error) && !(options.scopeProtected && result.error instanceof ApiError && result.error.status === 404) ? result.data ?? null : null;
   const error = result.error ? result.error instanceof ApiError ? result.error : ApiError.fromUnknown(result.error) : null;
   return {
     data, error, loading: enabled && result.isPending, refreshing: enabled && result.isFetching && data !== null,
@@ -106,10 +107,10 @@ export function useSiteQuery<T>(siteId: number, resource: string, params: unknow
 }
 
 export const RELATED: Record<string, readonly string[]> = {
-  pages: ["pages", "page-counts", "menu-targets", "dashboard-pages", "sidebars", "media-references"],
-  posts: ["posts", "taxonomy", "menu-targets", "dashboard-posts", "media-references"],
-  menus: ["menus", "menu-detail", "menu-locations", "dashboard-menus"],
-  media: ["media", "media-detail", "media-references", "dashboard-media"],
+  pages: ["pages", "page-counts", "menu-targets", "dashboard-pages", "sidebars", "media-references", "dashboard-summary", "dashboard-activity"],
+  posts: ["posts", "taxonomy", "menu-targets", "dashboard-posts", "media-references", "dashboard-summary", "dashboard-activity"],
+  menus: ["menus", "menu-detail", "menu-locations", "dashboard-menus", "dashboard-summary"],
+  media: ["media", "media-detail", "media-references", "dashboard-media", "dashboard-summary"],
 };
 export function useInvalidateSite() {
   const environment = useQueryEnvironment();

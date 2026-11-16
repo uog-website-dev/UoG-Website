@@ -1,0 +1,34 @@
+{
+  "files": [
+    {
+      "file": "src/sites/site-dashboard.tsx",
+      "sha256": "2ec63866801d9f8e270011533abf3c670328f36399ac7d31d57170664e85eaf6",
+      "matches_checkout": true
+    },
+    {
+      "file": "src/app/sites/dashboard-actions.ts",
+      "sha256": "93b88393ace392a8e6b9fac5364a6a34efc8203b655be9dde64674341626bb23",
+      "matches_checkout": true
+    },
+    {
+      "file": "src/app/sites/page-actions.ts",
+      "sha256": "8eccc2b8edcdbb9a783ffff3b83a34de2102f92e43f0e4ed099782cba81d2402",
+      "matches_checkout": true
+    },
+    {
+      "file": "src/data/query-cache.tsx",
+      "sha256": "5c60621f5dc1e382351faf397e36f5851d2148d562b90dd5867890101107a801",
+      "matches_checkout": true
+    },
+    {
+      "file": "src/data/section-prefetch.ts",
+      "sha256": "a111883248131e579e704e66f3c5f186df75d40028c18c2bb6b4b28891830afd",
+      "matches_checkout": true
+    },
+    {
+      "file": "src/sites/site-pages.tsx",
+      "sha256": "6f61a69c376d60a40e8c4264e2556acf502255b3d9ce9a1fceefcf4d43919c02",
+      "matches_checkout": true
+    }
+  ]
+}
