@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="79" failures="0" errors="0" time="10.266784806">
+    <testsuite name="src/app/sites/dashboard-actions.test.ts" timestamp="2026-11-16T04:32:18.315Z" hostname="fa68a66c0952" tests="5" failures="0" errors="0" skipped="0" time="0.006030393">
+        <testcase classname="src/app/sites/dashboard-actions.test.ts" name="uses the scoped aggregate endpoint without returning credentials" time="0.003343987">
+        </testcase>
+        <testcase classname="src/app/sites/dashboard-actions.test.ts" name="rejects a foreign or invalid summary instead of caching it" time="0.000390752">
+        </testcase>
+        <testcase classname="src/app/sites/dashboard-actions.test.ts" name="rejects a foreign or invalid summary instead of caching it" time="0.00034451">
+        </testcase>
+        <testcase classname="src/app/sites/dashboard-actions.test.ts" name="rejects a foreign or invalid summary instead of caching it" time="0.000361901">
+        </testcase>
+        <testcase classname="src/app/sites/dashboard-actions.test.ts" name="bounds and validates the separate recent activity contract" time="0.000467368">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/sites/page-actions.test.ts" timestamp="2026-11-16T04:32:18.321Z" hostname="fa68a66c0952" tests="8" failures="0" errors="0" skipped="0" time="0.014235444">
+        <testcase classname="src/app/sites/page-actions.test.ts" name="Site Page API actions &gt; uses the site-scoped list contract with encoded filters and returns pagination" time="0.004145386">
+        </testcase>
+        <testcase classname="src/app/sites/page-actions.test.ts" name="Site Page API actions &gt; builds status totals from one scoped summary instead of six list calls" time="0.001217179">
+        </testcase>
+        <testcase classname="src/app/sites/page-actions.test.ts" name="Site Page API actions &gt; loads a scoped detail with its ETag and sends that ETag for updates" time="0.001671394">
+        </testcase>
+        <testcase classname="src/app/sites/page-actions.test.ts" name="Site Page API actions &gt; sends structured blocks and same-site hierarchy in the create contract" time="0.00054538">
+        </testcase>
+        <testcase classname="src/app/sites/page-actions.test.ts" name="Site Page API actions &gt; reloads a visual draft through its scoped endpoint and preserves the returned ETag" time="0.000502666">
+        </testcase>
+        <testcase classname="src/app/sites/page-actions.test.ts" name="Site Page API actions &gt; submits complete trees from two editors without retrying the stale Slider" time="0.002884792">
+        </testcase>
+        <testcase classname="src/app/sites/page-actions.test.ts" name="Site Page API actions &gt; preserves node and numeric item-position error bindings" time="0.000898693">
+        </testcase>
+        <testcase classname="src/app/sites/page-actions.test.ts" name="Site Page API actions &gt; loads an immutable revision preview and uses its ETag for approval" time="0.000562685">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/data/query-cache.test.tsx" timestamp="2026-11-16T04:32:18.330Z" hostname="fa68a66c0952" tests="15" failures="0" errors="0" skipped="0" time="0.35070108">
+        <testcase classname="src/data/query-cache.test.tsx" name="deduplicates simultaneous reads and reuses the same section across navigation without a loading flash" time="0.065114962">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="partitions keys by user/session, Site, permissions, resource, filters, sort and page" time="0.000863847">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="shows stale valid data while refreshing, reports failure and recovers without discarding cached rows" time="0.035919415">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="invalidates only the mutated Site/domain, including other mounted consumers; failed writes leave cache intact" time="0.013652912">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="cancels a slow obsolete filter and cannot replace the newer query with its late response" time="0.00788175">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="clears the previous session and Site client on rapid boundary changes, even when requests finish late" time="0.014972712">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="purges protected entries when authorization changes or a refreshed workspace revokes access" time="0.03288312">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="uses finite defaults and garbage-collects unobserved entries" time="0.059330073">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="does not reuse data after an identity-change event even when Site and permissions are identical" time="0.011308968">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="automatically refreshes an expired entry on return while keeping its valid rows visible" time="0.013882305">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="a successful mutation cancels the pre-save read and coalesces duplicate invalidations" time="0.017993302">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="settles after development StrictMode effect replay" time="0.005646182">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="clears protected content on logout while still invoking the sign-out action" time="0.013150519">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="revalidates an unchanged forbidden resource once instead of looping workspace bootstraps" time="0.046586178">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="a late denied read from an abandoned Site cannot reset the new Site&apos;s cache" time="0.007657749">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/data/section-navigation.test.tsx" timestamp="2026-11-16T04:32:18.342Z" hostname="fa68a66c0952" tests="13" failures="0" errors="0" skipped="0" time="0.104046107">
+        <testcase classname="src/data/section-navigation.test.tsx" name="restores controls on same-Site remount without any network function and keeps sequential edits" time="0.049180867">
+        </testcase>
+        <testcase classname="src/data/section-navigation.test.tsx" name="isolates Sites and clears controls on authorization/session change" time="0.00962211">
+        </testcase>
+        <testcase classname="src/data/section-navigation.test.tsx" name="does not restore picker-local controls or reset list controls on content invalidation" time="0.007973638">
+        </testcase>
+        <testcase classname="src/data/section-navigation.test.tsx" name="prefetches only after sustained intent and deduplicates the canonical counts query on navigation" time="0.012376415">
+        </testcase>
+        <testcase classname="src/data/section-navigation.test.tsx" name="throttles route speculation and does not fetch Posts content" time="0.003843338">
+        </testcase>
+        <testcase classname="src/data/section-navigation.test.tsx" name="does not speculate into disabled, unauthorized or foreign context: {&quot;modules&quot;:[]}" time="0.002360404">
+        </testcase>
+        <testcase classname="src/data/section-navigation.test.tsx" name="does not speculate into disabled, unauthorized or foreign context: {&quot;permissions&quot;:[]}" time="0.00210295">
+        </testcase>
+        <testcase classname="src/data/section-navigation.test.tsx" name="does not speculate into disabled, unauthorized or foreign context: {&quot;payloadSite&quot;:22}" time="0.001816834">
+        </testcase>
+        <testcase classname="src/data/section-navigation.test.tsx" name="skips constrained networks, expired permission leases and unmounted intents" time="0.00400749">
+        </testcase>
+        <testcase classname="src/data/section-navigation.test.tsx" name="recovers only a lost pagination boundary: {&quot;status&quot;:404,&quot;message&quot;:&quot;Invalid page.&quot;,&quot;expected&quot;:1}" time="0.00278688">
+        </testcase>
+        <testcase classname="src/data/section-navigation.test.tsx" name="recovers only a lost pagination boundary: {&quot;status&quot;:404,&quot;message&quot;:&quot;Not found.&quot;,&quot;expected&quot;:2}" time="0.001455006">
+        </testcase>
+        <testcase classname="src/data/section-navigation.test.tsx" name="recovers only a lost pagination boundary: {&quot;status&quot;:403,&quot;message&quot;:&quot;Invalid page.&quot;,&quot;expected&quot;:2}" time="0.001478616">
+        </testcase>
+        <testcase classname="src/data/section-navigation.test.tsx" name="recovers only a lost pagination boundary: {&quot;status&quot;:503,&quot;message&quot;:&quot;Unavailable&quot;,&quot;expected&quot;:2}" time="0.001951467">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-dashboard.test.tsx" timestamp="2026-11-16T04:32:18.351Z" hostname="fa68a66c0952" tests="11" failures="0" errors="0" skipped="0" time="1.030054201">
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="renders five domains using one aggregate request without list fan-out" time="0.364317953">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="shows essentials while a secondary widget is slow or fails" time="0.12536619">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="isolates one failed aggregate without showing a false zero" time="0.122773694">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="retains prior values on transient refresh error and retries without blanking" time="0.097001384">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="hides cached protected counts after a scope-level 404" time="0.04832075">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="primes the canonical Page status query for a later section without another read" time="0.046248">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="omits disabled/unauthorized cards while preserving permission-aware quick actions" time="0.059275574">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="shows intentional empty data and a cache timestamp" time="0.047922397">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="handles a Site with no available modules" time="0.019688093">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="retains a permitted create action without exposing view-only counters" time="0.032021803">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="purges other cached views when a live summary reveals a removed read grant" time="0.064891288">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-pages.test.tsx" timestamp="2026-11-16T04:32:18.359Z" hostname="fa68a66c0952" tests="27" failures="0" errors="0" skipped="0" time="8.761717581">
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; saves a shell-only change without resending builder blocks or metadata" time="0.733768667">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; assigns only published Pages allowed by the backend as the homepage" time="0.42016517">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; renders a site-scoped accessible table and status dashboard" time="0.127119245">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; announces empty and failed API list states" time="0.214048959">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; applies server search and status filters and resets pagination" time="0.430215304">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; uses API pagination and resets to the first page when sorting changes" time="0.194267913">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; opens full-page preview in a new tab and submits this Site&apos;s draft for review" time="0.252412796">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; shows review controls only from backend-authorized actions and requires a rejection comment" time="0.484402479">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; shows append-only workflow history and reviewer feedback in a timeline" time="0.172735571">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; defaults a new Page to the Site language" time="0.397248844">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; links Create page to the dedicated create screen" time="0.120981803">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; starts a new Page blank and fills the slug from the title until it is edited" time="0.360220126">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; blocks create without create permission on the editor screen" time="0.014711107">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; creates and edits only with the matching permission and current ETag" time="0.687074216">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; does not navigate back to the former Site when its save completes after unmount" time="0.336874672">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; assigns a Site sidebar without replacing the builder document" time="0.496226121">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; surfaces stale edit conflicts without losing the form" time="0.589287824">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; previews private draft content and blocks malformed block JSON" time="0.466701082">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; shows the frozen private revision and sends its exact ETag when publishing" time="0.370029844">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; previews the shared visual fixture and rejects unsupported layout versions before saving" time="0.494815679">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; uses the Page editor dirty state for Site switches even outside a form element" time="0.196231997">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; asks before discarding unsaved editor changes" time="0.267946858">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; blocks management and protected reads when the PAGES module is off" time="0.058283559">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; clears filter and page state when the selected Site changes" time="0.205433301">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; does not fetch or expose Pages without view permission" time="0.006178311">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; switches Site scope and enforces view-only access across the admin workspace" time="0.150663049">
+        </testcase>
+        <testcase classname="src/sites/site-pages.test.tsx" name="SitePagesPanel &gt; opens a working draft of a published Page and keeps the live route fixed" time="0.509762351">
+        </testcase>
+    </testsuite>
+</testsuites>

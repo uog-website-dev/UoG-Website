@@ -7,8 +7,11 @@ from django.urls import include, path
 from apps.core import views as core_views
 from apps.core.documentation import RedocView, SchemaView, SwaggerView
 from apps.sites.api.workspace import WorkspaceBootstrap, WorkspaceSites
+from apps.core.dashboard import DashboardSummary, DashboardActivity
 
 urlpatterns = [
+    path("api/workspace/dashboard/", DashboardSummary.as_view(), name="workspace-dashboard"),
+    path("api/workspace/dashboard/activity/", DashboardActivity.as_view(), name="workspace-dashboard-activity"),
     path("api/workspace/", WorkspaceBootstrap.as_view(), name="workspace-bootstrap"),
     path("api/workspace/sites/", WorkspaceSites.as_view(), name="workspace-sites"),
     path("admin/", admin.site.urls),

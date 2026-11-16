@@ -18,6 +18,7 @@ const {chromium} = require(process.env.UOG_QA_PLAYWRIGHT_ROOT || 'playwright-cor
    await page.getByRole('navigation', {name: 'Site sections', exact: true}).locator(`a[href="/admin/sites/${site}/admin${name === 'dashboard' ? '' : '/' + name}"]`).click();
    await page.waitForURL(url => url.pathname.replace(/\/$/,'') === `/admin/sites/${site}/admin${name === 'dashboard' ? '' : '/' + name}`);
    await page.waitForFunction(name => {const node = document.querySelector(`[data-perf-section="${name}"]`); return !!node && node.getAttribute('data-perf-pending') !== 'true' && !node.querySelector('[data-perf-pending="true"],.MuiSkeleton-root');}, name);
+   if (name === 'dashboard') await page.waitForFunction(() => !document.querySelector('[data-dashboard-summary-refreshing="true"], [data-dashboard-secondary-pending="true"]'));
   };
   for (const name of ['pages','posts','menus','media']) {
    phase = `${name} filters`; await navigate(name);

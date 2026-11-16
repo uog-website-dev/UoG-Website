@@ -1,0 +1,105 @@
+{
+  "base_commit": "b2f915858beb61b4462a2e6ad08345b927bf6cef",
+  "files": [
+    {
+      "file": "backend/apps/core/apps.py",
+      "sha256": "06592a8b2d3a765d83d0f64329009163bdf5a6d2298daee785d660a3ae432b8f"
+    },
+    {
+      "file": "backend/apps/core/dashboard.py",
+      "sha256": "125968a98430530633287a130e9a4f68a7f42a063a6be2c916d53b656861c1de"
+    },
+    {
+      "file": "backend/apps/core/dashboard_cache.py",
+      "sha256": "80ac104fe0268f72f7b553be3d9d5917f9017677a6b877de3b85f91134284387"
+    },
+    {
+      "file": "backend/config/settings.py",
+      "sha256": "0219c7cdd36c4da29044936b468a485e19f461c80d6e36ad72866f2a64bff6f9"
+    },
+    {
+      "file": "backend/config/urls.py",
+      "sha256": "7c056cf1f295be7469de936088c024d95ba123860607a2394f22ec3849cf61e0"
+    },
+    {
+      "file": "backend/tests/test_dashboard.py",
+      "sha256": "f74938d879600c7f6d5c904981e0a4765caec8b68e9dafcb603c31c937527955"
+    },
+    {
+      "file": "backend/tests/test_documentation.py",
+      "sha256": "b9beeb13ce7975a8ef023a02383c142a95b79391c18f82eacf2f6113f81e3195"
+    },
+    {
+      "file": "docs/api/openapi.yaml",
+      "sha256": "e5ec39f4279d76bc4dbfb2f70aad05c5d0eb2e42375781b32113fab9218ebb3f"
+    },
+    {
+      "file": "docs/performance/P0-PERF-006.md",
+      "sha256": "7a86da027a1b5b9e4bac6f4715a002d44ff6ed37625084ab435f0156b2a42f25"
+    },
+    {
+      "file": "frontend/apps/admin-web/src/app/sites/dashboard-actions.test.ts",
+      "sha256": "200824a7a4c8f5469f0e9417d047481f54d54a241722ec67b258ed3894319716"
+    },
+    {
+      "file": "frontend/apps/admin-web/src/app/sites/dashboard-actions.ts",
+      "sha256": "93b88393ace392a8e6b9fac5364a6a34efc8203b655be9dde64674341626bb23"
+    },
+    {
+      "file": "frontend/apps/admin-web/src/app/sites/page-actions.test.ts",
+      "sha256": "33eb7bad8edd5c22dec95c3a4e4ef1f2fa2ab7a581583eb768a2a47a88df361b"
+    },
+    {
+      "file": "frontend/apps/admin-web/src/app/sites/page-actions.ts",
+      "sha256": "8eccc2b8edcdbb9a783ffff3b83a34de2102f92e43f0e4ed099782cba81d2402"
+    },
+    {
+      "file": "frontend/apps/admin-web/src/data/query-cache.tsx",
+      "sha256": "5c60621f5dc1e382351faf397e36f5851d2148d562b90dd5867890101107a801"
+    },
+    {
+      "file": "frontend/apps/admin-web/src/data/section-prefetch.ts",
+      "sha256": "a111883248131e579e704e66f3c5f186df75d40028c18c2bb6b4b28891830afd"
+    },
+    {
+      "file": "frontend/apps/admin-web/src/sites/site-dashboard.test.tsx",
+      "sha256": "686f705f48504f9ce6b58cd7840a78c600643435c194066ce66b750fcf4e8218"
+    },
+    {
+      "file": "frontend/apps/admin-web/src/sites/site-dashboard.tsx",
+      "sha256": "2ec63866801d9f8e270011533abf3c670328f36399ac7d31d57170664e85eaf6"
+    },
+    {
+      "file": "frontend/apps/admin-web/src/sites/site-pages.tsx",
+      "sha256": "6f61a69c376d60a40e8c4264e2556acf502255b3d9ce9a1fceefcf4d43919c02"
+    },
+    {
+      "file": "scripts/perf/benchmark.cjs",
+      "sha256": "f69938d086a569c50825c50b56fc147fc9c972c81e9e22579c7d8d82343342d3"
+    },
+    {
+      "file": "scripts/perf/cache-check.cjs",
+      "sha256": "cd43aab2af94bd8c93bffea52820280dbe004a2bed47294f35944eed3373f0cb"
+    },
+    {
+      "file": "scripts/perf/collect-traces.cjs",
+      "sha256": "983ad3868410ce44b91214b05684a3dbdd36250aeaf38a46453e16078c6b2daa"
+    },
+    {
+      "file": "scripts/perf/dashboard-check.cjs",
+      "sha256": "0254edc0f8a6b2766724938fb3008967736cc0ff2d4ddc3e4855a62657727721"
+    },
+    {
+      "file": "scripts/perf/metrics.cjs",
+      "sha256": "d48462943a9aa61e74b85b29f0231a212f8a00615b45e34d4707af4992847b76"
+    },
+    {
+      "file": "scripts/perf/run.ps1",
+      "sha256": "62047cb05e98aa571e98d809ba894fdafd37b22f131ecbee702a9cda7858e63f"
+    },
+    {
+      "file": "scripts/perf/section-check.cjs",
+      "sha256": "0a7045110a886a179b9c4f809bf38b48bd0c9df17faff1154d6b1dbf58559559"
+    }
+  ]
+}

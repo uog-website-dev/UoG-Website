@@ -354,6 +354,7 @@ REDIS_CACHE_HOST = config("REDIS_CACHE_HOST", default="redis-cache")
 REDIS_CACHE_PORT = config("REDIS_CACHE_PORT", default=6379, cast=int)
 REDIS_CACHE_DB = config("REDIS_CACHE_DB", default=0, cast=int)
 CACHE_KEY_PREFIX = config("CACHE_KEY_PREFIX", default="uog")
+DASHBOARD_SUMMARY_TTL = config("DASHBOARD_SUMMARY_TTL", default=15, cast=int)
 
 CACHES = {
     "default": {
@@ -363,6 +364,12 @@ CACHES = {
         "KEY_FUNCTION": "apps.core.cache.make_cache_key",
         "TIMEOUT": config("CACHE_TIMEOUT", default=300, cast=int),
     }
+}
+# Dashboard caching must fail open quickly without changing public cache policy.
+CACHES["dashboard"] = {
+    **CACHES["default"], "KEY_PREFIX": f"{CACHE_KEY_PREFIX}:dashboard",
+    "TIMEOUT": DASHBOARD_SUMMARY_TTL,
+    "OPTIONS": {"socket_connect_timeout": 0.2, "socket_timeout": 0.2},
 }
 
 # ---------------------------------------------------------------------------

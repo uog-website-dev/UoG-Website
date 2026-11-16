@@ -1,159 +1,70 @@
-import { act, fireEvent, render, screen, waitFor, within } from "@/test/render";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import {useSiteQuery} from "@/data/query-cache";
+import {act, fireEvent, render, screen, waitFor, within} from "@/test/render";
+import {beforeEach, expect, it, vi} from "vitest";
+import {useState} from "react";
+import {queryKey, useQueryEnvironment, useSiteQuery} from "@/data/query-cache";
 import {unwrap} from "@/organizations/contract";
-
-const loadSitePageStatusCounts = vi.fn();
-const loadSitePosts = vi.fn();
-const loadSiteNavigation = vi.fn();
-
-vi.mock("@/app/sites/page-actions", () => ({
-  loadSitePageStatusCounts: (...args: unknown[]) => loadSitePageStatusCounts(...args),
-}));
-vi.mock("@/app/sites/post-actions", () => ({
-  loadSitePosts: (...args: unknown[]) => loadSitePosts(...args),
-}));
-vi.mock("@/app/sites/menu-actions", () => ({
-  loadSiteNavigation: (...args: unknown[]) => loadSiteNavigation(...args),
-}));
-vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn() }),
-  usePathname: () => "/sites/11/admin",
-}));
-vi.mock("next/link", () => ({
-  default: ({ href, children, ...props }: React.ComponentProps<"a"> & { href: string }) => (
-    <a href={href} {...props}>{children}</a>
-  ),
-}));
-
-import { SiteAdminFrame } from "./site-admin-frame";
-import { SiteDashboard } from "./site-dashboard";
-
-const SITE = { id: 11, name: "Informatics", code: "INFORMATICS", status: "ACTIVE" as const };
-
-function renderDashboard(enabledModuleCodes: string[], permissions: string[], extra?: React.ReactNode) {
-  return render(
-    <SiteAdminFrame site={SITE} enabledModuleCodes={enabledModuleCodes} permissions={permissions}>
-      <SiteDashboard />
-      {extra}
-    </SiteAdminFrame>,
-  );
-}
-
-function postCount(count: number) {
-  return { ok: true, data: { count, next: null, previous: null, results: [] } };
-}
-
-beforeEach(() => {
-  vi.clearAllMocks();
-  loadSitePageStatusCounts.mockResolvedValue({
-    ok: true,
-    data: { DRAFT: 2, IN_REVIEW: 1, APPROVED: 0, PUBLISHED: 4, UNPUBLISHED: 0, ARCHIVED: 1 },
-  });
-  loadSitePosts.mockImplementation(async (_site: number, query: { status?: string }) =>
-    postCount(query.status === "PUBLISHED" ? 3 : query.status ? 1 : 5));
-  loadSiteNavigation.mockResolvedValue({
-    ok: true,
-    data: {
-      inheritance: [],
-      menus: [
-        { menu: { id: "m1", site: 11, location: "header", name: "Header", is_active: true, is_global: false }, items: [{}, {}], etag: "" },
-        { menu: { id: "m2", site: 11, location: "footer", name: "Footer", is_active: false, is_global: false }, items: [{}], etag: "" },
-        { menu: { id: "g", site: null, location: "header", name: "Central", is_active: true, is_global: true }, items: [{}], etag: "" },
-      ],
-    },
-  });
+import {SiteAdminFrame} from "./site-admin-frame";
+import {SiteDashboard} from "./site-dashboard";
+import type {DashboardSummary} from "@/app/sites/dashboard-actions";
+const {summary, activity, countRead} = vi.hoisted(() => ({summary:vi.fn(),activity:vi.fn(),countRead:vi.fn()}));
+vi.mock("@/app/sites/dashboard-actions", () => ({getSiteDashboardSummary:(...args:unknown[]) => summary(...args),getSiteDashboardActivity:(...args:unknown[]) => activity(...args)}));
+vi.mock("next/navigation", () => ({useRouter:()=>({push:vi.fn()}),usePathname:()=>"/sites/11/admin"}));
+vi.mock("next/link",()=>({default:({href,children,...props}:React.ComponentProps<"a"> & {href:string})=><a href={href} {...props}>{children}</a>}));
+const site={id:11,name:"Informatics",code:"INFORMATICS",status:"ACTIVE" as const};
+const all=["content.pages.view","content.pages.create","content.posts.view","menu.read","menu.write","content.media.view","platform.users.view"];
+const modules=["PAGES","POSTS","MENUS","MEDIA"];
+function body():DashboardSummary {return {schema_version:1,site:11,generated_at:new Date().toISOString(),expires_at:new Date(Date.now()+15000).toISOString(),partial:false,cache:{hit:false,available:true,ttl_seconds:15},sections:{
+ pages:{status:"ready",counts:{total:8,DRAFT:2,IN_REVIEW:1,APPROVED:0,PUBLISHED:4,UNPUBLISHED:0,ARCHIVED:1}},
+ posts:{status:"ready",counts:{total:5,DRAFT:1,IN_REVIEW:1,APPROVED:0,PUBLISHED:3,UNPUBLISHED:0,ARCHIVED:0}},
+ menus:{status:"ready",counts:{total:2,active:1,items:3}},media:{status:"ready",counts:{total:80}},users:{status:"ready",counts:{total:1}}}};}
+function dashboard(enabled=modules, permissions=all, extra?:React.ReactNode) {return render(<SiteAdminFrame site={site} enabledModuleCodes={enabled} permissions={permissions}><SiteDashboard/>{extra}</SiteAdminFrame>);}
+beforeEach(()=>{vi.clearAllMocks();summary.mockResolvedValue({ok:true,data:body()});activity.mockResolvedValue({ok:true,data:{site:11,generated_at:new Date().toISOString(),results:[]}});});
+it("renders five domains using one aggregate request without list fan-out",async()=>{
+ dashboard();const pages=await screen.findByRole("region",{name:"Pages"});await waitFor(()=>expect(within(pages).getByText("8")).toBeTruthy());
+ expect(within(screen.getByRole("region",{name:"Posts"})).getByText("5")).toBeTruthy();expect(within(screen.getByRole("region",{name:"Menus"})).getByText("3")).toBeTruthy();expect(within(screen.getByRole("region",{name:"Media"})).getByText("80")).toBeTruthy();
+ expect(summary).toHaveBeenCalledTimes(1);expect(summary).toHaveBeenCalledWith(11);
 });
+it("shows essentials while a secondary widget is slow or fails",async()=>{
+ let fail!:(value:unknown)=>void;activity.mockImplementationOnce(()=>new Promise(resolve=>{fail=resolve;}));dashboard();
+ await screen.findByText(/Loading recent activity/);expect(within(screen.getByRole("region",{name:"Pages"})).getByText("8")).toBeTruthy();
+ await act(async()=>fail({ok:false,error:{status:503,code:"unavailable",message:"Slow provider",details:null,requestId:null}}));
+ await screen.findByText("Recent activity is unavailable. Summary counts remain available.");expect(within(screen.getByRole("region",{name:"Pages"})).getByText("8")).toBeTruthy();
+});
+it("isolates one failed aggregate without showing a false zero",async()=>{
+ const data=body();data.partial=true;data.sections.posts={status:"unavailable"};summary.mockResolvedValueOnce({ok:true,data});dashboard();
+ await screen.findByText(/Posts could not be summarized/);expect(within(screen.getByRole("region",{name:"Pages"})).getByText("8")).toBeTruthy();expect(within(screen.getByRole("region",{name:"Posts"})).queryByText("0")).toBeNull();
+});
+it("retains prior values on transient refresh error and retries without blanking",async()=>{
+ dashboard(["PAGES"],["content.pages.view"]);await screen.findByText("8");
+ summary.mockResolvedValueOnce({ok:false,error:{status:503,code:"unavailable",message:"Outage",details:null,requestId:null}});
+ act(()=>{unwrap({ok:true,data:{},invalidation:{site:11,domain:"pages"}});});
+ await screen.findByText("Refresh failed. Previously loaded totals are shown.");expect(screen.getByText("8")).toBeTruthy();fireEvent.click(screen.getByRole("button",{name:"Retry summary"}));await waitFor(()=>expect(screen.queryByText("Refresh failed. Previously loaded totals are shown.")).toBeNull());
+});
+it("hides cached protected counts after a scope-level 404",async()=>{
+ dashboard(["PAGES"],["content.pages.view"]);await screen.findByText("8");summary.mockResolvedValueOnce({ok:false,error:{status:404,code:"not_found",message:"Unavailable Site",details:null,requestId:null}});
+ act(()=>{unwrap({ok:true,data:{},invalidation:{site:11,domain:"pages"}});});await screen.findByText(/Pages could not be summarized: Unavailable Site/);expect(screen.queryByText("8")).toBeNull();
+});
+it("primes the canonical Page status query for a later section without another read",async()=>{
+ function Counts(){const state=useSiteQuery(11,"page-counts",{},countRead);return <p>{state.data?"Counts ready":"Waiting"}</p>;}
+ function Later(){const[open,show]=useState(false);return <><button onClick={()=>show(true)}>Open counts</button>{open?<Counts/>:null}</>;}
+ dashboard(["PAGES"],["content.pages.view"],<Later/>);await screen.findByText("8");fireEvent.click(screen.getByText("Open counts"));await screen.findByText("Counts ready");expect(countRead).not.toHaveBeenCalled();
+});
+it("omits disabled/unauthorized cards while preserving permission-aware quick actions",async()=>{
+ dashboard(["PAGES"],["content.pages.view","content.pages.create","content.posts.view"]);expect(screen.getByRole("link",{name:"Create page"}).getAttribute("href")).toBe("/sites/11/admin/pages/new");await screen.findByText("8");expect(screen.queryByRole("region",{name:"Posts"})).toBeNull();expect(screen.getByText(/Not enabled for this Site: Posts/)).toBeTruthy();
+});
+it("shows intentional empty data and a cache timestamp",async()=>{
+ const data=body();data.cache.hit=true;data.sections.pages!.counts={total:0,DRAFT:0,IN_REVIEW:0,APPROVED:0,PUBLISHED:0,UNPUBLISHED:0,ARCHIVED:0};summary.mockResolvedValueOnce({ok:true,data});dashboard(["PAGES"],["content.pages.view"]);await screen.findByText("This Site has no Pages yet.");expect(screen.getByText(/Cached/)).toBeTruthy();expect(document.querySelector("time")?.getAttribute("dateTime")).toBe(data.generated_at);
+});
+it("handles a Site with no available modules",()=>{dashboard([],[]);expect(screen.getByText("No content modules are available to you for this Site.")).toBeTruthy();});
 
-const ALL = [
-  "content.pages.view", "content.pages.create",
-  "content.posts.view",
-  "menu.read", "menu.write",
-];
+it("retains a permitted create action without exposing view-only counters",()=>{dashboard(["PAGES"],["content.pages.create"]);expect(screen.getByRole("link",{name:"Create page"})).toBeTruthy();expect(screen.queryByRole("region",{name:"Pages"})).toBeNull();});
 
-describe("SiteDashboard", () => {
-  it("keeps confirmed totals visible when a background refresh fails and offers retry", async () => {
-    renderDashboard(["PAGES"], ["content.pages.view"]);
-    const region = await screen.findByRole("region", {name: "Pages"});
-    await waitFor(() => expect(within(region).getByText("8")).toBeTruthy());
-    loadSitePageStatusCounts.mockResolvedValueOnce({ok: false, error: {status: 503, code: "service_unavailable", message: "Temporary outage", details: null, requestId: null}});
-    act(() => {unwrap({ok: true, data: {}, invalidation: {site: 11, domain: "pages"}});});
-    await screen.findByText("Refresh failed. Previously loaded totals are shown.");
-    expect(within(region).getByText("8")).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", {name: "Retry summary"}));
-    await waitFor(() => expect(screen.queryByText("Refresh failed. Previously loaded totals are shown.")).toBeNull());
-  });
-  it("shares the canonical Page counts read with concurrent section consumers", async () => {
-    function CountsConsumer() {
-      const result = useSiteQuery(11, "page-counts", {}, async () => unwrap(await loadSitePageStatusCounts(11)));
-      return <p data-testid="shared-counts">{result.data ? "Counts ready" : "Loading"}</p>;
-    }
-    renderDashboard(["PAGES"], ["content.pages.view"], <CountsConsumer/>);
-    await screen.findByText("Counts ready");
-    await waitFor(() => expect(screen.getByRole("region", {name: "Pages"}).textContent).toContain("8"));
-    expect(loadSitePageStatusCounts).toHaveBeenCalledTimes(1);
-  });
-  it("summarizes this Site's Pages, Posts and Menus from the API", async () => {
-    renderDashboard(["PAGES", "POSTS", "MENUS"], ALL);
-
-    const pages = await screen.findByRole("region", { name: "Pages" });
-    await waitFor(() => expect(within(pages).getByText("8")).toBeTruthy());
-    expect(within(pages).getByText("4")).toBeTruthy();
-    const posts = screen.getByRole("region", { name: "Posts" });
-    await waitFor(() => expect(within(posts).getByText("5")).toBeTruthy());
-    expect(within(posts).getByText("3")).toBeTruthy();
-    const menus = screen.getByRole("region", { name: "Menus" });
-    // Two local menus, one active, three items; the central menu is not counted.
-    await waitFor(() => expect(within(menus).getByText("3")).toBeTruthy());
-    expect(within(menus).getByText("2")).toBeTruthy();
-
-    expect(loadSitePageStatusCounts).toHaveBeenCalledWith(11);
-    expect(loadSitePosts).toHaveBeenCalledWith(11, { page: 1, page_size: 1 });
-    expect(loadSitePosts).toHaveBeenCalledWith(11, { status: "PUBLISHED", page: 1, page_size: 1 });
-    expect(loadSiteNavigation).toHaveBeenCalledWith(11);
-  });
-
-  it("offers create-page and navigation quick actions within the Site", async () => {
-    renderDashboard(["PAGES", "MENUS"], ALL);
-    expect(screen.getByRole("link", { name: "Create page" }).getAttribute("href")).toBe("/sites/11/admin/pages/new");
-    expect(screen.getByRole("link", { name: "Manage navigation" }).getAttribute("href")).toBe("/sites/11/admin/menus");
-    await screen.findByRole("region", { name: "Pages" });
-  });
-
-  it("omits disabled or unauthorized sections and does not call their APIs", async () => {
-    renderDashboard(["PAGES"], ["content.pages.view", "content.posts.view"]);
-    await screen.findByRole("region", { name: "Pages" });
-    expect(screen.queryByRole("region", { name: "Posts" })).toBeNull();
-    expect(screen.queryByRole("region", { name: "Menus" })).toBeNull();
-    expect(screen.queryByRole("link", { name: "Create page" })).toBeNull();
-    expect(screen.queryByRole("link", { name: "Manage navigation" })).toBeNull();
-    expect(screen.getByText(/Not enabled for this Site: Posts\./)).toBeTruthy();
-    expect(loadSitePosts).not.toHaveBeenCalled();
-    expect(loadSiteNavigation).not.toHaveBeenCalled();
-  });
-
-  it("shows an empty state when the Site has no Pages", async () => {
-    loadSitePageStatusCounts.mockResolvedValue({
-      ok: true,
-      data: { DRAFT: 0, IN_REVIEW: 0, APPROVED: 0, PUBLISHED: 0, UNPUBLISHED: 0, ARCHIVED: 0 },
-    });
-    renderDashboard(["PAGES"], ["content.pages.view"]);
-    expect(await screen.findByText("This Site has no Pages yet.")).toBeTruthy();
-  });
-
-  it("reports a failed summary and retries it", async () => {
-    loadSiteNavigation.mockResolvedValueOnce({
-      ok: false,
-      error: { status: 403, code: "permission_denied", message: "Not allowed", details: null, requestId: null },
-    });
-    renderDashboard(["MENUS"], ["menu.read"]);
-    expect(await screen.findByText(/Menus could not be summarized: Not allowed/)).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
-    await waitFor(() => expect(loadSiteNavigation).toHaveBeenCalledTimes(2));
-  });
-
-  it("says so when no content module is available", () => {
-    renderDashboard([], []);
-    expect(screen.getByText("No content modules are available to you for this Site.")).toBeTruthy();
-  });
+it("purges other cached views when a live summary reveals a removed read grant",async()=>{
+ let client:ReturnType<typeof useQueryEnvironment>["client"];
+ function Cached(){const env=useQueryEnvironment();client=env.client;client.setQueryData(queryKey({...env,siteId:11},"pages"),{secret:"Previously allowed"});return null;}
+ dashboard(["PAGES"],["content.pages.view"],<Cached/>);await screen.findByText("8");
+ const data=body();delete data.sections.pages;summary.mockResolvedValueOnce({ok:true,data});
+ act(()=>{unwrap({ok:true,data:{},invalidation:{site:11,domain:"pages"}});});
+ await screen.findByText(/Pages could not be summarized/);
+ expect(client!.getQueryCache().getAll().some(query=>query.queryKey[4]==="pages")).toBe(false);
 });

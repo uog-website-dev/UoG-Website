@@ -22,6 +22,7 @@ const {chromium} = require(process.env.UOG_QA_PLAYWRIGHT_ROOT || 'playwright-cor
     const node = document.querySelector(`[data-perf-section="${name}"]`);
     return !!node && node.getAttribute('data-perf-pending') !== 'true' && !node.querySelector('[data-perf-pending="true"],.MuiSkeleton-root');
    }, name);
+   if (name === 'dashboard') await page.waitForFunction(() => !document.querySelector('[data-dashboard-summary-refreshing="true"], [data-dashboard-secondary-pending="true"]'));
   };
   const a = seed.sites[0].id, b = seed.sites[1].id;
   await choose(a); phase = 'Pages return';

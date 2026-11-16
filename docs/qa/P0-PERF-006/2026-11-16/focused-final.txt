@@ -1,0 +1,64 @@
+docker :  Container uog-digital-platform-perf-admin-run-64644bc34168 Creating 
+At line:2 char:1
++ docker compose -f docker-compose.yml -f docker-compose.perf.yml run - ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ( Container uog-...34168 Creating :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+ Container uog-digital-platform-perf-admin-run-64644bc34168 Created 
+==> UoG frontend entrypoint
+==> Installing workspace dependencies (pnpm)...
+Scope: all 7 workspace projects
+Lockfile is up to date, resolution step is skipped
+Already up to date
+
+Done in 1s using pnpm v9.15.9
+
+   ╭───────────────────────────────────────────────────────────────────╮
+   │                                                                   │
+   │                Update available! 9.15.9 → 12.21.0.                │
+   │   Changelog: https://github.com/pnpm/pnpm/releases/tag/v12.21.0   │
+   │                 Run "pnpm add -g pnpm" to update.                 │
+   │                                                                   │
+   ╰───────────────────────────────────────────────────────────────────╯
+
+==> Starting: sh -c cd /workspace && pnpm --filter @uog/admin-web typecheck && pnpm --filter @uog/admin-web exec vitest run src/sites/site-dashboard.test.tsx src/app/sites/page-actions.test.ts src/app/sites/dashboard-actions.test.ts src/data/query-cache.test.tsx src/data/section-navigation.test.tsx src/sites/site-pages.test.tsx --maxWorkers=2 --reporter=default --reporter=junit --outputFile=/workspace/perf006-focused.xml
+
+> @uog/admin-web@0.1.0 typecheck /workspace/apps/admin-web
+> tsc --noEmit
+
+
+ RUN  v5.0.5 /workspace/apps/admin-web
+
+ ✓ src/sites/site-dashboard.test.tsx (11 tests) 1030ms
+   ✓ renders five domains using one aggregate request without list fan-out 364ms
+ ✓ src/data/query-cache.test.tsx (15 tests) 351ms
+ ✓ src/data/section-navigation.test.tsx (13 tests) 104ms
+ ✓ src/app/sites/page-actions.test.ts (8 tests) 14ms
+ ✓ src/app/sites/dashboard-actions.test.ts (5 tests) 6ms
+ ✓ src/sites/site-pages.test.tsx (27 tests) 8762ms
+   ✓ SitePagesPanel (27)
+     ✓ saves a shell-only change without resending builder blocks or metadata 734ms
+     ✓ assigns only published Pages allowed by the backend as the homepage 420ms
+     ✓ applies server search and status filters and resets pagination 430ms
+     ✓ shows review controls only from backend-authorized actions and requires a rejection comment 484ms
+     ✓ defaults a new Page to the Site language 397ms
+     ✓ starts a new Page blank and fills the slug from the title until it is edited 360ms
+     ✓ creates and edits only with the matching permission and current ETag 687ms
+     ✓ does not navigate back to the former Site when its save completes after unmount 337ms
+     ✓ assigns a Site sidebar without replacing the builder document 496ms
+     ✓ surfaces stale edit conflicts without losing the form 589ms
+     ✓ previews private draft content and blocks malformed block JSON 467ms
+     ✓ shows the frozen private revision and sends its exact ETag when publishing 370ms
+     ✓ previews the shared visual fixture and rejects unsupported layout versions before saving 495ms
+     ✓ opens a working draft of a published Page and keeps the live route fixed 510ms
+
+ Test Files  6 passed (6)
+      Tests  79 passed (79)
+   Start at  04:32:06
+   Duration  11.49s (tests 58%, environment 14%, import 12%, transform 11%, setup 4%)
+
+    Isolate  6 workers spawned · ~518ms startup each (spawn + environment, per file)
+             at least ~1.04s faster with isolate: false — reuses workers across files instead of one per file
+
+JUNIT report written to /workspace/perf006-focused.xml

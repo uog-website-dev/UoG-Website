@@ -41,7 +41,7 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
     assert schema["openapi"] == "3.0.3"
     paths = schema["paths"]
     assert set(paths) == {
-        "/api/workspace/", "/api/workspace/sites/",
+        "/api/workspace/", "/api/workspace/sites/", "/api/workspace/dashboard/", "/api/workspace/dashboard/activity/",
         "/api/pages/", "/api/pages/{id}/", "/api/pages/home/",
         "/api/v1/sites/{site_pk}/sidebars/",
         "/api/v1/sites/{site_pk}/sidebars/{id}/",

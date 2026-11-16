@@ -1,0 +1,72 @@
+{
+  "status": "PASS",
+  "tests": {
+    "backend": {
+      "tests": 48,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "dashboard-tests": {
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "full": {
+      "tests": 624,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "focused-final": {
+      "tests": 79,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "full_frontend_note": "624-test full suite preceded final scope-change guard; final typecheck and 79 focused tests passed after guard. Dashboard 15 are included in backend 48.",
+  "production_samples": 151,
+  "production_failures": 0,
+  "trace_summary": {
+    "all_api_samples_correlated": true,
+    "django_requests": 172,
+    "next_api_spans": 92,
+    "navigation_samples_missing_django_spans": [
+      "871b0453-bdf6-450f-a296-7dd5997d1f01",
+      "c550418c-439c-4a14-8184-01bab395d2f0",
+      "8254f9f2-3956-4ad9-9372-294e051af152",
+      "5e2aa495-1717-4afd-bcc6-2c3b9589b6b3",
+      "88a80a4f-264a-4b63-950b-4459c87793bd",
+      "f5066575-f53b-4bda-97a5-d0693327117f",
+      "42cc40fc-6769-4894-9755-468b7ddf80f0",
+      "b157837f-d0d3-43c7-9151-9a8bae8cad2c",
+      "10c1930e-795b-4886-b7d9-391d6214bb1a",
+      "135f0ca7-97e7-46af-bbd6-c4fc2aedff43",
+      "ccf747bf-ff03-48a2-9aed-635f1d673533",
+      "513de232-8214-45b9-96da-f64ff698f6bf",
+      "fc770d17-cfd5-40e2-9f4c-2dde2aa87e6b",
+      "a786d4c8-0ac8-440f-9c36-0643ff5bed5f",
+      "e0478733-3da1-4085-b706-90f5863593e7",
+      "99a6f65b-f998-490e-b2ae-f25824e7eb1c",
+      "36284849-8f4c-4403-9501-25beafb3ad50",
+      "d04d902c-1a55-417c-8d06-91f932a7fa6b",
+      "7b9c8572-c84e-4a29-9fd3-ac9f79f77380",
+      "8b2c8fa4-2e61-45a9-88b8-532cfb24661e",
+      "99363b63-6460-4eb5-a325-497aa0607bb6",
+      "a60b7c59-18b1-4ea5-8f6f-f6ce1959a14c",
+      "6d766b21-36bc-4fd4-8058-674b7d0f9b2e",
+      "1e37f061-5c0c-4d6c-bb18-fe4e75e4ffa8",
+      "af044928-6e56-4d0f-abcb-3a27e67b101f",
+      "ee51deb2-c187-4ba6-81a4-968c6b0397df",
+      "30e90eba-afaa-422d-8e21-9afda1ed2690",
+      "23564949-5357-40c7-b5b3-dd5bbc43d8fa",
+      "27712f43-1f45-4f55-ba12-fd4a56035922",
+      "823d8e3b-2caa-4fa0-bb31-f51338ab4f49"
+    ],
+    "note": "No upstream requests may be legitimate for a fully cached transition; inspect browser waterfall before interpreting missing spans."
+  },
+  "budgets_status": "PROPOSED; product/QA approval pending",
+  "schema_migrations": "None"
+}

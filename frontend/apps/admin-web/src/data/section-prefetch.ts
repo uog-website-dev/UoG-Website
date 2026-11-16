@@ -42,8 +42,8 @@ export function useSectionPrefetch(siteId: number) {
       // Bound bookkeeping independently of the number of visited Sites.
       for (const [key, at] of current.routes) if (now - at >= STALE_MS) current.routes.delete(key);
       try {void Promise.resolve(router.prefetch(href)).catch(() => undefined);} catch { /* intent is optional */ }
-      if (sectionKey === "pages" && site.permissions.includes("content.pages.view")) {
-        void environment.client.prefetchQuery({queryKey: queryKey({...environment, siteId}, "page-counts"), staleTime: STALE_MS, gcTime: GC_MS,
+      if (sectionKey === "pages" && site.permissions.includes("content.pages.view") && environment.client.getQueryState(queryKey({...environment, siteId}, "dashboard-summary"))?.fetchStatus !== "fetching") {
+        void environment.client.prefetchQuery({queryKey: queryKey({...environment, siteId}, "page-counts"), staleTime: STALE_MS, gcTime: GC_MS, meta: {scopeProtected: true},
           queryFn: async ({signal}) => {const counts = unwrap(await loadSitePageStatusCounts(siteId)); signal.throwIfAborted(); return counts;},
         });
       }

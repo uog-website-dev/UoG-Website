@@ -1,5 +1,6 @@
 "use server";
 import {invalidated} from "@/data/mutation-receipt";
+import {getSiteDashboardSummary} from "./dashboard-actions";
 
 import {serverApiFetch} from "@/performance/server-fetch";
 
@@ -9,7 +10,7 @@ import {serverApiFetch} from "@/performance/server-fetch";
  * Every path is built from the Site id argument. These actions do not accept
  * a second Site. The Keycloak token stays on the server.
  */
-import { createApiClient } from "@uog/api-client";
+import { createApiClient, ApiError } from "@uog/api-client";
 import type { LayoutSection, VisualLayout } from "@uog/types";
 
 import { getAccessToken } from "@/access-token";
@@ -175,16 +176,12 @@ export async function loadSitePageStatusCounts(
   siteId: number,
 ): Promise<ActionResult<Record<SitePageStatus, number>>> {
   return attempt(async () => {
-    const api = await client();
-    const counts = await Promise.all(
-      PAGE_STATUSES.map(async (status) => {
-        const result = await api.get<SitePageListResponse>(
-          `${sitePagePath(siteId)}${queryString({ status, page: 1, page_size: 1 })}`,
-        );
-        return [status, result.count] as const;
-      }),
-    );
-    return Object.fromEntries(counts) as Record<SitePageStatus, number>;
+    const result = await getSiteDashboardSummary(siteId);
+    if (!result.ok) throw new ApiError(result.error.message, result.error.status);
+    const section = result.data.sections.pages;
+    if (!section) throw new ApiError("Page counts are not readable for this Site.", 403);
+    if (section?.status !== "ready" || !section.counts) throw new ApiError("Page counts are unavailable.", 503);
+    return Object.fromEntries(PAGE_STATUSES.map(status => [status, section.counts![status] ?? 0])) as Record<SitePageStatus, number>;
   });
 }
 

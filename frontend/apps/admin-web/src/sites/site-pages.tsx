@@ -212,7 +212,7 @@ function SitePagesPanelContent({
     async () => canView
       ? unwrap(await loadSitePageStatusCounts(siteId))
       : EMPTY_STATUS_COUNTS,
-    {enabled: canView && pagesEnabled === true},
+    {enabled: canView && pagesEnabled === true, scopeProtected: true},
   );
 
   const rows = (pages.data?.results ?? []).filter((row) => row.site === siteId);
