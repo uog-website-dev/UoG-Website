@@ -1,4 +1,5 @@
 "use server";
+import {invalidated} from "@/data/mutation-receipt";
 
 import {serverApiFetch} from "@/performance/server-fetch";
 
@@ -214,12 +215,12 @@ export async function getSiteVisualDraft(siteId: number, pageId: string): Promis
 
 /** Complete replacement with the caller's last loaded ETag. Never retries a conflict. */
 export async function saveSiteVisualDraft(siteId: number, pageId: string, ifMatch: string, visualLayout: VisualLayout): Promise<ActionResult<SitePageRecord>> {
-  return attempt(async () => {
+  return invalidated(siteId, "pages", attempt(async () => {
     const api = await client();
     const result = await api.patchDetailed<PageBody>(sitePagePath(siteId, `${pageId}/visual-draft/`), {visual_layout:visualLayout}, {ifMatch});
     if (result.data.site !== siteId) throw new Error("The Page does not belong to this Site.");
     return withEtag(result.data, result.etag);
-  });
+  }));
 }
 
 export interface SiteSectionTemplate {
@@ -268,7 +269,7 @@ export async function insertSiteSectionTemplate(
   ifMatch: string,
   templateId: string,
 ): Promise<ActionResult<SitePageRecord>> {
-  return attempt(async () => {
+  return invalidated(siteId, "pages", attempt(async () => {
     const api = await client();
     const result = await api.postDetailed<PageBody>(
       sitePagePath(siteId, `${pageId}/visual-draft/insert-template/`),
@@ -277,7 +278,7 @@ export async function insertSiteSectionTemplate(
     );
     if (result.data.site !== siteId) throw new Error("The Page does not belong to this Site.");
     return withEtag(result.data, result.etag);
-  });
+  }));
 }
 
 export async function createSitePage(
@@ -288,7 +289,7 @@ export async function createSitePage(
     metadata: Record<string, unknown>; seo: Record<string, unknown>; blocks: SitePageBlock[];
   },
 ): Promise<ActionResult<SitePageRecord>> {
-  return attempt(async () => {
+  return invalidated(siteId, "pages", attempt(async () => {
     const api = await client();
     const created = await api.postDetailed<PageBody>(sitePagePath(siteId), {
       title: input.title,
@@ -303,7 +304,7 @@ export async function createSitePage(
       blocks: input.blocks,
     });
     return withEtag(created.data, created.etag);
-  });
+  }));
 }
 
 export async function openWorkingDraft(
@@ -311,7 +312,7 @@ export async function openWorkingDraft(
   pageId: string,
   ifMatch: string,
 ): Promise<ActionResult<SitePageRecord>> {
-  return attempt(async () => {
+  return invalidated(siteId, "pages", attempt(async () => {
     const api = await client();
     const opened = await api.postDetailed<PageBody>(
       sitePagePath(siteId, `${pageId}/working-draft/`),
@@ -322,7 +323,7 @@ export async function openWorkingDraft(
       throw new Error("The Page does not belong to this Site.");
     }
     return withEtag(opened.data, opened.etag);
-  });
+  }));
 }
 
 export async function updateSitePage(
@@ -334,7 +335,7 @@ export async function updateSitePage(
     metadata?: Record<string, unknown>; seo?: Record<string, unknown>; blocks?: SitePageBlock[];
   },
 ): Promise<ActionResult<SitePageRecord>> {
-  return attempt(async () => {
+  return invalidated(siteId, "pages", attempt(async () => {
     const api = await client();
     const updated = await api.patchDetailed<PageBody>(
       sitePagePath(siteId, `${pageId}/`),
@@ -342,7 +343,7 @@ export async function updateSitePage(
       { ifMatch },
     );
     return withEtag(updated.data, updated.etag);
-  });
+  }));
 }
 
 export async function transitionSitePage(
@@ -352,7 +353,7 @@ export async function transitionSitePage(
   comment = "",
   ifMatch?: string,
 ): Promise<ActionResult<SitePageRecord>> {
-  return attempt(async () => {
+  return invalidated(siteId, "pages", attempt(async () => {
     const api = await client();
     const result = await api.postDetailed<PageBody>(
       sitePagePath(siteId, `${pageId}/workflow/`),
@@ -360,7 +361,7 @@ export async function transitionSitePage(
       ifMatch ? {headers:{"If-Match":ifMatch}} : undefined,
     );
     return withEtag(result.data, result.etag);
-  });
+  }));
 }
 
 export interface SitePagePreview {
@@ -395,12 +396,12 @@ export async function setSiteHomepage(
   siteId: number,
   pageId: string,
 ): Promise<ActionResult<SitePageRecord>> {
-  return attempt(async () => {
+  return invalidated(siteId, "pages", attempt(async () => {
     const api = await client();
     const result = await api.postDetailed<PageBody>(
       sitePagePath(siteId, `${pageId}/homepage/`),
       {},
     );
     return withEtag(result.data, result.etag);
-  });
+  }), true);
 }

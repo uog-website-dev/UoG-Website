@@ -12,6 +12,9 @@ import type { SiteStatus } from "@uog/types";
 
 import { APP_BASE_PATH } from "@/base-path";
 import { signInAgainIfExpired } from "@/session-watch";
+import {ApiError} from "@uog/api-client";
+import {useQuery} from "@tanstack/react-query";
+import {AuthorizationScope, queryKey, useQueryEnvironment} from "@/data/query-cache";
 
 export interface WorkspaceSite {
   id: number;
@@ -21,6 +24,7 @@ export interface WorkspaceSite {
 }
 
 export interface WorkspacePayload {
+  cacheIdentity?: string;
   schemaVersion: 1;
   version: string;
   platformPermissions: string[];
@@ -38,7 +42,7 @@ export interface WorkspacePayload {
 export type WorkspaceState =
   | { status: "loading" }
   | { status: "error"; signedOut: boolean }
-  | { status: "ready"; data: WorkspacePayload };
+  | { status: "ready"; data: WorkspacePayload; refreshing?: boolean };
 
 export const PLATFORM_WORKSPACE = "platform";
 
@@ -58,43 +62,42 @@ const WorkspaceContext = createContext<{siteId: number | null; state: WorkspaceS
 /** Drop all old-Site data synchronously, including while the new request is pending. */
 export function WorkspaceProvider({children}: {children: ReactNode}) {
   const siteId = siteWorkspaceId(normalizeAdminPathname(usePathname()));
-  const key = siteId == null ? "platform" : String(siteId);
-  const [revision, setRevision] = useState(0);
-  const [snapshot, setSnapshot] = useState<{key: string; revision: number; state: WorkspaceState}>({key: "", revision: -1, state: {status: "loading"}});
+  const environment = useQueryEnvironment();
+  const key = queryKey({...environment, siteId, authorization: "bootstrap"}, "workspace", {site: siteId});
+  const result = useQuery({queryKey: key, refetchOnWindowFocus: false, queryFn: async ({signal}) => {
+    const query = siteId == null ? "" : `?site=${siteId}`;
+    const response = await fetch(`${APP_BASE_PATH}/api/workspace/${query}`, {cache: "no-store", signal});
+    if (!response.ok) {
+      if (response.status === 401) void signInAgainIfExpired();
+      throw new ApiError("Workspace unavailable", response.status);
+    }
+    const data: unknown = await response.json();
+    if (!validWorkspace(data, siteId)) throw new Error("Invalid workspace response");
+    if (data.cacheIdentity && data.cacheIdentity !== environment.identity) {
+      window.dispatchEvent(new CustomEvent("uog:session:changed", {detail: {identity: data.cacheIdentity}}));
+      throw new ApiError("Session changed", 401);
+    }
+    return data;
+  }});
   useEffect(() => {
-    const refresh = () => setRevision(value => value + 1);
+    const refresh = () => {void environment.client.invalidateQueries({queryKey: key});};
     window.addEventListener("uog:workspace:refresh", refresh);
     window.addEventListener("focus", refresh);
-    return () => {window.removeEventListener("uog:workspace:refresh", refresh); window.removeEventListener("focus", refresh);};
-  }, []);
-  useEffect(() => {
-    const controller = new AbortController();
-    let active = true;
-    const save = (state: WorkspaceState) => {if (active) setSnapshot({key, revision, state});};
-    const query = siteId == null ? "" : `?site=${siteId}`;
-    void fetch(`${APP_BASE_PATH}/api/workspace/${query}`, {cache: "no-store", signal: controller.signal})
-      .then(async response => {
-        if (!active) return;
-        if (!response.ok) {
-          save({status: "error", signedOut: response.status === 401});
-          if (response.status === 401) void signInAgainIfExpired();
-          return;
-        }
-        const data: unknown = await response.json();
-        if (!validWorkspace(data, siteId)) throw new Error("Invalid workspace response");
-        save({status: "ready", data});
-      }).catch(() => {if (active) save({status: "error", signedOut: false});});
-    return () => {active = false; controller.abort();};
-  }, [key, revision, siteId]);
-  // Same-Site revalidation must not unmount an editor and discard its draft.
-  // Site changes still hide all old context immediately; failures fail closed.
-  const state: WorkspaceState = snapshot.key === key ? snapshot.state : {status: "loading"};
-  return createElement(WorkspaceContext.Provider, {value: {siteId, state}}, children);
+    const timer = window.setInterval(() => {if (document.visibilityState === "visible") refresh();}, 30_000);
+    return () => {window.clearInterval(timer); window.removeEventListener("uog:workspace:refresh", refresh); window.removeEventListener("focus", refresh);};
+  }, [environment.client, environment.identity, siteId]);
+  const data = result.data;
+  const state: WorkspaceState = result.isError ? {status: "error", signedOut: result.error instanceof ApiError && result.error.status === 401}
+    : data ? {status: "ready", data, refreshing: result.isFetching} : {status: "loading"};
+  const authorization = state.status === "ready" ? JSON.stringify({platform: data?.platformPermissions, permissions: data?.site?.permissions, modules: data?.site?.enabledModuleCodes, status: data?.site?.status}) : "blocked";
+  return createElement(WorkspaceContext.Provider, {value: {siteId, state}},
+    createElement(AuthorizationScope, {authorization, children}));
 }
 
 function validWorkspace(value: unknown, siteId: number | null): value is WorkspacePayload {
   if (!value || typeof value !== "object") return false;
   const data = value as WorkspacePayload;
+  if (data.cacheIdentity != null && typeof data.cacheIdentity !== "string") return false;
   const strings = (v: unknown): v is string[] => Array.isArray(v) && v.every(item => typeof item === "string");
   if (data.schemaVersion !== 1 || typeof data.version !== "string" || !data.version || !strings(data.platformPermissions)) return false;
   if (siteId == null) return data.site === null;

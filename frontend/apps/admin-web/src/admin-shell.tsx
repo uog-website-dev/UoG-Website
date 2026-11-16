@@ -29,6 +29,7 @@ import { DesktopSidebar, MobileNavDrawer } from "@/sidebar";
 import { usePathname } from "next/navigation";
 import { normalizeAdminPathname } from "@/navigation";
 import {WorkspaceProvider} from "@/workspace";
+import {AdminQueryProvider} from "@/data/admin-query-provider";
 
 /** Visually hidden until focused — first tab stop on every page. */
 const skipLinkSx = {
@@ -53,8 +54,9 @@ const skipLinkSx = {
 export function AdminShell({
   actions,
   children,
-}: {actions?: ReactNode; children: ReactNode}) {
-  return <WorkspaceProvider><ShellContent actions={actions}>{children}</ShellContent></WorkspaceProvider>;
+  identity,
+}: {actions?: ReactNode; children: ReactNode; identity: string}) {
+  return <AdminQueryProvider identity={identity}><WorkspaceProvider><ShellContent actions={actions}>{children}</ShellContent></WorkspaceProvider></AdminQueryProvider>;
 }
 
 function ShellContent({

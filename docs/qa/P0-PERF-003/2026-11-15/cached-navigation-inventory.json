@@ -1,0 +1,165 @@
+{
+  "pass": true,
+  "samples": [
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "134363d3-4ad8-4592-b2ac-e5fc74eebbb8",
+      "browser_requests": 2,
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_requests": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "e8532030-de80-4ed6-ad4e-26a26e71f493",
+      "browser_requests": 2,
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_requests": 0
+    },
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "896aa4f0-2c57-4246-a74b-43f0962836f9",
+      "browser_requests": 2,
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_requests": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "5f69bed1-fb2c-4987-bbe8-31319d3e49b6",
+      "browser_requests": 2,
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_requests": 0
+    },
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "1b81351a-0731-44f5-adb9-01db52949f38",
+      "browser_requests": 2,
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_requests": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "5431c838-7fe5-401f-8372-1b7d9fb03eb5",
+      "browser_requests": 2,
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_requests": 0
+    },
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "a9c5c910-1564-4e8e-a48b-cac48b74880f",
+      "browser_requests": 2,
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_requests": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "338ed0af-10ed-4802-9152-bb7fcaf39426",
+      "browser_requests": 2,
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_requests": 0
+    },
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "7983ea36-0676-4aad-a7e2-51172b98ad20",
+      "browser_requests": 2,
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_requests": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "c919a0f5-5e39-47f4-a421-90861f862323",
+      "browser_requests": 2,
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_requests": 0
+    },
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "b718e0cc-4729-4a8d-b168-19084cadd7b9",
+      "browser_requests": 2,
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_requests": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "7cee3e65-feed-4888-a770-6e94e8b43de5",
+      "browser_requests": 2,
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_requests": 0
+    },
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "eeae1be7-3529-4821-8a7d-07726c7561ce",
+      "browser_requests": 2,
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_requests": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "509f76f6-ae3a-49f0-8267-761b0cd76b28",
+      "browser_requests": 2,
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_requests": 0
+    },
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "34bfcd77-e9df-44ff-a671-92db70d287d0",
+      "browser_requests": 2,
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_requests": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "67bf321d-bb63-4e07-a93b-5a7a32000fb9",
+      "browser_requests": 2,
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_requests": 0
+    },
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "3e071cb9-2570-4f30-a975-4fe9040421db",
+      "browser_requests": 2,
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_requests": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "bce1d68c-de80-4aa9-ad70-46d6f7f7c0f9",
+      "browser_requests": 2,
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_requests": 0
+    },
+    {
+      "scenario": "cached_section_return",
+      "navigation_id": "9b841183-0eaf-47db-86da-d726ff50797c",
+      "browser_requests": 2,
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_requests": 0
+    },
+    {
+      "scenario": "cached_section_transition",
+      "navigation_id": "fa2dc872-8a6f-4e65-802a-3c675ef39f6a",
+      "browser_requests": 2,
+      "django_requests": 0,
+      "sql_count": 0,
+      "post_requests": 0
+    }
+  ]
+}

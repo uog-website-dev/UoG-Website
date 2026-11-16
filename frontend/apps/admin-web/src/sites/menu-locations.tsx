@@ -1,7 +1,7 @@
 "use client";
 import {APP_BASE_PATH} from "@/base-path";
 import {useState} from "react";
-import {useAsync} from "@uog/ui";
+import {useSiteQuery,useInvalidateSite} from "@/data/query-cache";
 import {ApiError} from "@uog/api-client";
 import {Alert,Box,Button,Checkbox,FormControlLabel,TextField,Typography} from "@mui/material";
 import {loadMenuLocations,saveMenuLocation,publishMenuLocation} from "@/app/sites/menu-actions";
@@ -39,18 +39,20 @@ function Slot({site,row,menus,enabled,canWrite,canPublish,onChanged}:{site:numbe
  </Box>;
 }
 export function MenuLocationPanel({site,menus,enabled,canWrite,canPublish}:{site:number;menus:MenuRecord[];enabled:boolean;canWrite:boolean;canPublish:boolean}){
- const state=useAsync(async()=>({site,rows:unwrap(await loadMenuLocations(site))}),[site]);
+ const invalidateSite=useInvalidateSite();
+ const state=useSiteQuery(site,"menu-locations",{},async()=>({site,rows:unwrap(await loadMenuLocations(site))}),{enabled});
  const current=state.data?.site===site?state.data.rows:[];
  return <Box data-perf-pending={state.loading?"true":"false"} component="section" aria-label="Template menu locations" sx={{display:"grid",gap:2}}>
   <Typography component="h2" variant="h6">Template menu locations</Typography>
   <Typography variant="body2">Save an assignment draft, then publish it to change public navigation. Unassigning a location keeps the menu and its items.</Typography>
   {canWrite?<Button component="a" href={enabled?`${APP_BASE_PATH}/sites/${site}/admin/menus/preview`:undefined} target="_blank" rel="noopener noreferrer" disabled={!enabled}>Preview draft navigation</Button>:null}
   <Button onClick={state.reload}>Refresh locations</Button>
+  {state.refreshing?<Typography role="status">Refreshing menu locations?</Typography>:null}
   {state.loading?<Typography role="status">Loading menu locations...</Typography>:null}
   {state.error?<Alert severity="error">{state.error.message}</Alert>:null}
   {!state.loading && state.data?.site===site && current.length===0?<Typography>The active template declares no menu locations.</Typography>:null}
   <Box sx={{display:"grid",gridTemplateColumns:{xs:"minmax(0,1fr)",md:"repeat(2,minmax(0,1fr))"},gap:2}}>
-   {current.map(row=><Slot key={`${site}:${row.location}:${row.version}`} site={site} row={row} menus={menus.filter(m=>m.site===site&&!m.is_global)} enabled={enabled&&!state.loading} canWrite={canWrite} canPublish={canPublish} onChanged={state.reload}/>)}
+   {current.map(row=><Slot key={`${site}:${row.location}:${row.version}`} site={site} row={row} menus={menus.filter(m=>m.site===site&&!m.is_global)} enabled={enabled&&!state.loading} canWrite={canWrite} canPublish={canPublish} onChanged={()=>invalidateSite(site,"menus")}/>)}
   </Box>
  </Box>;
 }

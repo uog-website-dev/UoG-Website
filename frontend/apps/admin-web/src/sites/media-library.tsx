@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Alert, Box, Button, Chip, Typography, TextField, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Paper, ToggleButton, ToggleButtonGroup, Skeleton, IconButton } from "@mui/material";
 import { ApiError } from "@uog/api-client";
-import { useAsync } from "@uog/ui";
+import {useSiteQuery} from "@/data/query-cache";
 import { listSiteMedia, getMediaUploadPolicy, getSiteMedia, updateSiteMedia, getMediaReferences, removeSiteMedia } from "@/app/sites/media-actions";
 import type { MediaAssetRecord } from "@/app/sites/media-actions";
 import { unwrap } from "@/organizations/contract";
@@ -53,8 +53,8 @@ function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, imag
   const [saving, setSaving] = useState(false);
   const [metadataNotice, setMetadataNotice] = useState<string | null>(null);
   const [metadataError, setMetadataError] = useState<string | null>(null);
-  const detail = useAsync(async () => detailId ? unwrap(await getSiteMedia(siteId, detailId)) : null, [siteId, detailId]);
-  const inventory = useAsync(async () => detailId && canDelete ? unwrap(await getMediaReferences(siteId, detailId)) : null, [siteId, detailId, canDelete]);
+  const detail = useSiteQuery(siteId, "media-detail", {id: detailId}, async () => detailId ? unwrap(await getSiteMedia(siteId, detailId)) : null, {enabled: Boolean(detailId)});
+  const inventory = useSiteQuery(siteId, "media-references", {id: detailId}, async () => detailId && canDelete ? unwrap(await getMediaReferences(siteId, detailId)) : null, {enabled: Boolean(detailId) && canDelete});
   const currentDetail = detail.data?.id === detailId && detail.data.site === siteId ? detail.data : null;
   useEffect(() => {
     if (currentDetail && !altTextDirty.current) {
@@ -66,11 +66,11 @@ function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, imag
 
   const uploadInput = useRef<HTMLInputElement | null>(null);
   const [uploadBusy, setUploadBusy] = useState(false);
-  const rows = useAsync(async () => unwrap(await listSiteMedia(siteId, {
+  const rows = useSiteQuery(siteId, "media", {filters, page, picker: Boolean(onSelect), imagesOnly}, async () => unwrap(await listSiteMedia(siteId, {
     ...filters, page,
     ...(onSelect ? imagesOnly ? { ready_images: true } : { status: "READY" as const } : imagesOnly ? { type: "image" as const } : {}),
-  })), [siteId, Boolean(onSelect), imagesOnly, page, filters]);
-  const policy = useAsync(async () => canUpload ? unwrap(await getMediaUploadPolicy(siteId)) : null, [siteId, canUpload]);
+  })));
+  const policy = useSiteQuery(siteId, "media-policy", {}, async () => unwrap(await getMediaUploadPolicy(siteId)), {enabled: canUpload});
   const [pollError, setPollError] = useState(false);
   const [watchUntil, setWatchUntil] = useState(() => onSelect ? Date.now() + 120000 : 0);
   const scope = useRef(0);
@@ -80,28 +80,24 @@ function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, imag
   if (currentQuery.current !== queryIdentity) { currentQuery.current = queryIdentity; scope.current += 1; }
   const rowsRef = useRef(rows);
   rowsRef.current = rows;
-  const detailRef = useRef({ id: detailId, saving, altText, currentDetail });
-  detailRef.current = { id: detailId, saving, altText, currentDetail };
+  const detailRef = useRef({ id: detailId, saving, altText, currentDetail, setData: detail.setData });
+  detailRef.current = { id: detailId, saving, altText, currentDetail, setData: detail.setData };
   const hasProcessing = rows.data?.results.some((asset) => asset.status === "PENDING" || asset.processing_state === "PROCESSING") ?? false;
   useEffect(() => {
-    if (rows.status !== "success" || (!hasProcessing && Date.now() >= watchUntil)) return;
+    if (!rows.data || (!hasProcessing && Date.now() >= watchUntil)) return;
     let cancelled = false;
     let timer: number;
     let failures = 0;
     const requestScope = scope.current;
     const poll = async () => {
       try {
-        const result = unwrap(await listSiteMedia(siteId, {
-          ...filters, page,
-          ...(onSelect ? imagesOnly ? { ready_images: true } : { status: "READY" as const } : imagesOnly ? { type: "image" as const } : {}),
-        }));
+        const result = await rowsRef.current.refresh();
         if (cancelled || requestScope !== scope.current) return;
         failures = 0; setPollError(false);
-        rowsRef.current.setData(result);
         const active = detailRef.current;
         const updated = result.results.find((asset) => asset.id === active.id);
         // Refresh processing metadata without replacing an unsaved alt-text edit.
-        if (updated && !active.saving) detail.setData(updated);
+        if (updated && !active.saving && (!active.currentDetail || updated.updated_at >= active.currentDetail.updated_at)) active.setData(updated);
         if (!result.results.some((asset) => asset.status === "PENDING" || asset.processing_state === "PROCESSING") && Date.now() >= watchUntil) return;
       } catch {
         if (cancelled || requestScope !== scope.current) return;
@@ -112,7 +108,7 @@ function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, imag
     };
     timer = window.setTimeout(() => void poll(), 5000);
     return () => { cancelled = true; window.clearTimeout(timer); };
-  }, [queryIdentity, rows.status, hasProcessing, watchUntil]);
+  }, [queryIdentity, Boolean(rows.data), hasProcessing, watchUntil]);
   useEffect(() => () => { scope.current += 1; }, []);
   const saveMetadata = async () => {
     if (!currentDetail || saving || !canUpload) return;
@@ -150,7 +146,7 @@ function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, imag
   const inUse = activeReferences.length > 0;
   const visible = (rows.data?.results ?? []).filter((asset) => asset.site === siteId && (!onSelect || (asset.status === "READY" && asset.processing_state === "READY" && !["PROCESSING", "FAILED", "UNAVAILABLE"].includes(asset.thumbnail_status))) && (!imagesOnly || asset.detected_mime.startsWith("image/")));
   const metadataChanged = currentDetail && (altText !== currentDetail.alt_text || mediaName !== (currentDetail.display_name || currentDetail.original_filename) || JSON.stringify(mediaCategories(categoryText)) !== JSON.stringify(currentDetail.categories ?? []));
-  return <Box component="section" aria-label="Site media library" sx={{ display: "grid", gap: 2.5, minWidth: 0, bgcolor: "grey.50", p: { xs: 1.5, sm: 2.5 }, borderRadius: 2 }}>
+  return <Box data-perf-section="media" data-perf-pending={rows.loading || policy.loading ? "true" : "false"} component="section" aria-label="Site media library" sx={{ display: "grid", gap: 2.5, minWidth: 0, bgcolor: "grey.50", p: { xs: 1.5, sm: 2.5 }, borderRadius: 2 }}>
     <Box sx={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:2,flexWrap:"wrap"}}>
       <Box><Typography variant="h5" component="h2" fontWeight={600}>{onSelect ? "Choose media" : "Media Library"}</Typography><Typography variant="body2" color="text.secondary" sx={{mt:0.5}}>Your Site's images and documents, in one place.</Typography></Box>
       {canUpload && policy.data ? <Button variant="contained" disabled={uploadBusy} startIcon={<CloudUploadOutlinedIcon />} onClick={() => uploadInput.current?.click()}>Upload files</Button> : null}
@@ -174,6 +170,7 @@ function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, imag
     {removalNotice ? <Alert severity="success">{removalNotice}</Alert> : null}
     {pollError ? <Alert severity="warning">Automatic updates are paused or delayed. Use Refresh media to check again.</Alert> : null}
     {policy.error ? <Alert severity="error">Upload policy unavailable. Refresh the page to try again.</Alert> : null}
+    {rows.refreshing ? <Typography role="status" variant="caption">Refreshing media?</Typography> : null}
     {rows.error ? <Alert severity="error" action={<Button onClick={() => rows.reload()}>Retry media</Button>}>Media could not be loaded. {rows.error.message}</Alert> : null}
     <Box sx={{ display: "flex", gap: 2, justifyContent: "space-between", flexWrap: "wrap", alignItems: "center" }}>
       <Typography role="status" aria-live="polite">{rows.loading || rows.status === "idle" ? "Loading media…" : rows.error ? "Media unavailable" : `${rows.data?.count ?? 0} assets · Page ${page}`}</Typography>
@@ -200,7 +197,7 @@ function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, imag
           <Typography variant="caption" color="text.secondary" sx={{whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>Alt text: {asset.alt_text || "Not set"}</Typography>
           <Box sx={{display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:1,mt:"auto"}}>
             <Button size="small" aria-label={`Details for ${asset.original_filename}`} onClick={() => { altTextDirty.current=false; setDetailId(asset.id); setMetadataError(null); setMetadataNotice(null); }}>Edit details</Button>
-            {onSelect ? <Button variant="contained" size="small" disabled={failedPreviews.has(previewKey(asset))} onClick={() => onSelect(asset)}>Select {asset.original_filename}</Button> : null}
+            {onSelect ? <Button variant="contained" size="small" disabled={rows.refreshing || Boolean(rows.error) || failedPreviews.has(previewKey(asset))} onClick={() => onSelect(asset)}>Select {asset.original_filename}</Button> : null}
           </Box>
         </Box>
       </Paper>)}

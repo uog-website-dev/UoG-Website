@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@/test/render";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ToastProvider } from "@uog/ui";
 import layoutFixtures from "../../../../packages/types/src/layout/fixtures.json";
@@ -203,6 +203,7 @@ describe("SitePagesPanel", () => {
     renderPanel();
 
     const table = await screen.findByRole("table", { name: "Pages for this Site" });
+    await waitFor(() => expect(document.querySelector('[data-perf-section="pages"]')?.getAttribute("data-perf-pending")).toBe("false"));
     expect(within(table).getByText("Admissions")).toBeTruthy();
     expect(within(table).getByText("/admissions")).toBeTruthy();
     expect(within(table).getByText("User 7")).toBeTruthy();
@@ -238,6 +239,7 @@ describe("SitePagesPanel", () => {
   it("applies server search and status filters and resets pagination", async () => {
     renderPanel();
     await screen.findByRole("table", { name: "Pages for this Site" });
+    await waitFor(() => expect(document.querySelector('[data-perf-section="pages"]')?.getAttribute("data-perf-pending")).toBe("false"));
 
     fireEvent.change(screen.getByRole("textbox", { name: "Search Pages" }), {
       target: { value: "  admissions  " },
@@ -255,22 +257,20 @@ describe("SitePagesPanel", () => {
         ordering: "-updated_at",
       });
     });
+    await waitFor(() => expect(screen.getByRole("button", {name: "Reset"})).toHaveProperty("disabled", false));
+    const calls = loadSitePages.mock.calls.length;
     fireEvent.click(screen.getByRole("button", { name: "Reset" }));
-    await waitFor(() => {
-      expect(loadSitePages).toHaveBeenLastCalledWith(11, {
-        search: undefined,
-        status: undefined,
-        page: 1,
-        page_size: 20,
-        ordering: "-updated_at",
-      });
-    });
+    await waitFor(() => expect(screen.getByRole("textbox", {name: "Search Pages"})).toHaveProperty("value", ""));
+    expect(await screen.findByText("Admissions")).toBeTruthy();
+    expect(loadSitePages).toHaveBeenCalledTimes(calls); // valid first-page cache reused
+
   });
 
   it("uses API pagination and resets to the first page when sorting changes", async () => {
     loadSitePages.mockResolvedValue(pageResult([draft()], 41));
     renderPanel();
     await screen.findByRole("table", { name: "Pages for this Site" });
+    await waitFor(() => expect(document.querySelector('[data-perf-section="pages"]')?.getAttribute("data-perf-pending")).toBe("false"));
     expect(screen.getByText("1–20 of 41")).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "Next page" }));
@@ -305,7 +305,7 @@ describe("SitePagesPanel", () => {
       submitted_by: 100,
     })]));
     renderPanel(11, true, ["content.pages.view"]);
-    expect(await screen.findByRole("button", { name: "Review queue" })).toBeTruthy();
+    expect(await screen.findByRole("button", { name: "Approve Admissions" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Approve Admissions" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Reject Admissions" })).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Submit Admissions for review" })).toBeNull();
@@ -315,7 +315,7 @@ describe("SitePagesPanel", () => {
     await waitFor(() => expect(loadSitePages).toHaveBeenLastCalledWith(
       11, expect.objectContaining({ status: "IN_REVIEW", page: 1 }),
     ));
-    fireEvent.click(screen.getByRole("button", { name: "Reject Admissions" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Reject Admissions" }));
     expect(screen.getByRole("button", { name: "Confirm reject" })).toHaveProperty("disabled", true);
     fireEvent.change(screen.getByRole("textbox", { name: "Reviewer comment (required)" }), {
       target: { value: "Please add sources." },
@@ -354,6 +354,7 @@ describe("SitePagesPanel", () => {
   it("links Create page to the dedicated create screen", async () => {
     renderPanel();
     await screen.findByRole("table", { name: "Pages for this Site" });
+    await waitFor(() => expect(document.querySelector('[data-perf-section="pages"]')?.getAttribute("data-perf-pending")).toBe("false"));
     expect(screen.getByRole("link", { name: "Create page" }).getAttribute("href")).toBe("/sites/11/admin/pages/new");
     expect(screen.getByRole("link", { name: "Edit Admissions" }).getAttribute("href")).toBe("/sites/11/admin/pages/page-1/edit");
   });
@@ -511,19 +512,18 @@ describe("SitePagesPanel", () => {
     confirm.mockRestore();
   });
 
-  it("blocks management when the PAGES module is off", async () => {
+  it("blocks management and protected reads when the PAGES module is off", async () => {
     renderPanel(11, false);
-    const submit = await screen.findByRole("button", { name: "Submit Admissions for review" });
-    expect(submit).toHaveProperty("disabled", true);
-    expect(screen.getByRole("link", { name: "Create page" }).getAttribute("aria-disabled")).toBe("true");
+    expect(screen.getByRole("link", {name: "Create page"}).getAttribute("aria-disabled")).toBe("true");
     expect(screen.getByText(/Create, edit and workflow changes are blocked/)).toBeTruthy();
-    fireEvent.click(submit);
+    expect(loadSitePages).not.toHaveBeenCalled();
     expect(transitionSitePage).not.toHaveBeenCalled();
   });
 
   it("clears filter and page state when the selected Site changes", async () => {
     const view = renderPanel(11);
     await screen.findByRole("table", { name: "Pages for this Site" });
+    await waitFor(() => expect(document.querySelector('[data-perf-section="pages"]')?.getAttribute("data-perf-pending")).toBe("false"));
     fireEvent.change(screen.getByRole("textbox", { name: "Search Pages" }), {
       target: { value: "admissions" },
     });

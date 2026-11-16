@@ -1,5 +1,7 @@
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@/test/render";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import {useSiteQuery} from "@/data/query-cache";
+import {unwrap} from "@/organizations/contract";
 
 const loadSitePageStatusCounts = vi.fn();
 const loadSitePosts = vi.fn();
@@ -29,10 +31,11 @@ import { SiteDashboard } from "./site-dashboard";
 
 const SITE = { id: 11, name: "Informatics", code: "INFORMATICS", status: "ACTIVE" as const };
 
-function renderDashboard(enabledModuleCodes: string[], permissions: string[]) {
+function renderDashboard(enabledModuleCodes: string[], permissions: string[], extra?: React.ReactNode) {
   return render(
     <SiteAdminFrame site={SITE} enabledModuleCodes={enabledModuleCodes} permissions={permissions}>
       <SiteDashboard />
+      {extra}
     </SiteAdminFrame>,
   );
 }
@@ -69,6 +72,27 @@ const ALL = [
 ];
 
 describe("SiteDashboard", () => {
+  it("keeps confirmed totals visible when a background refresh fails and offers retry", async () => {
+    renderDashboard(["PAGES"], ["content.pages.view"]);
+    const region = await screen.findByRole("region", {name: "Pages"});
+    await waitFor(() => expect(within(region).getByText("8")).toBeTruthy());
+    loadSitePageStatusCounts.mockResolvedValueOnce({ok: false, error: {status: 503, code: "service_unavailable", message: "Temporary outage", details: null, requestId: null}});
+    act(() => {unwrap({ok: true, data: {}, invalidation: {site: 11, domain: "pages"}});});
+    await screen.findByText("Refresh failed. Previously loaded totals are shown.");
+    expect(within(region).getByText("8")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", {name: "Retry summary"}));
+    await waitFor(() => expect(screen.queryByText("Refresh failed. Previously loaded totals are shown.")).toBeNull());
+  });
+  it("shares the canonical Page counts read with concurrent section consumers", async () => {
+    function CountsConsumer() {
+      const result = useSiteQuery(11, "page-counts", {}, async () => unwrap(await loadSitePageStatusCounts(11)));
+      return <p data-testid="shared-counts">{result.data ? "Counts ready" : "Loading"}</p>;
+    }
+    renderDashboard(["PAGES"], ["content.pages.view"], <CountsConsumer/>);
+    await screen.findByText("Counts ready");
+    await waitFor(() => expect(screen.getByRole("region", {name: "Pages"}).textContent).toContain("8"));
+    expect(loadSitePageStatusCounts).toHaveBeenCalledTimes(1);
+  });
   it("summarizes this Site's Pages, Posts and Menus from the API", async () => {
     renderDashboard(["PAGES", "POSTS", "MENUS"], ALL);
 

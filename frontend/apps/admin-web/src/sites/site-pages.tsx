@@ -1,4 +1,5 @@
 "use client";
+import {useSiteQuery} from "@/data/query-cache";
 
 import { useRef, useState } from "react";
 import Link from "next/link";
@@ -23,7 +24,6 @@ import {
   pageFromResponse,
   SelectFilter,
   TextFilter,
-  useAsync,
   useToast,
 } from "@uog/ui";
 import type {
@@ -193,7 +193,7 @@ function SitePagesPanelContent({
   const [busyPageId, setBusyPageId] = useState<string | null>(null);
 
   const ordering = orderingForSort(sort);
-  const pages = useAsync<SitePageListResponse>(
+  const pages = useSiteQuery<SitePageListResponse>(siteId, "pages", {search: appliedFilters.search, status: appliedFilters.status, page, page_size: PAGE_SIZE, ordering},
     async () => canView
       ? unwrap(await loadSitePages(siteId, {
           search: appliedFilters.search || undefined,
@@ -203,14 +203,13 @@ function SitePagesPanelContent({
           ordering,
         }))
       : EMPTY_PAGE_LIST,
-    [siteId, canView, appliedFilters.search, appliedFilters.status, page, ordering],
-    { isEmpty: (data) => data.count === 0 },
+    {enabled: canView && pagesEnabled === true, isEmpty: (data) => data.count === 0},
   );
-  const statusCounts = useAsync<Record<SitePageStatus, number>>(
+  const statusCounts = useSiteQuery<Record<SitePageStatus, number>>(siteId, "page-counts", {},
     async () => canView
       ? unwrap(await loadSitePageStatusCounts(siteId))
       : EMPTY_STATUS_COUNTS,
-    [siteId, canView],
+    {enabled: canView && pagesEnabled === true},
   );
 
   const rows = (pages.data?.results ?? []).filter((row) => row.site === siteId);
@@ -452,6 +451,8 @@ function SitePagesPanelContent({
       variant="outlined"
       sx={{ borderRadius: 3, p: { xs: 2, sm: 3 }, display: "flex", flexDirection: "column", gap: 2 }}
     >
+      {pages.error && pages.data ? <Alert severity="warning" action={<Button onClick={pages.reload}>Retry refresh</Button>}>Refresh failed. Showing previously loaded pages.</Alert> : null}
+      {pages.refreshing || statusCounts.refreshing ? <Typography role="status" variant="caption">Refreshing Pages?</Typography> : null}
       <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 2 }}>
         <Box>
           <Typography variant="h2" component="h2" sx={{ fontSize: "1.25rem", fontWeight: 700 }}>{visualBuilderMode ? "Visual Builder" : "Pages"}</Typography>
@@ -579,7 +580,7 @@ function SitePagesPanelContent({
                 setPage(1);
               }}
               loading={pages.loading}
-              error={pages.error}
+              error={pages.data ? null : pages.error}
               onRetry={pages.reload}
               emptyState={
                 <Typography role="status" color="text.secondary" sx={{ p: 3 }}>

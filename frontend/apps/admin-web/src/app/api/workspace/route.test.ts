@@ -1,5 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 const token = vi.fn();
+vi.mock("@/cache-identity", () => ({getCacheIdentity: async () => "test-session"}));
 const upstream = vi.fn();
 vi.mock("@/access-token", () => ({getAccessToken: () => token()}));
 vi.mock("@/performance/server-fetch", () => ({serverApiFetch: (...args: unknown[]) => upstream(...args)}));

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@/test/render";
 import { beforeEach, expect, it, vi } from "vitest";
 import { ToastProvider } from "@uog/ui";
 import { SitePostEditor } from "./site-post-editor";

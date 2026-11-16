@@ -1,4 +1,4 @@
-import {fireEvent,render,screen,within,waitFor} from '@testing-library/react';
+import {fireEvent,render,screen,within,waitFor} from '@/test/render';
 import {beforeEach,expect,it,vi} from 'vitest';
 const load=vi.fn(),save=vi.fn(),publish=vi.fn();
 vi.mock('@/app/sites/menu-actions',()=>({loadMenuLocations:(...args:unknown[])=>load(...args),saveMenuLocation:(...args:unknown[])=>save(...args),publishMenuLocation:(...args:unknown[])=>publish(...args)}));

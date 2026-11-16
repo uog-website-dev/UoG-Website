@@ -1,4 +1,5 @@
 "use server";
+import {invalidated} from "@/data/mutation-receipt";
 
 import {serverApiFetch} from "@/performance/server-fetch";
 
@@ -156,7 +157,7 @@ export async function createSiteMenu(
   name?: string,
   code?: string,
 ): Promise<ActionResult<MenuRecord>> {
-  return attempt(async () => {
+  return invalidated(siteId, "menus", attempt(async () => {
     const api = await client();
     const created = await api.postDetailed<MenuRecord>(siteMenuPath(siteId), {
       name: name?.trim() || (location === "header" ? "Header" : "Footer"),
@@ -164,7 +165,7 @@ export async function createSiteMenu(
       ...(code ? { code } : {}),
     });
     return created.data;
-  });
+  }));
 }
 
 export async function updateSiteMenu(
@@ -173,7 +174,7 @@ export async function updateSiteMenu(
   ifMatch: string,
   input: { name: string; location: MenuPlace },
 ): Promise<ActionResult<MenuRecord>> {
-  return attempt(async () => {
+  return invalidated(siteId, "menus", attempt(async () => {
     const api = await client();
     const result = await api.patchDetailed<MenuRecord>(
       siteMenuPath(siteId, `${menuId}/`),
@@ -181,7 +182,7 @@ export async function updateSiteMenu(
       { ifMatch },
     );
     return result.data;
-  });
+  }));
 }
 
 function itemBody(input: MenuItemInput): Record<string, unknown> {
@@ -211,7 +212,7 @@ export async function createMenuLink(
   ifMatch: string,
   input: MenuItemInput,
 ): Promise<ActionResult<MenuItemRecord>> {
-  return attempt(async () => {
+  return invalidated(siteId, "menus", attempt(async () => {
     const api = await client();
     const created = await api.postDetailed<MenuItemRecord>(
       siteMenuPath(siteId, `${menuId}/items/`),
@@ -219,7 +220,7 @@ export async function createMenuLink(
       { headers: { "If-Match": ifMatch } },
     );
     return created.data;
-  });
+  }));
 }
 
 export async function updateMenuItem(
@@ -229,7 +230,7 @@ export async function updateMenuItem(
   ifMatch: string,
   input: MenuItemInput,
 ): Promise<ActionResult<MenuItemRecord>> {
-  return attempt(async () => {
+  return invalidated(siteId, "menus", attempt(async () => {
     const api = await client();
     const result = await api.patchDetailed<MenuItemRecord>(
       siteMenuPath(siteId, `${menuId}/items/${itemId}/`),
@@ -237,7 +238,7 @@ export async function updateMenuItem(
       { ifMatch },
     );
     return result.data;
-  });
+  }));
 }
 
 export async function deleteMenuItem(
@@ -246,14 +247,14 @@ export async function deleteMenuItem(
   itemId: string,
   ifMatch: string,
 ): Promise<ActionResult<{ etag: string | null }>> {
-  return attempt(async () => {
+  return invalidated(siteId, "menus", attempt(async () => {
     const api = await client();
     const result = await api.delDetailed(
       siteMenuPath(siteId, `${menuId}/items/${itemId}/`),
       { ifMatch },
     );
     return { etag: result.etag };
-  });
+  }));
 }
 
 export async function moveMenuItem(
@@ -264,7 +265,7 @@ export async function moveMenuItem(
   parent: string | null,
   position: number,
 ): Promise<ActionResult<{ etag: string | null }>> {
-  return attempt(async () => {
+  return invalidated(siteId, "menus", attempt(async () => {
     const api = await client();
     const result = await api.postDetailed(
       siteMenuPath(siteId, `${menuId}/items/${itemId}/move/`),
@@ -272,7 +273,7 @@ export async function moveMenuItem(
       { headers: { "If-Match": ifMatch } },
     );
     return { etag: result.etag };
-  });
+  }));
 }
 
 export async function reorderSiteMenu(
@@ -282,7 +283,7 @@ export async function reorderSiteMenu(
   parent: string | null,
   items: string[],
 ): Promise<ActionResult<{ etag: string | null }>> {
-  return attempt(async () => {
+  return invalidated(siteId, "menus", attempt(async () => {
     const api = await client();
     const result = await api.postDetailed(
       siteMenuPath(siteId, `${menuId}/reorder/`),
@@ -290,7 +291,7 @@ export async function reorderSiteMenu(
       { headers: { "If-Match": ifMatch } },
     );
     return { etag: result.etag };
-  });
+  }));
 }
 
 export async function setMenuActive(
@@ -299,7 +300,7 @@ export async function setMenuActive(
   ifMatch: string,
   active: boolean,
 ): Promise<ActionResult<MenuRecord>> {
-  return attempt(async () => {
+  return invalidated(siteId, "menus", attempt(async () => {
     const api = await client();
     const result = await api.postDetailed<MenuRecord>(
       siteMenuPath(siteId, `${menuId}/${active ? "activate" : "deactivate"}/`),
@@ -307,7 +308,7 @@ export async function setMenuActive(
       { headers: { "If-Match": ifMatch } },
     );
     return result.data;
-  });
+  }));
 }
 
 export interface MenuLocationRecord {
@@ -319,10 +320,10 @@ export async function loadMenuLocations(site: number): Promise<ActionResult<Menu
   return attempt(async () => (await client()).get<MenuLocationRecord[]>(siteMenuPath(site,"locations/")));
 }
 export async function saveMenuLocation(site: number, location: string, version: number, menu: string | null, replace: boolean): Promise<ActionResult<MenuLocationRecord>> {
-  return attempt(async () => (await client()).post<MenuLocationRecord>(siteMenuPath(site,`locations/${encodeURIComponent(location)}/draft/`),{version,menu,replace}));
+  return invalidated(site, "menus", attempt(async () => (await client()).post<MenuLocationRecord>(siteMenuPath(site,`locations/${encodeURIComponent(location)}/draft/`),{version,menu,replace})));
 }
 export async function publishMenuLocation(site: number, location: string, version: number): Promise<ActionResult<MenuLocationRecord>> {
-  return attempt(async () => (await client()).post<MenuLocationRecord>(siteMenuPath(site,`locations/${encodeURIComponent(location)}/publish/`),{version}));
+  return invalidated(site, "menus", attempt(async () => (await client()).post<MenuLocationRecord>(siteMenuPath(site,`locations/${encodeURIComponent(location)}/publish/`),{version})));
 }
 
 export interface NavigationPreview {

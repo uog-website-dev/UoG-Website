@@ -32,8 +32,8 @@ export interface ApiErrorPayload {
  * a screen can chain the next conditional mutation without a re-fetch.
  */
 export type ActionResult<T> =
-  | { ok: true; data: T; etag?: string | null }
-  | { ok: false; error: ApiErrorPayload };
+  | { ok: true; data: T; etag?: string | null; invalidation?: {site: number; domain: string; workspace?: boolean} }
+  | { ok: false; error: ApiErrorPayload; deniedSite?: number };
 
 /** Convert a thrown value into a clone-safe payload. Never leaks credentials. */
 export function serializeApiError(cause: unknown): ApiErrorPayload {
@@ -74,7 +74,28 @@ export function isOk<T>(
  * renders the shared error state — so a failed list load looks identical to a
  * failed detail load without each screen re-implementing the branch.
  */
+const reportedAccessFailures = new WeakSet<Error>();
+export function accessFailureWasReported(error: unknown): boolean {
+  return error instanceof Error && reportedAccessFailures.has(error);
+}
+
+export function reportActionResult<T>(result: ActionResult<T>): ApiError | null {
+  if (result.ok) {
+    if (result.invalidation && typeof window !== "undefined") window.dispatchEvent(new CustomEvent("uog:data:changed", {detail: result.invalidation}));
+    return null;
+  }
+  const error = deserializeApiError(result.error);
+  // Query reads report access failure through their live QueryCache observer.
+  // A cancelled old read must not emit a global event into the new Site.
+  if (result.deniedSite != null && [401, 403].includes(error.status) && typeof window !== "undefined") {
+    reportedAccessFailures.add(error);
+    window.dispatchEvent(new CustomEvent("uog:access:denied", {detail: {site: result.deniedSite}}));
+  }
+  return error;
+}
+
 export function unwrap<T>(result: ActionResult<T>): T {
+  const error = reportActionResult(result);
   if (result.ok) return result.data;
-  throw deserializeApiError(result.error);
+  throw error;
 }

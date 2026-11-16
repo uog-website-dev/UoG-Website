@@ -14,6 +14,7 @@ vi.mock("@/auth", () => ({
 vi.mock("@/access-token", () => ({
   getAccessToken: vi.fn(async () => "access-token"),
 }));
+vi.mock("@/cache-identity", () => ({getCacheIdentity: vi.fn(async () => "layout-test-session")}));
 
 vi.mock("@/app/actions", () => ({
   signInWithKeycloak: vi.fn(),

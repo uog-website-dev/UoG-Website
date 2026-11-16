@@ -1,4 +1,4 @@
-import {fireEvent,render,screen,waitFor,within,act} from "@testing-library/react";
+import {fireEvent,render,screen,waitFor,within,act} from "@/test/render";
 import userEvent from "@testing-library/user-event";
 import {beforeEach,describe,it,expect,vi} from "vitest";
 import type {SitePageRecord} from "@/app/sites/page-actions";

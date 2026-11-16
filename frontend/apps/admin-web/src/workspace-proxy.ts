@@ -1,5 +1,6 @@
 import { getAccessToken } from "@/access-token";
 import { serverApiFetch } from "@/performance/server-fetch";
+import {getCacheIdentity} from "@/cache-identity";
 
 /** One upstream request; credentials never cross into the client response. */
 export async function workspaceProxy(request: Request, discovery = false) {
@@ -11,12 +12,14 @@ export async function workspaceProxy(request: Request, discovery = false) {
     return Response.json({error: "invalid_query"}, {status: 400, headers});
   }
   const token = await getAccessToken();
-  if (!token) return Response.json({error: "unauthenticated"}, {status: 401, headers});
+  const cacheIdentity = token ? await getCacheIdentity() : null;
+  if (!token || !cacheIdentity) return Response.json({error: "unauthenticated"}, {status: 401, headers});
   try {
     const response = await serverApiFetch(`${process.env.API_BASE_URL ?? "http://backend:8000/api"}/workspace/${discovery ? "sites/" : ""}?${query}`, {
       headers: {Authorization: `Bearer ${token}`}, cache: "no-store", signal: request.signal,
     });
     const body = await response.json();
+    if (!discovery && response.ok) body.cacheIdentity = cacheIdentity;
     return Response.json(body, {status: response.status, headers: {...headers, ...(response.headers.get("ETag") ? {ETag: response.headers.get("ETag")!} : {})}});
   } catch {
     return Response.json({error: "workspace_unavailable"}, {status: 502, headers});

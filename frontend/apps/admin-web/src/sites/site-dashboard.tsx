@@ -23,7 +23,7 @@ import Skeleton from "@mui/material/Skeleton";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { useAsync } from "@uog/ui";
+import {useSiteQuery} from "@/data/query-cache";
 
 import { loadSiteNavigation } from "@/app/sites/menu-actions";
 import { loadSitePageStatusCounts } from "@/app/sites/page-actions";
@@ -42,17 +42,6 @@ interface Metric {
 }
 
 const POST_SUMMARY_STATUSES: readonly SitePostStatus[] = ["DRAFT", "IN_REVIEW", "PUBLISHED"];
-
-async function pageSummary(siteId: number): Promise<Metric[]> {
-  const counts = unwrap(await loadSitePageStatusCounts(siteId));
-  const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
-  return [
-    { label: "Total", value: total },
-    { label: "Draft", value: counts.DRAFT },
-    { label: "In review", value: counts.IN_REVIEW },
-    { label: "Published", value: counts.PUBLISHED },
-  ];
-}
 
 async function postSummary(siteId: number): Promise<Metric[]> {
   const [total, ...byStatus] = await Promise.all([
@@ -84,34 +73,49 @@ async function userSummary(siteId: number): Promise<Metric[]> {
 
 type SummarySectionKey = Exclude<SiteSection["key"], "dashboard" | "builder" | "homepage" | "sidebars">;
 
-const SUMMARIES: Record<SummarySectionKey, {
-  icon: SvgIconComponent;
-  title: string;
-  empty: string;
-  load: (siteId: number) => Promise<Metric[]>;
-}> = {
-  pages: { icon: DescriptionIcon, title: "Pages", empty: "This Site has no Pages yet.", load: pageSummary },
+const SUMMARIES = {
+  pages: { icon: DescriptionIcon, title: "Pages", empty: "This Site has no Pages yet." },
   posts: { icon: ArticleIcon, title: "Posts", empty: "This Site has no Posts yet.", load: postSummary },
   menus: { icon: AccountTreeIcon, title: "Menus", empty: "This Site has no local menus yet.", load: menuSummary },
-  media: { icon: PhotoLibraryIcon, title: "Media", empty: "This Site has no media yet.", load: async (siteId) => [{ label: "Assets", value: unwrap(await listSiteMedia(siteId)).count }] },
+  media: { icon: PhotoLibraryIcon, title: "Media", empty: "This Site has no media yet." },
   users: { icon: GroupIcon, title: "Users", empty: "No users are assigned to this Site yet.", load: userSummary },
-};
+} satisfies Record<SummarySectionKey, {icon: SvgIconComponent; title: string; empty: string; load?: (siteId: number) => Promise<Metric[]>}>;
 
-function SummaryCard({
-  sectionKey,
-  siteId,
-}: {
-  sectionKey: SummarySectionKey;
-  siteId: number;
-}) {
+interface SummaryState {
+  status: "idle" | "loading" | "success" | "error";
+  data: Metric[] | null; error: Error | null; loading: boolean; refreshing: boolean; reload: () => void;
+}
+function SummaryCard({sectionKey, siteId}: {sectionKey: SummarySectionKey; siteId: number}) {
+  if (sectionKey === "pages") return <PageSummaryCard siteId={siteId}/>;
+  if (sectionKey === "media") return <MediaSummaryCard siteId={siteId}/>;
+  return <AggregateSummaryCard sectionKey={sectionKey} siteId={siteId}/>;
+}
+function PageSummaryCard({siteId}: {siteId: number}) {
+  // Same raw contract/key as the Pages status dashboard, not a second metric cache.
+  const state = useSiteQuery(siteId, "page-counts", {}, async () => unwrap(await loadSitePageStatusCounts(siteId)));
+  const counts = state.data;
+  const data = counts ? [{label: "Total", value: Object.values(counts).reduce((sum, count) => sum + count, 0)},
+    {label: "Draft", value: counts.DRAFT}, {label: "In review", value: counts.IN_REVIEW}, {label: "Published", value: counts.PUBLISHED}] : null;
+  return <SummaryCardView sectionKey="pages" siteId={siteId} state={{...state, data}}/>;
+}
+function MediaSummaryCard({siteId}: {siteId: number}) {
+  // Identical first-page query to the unrestricted library; cards derive the count.
+  const state = useSiteQuery(siteId, "media", {filters: {}, page: 1, picker: false, imagesOnly: false}, async () => unwrap(await listSiteMedia(siteId, {page: 1})));
+  return <SummaryCardView sectionKey="media" siteId={siteId} state={{...state, data: state.data ? [{label: "Assets", value: state.data.count}] : null}}/>;
+}
+function AggregateSummaryCard({sectionKey, siteId}: {sectionKey: Exclude<SummarySectionKey, "pages" | "media">; siteId: number}) {
   const summary = SUMMARIES[sectionKey];
-  const state = useAsync(() => summary.load(siteId), [siteId, sectionKey]);
+  const state = useSiteQuery(siteId, `dashboard-${sectionKey}`, {}, () => summary.load(siteId));
+  return <SummaryCardView sectionKey={sectionKey} siteId={siteId} state={state}/>;
+}
+function SummaryCardView({sectionKey, siteId, state}: {sectionKey: SummarySectionKey; siteId: number; state: SummaryState}) {
+  const summary = SUMMARIES[sectionKey];
   const Icon = summary.icon;
   const headingId = `site-summary-${sectionKey}`;
   const empty = state.data != null && (state.data[0]?.value ?? 0) === 0;
 
   let body: ReactNode;
-  if (state.status === "error") {
+  if (state.status === "error" && !state.data) {
     body = (
       <Alert
         severity="error"
@@ -172,6 +176,8 @@ function SummaryCard({
           {summary.title}
         </Typography>
       </Box>
+      {state.refreshing ? <Typography role="status" variant="caption">Refreshing {summary.title.toLowerCase()}?</Typography> : null}
+      {state.error && state.data ? <Alert severity="warning" action={<Button onClick={state.reload}>Retry summary</Button>}>Refresh failed. Previously loaded totals are shown.</Alert> : null}
       {body}
       <Box sx={{ mt: "auto" }}>
         <Button component={Link} href={siteAdminHref(siteId, sectionKey)} size="small">

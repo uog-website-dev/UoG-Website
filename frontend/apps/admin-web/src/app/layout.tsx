@@ -9,6 +9,8 @@ import { UogFooter, UogHeader, UogThemeProvider, ToastProvider } from "@uog/ui";
 import { redirect } from "next/navigation";
 
 import { getAccessToken } from "@/access-token";
+import {getCacheIdentity} from "@/cache-identity";
+import {SessionSignOutForm} from "@/session-sign-out-form";
 import { NavigationTiming } from "@/performance/navigation-timing";
 import { AdminShell } from "@/admin-shell";
 import { auth, siteOrigin } from "@/auth";
@@ -82,16 +84,18 @@ export default async function AdminLayout({
     );
   }
 
+  const cacheIdentity = await getCacheIdentity();
+  if (!cacheIdentity) redirect(`${siteOrigin}${sessionExpiredHref()}`);
   const actions = (
     <Box component="span" sx={{ display: "flex", gap: 1.5, alignItems: "center" }}>
       <Box component="span" sx={{ fontSize: 14, opacity: 0.9, display: { xs: "none", md: "inline" }, maxWidth: 240, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
         {session.user?.email ?? session.user?.name ?? "signed in"}
       </Box>
-      <form action={signOutFromSite} style={{ display: "inline" }}>
+      <SessionSignOutForm action={signOutFromSite}>
         <button type="submit" style={linkButtonStyle}>
           Sign out
         </button>
-      </form>
+      </SessionSignOutForm>
     </Box>
   );
 
@@ -103,7 +107,7 @@ export default async function AdminLayout({
               mutation screens (create/edit/lifecycle). */}
           <ToastProvider>
             {process.env.PERF_INSTRUMENTATION_ENABLED==="1"?<NavigationTiming/>:null}
-            <AdminShell actions={actions}>{children}</AdminShell>
+            <AdminShell identity={cacheIdentity} actions={actions}>{children}</AdminShell>
           </ToastProvider>
         </UogThemeProvider>
       </body>

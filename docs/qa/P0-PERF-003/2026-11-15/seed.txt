@@ -1,0 +1,12 @@
+Seeded 38 registered permissions and 7 standard roles. No user assignments were created.
+{"event": "perf.seed.progress", "site": 81, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.progress", "site": 82, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.progress", "site": 83, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.progress", "site": 84, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.progress", "site": 85, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.progress", "site": 86, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.progress", "site": 87, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.progress", "site": 88, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.progress", "site": 89, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.progress", "site": 90, "pages": 40, "posts": 100, "media": 80}
+{"event": "perf.seed.complete", "sites": 10, "counts_per_site": {"sites": 10, "pages": 40, "posts": 100, "media": 80}, "private_session": "/tmp/perf001-session.json"}

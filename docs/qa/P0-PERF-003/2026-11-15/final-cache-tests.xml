@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="27" failures="0" errors="0" time="1.889934147">
+    <testsuite name="src/data/query-cache.test.tsx" timestamp="2026-11-15T18:07:19.716Z" hostname="93b1fc1a39a5" tests="14" failures="0" errors="0" skipped="0" time="0.340019393">
+        <testcase classname="src/data/query-cache.test.tsx" name="deduplicates simultaneous reads and reuses the same section across navigation without a loading flash" time="0.052283391">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="partitions keys by user/session, Site, permissions, resource, filters, sort and page" time="0.000475792">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="shows stale valid data while refreshing, reports failure and recovers without discarding cached rows" time="0.026016623">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="invalidates only the mutated Site/domain, including other mounted consumers; failed writes leave cache intact" time="0.015330337">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="cancels a slow obsolete filter and cannot replace the newer query with its late response" time="0.015723813">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="clears the previous session and Site client on rapid boundary changes, even when requests finish late" time="0.025104064">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="purges protected entries when authorization changes or a refreshed workspace revokes access" time="0.038775534">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="uses finite defaults and garbage-collects unobserved entries" time="0.058855889">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="does not reuse data after an identity-change event even when Site and permissions are identical" time="0.016440757">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="automatically refreshes an expired entry on return while keeping its valid rows visible" time="0.014256564">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="a successful mutation cancels the pre-save read and coalesces duplicate invalidations" time="0.01241792">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="settles after development StrictMode effect replay" time="0.005278241">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="clears protected content on logout while still invoking the sign-out action" time="0.013413816">
+        </testcase>
+        <testcase classname="src/data/query-cache.test.tsx" name="revalidates an unchanged forbidden resource once instead of looping workspace bootstraps" time="0.043361534">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-dashboard.test.tsx" timestamp="2026-11-15T18:07:19.731Z" hostname="93b1fc1a39a5" tests="8" failures="0" errors="0" skipped="0" time="0.63562827">
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="SiteDashboard &gt; keeps confirmed totals visible when a background refresh fails and offers retry" time="0.310447497">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="SiteDashboard &gt; shares the canonical Page counts read with concurrent section consumers" time="0.04275489">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="SiteDashboard &gt; summarizes this Site&apos;s Pages, Posts and Menus from the API" time="0.085760359">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="SiteDashboard &gt; offers create-page and navigation quick actions within the Site" time="0.052754697">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="SiteDashboard &gt; omits disabled or unauthorized sections and does not call their APIs" time="0.036875274">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="SiteDashboard &gt; shows an empty state when the Site has no Pages" time="0.03208613">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="SiteDashboard &gt; reports a failed summary and retries it" time="0.055927726">
+        </testcase>
+        <testcase classname="src/sites/site-dashboard.test.tsx" name="SiteDashboard &gt; says so when no content module is available" time="0.01500284">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/workspace.test.tsx" timestamp="2026-11-15T18:07:19.738Z" hostname="93b1fc1a39a5" tests="5" failures="0" errors="0" skipped="0" time="0.914286484">
+        <testcase classname="src/workspace.test.tsx" name="shares one bootstrap across simultaneous consumers and same-Site sections" time="0.038879425">
+        </testcase>
+        <testcase classname="src/workspace.test.tsx" name="clears old Site immediately and ignores a late response even if transport ignores abort" time="0.008882128">
+        </testcase>
+        <testcase classname="src/workspace.test.tsx" name="fails closed for a mismatched/version-invalid response and recovers explicitly" time="0.014448077">
+        </testcase>
+        <testcase classname="src/workspace.test.tsx" name="keeps an unsaved editor mounted during successful same-Site revalidation" time="0.052505318">
+        </testcase>
+        <testcase classname="src/workspace.test.tsx" name="loads discovery only on open, pages explicitly and rejects stale search results" time="0.798302048">
+        </testcase>
+    </testsuite>
+</testsuites>

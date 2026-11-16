@@ -1,4 +1,5 @@
 "use client";
+import {useSiteQuery} from "@/data/query-cache";
 
 /**
  * Full-page Post create/edit screen (WordPress-style, not a modal).
@@ -23,7 +24,7 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { ApiError } from "@uog/api-client";
 import {
-  ArticleDocumentView, ArticleAssetImage, articlePlainText, normalizeArticleDocument, PublicPageView, useAsync, useToast,
+  ArticleDocumentView, ArticleAssetImage, articlePlainText, normalizeArticleDocument, PublicPageView, useToast,
 } from "@uog/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -350,14 +351,14 @@ function SitePostEditorContent({
     return () => { cancelled = true; };
   }, [mode, postId, siteId, canRead, postsEnabled]);
 
-  const taxonomy = useAsync<{ categories: SiteTaxonomyRecord[]; tags: SiteTaxonomyRecord[] }>(
+  const taxonomy = useSiteQuery<{ categories: SiteTaxonomyRecord[]; tags: SiteTaxonomyRecord[] }>(siteId, "taxonomy", {},
     async () => permissions.includes(PERMISSIONS.view) && postsEnabled === true
       ? {
           categories: unwrap(await loadSiteTaxonomy(siteId, "categories")),
           tags: unwrap(await loadSiteTaxonomy(siteId, "tags")),
         }
       : { categories: EMPTY_TAXONOMY, tags: EMPTY_TAXONOMY },
-    [siteId, permissions, postsEnabled],
+    {enabled: permissions.includes(PERMISSIONS.view) && postsEnabled === true},
   );
 
   const categories = taxonomy.data?.categories ?? EMPTY_TAXONOMY;

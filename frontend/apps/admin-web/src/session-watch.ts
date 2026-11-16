@@ -21,11 +21,18 @@ export async function signInAgainIfExpired(): Promise<boolean> {
   if (redirecting) return true;
   try {
     const response = await fetch(`${APP_BASE_PATH}/api/session`, { cache: "no-store" });
-    if (response.status !== 401) return false;
+    if (response.status !== 401) {
+      if (response.ok) {
+        const data = await response.json();
+        if (typeof data.cacheIdentity === "string") window.dispatchEvent(new CustomEvent("uog:session:changed", {detail: {identity: data.cacheIdentity}}));
+      }
+      return false;
+    }
   } catch {
     return false;
   }
   redirecting = true;
+  window.dispatchEvent(new Event("uog:session:clear"));
   redirectToSignIn();
   return true;
 }
