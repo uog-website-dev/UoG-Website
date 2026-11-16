@@ -47,6 +47,7 @@ import {
 } from "@/workspace";
 import type { WorkspaceState } from "@/workspace";
 import {WorkspaceSwitcher} from "@/workspace-switcher";
+import {useSectionPrefetch} from "@/data/section-prefetch";
 
 const DRAWER_WIDTH = 296;
 
@@ -112,6 +113,8 @@ function NavItem({
   icon: Icon,
   active,
   onNavigate,
+  onIntent,
+  onEndIntent,
 }: {
   href: string;
   label: string;
@@ -119,6 +122,8 @@ function NavItem({
   icon: SvgIconComponent;
   active: boolean;
   onNavigate?: () => void;
+  onIntent?: () => void;
+  onEndIntent?: () => void;
 }) {
   return (
     <ListItemButton
@@ -126,6 +131,11 @@ function NavItem({
       href={href}
       selected={active}
       onClick={onNavigate}
+      prefetch={onIntent ? false : undefined}
+      onPointerEnter={onIntent}
+      onFocus={onIntent}
+      onPointerLeave={onEndIntent}
+      onBlur={onEndIntent}
       aria-current={active ? "page" : undefined}
       sx={{
         position: "relative",
@@ -275,6 +285,7 @@ function SiteNav({
   currentPath: string;
   onNavigate?: () => void;
 }) {
+  const prefetch = useSectionPrefetch(siteId);
   const data = state.status === "ready" ? state.data : null;
   const site = data?.site?.id === siteId ? data.site : null;
   const access = data?.site;
@@ -317,6 +328,8 @@ function SiteNav({
             icon={SITE_SECTION_ICONS[section.key]}
             active={active}
             onNavigate={onNavigate}
+            onIntent={["pages", "posts", "menus", "media"].includes(section.key) && !active ? () => prefetch.schedule(section.key) : undefined}
+            onEndIntent={prefetch.cancel}
           />
         );
       }) : null}

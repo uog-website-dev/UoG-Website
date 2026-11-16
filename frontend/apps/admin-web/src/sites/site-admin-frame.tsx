@@ -52,7 +52,7 @@ function SiteEditableContent({children}: {children: ReactNode}) {
   return <Box sx={{minWidth: 0}} onChange={event => {
     // Filters are not drafts. Forms (including portalled dialogs) are isolated.
     const form = (event.target as HTMLElement).closest("form");
-    if (form) changedForms.current.add(form);
+    if (form && form.getAttribute("role") !== "search") changedForms.current.add(form);
   }}>{children}</Box>;
 }
 

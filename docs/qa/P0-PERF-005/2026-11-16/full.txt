@@ -1,0 +1,732 @@
+
+ RUN  v5.0.5 /workspace/apps/admin-web
+
+docker : stderr | src/sites/visual-builder.test.tsx > Visual Builder workspace > 
+provides a meaningful empty palette search and Escape restores focus
+At line:2 char:1
++ docker compose -f docker-compose.yml -f docker-compose.perf.yml exec  ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr... restores focus:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(ButtonBase) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+An update to ForwardRef(FormControl) inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+stderr | src/sites/visual-builder.test.tsx > Visual Builder workspace > provides a 
+meaningful empty palette search and Escape restores focus
+A component suspended inside an `act` scope, but the `act` call was not awaited. When testing React 
+components that depend on asynchronous data, you must await the result:
+
+await act(() => ...)
+
+ ✓ src/sites/site-posts.test.tsx (19 tests) 15176ms
+   ✓ SitePostsPanel (7)
+     ✓ loads only the selected Site and renders status, author, taxonomy and featured media 531ms
+     ✓ applies search, status, category and tag filters and resets them 1085ms
+     ✓ shows empty and API error states 403ms
+     ✓ runs submit, approve and publish only when the API offers that action for this Site 931ms
+   ✓ SitePostEditor (12)
+     ✓ creates drafts and edits with the detail ETag on the full-page editor 1663ms
+     ✓ validates media scope and offers taxonomy creation only to authorized creators 2417ms
+     ✓ previews the Site draft through the shared safe block renderer 556ms
+     ✓ keeps unsaved formatting after failed saves and warns before discard 983ms
+     ✓ preserves a stale draft and displays explicit conflict guidance 835ms
+     ✓ refreshes the revision marker after a conflict while keeping unsaved text 1171ms
+     ✓ surfaces editor_document field errors on the draft editor 501ms
+     ✓ fills the permalink from the title until the slug is edited 581ms
+     ✓ rejects reserved permalinks and shows the public path preview 771ms
+     ✓ surfaces duplicate slug API field errors on the settings panel 857ms
+     ✓ locks Post settings while the Post is published 346ms
+     ✓ lets an editor remove selected taxonomy that is no longer eligible 1079ms
+ ✓ src/sites/media-library.test.tsx (26 tests) 13938ms
+   ✓ MediaLibrary (16)
+     ✓ keeps cached images visible but pauses selection while eligibility is refreshing 572ms
+     ✓ shows processing state in the library and preserves the retry key after transfer failure 812ms
+     ✓ keeps the selected file after a failed upload and never invents a ready row 460ms
+     ✓ applies filename search before paging and resets to the first page 306ms
+     ✓ loads scoped details and saves only persisted alt text 895ms
+     ✓ shows readonly metadata without a save control 451ms
+     ✓ sends the selected status and type filters to the server 356ms
+     ✓ blocks deletion for a live reference and confirms unused removal 1234ms
+     ✓ keeps the library card and metadata after a delete conflict 1238ms
+     ✓ preserves edited alt text after a recoverable save failure 827ms
+     ✓ keeps a Gallery-referenced asset, saves alt text, and reloads persisted details 1267ms
+     ✓ keeps deletion disabled if the reference inventory cannot be verified 392ms
+   ✓ Site-isolated media browsing (4)
+     ✓ offers recovery for empty search and transport failure 450ms
+     ✓ supports keyboard pagination and grid/list controls 545ms
+   ✓ Quiet processing updates and previews (2)
+     ✓ refreshes a processing image without a loading flash and updates its open details preview 505ms
+   ✓ renames and categorizes an asset without changing its original filename 876ms
+   ✓ opens the scoped display image in an immersive viewer and clears it on Site change 351ms
+   ✓ keeps unsaved metadata when expanding and closing the image 986ms
+ ✓ src/sites/site-pages.test.tsx (27 tests) 15572ms
+   ✓ SitePagesPanel (27)
+     ✓ saves a shell-only change without resending builder blocks or metadata 1082ms
+     ✓ assigns only published Pages allowed by the backend as the homepage 680ms
+     ✓ announces empty and failed API list states 306ms
+     ✓ applies server search and status filters and resets pagination 629ms
+     ✓ uses API pagination and resets to the first page when sorting changes 409ms
+     ✓ opens full-page preview in a new tab and submits this Site's draft for review 501ms
+     ✓ shows review controls only from backend-authorized actions and requires a rejection comment 790ms
+     ✓ shows append-only workflow history and reviewer feedback in a timeline 319ms
+     ✓ defaults a new Page to the Site language 891ms
+     ✓ starts a new Page blank and fills the slug from the title until it is edited 618ms
+     ✓ creates and edits only with the matching permission and current ETag 1195ms
+     ✓ does not navigate back to the former Site when its save completes after unmount 514ms
+     ✓ assigns a Site sidebar without replacing the builder document 973ms
+     ✓ surfaces stale edit conflicts without losing the form 980ms
+     ✓ previews private draft content and blocks malformed block JSON 821ms
+     ✓ shows the frozen private revision and sends its exact ETag when publishing 502ms
+     ✓ previews the shared visual fixture and rejects unsupported layout versions before saving 1037ms
+     ✓ uses the Page editor dirty state for Site switches even outside a form element 341ms
+     ✓ asks before discarding unsaved editor changes 529ms
+     ✓ clears filter and page state when the selected Site changes 662ms
+     ✓ switches Site scope and enforces view-only access across the admin workspace 306ms
+     ✓ opens a working draft of a published Page and keeps the live route fixed 889ms
+ ✓ src/domains/domains-list.test.tsx (13 tests) 5585ms
+   ✓ DomainsList (13)
+     ✓ renders domains with their site, organization, type and statuses 730ms
+     ✓ searches across hostname and site, and resets to page 1 548ms
+     ✓ filters by domain type through the select 814ms
+     ✓ filters by site through the select 550ms
+     ✓ sorts by the clicked column header 372ms
+     ✓ surfaces an API error with a retry instead of an empty table 325ms
+     ✓ offers a reset when filters match nothing 412ms
+     ✓ opens the Add domain dialog from the toolbar button 651ms
+     ✓ opens the Edit dialog from a row action, pre-filled with the record 431ms
+ ✓ src/sites/visual-builder.test.tsx (25 tests) 59263ms
+   ✓ Visual Builder workspace (25)
+     ✓ keeps the selected device layout width while fitting a narrow workspace 2027ms
+     ✓ mounts the actual Page route inside Site Administration and guards disabled/view-only direct navigation 370ms
+     ✓ renders loading, empty and initial keyboard focus with explicit Page and Site context 467ms
+     ✓ searches the 43-card picker, supports arrow/Enter selection and restores invoking focus 4734ms
+     ✓ provides a meaningful empty palette search and Escape restores focus 2667ms
+     ✓ exposes Widgets and Structure docks with canvas viewport chrome 908ms
+     ✓ saves the complete valid tree with the last loaded ETag and reports conflicts without losing edits 1880ms
+     ✓ keeps local edits on conflict and lets Reload refresh the ETag for reconciliation 3176ms
+     ✓ warns before discarding unsaved edits when leaving the builder 1858ms
+     ✓ saves current edits and opens a revision-bound preview in a new tab 1500ms
+     ✓ keeps the editor and closes the preview tab when saving conflicts 1477ms
+     ✓ offers server-advertised workflow actions after a saved draft and reports authoritative status 2283ms
+     ✓ uses the canonical saved tree/revision and keeps local undo distinct from CMS history 4563ms
+     ✓ undo and redo restore layout order and selection, and a divergent edit clears redo 7714ms
+     ✓ keeps Ctrl+Z for the builder outside inspector fields and clears history on Page switch 5953ms
+     ✓ ignores late Page results and clears selection, picker, focus mode and inspector on Site/Page changes 3441ms
+     ✓ keeps the canvas visible in focus mode and Escape returns to the full workspace 2338ms
+     ✓ shows selection chrome actions for the active canvas widget 2334ms
+     ✓ exposes drag handles for Structure and row editor widget reordering 1292ms
+     ✓ makes palette widgets draggable onto the canvas drop targets and hides the automatic page title 1311ms
+     ✓ accepts a palette drop on the empty canvas to create the first section 798ms
+     ✓ sets a mobile spacing override, resets it to inherit, and keeps viewport chrome 5966ms
+ ✓ src/modules/site-module-management.test.tsx (6 tests) 6463ms
+   ✓ SiteModuleManagement (6)
+     ✓ shows each Site's activation from the backend, with planned modules left out 839ms
+     ✓ previews exactly the visibly selected Sites 1722ms
+     ✓ uses one Site scope for a single selection 924ms
+     ✓ distinguishes the visible page from every matching Site 1359ms
+     ✓ targets an Organization with or without its descendants 1039ms
+     ✓ shows a failed Site read with a retry 575ms
+ ✓ src/access/access-screen.test.tsx (16 tests) 7405ms
+   ✓ AccessScreen — states (5)
+     ✓ renders the user search, effective summary, assignments and audit trail 680ms
+   ✓ AccessScreen — role visibility (2)
+     ✓ offers only the roles and scopes the caller may manage 1257ms
+     ✓ disables assignment for a caller with nothing to grant, and says why 306ms
+   ✓ AccessScreen — create assignment (6)
+     ✓ submits role and scope, refreshes the views and closes 1058ms
+     ✓ prevents duplicate submissions while the request is in flight 592ms
+     ✓ keeps the dialog and the entered values when the backend rejects (409) 538ms
+     ✓ maps backend field errors onto the offending control 592ms
+     ✓ displays a denied write (403) without pretending it succeeded 566ms
+   ✓ AccessScreen — revoke assignment (3)
+     ✓ confirms before revoking, then refreshes the lists 618ms
+     ✓ shows the backend failure inside the confirmation instead of closing it 321ms
+ ✓ src/organizations/organizations-list.test.tsx (12 tests) 4775ms
+   ✓ OrganizationsList — reads (6)
+     ✓ renders rows from the API with status chips 806ms
+     ✓ shows an empty state and offers a filter reset when filters match nothing 612ms
+   ✓ OrganizationsList — lifecycle actions (6)
+     ✓ requires explicit confirmation before deactivating, and only then calls the API 503ms
+     ✓ closes without writing when the confirmation is cancelled 577ms
+     ✓ shows a denied write (403) inside the dialog instead of pretending success 418ms
+     ✓ reports a stale ETag (412) during a lifecycle change 396ms
+ ✓ src/sites/sites-list.test.tsx (14 tests) 4233ms
+   ✓ SitesList — reads (3)
+     ✓ renders rows from the API with status chips 865ms
+     ✓ shows an empty state when filters match nothing 368ms
+   ✓ SitesList — lifecycle (4)
+     ✓ confirms before archiving and refreshes on success 676ms
+     ✓ archives multiple selected sites through Delete selected 690ms
+     ✓ shows the server's denial verbatim instead of pretending success 364ms
+ ✓ src/sites/site-domains-panel.test.tsx (18 tests) 3074ms
+   ✓ SiteDomainsPanel — set as primary (4)
+     ✓ confirms by naming both hostnames, then applies the switch atomically 322ms
+   ✓ SiteDomainsPanel — deactivating the active primary (3)
+     ✓ sends the chosen replacement and reports the primary swap 409ms
+     ✓ shows the backend's rejected-replacement sentences, not a generic failure 328ms
+ ✓ src/sites/post-workflow.test.tsx (6 tests) 3578ms
+   ✓ ignores a former Site's completed save after its editor unmounts 734ms
+   ✓ ignores a former Site's late working-draft redirect 313ms
+   ✓ submits the saved revision and displays the backend-confirmed status 735ms
+   ✓ prevents transitions while unsaved text exists and retains text after a rejected transition 781ms
+   ✓ lets a scoped reviewer read and reject with a required comment 749ms
+ ✓ src/organizations/organization-hierarchy.test.tsx (6 tests) 2822ms
+   ✓ organization hierarchy browser (6)
+     ✓ renders a nested accessible tree, supports keyboard expansion and ancestor navigation 522ms
+     ✓ hides the selected and archived parent options and lets the backend reject cycle candidates 571ms
+     ✓ surfaces backend status 412 without applying a rejected move 610ms
+     ✓ surfaces backend status 403 without applying a rejected move 529ms
+     ✓ updates the tree after a successful move and shows the API confirmation 512ms
+stderr | src/organizations/organization-form.test.tsx > OrganizationForm — edit > 
+locks the immutable code and sends a conditional update with the ETag
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or ''.
+The available values are ``.
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or ''.
+The available values are ``.
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or ''.
+The available values are ``.
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or ''.
+The available values are ``.
+
+stderr | src/organizations/organization-form.test.tsx > OrganizationForm — edit > 
+locks the immutable code and sends a conditional update with the ETag
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or ''.
+The available values are ``.
+
+stderr | src/organizations/organization-form.test.tsx > OrganizationForm — edit > 
+reports a stale ETag (412) as a concurrency conflict asking for a reload
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or ''.
+The available values are ``.
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or ''.
+The available values are ``.
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or ''.
+The available values are ``.
+
+stderr | src/organizations/organization-form.test.tsx > OrganizationForm — edit > 
+reports a stale ETag (412) as a concurrency conflict asking for a reload
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or ''.
+The available values are ``.
+
+stderr | src/organizations/organization-form.test.tsx > OrganizationForm — edit > 
+reports a missing precondition (428) distinctly
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or ''.
+The available values are ``.
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or ''.
+The available values are ``.
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or ''.
+The available values are ``.
+
+stderr | src/organizations/organization-form.test.tsx > OrganizationForm — edit > 
+reports a missing precondition (428) distinctly
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or ''.
+The available values are ``.
+
+stderr | src/organizations/organization-form.test.tsx > OrganizationForm — edit > 
+locks hierarchy fields on an archived unit
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or ''.
+The available values are ``.
+MUI: You have provided an out-of-range value `1` for the select component.
+Consider providing a value that matches one of the available options or ''.
+The available values are ``.
+
+ ✓ src/organizations/organization-form.test.tsx (12 tests) 2848ms
+   ✓ OrganizationForm — create (7)
+     ✓ submits an approved payload on success and refreshes the view 541ms
+     ✓ shows a 409 duplicate code as a field error rather than a generic failure 503ms
+     ✓ explains a closed development write gate 330ms
+     ✓ shows invalid JSON metadata before any request is made 306ms
+ ✓ src/modules/module-registry.test.tsx (12 tests) 3257ms
+   ✓ ModuleRegistry (12)
+     ✓ enables a shipped default-disabled module only after confirmation and refreshes 955ms
+     ✓ keeps the switch on and displays a failed disable without reporting success 362ms
+     ✓ does not allow planned or unshipped modules to be enabled and supports cancel 406ms
+stderr | src/sites/site-form.test.tsx > SiteForm — edit > does not write anything 
+when nothing changed
+MUI: You have provided an out-of-range value `2` for the select component.
+Consider providing a value that matches one of the available options or ''.
+The available values are "".
+MUI: You have provided an out-of-range value `2` for the select component.
+Consider providing a value that matches one of the available options or ''.
+The available values are "".
+MUI: You have provided an out-of-range value `2` for the select component.
+Consider providing a value that matches one of the available options or ''.
+The available values are "".
+
+stderr | src/sites/site-form.test.tsx > SiteForm — edit > merges configuration 
+first with a fresh ETag, then saves details
+MUI: You have provided an out-of-range value `2` for the select component.
+Consider providing a value that matches one of the available options or ''.
+The available values are "".
+MUI: You have provided an out-of-range value `2` for the select component.
+Consider providing a value that matches one of the available options or ''.
+The available values are "".
+MUI: You have provided an out-of-range value `2` for the select component.
+Consider providing a value that matches one of the available options or ''.
+The available values are "".
+MUI: You have provided an out-of-range value `2` for the select component.
+Consider providing a value that matches one of the available options or ''.
+The available values are "".
+MUI: You have provided an out-of-range value `2` for the select component.
+Consider providing a value that matches one of the available options or ''.
+The available values are "".
+
+stderr | src/sites/site-form.test.tsx > SiteForm — edit > locks frozen controls on 
+an archived site
+MUI: You have provided an out-of-range value `2` for the select component.
+Consider providing a value that matches one of the available options or ''.
+The available values are "".
+MUI: You have provided an out-of-range value `2` for the select component.
+Consider providing a value that matches one of the available options or ''.
+The available values are "".
+
+ ✓ src/sites/site-form.test.tsx (8 tests) 3140ms
+   ✓ SiteForm — create (5)
+     ✓ renders labelled controls for the approved DTO fields 573ms
+     ✓ gives usable client feedback and does not call the API when invalid 342ms
+     ✓ submits the approved payload on success and navigates to the new site 637ms
+     ✓ shows the server's denial instead of pretending the write succeeded 424ms
+     ✓ attaches a duplicate-code conflict to the offending field 449ms
+ ✓ src/sites/site-detail.test.tsx (13 tests) 3934ms
+   ✓ SiteDetail — owner organization (3)
+     ✓ shows a root-owned site with the owner's own identity and designation 1034ms
+   ✓ SiteDetail — domains (3)
+     ✓ lists hostnames with their primary and status flags 556ms
+     ✓ states when no hostnames are registered 374ms
+ ✓ src/sites/site-user-create.test.tsx (5 tests) 3123ms
+   ✓ requires a Site role before calling the server 766ms
+   ✓ creates with explicit Site role and optional picture omitted 477ms
+   ✓ preserves inputs and focuses the field on recoverable rejection 348ms
+   ✓ retains existing-user search and Site-only assignment flow 1291ms
+ ✓ src/domains/domain-form-dialog.test.tsx (13 tests) 3188ms
+   ✓ DomainFormDialog — add (7)
+     ✓ shows the selected site and its existing primary domain 497ms
+     ✓ validates required fields and rejects invalid hostnames without an API call 389ms
+   ✓ DomainFormDialog — primary change confirmation (2)
+     ✓ does not promote when the confirmation is cancelled 327ms
+ ✓ src/sites/menu-items.test.tsx (7 tests) 1980ms
+   ✓ MenuItemTree (6)
+     ✓ moves, nests and lifts items from the keyboard for this Site only 726ms
+     ✓ saves a Page target and removes a leaf 443ms
+ ✓ src/sites/media-picker.test.tsx (11 tests) 3767ms
+   ✓ MediaPickerDialog (3)
+     ✓ filters, selects a ready Site asset and returns a stable asset ID payload 1101ms
+     ✓ keeps the draft selection when confirm finds the asset ineligible 404ms
+   ✓ SiteImageField and repeater builder (3)
+     ✓ changes only the targeted Slider slide and restores focus after picking 707ms
+     ✓ keeps separate slide references after reorder and reopen 490ms
+ ✓ src/sites/post-media.test.tsx (4 tests) 3256ms
+   ✓ saves a featured asset identity and editable alternative text 1811ms
+   ✓ removes the featured reference and retains the article body 630ms
+   ✓ inserts inline images with a stable placement ID and requires alternative text 569ms
+ ✓ src/sites/site-menus.test.tsx (13 tests) 2859ms
+   ✓ SiteMenusPanel (10)
+     ✓ reorders the header with the keyboard-reachable move control and only for this Site 473ms
+     ✓ shows the reloaded menu order after a move 361ms
+     ✓ creates an unassigned local menu and renames it without changing placement 588ms
+ ✓ src/sites/site-modules.test.tsx (18 tests) 2522ms
+ ✓ src/modules/bulk-operation-dialog.test.tsx (9 tests) 1727ms
+   ✓ BulkOperationDialog (7)
+     ✓ shows the backend preview and reports success only after the commit 470ms
+ ✓ src/app/access/access-control-manager.test.tsx (7 tests) 2342ms
+   ✓ Access control manager (7)
+     ✓ renders Editor, Reviewer and Viewer from the registered permission arrays 325ms
+     ✓ assigns a site role and shows the refreshed effective permissions 801ms
+     ✓ shows self-escalation and foreign delegation failures without treating them as success 490ms
+     ✓ revokes a site assignment and refreshes that user's effective permissions 419ms
+ ✓ src/sites/media-picker-save.test.tsx (1 test) 1221ms
+   ✓ CMS media picker save integration (1)
+     ✓ keeps the draft image selection when save finds the asset ineligible 1219ms
+ ✓ src/sites/site-sidebars.test.tsx (6 tests) 1884ms
+   ✓ creates a named sidebar using an existing Menu reference 676ms
+   ✓ configures and reorders approved content sources without requiring MENUS 618ms
+ ✓ src/sites/media-upload-panel.test.tsx (5 tests) 1171ms
+   ✓ Media upload queue (4)
+     ✓ drops multiple files and persists each file's name, categories and alt text 552ms
+ ✓ src/modules/operation-history.test.tsx (3 tests) 1008ms
+   ✓ OperationHistory (3)
+     ✓ lists operations and shows every change with its audit fields 537ms
+     ✓ filters by action and reloads after a new operation 392ms
+ ✓ src/sites/visual-builder-inspector.test.tsx (4 tests) 731ms
+ ✓ src/workspace.test.tsx (5 tests) 1033ms
+   ✓ loads discovery only on open, pages explicitly and rejects stale search results 878ms
+ ✓ src/site-switching.test.tsx (8 tests) 893ms
+   ✓ returning near lease expiry does not grant another 30 seconds and timer/focus refreshes share transport 546ms
+ ✓ src/sites/homepage-template-catalogue.test.tsx (7 tests) 1009ms
+   ✓ browses three templates and responsive non-mutating previews with keyboard focus 461ms
+ ✓ src/sites/site-dashboard.test.tsx (8 tests) 913ms
+   ✓ SiteDashboard (8)
+     ✓ keeps confirmed totals visible when a background refresh fails and offers retry 420ms
+stderr | src/sidebar.test.tsx > DesktopSidebar — Site workspace > shows the Visual 
+Builder menu and keeps it active while editing a Page canvas
+Received `false` for a non-boolean attribute `prefetch`.
+
+If you want to write it to the DOM, pass a string instead: prefetch="false" or prefetch={value.toString()}.
+
+If you used to conditionally omit it with prefetch={condition && value}, pass prefetch={condition ? value : undefined} 
+instead.
+
+ ✓ src/sidebar.test.tsx (10 tests) 948ms
+ ✓ src/sites/menu-preview.test.tsx (5 tests) 617ms
+ ✓ src/app/organizations/actions.test.ts (2 tests) 761ms
+   ✓ organization server actions (2)
+     ✓ keeps mock-created organizations visible to subsequent list reads 306ms
+     ✓ moves with a fresh ETag and exposes the persisted parent in a later read 453ms
+ ✓ src/sites/menu-locations.test.tsx (5 tests) 602ms
+   ✓ requires explicit replacement and keeps separate save and publish actions 311ms
+ ✓ src/admin-shell.test.tsx (3 tests) 666ms
+   ✓ AdminShell (3)
+     ✓ opens and closes the mobile navigation drawer from the header toggle 439ms
+ ✓ src/sites/site-admin-frame.test.tsx (10 tests) 506ms
+ ✓ src/sites/site-homepage.test.tsx (4 tests) 736ms
+   ✓ Homepage Settings (4)
+     ✓ lists only eligible same-Site published Pages and assigns with authoritative success 477ms
+ ✓ src/data/query-cache.test.tsx (15 tests) 352ms
+ ✓ src/sites/post-rich-editor.test.tsx (1 test) 429ms
+   ✓ applies Paragraph even when the menu already displays Paragraph for an existing heading 428ms
+stderr | src/auth.test.ts > OIDC authorization-code sign-in > refuses a sign-in 
+POST that carries no CSRF token
+[auth][error] MissingCSRF: CSRF token was missing during an action signin. Read more at 
+https://errors.authjs.dev#missingcsrf
+    at validateCSRF (/workspace/node_modules/.pnpm/@auth+core@0.41.3/node_modules/@auth/core/lib/actions/callback/oauth
+/csrf-token.js:38:11)
+    at AuthInternal (/workspace/node_modules/.pnpm/@auth+core@0.41.3/node_modules/@auth/core/lib/index.js:61:17)
+    at Auth (/workspace/node_modules/.pnpm/@auth+core@0.41.3/node_modules/@auth/core/index.js:111:34)
+    at /workspace/apps/admin-web/src/auth.test.ts:174:22
+    at async file:///workspace/node_modules/.pnpm/vitest@5.0.5_@types+node@22.10.5_jsdom@25.0.1_vite@8.3.5_@types+node@
+22.10.5_/node_modules/vitest/dist/chunks/run.BPv-BBRv.js:2801:20
+
+stderr | src/auth.test.ts > OIDC authorization-code sign-in > does not establish a 
+session when the callback state does not match
+[auth][error] InvalidCheck: state value could not be parsed. Read more at 
+https://errors.authjs.dev#invalidcheck
+    at parseCookie 
+(/workspace/node_modules/.pnpm/@auth+core@0.41.3/node_modules/@auth/core/lib/actions/callback/oauth/checks.js:51:15)
+    at Object.use 
+(/workspace/node_modules/.pnpm/@auth+core@0.41.3/node_modules/@auth/core/lib/actions/callback/oauth/checks.js:73:30)
+    at handleOAuth 
+(/workspace/node_modules/.pnpm/@auth+core@0.41.3/node_modules/@auth/core/lib/actions/callback/oauth/callback.js:90:38)
+    at Module.callback 
+(/workspace/node_modules/.pnpm/@auth+core@0.41.3/node_modules/@auth/core/lib/actions/callback/index.js:37:47)
+    at AuthInternal (/workspace/node_modules/.pnpm/@auth+core@0.41.3/node_modules/@auth/core/lib/index.js:29:38)
+    at Auth (/workspace/node_modules/.pnpm/@auth+core@0.41.3/node_modules/@auth/core/index.js:111:34)
+    at /workspace/apps/admin-web/src/auth.test.ts:185:22
+    at async file:///workspace/node_modules/.pnpm/vitest@5.0.5_@types+node@22.10.5_jsdom@25.0.1_vite@8.3.5_@types+node@
+22.10.5_/node_modules/vitest/dist/chunks/run.BPv-BBRv.js:2801:20
+
+ ✓ src/auth.test.ts (6 tests) 281ms
+ ✓ src/app/organizations/[id]/organization-detail.test.tsx (4 tests) 380ms
+ ✓ src/app/sites/[id]/admin/posts/[postId]/preview/page.test.tsx (2 tests) 255ms
+ ✓ src/sites/content-workflow.test.tsx (2 tests) 278ms
+ ✓ src/sites/view-public-site.test.tsx (5 tests) 201ms
+ ✓ src/data/section-navigation.test.tsx (13 tests) 136ms
+ ✓ src/app/sites/[id]/admin/pages/[pageId]/preview/page.test.tsx (3 tests) 220ms
+ ✓ src/performance/navigation-timing.test.tsx (3 tests) 110ms
+ ✓ src/app/layout.test.tsx (5 tests) 86ms
+ ✓ src/breadcrumb.test.tsx (2 tests) 104ms
+ ✓ src/session-watch.test.ts (2 tests) 51ms
+ ✓ src/session-jwt.test.ts (2 tests) 22ms
+ ✓ src/access-token.test.ts (12 tests) 18ms
+ ✓ src/app/sites/[id]/media-upload/route.test.ts (2 tests) 18ms
+ ✓ src/app/api/workspace/route.test.ts (10 tests) 14ms
+ ✓ src/app/sites/page-actions.test.ts (8 tests) 17ms
+ ✓ src/sites/visual-builder-model.test.ts (3 tests) 15ms
+ ✓ src/performance/server-fetch.test.ts (3 tests) 12ms
+ ✓ src/sites/visual-builder-history.test.ts (2 tests) 12ms
+ ✓ src/organizations/hierarchy-tree.test.ts (3 tests) 19ms
+ ✓ src/app/api/session/expired/route.test.ts (3 tests) 10ms
+ ✓ src/sites/visual-builder-composition.test.ts (5 tests) 13ms
+ ✓ src/organizations/validation.test.ts (17 tests) 10ms
+ ✓ src/app/sites/[id]/media/[assetId]/image/route.test.ts (2 tests) 13ms
+ ✓ src/sites/site-admin.test.ts (12 tests) 13ms
+ ✓ src/app/access/actions.test.ts (5 tests) 12ms
+ ✓ src/sites/post-paths.test.ts (3 tests) 4ms
+ ✓ src/app/sites/[id]/pages/[pageId]/preview-media/[revision]/[assetId]/image/route.test.ts (2 tests) 11ms
+ ✓ src/app/modules/actions.test.ts (6 tests) 10ms
+ ✓ src/navigation.test.ts (13 tests) 8ms
+ ✓ src/sites/menu-paths.test.ts (2 tests) 5ms
+ ✓ src/sites/configuration.test.ts (6 tests) 8ms
+ ✓ src/app/actions.test.ts (3 tests) 8ms
+ ✓ src/session-expiry.test.ts (3 tests) 6ms
+ ✓ src/sites/owner.test.ts (8 tests) 8ms
+ ✓ src/organizations/list-query.test.ts (3 tests) 8ms
+ ✓ src/sites/visual-builder-dnd.test.ts (4 tests) 7ms
+ ✓ src/app/sites/post-actions.test.ts (1 test) 7ms
+ ✓ src/sites/page-paths.test.ts (2 tests) 7ms
+ ✓ src/cache-identity.test.ts (2 tests) 6ms
+ ✓ src/admin/bulk-lifecycle.test.ts (1 test) 5ms
+
+ Test Files  84 passed (84)
+      Tests  617 passed (617)
+   Start at  03:03:23
+   Duration  160.96s (tests 64%, import 17%, environment 13%, setup 4%, transform 3%)
+
+    Isolate  84 workers spawned · ~590ms startup each (spawn + environment, per file)
+             at least ~24.18s faster with isolate: false — reuses workers across files instead of one per file
+
+JUNIT report written to /workspace/perf005-full.xml

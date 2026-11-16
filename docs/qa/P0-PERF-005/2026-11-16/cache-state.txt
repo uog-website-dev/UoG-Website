@@ -1,0 +1,10 @@
+
+ RUN  v5.0.5 /workspace/apps/admin-web
+
+ ✓ src/data/section-navigation.test.tsx (9 tests) 141ms
+
+ Test Files  1 passed (1)
+      Tests  9 passed (9)
+   Start at  02:55:37
+   Duration  1.29s (transform 37%, environment 33%, tests 12%, setup 9%, import 8%)
+

@@ -3,7 +3,8 @@ param(
  [ValidateRange(2,100)][int]$Samples=10,
  [ValidateRange(10,30)][int]$Sites=10,
  [string]$Output="docs/qa/P0-PERF-001/local",
- [switch]$SkipSeed
+ [switch]$SkipSeed,
+ [switch]$SectionMatrix
 )
 $ErrorActionPreference="Stop"
 # Run from the repository root. Secrets remain in memory/stdin, never evidence.
@@ -22,6 +23,7 @@ if(!$SkipSeed){
  if($LASTEXITCODE){throw "Dataset preparation failed"}
 }
 $previousMode=$env:PERF_NEXT_MODE
+$previousMatrix=$env:PERF_SECTION_MATRIX
 try{
  $env:PERF_NEXT_MODE=$Mode
  docker @compose up -d --no-deps --force-recreate perf-backend perf-admin perf-gateway
@@ -33,9 +35,10 @@ try{
  }
  if(!$ready){throw "Performance frontend did not become ready"}
  $env:PERF_MODE=$Mode;$env:PERF_SAMPLES="$Samples";$env:PERF_OUTPUT="$Output/$Mode";$env:PERF_ORIGIN="http://localhost:8088"
+ $env:PERF_SECTION_MATRIX=if($SectionMatrix){'1'}else{'0'}
  # Never tee the output of prepare-session.py: it contains the ephemeral login/token.
  $privateConfig | ConvertTo-Json | docker compose exec -T backend python manage.py shell -c "exec(open('/tmp/prepare-session.py').read())" | node scripts/perf/benchmark.cjs
  if($LASTEXITCODE){throw "Browser/API smoke benchmark failed; inspect the redacted results file"}
  node scripts/perf/collect-traces.cjs "$Output/$Mode/results.json"
  if($LASTEXITCODE){throw "Trace correlation failed"}
-}finally{$env:PERF_NEXT_MODE=$previousMode}
+}finally{$env:PERF_NEXT_MODE=$previousMode;$env:PERF_SECTION_MATRIX=$previousMatrix}

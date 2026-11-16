@@ -1,0 +1,34 @@
+{
+  "checks": [
+    "Pages, Posts, Menus and Media reuse cached section data without read RPCs or loading flashes",
+    "Saving an existing managed draft invalidates the previously cached Pages list",
+    "Original draft title restored through a second revision; no publication changed",
+    "Return view is Site-scoped; reuse or refresh follows the bounded workspace lease",
+    "Logout clears the session and disposes protected query state"
+  ],
+  "cached_returns": [
+    {
+      "section": "pages",
+      "server_action_reads": 0,
+      "loading_flashes": 0
+    },
+    {
+      "section": "posts",
+      "server_action_reads": 0,
+      "loading_flashes": 0
+    },
+    {
+      "section": "menus",
+      "server_action_reads": 0,
+      "loading_flashes": 0
+    },
+    {
+      "section": "media",
+      "server_action_reads": 0,
+      "loading_flashes": 0
+    }
+  ],
+  "return_site_reads": 0,
+  "status": "PASS",
+  "browser": "157.0.4341.46"
+}

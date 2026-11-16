@@ -1,7 +1,7 @@
 /* Collect only allowlisted structured events; never persist raw container logs. */
 const fs=require('node:fs'),{spawnSync}=require('node:child_process'),path=require('node:path');
 const file=process.argv[2];if(!file)throw new Error('Provide results.json');const data=JSON.parse(fs.readFileSync(file,'utf8')),ids=new Set(data.samples.map(s=>s.navigation_id));
-if(data.metadata.run_status!=='complete'||data.failures.length||data.samples.length!==1+13*data.metadata.samples_per_scenario)throw new Error('Cannot publish incomplete or failed benchmark evidence');
+if(data.metadata.run_status!=='complete'||data.failures.length||data.samples.length!==1+(data.metadata.section_matrix?17:13)*data.metadata.samples_per_scenario)throw new Error('Cannot publish incomplete or failed benchmark evidence');
 const actualMode=spawnSync('docker',['compose','-f','docker-compose.yml','-f','docker-compose.perf.yml','exec','-T','perf-admin','printenv','PERF_NEXT_MODE'],{encoding:'utf8'});
 if(actualMode.status!==0||actualMode.stdout.trim()!==data.metadata.mode)throw new Error('Measured frontend mode does not match the evidence label');
 data.metadata.verified_server_mode=actualMode.stdout.trim();
