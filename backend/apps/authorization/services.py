@@ -31,7 +31,7 @@ def record_decision(*, user, action, outcome, permission_code="", assignment=Non
     )
 
 
-def assignment_matches(assignment, *, organization_id=None, site_id=None):
+def assignment_matches(assignment, *, organization_id=None, site_id=None, scope_cache=None):
     """A broad scope can cover descendants; narrower scopes never broaden."""
     if assignment.scope == UserRoleAssignment.Scope.PLATFORM:
         return True
@@ -39,16 +39,25 @@ def assignment_matches(assignment, *, organization_id=None, site_id=None):
         return site_id is not None and assignment.site_id == site_id
     if assignment.scope != UserRoleAssignment.Scope.ORGANIZATION or organization_id is None:
         return False
+    # Reuse only structural lookups within this single evaluation. Membership,
+    # role and permission liveness are still read from the DB on every call.
+    scope_cache = {} if scope_cache is None else scope_cache
     if site_id is not None:
         from apps.sites.models import Site
-        owning_organization_id = Site.objects.filter(pk=site_id).values_list("organization_unit_id", flat=True).first()
+        key = ("owner", site_id)
+        if key not in scope_cache:
+            scope_cache[key] = Site.objects.filter(pk=site_id).values_list("organization_unit_id", flat=True).first()
+        owning_organization_id = scope_cache[key]
         if owning_organization_id is None or owning_organization_id != organization_id:
             return False
     if assignment.organization_id == organization_id:
         return True
     from apps.organizations.selectors.hierarchy import get_ancestors
     try:
-        return any(row.pk == assignment.organization_id for row in get_ancestors(organization_id, include_self=True))
+        key = ("ancestors", organization_id)
+        if key not in scope_cache:
+            scope_cache[key] = {row.pk for row in get_ancestors(organization_id, include_self=True)}
+        return assignment.organization_id in scope_cache[key]
     except Exception:
         return False
 
@@ -86,25 +95,22 @@ def permission_granted(user, permission_code, *, organization_id=None, site_id=N
     now = timezone.now()
     assignments = (
         UserRoleAssignment.objects.select_related("role")
-        .prefetch_related("role__permission_links__permission")
-        .filter(user=user, revoked_at__isnull=True, role__is_active=True)
+        .filter(user=user, revoked_at__isnull=True, role__is_active=True,
+                role__permission_links__permission_id=permission.pk)
         .filter(Q_expiry(now))
     )
     if organization_id is None and site_id is None:
         # A scope-less query is a platform-level query, not a wildcard. Only
         # platform grants (or the explicit platform-admin bypass above) apply.
         assignments = assignments.filter(scope=UserRoleAssignment.Scope.PLATFORM)
+    scope_cache = {}
     for assignment in assignments:
-        if not assignment_matches(assignment, organization_id=organization_id, site_id=site_id):
+        if not assignment_matches(assignment, organization_id=organization_id, site_id=site_id, scope_cache=scope_cache):
             continue
-        has_permission = assignment.role.permission_links.filter(
-            permission_id=permission.pk, permission__is_active=True, permission__is_system=True,
-        ).exists()
-        if has_permission:
-            if audit:
-                record_decision(user=user, action="PERMISSION_CHECK", outcome="ALLOW", permission_code=permission_code,
-                                assignment=assignment, request=request)
-            return True
+        if audit:
+            record_decision(user=user, action="PERMISSION_CHECK", outcome="ALLOW", permission_code=permission_code,
+                            assignment=assignment, request=request)
+        return True
     if audit:
         record_decision(user=user, action="PERMISSION_CHECK", outcome="DENY", permission_code=permission_code, request=request)
     return False
@@ -142,12 +148,13 @@ def effective_permission_sets(user, scopes):
     bypass = any(a.scope == UserRoleAssignment.Scope.PLATFORM and a.role.is_system
                  and a.role.code == "platform-administrator" for a in assignments)
     results = []
+    scope_cache = {}
     for organization_id, site_id in scopes:
         granted = registered.intersection(PLATFORM_ADMIN) if bypass else set()
         for assignment in assignments:
             if organization_id is None and site_id is None and assignment.scope != UserRoleAssignment.Scope.PLATFORM:
                 continue
-            if assignment_matches(assignment, organization_id=organization_id, site_id=site_id):
+            if assignment_matches(assignment, organization_id=organization_id, site_id=site_id, scope_cache=scope_cache):
                 granted.update(link.permission.code for link in assignment.role.live_permission_links
                                if link.permission.code in registered)
         results.append(sorted(granted))

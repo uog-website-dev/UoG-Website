@@ -1,0 +1,310 @@
+{
+  "decision": "No new indexes: repeated ORM reads dominated; existing ownership/join/version indexes support measured queries. No schema migration or DDL locks.",
+  "paths": {
+    "bootstrap": {
+      "indexes_used": [
+        "auth_assign_user_live",
+        "organizations_organizationunit_pkey",
+        "sites_module_pkey",
+        "sites_moduledependency_module_id_b29cb288"
+      ],
+      "relations": [
+        "authorization_permission",
+        "authorization_role",
+        "authorization_rolepermission",
+        "authorization_userroleassignment",
+        "organizations_organizationunit",
+        "sites_module",
+        "sites_module_implementation",
+        "sites_moduledependency",
+        "sites_site",
+        "sites_sitedomain",
+        "sites_sitemodule"
+      ],
+      "largest_individual_plan_ms": 0.326,
+      "sql_count": 6
+    },
+    "switcher": {
+      "indexes_used": [
+        "auth_assign_user_live",
+        "auth_assignment_platform_uniq",
+        "auth_roleperm_lookup"
+      ],
+      "relations": [
+        "authorization_permission",
+        "authorization_role",
+        "authorization_rolepermission",
+        "authorization_userroleassignment",
+        "organizations_organizationunit",
+        "sites_site"
+      ],
+      "largest_individual_plan_ms": 0.243,
+      "sql_count": 6
+    },
+    "pages": {
+      "indexes_used": [
+        "auth_assign_user_live",
+        "auth_assignment_platform_uniq",
+        "auth_assignment_site_uniq",
+        "cms_page_pkey",
+        "cms_sitecontent_pkey",
+        "cms_sitecontent_site_id_2bd58eea",
+        "sites_site_pkey"
+      ],
+      "relations": [
+        "authorization_permission",
+        "authorization_role",
+        "authorization_rolepermission",
+        "authorization_userroleassignment",
+        "cms_page",
+        "cms_sitecontent",
+        "sites_site"
+      ],
+      "largest_individual_plan_ms": 0.432,
+      "sql_count": 14
+    },
+    "posts": {
+      "indexes_used": [
+        "api_post_pkey",
+        "api_post_tags_post_id_tag_id_58fa45e9_uniq",
+        "auth_assignment_platform_uniq",
+        "auth_assignment_site_uniq",
+        "cms_published_snapshot_version_uniq",
+        "cms_sitecontent_pkey",
+        "cms_sitecontent_site_id_2bd58eea",
+        "module_code_uniq",
+        "sites_module_implementation_pkey",
+        "sites_moduledependency_module_id_b29cb288",
+        "sites_site_pkey"
+      ],
+      "relations": [
+        "api_category",
+        "api_post",
+        "api_post_categories",
+        "api_post_tags",
+        "api_tag",
+        "authorization_role",
+        "authorization_userroleassignment",
+        "cms_publishedcontentsnapshot",
+        "cms_sitecontent",
+        "sites_module",
+        "sites_module_implementation",
+        "sites_moduledependency",
+        "sites_site",
+        "sites_sitemodule"
+      ],
+      "largest_individual_plan_ms": 0.814,
+      "sql_count": 14
+    },
+    "menus": {
+      "indexes_used": [
+        "auth_assign_user_live",
+        "auth_assignment_platform_uniq",
+        "cms_menuitem_menu_id_0e8f0043",
+        "sites_site_pkey"
+      ],
+      "relations": [
+        "authorization_permission",
+        "authorization_role",
+        "authorization_rolepermission",
+        "authorization_userroleassignment",
+        "cms_menu",
+        "cms_menuitem",
+        "sites_site"
+      ],
+      "largest_individual_plan_ms": 0.109,
+      "sql_count": 16
+    },
+    "media": {
+      "indexes_used": [
+        "auth_assignment_platform_uniq",
+        "authorization_userroleassignment_role_id_a8c240d3",
+        "media_mediaasset_site_id_811ca9e7",
+        "module_code_uniq",
+        "sites_module_implementation_pkey",
+        "sites_moduledependency_module_id_b29cb288",
+        "sites_site_pkey"
+      ],
+      "relations": [
+        "authorization_permission",
+        "authorization_role",
+        "authorization_rolepermission",
+        "authorization_userroleassignment",
+        "media_mediaasset",
+        "media_mediaprocessing",
+        "sites_module",
+        "sites_module_implementation",
+        "sites_moduledependency",
+        "sites_site",
+        "sites_sitemodule"
+      ],
+      "largest_individual_plan_ms": 0.348,
+      "sql_count": 16
+    },
+    "dashboard": {
+      "indexes_used": [
+        "auth_assign_user_live",
+        "auth_assignment_platform_uniq",
+        "auth_assignment_site_uniq",
+        "sites_module_pkey",
+        "sites_moduledependency_module_id_b29cb288",
+        "sites_site_pkey"
+      ],
+      "relations": [
+        "authorization_permission",
+        "authorization_role",
+        "authorization_rolepermission",
+        "authorization_userroleassignment",
+        "sites_module",
+        "sites_module_implementation",
+        "sites_moduledependency",
+        "sites_site",
+        "sites_sitemodule"
+      ],
+      "largest_individual_plan_ms": 0.262,
+      "sql_count": 7
+    },
+    "dashboard_cold": {
+      "indexes_used": [
+        "auth_assign_user_live",
+        "auth_assignment_platform_uniq",
+        "auth_assignment_site_uniq",
+        "authorization_userroleassignment_site_id_9b3bd16d",
+        "cms_menuitem_site_id_03daec46",
+        "cms_sitecontent_site_id_2bd58eea",
+        "media_mediaasset_site_id_811ca9e7",
+        "sites_module_pkey",
+        "sites_moduledependency_module_id_b29cb288",
+        "sites_site_pkey"
+      ],
+      "relations": [
+        "api_post",
+        "auth_user",
+        "authorization_permission",
+        "authorization_role",
+        "authorization_rolepermission",
+        "authorization_userroleassignment",
+        "cms_menu",
+        "cms_menuitem",
+        "cms_page",
+        "cms_sitecontent",
+        "media_mediaasset",
+        "sites_module",
+        "sites_module_implementation",
+        "sites_moduledependency",
+        "sites_site",
+        "sites_sitemodule"
+      ],
+      "largest_individual_plan_ms": 0.348,
+      "sql_count": 23
+    },
+    "pages_status_recent": {
+      "indexes_used": [
+        "auth_assignment_platform_uniq",
+        "auth_assignment_site_uniq",
+        "cms_page_pkey",
+        "cms_sitecontent_pkey",
+        "cms_sitecontent_site_id_2bd58eea",
+        "sites_site_pkey"
+      ],
+      "relations": [
+        "authorization_role",
+        "authorization_userroleassignment",
+        "cms_page",
+        "cms_sitecontent",
+        "sites_site"
+      ],
+      "largest_individual_plan_ms": 0.421,
+      "sql_count": 11
+    },
+    "posts_status_recent": {
+      "indexes_used": [
+        "api_post_pkey",
+        "api_post_tags_post_id_tag_id_58fa45e9_uniq",
+        "auth_assignment_platform_uniq",
+        "auth_assignment_site_uniq",
+        "cms_published_snapshot_version_uniq",
+        "cms_sitecontent_pkey",
+        "cms_sitecontent_site_id_2bd58eea",
+        "module_code_uniq",
+        "sites_module_implementation_pkey",
+        "sites_moduledependency_module_id_b29cb288",
+        "sites_site_pkey"
+      ],
+      "relations": [
+        "api_category",
+        "api_post",
+        "api_post_categories",
+        "api_post_tags",
+        "api_tag",
+        "authorization_role",
+        "authorization_userroleassignment",
+        "cms_publishedcontentsnapshot",
+        "cms_sitecontent",
+        "sites_module",
+        "sites_module_implementation",
+        "sites_moduledependency",
+        "sites_site",
+        "sites_sitemodule"
+      ],
+      "largest_individual_plan_ms": 0.523,
+      "sql_count": 14
+    },
+    "media_ready": {
+      "indexes_used": [
+        "auth_assignment_platform_uniq",
+        "authorization_userroleassignment_role_id_a8c240d3",
+        "media_mediaasset_site_id_811ca9e7",
+        "module_code_uniq",
+        "sites_module_implementation_pkey",
+        "sites_moduledependency_module_id_b29cb288",
+        "sites_site_pkey"
+      ],
+      "relations": [
+        "authorization_permission",
+        "authorization_role",
+        "authorization_rolepermission",
+        "authorization_userroleassignment",
+        "media_mediaasset",
+        "media_mediaprocessing",
+        "sites_module",
+        "sites_module_implementation",
+        "sites_moduledependency",
+        "sites_site",
+        "sites_sitemodule"
+      ],
+      "largest_individual_plan_ms": 0.437,
+      "sql_count": 16
+    },
+    "switcher_search": {
+      "indexes_used": [
+        "auth_assign_user_live",
+        "auth_assignment_platform_uniq",
+        "auth_roleperm_lookup"
+      ],
+      "relations": [
+        "authorization_permission",
+        "authorization_role",
+        "authorization_rolepermission",
+        "authorization_userroleassignment",
+        "organizations_organizationunit",
+        "sites_site"
+      ],
+      "largest_individual_plan_ms": 0.251,
+      "sql_count": 6
+    },
+    "permissions": {
+      "indexes_used": [
+        "auth_assign_user_live"
+      ],
+      "relations": [
+        "authorization_permission",
+        "authorization_role",
+        "authorization_rolepermission",
+        "authorization_userroleassignment"
+      ],
+      "largest_individual_plan_ms": 0.078,
+      "sql_count": 3
+    }
+  }
+}
