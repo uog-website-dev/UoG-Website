@@ -30,6 +30,8 @@ import {
   saveSiteVisualDraft,
   getSitePagePreview,
   transitionSitePage,
+  loadSitePageRevisions,
+  restoreSitePageRevision,
 } from "./page-actions";
 import { ApiError } from "@uog/api-client";
 import { validateVisualLayout } from "@uog/types";
@@ -188,5 +190,16 @@ describe("Site Page API actions", () => {
     api.postDetailed.mockResolvedValue({data:record,etag:'"cms-content-page-1-r9"'});
     await transitionSitePage(11,"page-1","approve","Reviewed exact tree",'"cms-content-page-1-r8"');
     expect(api.postDetailed).toHaveBeenCalledWith("/v1/sites/11/pages/page-1/workflow/",{action:"approve",comment:"Reviewed exact tree"},{headers:{"If-Match":'"cms-content-page-1-r8"'}});
+  });
+
+  it("loads Site-scoped Page revisions and restores with the current ETag", async () => {
+    api.getDetailed.mockResolvedValue({ data: { count: 1, next: null, previous: null, results: [{ id: 4, revision_number: 4 }] }, etag: '"cms-content-page-1-r4"' });
+    const revisions = await loadSitePageRevisions(11, "page-1");
+    expect(api.getDetailed).toHaveBeenCalledWith("/v1/cms/sites/11/content/page-1/revisions/?page_size=100");
+    expect(revisions).toMatchObject({ ok: true, data: { etag: '"cms-content-page-1-r4"', results: [{ revision_number: 4 }] } });
+    api.postDetailed.mockResolvedValue({ data: { id: 5, revision_number: 5, restored_from_revision: 2 } });
+    const restored = await restoreSitePageRevision(11, "page-1", 2, '"cms-content-page-1-r4"');
+    expect(api.postDetailed).toHaveBeenCalledWith("/v1/cms/sites/11/content/page-1/revisions/2/restore/", {}, { headers: { "If-Match": '"cms-content-page-1-r4"' } });
+    expect(restored).toMatchObject({ ok: true, data: { revision_number: 5, restored_from_revision: 2 } });
   });
 });

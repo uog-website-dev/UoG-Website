@@ -41,6 +41,7 @@ export function SiteHomepagePanel() {
   const [selection, setSelection] = useState<string>("");
   const [pages, setPages] = useState<SitePageRecord[]>([]);
   const [assignedPage, setAssignedPage] = useState<SitePageRecord | null>(null);
+  const [pendingDraft, setPendingDraft] = useState<SitePageRecord | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -60,15 +61,28 @@ export function SiteHomepagePanel() {
     setLoading(true);
     setError("");
     try {
-      const [siteResult, listed] = await Promise.all([
+      const [siteResult, listed, draftResult, reviewResult, approvedResult, unpublishedResult] = await Promise.all([
         getSite(siteId),
         loadSitePages(siteId, { status: "PUBLISHED", page: 1, page_size: 100, ordering: "title" }),
+        loadSitePages(siteId, { status: "DRAFT", page: 1, page_size: 100, ordering: "-updated_at" }),
+        loadSitePages(siteId, { status: "IN_REVIEW", page: 1, page_size: 100, ordering: "-updated_at" }),
+        loadSitePages(siteId, { status: "APPROVED", page: 1, page_size: 100, ordering: "-updated_at" }),
+        loadSitePages(siteId, { status: "UNPUBLISHED", page: 1, page_size: 100, ordering: "-updated_at" }),
       ]);
       if (!alive.current || sequence !== loadSequence.current) return;
       const homepageId = siteResult.ok ? (siteResult.data.data.homepage ?? null) : (admin.site.homepageId ?? null);
       const rows = unwrap(listed).results.filter((page) => page.site === siteId);
       setPages(rows);
       setAssignedId(homepageId);
+      const workingCopies = [draftResult, reviewResult, approvedResult, unpublishedResult]
+        .filter((result) => result.ok)
+        .flatMap((result) => result.ok ? result.data.results : [])
+        .filter((page) => page.site === siteId && (
+          (homepageId !== null && page.draft_of === homepageId)
+          || (!page.draft_of && Boolean(page.metadata?.template_application))
+        ))
+        .sort((left, right) => right.updated_at.localeCompare(left.updated_at));
+      setPendingDraft(workingCopies[0] ?? null);
       let current: SitePageRecord | null = rows.find((page) => page.id === homepageId) ?? null;
       if (homepageId && !current) {
         try {
@@ -99,6 +113,7 @@ export function SiteHomepagePanel() {
     setSelection("");
     setPages([]);
     setAssignedPage(null);
+    setPendingDraft(null);
     setMessage("");
     setError("");
     void reload();
@@ -221,6 +236,18 @@ export function SiteHomepagePanel() {
         ) : (
           <Typography color="text.secondary">No homepage is assigned for this Site yet.</Typography>
         )}
+        {pendingDraft ? (
+          <Alert severity={pendingDraft.status === "APPROVED" ? "success" : "info"} role="status">
+            Pending homepage draft: <strong>{pendingDraft.title}</strong> · {pendingDraft.status}.
+            {pendingDraft.status === "APPROVED" ? " It is ready for an authorized publisher." : " It is not visible to anonymous visitors."}
+            <Box sx={{ display: "flex", gap: 1, mt: 1, flexWrap: "wrap" }}>
+              <Button component={Link} href={siteAdminHref(siteId, "pages")} size="small">Open Page workflow</Button>
+              {admin.permissions.includes("content.pages.update") && admin.enabledModuleCodes.includes("VISUAL_BUILDER") ? (
+                <Button component={Link} href={`/sites/${siteId}/admin/pages/${pendingDraft.id}/builder`} size="small">Edit draft</Button>
+              ) : null}
+            </Box>
+          </Alert>
+        ) : null}
       </Paper>
 
       <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 3, display: "grid", gap: 2 }}>

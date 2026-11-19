@@ -8,6 +8,12 @@ Preview cards show the template description, manifest version and builder schema
 
 Open an existing Page's Visual Builder, choose **Homepage templates**, preview a design, then choose **Use ... in this draft**. Confirm the replacement explicitly. This loads an unsaved tree and participates in builder undo; it does not save automatically. Save Draft uses the existing Page API with its ETag, revision history and conflict behavior. Review, publication and homepage assignment remain separate existing operations. Replace sample copy with approved Site content before publication. Published Pages must first open a working draft.
 
+## Publishing and recovery
+
+Homepage Settings identifies the effective published root and the newest pending draft associated with it or created from a homepage starter template. Pending drafts stay private. Editors use the existing Page workflow controls to submit and review them; Publish is offered only when the API grants the current user the publisher action. After publication, assign an eligible published Page through Homepage Settings. Assignment is scoped and locked to the selected Site, and a failed write leaves the previous assignment intact.
+
+In Pages, authorized editors can open **Revisions** and restore an older revision only while the Page is editable. Restore copies the selected snapshot to a new draft revision and records its source; it never changes immutable history or publishes automatically. Submit, review, publish and homepage assignment continue through the normal workflow. A Site without an assigned eligible homepage uses the public empty-root response. Missing Site news or navigation is handled by the existing widget fallbacks.
+
 ## Manifest contract
 
 The source registry is `backend/apps/cms/schemas/homepage/`. Each manifest has exactly:

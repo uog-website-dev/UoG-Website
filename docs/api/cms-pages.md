@@ -34,7 +34,9 @@ AUTHOR, REVIEWER and PUBLISHER role rules apply to both content types.
 | `POST /api/v1/sites/{site_pk}/pages/{id}/workflow/` | Apply a validated workflow action |
 | `GET /api/v1/sites/{site_pk}/pages/{id}/workflow-history/` | Read the private, append-only transition timeline and review comments |
 | `POST /api/v1/sites/{site_pk}/pages/{id}/working-draft/` | Open the one working draft of a published Page. Requires `If-Match`. |
-| `POST /api/v1/sites/{site_pk}/pages/{id}/homepage/` | Make a draft or unpublished Page this Site's homepage |
+| `POST /api/v1/sites/{site_pk}/pages/{id}/homepage/` | Assign an eligible, published Page owned by this Site as its public root |
+| `GET /api/v1/cms/sites/{site_pk}/content/{id}/revisions/` | List immutable content revisions and return the current ETag |
+| `POST /api/v1/cms/sites/{site_pk}/content/{id}/revisions/{revision}/restore/` | Restore a historical revision into a new editable draft; requires the current `If-Match` |
 
 Create, edit, workflow and homepage assignment require PAGES to be
 implemented, globally enabled and enabled for that Site. When it is off,
@@ -76,6 +78,16 @@ keeps the previous snapshot. A stale `If-Match`, a second publish, or a
 publish after the live Page was unpublished fails without changing the
 public snapshot. The contract is recorded in
 [cms-workflow](../architecture/cms-workflow.md).
+
+Homepage Settings shows the assigned published root and any matching working
+draft or template-created draft. Drafts are private to authenticated editors;
+anonymous public delivery resolves only the current published Site assignment.
+The Pages table exposes **Revisions** to authorized editors. Restoring a
+previous revision creates a new draft revision that records its source; it
+does not edit immutable history or publish automatically. Continue through
+the existing submit, review and publish workflow, then assign only if the
+Page is not already the Site root. Assignment is Site-scoped, serialized and
+committed atomically; failed assignments leave the previous root unchanged.
 
 ### Example: create a draft
 
