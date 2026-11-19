@@ -1,0 +1,25 @@
+{
+  "run": "homeapply-restart-45",
+  "results": [
+    {
+      "name": "AC-01 valid template creates an editable Page draft with the expected component structure",
+      "status": "PASS"
+    },
+    {
+      "name": "AC-03 editor modifies, saves and reopens the resulting draft in Visual Builder",
+      "status": "PASS"
+    },
+    {
+      "name": "AC-02 published homepage assignment remains unchanged after draft application",
+      "status": "PASS"
+    },
+    {
+      "name": "AC-08 applied draft remains editable and versioned through existing Page revisions",
+      "status": "PASS"
+    },
+    {
+      "name": "Replace mode fetches a current Page ETag, applies the second template and reopens the selected draft",
+      "status": "PASS"
+    }
+  ]
+}

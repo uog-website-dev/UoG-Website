@@ -1,4 +1,5 @@
 vi.mock("./homepage-template-catalogue",()=>({HomepageTemplateCatalogue:()=>null}));
+vi.mock("next/navigation",()=>({usePathname:()=>"/sites/11/admin/homepage",useRouter:()=>({push:vi.fn()})}));
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { SitePageRecord } from "@/app/sites/page-actions";
