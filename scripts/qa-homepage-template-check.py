@@ -20,5 +20,5 @@ else:
  if QA_STAGE=='preview':assert state==before,'Preview mutated CMS data'
  else:
   assert state['publications']==before['publications'] and state['settings']==before['settings'] and state['other_pages']==before['other_pages']
-  page=Page.objects.get(pk=seed['page_id']);assert len(page.metadata['visual_layout']['rows'])==3
+  page=Page.objects.get(pk=seed['page_id']);assert len(page.metadata['visual_layout']['rows'])==5
 print(json.dumps({'stage':QA_STAGE,'result':'PASS','revisions':state['revisions']}))

@@ -1,79 +1,47 @@
 {
   "manifest_version": 1,
   "id": "university-main",
-  "version": 1,
+  "version": 3,
   "name": "University Main",
-  "description": "An institutional welcome, academic priorities and a clear invitation to explore.",
+  "description": "A branded university homepage with an editable welcome, key links and published Site news.",
   "required_modules": [
     "PAGES",
     "VISUAL_BUILDER"
   ],
   "layout": {
     "schema_version": 1,
+    "settings": {
+      "show_title": false,
+      "content_width": "wide"
+    },
     "rows": [
       {
-        "id": "university-main-section-0",
+        "id": "um-brand",
         "type": "section",
         "ratios": [
-          100
+          25,
+          75
         ],
         "columns": [
           {
-            "id": "university-main-section-0-column",
+            "id": "um-brand-logo",
             "type": "column",
             "children": [
               {
-                "id": "university-main-title-0",
-                "type": "headline",
-                "props": {
-                  "text": "Learning that transforms lives",
-                  "level": 2
-                }
-              },
-              {
-                "id": "university-main-body-0",
-                "type": "editor",
-                "props": {
-                  "html": "<p>Discover our university, our people and our contribution to society.</p>"
-                }
+                "id": "um-logo",
+                "type": "site_logo",
+                "props": {}
               }
             ]
-          }
-        ],
-        "style": {
-          "padding": "md",
-          "background": "navy",
-          "text_color": "inverse",
-          "radius": "lg",
-          "gap": "md",
-          "text_size": "xl"
-        }
-      },
-      {
-        "id": "university-main-section-1",
-        "type": "section",
-        "ratios": [
-          100
-        ],
-        "columns": [
+          },
           {
-            "id": "university-main-section-1-column",
+            "id": "um-brand-title",
             "type": "column",
             "children": [
               {
-                "id": "university-main-title-1",
-                "type": "headline",
-                "props": {
-                  "text": "Explore our university",
-                  "level": 2
-                }
-              },
-              {
-                "id": "university-main-body-1",
-                "type": "editor",
-                "props": {
-                  "html": "<p>Education, research and community partnership.</p>"
-                }
+                "id": "um-title",
+                "type": "site_title",
+                "props": {}
               }
             ]
           }
@@ -82,47 +50,175 @@
           "padding": "md",
           "background": "paper",
           "text_color": "default",
-          "radius": "lg",
           "gap": "md",
-          "text_size": "lg"
+          "radius": "md"
+        },
+        "responsive": {
+          "mobile": {
+            "stack": true
+          }
         }
       },
       {
-        "id": "university-main-section-2",
+        "id": "um-nav",
         "type": "section",
         "ratios": [
           100
         ],
         "columns": [
           {
-            "id": "university-main-section-2-column",
+            "id": "um-nav-col",
             "type": "column",
             "children": [
               {
-                "id": "university-main-title-2",
-                "type": "headline",
+                "id": "um-menu",
+                "type": "menu",
                 "props": {
-                  "text": "Shape your future",
-                  "level": 2
-                }
-              },
-              {
-                "id": "university-main-body-2",
-                "type": "editor",
-                "props": {
-                  "html": "<p>Discover opportunities to learn, collaborate and make a difference.</p>"
+                  "menu_code": "header"
                 }
               }
             ]
           }
         ],
         "style": {
-          "padding": "md",
+          "padding": "sm",
           "background": "mist",
           "text_color": "default",
+          "gap": "sm"
+        }
+      },
+      {
+        "id": "um-hero",
+        "type": "section",
+        "ratios": [
+          100
+        ],
+        "columns": [
+          {
+            "id": "um-hero-col",
+            "type": "column",
+            "children": [
+              {
+                "id": "um-hero-title",
+                "type": "headline",
+                "props": {
+                  "text": "Welcome to our university",
+                  "level": 2
+                }
+              },
+              {
+                "id": "um-hero-copy",
+                "type": "editor",
+                "props": {
+                  "html": "<p>Replace this introduction with an approved welcome for your Site. Add locally approved imagery through the builder when available.</p>"
+                }
+              }
+            ]
+          }
+        ],
+        "style": {
+          "padding": "xl",
+          "background": "navy_gradient",
+          "text_color": "inverse",
           "radius": "lg",
-          "gap": "md",
-          "text_size": "lg"
+          "gap": "lg",
+          "text_size": "xl"
+        },
+        "responsive": {
+          "mobile": {
+            "gap": "md"
+          }
+        }
+      },
+      {
+        "id": "um-links",
+        "type": "section",
+        "ratios": [
+          100
+        ],
+        "columns": [
+          {
+            "id": "um-links-col",
+            "type": "column",
+            "children": [
+              {
+                "id": "um-links-title",
+                "type": "headline",
+                "props": {
+                  "text": "Explore our university",
+                  "level": 3
+                }
+              },
+              {
+                "id": "um-hero-links",
+                "type": "button_grid",
+                "props": {
+                  "items": [
+                    {
+                      "id": "um-apply",
+                      "label": "Apply to study",
+                      "href": "/admissions"
+                    },
+                    {
+                      "id": "um-programmes",
+                      "label": "Explore programmes",
+                      "href": "/academics"
+                    },
+                    {
+                      "id": "um-research",
+                      "label": "Research",
+                      "href": "/research"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "style": {
+          "padding": "lg",
+          "background": "paper",
+          "text_color": "default",
+          "radius": "md",
+          "gap": "md"
+        }
+      },
+      {
+        "id": "um-news",
+        "type": "section",
+        "ratios": [
+          100
+        ],
+        "columns": [
+          {
+            "id": "um-news-col",
+            "type": "column",
+            "children": [
+              {
+                "id": "um-news-title",
+                "type": "headline",
+                "props": {
+                  "text": "University news",
+                  "level": 3
+                }
+              },
+              {
+                "id": "um-news-grid",
+                "type": "loop_grid",
+                "props": {
+                  "source": "posts",
+                  "limit": 3
+                }
+              }
+            ]
+          }
+        ],
+        "style": {
+          "padding": "lg",
+          "background": "paper",
+          "text_color": "default",
+          "radius": "md",
+          "gap": "md"
         }
       }
     ]
