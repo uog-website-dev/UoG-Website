@@ -46,6 +46,17 @@ def test_catalogue_and_preparation_never_write_pages_or_settings(api):
     assert inventory(api)==before
 
 
+def test_starter_manifests_use_site_bound_widgets_and_editable_sections(api):
+    endpoint(api)
+    for template_id in ('university-main','college-department'):
+        prepared=domain.prepare_template(api.site.pk,template_id,3)['visual_layout']
+        kinds={node['type'] for node,_ in iter_nodes(prepared)}
+        assert {'site_logo','site_title','menu','headline','editor','button_grid','loop_grid'} <= kinds
+        news=[node for node,_ in iter_nodes(prepared) if node['type']=='loop_grid']
+        assert len(news)==1 and news[0]['props']['source']=='posts'
+        assert all('asset_id' not in node.get('props',{}) and 'url' not in node.get('props',{}) for node,_ in iter_nodes(prepared))
+
+
 @pytest.mark.parametrize('field,value',[('manifest_version',2),('version',0)])
 def test_unsupported_manifest_is_unavailable_and_cannot_be_prepared(api,monkeypatch,field,value):
     url=endpoint(api);bad=copy.deepcopy(domain.MANIFESTS[0]);bad[field]=value
@@ -64,6 +75,16 @@ def test_unknown_components_versions_and_site_bound_assets_are_rejected(api,monk
     monkeypatch.setattr(domain,'MANIFESTS',(bad,))
     assert not api.client.get(url,**api.header).json()[0]['available']
     assert api.client.post(url+'prepare/',{'template_id':bad['id'],'version':1},content_type='application/json',**api.header).status_code==400
+
+
+def test_homepage_template_news_must_be_site_posts(api,monkeypatch):
+    url=endpoint(api);bad=copy.deepcopy(domain.MANIFESTS[0])
+    grid=next(node for node,_ in iter_nodes(bad['layout']) if node['type']=='loop_grid')
+    grid['props']['source']='pages'
+    monkeypatch.setattr(domain,'MANIFESTS',(bad,))
+    entry=api.client.get(url,**api.header).json()[0]
+    assert not entry['available'] and entry['layout'] is None
+    assert api.client.post(url+'prepare/',{'template_id':bad['id'],'version':3},content_type='application/json',**api.header).status_code==400
 
 
 def test_permissions_isolation_expiration_and_module_contract(api):
@@ -99,7 +120,7 @@ def test_selected_template_saves_via_existing_revision_contract(api):
     endpoint(api)
     page=create_page(site=api.site,title="Template draft",slug="template-draft",actor=api.user)
     original_revision=page.revision_number
-    prepared=domain.prepare_template(api.site.pk,'university-main',1)['visual_layout']
+    prepared=domain.prepare_template(api.site.pk,'university-main',3)['visual_layout']
     url=f'/api/v1/sites/{api.site.pk}/pages/{page.pk}/visual-draft/'
     tag=content_etag(page)
     result=api.client.patch(url,{'visual_layout':prepared},content_type='application/json',HTTP_IF_MATCH=tag,**api.header)
