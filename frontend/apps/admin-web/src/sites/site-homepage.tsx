@@ -15,6 +15,7 @@ import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
+import {useRouter} from "next/navigation";
 import { useToast } from "@uog/ui";
 
 import { ApiError } from "@uog/api-client";
@@ -33,6 +34,7 @@ function eligibleCandidate(page: SitePageRecord): boolean {
 
 export function SiteHomepagePanel() {
   const admin = useSiteAdmin();
+  const router = useRouter();
   const toast = useToast();
   const siteId = admin.site.id;
   const [assignedId, setAssignedId] = useState<string | null>(admin.site.homepageId ?? null);
@@ -174,7 +176,7 @@ export function SiteHomepagePanel() {
         </Box>
       </Paper>
 
-      <HomepageTemplateCatalogue siteId={siteId} canEdit={admin.permissions.includes("content.pages.update")} />
+      <HomepageTemplateCatalogue siteId={siteId} canEdit={admin.permissions.includes("content.pages.update")} onApplied={(page)=>router.push(`/sites/${siteId}/admin/pages/${page.id}/builder`)} />
       {error ? <Alert severity="error" role="alert">{error}</Alert> : null}
       {message ? <Alert severity="success" role="status">{message}</Alert> : null}
 
