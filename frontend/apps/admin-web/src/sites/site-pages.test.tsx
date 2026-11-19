@@ -17,6 +17,8 @@ const updateSitePage = vi.fn();
 const transitionSitePage = vi.fn();
 const setSiteHomepage = vi.fn();
 const loadSitePageWorkflowHistory = vi.fn();
+const loadSitePageRevisions = vi.fn();
+const restoreSitePageRevision = vi.fn();
 const openWorkingDraft = vi.fn();
 
 vi.mock("@/app/sites/page-actions", () => ({
@@ -28,6 +30,8 @@ vi.mock("@/app/sites/page-actions", () => ({
   updateSitePage: (...args: unknown[]) => updateSitePage(...args),
   transitionSitePage: (...args: unknown[]) => transitionSitePage(...args),
   loadSitePageWorkflowHistory: (...args: unknown[]) => loadSitePageWorkflowHistory(...args),
+  loadSitePageRevisions: (...args: unknown[]) => loadSitePageRevisions(...args),
+  restoreSitePageRevision: (...args: unknown[]) => restoreSitePageRevision(...args),
   openWorkingDraft: (...args: unknown[]) => openWorkingDraft(...args),
   setSiteHomepage: (...args: unknown[]) => setSiteHomepage(...args),
 }));
@@ -167,6 +171,8 @@ beforeEach(() => {
   createSitePage.mockResolvedValue({ ok: true, data: draft() });
   transitionSitePage.mockResolvedValue({ ok: true, data: draft({ status: "IN_REVIEW" }) });
   loadSitePageWorkflowHistory.mockResolvedValue({ ok: true, data: [] });
+  loadSitePageRevisions.mockResolvedValue({ ok: true, data: { count: 0, next: null, previous: null, results: [], etag: '"cms-content-page-1-r1"' } });
+  restoreSitePageRevision.mockResolvedValue({ ok: true, data: { revision_number: 9, restored_from_revision: 1 } });
   openWorkingDraft.mockResolvedValue({ ok: true, data: draft() });
   setSiteHomepage.mockResolvedValue({ ok: true, data: draft({ is_homepage: true }) });
   updateSitePage.mockResolvedValue({ ok: true, data: draft({ title: "Admissions updated" }) });
@@ -337,6 +343,20 @@ describe("SitePagesPanel", () => {
     expect(await screen.findByRole("dialog", { name: "Workflow history: Admissions" })).toBeTruthy();
     expect(screen.getByRole("list", { name: "Page status timeline" }).textContent).toContain("Please add sources.");
     expect(loadSitePageWorkflowHistory).toHaveBeenCalledWith(11, "page-1");
+  });
+
+  it("restores an older Page revision as a new draft with the current ETag", async () => {
+    loadSitePages.mockResolvedValue(pageResult([draft({ revision_number: 8 })]));
+    loadSitePageRevisions.mockResolvedValue({ ok: true, data: { count: 2, next: null, previous: null, etag: '"cms-content-page-1-r8"', results: [
+      { id: 8, revision_number: 8, editor: "7", status: "DRAFT", changed_fields: [], content_hash: "latest", restored_from_revision: null, created_at: "2026-03-21T10:00:00Z" },
+      { id: 1, revision_number: 1, editor: "7", status: "DRAFT", changed_fields: ["title"], content_hash: "older", restored_from_revision: null, created_at: "2026-03-20T10:00:00Z" },
+    ] } });
+    renderPanel();
+    fireEvent.click(await screen.findByRole("button", { name: "Revisions for Admissions" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Restore as draft" }));
+    expect(screen.getByText(/copied into a new editable draft/i)).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Confirm restore" }));
+    await waitFor(() => expect(restoreSitePageRevision).toHaveBeenCalledWith(11, "page-1", 1, '"cms-content-page-1-r8"'));
   });
 
   it("defaults a new Page to the Site language", async () => {

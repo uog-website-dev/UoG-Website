@@ -37,8 +37,10 @@ import type {
 import {
   getSitePage,
   getSitePagePreview,
+  loadSitePageRevisions,
   loadSitePageWorkflowHistory,
   openWorkingDraft,
+  restoreSitePageRevision,
   setSiteHomepage,
   transitionSitePage,
 } from "@/app/sites/page-actions";
@@ -50,6 +52,7 @@ import type {
   SitePageWorkflowAction,
   SitePageWorkflowTransition,
   SitePagePreview,
+  SitePageRevision,
 } from "@/app/sites/page-actions";
 import { unwrap } from "@/organizations/contract";
 import { APP_BASE_PATH } from "@/base-path";
@@ -188,6 +191,13 @@ function SitePagesPanelContent({
   const [workflowHistory, setWorkflowHistory] = useState<SitePageWorkflowTransition[]>([]);
   const [historyError, setHistoryError] = useState("");
   const [historyLoading, setHistoryLoading] = useState(false);
+  const [revisionPage, setRevisionPage] = useState<SitePageRecord | null>(null);
+  const [revisions, setRevisions] = useState<SitePageRevision[]>([]);
+  const [revisionEtag, setRevisionEtag] = useState("");
+  const [revisionLoading, setRevisionLoading] = useState(false);
+  const [revisionError, setRevisionError] = useState("");
+  const [restoreTarget, setRestoreTarget] = useState<SitePageRevision | null>(null);
+  const [restoreError, setRestoreError] = useState("");
   const [saving, setSaving] = useState(false);
   const [workflowPreview, setWorkflowPreview] = useState<SitePagePreview | null>(null);
   const workflowSequence = useRef(0);
@@ -290,6 +300,43 @@ function SitePagesPanelContent({
     }
   }
 
+  async function openRevisionHistory(row: SitePageRecord) {
+    setRevisionPage(row);
+    setRevisions([]);
+    setRevisionEtag("");
+    setRevisionError("");
+    setRevisionLoading(true);
+    try {
+      const result = unwrap(await loadSitePageRevisions(siteId, row.id));
+      setRevisions(result.results);
+      setRevisionEtag(result.etag);
+    } catch (cause) {
+      setRevisionError(cause instanceof Error ? cause.message : "Page revisions could not be loaded.");
+    } finally {
+      setRevisionLoading(false);
+    }
+  }
+
+  async function confirmRevisionRestore() {
+    if (!revisionPage || !restoreTarget || !revisionEtag || saving) return;
+    setSaving(true);
+    setRestoreError("");
+    try {
+      unwrap(await restoreSitePageRevision(siteId, revisionPage.id, restoreTarget.revision_number, revisionEtag));
+      toast.success(`Revision ${restoreTarget.revision_number} restored as a new draft.`);
+      setRestoreTarget(null);
+      setRevisionPage(null);
+      pages.reload();
+      statusCounts.reload();
+    } catch (cause) {
+      const message = cause instanceof Error ? cause.message : "The Page revision could not be restored.";
+      setRestoreError(message);
+      toast.error(message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
   async function queueWorkflowAction(row: SitePageRecord, action: WorkflowAction) {
     const sequence = ++workflowSequence.current;
     setWorkflowComment("");
@@ -374,6 +421,9 @@ function SitePagesPanelContent({
       <Button key="history" size="small" aria-label={`Workflow history for ${row.title}`} onClick={() => void openWorkflowHistory(row)}>
         History
       </Button>,
+      ...(canEdit ? [<Button key="revisions" size="small" aria-label={`Revisions for ${row.title}`} onClick={() => void openRevisionHistory(row)}>
+        Revisions
+      </Button>] : []),
     ];
 
     if (canEdit && (row.status === "DRAFT" || row.status === "UNPUBLISHED")) {
@@ -620,6 +670,34 @@ function SitePagesPanelContent({
       >
         {workflowPreview && pendingWorkflow ? <Box><Typography variant="overline">Private revision {workflowPreview.revision_number}</Typography><PublicPageView page={pageFromResponse(200, workflowPreview.page)} privateMediaBase={`${APP_BASE_PATH}/sites/${siteId}/pages/${pendingWorkflow.page.id}/preview-media/${workflowPreview.revision_number}`} /></Box> : null}
       </ContentWorkflowDialog>
+
+      <Dialog open={revisionPage !== null} onClose={() => { if (!saving) setRevisionPage(null); }} fullWidth maxWidth="sm" aria-labelledby="page-revision-history-title">
+        <DialogTitle id="page-revision-history-title">Revisions: {revisionPage?.title}</DialogTitle>
+        <DialogContent dividers>
+          {revisionLoading ? <Typography role="status">Loading Page revisions…</Typography> : null}
+          {revisionError ? <Alert severity="error" role="alert">{revisionError}</Alert> : null}
+          {!revisionLoading && !revisionError && revisions.length === 0 ? <Typography color="text.secondary">No revisions are available.</Typography> : null}
+          {revisionPage && !["DRAFT", "UNPUBLISHED"].includes(revisionPage.status) ? <Alert severity="info" sx={{ mb: 1 }}>Restore is available after this Page returns to an editable draft through its existing workflow.</Alert> : null}
+          <Box component="ol" aria-label="Page revisions" sx={{ m: 0, pl: 3 }}>
+            {revisions.map((revision) => <Box component="li" key={revision.id} sx={{ mb: 1.5 }}>
+              <Typography fontWeight={600}>Revision {revision.revision_number} · {revision.status}</Typography>
+              <Typography variant="body2" color="text.secondary">{new Date(revision.created_at).toLocaleString()} · Editor {revision.editor}{revision.restored_from_revision ? ` · restored from revision ${revision.restored_from_revision}` : ""}</Typography>
+              <Typography variant="caption" color="text.secondary">Changed: {revision.changed_fields.join(", ") || "No recorded field changes"}</Typography>
+              {canEdit && revisionPage && ["DRAFT", "UNPUBLISHED"].includes(revisionPage.status) && revisionPage.revision_number !== undefined && revision.revision_number < revisionPage.revision_number ? <Button size="small" onClick={() => { setRestoreError(""); setRestoreTarget(revision); }}>Restore as draft</Button> : null}
+            </Box>)}
+          </Box>
+        </DialogContent>
+        <DialogActions><Button disabled={saving} onClick={() => setRevisionPage(null)}>Close</Button></DialogActions>
+      </Dialog>
+
+      <Dialog open={restoreTarget !== null} onClose={() => { if (!saving) setRestoreTarget(null); }} aria-labelledby="restore-page-revision-title">
+        <DialogTitle id="restore-page-revision-title">Restore Page revision?</DialogTitle>
+        <DialogContent>
+          {restoreError ? <Alert severity="error" role="alert">{restoreError}</Alert> : null}
+          <Typography>Revision {restoreTarget?.revision_number} will be copied into a new editable draft. The current published Page stays unchanged until the restored draft completes review and is published.</Typography>
+        </DialogContent>
+        <DialogActions><Button disabled={saving} onClick={() => setRestoreTarget(null)}>Cancel</Button><Button variant="contained" disabled={saving || !revisionEtag} onClick={() => void confirmRevisionRestore()}>{saving ? "Restoring…" : "Confirm restore"}</Button></DialogActions>
+      </Dialog>
 
       <Dialog
         open={historyPage !== null}

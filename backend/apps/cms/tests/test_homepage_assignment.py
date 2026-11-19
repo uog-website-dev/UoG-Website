@@ -71,6 +71,10 @@ def test_assignment_rejects_draft_foreign_and_preserves_revisions(world):
     assert response.status_code == 200, response.content
     assert response.json()["is_homepage"] is True
     a.refresh_from_db(); assert a.homepage_id == second.pk
+    site_detail = client.get(f"/api/v1/sites/{a.pk}/")
+    assert site_detail.status_code == 200, site_detail.content
+    assert site_detail.json()["homepage"] == str(second.pk)
+    assert site_detail["ETag"]
     second.refresh_from_db(); assert second.revision_number == revision
     assert PublishedContentSnapshot.objects.get(content=second).payload == snapshot
     generation = current_publication_version(a.pk,a.default_language)
@@ -107,6 +111,47 @@ def test_unpublished_selection_uses_empty_fallback_without_other_site_cache_chan
     assert again.json() == medicine.json()
     assert again["X-Publication-Version"] == medicine["X-Publication-Version"]
     a.refresh_from_db(); assert a.homepage_id == second.pk
+
+
+def test_previous_homepage_revision_can_be_restored_republished_and_remains_in_history(world):
+    from apps.cms.services.pages import create_page
+    from apps.cms.services.revisions import restore_content_revision
+
+    a,b,admin,client,first,second,foreign,draft,ha,hb = world
+    author=get_user_model().objects.create_user(username="homepage-recovery-author")
+    reviewer=get_user_model().objects.create_user(username="homepage-recovery-reviewer")
+    publisher=get_user_model().objects.create_user(username="homepage-recovery-publisher")
+    page=create_page(site=a,title="Earlier homepage",slug="recovery-home",actor=author)
+    source=page.revisions.get(revision_number=1)
+    page.title="Current homepage"
+    page.updated_by=author
+    page.save()
+    transition_with_site_role(page,"submit",author)
+    transition_with_site_role(page,"approve",reviewer)
+    transition_with_site_role(page,"publish",publisher)
+    assign_homepage(site_id=a.pk,page_id=page.pk,actor=admin)
+    assert root(client,ha).json()["title"]=="Current homepage"
+    assert root(client,hb).json()["title"]==foreign.title
+
+    transition_with_site_role(page,"unpublish",publisher)
+    page.refresh_from_db()
+    restored,restored_from=restore_content_revision(
+        page.pk,source.revision_number,actor=author,expected_revision=page.revision_number,
+    )
+    assert restored.status=="DRAFT" and restored.title=="Earlier homepage"
+    assert restored_from.pk==source.pk
+    assert page.revisions.filter(pk=source.pk).exists()
+
+    transition_with_site_role(page,"submit",author)
+    transition_with_site_role(page,"approve",reviewer)
+    transition_with_site_role(page,"publish",publisher)
+    page.refresh_from_db()
+    source.refresh_from_db()
+    assert page.status=="PUBLISHED" and page.title=="Earlier homepage"
+    assert source.snapshot["title"]=="Earlier homepage"
+    assert page.revisions.filter(restored_from_revision=source.revision_number).exists()
+    assert root(client,ha).json()["title"]=="Earlier homepage"
+    assert root(client,hb).json()["title"]==foreign.title
 
 
 def test_same_slug_slider_pages_stay_isolated_after_warm_cache_and_reassignment(world):
