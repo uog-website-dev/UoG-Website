@@ -179,6 +179,13 @@ beforeEach(() => {
 });
 
 describe("SitePagesPanel", () => {
+  it("offers a public link only for a published Page on the selected Site hostname", async () => {
+    loadSitePages.mockResolvedValue(pageResult([draft({ status: "PUBLISHED", path: "/about" })]));
+    render(siteWorkspace({ id: 11, name: "Informatics", code: "INFO", status: "ACTIVE", primaryDomain: { hostname: "informatics.uog.edu.et", status: "ACTIVE" } }, ALL_PERMISSIONS));
+    const link = await screen.findByRole("link", { name: "View public Admissions" });
+    expect(link.getAttribute("href")).toBe("https://informatics.uog.edu.et/about");
+  });
+
   it("saves a shell-only change without resending builder blocks or metadata",async()=>{
     const metadata={visual_layout:layoutFixtures[0].layout};
     getSitePage.mockResolvedValue({ok:true,data:draft({layout:"FULL_WIDTH",metadata,blocks:[]})});

@@ -1,6 +1,5 @@
 "use client";
-import {loadSitePosts, loadSiteTaxonomy} from "@/data/read-client";
-import {loadSitePostAuthors} from "@/data/read-client";
+import {loadSitePosts, loadSiteTaxonomy, loadSitePostAuthors} from "@/data/read-client";
 import {usePageBoundary} from "@/data/page-boundary";
 import {useSectionState} from "@/data/section-state";
 import {useSiteQuery} from "@/data/query-cache";
@@ -35,6 +34,8 @@ import type {
 } from "@/app/sites/post-actions";
 import { unwrap } from "@/organizations/contract";
 import { ContentWorkflowButtons, ContentWorkflowDialog, ContentWorkflowHistory } from "@/sites/content-workflow";
+import { useOptionalSiteAdmin } from "@/sites/site-admin-frame";
+import { sitePublicContentUrl } from "@/sites/site-public-content-url";
 import type { WorkflowAction, WorkflowTransition } from "@/sites/content-workflow";
 
 const PAGE_SIZE = 20;
@@ -122,6 +123,7 @@ function SitePostsPanelContent({
 }) {
   const toast = useToast();
   const canView = permissions.includes(PERMISSIONS.view);
+  const siteAdmin = useOptionalSiteAdmin();
   const canCreate = permissions.includes(PERMISSIONS.create);
   const canEdit = permissions.includes(PERMISSIONS.update);
   const [draftFilters, setDraftFilters] = useSectionState<PostFilters>(siteId, "posts", "draftFilters", { search: "", status: "", author: "", category: "", tag: "" });
@@ -307,20 +309,22 @@ function SitePostsPanelContent({
               columns={columns}
               rows={rows}
               getRowKey={(row) => row.id}
-              renderActions={(row) => (
+              renderActions={(row) => postsEnabled !== true || !canView ? null : (
                 <Box role="group" aria-label={`Actions for ${row.title}`} sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                   <Button size="small" aria-label={`Workflow history for ${row.title}`} onClick={() => void openHistory(row)}>History</Button>
-                  {canEdit || Boolean(row.available_actions?.length) ? (
+                  {canEdit && ["DRAFT", "UNPUBLISHED", "PUBLISHED"].includes(row.status) ? (
                     <Button
                       component={Link}
                       href={`/sites/${siteId}/admin/posts/${row.id}/edit`}
                       size="small"
-                      aria-label={`${canEdit ? "Edit" : "Review"} ${row.title}`}
+                      aria-label={`${row.status === "PUBLISHED" ? "Edit draft of" : "Edit"} ${row.title}`}
                       disabled={!enabled}
                     >
-                      {canEdit ? "Edit" : "Review"}
+                      {row.status === "PUBLISHED" ? "Edit draft" : "Edit"}
                     </Button>
                   ) : null}
+                  {!canEdit && row.available_actions?.length ? <Button component={Link} href={`/sites/${siteId}/admin/posts/${row.id}/edit`} size="small" aria-label={`Review ${row.title}`} disabled={!enabled}>Review</Button> : null}
+                  {row.status === "PUBLISHED" && siteAdmin?.site.id === siteId ? (() => { const href = sitePublicContentUrl(siteAdmin.site, `/posts/${row.publication_slug || row.slug}`); return href ? <Button component="a" href={href} target="_blank" rel="noopener noreferrer" size="small" aria-label={`View public ${row.title}`}>View Public</Button> : null; })() : null}
                   {postsEnabled === true ? (
                     <ContentWorkflowButtons
                       title={row.title}

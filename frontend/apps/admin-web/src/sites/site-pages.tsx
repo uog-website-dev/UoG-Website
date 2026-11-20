@@ -57,6 +57,8 @@ import type {
 import { unwrap } from "@/organizations/contract";
 import { APP_BASE_PATH } from "@/base-path";
 import { ContentWorkflowButtons, ContentWorkflowDialog } from "@/sites/content-workflow";
+import { useOptionalSiteAdmin } from "@/sites/site-admin-frame";
+import { sitePublicContentUrl } from "@/sites/site-public-content-url";
 import type { WorkflowAction } from "@/sites/content-workflow";
 import type { PageLanguages } from "@/sites/site-page-editor";
 
@@ -178,6 +180,7 @@ function SitePagesPanelContent({
   const toast = useToast();
   const router = useRouter();
   const canView = permissions.includes(PERMISSIONS.view);
+  const siteAdmin = useOptionalSiteAdmin();
   const canCreate = permissions.includes(PERMISSIONS.create);
   const canEdit = permissions.includes(PERMISSIONS.update);
   const [draftFilters, setDraftFilters] = useSectionState<PageFilters>(siteId, visualBuilderMode ? "builder" : "pages", "draftFilters", { search: "", status: "", author: "" });
@@ -410,6 +413,7 @@ function SitePagesPanelContent({
   ];
 
   function renderActions(row: SitePageRecord) {
+    if (!canView || pagesEnabled !== true) return null;
     const actions = [
       <Button
         key="preview"
@@ -459,6 +463,14 @@ function SitePagesPanelContent({
       actions.push(
         <Button key="working-draft" size="small" aria-label={`Edit a draft of ${row.title}`} disabled={!enabled} onClick={() => void openPublishedDraft(row)}>
           Edit draft
+        </Button>,
+      );
+    }
+    if (row.status === "PUBLISHED") {
+      const publicUrl = siteAdmin?.site.id === siteId ? sitePublicContentUrl(siteAdmin.site, row.path) : null;
+      if (publicUrl) actions.push(
+        <Button key="public" component="a" href={publicUrl} target="_blank" rel="noopener noreferrer" size="small" aria-label={`View public ${row.title}`}>
+          View Public
         </Button>,
       );
     }

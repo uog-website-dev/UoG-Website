@@ -85,6 +85,10 @@ export function useSiteAdmin(): SiteAdminValue {
   return value;
 }
 
+export function useOptionalSiteAdmin(): SiteAdminValue | null {
+  return useContext(SiteAdminContext);
+}
+
 function organizationLabel(site: SiteAdminSite): string {
   if (site.organizationName) return site.organizationName;
   if (site.organizationId != null) return `Organization unit #${site.organizationId}`;
