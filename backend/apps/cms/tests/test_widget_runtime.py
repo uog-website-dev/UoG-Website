@@ -149,6 +149,18 @@ def test_site_logo_configuration_cannot_resolve_foreign_asset(world, client):
     identity = client.get("/api/v1/site-context/widgets/?source=identity", HTTP_HOST=ha).json()
     assert identity["results"] == [{"name": "Informatics identity", "logo_asset_id": None, "logo_url": None}]
     assert client.get("/api/v1/site-context/identity/logo/", HTTP_HOST=ha).status_code == 404
+    with _media_write_session(actor, a.pk):
+        own = MediaAsset.objects.create(site=a, storage_reference=f"platform-private:sites/{a.pk}/review/{uuid.uuid4()}",
+            original_filename="owned-logo.png", detected_mime="image/png", byte_count=10, checksum="b" * 64, status="PENDING",
+            created_by=actor, updated_by=actor)
+        own.status = "READY"
+        own.save(update_fields=("status",))
+    a.configuration["identity"]["logo_ref"] = str(own.pk)
+    a.save(update_fields=("configuration",))
+    own_identity = client.get("/api/v1/site-context/widgets/?source=identity", HTTP_HOST=ha).json()
+    assert own_identity["results"] == [{"name": "Informatics identity", "logo_asset_id": str(own.pk), "logo_url": "/api/v1/site-context/identity/logo/"}]
+    public_context = client.get("/api/v1/site-context/", HTTP_HOST=ha).json()
+    assert public_context["configuration"]["logo_url"] == "/api/v1/site-context/identity/logo/"
     from django.core.management import call_command
     from apps.authorization.models import Role, UserRoleAssignment
     from apps.media.removal import remove_asset

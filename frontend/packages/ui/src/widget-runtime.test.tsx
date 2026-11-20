@@ -1,4 +1,4 @@
-import {render,screen,act} from "@testing-library/react";
+import {render,screen,act,fireEvent} from "@testing-library/react";
 import {afterEach,beforeEach,describe,expect,it,vi} from "vitest";
 import userEvent from "@testing-library/user-event";
 import type {WidgetNode,VisualLayout} from "@uog/types";
@@ -21,6 +21,17 @@ describe("Configured widget runtime",()=>{
     expect(await screen.findByRole("heading",{name:"Informatics"})).toBeTruthy();
     expect(screen.getByRole("img",{name:"Informatics"}).getAttribute("src")).toBe("/api/v1/site-context/identity/logo/");
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+  it("renders safe placeholders in catalogue previews without fetching host Site data",()=>{
+    render(<VisualLayoutView siteId={null} pageTitle="Home" layout={layout([
+      {id:"logo",type:"site_logo",props:{}},{id:"title",type:"site_title",props:{}},
+      {id:"menu",type:"menu",props:{menu_code:"header"}},{id:"news",type:"loop_grid",props:{source:"posts",limit:3}},
+    ])}/>);
+    expect(screen.getByRole("img",{name:"Site logo placeholder"})).toBeTruthy();
+    expect(screen.getByText("Site title placeholder")).toBeTruthy();
+    expect(screen.getByText(/Site navigation placeholder/)).toBeTruthy();
+    expect(screen.getByText(/Site news placeholder/)).toBeTruthy();
+    expect(fetchMock).not.toHaveBeenCalled();
   });
   it("ignores stale identity responses when the active Site changes",async()=>{
     let resolve!:(value:unknown)=>void;
@@ -49,6 +60,25 @@ describe("Configured widget runtime",()=>{
     expect(await screen.findByRole("heading",{name:"Filtered news"})).toBeTruthy();
     expect(screen.queryByRole("heading",{name:"Campus news"})).toBeNull();
     expect(screen.getByRole("img",{name:"Filtered news"}).getAttribute("src")).toContain(`/api/v1/site-context/media/${asset}/`);
+  });
+  it("shows an explicit empty state when this Site has no published news",async()=>{
+    fetchMock.mockResolvedValue(response(11,[]));
+    render(<VisualLayoutView siteId={11} pageTitle="Home" layout={layout([{id:"news",type:"loop_grid",props:{source:"posts",limit:3}}])}/>);
+    expect(await screen.findByText("No published posts match these filters.")).toBeTruthy();
+  });
+  it("fails closed on foreign Site news and uses an editor placeholder for unavailable logo media",async()=>{
+    fetchMock.mockImplementation(async(url:string)=>url.includes("source=identity")
+      ? response(11,[{name:"Informatics",logo_asset_id:asset,logo_url:"/api/v1/site-context/identity/logo/"}])
+      : response(22,[{...post,site:22,title:"Foreign secret"}]));
+    render(<VisualLayoutView siteId={11} pageTitle="Home" layout={layout([
+      {id:"logo",type:"site_logo",props:{}},{id:"news",type:"loop_grid",props:{source:"posts",limit:3}},
+    ])}/>);
+    expect(await screen.findByRole("img",{name:"Informatics"})).toBeTruthy();
+    expect(await screen.findByText("Content does not belong to the active Site.")).toBeTruthy();
+    const logo=screen.getByRole("img",{name:"Informatics"});
+    await act(async()=>{fireEvent.error(logo);});
+    expect(screen.getByRole("img",{name:"Logo unavailable for Informatics"})).toBeTruthy();
+    expect(screen.queryByText("Foreign secret")).toBeNull();
   });
   it("switches Post fields and hides a foreign Post",()=>{
     const tree=layout([{id:"title",type:"post_title",props:{}},{id:"excerpt",type:"post_excerpt",props:{}},{id:"image",type:"featured_image",props:{}}]);

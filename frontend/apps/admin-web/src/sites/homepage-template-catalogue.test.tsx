@@ -1,11 +1,12 @@
 import {fireEvent,render,screen,waitFor} from "@testing-library/react";
 import {beforeEach,it,expect,vi} from "vitest";
-const load=vi.fn(),prepare=vi.fn();
-vi.mock("@/app/sites/homepage-template-actions",()=>({loadHomepageTemplates:(...args:unknown[])=>load(...args),prepareHomepageTemplate:(...args:unknown[])=>prepare(...args)}));
+const load=vi.fn(),prepare=vi.fn(),apply=vi.fn(),pages=vi.fn(),getPage=vi.fn();
+vi.mock("@/app/sites/homepage-template-actions",()=>({loadHomepageTemplates:(...args:unknown[])=>load(...args),prepareHomepageTemplate:(...args:unknown[])=>prepare(...args),applyHomepageTemplate:(...args:unknown[])=>apply(...args)}));
+vi.mock("@/app/sites/page-actions",()=>({loadSitePages:(...args:unknown[])=>pages(...args),getSitePage:(...args:unknown[])=>getPage(...args)}));
 import {HomepageTemplateCatalogue} from "./homepage-template-catalogue";
 const layout={schema_version:1 as const,rows:[]};
 const entries=['University Main','College/Department','Blank'].map((name,i)=>({manifest_version:1,id:['university-main','college-department','blank'][i],version:1,name,description:'Approved starting design '+name,required_modules:['PAGES','VISUAL_BUILDER'],layout,available:true,unavailable_reasons:[]}));
-beforeEach(()=>{vi.clearAllMocks();load.mockResolvedValue({ok:true,data:entries});prepare.mockResolvedValue({ok:true,data:layout});});
+beforeEach(()=>{vi.clearAllMocks();load.mockResolvedValue({ok:true,data:entries});prepare.mockResolvedValue({ok:true,data:layout});pages.mockResolvedValue({ok:true,data:{results:[]}});getPage.mockResolvedValue({ok:true,data:{id:"draft-1",site:11,etag:'"cms-content-draft-1-r2"'}});apply.mockResolvedValue({ok:true,data:{id:"draft-1"}});});
 it('browses three templates and responsive non-mutating previews with keyboard focus',async()=>{
  render(<HomepageTemplateCatalogue siteId={11} canEdit/>);
  const button=await screen.findByRole('button',{name:'Preview University Main'});button.focus();expect(document.activeElement).toBe(button);fireEvent.click(button);
@@ -41,4 +42,25 @@ it('loads a real approved layout through the shared renderer',async()=>{
  const manifest={layout:{schema_version:1,rows:[{id:'row',type:'section',ratios:[100],columns:[{id:'column',type:'column',children:[{id:'heading',type:'headline',props:{text:'Learning that transforms lives',level:2}}]}]}]}};
  load.mockResolvedValue({ok:true,data:[{...entries[0],layout:manifest.layout}]});render(<HomepageTemplateCatalogue siteId={11} canEdit/>);
  fireEvent.click(await screen.findByRole('button',{name:'Preview University Main'}));expect(await screen.findByRole('heading',{name:'Learning that transforms lives'})).toBeTruthy();
+});
+it('requires confirmation before applying a template as a new Page draft and opens the result',async()=>{
+ const opened=vi.fn();render(<HomepageTemplateCatalogue siteId={11} canEdit onApplied={opened}/>);
+ fireEvent.click(await screen.findByRole('button',{name:'Preview University Main'}));
+ fireEvent.click(screen.getByRole('button',{name:'Apply University Main as draft'}));
+ expect(screen.getByText(/published homepage will remain unchanged/i)).toBeTruthy();
+ fireEvent.change(screen.getByRole('textbox',{name:'Draft title'}),{target:{value:'A new homepage'}});
+ fireEvent.click(screen.getByRole('button',{name:'Confirm and open draft'}));
+ await waitFor(()=>expect(apply).toHaveBeenCalledWith(11,{template_id:'university-main',version:1,mode:'new',title:'A new homepage'},expect.any(String),undefined));
+ expect(opened).toHaveBeenCalledWith({id:'draft-1'});
+});
+it('fetches a fresh revision tag before replacing an existing draft',async()=>{
+ pages.mockImplementation((_site:number,query:{status:string})=>Promise.resolve({ok:true,data:{results:query.status==="DRAFT"?[{id:"draft-1",site:11,title:"Existing draft",is_homepage:false}]:[]}}));
+ const opened=vi.fn();render(<HomepageTemplateCatalogue siteId={11} canEdit onApplied={opened}/>);
+ fireEvent.click(await screen.findByRole('button',{name:'Preview College/Department'}));fireEvent.click(screen.getByRole('button',{name:'Apply College/Department as draft'}));
+ fireEvent.mouseDown(screen.getByRole('combobox',{name:'Draft action'}));fireEvent.click(await screen.findByRole('option',{name:'Replace an existing draft'}));
+ fireEvent.mouseDown(screen.getByRole('combobox',{name:'Draft to replace'}));fireEvent.click((await screen.findAllByRole('option',{name:'Existing draft'}))[0]!);
+ fireEvent.click(screen.getByRole('button',{name:'Confirm and open draft'}));
+ await waitFor(()=>expect(getPage).toHaveBeenCalledWith(11,'draft-1'));
+ await waitFor(()=>expect(apply).toHaveBeenCalledWith(11,{template_id:'college-department',version:1,mode:'replace',page_id:'draft-1'},expect.any(String),'"cms-content-draft-1-r2"'));
+ expect(opened).toHaveBeenCalledWith({id:'draft-1'});
 });

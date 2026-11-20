@@ -22,7 +22,7 @@ import {
   publicFetchInit,
   PublicPostDetail,
   PublicPostFeed,
-  siteFromContext,
+  usePublicSiteBranding,
 } from "@uog/ui";
 import type { PublicPostDocument, PublicPostPageResult, PublicSiteContext } from "@uog/ui";
 
@@ -46,6 +46,7 @@ function applyDocumentMetadata(site: PublicSiteContext, post: PublicPostDocument
 
 export function PublicPostsPage({ archiveSlug }: { archiveSlug?: string }) {
   const router = useRouter();
+  const site = usePublicSiteBranding();
   const search = useSearchParams();
   const category = archiveSlug ?? filterValue(search.get("category"));
   const basePath = archiveSlug ? `/posts/categories/${encodeURIComponent(archiveSlug)}` : "/posts";
@@ -69,9 +70,6 @@ export function PublicPostsPage({ archiveSlug }: { archiveSlug?: string }) {
     setView({key:identity,phase:"loading",data:null,message:""});
     async function load() {
       try {
-        const context = await fetch("/api/v1/site-context/",{...publicFetchInit(),signal:controller.signal});
-        if (!context.ok) throw new Error("News is temporarily unavailable. Please try again.");
-        const site = siteFromContext(context.status,await context.json());
         if (!site.modules.posts || site.id == null) {
           if (!cancelled) setView({key:identity,phase:"disabled",data:null,message:""});
           return;
@@ -101,7 +99,7 @@ export function PublicPostsPage({ archiveSlug }: { archiveSlug?: string }) {
     }
     void load();
     return () => {cancelled=true;controller.abort();};
-  },[identity,archiveSlug,category,tag,page,pageSize]);
+  },[identity,archiveSlug,category,tag,page,pageSize,site]);
 
   function navigate(nextPage:number,resetSize=false,clearFilters=false) {
     const params = new URLSearchParams();
@@ -150,6 +148,7 @@ export function PublicPostPage({ slug }: { slug: string }) {
 }
 
 function ScopedPublicPost({ slug }: { slug: string }) {
+  const site = usePublicSiteBranding();
   const [post, setPost] = useState<PublicPostDocument | null>(null);
   const [ready, setReady] = useState(false);
 
@@ -159,21 +158,18 @@ function ScopedPublicPost({ slug }: { slug: string }) {
       setReady(true);
       return;
     }
+    if (site.id === null || !site.modules.posts) {
+      applyDocumentMetadata(site, null);
+      setPost(null);
+      setReady(true);
+      return;
+    }
     let cancelled = false;
-    fetch("/api/v1/site-context/", publicFetchInit())
+    fetch(`/api/v1/site-context/posts/${slug}/`, publicFetchInit())
       .then(async (response) => {
         const body = response.ok ? await response.json().catch(() => null) : null;
-        return siteFromContext(response.status, body);
-      })
-      .then(async (site) => {
-        if (!site.modules.posts) {
-          applyDocumentMetadata(site, null);
-          return null;
-        }
-        const response = await fetch(`/api/v1/site-context/posts/${slug}/`, publicFetchInit());
-        const body = response.ok ? await response.json().catch(() => null) : null;
         const document = postFromResponse(response.status, body);
-        const visible = document && (document.site === undefined || document.site === site.id) ? document : null;
+        const visible = document && document.site === site.id ? document : null;
         applyDocumentMetadata(site, visible);
         return visible;
       })
@@ -187,7 +183,7 @@ function ScopedPublicPost({ slug }: { slug: string }) {
     return () => {
       cancelled = true;
     };
-  }, [slug]);
+  }, [slug, site]);
 
   if (!ready) return <Typography role="status">Loading published post…</Typography>;
   return <PublicPostDetail post={post} />;

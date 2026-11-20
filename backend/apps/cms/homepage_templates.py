@@ -9,8 +9,11 @@ from .services.section_templates import remap_section_ids
 
 MANIFESTS = tuple(json.loads((Path(__file__).parent / "schemas/homepage" / (code + ".json")).read_text(encoding="utf-8"))
                   for code in ("university-main", "college-department", "blank"))
-# Templates are intentionally independent of live media, menus and Post queries.
-STATIC_WIDGETS = frozenset({"headline", "editor", "features", "call_to_action", "button", "button_grid", "alert"})
+# Only existing Sprint 3 widgets are allowed. The dynamic entries resolve data
+# from the active Site through the public widget runtime; manifests never carry
+# Site IDs or media URLs.
+EDITABLE_WIDGETS = frozenset({"headline", "editor", "features", "call_to_action", "button", "button_grid", "alert"})
+SITE_WIDGETS = frozenset({"site_logo", "site_title", "menu", "loop_grid"})
 
 
 def validate_manifest(value):
@@ -28,8 +31,10 @@ def validate_manifest(value):
         raise ValidationError({"required_modules": "Declare PAGES and VISUAL_BUILDER dependencies."})
     layout = validate_layout(value["layout"], prefix="layout")
     for node, path in iter_nodes(layout, prefix="layout"):
-        if node["type"] not in STATIC_WIDGETS | {"section", "column"}:
-            raise ValidationError({path + ".type": "Starting templates must use approved static components without Site references."})
+        if node["type"] not in EDITABLE_WIDGETS | SITE_WIDGETS | {"section", "column"}:
+            raise ValidationError({path + ".type": "Starting templates must use registered approved components."})
+        if node["type"] == "loop_grid" and node["props"].get("source") != "posts":
+            raise ValidationError({path + ".props.source": "Homepage news sections must use published Posts."})
     return copy.deepcopy({**value,"layout":layout})
 
 

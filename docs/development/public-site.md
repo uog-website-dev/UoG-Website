@@ -11,6 +11,9 @@ A platform host such as `localhost` resolves to no Site. An unknown or inactive 
 - Posts: `/posts` and `/posts/{slug}` render only when POSTS is enabled for the resolved Site.
 - Header and footer: rendered only when MENUS is enabled. A 404 leaves both empty.
 - Theme: `institutional` or `high-contrast`, from the Site configuration. Other theme names stay on the institutional theme.
+- Brand identity: the shared public shell resolves the Site title, ready Site-owned logo and approved theme from the request hostname. Header, footer, Page/homepage and article components use that shared identity; Pages and Builder documents do not need copied logo assets.
+- Refresh policy: the server resolves public Site configuration on each document request. The public Site-context API is `private, no-store`, varies by Host, and is revalidated by the browser with `cache: no-store`. A background tab refreshes branding when it returns to the foreground.
+- Fallback and contrast: missing or unavailable logos render the UoG wordmark fallback. Institutional navy/gold and high-contrast black/white/yellow tokens are shared; do not add arbitrary colors or per-page CSS.
 
 Draft, hidden, foreign-Site and module-off responses are not rendered. Disabling a module returns 404 and does not delete the rows.
 

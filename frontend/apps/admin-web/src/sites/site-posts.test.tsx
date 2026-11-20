@@ -42,6 +42,7 @@ vi.mock("next/link", () => ({
 
 import { SitePostsPanel } from "./site-posts";
 import { SitePostEditor } from "./site-post-editor";
+import { SiteAdminFrame, SiteSection } from "./site-admin-frame";
 
 const PERMISSIONS = ["content.posts.view", "content.posts.create", "content.posts.update"];
 const category = { id: "category-1", site: 11, code: "NEWS", name: "News", slug: "news", is_active: true };
@@ -123,6 +124,13 @@ beforeEach(() => {
 });
 
 describe("SitePostsPanel", () => {
+  it("offers View Public only for a published Post using its Site hostname and publication slug", async () => {
+    loadSitePosts.mockResolvedValue(list([post({ status: "PUBLISHED", slug: "working-copy", publication_slug: "campus-update" })]));
+    render(<ToastProvider><SiteAdminFrame site={{ id: 11, name: "Informatics", code: "INFO", status: "ACTIVE", primaryDomain: { hostname: "informatics.uog.edu.et", status: "ACTIVE" } }} enabledModuleCodes={["POSTS"]} permissions={PERMISSIONS}><SiteSection sectionKey="posts"><SitePostsPanel siteId={11} postsEnabled permissions={PERMISSIONS} /></SiteSection></SiteAdminFrame></ToastProvider>);
+    const link = await screen.findByRole("link", { name: "View public Campus update" });
+    expect(link.getAttribute("href")).toBe("https://informatics.uog.edu.et/posts/campus-update");
+  });
+
   it("loads only the selected Site and renders status, author, taxonomy and featured media", async () => {
     loadSitePosts.mockResolvedValue(list([post(), post({ id: "foreign", site: 22, slug: "foreign" })]));
     renderPanel();
@@ -139,18 +147,18 @@ describe("SitePostsPanel", () => {
     expect(screen.getByTestId("posts-table-scroll")).toBeTruthy();
   });
 
-  it("applies search, status, category and tag filters and resets them", async () => {
+  it("applies search, status, Site-author, category and tag filters and resets them", async () => {
     renderPanel();
     await screen.findByRole("table", { name: "Posts for this Site" });
     await waitFor(() => expect(document.querySelector('[data-perf-section="posts"]')?.getAttribute("data-perf-pending")).toBe("false"));
     fireEvent.change(screen.getByRole("textbox", { name: "Search Posts" }), { target: { value: "  campus  " } });
-    for (const [label, option] of [["Status", "Draft"], ["Category", "News"], ["Tag", "Campus"]] as const) {
+    for (const [label, option] of [["Status", "Draft"], ["Author", "post-author"], ["Category", "News"], ["Tag", "Campus"]] as const) {
       fireEvent.mouseDown(screen.getByRole("combobox", { name: label }));
       fireEvent.click(await screen.findByRole("option", { name: option }));
     }
     fireEvent.click(screen.getByRole("button", { name: "Apply" }));
     await waitFor(() => expect(loadSitePosts).toHaveBeenLastCalledWith(11, expect.objectContaining({
-      search: "campus", status: "DRAFT", category: category.id, tag: tag.id,
+      search: "campus", status: "DRAFT", author: 42, category: category.id, tag: tag.id,
     })));
 
     await waitFor(() => expect(screen.getByRole("button", {name: "Reset"})).toHaveProperty("disabled", false));
@@ -239,18 +247,22 @@ describe("SitePostEditor", () => {
     await screen.findByRole("heading", { name: "Create Post" });
     fireEvent.change(screen.getByRole("textbox", { name: "Title" }), { target: { value: "New campus story" } });
     fireEvent.change(screen.getByRole("textbox", { name: "Permalink slug" }), { target: { value: "new-campus-story" } });
+    const seo = { meta_title: "Campus research", meta_description: "Research at the university" };
+    fireEvent.change(screen.getByRole("textbox", { name: "SEO metadata (JSON object)" }), { target: { value: JSON.stringify(seo) } });
     const body = await screen.findByRole("textbox", { name: "Article body" });
     body.innerHTML = "<p>Story body</p>"; fireEvent.input(body);
     fireEvent.click(screen.getByRole("button", { name: "Save Draft" }));
     await waitFor(() => expect(createSitePost).toHaveBeenCalledWith(11, expect.objectContaining({
-      title: "New campus story", slug: "new-campus-story", editor_document: { schema_version: 1, html: "<p>Story body</p>" }, seo: {},
+      title: "New campus story", slug: "new-campus-story", editor_document: { schema_version: 1, html: "<p>Story body</p>" }, seo,
     })));
     expect(replace).toHaveBeenCalledWith("/sites/11/admin/posts/post-2/edit");
     expect(await screen.findByText("Draft saved just now")).toBeTruthy();
     createView.unmount();
 
+    getSitePost.mockResolvedValueOnce(result({ ...post({ seo }), etag: '"post-v1"', editor_document: { schema_version: 1, html: "<p>Post body</p>" } }));
     renderEditor("edit", { postId: "post-1" });
     expect(await screen.findByRole("heading", { name: "Edit Post" })).toBeTruthy();
+    expect(await screen.findByRole("textbox", { name: "SEO metadata (JSON object)" })).toHaveProperty("value", JSON.stringify(seo, null, 2));
     fireEvent.click(screen.getByRole("button", { name: "Save Draft" }));
     await waitFor(() => expect(updateSitePost).toHaveBeenCalledWith(11, "post-1", '"post-v1"', expect.any(Object)));
   });
@@ -435,4 +447,4 @@ describe("SitePostEditor", () => {
   });
 });
 
-vi.mock("@/data/read-client", async()=>{const source0=await import("@/app/sites/post-actions");return {loadSiteTaxonomy:(...args:unknown[])=>(source0.loadSiteTaxonomy as (...values:unknown[])=>unknown)(...args.slice(0,2)),loadSitePosts:(...args:unknown[])=>(source0.loadSitePosts as (...values:unknown[])=>unknown)(...args.slice(0,2))};});
+vi.mock("@/data/read-client", async()=>{const source0=await import("@/app/sites/post-actions");return {loadSiteTaxonomy:(...args:unknown[])=>(source0.loadSiteTaxonomy as (...values:unknown[])=>unknown)(...args.slice(0,2)),loadSitePostAuthors:async(site:number)=>({ok:true,data:{count:site===11?1:0,next:null,previous:null,results:site===11?[{id:42,name:"post-author",site}]:[]}}),loadSitePosts:(...args:unknown[])=>(source0.loadSitePosts as (...values:unknown[])=>unknown)(...args.slice(0,2))};});

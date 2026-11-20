@@ -1,0 +1,25 @@
+{
+  "run": "homepublish-45g",
+  "results": [
+    {
+      "name": "Homepage Settings shows the effective published root and its private template draft",
+      "status": "PASS"
+    },
+    {
+      "name": "An authorized editor restores an older Page revision as a new editable draft",
+      "status": "PASS"
+    },
+    {
+      "name": "Restoring the draft leaves the current live homepage assignment unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "Publishing and assigning Site A updates only its public root; Site B is unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "Anonymous public root serves the restored live assignment and excludes the pending draft",
+      "status": "PASS"
+    }
+  ]
+}

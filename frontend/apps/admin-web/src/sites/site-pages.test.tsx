@@ -17,6 +17,8 @@ const updateSitePage = vi.fn();
 const transitionSitePage = vi.fn();
 const setSiteHomepage = vi.fn();
 const loadSitePageWorkflowHistory = vi.fn();
+const loadSitePageRevisions = vi.fn();
+const restoreSitePageRevision = vi.fn();
 const openWorkingDraft = vi.fn();
 
 vi.mock("@/app/sites/page-actions", () => ({
@@ -28,6 +30,8 @@ vi.mock("@/app/sites/page-actions", () => ({
   updateSitePage: (...args: unknown[]) => updateSitePage(...args),
   transitionSitePage: (...args: unknown[]) => transitionSitePage(...args),
   loadSitePageWorkflowHistory: (...args: unknown[]) => loadSitePageWorkflowHistory(...args),
+  loadSitePageRevisions: (...args: unknown[]) => loadSitePageRevisions(...args),
+  restoreSitePageRevision: (...args: unknown[]) => restoreSitePageRevision(...args),
   openWorkingDraft: (...args: unknown[]) => openWorkingDraft(...args),
   setSiteHomepage: (...args: unknown[]) => setSiteHomepage(...args),
 }));
@@ -167,12 +171,21 @@ beforeEach(() => {
   createSitePage.mockResolvedValue({ ok: true, data: draft() });
   transitionSitePage.mockResolvedValue({ ok: true, data: draft({ status: "IN_REVIEW" }) });
   loadSitePageWorkflowHistory.mockResolvedValue({ ok: true, data: [] });
+  loadSitePageRevisions.mockResolvedValue({ ok: true, data: { count: 0, next: null, previous: null, results: [], etag: '"cms-content-page-1-r1"' } });
+  restoreSitePageRevision.mockResolvedValue({ ok: true, data: { revision_number: 9, restored_from_revision: 1 } });
   openWorkingDraft.mockResolvedValue({ ok: true, data: draft() });
   setSiteHomepage.mockResolvedValue({ ok: true, data: draft({ is_homepage: true }) });
   updateSitePage.mockResolvedValue({ ok: true, data: draft({ title: "Admissions updated" }) });
 });
 
 describe("SitePagesPanel", () => {
+  it("offers a public link only for a published Page on the selected Site hostname", async () => {
+    loadSitePages.mockResolvedValue(pageResult([draft({ status: "PUBLISHED", path: "/about" })]));
+    render(siteWorkspace({ id: 11, name: "Informatics", code: "INFO", status: "ACTIVE", primaryDomain: { hostname: "informatics.uog.edu.et", status: "ACTIVE" } }, ALL_PERMISSIONS));
+    const link = await screen.findByRole("link", { name: "View public Admissions" });
+    expect(link.getAttribute("href")).toBe("https://informatics.uog.edu.et/about");
+  });
+
   it("saves a shell-only change without resending builder blocks or metadata",async()=>{
     const metadata={visual_layout:layoutFixtures[0].layout};
     getSitePage.mockResolvedValue({ok:true,data:draft({layout:"FULL_WIDTH",metadata,blocks:[]})});
@@ -237,7 +250,7 @@ describe("SitePagesPanel", () => {
     expect(screen.getByRole("button", { name: "Try again" })).toBeTruthy();
   });
 
-  it("applies server search and status filters and resets pagination", async () => {
+  it("applies server search, status and Site-author filters and resets pagination", async () => {
     renderPanel();
     await screen.findByRole("table", { name: "Pages for this Site" });
     await waitFor(() => expect(document.querySelector('[data-perf-section="pages"]')?.getAttribute("data-perf-pending")).toBe("false"));
@@ -247,12 +260,15 @@ describe("SitePagesPanel", () => {
     });
     fireEvent.mouseDown(screen.getByRole("combobox", { name: "Status" }));
     fireEvent.click(screen.getByRole("option", { name: "Draft" }));
+    fireEvent.mouseDown(screen.getByRole("combobox", { name: "Author" }));
+    fireEvent.click(await screen.findByRole("option", { name: "page-author" }));
     fireEvent.click(screen.getByRole("button", { name: "Apply" }));
 
     await waitFor(() => {
       expect(loadSitePages).toHaveBeenLastCalledWith(11, {
         search: "admissions",
         status: "DRAFT",
+        author: 7,
         page: 1,
         page_size: 20,
         ordering: "-updated_at",
@@ -337,6 +353,20 @@ describe("SitePagesPanel", () => {
     expect(await screen.findByRole("dialog", { name: "Workflow history: Admissions" })).toBeTruthy();
     expect(screen.getByRole("list", { name: "Page status timeline" }).textContent).toContain("Please add sources.");
     expect(loadSitePageWorkflowHistory).toHaveBeenCalledWith(11, "page-1");
+  });
+
+  it("restores an older Page revision as a new draft with the current ETag", async () => {
+    loadSitePages.mockResolvedValue(pageResult([draft({ revision_number: 8 })]));
+    loadSitePageRevisions.mockResolvedValue({ ok: true, data: { count: 2, next: null, previous: null, etag: '"cms-content-page-1-r8"', results: [
+      { id: 8, revision_number: 8, editor: "7", status: "DRAFT", changed_fields: [], content_hash: "latest", restored_from_revision: null, created_at: "2026-03-21T10:00:00Z" },
+      { id: 1, revision_number: 1, editor: "7", status: "DRAFT", changed_fields: ["title"], content_hash: "older", restored_from_revision: null, created_at: "2026-03-20T10:00:00Z" },
+    ] } });
+    renderPanel();
+    fireEvent.click(await screen.findByRole("button", { name: "Revisions for Admissions" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Restore as draft" }));
+    expect(screen.getByText(/copied into a new editable draft/i)).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Confirm restore" }));
+    await waitFor(() => expect(restoreSitePageRevision).toHaveBeenCalledWith(11, "page-1", 1, '"cms-content-page-1-r8"'));
   });
 
   it("defaults a new Page to the Site language", async () => {
@@ -459,7 +489,7 @@ describe("SitePagesPanel", () => {
     renderEditor("edit", { pageId: "page-1" });
     await screen.findByRole("heading", { name: "Edit Page" });
     fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
-    expect((await screen.findByRole("alert")).textContent).toMatch(/Content changed/i);
+    expect(await screen.findByText(/Content changed/i)).toBeTruthy();
     expect(screen.getByRole("textbox", { name: "Title" })).toHaveProperty("value", "Admissions");
     fireEvent.click(screen.getByRole("button", { name: "Reload latest" }));
     await waitFor(() => expect(getSitePage).toHaveBeenCalledTimes(2));
@@ -477,6 +507,31 @@ describe("SitePagesPanel", () => {
     });
     expect(screen.getByRole("button", { name: "Create Page" })).toHaveProperty("disabled", true);
     expect(screen.getAllByRole("alert").some((alert) => /JSON at position|Expected property/i.test(alert.textContent ?? ""))).toBe(true);
+  });
+
+  it("shows SEO title, description and social image fallbacks with format limits", async () => {
+    renderEditor("create");
+    await screen.findByRole("heading", { name: "Create Page" });
+    expect(screen.getByRole("textbox", { name: "SEO title" }).getAttribute("maxlength")).toBe("120");
+    expect(screen.getByRole("textbox", { name: "Meta description" }).getAttribute("maxlength")).toBe("300");
+    expect(screen.getByRole("textbox", { name: "Social sharing image reference" }).getAttribute("maxlength")).toBe("512");
+    expect(screen.getByRole("alert", { name: "Effective SEO preview" }).textContent).toContain("Site display name (fallback)");
+  });
+
+  it("saves Page SEO fields and reloads them in the editor", async () => {
+    const values = { meta_title: "Admissions SEO", meta_description: "Apply to the university" };
+    const view = renderEditor("create");
+    await screen.findByRole("heading", { name: "Create Page" });
+    fireEvent.change(screen.getByRole("textbox", { name: "Title" }), { target: { value: "Admissions" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "SEO title" }), { target: { value: values.meta_title } });
+    fireEvent.change(screen.getByRole("textbox", { name: "Meta description" }), { target: { value: values.meta_description } });
+    fireEvent.click(screen.getByRole("button", { name: "Create Page" }));
+    await waitFor(() => expect(createSitePage).toHaveBeenCalledWith(11, expect.objectContaining({ seo: values })));
+    view.unmount();
+    getSitePage.mockResolvedValueOnce({ ok: true, data: draft({ seo: values }) });
+    renderEditor("edit", { pageId: "page-1" });
+    expect(await screen.findByRole("textbox", { name: "SEO title" })).toHaveProperty("value", values.meta_title);
+    expect(screen.getByRole("textbox", { name: "Meta description" })).toHaveProperty("value", values.meta_description);
   });
 
   it("shows the frozen private revision and sends its exact ETag when publishing",async()=>{
@@ -647,4 +702,4 @@ describe("SitePagesPanel", () => {
   });
 });
 
-vi.mock("@/data/read-client", async()=>{const source0=await import("@/app/sites/page-actions");return {loadSitePages:(...args:unknown[])=>(source0.loadSitePages as (...values:unknown[])=>unknown)(...args.slice(0,2)),loadSitePageStatusCounts:(...args:unknown[])=>(source0.loadSitePageStatusCounts as (...values:unknown[])=>unknown)(...args.slice(0,1))};});
+vi.mock("@/data/read-client", async()=>{const source0=await import("@/app/sites/page-actions");return {loadSitePages:(...args:unknown[])=>(source0.loadSitePages as (...values:unknown[])=>unknown)(...args.slice(0,2)),loadSitePageAuthors:async(site:number)=>({ok:true,data:{count:site===11?1:0,next:null,previous:null,results:site===11?[{id:7,name:"page-author",site}]:[]}}),loadSitePageStatusCounts:(...args:unknown[])=>(source0.loadSitePageStatusCounts as (...values:unknown[])=>unknown)(...args.slice(0,1))};});

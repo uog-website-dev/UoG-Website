@@ -1,7 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { pageFromResponse } from "./public-page";
+import { pageFromResponse, PublicPageView } from "./public-page";
 import {
   EMPTY_SITE,
   pageMetadata,
@@ -15,10 +15,15 @@ import {
   websitePathFromRedirect,
 } from "./public-site";
 import { PublicSiteFrame } from "./public-site-frame";
+import { PublicSiteBrandingProvider } from "./site-branding";
+import { SiteBrandingLockup, SiteBrandingMark } from "./site-branding";
+import { UogFooter, UogHeader } from "./UogShell";
 
 const informatics = {
   site: { id: 2, code: "INFORMATICS", name: "Informatics" },
-  configuration: { display_name: "College of Informatics", theme: "institutional" },
+  domain: "informatics.uog.edu.et",
+  canonical_domain: "informatics.uog.edu.et",
+  configuration: { ...{ display_name: "College of Informatics", theme: "institutional" }, logo_url: "/api/v1/site-context/identity/logo/" },
   modules: ["PAGES", "POSTS", "MENUS"],
 };
 
@@ -30,6 +35,8 @@ const medicine = {
 
 const main = {
   site: { id: 1, code: "MAIN", name: "University of Gondar" },
+  domain: "uog.edu.et",
+  canonical_domain: "uog.edu.et",
   configuration: { display_name: "University of Gondar", theme: "institutional" },
   modules: ["PAGES", "POSTS", "MENUS"],
 };
@@ -43,6 +50,11 @@ describe("siteFromContext", () => {
       "College of Medicine",
     ]);
     expect(hosts.map((site) => site.id)).toEqual([1, 2, 3]);
+    expect(hosts.map((site) => site.domain)).toEqual(["uog.edu.et", "informatics.uog.edu.et", null]);
+    expect(hosts.map((site) => site.canonicalDomain)).toEqual(["uog.edu.et", "informatics.uog.edu.et", null]);
+    expect(hosts[1]?.logoUrl).toBe("/api/v1/site-context/identity/logo/");
+    expect(hosts[2]?.logoUrl).toBeNull();
+    expect(siteFromContext(200, { ...informatics, configuration: { ...informatics.configuration, logo_url: "https://private.example/logo.png" } }).logoUrl).toBeNull();
     expect(hosts[2]?.theme).toBe("high-contrast");
     expect(hosts[1]?.modules.posts).toBe(true);
     expect(hosts[2]?.modules.posts).toBe(false);
@@ -123,5 +135,54 @@ describe("PublicSiteFrame", () => {
     expect(frame?.getAttribute("data-site-code")).toBe("MEDICINE");
     const heading = screen.getByRole("heading", { name: "College of Medicine" });
     expect(heading.tagName).toBe("H1");
+  });
+});
+
+describe("Site-bound Page and homepage branding", () => {
+  it("uses the current Site logo and title from shared context without Page-specific logo data", () => {
+    const page = pageFromResponse(200, {
+      status: "PUBLISHED",
+      title: "About our college",
+      path: "/about",
+      site: 2,
+      blocks: [{ type: "paragraph", html: "Our work" }],
+      seo: {},
+    });
+    expect(page).not.toBeNull();
+    const { rerender, container } = render(
+      <PublicSiteBrandingProvider site={siteFromContext(200, informatics)}>
+        <PublicPageView page={page} />
+      </PublicSiteBrandingProvider>,
+    );
+    const logo = screen.getByRole("img", { name: "College of Informatics logo" }) as HTMLImageElement;
+    expect(logo.getAttribute("src")).toBe("/api/v1/site-context/identity/logo/");
+    expect(container.querySelector('[data-site-code="INFORMATICS"]')).toBeTruthy();
+
+    const medicinePage = { ...page!, site: 3 };
+    rerender(
+      <PublicSiteBrandingProvider site={siteFromContext(200, medicine)}>
+        <PublicPageView page={medicinePage} />
+      </PublicSiteBrandingProvider>,
+    );
+    expect(screen.getByRole("img", { name: "College of Medicine logo fallback" })).toBeTruthy();
+    expect(container.querySelector('[data-site-code="MEDICINE"]')).toBeTruthy();
+    expect(container.querySelector('img[src="/api/v1/site-context/identity/logo/"]')).toBeNull();
+  });
+
+  it("uses one shared brand identity in public header and footer and safely falls back on logo failure", () => {
+    const site = siteFromContext(200, informatics);
+    const { container } = render(
+      <>
+        <UogHeader title={site.displayName} brand={<SiteBrandingMark site={site} />} />
+        <UogFooter apiBaseUrl={undefined} brand={<SiteBrandingLockup site={site} compact />} />
+      </>,
+    );
+    expect(container.querySelector("header img")?.getAttribute("src")).toBe(
+      "/api/v1/site-context/identity/logo/",
+    );
+    expect(container.querySelector("footer [data-site-branding='INFORMATICS']")).toBeTruthy();
+    fireEvent.error(container.querySelector("header img")!);
+    expect(screen.getByRole("img", { name: "College of Informatics logo fallback" })).toBeTruthy();
+    expect(container.querySelector("img[src*='private']")).toBeNull();
   });
 });

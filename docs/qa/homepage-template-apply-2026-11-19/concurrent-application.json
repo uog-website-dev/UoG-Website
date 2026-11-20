@@ -1,0 +1,1 @@
+﻿{"criterion": "AC-07 concurrent replace with same If-Match", "http_statuses": [200, 409], "revision_before": 2, "revision_after": 3, "result": "PASS"}

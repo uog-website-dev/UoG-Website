@@ -14,7 +14,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.db import models
 
-from apps.cms.models import ContentStatus, SEO_KEYS, SLUG_FORMAT, SiteContent, normalize_slug
+from apps.cms.models import ContentStatus, SLUG_FORMAT, SiteContent, normalize_slug, validate_seo_document
 
 # Permalinks under /posts/{slug}. Keep in sync with the admin Post settings UI.
 RESERVED_POST_SLUGS = frozenset({
@@ -52,25 +52,6 @@ class Page(models.Model):
 
     def __str__(self):
         return self.title
-
-
-def _validate_seo(seo):
-    """Reject unsupported SEO keys, non-string values and overlong text."""
-    if not isinstance(seo, dict):
-        raise ValidationError({"seo": "SEO metadata must be a JSON object."})
-    unknown = sorted(set(seo) - set(SEO_KEYS))
-    if unknown:
-        raise ValidationError({
-            "seo": "Unsupported SEO keys: " + ", ".join(unknown)
-                   + ". Approved: " + ", ".join(sorted(SEO_KEYS)) + ".",
-        })
-    for key, value in seo.items():
-        if value is not None and not isinstance(value, str):
-            raise ValidationError({"seo": f"{key} must be a string or null."})
-        if isinstance(value, str) and len(value) > SEO_KEYS[key]:
-            raise ValidationError({
-                "seo": f"{key} must be at most {SEO_KEYS[key]} characters.",
-            })
 
 
 class Post(SiteContent):
@@ -179,7 +160,7 @@ class Post(SiteContent):
         self._validate_working_draft()
         self._validate_identity_lock()
         self._validate_reserved_slug()
-        _validate_seo(self.seo)
+        self.seo = validate_seo_document(self.seo, site_id=self.site_id)
         self._validate_slug_is_free()
         self._validate_blocks()
 

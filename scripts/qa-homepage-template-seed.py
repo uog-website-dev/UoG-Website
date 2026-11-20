@@ -54,7 +54,9 @@ for suffix in ('a', 'b'):
     activate_site(site.pk)
     domain = SiteDomain.objects.create(site=site, hostname=review.run+suffix+'.uog.local', is_primary=True)
     activate_domain(domain.pk)
-    for code in ('MENUS','PAGES','VISUAL_BUILDER'):
+    # POSTS is enabled so the browser rehearsal can verify the valid empty
+    # news state without introducing template prerequisites or sample content.
+    for code in ('MENUS','PAGES','VISUAL_BUILDER','POSTS'):
         enable_module_for_site(site.pk, Module.objects.get(code=code).pk)
     sites.append(site)
 # Authorize the alternate local callback; port 80/8080 belong to WordPress.

@@ -98,13 +98,17 @@ function DataState({error,retry}:{error:string|null;retry:()=>void}) {
 }
 
 export function SiteTitleWidget() {
+  const scope=useContext(ScopeContext);
   const state=useWidgetData({source:"identity"});
+  if(scope?.siteId===null)return <Typography component="h1" variant="h4" color="text.secondary" sx={{fontWeight:700,overflowWrap:"anywhere",my:0}}>Site title placeholder</Typography>;
   if(!state.data)return <DataState {...state}/>;
-  return <Typography variant="h2">{String(state.data.results[0]?.name??"")}</Typography>;
+  return <Typography component="h1" variant="h4" sx={{fontWeight:700,overflowWrap:"anywhere",my:0}}>{String(state.data.results[0]?.name??"")}</Typography>;
 }
 
 export function MenuWidget({menu_code}:{menu_code:string}) {
+  const scope=useContext(ScopeContext);
   const state=useWidgetData({source:"menu",menu_code});
+  if(scope?.siteId===null)return <Typography role="status" color="text.secondary">Site navigation placeholder · uses this Site’s published menu</Typography>;
   if(!state.data)return <DataState {...state}/>;
   const menu=menusFromResponse(200,{locations:{header:state.data.results}}).header;
   if(!menu.length)return <Typography role="status">No published navigation links are available.</Typography>;
@@ -119,6 +123,7 @@ export function SiteLogoWidget() {
   const scope=useContext(ScopeContext);
   const state=useWidgetData({source:"identity"});
   const [failed,setFailed]=useState(false);
+  if(scope?.siteId===null)return <Box role="img" aria-label="Site logo placeholder" sx={{minHeight:56,minWidth:96,p:1,border:"1px dashed",borderColor:"divider",display:"grid",placeItems:"center",color:"text.secondary",textAlign:"center",fontSize:"0.8rem"}}>Site logo placeholder</Box>;
   if(!state.data)return <DataState {...state}/>;
   const identity=state.data.results[0];
   const name=String(identity?.name??"");
@@ -128,7 +133,7 @@ export function SiteLogoWidget() {
     const base=libraryBase(scope);
     src=base?`${base.endsWith("/media")?base:`${base}/media`}/${asset}/image?variant=display`:null;
   }
-  if(!src || failed)return <Typography fontWeight={700}>{name}</Typography>;
+  if(!src || failed)return <Box role="img" aria-label={`Logo unavailable for ${name}`} sx={{minHeight:56,minWidth:96,p:1,border:"1px dashed",borderColor:"divider",display:"grid",placeItems:"center",color:"text.secondary",textAlign:"center",fontSize:"0.8rem"}}>Logo placeholder · {name}</Box>;
   return <Box component="img" src={src} alt={name} onError={()=>setFailed(true)} sx={{maxWidth:"100%",maxHeight:140,objectFit:"contain"}}/>;
 }
 
@@ -194,6 +199,7 @@ export function LoopGridWidget({source,limit,category}:{source:"posts"|"pages";l
   if(category || scope?.filters.category)query.category=category || scope!.filters.category;
   if(scope?.filters.tag)query.tag=scope.filters.tag;
   const state=useWidgetData(query);
+  if(scope?.siteId===null)return <Typography role="status" color="text.secondary">{source === "posts" ? "Site news placeholder · shows published news for this Site" : "Site pages placeholder · shows published pages for this Site"}</Typography>;
   if(!state.data)return <DataState {...state}/>;
   if(!state.data.results.length)return <Typography role="status">No published {source} match these filters.</Typography>;
   return <Box aria-label="Published content grid" sx={{display:"grid",gridTemplateColumns:"1fr","@container visual-layout (min-width: 600px)":{gridTemplateColumns:"repeat(2,minmax(0,1fr))"},gap:2}}>

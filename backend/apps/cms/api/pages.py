@@ -36,6 +36,7 @@ from ..services.working_drafts import content_etag, open_working_draft, save_vis
 from ..services import section_templates as section_template_domain
 from .visual_drafts import VISUAL_DRAFT_REQUEST_SCHEMA, VisualDraftInput, VisualDraftErrorSerializer, VisualDraftValidationError
 from .serializers import PageSerializer
+from .authors import site_content_authors
 from .preview import PagePreviewSerializer, preview_revision
 from .widget_runtime import WidgetQuery, WidgetPayload, widget_data
 from .workflow import WorkflowActionInput, WorkflowStateConflict, workflow_expected_revision, VISUAL_WORKFLOW_IF_MATCH
@@ -59,6 +60,7 @@ IF_MATCH = OpenApiParameter(
 
 class PageListQuery(StrictFields, serializers.Serializer):
     search = serializers.CharField(required=False, allow_blank=True, max_length=255)
+    author = serializers.IntegerField(required=False, min_value=1)
     status = serializers.ChoiceField(
         choices=("DRAFT", "IN_REVIEW", "APPROVED", "PUBLISHED", "UNPUBLISHED", "ARCHIVED"),
         required=False,
@@ -199,6 +201,7 @@ class SitePageViewSet(
         parameters=[
             SITE_PARAMETER,
             OpenApiParameter("search", str, description="Case-insensitive title or slug substring."),
+            OpenApiParameter("author", int, description="Filter by the creating user id for Pages in this Site."),
             OpenApiParameter("status", str, enum=("DRAFT", "IN_REVIEW", "APPROVED", "PUBLISHED", "UNPUBLISHED", "ARCHIVED")),
             OpenApiParameter("visibility", str, enum=("PUBLIC", "UNLISTED", "HIDDEN")),
             OpenApiParameter("locale", str),
@@ -226,6 +229,8 @@ class SitePageViewSet(
         if "search" in filters and filters["search"].strip():
             term = filters["search"].strip()
             queryset = queryset.filter(Q(title__icontains=term) | Q(slug__icontains=term))
+        if "author" in filters:
+            queryset = queryset.filter(created_by_id=filters["author"])
         for field in ("status", "visibility", "locale", "parent"):
             if field in filters:
                 queryset = queryset.filter(**{field: filters[field]})
@@ -238,6 +243,15 @@ class SitePageViewSet(
         return paginator.get_paginated_response(
             self.get_serializer(page, many=True).data,
         )
+
+    @extend_schema(tags=["CMS pages"], parameters=[SITE_PARAMETER], description="Active CMS authors assigned to this Site. Requires Page list access.")
+    @action(detail=False, methods=["get"], url_path="authors")
+    def authors(self, request, *args, **kwargs):
+        site = self._site()
+        self._authorize(site, ContentRole.values)
+        ensure_pages_module_enabled(site.pk)
+        rows = site_content_authors(site.pk)
+        return Response({"count": len(rows), "next": None, "previous": None, "results": rows})
 
     @extend_schema(
         tags=["CMS pages"],

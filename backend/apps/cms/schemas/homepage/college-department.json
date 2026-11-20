@@ -1,79 +1,47 @@
 {
   "manifest_version": 1,
   "id": "college-department",
-  "version": 1,
+  "version": 3,
   "name": "College/Department",
-  "description": "A focused introduction, areas of study and community information for any academic unit.",
+  "description": "A focused academic Site homepage with live identity, local navigation, programme links and published news.",
   "required_modules": [
     "PAGES",
     "VISUAL_BUILDER"
   ],
   "layout": {
     "schema_version": 1,
+    "settings": {
+      "show_title": false,
+      "content_width": "wide"
+    },
     "rows": [
       {
-        "id": "college-department-section-0",
+        "id": "cd-brand",
         "type": "section",
         "ratios": [
-          100
+          25,
+          75
         ],
         "columns": [
           {
-            "id": "college-department-section-0-column",
+            "id": "cd-brand-logo",
             "type": "column",
             "children": [
               {
-                "id": "college-department-title-0",
-                "type": "headline",
-                "props": {
-                  "text": "Welcome to our academic community",
-                  "level": 2
-                }
-              },
-              {
-                "id": "college-department-body-0",
-                "type": "editor",
-                "props": {
-                  "html": "<p>Learn about our teaching, research and service.</p>"
-                }
+                "id": "cd-logo",
+                "type": "site_logo",
+                "props": {}
               }
             ]
-          }
-        ],
-        "style": {
-          "padding": "md",
-          "background": "navy",
-          "text_color": "inverse",
-          "radius": "lg",
-          "gap": "md",
-          "text_size": "xl"
-        }
-      },
-      {
-        "id": "college-department-section-1",
-        "type": "section",
-        "ratios": [
-          100
-        ],
-        "columns": [
+          },
           {
-            "id": "college-department-section-1-column",
+            "id": "cd-brand-title",
             "type": "column",
             "children": [
               {
-                "id": "college-department-title-1",
-                "type": "headline",
-                "props": {
-                  "text": "Discover our areas of study",
-                  "level": 2
-                }
-              },
-              {
-                "id": "college-department-body-1",
-                "type": "editor",
-                "props": {
-                  "html": "<p>Explore programmes, meet our people and find opportunities to collaborate.</p>"
-                }
+                "id": "cd-title",
+                "type": "site_title",
+                "props": {}
               }
             ]
           }
@@ -82,47 +50,175 @@
           "padding": "md",
           "background": "paper",
           "text_color": "default",
-          "radius": "lg",
           "gap": "md",
-          "text_size": "lg"
+          "radius": "md"
+        },
+        "responsive": {
+          "mobile": {
+            "stack": true
+          }
         }
       },
       {
-        "id": "college-department-section-2",
+        "id": "cd-nav",
         "type": "section",
         "ratios": [
           100
         ],
         "columns": [
           {
-            "id": "college-department-section-2-column",
+            "id": "cd-nav-col",
             "type": "column",
             "children": [
               {
-                "id": "college-department-title-2",
-                "type": "headline",
+                "id": "cd-menu",
+                "type": "menu",
                 "props": {
-                  "text": "Connect with our community",
-                  "level": 2
-                }
-              },
-              {
-                "id": "college-department-body-2",
-                "type": "editor",
-                "props": {
-                  "html": "<p>Replace this introduction with approved departmental information.</p>"
+                  "menu_code": "header"
                 }
               }
             ]
           }
         ],
         "style": {
-          "padding": "md",
+          "padding": "sm",
           "background": "mist",
           "text_color": "default",
+          "gap": "sm"
+        }
+      },
+      {
+        "id": "cd-hero",
+        "type": "section",
+        "ratios": [
+          100
+        ],
+        "columns": [
+          {
+            "id": "cd-hero-col",
+            "type": "column",
+            "children": [
+              {
+                "id": "cd-hero-title",
+                "type": "headline",
+                "props": {
+                  "text": "Welcome to our academic community",
+                  "level": 2
+                }
+              },
+              {
+                "id": "cd-hero-copy",
+                "type": "editor",
+                "props": {
+                  "html": "<p>Replace this introduction with approved information about your college or department. Add locally approved imagery through the builder when available.</p>"
+                }
+              }
+            ]
+          }
+        ],
+        "style": {
+          "padding": "xl",
+          "background": "blue_gradient",
+          "text_color": "inverse",
           "radius": "lg",
-          "gap": "md",
-          "text_size": "lg"
+          "gap": "lg",
+          "text_size": "xl"
+        },
+        "responsive": {
+          "mobile": {
+            "gap": "md"
+          }
+        }
+      },
+      {
+        "id": "cd-links",
+        "type": "section",
+        "ratios": [
+          100
+        ],
+        "columns": [
+          {
+            "id": "cd-links-col",
+            "type": "column",
+            "children": [
+              {
+                "id": "cd-links-title",
+                "type": "headline",
+                "props": {
+                  "text": "Explore our community",
+                  "level": 3
+                }
+              },
+              {
+                "id": "cd-hero-links",
+                "type": "button_grid",
+                "props": {
+                  "items": [
+                    {
+                      "id": "cd-programmes",
+                      "label": "Programmes",
+                      "href": "/programmes"
+                    },
+                    {
+                      "id": "cd-admissions",
+                      "label": "Admissions",
+                      "href": "/admissions"
+                    },
+                    {
+                      "id": "cd-contact",
+                      "label": "Contact our team",
+                      "href": "/contact"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "style": {
+          "padding": "lg",
+          "background": "paper",
+          "text_color": "default",
+          "radius": "md",
+          "gap": "md"
+        }
+      },
+      {
+        "id": "cd-news",
+        "type": "section",
+        "ratios": [
+          100
+        ],
+        "columns": [
+          {
+            "id": "cd-news-col",
+            "type": "column",
+            "children": [
+              {
+                "id": "cd-news-title",
+                "type": "headline",
+                "props": {
+                  "text": "College and department news",
+                  "level": 3
+                }
+              },
+              {
+                "id": "cd-news-grid",
+                "type": "loop_grid",
+                "props": {
+                  "source": "posts",
+                  "limit": 3
+                }
+              }
+            ]
+          }
+        ],
+        "style": {
+          "padding": "lg",
+          "background": "paper",
+          "text_color": "default",
+          "radius": "md",
+          "gap": "md"
         }
       }
     ]

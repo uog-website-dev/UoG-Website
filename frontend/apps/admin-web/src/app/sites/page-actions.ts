@@ -93,9 +93,52 @@ export interface SitePageWorkflowTransition {
   created_at: string;
 }
 
+export interface SitePageRevision {
+  id: number;
+  revision_number: number;
+  editor: string;
+  status: SitePageStatus;
+  changed_fields: string[];
+  content_hash: string;
+  restored_from_revision: number | null;
+  created_at: string;
+}
+
+export interface SitePageRevisionList {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: SitePageRevision[];
+  etag: string;
+}
+
+function siteContentRevisionPath(siteId: number, pageId: string, suffix = ""): string {
+  if (!Number.isInteger(siteId) || siteId < 1) throw new Error("A revision request needs one Site id.");
+  return `/v1/cms/sites/${siteId}/content/${encodeURIComponent(pageId)}/revisions/${suffix}`;
+}
+
+export async function loadSitePageRevisions(siteId: number, pageId: string): Promise<ActionResult<SitePageRevisionList>> {
+  return attempt(async () => {
+    const api = await client();
+    const result = await api.getDetailed<Omit<SitePageRevisionList, "etag">>(siteContentRevisionPath(siteId, pageId, "?page_size=100"));
+    return { ...result.data, results: result.data.results, etag: result.etag ?? "" };
+  });
+}
+
+export async function restoreSitePageRevision(siteId: number, pageId: string, revision: number, etag: string): Promise<ActionResult<SitePageRevision>> {
+  return invalidated(siteId, "pages", attempt(async () => {
+    const api = await client();
+    const result = await api.postDetailed<SitePageRevision>(
+      siteContentRevisionPath(siteId, pageId, `${revision}/restore/`), {}, { headers: { "If-Match": etag } },
+    );
+    return result.data;
+  }));
+}
+
 export interface SitePageListQuery {
   search?: string;
   status?: SitePageStatus;
+  author?: number;
   page?: number;
   page_size?: number;
   ordering?: "title" | "-title" | "updated_at" | "-updated_at";

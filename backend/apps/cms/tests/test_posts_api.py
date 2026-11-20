@@ -87,6 +87,16 @@ def test_posts_crud_filtering_search_ordering_and_pagination(site_editor, sites,
     detail_url = created["Location"]
     detail = site_editor.get(detail_url)
     assert detail.status_code == 200 and detail.json()["slug"] == "opening-ceremony"
+    assert detail.json()["seo"] == {"meta_title": "Opening", "meta_description": "Details"}
+    seo_update = site_editor.patch(
+        detail_url, {"seo": {"meta_title": "Opening revised", "meta_description": "New details"}},
+        content_type="application/json", HTTP_IF_MATCH=detail["ETag"],
+    )
+    assert seo_update.status_code == 200, seo_update.content
+    assert site_editor.get(detail_url).json()["seo"] == {
+        "meta_title": "Opening revised", "meta_description": "New details",
+    }
+    detail = seo_update
 
     # Filters, search, ordering and pagination all scope to this Site.
     Post.objects.create(site=site, title="Second story", slug="second-story", content="Body")
@@ -401,9 +411,13 @@ def test_article_site_permission_and_module_gates(site_editor,oidc,sites):
     assert site_editor.patch(foreign_url,{"editor_document":ARTICLE},content_type="application/json",HTTP_IF_MATCH='"anything"').status_code==404
     assert site_editor.get(POSTS.format(site=b.pk)+f"{foreign.pk}/").status_code==403
     outsider=get_user_model().objects.create_user(username="article-outsider")
-    assert site_editor.post(url,{"title":"Denied","slug":"denied-article","editor_document":ARTICLE},content_type="application/json",**_viewer(oidc,outsider.username)).status_code==403
+    outsider_token=_viewer(oidc,outsider.username)
+    assert site_editor.post(url,{"title":"Denied","slug":"denied-article","editor_document":ARTICLE},content_type="application/json",**outsider_token).status_code==403
     created=site_editor.post(url,{"title":"Local","slug":"local-article","editor_document":ARTICLE},content_type="application/json")
     assert created.status_code==201,created.content
+    denied_update=site_editor.patch(created["Location"],{"seo":{"meta_title":"Unauthorized"}},content_type="application/json",HTTP_IF_MATCH=created["ETag"],**outsider_token)
+    assert denied_update.status_code==403
+    assert site_editor.get(created["Location"]).json()["seo"]=={}
     disable_module_for_site(a.pk,Module.objects.get(code="POSTS").pk)
     assert site_editor.post(url,{"title":"Disabled","slug":"disabled-article","editor_document":ARTICLE},content_type="application/json").status_code==400
     assert site_editor.patch(created["Location"],{"editor_document":ARTICLE},content_type="application/json",HTTP_IF_MATCH=created["ETag"]).status_code==400
@@ -522,6 +536,22 @@ def test_post_metadata_validation_is_atomic(site_editor,sites,fields,field):
     response=site_editor.patch(created["Location"],{**fields,"excerpt":"Must not persist"},content_type="application/json",HTTP_IF_MATCH=created["ETag"])
     assert response.status_code==400,response.content
     assert field in response.json()["error"]["details"]
+    assert site_editor.get(created["Location"]).json()==created.json()
+
+
+@pytest.mark.parametrize("seo,field", [
+    ({"meta_title": "<script>alert(1)</script>"}, "seo.meta_title"),
+    ({"meta_description": "x" * 301}, "seo.meta_description"),
+    ({"og_image_ref": "sites/999/other.jpg"}, "seo.og_image_ref"),
+])
+def test_post_seo_rejects_markup_limits_and_foreign_site_image(site_editor,sites,seo,field):
+    _enable_posts_module(sites[0])
+    created=site_editor.post(POSTS.format(site=sites[0].pk),{"title":"SEO boundary","slug":"seo-boundary","content":"Body"},content_type="application/json")
+    assert created.status_code==201,created.content
+    response=site_editor.patch(created["Location"],{"seo":seo},content_type="application/json",HTTP_IF_MATCH=created["ETag"])
+    assert response.status_code==400,response.content
+    details=response.json()["error"]["details"]
+    assert field in str(details) or field.split(".",1)[1] in str(details)
     assert site_editor.get(created["Location"]).json()==created.json()
 
 

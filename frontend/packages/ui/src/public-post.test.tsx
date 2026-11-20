@@ -2,6 +2,8 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { postFromResponse, postsFromResponse, postsPageFromResponse, PublicPostDetail, PublicPostFeed } from "./public-post";
+import { siteFromContext } from "./public-site";
+import { PublicSiteBrandingProvider } from "./site-branding";
 
 const published = {
   site: 11,
@@ -60,6 +62,32 @@ describe("PublicPostFeed and PublicPostDetail", () => {
     render(<PublicPostDetail post={postFromResponse(404, { title: "Hidden", slug: "hidden", content: "secret" })} />);
     expect(screen.getAllByText(/no published post/i).length).toBeGreaterThan(0);
     expect(screen.queryByText("secret")).toBeNull();
+  });
+
+  it("binds article banner branding to the resolved Site context", () => {
+    const site = siteFromContext(200, {
+      site: { id: 11, code: "INFORMATICS", name: "Informatics" },
+      domain: "informatics.uog.edu.et",
+      canonical_domain: "informatics.uog.edu.et",
+      configuration: {
+        display_name: "College of Informatics",
+        theme: "high-contrast",
+        logo_url: "/api/v1/site-context/identity/logo/",
+      },
+      modules: ["POSTS"],
+    });
+    const post = postFromResponse(200, published);
+    const { container } = render(
+      <PublicSiteBrandingProvider site={site}>
+        <PublicPostDetail post={post} />
+      </PublicSiteBrandingProvider>,
+    );
+    const banner = screen.getByRole("banner", { name: "Article banner" });
+    expect(banner.querySelector('[data-site-branding="INFORMATICS"]')).toBeTruthy();
+    expect(banner.querySelector('img[alt="College of Informatics logo"]')?.getAttribute("src")).toBe(
+      "/api/v1/site-context/identity/logo/",
+    );
+    expect(container.querySelector("[data-site-branding=MEDICINE]")).toBeNull();
   });
 
   it("renders versioned editor_document bodies without executing hostile markup", () => {

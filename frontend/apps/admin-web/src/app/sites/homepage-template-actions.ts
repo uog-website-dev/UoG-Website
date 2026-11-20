@@ -7,6 +7,8 @@ import type {VisualLayout} from "@uog/types";
 import {getAccessToken} from "@/access-token";
 import {serializeApiError} from "@/organizations/contract";
 import type {ActionResult} from "@/organizations/contract";
+import {invalidated} from "@/data/mutation-receipt";
+import type {SitePageRecord} from "./page-actions";
 export interface HomepageTemplate {
  manifest_version:number;id:string;version:number;name:string;description:string;
  required_modules:string[];layout:VisualLayout|null;available:boolean;unavailable_reasons:string[];
@@ -21,4 +23,7 @@ export async function prepareHomepageTemplate(siteId:number,templateId:string,ve
  try{const api=await client();const result=await api.post<{visual_layout:VisualLayout}>(`/v1/sites/${siteId}/homepage-templates/prepare/`,{template_id:templateId,version});
  const checked=validateVisualLayout(result.visual_layout);if(!checked.ok)throw new Error("The template document is incompatible with this builder.");
  return {ok:true,data:checked.value};}catch(error){return {ok:false,error:serializeApiError(error)};}
+}
+export async function applyHomepageTemplate(siteId:number,input:{template_id:string;version:number;mode:"new"|"replace";title?:string;page_id?:string},idempotencyKey:string,ifMatch?:string):Promise<ActionResult<SitePageRecord>>{
+ return invalidated(siteId,"pages",(async()=>{try{const api=await client();const result=await api.postDetailed<SitePageRecord>(`/v1/sites/${siteId}/homepage-templates/apply/`,input,{headers:{...(input.mode==="new"?{"Idempotency-Key":idempotencyKey}:{}),...(ifMatch?{"If-Match":ifMatch}:{})}});return {ok:true,data:{...result.data,etag:result.etag??""}};}catch(error){return {ok:false,error:serializeApiError(error)};}})());
 }

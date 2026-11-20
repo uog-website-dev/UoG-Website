@@ -1021,6 +1021,16 @@ function SitePostEditorContent({
               error={Boolean(seoFieldError)}
               helperText={seoFieldError || "Allowed keys: meta_title, meta_description and og_image_ref."}
             />
+            {(() => {
+              let seo: Record<string, unknown> = {};
+              try { seo = parseObject(form.seo, "SEO metadata"); } catch { /* the field error above explains invalid JSON */ }
+              const title = typeof seo.meta_title === "string" && seo.meta_title.trim() ? seo.meta_title.trim() : form.title || "Untitled Post";
+              const description = typeof seo.meta_description === "string" && seo.meta_description.trim()
+                ? seo.meta_description.trim() : form.excerpt.trim() || "Site display name (fallback)";
+              return <Alert severity="info" aria-label="Effective SEO preview">
+                Search preview: <strong>{title}</strong><br />Description: {description}
+              </Alert>;
+            })()}
           </Paper>
         </Box>
       </Box>

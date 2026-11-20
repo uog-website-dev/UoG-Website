@@ -81,6 +81,7 @@ interface PageForm {
   metadata: string;
   seoTitle: string;
   seoDescription: string;
+  seoImage: string;
   seoExtra: string;
   blocks: string[];
 }
@@ -101,7 +102,7 @@ function seoPreview(seo: Record<string, unknown> | undefined): PublicPageDocumen
 function emptyForm(locale = "en"): PageForm {
   return {
     sidebar: "", layout:"FULL_WIDTH", title: "", slug: "", parent: "", locale, visibility: "PUBLIC",
-    metadata: "{}", seoTitle: "", seoDescription: "", seoExtra: "{}",
+    metadata: "{}", seoTitle: "", seoDescription: "", seoImage: "", seoExtra: "{}",
     blocks: [],
   };
 }
@@ -114,8 +115,10 @@ function formFromRecord(current: SitePageRecord, fallbackLocale: string): PageFo
   const seo = { ...(current.seo ?? {}) };
   const metaTitle = seo.meta_title;
   const metaDescription = seo.meta_description;
+  const image = seo.og_image_ref;
   delete seo.meta_title;
   delete seo.meta_description;
+  delete seo.og_image_ref;
   return {
     sidebar: current.sidebar ?? "",
     layout:shellLayout(current.layout),
@@ -127,6 +130,7 @@ function formFromRecord(current: SitePageRecord, fallbackLocale: string): PageFo
     metadata: JSON.stringify(current.metadata ?? {}, null, 2),
     seoTitle: typeof metaTitle === "string" ? metaTitle : "",
     seoDescription: typeof metaDescription === "string" ? metaDescription : "",
+    seoImage: typeof image === "string" ? image : "",
     seoExtra: JSON.stringify(seo, null, 2),
     blocks: (current.blocks ?? []).map((block) => JSON.stringify(block, null, 2)),
   };
@@ -162,6 +166,12 @@ function seoInput(form: PageForm): Record<string, unknown> {
   else delete seo.meta_title;
   if (description) seo.meta_description = description;
   else delete seo.meta_description;
+  const image = form.seoImage.trim();
+  if (image) seo.og_image_ref = image;
+  else delete seo.og_image_ref;
+  if (title.length > 120) throw new Error("SEO title must be at most 120 characters.");
+  if (description.length > 300) throw new Error("Meta description must be at most 300 characters.");
+  if (image.length > 512) throw new Error("Social image reference must be at most 512 characters.");
   return seo;
 }
 
@@ -563,7 +573,8 @@ function SitePageEditorContent({
         label="SEO title"
         value={form.seoTitle}
         onChange={(event) => setForm((current) => ({ ...current, seoTitle: event.target.value }))}
-        helperText="Search result title. Leave blank to use the Page title."
+        inputProps={{ maxLength: 120 }}
+        helperText={`Search title (${form.seoTitle.length}/120). Leave blank to use the Page title.`}
       />
       <TextField
         label="Meta description"
@@ -571,8 +582,20 @@ function SitePageEditorContent({
         onChange={(event) => setForm((current) => ({ ...current, seoDescription: event.target.value }))}
         multiline
         minRows={2}
-        helperText="Short summary shown in search results."
+        inputProps={{ maxLength: 300 }}
+        helperText={`Plain text only (${form.seoDescription.length}/300). Leave blank to use the Site name.`}
       />
+      <TextField
+        label="Social sharing image reference"
+        value={form.seoImage}
+        onChange={(event) => setForm((current) => ({ ...current, seoImage: event.target.value }))}
+        inputProps={{ maxLength: 512 }}
+        helperText={`Use a ready image from sites/${siteId}/ or shared/. Leave blank for renderer fallback (${form.seoImage.length}/512).`}
+      />
+      <Alert severity="info" aria-label="Effective SEO preview">
+        Search preview: <strong>{form.seoTitle.trim() || form.title || "Untitled Page"}</strong>
+        <br />Description: {form.seoDescription.trim() || "Site display name (fallback)"}
+      </Alert>
       <Accordion disableGutters elevation={0} sx={{ border: 1, borderColor: "divider", "&:before": { display: "none" } }}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>Advanced</AccordionSummary>
         <AccordionDetails sx={{ display: "flex", flexDirection: "column", gap: 2 }}>

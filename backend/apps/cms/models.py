@@ -536,6 +536,31 @@ SEO_KEYS = {
 }
 
 
+def validate_seo_document(seo, *, site_id):
+    """Validate the shared, plain-text SEO contract and scoped image reference."""
+    if not isinstance(seo, dict):
+        raise ValidationError({"seo": "SEO metadata must be a JSON object."})
+    unknown = sorted(set(seo) - set(SEO_KEYS))
+    if unknown:
+        raise ValidationError({"seo": "Unsupported SEO keys: " + ", ".join(unknown)
+                               + ". Approved: " + ", ".join(sorted(SEO_KEYS)) + "."})
+    for key, value in seo.items():
+        if value is not None and not isinstance(value, str):
+            raise ValidationError({f"seo.{key}": "This field must be text or null."})
+        if isinstance(value, str) and len(value) > SEO_KEYS[key]:
+            raise ValidationError({f"seo.{key}": f"Use at most {SEO_KEYS[key]} characters."})
+        if key != "og_image_ref" and isinstance(value, str) and re.search(r"<(?:!?/?\s*[a-z]|script\b)", value, re.I):
+            raise ValidationError({f"seo.{key}": "HTML markup is not allowed; enter plain text."})
+    image_ref = seo.get("og_image_ref")
+    if image_ref:
+        from .blocks import Rejection, check_image_ref
+        try:
+            seo["og_image_ref"] = check_image_ref(image_ref, site_id=site_id)
+        except Rejection as error:
+            raise ValidationError({"seo.og_image_ref": str(error)}) from error
+    return seo
+
+
 def normalize_slug(value):
     """Lowercase, collapse every run of non-alphanumerics into one hyphen."""
     return re.sub(r"[^a-z0-9]+", "-", str(value).strip().lower()).strip("-")
@@ -726,21 +751,7 @@ class Page(SiteContent):
                             "status": "Page content is locked while in review, "
                                       "approved, published or archived.",
                         })
-        if not isinstance(self.seo, dict):
-            raise ValidationError({"seo": "SEO metadata must be a JSON object."})
-        unknown = sorted(set(self.seo) - set(SEO_KEYS))
-        if unknown:
-            raise ValidationError({
-                "seo": "Unsupported SEO keys: " + ", ".join(unknown)
-                       + ". Approved: " + ", ".join(sorted(SEO_KEYS)) + ".",
-            })
-        for key, value in self.seo.items():
-            if value is not None and not isinstance(value, str):
-                raise ValidationError({"seo": f"{key} must be a string or null."})
-            if isinstance(value, str) and len(value) > SEO_KEYS[key]:
-                raise ValidationError({
-                    "seo": f"{key} must be at most {SEO_KEYS[key]} characters.",
-                })
+        self.seo = validate_seo_document(self.seo, site_id=self.site_id)
 
         from .services.sidebars import validate_page
         validate_page(self)

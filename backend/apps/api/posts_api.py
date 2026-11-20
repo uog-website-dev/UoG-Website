@@ -21,6 +21,7 @@ from rest_framework.response import Response
 
 from apps.accounts.authentication import KeycloakBearerAuthentication
 from apps.cms.authorization import require_cms_grant
+from apps.cms.api.authors import site_content_authors
 from apps.authorization.services import record_decision
 from apps.cms.models import ContentRole, ContentStatus
 from apps.sites.models import Site
@@ -389,6 +390,15 @@ class PostViewSet(SiteContentAdminViewSet):
 
     def create_defaults(self):
         return {"author": self.request.user}
+
+    @extend_schema(tags=["Posts"], parameters=[SITE_PARAMETER], description="Active CMS authors assigned to this Site. Requires Post list access and enabled POSTS module.")
+    @action(detail=False, methods=["get"], url_path="authors")
+    def authors(self, request, *args, **kwargs):
+        site = self._site()
+        self._authorize(site, ContentRole.values)
+        self._module(site)
+        rows = site_content_authors(site.pk)
+        return Response({"count": len(rows), "next": None, "previous": None, "results": rows})
 
     def search_q(self, term):
         return (

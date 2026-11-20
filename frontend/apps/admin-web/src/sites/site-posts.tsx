@@ -1,5 +1,5 @@
 "use client";
-import {loadSitePosts, loadSiteTaxonomy} from "@/data/read-client";
+import {loadSitePosts, loadSiteTaxonomy, loadSitePostAuthors} from "@/data/read-client";
 import {usePageBoundary} from "@/data/page-boundary";
 import {useSectionState} from "@/data/section-state";
 import {useSiteQuery} from "@/data/query-cache";
@@ -34,6 +34,8 @@ import type {
 } from "@/app/sites/post-actions";
 import { unwrap } from "@/organizations/contract";
 import { ContentWorkflowButtons, ContentWorkflowDialog, ContentWorkflowHistory } from "@/sites/content-workflow";
+import { useOptionalSiteAdmin } from "@/sites/site-admin-frame";
+import { sitePublicContentUrl } from "@/sites/site-public-content-url";
 import type { WorkflowAction, WorkflowTransition } from "@/sites/content-workflow";
 
 const PAGE_SIZE = 20;
@@ -59,6 +61,7 @@ const EMPTY_TAXONOMY: SiteTaxonomyRecord[] = [];
 interface PostFilters {
   search: string;
   status: SitePostStatus | "";
+  author: string;
   category: string;
   tag: string;
 }
@@ -120,10 +123,11 @@ function SitePostsPanelContent({
 }) {
   const toast = useToast();
   const canView = permissions.includes(PERMISSIONS.view);
+  const siteAdmin = useOptionalSiteAdmin();
   const canCreate = permissions.includes(PERMISSIONS.create);
   const canEdit = permissions.includes(PERMISSIONS.update);
-  const [draftFilters, setDraftFilters] = useSectionState<PostFilters>(siteId, "posts", "draftFilters", { search: "", status: "", category: "", tag: "" });
-  const [appliedFilters, setAppliedFilters] = useSectionState<PostFilters>(siteId, "posts", "appliedFilters", { search: "", status: "", category: "", tag: "" });
+  const [draftFilters, setDraftFilters] = useSectionState<PostFilters>(siteId, "posts", "draftFilters", { search: "", status: "", author: "", category: "", tag: "" });
+  const [appliedFilters, setAppliedFilters] = useSectionState<PostFilters>(siteId, "posts", "appliedFilters", { search: "", status: "", author: "", category: "", tag: "" });
   const [page, setPage] = useSectionState(siteId, "posts", "page", 1);
   const [sort, setSort] = useSectionState<SortState>(siteId, "posts", "sort", { field: "created_at", direction: "desc" });
   const [pendingWorkflow, setPendingWorkflow] = useState<{ post: SitePostRecord; action: SitePostWorkflowAction } | null>(null);
@@ -136,11 +140,12 @@ function SitePostsPanelContent({
   const [historyLoading, setHistoryLoading] = useState(false);
 
   const ordering = orderingForSort(sort);
-  const posts = useSiteQuery<SitePostListResponse>(siteId, "posts", {search: appliedFilters.search, status: appliedFilters.status, page, page_size: PAGE_SIZE, ordering, category: appliedFilters.category, tag: appliedFilters.tag},
+  const posts = useSiteQuery<SitePostListResponse>(siteId, "posts", {search: appliedFilters.search, status: appliedFilters.status, author: appliedFilters.author, page, page_size: PAGE_SIZE, ordering, category: appliedFilters.category, tag: appliedFilters.tag},
     async (signal) => canView && postsEnabled === true
       ? unwrap(await loadSitePosts(siteId, {
           search: appliedFilters.search || undefined,
           status: appliedFilters.status || undefined,
+          author: appliedFilters.author ? Number(appliedFilters.author) : undefined,
           category: appliedFilters.category || undefined,
           tag: appliedFilters.tag || undefined,
           page,
@@ -157,6 +162,7 @@ function SitePostsPanelContent({
       : { categories: EMPTY_TAXONOMY, tags: EMPTY_TAXONOMY },
     {enabled: canView && postsEnabled === true},
   );
+  const authors = useSiteQuery<{count:number;next:null;previous:null;results:{id:number;name:string;site:number}[]}>(siteId,"post-authors",{},async signal=>canView&&postsEnabled===true?unwrap(await loadSitePostAuthors(siteId,signal)):({count:0,next:null,previous:null,results:[]}),{enabled:canView&&postsEnabled===true});
 
   const categories = taxonomy.data?.categories ?? EMPTY_TAXONOMY;
   const tags = taxonomy.data?.tags ?? EMPTY_TAXONOMY;
@@ -166,19 +172,21 @@ function SitePostsPanelContent({
   const enabled = postsEnabled === true && busyPostId === null;
   const activeFilterCount = Number(Boolean(appliedFilters.search))
     + Number(Boolean(appliedFilters.status))
+    + Number(Boolean(appliedFilters.author))
     + Number(Boolean(appliedFilters.category))
     + Number(Boolean(appliedFilters.tag));
 
   function applyFilters() {
     setAppliedFilters({
       search: draftFilters.search.trim(), status: draftFilters.status,
+      author: draftFilters.author,
       category: draftFilters.category, tag: draftFilters.tag,
     });
     setPage(1);
   }
 
   function resetFilters() {
-    const cleared = { search: "", status: "" as const, category: "", tag: "" };
+    const cleared = { search: "", status: "" as const, author: "", category: "", tag: "" };
     setDraftFilters(cleared);
     setAppliedFilters(cleared);
     setPage(1);
@@ -290,6 +298,7 @@ function SitePostsPanelContent({
           <FilterBar label="Post filters" activeCount={activeFilterCount} onApply={applyFilters} onReset={resetFilters} resetDisabled={posts.loading && !posts.data}>
             <TextFilter label="Search Posts" placeholder="Title, slug, excerpt or content" value={draftFilters.search} onChange={(search) => setDraftFilters((current) => ({ ...current, search }))} />
             <SelectFilter label="Status" value={draftFilters.status} options={STATUSES.map((status) => ({ value: status, label: STATUS_LABELS[status] }))} onChange={(status) => setDraftFilters((current) => ({ ...current, status: STATUSES.find((candidate) => candidate === status) ?? "" }))} />
+            <SelectFilter label="Author" value={draftFilters.author} options={(authors.data?.results ?? []).filter(row=>row.site===siteId).map(row=>({value:String(row.id),label:row.name}))} onChange={(author) => setDraftFilters((current) => ({ ...current, author }))} />
             <SelectFilter label="Category" value={draftFilters.category} options={categories.map((row) => ({ value: row.id, label: row.name }))} onChange={(category) => setDraftFilters((current) => ({ ...current, category }))} />
             <SelectFilter label="Tag" value={draftFilters.tag} options={tags.map((row) => ({ value: row.id, label: row.name }))} onChange={(tag) => setDraftFilters((current) => ({ ...current, tag }))} />
           </FilterBar>
@@ -300,20 +309,22 @@ function SitePostsPanelContent({
               columns={columns}
               rows={rows}
               getRowKey={(row) => row.id}
-              renderActions={(row) => (
+              renderActions={(row) => postsEnabled !== true || !canView ? null : (
                 <Box role="group" aria-label={`Actions for ${row.title}`} sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                   <Button size="small" aria-label={`Workflow history for ${row.title}`} onClick={() => void openHistory(row)}>History</Button>
-                  {canEdit || Boolean(row.available_actions?.length) ? (
+                  {canEdit && ["DRAFT", "UNPUBLISHED", "PUBLISHED"].includes(row.status) ? (
                     <Button
                       component={Link}
                       href={`/sites/${siteId}/admin/posts/${row.id}/edit`}
                       size="small"
-                      aria-label={`${canEdit ? "Edit" : "Review"} ${row.title}`}
+                      aria-label={`${row.status === "PUBLISHED" ? "Edit draft of" : "Edit"} ${row.title}`}
                       disabled={!enabled}
                     >
-                      {canEdit ? "Edit" : "Review"}
+                      {row.status === "PUBLISHED" ? "Edit draft" : "Edit"}
                     </Button>
                   ) : null}
+                  {!canEdit && row.available_actions?.length ? <Button component={Link} href={`/sites/${siteId}/admin/posts/${row.id}/edit`} size="small" aria-label={`Review ${row.title}`} disabled={!enabled}>Review</Button> : null}
+                  {row.status === "PUBLISHED" && siteAdmin?.site.id === siteId ? (() => { const href = sitePublicContentUrl(siteAdmin.site, `/posts/${row.publication_slug || row.slug}`); return href ? <Button component="a" href={href} target="_blank" rel="noopener noreferrer" size="small" aria-label={`View public ${row.title}`}>View Public</Button> : null; })() : null}
                   {postsEnabled === true ? (
                     <ContentWorkflowButtons
                       title={row.title}

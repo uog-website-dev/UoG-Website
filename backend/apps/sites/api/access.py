@@ -4,6 +4,7 @@ import json
 from contextlib import contextmanager
 
 from django.core.exceptions import ValidationError as DomainValidationError
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import DatabaseError
 from rest_framework import serializers, viewsets
 from rest_framework.exceptions import APIException, NotFound
@@ -81,7 +82,7 @@ def require_if_match(request, etag):
 
 def representation(serializer_class, instance):
     data = serializer_class(instance).data
-    digest = hashlib.sha256(json.dumps(data, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    digest = hashlib.sha256(json.dumps(data, sort_keys=True, separators=(",", ":"), cls=DjangoJSONEncoder).encode()).hexdigest()
     return data, f'"{digest}"'
 
 

@@ -1,4 +1,5 @@
 vi.mock("./homepage-template-catalogue",()=>({HomepageTemplateCatalogue:()=>null}));
+vi.mock("next/navigation",()=>({usePathname:()=>"/sites/11/admin/homepage",useRouter:()=>({push:vi.fn()})}));
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { SitePageRecord } from "@/app/sites/page-actions";
@@ -80,6 +81,19 @@ beforeEach(() => {
 });
 
 describe("Homepage Settings", () => {
+  it("shows the effective live homepage and its unpublished working draft", async () => {
+    getSite.mockResolvedValue({ ok: true, data: { data: { id: 11, homepage: "page-1" }, etag: '"site-1"' } });
+    loadSitePages.mockImplementation((_site: number, query: { status?: string }) => Promise.resolve({ ok: true, data: {
+      count: 1, next: null, previous: null,
+      results: query.status === "PUBLISHED" ? [page({ is_homepage: true })]
+        : query.status === "DRAFT" ? [page({ id: "draft-1", title: "New Campus Home", status: "DRAFT", draft_of: "page-1", can_set_homepage: false })] : [],
+    } }));
+    renderPanel({ id: 11, name: "Informatics", homepageId: "page-1" });
+    expect(await screen.findByText("Campus Home")).toBeTruthy();
+    expect(await screen.findByText("New Campus Home")).toBeTruthy();
+    expect(screen.getByText(/not visible to anonymous visitors/i)).toBeTruthy();
+  });
+
   it("lists only eligible same-Site published Pages and assigns with authoritative success", async () => {
     loadSitePages.mockResolvedValue({
       ok: true,
