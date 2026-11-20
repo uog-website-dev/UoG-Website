@@ -56389,8 +56389,12 @@ components:
           nullable: true
         theme:
           type: string
+        logo_url:
+          type: string
+          nullable: true
       required:
       - display_name
+      - logo_url
       - theme
     PublicMenuNode:
       type: object

@@ -75,6 +75,19 @@ configuration are not writable there.
 and run under the hierarchy write lock. `PATCH .../configuration/` merges
 one allowlisted change into that Site only, in the same lock as `If-Match`.
 
+### Site appearance
+
+The Site Appearance controls use that same configuration endpoint. A Site
+Administrator can set `identity.display_name`, choose a ready image from the
+same Site's Media Library using its asset UUID as `identity.logo_ref`, and
+select `presentation.theme` from `institutional` or `high-contrast`. The
+themes map to approved university color palettes. The server rejects a foreign,
+unready, unsupported, or non-image logo and rejects custom CSS, JavaScript,
+arbitrary colors, and unknown configuration keys. The Site's title and theme
+are stored on that Site; the platform or template defaults are not changed.
+Public context returns a logo route only when the same Site's logo is still
+eligible. Missing or unavailable logos use the accessible UoG brand fallback.
+
 ## Domains
 
 Hostnames are normalized and globally unique. A duplicate returns 409.

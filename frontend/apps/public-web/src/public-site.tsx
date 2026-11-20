@@ -11,6 +11,7 @@
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import Container from "@mui/material/Container";
+import Box from "@mui/material/Box";
 import { UogFooter, UogHeader, UogThemeProvider, EMPTY_SITE, publicFetchInit, siteFromContext } from "@uog/ui";
 import type { PublicSiteContext } from "@uog/ui";
 
@@ -20,6 +21,7 @@ const CONTEXT_PATH = "/api/v1/site-context/";
 
 export function PublicSiteChrome({ children }: { children: ReactNode }) {
   const [site, setSite] = useState<PublicSiteContext>(EMPTY_SITE);
+  const [logoFailed, setLogoFailed] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -30,7 +32,7 @@ export function PublicSiteChrome({ children }: { children: ReactNode }) {
       })
       .catch(() => EMPTY_SITE)
       .then((next) => {
-        if (!cancelled) setSite(next);
+        if (!cancelled) { setSite(next); setLogoFailed(false); }
       });
     return () => {
       cancelled = true;
@@ -46,7 +48,7 @@ export function PublicSiteChrome({ children }: { children: ReactNode }) {
   return (
     <UogThemeProvider theme={site.theme}>
       <div data-theme={site.theme} data-site-code={site.code ?? ""}>
-        <UogHeader title={site.displayName} />
+        <UogHeader title={site.displayName} leading={site.logoUrl && !logoFailed ? <Box component="img" src={site.logoUrl} alt={`${site.displayName} logo`} onError={() => setLogoFailed(true)} sx={{ width: 40, height: 40, objectFit: "contain", bgcolor: "common.white", borderRadius: 1, p: 0.25 }} /> : undefined} />
         {site.modules.menus ? <PublicMenus>{body}</PublicMenus> : body}
         <UogFooter apiBaseUrl={undefined} />
       </div>

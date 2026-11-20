@@ -20,7 +20,7 @@ const informatics = {
   site: { id: 2, code: "INFORMATICS", name: "Informatics" },
   domain: "informatics.uog.edu.et",
   canonical_domain: "informatics.uog.edu.et",
-  configuration: { display_name: "College of Informatics", theme: "institutional" },
+  configuration: { ...{ display_name: "College of Informatics", theme: "institutional" }, logo_url: "/api/v1/site-context/identity/logo/" },
   modules: ["PAGES", "POSTS", "MENUS"],
 };
 
@@ -49,6 +49,9 @@ describe("siteFromContext", () => {
     expect(hosts.map((site) => site.id)).toEqual([1, 2, 3]);
     expect(hosts.map((site) => site.domain)).toEqual(["uog.edu.et", "informatics.uog.edu.et", null]);
     expect(hosts.map((site) => site.canonicalDomain)).toEqual(["uog.edu.et", "informatics.uog.edu.et", null]);
+    expect(hosts[1]?.logoUrl).toBe("/api/v1/site-context/identity/logo/");
+    expect(hosts[2]?.logoUrl).toBeNull();
+    expect(siteFromContext(200, { ...informatics, configuration: { ...informatics.configuration, logo_url: "https://private.example/logo.png" } }).logoUrl).toBeNull();
     expect(hosts[2]?.theme).toBe("high-contrast");
     expect(hosts[1]?.modules.posts).toBe(true);
     expect(hosts[2]?.modules.posts).toBe(false);

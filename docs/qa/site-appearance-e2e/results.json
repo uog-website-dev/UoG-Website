@@ -1,0 +1,21 @@
+{
+  "host": "informatics.uog.local",
+  "results": [
+    {
+      "name": "A Site without a configured logo renders approved UoG fallback branding",
+      "status": "PASS"
+    },
+    {
+      "name": "An approved public Site logo renders from the fixed Site-context endpoint",
+      "status": "PASS"
+    },
+    {
+      "name": "An unavailable Site logo falls back without exposing a storage URL",
+      "status": "PASS"
+    },
+    {
+      "name": "A private or remote media URL is ignored and never rendered as Site branding",
+      "status": "PASS"
+    }
+  ]
+}

@@ -1,7 +1,10 @@
 """Versioned Site configuration: defaults, isolation, rejection and audit."""
 import pytest
+import uuid
+from unittest.mock import patch
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
+from django.contrib.auth import get_user_model
 
 from apps.audit.models import AuditEvent
 from apps.organizations.models import OrganizationType, OrganizationUnit
@@ -9,6 +12,8 @@ from apps.sites.configuration import CURRENT_SCHEMA_VERSION, default_configurati
 from apps.sites.models import Site
 from apps.sites.services.configuration import apply_site_configuration
 from apps.sites.services.lifecycle import activate_site
+from apps.media.models import MediaAsset
+from apps.media.services import _media_write_session
 
 pytestmark = pytest.mark.django_db
 
@@ -24,6 +29,19 @@ def owners():
 
 def create_site(owner, code, **overrides):
     return Site.objects.create(organization_unit=owner, code=code, name=f"{code} website", **overrides)
+
+
+def ready_logo(site, user):
+    with _media_write_session(user, site.pk):
+        asset = MediaAsset.objects.create(
+            site=site, storage_reference=f"platform-private:sites/{site.pk}/logo/{uuid.uuid4()}",
+            original_filename="logo.png", detected_mime="image/png", byte_count=100,
+            checksum="a" * 64, status="PENDING", width=64, height=64,
+            created_by=user, updated_by=user,
+        )
+        asset.status = "READY"
+        asset.save(update_fields=("status",))
+    return asset
 
 
 def test_new_site_persists_independent_schema_defaults(owners):
@@ -44,16 +62,20 @@ def test_partial_update_changes_only_the_selected_site(owners):
     target = create_site(college, "TARGET")
     other = create_site(college, "OTHER")
     original = other.configuration
-    updated = apply_site_configuration(target.pk, {
-        "identity": {"display_name": "College of Informatics", "logo_ref": "logo-informatics"},
-        "presentation": {"theme": "high-contrast"},
-        "language": {"enabled": ["en-us", "am"]},
-        "navigation": {"items": [{"code": "HOME", "label": "Home", "path": "/"}]},
-        "behavior": {"show_search": True},
-    })
+    user = get_user_model().objects.create_user(username="site-brand-owner")
+    logo = ready_logo(target, user)
+    with patch("apps.sites.services.configuration.module_is_available", return_value=True):
+        updated = apply_site_configuration(target.pk, {
+            "identity": {"display_name": "College of Informatics", "logo_ref": logo.pk.hex},
+            "presentation": {"theme": "high-contrast"},
+            "language": {"enabled": ["en-us", "am"]},
+            "navigation": {"items": [{"code": "HOME", "label": "Home", "path": "/"}]},
+            "behavior": {"show_search": True},
+        })
     updated.refresh_from_db()
     other.refresh_from_db()
     assert updated.configuration["identity"]["display_name"] == "College of Informatics"
+    assert updated.configuration["identity"]["logo_ref"] == logo.pk.hex
     assert updated.configuration["identity"]["favicon_ref"] is None
     assert updated.configuration["presentation"]["theme"] == "high-contrast"
     assert updated.configuration["language"]["enabled"] == ["en-us", "am"]
@@ -62,11 +84,35 @@ def test_partial_update_changes_only_the_selected_site(owners):
     assert other.configuration == original
 
 
+def test_logo_must_be_a_ready_image_owned_by_the_updated_site(owners):
+    target = create_site(owners[1], "LOGO_TARGET")
+    other = create_site(owners[1], "LOGO_OTHER")
+    user = get_user_model().objects.create_user(username="site-brand-check")
+    foreign = ready_logo(other, user)
+    with patch("apps.sites.services.configuration.module_is_available", return_value=True):
+        with pytest.raises(ValidationError, match="ready image from this Site"):
+            apply_site_configuration(target.pk, {"identity": {"logo_ref": str(foreign.pk)}})
+    target.refresh_from_db()
+    assert target.configuration["identity"]["logo_ref"] is None
+
+
+def test_logo_write_requires_the_site_media_module(owners):
+    target = create_site(owners[1], "LOGO_MODULE")
+    user = get_user_model().objects.create_user(username="site-brand-module")
+    logo = ready_logo(target, user)
+    with patch("apps.sites.services.configuration.module_is_available", return_value=False):
+        with pytest.raises(ValidationError, match="Media Library must be available"):
+            apply_site_configuration(target.pk, {"identity": {"logo_ref": str(logo.pk)}})
+
+
 @pytest.mark.parametrize("changes", [
     {"analytics_token": "abc"},
     {"identity": {"password": "hunter2"}},
     {"presentation": {"theme": "custom-css"}},
+    {"presentation": {"theme": {"custom": "institutional"}}},
     {"presentation": {"primary_color": "#fff"}},
+    {"presentation": {"custom_css": "body { display: none }"}},
+    {"presentation": {"custom_js": "alert(1)"}},
     {"behavior": {"show_search": "yes"}},
     {"language": {"enabled": ["en"]}},
     {"identity": {"logo_ref": "https://cdn.example/logo.png"}},

@@ -27,6 +27,21 @@ vi.mock("@/app/organizations/actions", () => ({
   getOrganizationTree: (...args: unknown[]) => getOrganizationTree(...args),
 }));
 
+vi.mock("./site-image-field", () => ({
+  SiteImageField: ({ value, onChange }: {
+    value: { assetId: string | null; alt: string };
+    onChange: (next: { assetId: string | null; alt: string }) => void;
+  }) => (
+    <section aria-label="Site logo">
+      <span>{value.assetId ?? "No logo selected"}</span>
+      <button type="button" onClick={() => onChange({
+        assetId: "a09a4b48-3343-4e6b-9baa-61db3f726003",
+        alt: "Approved Site logo",
+      })}>Choose approved Site logo</button>
+    </section>
+  ),
+}));
+
 const push = vi.fn();
 const refresh = vi.fn();
 vi.mock("next/navigation", () => ({
@@ -131,11 +146,13 @@ describe("SiteForm — create", () => {
     expect(screen.getByLabelText(/Code/)).toBeTruthy();
     expect(screen.getByLabelText(/^Name/)).toBeTruthy();
     expect(screen.getByLabelText(/Short name/)).toBeTruthy();
-    expect(screen.getByLabelText(/Display name/)).toBeTruthy();
+    expect(screen.getByLabelText(/Public site title/)).toBeTruthy();
     expect(screen.getByRole("combobox", { name: /Owning organization/ })).toBeTruthy();
     expect(screen.getByRole("combobox", { name: /Default language/ })).toBeTruthy();
     expect(screen.getByRole("combobox", { name: /Template/ })).toBeTruthy();
     expect(screen.getByRole("combobox", { name: /Theme/ })).toBeTruthy();
+    expect(screen.getByRole("region", { name: "Appearance preview" })).toBeTruthy();
+    expect(screen.getByText(/Colors come from the selected approved theme/)).toBeTruthy();
     expect(screen.getByText("Enabled languages")).toBeTruthy();
     const languageGroup = document.getElementById("site-enabled-languages");
     expect(languageGroup).toBeTruthy();
@@ -295,6 +312,40 @@ describe("SiteForm — edit", () => {
     ).toBeLessThan(updateSite.mock.invocationCallOrder[0]);
 
     await waitFor(() => expect(push).toHaveBeenCalledWith("/sites/5"));
+  });
+
+  it("saves a selected Site logo and approved appearance, then reopens with effective values", async () => {
+    getSite.mockResolvedValue({
+      ok: true,
+      data: { data: site(), etag: '"e1"', requestId: "r" },
+    });
+    updateSiteConfiguration.mockResolvedValue({
+      ok: true,
+      data: { data: site(), etag: '"e2"', requestId: "r" },
+    });
+    updateSite.mockResolvedValue({
+      ok: true,
+      data: { data: site(), etag: '"e3"', requestId: "r" },
+    });
+
+    const rendered = renderForm({ site: site() });
+    fireEvent.click(screen.getByRole("button", { name: "Choose approved Site logo" }));
+    await pickOption(/Theme/, "High contrast");
+    fireEvent.click(screen.getByRole("button", { name: /Save changes/i }));
+
+    await waitFor(() => expect(updateSiteConfiguration).toHaveBeenCalledTimes(1));
+    expect(updateSiteConfiguration.mock.calls[0][2]).toMatchObject({
+      identity: { logo_ref: "a09a4b4833434e6b9baa61db3f726003" },
+      presentation: { theme: "high-contrast" },
+    });
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/sites/5"));
+
+    const reopened = site();
+    reopened.configuration.identity.logo_ref = "a09a4b4833434e6b9baa61db3f726003";
+    reopened.configuration.presentation.theme = "high-contrast";
+    rendered.rerender(<ToastProvider><SiteForm site={reopened} /></ToastProvider>);
+    expect(screen.getByText("a09a4b48-3343-4e6b-9baa-61db3f726003")).toBeTruthy();
+    expect(screen.getByRole("combobox", { name: /Theme/ }).textContent).toMatch(/High contrast/);
   });
 
   it("locks frozen controls on an archived site", () => {

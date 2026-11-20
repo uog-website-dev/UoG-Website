@@ -22,6 +22,7 @@ class ResolvedSiteSerializer(serializers.Serializer):
 class PublicConfigurationSerializer(serializers.Serializer):
     display_name = serializers.CharField(allow_null=True)
     theme = serializers.CharField()
+    logo_url = serializers.CharField(allow_null=True)
 
 
 class SiteContextSerializer(serializers.Serializer):
@@ -62,9 +63,15 @@ class SiteContextView(APIView):
                 "configuration": {
                     "display_name": current.configuration["identity"]["display_name"],
                     "theme": current.configuration["presentation"]["theme"],
+                    "logo_url": self._logo_url(current),
                 },
                 "modules": sorted(request.enabled_module_codes),
             }
         response = Response(body)
         response["Cache-Control"] = "private, no-store"
         return response
+
+    @staticmethod
+    def _logo_url(site):
+        from apps.cms.api.widget_runtime import logo_asset
+        return "/api/v1/site-context/identity/logo/" if logo_asset(site) else None
