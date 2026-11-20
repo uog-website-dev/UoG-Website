@@ -42,6 +42,7 @@ vi.mock("next/link", () => ({
 
 import { SitePostsPanel } from "./site-posts";
 import { SitePostEditor } from "./site-post-editor";
+import { SiteAdminFrame, SiteSection } from "./site-admin-frame";
 
 const PERMISSIONS = ["content.posts.view", "content.posts.create", "content.posts.update"];
 const category = { id: "category-1", site: 11, code: "NEWS", name: "News", slug: "news", is_active: true };
@@ -123,6 +124,13 @@ beforeEach(() => {
 });
 
 describe("SitePostsPanel", () => {
+  it("offers View Public only for a published Post using its Site hostname and publication slug", async () => {
+    loadSitePosts.mockResolvedValue(list([post({ status: "PUBLISHED", slug: "working-copy", publication_slug: "campus-update" })]));
+    render(<ToastProvider><SiteAdminFrame site={{ id: 11, name: "Informatics", code: "INFO", status: "ACTIVE", primaryDomain: { hostname: "informatics.uog.edu.et", status: "ACTIVE" } }} enabledModuleCodes={["POSTS"]} permissions={PERMISSIONS}><SiteSection sectionKey="posts"><SitePostsPanel siteId={11} postsEnabled permissions={PERMISSIONS} /></SiteSection></SiteAdminFrame></ToastProvider>);
+    const link = await screen.findByRole("link", { name: "View public Campus update" });
+    expect(link.getAttribute("href")).toBe("https://informatics.uog.edu.et/posts/campus-update");
+  });
+
   it("loads only the selected Site and renders status, author, taxonomy and featured media", async () => {
     loadSitePosts.mockResolvedValue(list([post(), post({ id: "foreign", site: 22, slug: "foreign" })]));
     renderPanel();
