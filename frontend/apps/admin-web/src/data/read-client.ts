@@ -25,6 +25,10 @@ async function read<T>(site:number, resource:string, query:object={}, signal?:Ab
 }
 export const loadSitePages=(site:number,query:SitePageListQuery={},signal?:AbortSignal)=>read<SitePageListResponse>(site,"pages",query,signal);
 export const loadSitePosts=(site:number,query:SitePostListQuery={},signal?:AbortSignal)=>read<SitePostListResponse>(site,"posts",query,signal);
+export interface SiteContentAuthor { id:number; name:string; site:number }
+export interface SiteContentAuthorList { count:number; next:null; previous:null; results:SiteContentAuthor[] }
+export const loadSitePageAuthors=(site:number,signal?:AbortSignal)=>read<SiteContentAuthorList>(site,"page-authors",{},signal);
+export const loadSitePostAuthors=(site:number,signal?:AbortSignal)=>read<SiteContentAuthorList>(site,"post-authors",{},signal);
 export const listSiteMedia=(site:number,query:MediaListQuery={},signal?:AbortSignal)=>read<PaginatedResponse<MediaAssetRecord>>(site,"media",query,signal);
 async function collect<T>(site:number,resource:string,query:object,signal?:AbortSignal):Promise<T[]> {
   const rows:T[]=[];

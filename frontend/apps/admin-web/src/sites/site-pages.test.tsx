@@ -243,7 +243,7 @@ describe("SitePagesPanel", () => {
     expect(screen.getByRole("button", { name: "Try again" })).toBeTruthy();
   });
 
-  it("applies server search and status filters and resets pagination", async () => {
+  it("applies server search, status and Site-author filters and resets pagination", async () => {
     renderPanel();
     await screen.findByRole("table", { name: "Pages for this Site" });
     await waitFor(() => expect(document.querySelector('[data-perf-section="pages"]')?.getAttribute("data-perf-pending")).toBe("false"));
@@ -253,12 +253,15 @@ describe("SitePagesPanel", () => {
     });
     fireEvent.mouseDown(screen.getByRole("combobox", { name: "Status" }));
     fireEvent.click(screen.getByRole("option", { name: "Draft" }));
+    fireEvent.mouseDown(screen.getByRole("combobox", { name: "Author" }));
+    fireEvent.click(await screen.findByRole("option", { name: "page-author" }));
     fireEvent.click(screen.getByRole("button", { name: "Apply" }));
 
     await waitFor(() => {
       expect(loadSitePages).toHaveBeenLastCalledWith(11, {
         search: "admissions",
         status: "DRAFT",
+        author: 7,
         page: 1,
         page_size: 20,
         ordering: "-updated_at",
@@ -692,4 +695,4 @@ describe("SitePagesPanel", () => {
   });
 });
 
-vi.mock("@/data/read-client", async()=>{const source0=await import("@/app/sites/page-actions");return {loadSitePages:(...args:unknown[])=>(source0.loadSitePages as (...values:unknown[])=>unknown)(...args.slice(0,2)),loadSitePageStatusCounts:(...args:unknown[])=>(source0.loadSitePageStatusCounts as (...values:unknown[])=>unknown)(...args.slice(0,1))};});
+vi.mock("@/data/read-client", async()=>{const source0=await import("@/app/sites/page-actions");return {loadSitePages:(...args:unknown[])=>(source0.loadSitePages as (...values:unknown[])=>unknown)(...args.slice(0,2)),loadSitePageAuthors:async(site:number)=>({ok:true,data:{count:site===11?1:0,next:null,previous:null,results:site===11?[{id:7,name:"page-author",site}]:[]}}),loadSitePageStatusCounts:(...args:unknown[])=>(source0.loadSitePageStatusCounts as (...values:unknown[])=>unknown)(...args.slice(0,1))};});

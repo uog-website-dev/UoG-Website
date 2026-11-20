@@ -120,7 +120,6 @@ def test_realm_platform_admin_cannot_read_or_mutate_another_site(realm_admin):
     assert history.status_code == 403
     roles = client.get(ROLES.format(site=site_b.pk), **header)
     assert roles.status_code == 404
-
     posted = client.post(
         POSTS.format(site=site_b.pk),
         {"title": "Foreign post", "slug": "foreign-post", "content": "no"},
@@ -144,9 +143,7 @@ def test_realm_platform_admin_cannot_read_or_mutate_another_site(realm_admin):
         **header,
     )
     assert submitted.status_code == 200, submitted.content
-    grant_cms_role(
-        site=site_a, user=user, role=ContentRole.REVIEWER,
-    )
+    grant_cms_role(site=site_a, user=user, role=ContentRole.REVIEWER)
     self_review = client.post(
         f"{PAGES.format(site=site_a.pk)}{own.json()['id']}/workflow/",
         {"action": "approve"},
@@ -155,7 +152,6 @@ def test_realm_platform_admin_cannot_read_or_mutate_another_site(realm_admin):
     )
     assert self_review.status_code == 403
     assert Page.objects.get(pk=own.json()["id"]).status == ContentStatus.IN_REVIEW
-
     denial = AuthorizationAuditEvent.objects.filter(
         actor=user, action="CMS_AUTHORIZE", outcome="DENY", site_id=str(site_b.pk),
     )
@@ -164,6 +160,26 @@ def test_realm_platform_admin_cannot_read_or_mutate_another_site(realm_admin):
     assert not UserRoleAssignment.objects.filter(
         user=user, role__code="platform-administrator",
     ).exists()
+
+
+def test_author_options_and_filters_are_site_scoped_and_require_list_access(realm_admin, oidc):
+    client, header, user, site_a, site_b, foreign = realm_admin
+    page_a = create_page(site=site_a, title="Site A draft", slug="site-a-draft", actor=user)
+    page_url = PAGES.format(site=site_a.pk)
+    authors = client.get(page_url + "authors/", **header)
+    assert authors.status_code == 200
+    assert {row["id"] for row in authors.json()["results"]} == {user.pk}
+    assert client.get(page_url + f"?author={user.pk}", **header).json()["count"] == 1
+    assert client.get(page_url + f"?author={foreign.created_by_id}", **header).json()["count"] == 0
+    assert client.get(page_url + "?author=not-a-number", **header).status_code == 400
+    post_authors = client.get(POSTS.format(site=site_a.pk) + "authors/", **header)
+    assert post_authors.status_code == 200
+    assert {row["id"] for row in post_authors.json()["results"]} == {user.pk}
+
+    denied = _identity(oidc, "no-content-list-access", roles=["platform-admin"])
+    assert client.get("/api/me/", **denied).status_code == 200
+    assert client.get(page_url, **denied).status_code == 403
+    assert client.get(POSTS.format(site=site_a.pk), **denied).status_code == 403
 
 
 def test_realm_role_without_any_database_grant_cannot_administer_cms(

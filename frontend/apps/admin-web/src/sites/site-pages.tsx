@@ -1,5 +1,5 @@
 "use client";
-import {loadSitePages, loadSitePageStatusCounts} from "@/data/read-client";
+import {loadSitePages, loadSitePageAuthors, loadSitePageStatusCounts} from "@/data/read-client";
 import {usePageBoundary} from "@/data/page-boundary";
 import {useSectionState} from "@/data/section-state";
 import {useSiteQuery} from "@/data/query-cache";
@@ -110,6 +110,7 @@ const EMPTY_STATUS_COUNTS: Record<SitePageStatus, number> = {
 interface PageFilters {
   search: string;
   status: SitePageStatus | "";
+  author: string;
 }
 
 function formatUpdatedAt(value: string): string {
@@ -179,8 +180,8 @@ function SitePagesPanelContent({
   const canView = permissions.includes(PERMISSIONS.view);
   const canCreate = permissions.includes(PERMISSIONS.create);
   const canEdit = permissions.includes(PERMISSIONS.update);
-  const [draftFilters, setDraftFilters] = useSectionState<PageFilters>(siteId, visualBuilderMode ? "builder" : "pages", "draftFilters", { search: "", status: "" });
-  const [appliedFilters, setAppliedFilters] = useSectionState<PageFilters>(siteId, visualBuilderMode ? "builder" : "pages", "appliedFilters", { search: "", status: "" });
+  const [draftFilters, setDraftFilters] = useSectionState<PageFilters>(siteId, visualBuilderMode ? "builder" : "pages", "draftFilters", { search: "", status: "", author: "" });
+  const [appliedFilters, setAppliedFilters] = useSectionState<PageFilters>(siteId, visualBuilderMode ? "builder" : "pages", "appliedFilters", { search: "", status: "", author: "" });
   const [page, setPage] = useSectionState(siteId, visualBuilderMode ? "builder" : "pages", "page", 1);
   const [sort, setSort] = useSectionState<SortState>(siteId, visualBuilderMode ? "builder" : "pages", "sort", { field: "updated_at", direction: "desc" });
   const [reviewQueue, setReviewQueue] = useSectionState(siteId, visualBuilderMode ? "builder" : "pages", "reviewQueue", false);
@@ -204,11 +205,12 @@ function SitePagesPanelContent({
   const [busyPageId, setBusyPageId] = useState<string | null>(null);
 
   const ordering = orderingForSort(sort);
-  const pages = useSiteQuery<SitePageListResponse>(siteId, "pages", {search: appliedFilters.search, status: appliedFilters.status, page, page_size: PAGE_SIZE, ordering},
+  const pages = useSiteQuery<SitePageListResponse>(siteId, "pages", {search: appliedFilters.search, status: appliedFilters.status, author: appliedFilters.author, page, page_size: PAGE_SIZE, ordering},
     async (signal) => canView
       ? unwrap(await loadSitePages(siteId, {
           search: appliedFilters.search || undefined,
           status: appliedFilters.status || undefined,
+          author: appliedFilters.author ? Number(appliedFilters.author) : undefined,
           page,
           page_size: PAGE_SIZE,
           ordering,
@@ -216,6 +218,7 @@ function SitePagesPanelContent({
       : EMPTY_PAGE_LIST,
     {enabled: canView && pagesEnabled === true, isEmpty: (data) => data.count === 0},
   );
+  const authors = useSiteQuery<{count:number;next:null;previous:null;results:{id:number;name:string;site:number}[]}>(siteId,"page-authors",{},async signal=>canView?unwrap(await loadSitePageAuthors(siteId,signal)):({count:0,next:null,previous:null,results:[]}),{enabled:canView&&pagesEnabled===true});
   usePageBoundary(page, setPage, pages.data, pages.error);
   const statusCounts = useSiteQuery<Record<SitePageStatus, number>>(siteId, "page-counts", {},
     async (signal) => canView
@@ -226,20 +229,21 @@ function SitePagesPanelContent({
 
   const rows = (pages.data?.results ?? []).filter((row) => row.site === siteId);
   const enabled = pagesEnabled === true && !saving && busyPageId === null;
-  const activeFilterCount = Number(Boolean(appliedFilters.search)) + Number(Boolean(appliedFilters.status));
+  const activeFilterCount = Number(Boolean(appliedFilters.search)) + Number(Boolean(appliedFilters.status)) + Number(Boolean(appliedFilters.author));
 
   function applyFilters() {
     setAppliedFilters({
       search: draftFilters.search.trim(),
       status: draftFilters.status,
+      author: draftFilters.author,
     });
     setPage(1);
   }
 
   function resetFilters() {
     setReviewQueue(false);
-    setDraftFilters({ search: "", status: "" });
-    setAppliedFilters({ search: "", status: "" });
+    setDraftFilters({ search: "", status: "", author: "" });
+    setAppliedFilters({ search: "", status: "", author: "" });
     setPage(1);
   }
 
@@ -603,6 +607,7 @@ function SitePagesPanelContent({
                 status: STATUSES.find((candidate) => candidate === status) ?? "",
               }))}
             />
+            <SelectFilter label="Author" value={draftFilters.author} options={(authors.data?.results ?? []).filter(row=>row.site===siteId).map(row=>({value:String(row.id),label:row.name}))} onChange={(author) => setDraftFilters((current) => ({ ...current, author }))} />
           </FilterBar>
 
           <Button
