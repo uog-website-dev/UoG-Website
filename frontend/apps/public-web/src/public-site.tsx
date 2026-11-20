@@ -37,10 +37,6 @@ export function PublicSiteChrome({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  useEffect(() => {
-    if (site.displayName) document.title = site.displayName;
-  }, [site.displayName]);
-
   const body = (
     <Container maxWidth="lg" sx={{ py: 4, display: "flex", flexDirection: "column", minHeight: "70vh" }}>
       {children}
