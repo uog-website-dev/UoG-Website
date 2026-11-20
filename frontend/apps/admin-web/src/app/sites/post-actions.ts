@@ -75,6 +75,7 @@ export interface SiteTaxonomyRecord {
 export interface SitePostListQuery {
   search?: string;
   status?: SitePostStatus;
+  author?: number;
   category?: string;
   tag?: string;
   page?: number;

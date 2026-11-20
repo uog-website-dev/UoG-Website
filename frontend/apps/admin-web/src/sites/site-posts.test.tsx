@@ -139,18 +139,18 @@ describe("SitePostsPanel", () => {
     expect(screen.getByTestId("posts-table-scroll")).toBeTruthy();
   });
 
-  it("applies search, status, category and tag filters and resets them", async () => {
+  it("applies search, status, Site-author, category and tag filters and resets them", async () => {
     renderPanel();
     await screen.findByRole("table", { name: "Posts for this Site" });
     await waitFor(() => expect(document.querySelector('[data-perf-section="posts"]')?.getAttribute("data-perf-pending")).toBe("false"));
     fireEvent.change(screen.getByRole("textbox", { name: "Search Posts" }), { target: { value: "  campus  " } });
-    for (const [label, option] of [["Status", "Draft"], ["Category", "News"], ["Tag", "Campus"]] as const) {
+    for (const [label, option] of [["Status", "Draft"], ["Author", "post-author"], ["Category", "News"], ["Tag", "Campus"]] as const) {
       fireEvent.mouseDown(screen.getByRole("combobox", { name: label }));
       fireEvent.click(await screen.findByRole("option", { name: option }));
     }
     fireEvent.click(screen.getByRole("button", { name: "Apply" }));
     await waitFor(() => expect(loadSitePosts).toHaveBeenLastCalledWith(11, expect.objectContaining({
-      search: "campus", status: "DRAFT", category: category.id, tag: tag.id,
+      search: "campus", status: "DRAFT", author: 42, category: category.id, tag: tag.id,
     })));
 
     await waitFor(() => expect(screen.getByRole("button", {name: "Reset"})).toHaveProperty("disabled", false));
@@ -439,4 +439,4 @@ describe("SitePostEditor", () => {
   });
 });
 
-vi.mock("@/data/read-client", async()=>{const source0=await import("@/app/sites/post-actions");return {loadSiteTaxonomy:(...args:unknown[])=>(source0.loadSiteTaxonomy as (...values:unknown[])=>unknown)(...args.slice(0,2)),loadSitePosts:(...args:unknown[])=>(source0.loadSitePosts as (...values:unknown[])=>unknown)(...args.slice(0,2))};});
+vi.mock("@/data/read-client", async()=>{const source0=await import("@/app/sites/post-actions");return {loadSiteTaxonomy:(...args:unknown[])=>(source0.loadSiteTaxonomy as (...values:unknown[])=>unknown)(...args.slice(0,2)),loadSitePostAuthors:async(site:number)=>({ok:true,data:{count:site===11?1:0,next:null,previous:null,results:site===11?[{id:42,name:"post-author",site}]:[]}}),loadSitePosts:(...args:unknown[])=>(source0.loadSitePosts as (...values:unknown[])=>unknown)(...args.slice(0,2))};});

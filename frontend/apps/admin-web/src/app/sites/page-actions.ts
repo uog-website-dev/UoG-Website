@@ -138,6 +138,7 @@ export async function restoreSitePageRevision(siteId: number, pageId: string, re
 export interface SitePageListQuery {
   search?: string;
   status?: SitePageStatus;
+  author?: number;
   page?: number;
   page_size?: number;
   ordering?: "title" | "-title" | "updated_at" | "-updated_at";

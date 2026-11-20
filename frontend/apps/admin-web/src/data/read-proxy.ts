@@ -3,8 +3,10 @@ import {getAccessToken} from "@/access-token";
 import {serverApiFetch} from "@/performance/server-fetch";
 
 const resources: Record<string, {path: (site: number) => string; query: string[]}> = {
-  pages: {path: site => `/v1/sites/${site}/pages/`, query:["search","status","visibility","locale","parent","ordering","page","page_size"]},
+  pages: {path: site => `/v1/sites/${site}/pages/`, query:["search","status","author","visibility","locale","parent","ordering","page","page_size"]},
+  "page-authors": {path: site => `/v1/sites/${site}/pages/authors/`, query:[]},
   posts: {path: site => `/v1/sites/${site}/posts/`, query:["search","status","locale","category","tag","author","ordering","page","page_size","created_after","created_before","published_after","published_before"]},
+  "post-authors": {path: site => `/v1/sites/${site}/posts/authors/`, query:[]},
   media: {path: site => `/v1/sites/${site}/assets/`, query:["search","status","type","content_type","ready_images","ordering","page","page_size"]},
   menus: {path: site => `/v1/sites/${site}/menus/`, query:["search","is_active","page","page_size"]},
   inheritance: {path: site => `/v1/sites/${site}/menu-inheritance/`, query:[]},
