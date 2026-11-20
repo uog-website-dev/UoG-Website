@@ -17,9 +17,11 @@ export function UogHeader({
   title,
   actions,
   leading,
+  brand,
 }: {
   title: string;
   actions?: ReactNode;
+  brand?: ReactNode;
   /**
    * Optional slot rendered before the brand mark — e.g. the admin console
    * passes a mobile navigation toggle that only appears on small screens.
@@ -31,10 +33,11 @@ export function UogHeader({
       <Toolbar disableGutters>
         <Container maxWidth="lg" sx={{ display: "flex", alignItems: "center", gap: 2, py: 0.75 }}>
           {leading}
+          {brand}
           <Typography
             variant="h6"
             component="div"
-            sx={{ fontWeight: 700, letterSpacing: 0.4, flexGrow: 0, flexShrink: 0, whiteSpace: "nowrap" }}
+            sx={{ fontWeight: 700, letterSpacing: 0.4, flexGrow: 0, flexShrink: 0, whiteSpace: "nowrap", display: brand ? "none" : undefined }}
           >
             ⚙ UoG
           </Typography>
@@ -51,9 +54,10 @@ export function UogHeader({
   );
 }
 
-export function UogFooter({ apiBaseUrl }: { apiBaseUrl: string | undefined }) {
+export function UogFooter({ apiBaseUrl, brand }: { apiBaseUrl: string | undefined; brand?: ReactNode }) {
   return (
-    <Box component="footer" sx={{ mt: "auto", py: 3, textAlign: "center" }}>
+    <Box component="footer" sx={{ mt: "auto", py: 3, px: 2, textAlign: "center", bgcolor: "background.paper", borderTop: 1, borderColor: "divider" }}>
+      {brand ? <Box sx={{ display: "flex", justifyContent: "center", mb: 1.5 }}>{brand}</Box> : null}
       <Typography variant="body2" color="text.secondary">
         © {new Date().getFullYear()} University of Gondar — Digital Platform
         (development environment)

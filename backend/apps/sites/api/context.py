@@ -69,6 +69,7 @@ class SiteContextView(APIView):
             }
         response = Response(body)
         response["Cache-Control"] = "private, no-store"
+        response["Vary"] = "Host"
         return response
 
     @staticmethod

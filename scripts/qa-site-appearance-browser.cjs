@@ -54,7 +54,13 @@ async function main() {
     page.setDefaultTimeout(30000);
     page.on('pageerror', (error) => console.error(`browser page error: ${error.message}`));
     await page.goto(origin, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    // Site context is host-resolved in the server layout. The browser refreshes
+    // it on focus so this test can model a saved configuration without copying
+    // logo settings into a Page document.
+    const refreshContext = () => page.evaluate(() => window.dispatchEvent(new Event('focus')));
+    await refreshContext();
     await page.getByText('Appearance E2E Site', { exact: true }).waitFor();
+    await page.locator('footer [data-site-branding="INFORMATICS"]').waitFor();
     assert.equal(await page.locator('header img').count(), 0);
     assert.match(await page.locator('header').innerText(), /UoG/);
     await page.screenshot({ path: path.join(output, 'fallback-branding.png'), fullPage: true });
@@ -62,6 +68,7 @@ async function main() {
 
     activeLogo = logoPath;
     await page.reload({ waitUntil: 'domcontentloaded', timeout: 60000 });
+    await refreshContext();
     const logo = page.locator('header img');
     await logo.waitFor();
     await page.waitForFunction(() => {
@@ -74,6 +81,7 @@ async function main() {
 
     imageMode = 'missing';
     await page.reload({ waitUntil: 'domcontentloaded', timeout: 60000 });
+    await refreshContext();
     await page.waitForFunction(() => document.querySelector('header img') === null);
     assert.match(await page.locator('header').innerText(), /UoG/);
     await page.screenshot({ path: path.join(output, 'unavailable-logo-fallback.png'), fullPage: true });
@@ -82,6 +90,7 @@ async function main() {
     activeLogo = 'https://private.example/media/private-logo.png';
     imageMode = 'valid';
     await page.reload({ waitUntil: 'domcontentloaded', timeout: 60000 });
+    await refreshContext();
     assert.equal(await page.locator('header img').count(), 0);
     assert.match(await page.locator('header').innerText(), /UoG/);
     pass('A private or remote media URL is ignored and never rendered as Site branding');

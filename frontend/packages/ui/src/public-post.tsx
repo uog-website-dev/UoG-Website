@@ -17,6 +17,7 @@ import Typography from "@mui/material/Typography";
 import { paragraphParts } from "./public-page";
 import { ArticleDocumentView } from "./article-document";
 import { VisualPostProvider, PostTitleWidget, PostExcerptWidget, FeaturedImageWidget } from "./widget-runtime";
+import { SiteBrandingLockup, usePublicSiteBranding } from "./site-branding";
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -205,6 +206,7 @@ export function PublicPostDetail({
   /** When false, omit the public “Back to posts” link (private Site preview). */
   showListingLink?: boolean;
 }): ReactNode {
+  const site = usePublicSiteBranding();
   if (!post) {
     return (
       <Typography role="status" color="text.secondary">
@@ -237,12 +239,17 @@ export function PublicPostDetail({
           component="header"
           aria-label="Article banner"
           sx={{
-            bgcolor: "grey.900",
-            color: "common.white",
+            bgcolor: "primary.main",
+            color: "primary.contrastText",
             mb: 3,
             overflow: "hidden",
           }}
         >
+          {site.id !== null && (!scoped || post.site === site.id) ? (
+            <Box sx={{ px: { xs: 2, sm: 3 }, pt: 2 }}>
+              <SiteBrandingLockup site={site} compact inverse />
+            </Box>
+          ) : null}
           {scoped ? <FeaturedImageWidget compact variant="hero" /> : null}
           <Box
             sx={{

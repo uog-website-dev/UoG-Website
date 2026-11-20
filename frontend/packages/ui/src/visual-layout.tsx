@@ -20,10 +20,12 @@ const tokenGap = {none:0,sm:1,md:2,lg:4} as const;
 const focusRing = {"&:focus-visible":{outline:"3px solid",outlineColor:"primary.main",outlineOffset:2}} as const;
 
 function presentationStyle(resolved:{align:string;tone:string;gap:"none"|"sm"|"md"|"lg"}) {
+  const branded = resolved.tone === "brand";
   return {
     textAlign:resolved.align === "center" ? "center" as const : resolved.align === "end" ? "end" as const : "start" as const,
     gap:tokenGap[resolved.gap],
-    bgcolor:resolved.tone === "muted" ? "grey.100" : resolved.tone === "brand" ? "primary.light" : "transparent",
+    bgcolor:resolved.tone === "muted" ? "background.paper" : branded ? "primary.main" : "transparent",
+    color:branded ? "primary.contrastText" : "text.primary",
   };
 }
 
