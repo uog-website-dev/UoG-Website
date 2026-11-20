@@ -479,7 +479,7 @@ describe("SitePagesPanel", () => {
     renderEditor("edit", { pageId: "page-1" });
     await screen.findByRole("heading", { name: "Edit Page" });
     fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
-    expect((await screen.findByRole("alert")).textContent).toMatch(/Content changed/i);
+    expect(await screen.findByText(/Content changed/i)).toBeTruthy();
     expect(screen.getByRole("textbox", { name: "Title" })).toHaveProperty("value", "Admissions");
     fireEvent.click(screen.getByRole("button", { name: "Reload latest" }));
     await waitFor(() => expect(getSitePage).toHaveBeenCalledTimes(2));
@@ -497,6 +497,31 @@ describe("SitePagesPanel", () => {
     });
     expect(screen.getByRole("button", { name: "Create Page" })).toHaveProperty("disabled", true);
     expect(screen.getAllByRole("alert").some((alert) => /JSON at position|Expected property/i.test(alert.textContent ?? ""))).toBe(true);
+  });
+
+  it("shows SEO title, description and social image fallbacks with format limits", async () => {
+    renderEditor("create");
+    await screen.findByRole("heading", { name: "Create Page" });
+    expect(screen.getByRole("textbox", { name: "SEO title" }).getAttribute("maxlength")).toBe("120");
+    expect(screen.getByRole("textbox", { name: "Meta description" }).getAttribute("maxlength")).toBe("300");
+    expect(screen.getByRole("textbox", { name: "Social sharing image reference" }).getAttribute("maxlength")).toBe("512");
+    expect(screen.getByRole("alert", { name: "Effective SEO preview" }).textContent).toContain("Site display name (fallback)");
+  });
+
+  it("saves Page SEO fields and reloads them in the editor", async () => {
+    const values = { meta_title: "Admissions SEO", meta_description: "Apply to the university" };
+    const view = renderEditor("create");
+    await screen.findByRole("heading", { name: "Create Page" });
+    fireEvent.change(screen.getByRole("textbox", { name: "Title" }), { target: { value: "Admissions" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "SEO title" }), { target: { value: values.meta_title } });
+    fireEvent.change(screen.getByRole("textbox", { name: "Meta description" }), { target: { value: values.meta_description } });
+    fireEvent.click(screen.getByRole("button", { name: "Create Page" }));
+    await waitFor(() => expect(createSitePage).toHaveBeenCalledWith(11, expect.objectContaining({ seo: values })));
+    view.unmount();
+    getSitePage.mockResolvedValueOnce({ ok: true, data: draft({ seo: values }) });
+    renderEditor("edit", { pageId: "page-1" });
+    expect(await screen.findByRole("textbox", { name: "SEO title" })).toHaveProperty("value", values.meta_title);
+    expect(screen.getByRole("textbox", { name: "Meta description" })).toHaveProperty("value", values.meta_description);
   });
 
   it("shows the frozen private revision and sends its exact ETag when publishing",async()=>{

@@ -69,6 +69,20 @@ Each detail response returns an ETag of the form
 Cross-Site Page IDs return 404. Page route changes use route-history handling,
 and every meaningful update creates a content revision.
 
+### SEO and social metadata
+
+Page create and update bodies accept `seo` with only `meta_title` (up to 120
+plain-text characters), `meta_description` (up to 300 plain-text characters),
+and `og_image_ref` (up to 512 characters). The image must reference a ready
+image under `sites/{site_id}/` or the shared `shared/` scope; foreign-Site,
+external, unsupported and non-image references are rejected with a field
+error. HTML tags and script markup are rejected in title and description.
+Omitting `meta_title` uses the Page title; omitting `meta_description` uses
+the Site display name. The public renderer reads these same keys from the
+published Page response's `seo` object and applies those defaults. Revisions
+and publication snapshots carry `seo` with the content, so draft values do not
+appear publicly until that revision is published.
+
 `working-draft` is how an AUTHOR prepares a replacement for a published Page.
 The published row stays locked and PUBLISHED. The draft is edited, submitted
 and independently approved through the normal workflow. Publishing that

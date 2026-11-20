@@ -21,7 +21,15 @@ an `If-Match` ETag (`cms-content-{id}-r{revision}`); a stale ETag returns
 
 Also accepted: `title`, `slug`, `excerpt`, `seo`, `featured_media`,
 `categories`, and `tags`. SEO accepts only `meta_title`, `meta_description`,
-and `og_image_ref`.
+and `og_image_ref`. The title and description are plain text, capped at 120
+and 300 characters; the image reference is capped at 512 characters and must
+belong to `sites/{site_pk}/` or `shared/`. HTML/script markup, unsupported
+keys, and foreign-Site image references return field-specific errors. An
+omitted title falls back to the Post title; an omitted description falls back
+to the excerpt and then the Site display name. Public renderers read these
+values from the published response's `seo` object. Revision history and
+publication snapshots preserve these fields, so draft changes stay private
+until publication.
 
 Slug rules: lowercase letters, digits and single hyphens; unique per Site and
 language; reserved values such as `new`, `edit`, `admin`, `api`, `preview`,

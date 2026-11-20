@@ -239,18 +239,22 @@ describe("SitePostEditor", () => {
     await screen.findByRole("heading", { name: "Create Post" });
     fireEvent.change(screen.getByRole("textbox", { name: "Title" }), { target: { value: "New campus story" } });
     fireEvent.change(screen.getByRole("textbox", { name: "Permalink slug" }), { target: { value: "new-campus-story" } });
+    const seo = { meta_title: "Campus research", meta_description: "Research at the university" };
+    fireEvent.change(screen.getByRole("textbox", { name: "SEO metadata (JSON object)" }), { target: { value: JSON.stringify(seo) } });
     const body = screen.getByRole("textbox", { name: "Article body" });
     body.innerHTML = "<p>Story body</p>"; fireEvent.input(body);
     fireEvent.click(screen.getByRole("button", { name: "Save Draft" }));
     await waitFor(() => expect(createSitePost).toHaveBeenCalledWith(11, expect.objectContaining({
-      title: "New campus story", slug: "new-campus-story", editor_document: { schema_version: 1, html: "<p>Story body</p>" }, seo: {},
+      title: "New campus story", slug: "new-campus-story", editor_document: { schema_version: 1, html: "<p>Story body</p>" }, seo,
     })));
     expect(replace).toHaveBeenCalledWith("/sites/11/admin/posts/post-2/edit");
     expect(await screen.findByText("Draft saved just now")).toBeTruthy();
     createView.unmount();
 
+    getSitePost.mockResolvedValueOnce(result({ ...post({ seo }), etag: '"post-v1"', editor_document: { schema_version: 1, html: "<p>Post body</p>" } }));
     renderEditor("edit", { postId: "post-1" });
     expect(await screen.findByRole("heading", { name: "Edit Post" })).toBeTruthy();
+    expect(await screen.findByRole("textbox", { name: "SEO metadata (JSON object)" })).toHaveProperty("value", JSON.stringify(seo, null, 2));
     fireEvent.click(screen.getByRole("button", { name: "Save Draft" }));
     await waitFor(() => expect(updateSitePost).toHaveBeenCalledWith(11, "post-1", '"post-v1"', expect.any(Object)));
   });
