@@ -196,6 +196,26 @@ def test_page_authoring_requires_an_active_site_author_role(
         **_token(oidc, "5f1b2c3d-0000-4000-8000-000000000033", outsider.username),
     )
     assert created.status_code == 201, created.content
+    detail_url = f"{ADMIN_PAGES.format(site_id=site.pk)}{created.json()['id']}/"
+    author_token = _token(oidc, "5f1b2c3d-0000-4000-8000-000000000033", outsider.username)
+    saved = client.patch(
+        detail_url,
+        {"seo": {"meta_title": "Accessible Page", "meta_description": "University information"}},
+        content_type="application/json", HTTP_IF_MATCH=created["ETag"], **author_token,
+    )
+    assert saved.status_code == 200, saved.content
+    reopened = client.get(detail_url, **author_token)
+    assert reopened.json()["seo"] == {
+        "meta_title": "Accessible Page", "meta_description": "University information",
+    }
+    unauthorized = get_user_model().objects.create_user(username="pages-seo-outsider")
+    denied_update = client.patch(
+        detail_url, {"seo": {"meta_title": "Unauthorized overwrite"}},
+        content_type="application/json", HTTP_IF_MATCH=reopened["ETag"],
+        **_token(oidc, "5f1b2c3d-0000-4000-0000-000000000034", unauthorized.username),
+    )
+    assert denied_update.status_code == 403
+    assert client.get(detail_url, **author_token).json()["seo"]["meta_title"] == "Accessible Page"
 
 
 def test_page_workflow_actions_and_history_are_site_role_aware(

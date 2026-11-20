@@ -168,6 +168,17 @@ def test_seo_visibility_and_layout_are_validated(sites):
         seo={"meta_title": "Welcome", "meta_description": "The university portal"},
     )
     assert accepted.seo["meta_title"] == "Welcome"
+    assert create_page(site=site, title="Social", slug="social-image", seo={
+        "og_image_ref": f"sites/{site.pk}/social.jpg",
+    }).seo["og_image_ref"] == f"sites/{site.pk}/social.jpg"
+    for bad_seo, field in [
+        ({"meta_description": "x" * 301}, "seo.meta_description"),
+        ({"meta_title": "<script>alert(1)</script>"}, "seo.meta_title"),
+        ({"og_image_ref": "sites/999/other.jpg"}, "seo.og_image_ref"),
+    ]:
+        with pytest.raises(ValidationError) as error:
+            create_page(site=site, title="Invalid SEO", slug=f"invalid-seo-{len(str(bad_seo))}", seo=bad_seo)
+        assert field in error.value.error_dict
     with pytest.raises(ValidationError) as error:
         create_page(site=site, title="X", slug="bad-visibility", visibility="SECRET")
     assert "visibility" in error.value.error_dict
