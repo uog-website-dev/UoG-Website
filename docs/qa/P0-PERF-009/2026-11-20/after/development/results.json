@@ -1,0 +1,2730 @@
+{
+  "metadata": {
+    "run": "2f2aa169-d9d6-4f7e-baa6-2c043779d9f4",
+    "mode": "development",
+    "release_baseline": false,
+    "budgets_status": "PROPOSED",
+    "method": "nearest-rank percentiles",
+    "samples_per_scenario": 2,
+    "sites": [
+      {
+        "id": 81,
+        "name": "Performance Site 01",
+        "code": "PERF001-01"
+      },
+      {
+        "id": 82,
+        "name": "Performance Site 02",
+        "code": "PERF001-02"
+      },
+      {
+        "id": 83,
+        "name": "Performance Site 03",
+        "code": "PERF001-03"
+      },
+      {
+        "id": 84,
+        "name": "Performance Site 04",
+        "code": "PERF001-04"
+      },
+      {
+        "id": 85,
+        "name": "Performance Site 05",
+        "code": "PERF001-05"
+      },
+      {
+        "id": 86,
+        "name": "Performance Site 06",
+        "code": "PERF001-06"
+      },
+      {
+        "id": 87,
+        "name": "Performance Site 07",
+        "code": "PERF001-07"
+      },
+      {
+        "id": 88,
+        "name": "Performance Site 08",
+        "code": "PERF001-08"
+      },
+      {
+        "id": 89,
+        "name": "Performance Site 09",
+        "code": "PERF001-09"
+      },
+      {
+        "id": 90,
+        "name": "Performance Site 10",
+        "code": "PERF001-10"
+      },
+      {
+        "id": 91,
+        "name": "Performance Site 11",
+        "code": "PERF001-11"
+      },
+      {
+        "id": 92,
+        "name": "Performance Site 12",
+        "code": "PERF001-12"
+      },
+      {
+        "id": 93,
+        "name": "Performance Site 13",
+        "code": "PERF001-13"
+      },
+      {
+        "id": 94,
+        "name": "Performance Site 14",
+        "code": "PERF001-14"
+      },
+      {
+        "id": 95,
+        "name": "Performance Site 15",
+        "code": "PERF001-15"
+      },
+      {
+        "id": 96,
+        "name": "Performance Site 16",
+        "code": "PERF001-16"
+      },
+      {
+        "id": 97,
+        "name": "Performance Site 17",
+        "code": "PERF001-17"
+      },
+      {
+        "id": 98,
+        "name": "Performance Site 18",
+        "code": "PERF001-18"
+      },
+      {
+        "id": 99,
+        "name": "Performance Site 19",
+        "code": "PERF001-19"
+      },
+      {
+        "id": 100,
+        "name": "Performance Site 20",
+        "code": "PERF001-20"
+      },
+      {
+        "id": 101,
+        "name": "Performance Site 21",
+        "code": "PERF001-21"
+      }
+    ],
+    "counts_per_site": {
+      "sites": 21,
+      "pages": 40,
+      "posts": 100,
+      "media": 80
+    },
+    "api_cache_definition": "First versus immediate repeat per Site/resource; server caches retained",
+    "automatic_prefetch": "Content rail uses explicit hover/focus intent with 180 ms dwell and 1 s throttle; normal prefetch on other links remains; pre-initiation traffic is outside measured navigation",
+    "network": {
+      "profile": "loopback, unthrottled",
+      "cpu_slowdown": 1,
+      "viewport": [
+        1440,
+        1000
+      ]
+    },
+    "browser": "157.0.4341.60",
+    "started_at": "2026-11-20T19:44:28.906Z",
+    "cold_definition": "fresh browser context and HTTP cache; target Site absent from Next router cache; application/database caches retained",
+    "warm_definition": "same browser context; previously visited target; no forced invalidation",
+    "session_policy": "Independent real Keycloak browser sign-in before every cold/warm iteration; login is excluded from timings; each pair uses one active session",
+    "authentication_role": "Site Administrator on 21 benchmark Sites; no platform role",
+    "sampling_warning": "SMOKE: p95 is a small-sample diagnostic; use >=30 per scenario for acceptance.",
+    "react_profiling": false,
+    "section_matrix": false,
+    "dashboard_probes": false,
+    "interaction": "Searchable Workspace dialog; discovery is included in switch timing",
+    "site_switch_policy": "Preserve authorized section root; read caches scoped to session/Site/authorization; 30-second context lease, 5-minute inactive GC; mutable forms reset",
+    "cache_policy": "PERF-005: scoped navigation controls plus PERF-004 30-second in-memory context/read lease, five-minute inactive GC; scoped reuse on Site return, disposal on session change and purge on Site authorization change",
+    "source": {
+      "commit": "2714f255d6373a79a1b96eb770ef51c3f4e30b9c",
+      "files": {
+        "frontend/pnpm-lock.yaml": "516e90afe0f99d95d769e22b47b1f015a88aab8aa03cb67c22297697090c27ed",
+        "frontend/apps/admin-web/next.config.ts": "190ecf926211f0127e41cc3268eff5cc03189ea2b8afe5ae5139a79a816c3e31",
+        "frontend/apps/admin-web/src/performance/navigation-timing.tsx": "5ae49a3d0721db6406f140d04785071586fbddd733f9509d7f67604640591c41",
+        "frontend/apps/admin-web/src/performance/server-fetch.ts": "6df44067d627d99965b38d20d14fc709c83994221a10e0af77f7d0b27870c6fc",
+        "backend/apps/core/middleware.py": "aef9dbf6543c43586be96366acf6f65694e6403bbbbb0a360398a73283c3e115",
+        "backend/config/settings.py": "0219c7cdd36c4da29044936b468a485e19f461c80d6e36ad72866f2a64bff6f9",
+        "backend/apps/core/dashboard.py": "125968a98430530633287a130e9a4f68a7f42a063a6be2c916d53b656861c1de",
+        "backend/apps/core/dashboard_cache.py": "80ac104fe0268f72f7b553be3d9d5917f9017677a6b877de3b85f91134284387",
+        "docker-compose.perf.yml": "b9ccde8b8d3a0f444b95bd158ce5f0656ec17706e0767d2282ca0d0e56d3e840",
+        "infrastructure/nginx/performance.conf": "ec724e71f51b3c294b99f446a894a894ebe14215becb34d8559c9b3f7b9b3187",
+        "scripts/perf/benchmark.cjs": "1d225508313c5a059ad0719a0891458d77b2f6d039d29de0b342a391784d8378",
+        "scripts/perf/metrics.cjs": "9d72e8d220486acf9044cfa237f6ab14607ad3b0e6c5b2621fe3ca92b95edc32",
+        "scripts/perf/package-lock.json": "33fd08047cf72c63ff406030f7b2240bec02f7c3f3027a13f25a889e2f5695cb",
+        "backend/apps/sites/api/workspace.py": "1931b100f70057fc6db296e337d9edf98ad7bbf87e2cf3e00dd33adf0b731e1e",
+        "backend/apps/authorization/services.py": "55fad39610b3e6a723e02acb94fa622dd6f19634e54af2289b098df94b0331fb",
+        "frontend/apps/admin-web/src/workspace.ts": "1a04893cb0514d006de19eb4665ad328d3da1d39220267d3b2f8e70143ae8a28",
+        "frontend/apps/admin-web/src/workspace-switcher.tsx": "e02f83034d6ff69650c42ce3265e810b60b7424e2e13b9cce94b8383ce246dab",
+        "frontend/apps/admin-web/src/workspace-proxy.ts": "cc4595993e98cd7668c3881325ba5a5f9eed5a44aa5e64d25935a3a38f0fb75c",
+        "frontend/apps/admin-web/src/sites/site-workspace.tsx": "5e4630541c1624921ff81c1ab54822cf5678139bc07b414ba2d1921b06c39b1e",
+        "frontend/apps/admin-web/src/sites/site-admin-frame.tsx": "6ff9328dcf1416236b7127e907486c451c45dd2e4ae240c159ce999edbddfe51",
+        "frontend/apps/admin-web/src/sites/site-admin.ts": "daaa05f12fc21e927883cefc1b8d2203fbbc6565c4e3854762ae9a4a6b3fcc8b",
+        "frontend/apps/admin-web/src/sites/site-draft-guard.ts": "13570d99e0d27d1927cfc6faf8364069bcb67215a352cfbd1ac3573b7865d05d",
+        "frontend/apps/admin-web/src/sites/site-page-editor.tsx": "9f0757160a77bce00c701dc6e8fa489d6f1d2d87318e2112b105cb1f4c3220dd",
+        "frontend/apps/admin-web/src/data/query-cache.tsx": "a864595f0f0e00d3f06a8beafe2149caf426f6855849efddf813ee16ec106c67",
+        "frontend/apps/admin-web/src/data/section-state.ts": "972b27f3a3946b7613af6b23ce6b40ed35cf16717b63531e6330f2e65bae36c9",
+        "frontend/apps/admin-web/src/data/page-boundary.ts": "2058afbf300205798c43f009db88b73feb5275a33f82fa9ef088865006bf4474",
+        "frontend/apps/admin-web/src/data/section-prefetch.ts": "ac23fa05cf01086ddf46203bc220f6f0b5f6f18b5f591e9978646fa318c7251c",
+        "frontend/apps/admin-web/src/sidebar.tsx": "4c7abfeb8b451e4d24b06c7beac19387ba4056883a85cfb4a96e39b24004caaf",
+        "frontend/apps/admin-web/src/data/admin-query-provider.tsx": "d20fedf4f2368c197eca202233cd16d0b959a90a4c7eb2b36b8633acc920ec77",
+        "frontend/apps/admin-web/src/cache-identity.ts": "06370d064539971eef6e3cf48d18ec1bb9808ee77fe004bf460e3d2a94cfec54",
+        "frontend/apps/admin-web/src/organizations/contract.ts": "a274260e4f322e4e5fa13d8aeb97bebf8465a18477ad951011a8775787ca4a94",
+        "frontend/apps/admin-web/src/sites/media-library.tsx": "d02c27c26c0a362884292ed41d018b4ccadd8bea21b5a9e9a0d38afd14f096d3",
+        "frontend/apps/admin-web/src/sites/site-pages.tsx": "d16a9f18494f732b9953f5d0db2846c687f1f3e81a3a828f6ed9b7f0a7513aff",
+        "frontend/apps/admin-web/src/sites/site-dashboard.tsx": "2759efa13cfb1e266ad65c45b77ce37202077d8eed932eb266dac680fd30d3e4",
+        "frontend/apps/admin-web/src/app/sites/dashboard-actions.ts": "d485327242ab72b988a4b3ff047b520287ef9250d0c66056cc85a70477c86f97",
+        "frontend/apps/admin-web/src/sites/site-posts.tsx": "08675425a4dc2729b1ee653952bb79be57832ca20f1e414b766ceb556c9e82f5",
+        "frontend/apps/admin-web/src/sites/site-menus.tsx": "e104bdeb72774e3164421a77215a074b96e4ff9ca6b6902570fb29e62cc6701c",
+        "frontend/apps/admin-web/src/app/sites/[id]/admin/layout.tsx": "986af14214d9c0531d74dd7a81e32ba7aa1b1b12c2ac9be4e37423a9f70c1258"
+      }
+    },
+    "run_status": "complete",
+    "authentication": {
+      "landing_path": "/admin",
+      "error_code": null,
+      "session_cookie_present": true
+    },
+    "completed_at": "2026-11-20T19:45:09.363Z",
+    "verified_server_mode": "development"
+  },
+  "summary": {
+    "first_site_visit": {
+      "n": 1,
+      "p50_ms": 8101.4946,
+      "p95_ms": 8101.4946,
+      "budget_ms": null,
+      "budget_status": "PROPOSED",
+      "within_proposed_budget": null
+    },
+    "dashboard_usable": {
+      "n": 7,
+      "p50_ms": 260.12019999999757,
+      "p95_ms": 8101.4946,
+      "budget_ms": 1500,
+      "budget_status": "PROPOSED",
+      "within_proposed_budget": false
+    },
+    "paginated_list_api": {
+      "n": 12,
+      "p50_ms": 42.20000001788139,
+      "p95_ms": 60.20000001788139,
+      "budget_ms": 400,
+      "budget_status": "PROPOSED",
+      "within_proposed_budget": true
+    },
+    "workspace_api": {
+      "n": 4,
+      "p50_ms": 69,
+      "p95_ms": 82.69999998807907,
+      "budget_ms": 500,
+      "budget_status": "PROPOSED",
+      "within_proposed_budget": true
+    },
+    "cold_site_switch": {
+      "n": 2,
+      "p50_ms": 526.113599999997,
+      "p95_ms": 562.3076999999976,
+      "budget_ms": 2000,
+      "budget_status": "PROPOSED",
+      "within_proposed_budget": true
+    },
+    "warm_site_switch": {
+      "n": 2,
+      "p50_ms": 246.5896999999968,
+      "p95_ms": 260.12019999999757,
+      "budget_ms": 1000,
+      "budget_status": "PROPOSED",
+      "within_proposed_budget": true
+    },
+    "same_site_menu_navigation": {
+      "n": 2,
+      "p50_ms": 2796.9704999999994,
+      "p95_ms": 2937.2123999999967,
+      "budget_ms": null,
+      "budget_status": "PROPOSED",
+      "within_proposed_budget": null
+    },
+    "cached_section_return": {
+      "n": 2,
+      "p50_ms": 170.84590000000026,
+      "p95_ms": 171.3536000000022,
+      "budget_ms": 300,
+      "budget_status": "PROPOSED",
+      "within_proposed_budget": true
+    },
+    "cached_section_transition": {
+      "n": 2,
+      "p50_ms": 200.1736000000019,
+      "p95_ms": 292.91229999999996,
+      "budget_ms": 500,
+      "budget_status": "PROPOSED",
+      "within_proposed_budget": true
+    }
+  },
+  "by_cache_state": {
+    "cold": {
+      "first_site_visit": {
+        "n": 1,
+        "p50_ms": 8101.4946,
+        "p95_ms": 8101.4946,
+        "budget_ms": null,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": null
+      },
+      "dashboard_usable": {
+        "n": 3,
+        "p50_ms": 562.3076999999976,
+        "p95_ms": 8101.4946,
+        "budget_ms": 1500,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": false
+      },
+      "paginated_list_api": {
+        "n": 6,
+        "p50_ms": 42.20000001788139,
+        "p95_ms": 60.20000001788139,
+        "budget_ms": 400,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": true
+      },
+      "workspace_api": {
+        "n": 2,
+        "p50_ms": 69,
+        "p95_ms": 73.59999999403954,
+        "budget_ms": 500,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": true
+      },
+      "cold_site_switch": {
+        "n": 2,
+        "p50_ms": 526.113599999997,
+        "p95_ms": 562.3076999999976,
+        "budget_ms": 2000,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": true
+      },
+      "same_site_menu_navigation": {
+        "n": 2,
+        "p50_ms": 2796.9704999999994,
+        "p95_ms": 2937.2123999999967,
+        "budget_ms": null,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": null
+      }
+    },
+    "warm": {
+      "paginated_list_api": {
+        "n": 6,
+        "p50_ms": 39.19999998807907,
+        "p95_ms": 56.19999998807907,
+        "budget_ms": 400,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": true
+      },
+      "workspace_api": {
+        "n": 2,
+        "p50_ms": 48.30000001192093,
+        "p95_ms": 82.69999998807907,
+        "budget_ms": 500,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": true
+      },
+      "warm_site_switch": {
+        "n": 2,
+        "p50_ms": 246.5896999999968,
+        "p95_ms": 260.12019999999757,
+        "budget_ms": 1000,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": true
+      },
+      "dashboard_usable": {
+        "n": 4,
+        "p50_ms": 171.3536000000022,
+        "p95_ms": 260.12019999999757,
+        "budget_ms": 1500,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": true
+      },
+      "cached_section_return": {
+        "n": 2,
+        "p50_ms": 170.84590000000026,
+        "p95_ms": 171.3536000000022,
+        "budget_ms": 300,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": true
+      },
+      "cached_section_transition": {
+        "n": 2,
+        "p50_ms": 200.1736000000019,
+        "p95_ms": 292.91229999999996,
+        "budget_ms": 500,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": true
+      }
+    }
+  },
+  "samples": [
+    {
+      "scenario": "first_site_visit",
+      "cache_state": "cold",
+      "navigation_id": "6753bf98-aebb-4b81-9d70-d9d1bf8add96",
+      "site_id": 81,
+      "section": "dashboard",
+      "duration_ms": 8101.4946,
+      "dashboard_usable_ms": 8101.4946,
+      "requests": 14,
+      "transferred_bytes": 3840050,
+      "response_transferred_bytes": 3840050,
+      "request_payload_bytes": 0,
+      "duplicate_endpoints": [
+        {
+          "endpoint": "GET /admin/favicon.ico",
+          "count": 2
+        },
+        {
+          "endpoint": "GET /admin/api/workspace/sites/?page=1&page_size=20",
+          "count": 2
+        },
+        {
+          "endpoint": "GET /admin/api/reads?site=81&resource=dashboard-summary",
+          "count": 2
+        },
+        {
+          "endpoint": "GET /admin/api/reads?site=81&resource=dashboard-activity",
+          "count": 2
+        }
+      ],
+      "cancelled_requests": 3,
+      "failed_requests": 0,
+      "browser_measure_ms": 8103.5,
+      "browser_measure_scope": "current-document",
+      "in_flight_at_usable_boundary": 1,
+      "waterfall": [
+        {
+          "cdp_id": "28816.84",
+          "method": "GET",
+          "path": "/admin/favicon.ico",
+          "action_id": null,
+          "start_ms": 415.835205078125,
+          "initiator_type": "other",
+          "initiator_request_id": null,
+          "request_id": "6753bf98-aebb-4b81-9d70-d9d1bf8add96",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1458,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 1275.969
+          },
+          "duration_ms": 1276.9599999883212
+        },
+        {
+          "cdp_id": "28816.85",
+          "method": "GET",
+          "path": "/admin/api/workspace/",
+          "action_id": null,
+          "start_ms": 454.023193359375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "6753bf98-aebb-4b81-9d70-d9d1bf8add96",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 570,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 1481.526
+          },
+          "duration_ms": 1484.2650000064168
+        },
+        {
+          "cdp_id": "28816.87",
+          "method": "GET",
+          "path": "/admin/api/workspace/sites/?page=1&page_size=20",
+          "action_id": null,
+          "start_ms": 2180.433837890625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "6753bf98-aebb-4b81-9d70-d9d1bf8add96",
+          "status": null,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 0,
+          "failed": true,
+          "cancelled": true,
+          "network_error": "net::ERR_ABORTED"
+        },
+        {
+          "cdp_id": "28816.88",
+          "method": "GET",
+          "path": "/admin/api/workspace/sites/?page=1&page_size=20",
+          "action_id": null,
+          "start_ms": 2186.25,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "6753bf98-aebb-4b81-9d70-d9d1bf8add96",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1898,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 938.7059999999999
+          },
+          "duration_ms": 940.6580000068061
+        },
+        {
+          "cdp_id": "28816.89",
+          "method": "GET",
+          "path": "/admin/api/workspace/?site=81",
+          "action_id": null,
+          "start_ms": 3597.001953125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "6753bf98-aebb-4b81-9d70-d9d1bf8add96",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1427,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 81.239
+          },
+          "duration_ms": 82.6680000172928
+        },
+        {
+          "cdp_id": "28816.90",
+          "method": "GET",
+          "path": "/admin/sites/81/admin",
+          "action_id": null,
+          "start_ms": 3598.62890625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "6753bf98-aebb-4b81-9d70-d9d1bf8add96",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 3772,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 2608.983
+          },
+          "duration_ms": 2630.9519999776967
+        },
+        {
+          "cdp_id": "28816.91",
+          "method": "GET",
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/page.js",
+          "action_id": null,
+          "start_ms": 6227.718994140625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "6753bf98-aebb-4b81-9d70-d9d1bf8add96",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1012103,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 9.998000000000001
+          },
+          "duration_ms": 667.3160000063945
+        },
+        {
+          "cdp_id": "28816.92",
+          "method": "GET",
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/loading.js",
+          "action_id": null,
+          "start_ms": 6228.447021484375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "6753bf98-aebb-4b81-9d70-d9d1bf8add96",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1831372,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 11.409
+          },
+          "duration_ms": 833.7939999764785
+        },
+        {
+          "cdp_id": "28816.93",
+          "method": "GET",
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/layout.js",
+          "action_id": null,
+          "start_ms": 6228.97314453125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "6753bf98-aebb-4b81-9d70-d9d1bf8add96",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 984299,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 12.516
+          },
+          "duration_ms": 657.407000020612
+        },
+        {
+          "cdp_id": "28816.94",
+          "method": "GET",
+          "path": "/admin/favicon.ico",
+          "action_id": null,
+          "start_ms": 6344.951171875,
+          "initiator_type": "other",
+          "initiator_request_id": null,
+          "request_id": "6753bf98-aebb-4b81-9d70-d9d1bf8add96",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1458,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 358.726
+          },
+          "duration_ms": 361.21500001172535
+        },
+        {
+          "cdp_id": "28816.95",
+          "method": "GET",
+          "path": "/admin/api/reads?site=81&resource=dashboard-summary",
+          "action_id": null,
+          "start_ms": 7154.5791015625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "6753bf98-aebb-4b81-9d70-d9d1bf8add96",
+          "status": null,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 0,
+          "failed": true,
+          "cancelled": true,
+          "network_error": "net::ERR_ABORTED"
+        },
+        {
+          "cdp_id": "28816.96",
+          "method": "GET",
+          "path": "/admin/api/reads?site=81&resource=dashboard-summary",
+          "action_id": null,
+          "start_ms": 7158.694091796875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "57da5adf-4080-4816-8a91-74c5dee4828a",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 815,
+          "navigation_id": null,
+          "server_timing": "bff;dur=71.999, upstream;dur=60.474, encode;dur=0.087",
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 896.936
+          },
+          "duration_ms": 899.5909999939613
+        },
+        {
+          "cdp_id": "28816.97",
+          "method": "GET",
+          "path": "/admin/api/reads?site=81&resource=dashboard-activity",
+          "action_id": null,
+          "start_ms": 8091.9560546875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "6753bf98-aebb-4b81-9d70-d9d1bf8add96",
+          "status": null,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 0,
+          "failed": true,
+          "cancelled": true,
+          "network_error": "net::ERR_ABORTED"
+        },
+        {
+          "cdp_id": "28816.98",
+          "method": "GET",
+          "path": "/admin/api/reads?site=81&resource=dashboard-activity",
+          "action_id": null,
+          "start_ms": 8093.883056640625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "16a3f635-85cf-409a-8c43-618370bcfb8b",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 878,
+          "navigation_id": null,
+          "server_timing": "bff;dur=32.911, upstream;dur=24.010, encode;dur=0.105",
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 67.773
+          },
+          "duration_ms": 70.29400000465102
+        }
+      ],
+      "blocking_waterfall_candidates": [
+        {
+          "cdp_id": "28816.84",
+          "path": "/admin/favicon.ico",
+          "start_ms": 415.835205078125,
+          "wait_ms": 1275.969,
+          "initiator_type": "other"
+        },
+        {
+          "cdp_id": "28816.85",
+          "path": "/admin/api/workspace/",
+          "start_ms": 454.023193359375,
+          "wait_ms": 1481.526,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "28816.87",
+          "path": "/admin/api/workspace/sites/?page=1&page_size=20",
+          "start_ms": 2180.433837890625,
+          "wait_ms": null,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "28816.88",
+          "path": "/admin/api/workspace/sites/?page=1&page_size=20",
+          "start_ms": 2186.25,
+          "wait_ms": 938.7059999999999,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "28816.89",
+          "path": "/admin/api/workspace/?site=81",
+          "start_ms": 3597.001953125,
+          "wait_ms": 81.239,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "28816.90",
+          "path": "/admin/sites/81/admin",
+          "start_ms": 3598.62890625,
+          "wait_ms": 2608.983,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "28816.91",
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/page.js",
+          "start_ms": 6227.718994140625,
+          "wait_ms": 9.998000000000001,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "28816.92",
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/loading.js",
+          "start_ms": 6228.447021484375,
+          "wait_ms": 11.409,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "28816.93",
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/layout.js",
+          "start_ms": 6228.97314453125,
+          "wait_ms": 12.516,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "28816.94",
+          "path": "/admin/favicon.ico",
+          "start_ms": 6344.951171875,
+          "wait_ms": 358.726,
+          "initiator_type": "other"
+        },
+        {
+          "cdp_id": "28816.95",
+          "path": "/admin/api/reads?site=81&resource=dashboard-summary",
+          "start_ms": 7154.5791015625,
+          "wait_ms": null,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "28816.96",
+          "path": "/admin/api/reads?site=81&resource=dashboard-summary",
+          "start_ms": 7158.694091796875,
+          "wait_ms": 896.936,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "28816.97",
+          "path": "/admin/api/reads?site=81&resource=dashboard-activity",
+          "start_ms": 8091.9560546875,
+          "wait_ms": null,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "28816.98",
+          "path": "/admin/api/reads?site=81&resource=dashboard-activity",
+          "start_ms": 8093.883056640625,
+          "wait_ms": 67.773,
+          "initiator_type": "script"
+        }
+      ],
+      "waterfall_note": "Start offsets are relative to navigation initiation; temporal sequences are candidates, not proof of causal blocking.",
+      "server": {
+        "django_requests": 5,
+        "next_api_spans": 6,
+        "sql_count": 57,
+        "sql_ms": 81.477,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "e931cbe3-eb67-4c73-b982-2b3605881d33",
+          "0e41f6a4-904a-413c-8089-136de1884511",
+          "8ee1b7c7-c52c-4bae-a344-1e9bfbded944",
+          "57da5adf-4080-4816-8a91-74c5dee4828a",
+          "16a3f635-85cf-409a-8c43-618370bcfb8b"
+        ],
+        "browser_parent_matches": 5
+      }
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 81,
+      "navigation_id": "bdf26abe-6006-45cd-bb77-beb77958e00b",
+      "status": 200,
+      "duration_ms": 48,
+      "request_id": "bdf26abe-6006-45cd-bb77-beb77958e00b",
+      "sql_count": 18,
+      "sql_ms": 9.704,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 0,
+        "sql_count": 18,
+        "sql_ms": 9.704,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "bdf26abe-6006-45cd-bb77-beb77958e00b"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 81,
+      "navigation_id": "0e100016-e99c-4d64-bc21-af4cfad9950e",
+      "status": 200,
+      "duration_ms": 42.400000005960464,
+      "request_id": "0e100016-e99c-4d64-bc21-af4cfad9950e",
+      "sql_count": 18,
+      "sql_ms": 11.849,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 0,
+        "sql_count": 18,
+        "sql_ms": 11.849,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "0e100016-e99c-4d64-bc21-af4cfad9950e"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 81,
+      "navigation_id": "ac347bdf-8d8c-4b94-b44d-405c1db8096f",
+      "status": 200,
+      "duration_ms": 60.20000001788139,
+      "request_id": "ac347bdf-8d8c-4b94-b44d-405c1db8096f",
+      "sql_count": 18,
+      "sql_ms": 27.517,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 0,
+        "sql_count": 18,
+        "sql_ms": 27.517,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "ac347bdf-8d8c-4b94-b44d-405c1db8096f"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 81,
+      "navigation_id": "56037c45-7266-4b16-b9ae-44e078638642",
+      "status": 200,
+      "duration_ms": 39.19999998807907,
+      "request_id": "56037c45-7266-4b16-b9ae-44e078638642",
+      "sql_count": 18,
+      "sql_ms": 11.272,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 0,
+        "sql_count": 18,
+        "sql_ms": 11.272,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "56037c45-7266-4b16-b9ae-44e078638642"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 81,
+      "navigation_id": "39084bd7-9a82-4fef-9cf2-82fe0ad1cce0",
+      "status": 200,
+      "duration_ms": 37.20000001788139,
+      "request_id": "39084bd7-9a82-4fef-9cf2-82fe0ad1cce0",
+      "sql_count": 16,
+      "sql_ms": 11.539,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 0,
+        "sql_count": 16,
+        "sql_ms": 11.539,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "39084bd7-9a82-4fef-9cf2-82fe0ad1cce0"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 81,
+      "navigation_id": "a9602677-d90b-4be3-9253-4a10c54fc076",
+      "status": 200,
+      "duration_ms": 31,
+      "request_id": "a9602677-d90b-4be3-9253-4a10c54fc076",
+      "sql_count": 16,
+      "sql_ms": 8.857,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 0,
+        "sql_count": 16,
+        "sql_ms": 8.857,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "a9602677-d90b-4be3-9253-4a10c54fc076"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 82,
+      "navigation_id": "6b0ac3d0-b834-4645-b49b-af71a64d926d",
+      "status": 200,
+      "duration_ms": 37,
+      "request_id": "6b0ac3d0-b834-4645-b49b-af71a64d926d",
+      "sql_count": 18,
+      "sql_ms": 10.677,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 0,
+        "sql_count": 18,
+        "sql_ms": 10.677,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "6b0ac3d0-b834-4645-b49b-af71a64d926d"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 82,
+      "navigation_id": "3f6fa809-6a1c-424b-b50b-ff240589157a",
+      "status": 200,
+      "duration_ms": 34.19999998807907,
+      "request_id": "3f6fa809-6a1c-424b-b50b-ff240589157a",
+      "sql_count": 18,
+      "sql_ms": 9.401,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 0,
+        "sql_count": 18,
+        "sql_ms": 9.401,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "3f6fa809-6a1c-424b-b50b-ff240589157a"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 82,
+      "navigation_id": "478063ec-3248-4654-a5d6-0df427b199a8",
+      "status": 200,
+      "duration_ms": 59.30000001192093,
+      "request_id": "478063ec-3248-4654-a5d6-0df427b199a8",
+      "sql_count": 18,
+      "sql_ms": 22.739,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 0,
+        "sql_count": 18,
+        "sql_ms": 22.739,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "478063ec-3248-4654-a5d6-0df427b199a8"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 82,
+      "navigation_id": "fa9d6acd-ff68-4b69-9aed-c490687d1287",
+      "status": 200,
+      "duration_ms": 56.19999998807907,
+      "request_id": "fa9d6acd-ff68-4b69-9aed-c490687d1287",
+      "sql_count": 18,
+      "sql_ms": 18.321,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 0,
+        "sql_count": 18,
+        "sql_ms": 18.321,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "fa9d6acd-ff68-4b69-9aed-c490687d1287"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 82,
+      "navigation_id": "e41239bb-7328-46e3-bde8-7fa0ca2d024f",
+      "status": 200,
+      "duration_ms": 42.20000001788139,
+      "request_id": "e41239bb-7328-46e3-bde8-7fa0ca2d024f",
+      "sql_count": 16,
+      "sql_ms": 12.841,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 0,
+        "sql_count": 16,
+        "sql_ms": 12.841,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "e41239bb-7328-46e3-bde8-7fa0ca2d024f"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 82,
+      "navigation_id": "0d2e7822-1e4f-4a35-82ba-d1f9f43f80ac",
+      "status": 200,
+      "duration_ms": 43.19999998807907,
+      "request_id": "0d2e7822-1e4f-4a35-82ba-d1f9f43f80ac",
+      "sql_count": 16,
+      "sql_ms": 12.898,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 0,
+        "sql_count": 16,
+        "sql_ms": 12.898,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "0d2e7822-1e4f-4a35-82ba-d1f9f43f80ac"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "c73ecdf5-12af-4fed-ae16-893cc5131065",
+      "site_id": 81,
+      "status": 200,
+      "duration_ms": 73.59999999403954,
+      "request_id": "c73ecdf5-12af-4fed-ae16-893cc5131065",
+      "site": 81,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 1,
+        "sql_count": 10,
+        "sql_ms": 8.224,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "2419b752-8bd3-4c24-bb0c-6a93ecf6e332"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "60ff3d9d-cff8-40f6-bb5c-76a4b4648943",
+      "site_id": 81,
+      "status": 200,
+      "duration_ms": 82.69999998807907,
+      "request_id": "60ff3d9d-cff8-40f6-bb5c-76a4b4648943",
+      "site": 81,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 1,
+        "sql_count": 10,
+        "sql_ms": 9.884,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "c85e3301-fb66-40c6-aa19-d98f4d652b58"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "dedbe4cd-36e6-445e-884a-1a991781a161",
+      "site_id": 82,
+      "status": 200,
+      "duration_ms": 69,
+      "request_id": "dedbe4cd-36e6-445e-884a-1a991781a161",
+      "site": 82,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 1,
+        "sql_count": 10,
+        "sql_ms": 5.47,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "e54f2545-d063-493e-9178-32510e8cf97c"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "03836cdc-264c-4e52-974c-3261d8743223",
+      "site_id": 82,
+      "status": 200,
+      "duration_ms": 48.30000001192093,
+      "request_id": "03836cdc-264c-4e52-974c-3261d8743223",
+      "site": 82,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 1,
+        "sql_count": 10,
+        "sql_ms": 5.272,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "83673c83-d1c9-45b9-8ae2-77d1ee27a659"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "cold_site_switch",
+      "cache_state": "cold",
+      "navigation_id": "24f5385d-2310-47dd-9cf2-0a10011c48dd",
+      "site_id": 82,
+      "section": "dashboard",
+      "duration_ms": 562.3076999999976,
+      "dashboard_usable_ms": 562.3076999999976,
+      "requests": 9,
+      "transferred_bytes": 10116,
+      "response_transferred_bytes": 10116,
+      "request_payload_bytes": 0,
+      "duplicate_endpoints": [
+        {
+          "endpoint": "GET /admin/api/workspace/sites/?page=1&page_size=20",
+          "count": 2
+        },
+        {
+          "endpoint": "GET /admin/api/reads?site=82&resource=dashboard-summary",
+          "count": 2
+        },
+        {
+          "endpoint": "GET /admin/api/reads?site=82&resource=dashboard-activity",
+          "count": 2
+        }
+      ],
+      "cancelled_requests": 3,
+      "failed_requests": 0,
+      "browser_measure_ms": 564.4000000059605,
+      "browser_measure_scope": "current-document",
+      "in_flight_at_usable_boundary": 1,
+      "waterfall": [
+        {
+          "cdp_id": "34584.114",
+          "method": "GET",
+          "path": "/admin/api/workspace/sites/?page=1&page_size=20",
+          "action_id": null,
+          "start_ms": 78.01904296875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "24f5385d-2310-47dd-9cf2-0a10011c48dd",
+          "status": null,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 0,
+          "failed": true,
+          "cancelled": true,
+          "network_error": "net::ERR_ABORTED"
+        },
+        {
+          "cdp_id": "34584.115",
+          "method": "GET",
+          "path": "/admin/api/workspace/sites/?page=1&page_size=20",
+          "action_id": null,
+          "start_ms": 80.01904296875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "24f5385d-2310-47dd-9cf2-0a10011c48dd",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1898,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 81.378
+          },
+          "duration_ms": 83.09099997859448
+        },
+        {
+          "cdp_id": "34584.116",
+          "method": "GET",
+          "path": "/admin/api/workspace/?site=82",
+          "action_id": null,
+          "start_ms": 225.260009765625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "24f5385d-2310-47dd-9cf2-0a10011c48dd",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1427,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 84.25999999999999
+          },
+          "duration_ms": 86.80900000035763
+        },
+        {
+          "cdp_id": "34584.117",
+          "method": "GET",
+          "path": "/admin/sites/82/admin",
+          "action_id": null,
+          "start_ms": 227.215087890625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "24f5385d-2310-47dd-9cf2-0a10011c48dd",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 3655,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 76.553
+          },
+          "duration_ms": 91.19700000155717
+        },
+        {
+          "cdp_id": "34584.118",
+          "method": "GET",
+          "path": "/admin/favicon.ico",
+          "action_id": null,
+          "start_ms": 402.493896484375,
+          "initiator_type": "other",
+          "initiator_request_id": null,
+          "request_id": "24f5385d-2310-47dd-9cf2-0a10011c48dd",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1458,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 49.263999999999996
+          },
+          "duration_ms": 52.47400002554059
+        },
+        {
+          "cdp_id": "34584.119",
+          "method": "GET",
+          "path": "/admin/api/reads?site=82&resource=dashboard-summary",
+          "action_id": null,
+          "start_ms": 405.702880859375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "24f5385d-2310-47dd-9cf2-0a10011c48dd",
+          "status": null,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 0,
+          "failed": true,
+          "cancelled": true,
+          "network_error": "net::ERR_ABORTED"
+        },
+        {
+          "cdp_id": "34584.120",
+          "method": "GET",
+          "path": "/admin/api/reads?site=82&resource=dashboard-summary",
+          "action_id": null,
+          "start_ms": 411.98388671875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "10f72f3b-42e7-48a9-8e85-bbed6727810c",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 816,
+          "navigation_id": null,
+          "server_timing": "bff;dur=46.253, upstream;dur=39.444, encode;dur=0.096",
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 112.37400000000001
+          },
+          "duration_ms": 115.29899999732152
+        },
+        {
+          "cdp_id": "34584.121",
+          "method": "GET",
+          "path": "/admin/api/reads?site=82&resource=dashboard-activity",
+          "action_id": null,
+          "start_ms": 551.045166015625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "24f5385d-2310-47dd-9cf2-0a10011c48dd",
+          "status": null,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 0,
+          "failed": true,
+          "cancelled": true,
+          "network_error": "net::ERR_ABORTED"
+        },
+        {
+          "cdp_id": "34584.122",
+          "method": "GET",
+          "path": "/admin/api/reads?site=82&resource=dashboard-activity",
+          "action_id": null,
+          "start_ms": 552.45703125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "07ebac78-0444-40b9-a2c1-3ed6b79c427d",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 862,
+          "navigation_id": null,
+          "server_timing": "bff;dur=46.605, upstream;dur=33.946, encode;dur=0.131",
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 85.47200000000001
+          },
+          "duration_ms": 87.5159999995958
+        }
+      ],
+      "blocking_waterfall_candidates": [
+        {
+          "cdp_id": "34584.116",
+          "path": "/admin/api/workspace/?site=82",
+          "start_ms": 225.260009765625,
+          "wait_ms": 84.25999999999999,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "34584.117",
+          "path": "/admin/sites/82/admin",
+          "start_ms": 227.215087890625,
+          "wait_ms": 76.553,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "34584.118",
+          "path": "/admin/favicon.ico",
+          "start_ms": 402.493896484375,
+          "wait_ms": 49.263999999999996,
+          "initiator_type": "other"
+        },
+        {
+          "cdp_id": "34584.119",
+          "path": "/admin/api/reads?site=82&resource=dashboard-summary",
+          "start_ms": 405.702880859375,
+          "wait_ms": null,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "34584.120",
+          "path": "/admin/api/reads?site=82&resource=dashboard-summary",
+          "start_ms": 411.98388671875,
+          "wait_ms": 112.37400000000001,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "34584.121",
+          "path": "/admin/api/reads?site=82&resource=dashboard-activity",
+          "start_ms": 551.045166015625,
+          "wait_ms": null,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "34584.122",
+          "path": "/admin/api/reads?site=82&resource=dashboard-activity",
+          "start_ms": 552.45703125,
+          "wait_ms": 85.47200000000001,
+          "initiator_type": "script"
+        }
+      ],
+      "waterfall_note": "Start offsets are relative to navigation initiation; temporal sequences are candidates, not proof of causal blocking.",
+      "server": {
+        "django_requests": 4,
+        "next_api_spans": 5,
+        "sql_count": 50,
+        "sql_ms": 39.215,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "cdcf84d3-b566-4f59-ad36-3a631220c86d",
+          "b0ce1887-e6f4-4ae4-ac1e-1be3090156eb",
+          "10f72f3b-42e7-48a9-8e85-bbed6727810c",
+          "07ebac78-0444-40b9-a2c1-3ed6b79c427d"
+        ],
+        "browser_parent_matches": 4
+      }
+    },
+    {
+      "scenario": "warm_site_switch",
+      "cache_state": "warm",
+      "navigation_id": "64244ac5-f4b6-4881-a1a3-8b2544c90f8f",
+      "site_id": 82,
+      "section": "dashboard",
+      "duration_ms": 260.12019999999757,
+      "dashboard_usable_ms": 260.12019999999757,
+      "requests": 2,
+      "transferred_bytes": 5108,
+      "response_transferred_bytes": 5108,
+      "request_payload_bytes": 0,
+      "duplicate_endpoints": [],
+      "cancelled_requests": 0,
+      "failed_requests": 0,
+      "browser_measure_ms": 262.09999999403954,
+      "browser_measure_scope": "current-document",
+      "in_flight_at_usable_boundary": 1,
+      "waterfall": [
+        {
+          "cdp_id": "34584.127",
+          "method": "GET",
+          "path": "/admin/sites/82/admin",
+          "action_id": null,
+          "start_ms": 116.398193359375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "64244ac5-f4b6-4881-a1a3-8b2544c90f8f",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 3650,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 44.274
+          },
+          "duration_ms": 55.79600000055507
+        },
+        {
+          "cdp_id": "34584.128",
+          "method": "GET",
+          "path": "/admin/favicon.ico",
+          "action_id": null,
+          "start_ms": 252.05712890625,
+          "initiator_type": "other",
+          "initiator_request_id": null,
+          "request_id": "64244ac5-f4b6-4881-a1a3-8b2544c90f8f",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1458,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 35.31
+          },
+          "duration_ms": 37.03399997903034
+        }
+      ],
+      "blocking_waterfall_candidates": [
+        {
+          "cdp_id": "34584.127",
+          "path": "/admin/sites/82/admin",
+          "start_ms": 116.398193359375,
+          "wait_ms": 44.274,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "34584.128",
+          "path": "/admin/favicon.ico",
+          "start_ms": 252.05712890625,
+          "wait_ms": 35.31,
+          "initiator_type": "other"
+        }
+      ],
+      "waterfall_note": "Start offsets are relative to navigation initiation; temporal sequences are candidates, not proof of causal blocking.",
+      "server": {
+        "django_requests": 0,
+        "next_api_spans": 0,
+        "sql_count": 0,
+        "sql_ms": 0,
+        "duplicate_endpoints": [],
+        "request_ids": [],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "same_site_menu_navigation",
+      "cache_state": "cold",
+      "navigation_id": "f17ad098-4f6e-4034-b39c-15a4bc0eb629",
+      "site_id": 82,
+      "section": "pages",
+      "duration_ms": 2796.9704999999994,
+      "dashboard_usable_ms": null,
+      "requests": 5,
+      "transferred_bytes": 2142919,
+      "response_transferred_bytes": 2142919,
+      "request_payload_bytes": 0,
+      "duplicate_endpoints": [
+        {
+          "endpoint": "GET /admin/api/reads?site=82&resource=pages&page=1&page_size=20&ordering=-updated_at",
+          "count": 2
+        }
+      ],
+      "cancelled_requests": 1,
+      "failed_requests": 0,
+      "browser_measure_ms": 2798.2999999821186,
+      "browser_measure_scope": "current-document",
+      "in_flight_at_usable_boundary": 0,
+      "waterfall": [
+        {
+          "cdp_id": "34584.129",
+          "method": "GET",
+          "path": "/admin/sites/82/admin/pages",
+          "action_id": null,
+          "start_ms": 37.41796875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "f17ad098-4f6e-4034-b39c-15a4bc0eb629",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 2769,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 2169.073
+          },
+          "duration_ms": 2177.854000008665
+        },
+        {
+          "cdp_id": "34584.130",
+          "method": "GET",
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/pages/page.js",
+          "action_id": null,
+          "start_ms": 2213.2080078125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "f17ad098-4f6e-4034-b39c-15a4bc0eb629",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 2136012,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 7.171999999999999
+          },
+          "duration_ms": 225.44599999673665
+        },
+        {
+          "cdp_id": "34584.131",
+          "method": "GET",
+          "path": "/admin/api/reads?site=82&resource=pages&page=1&page_size=20&ordering=-updated_at",
+          "action_id": null,
+          "start_ms": 2552.22705078125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "f17ad098-4f6e-4034-b39c-15a4bc0eb629",
+          "status": null,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 0,
+          "failed": true,
+          "cancelled": true,
+          "network_error": "net::ERR_ABORTED"
+        },
+        {
+          "cdp_id": "34584.132",
+          "method": "GET",
+          "path": "/admin/api/reads?site=82&resource=pages&page=1&page_size=20&ordering=-updated_at",
+          "action_id": null,
+          "start_ms": 2560.947998046875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "747a7306-9bba-48b7-aa25-e4e962d8bfb9",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 2680,
+          "navigation_id": null,
+          "server_timing": "bff;dur=67.028, upstream;dur=58.162, encode;dur=0.385",
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 129.425
+          },
+          "duration_ms": 133.32500000251457
+        },
+        {
+          "cdp_id": "34584.133",
+          "method": "GET",
+          "path": "/admin/favicon.ico",
+          "action_id": null,
+          "start_ms": 2569.255126953125,
+          "initiator_type": "other",
+          "initiator_request_id": null,
+          "request_id": "f17ad098-4f6e-4034-b39c-15a4bc0eb629",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1458,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0.013999999999999985,
+            "connect_ms": 1.035,
+            "wait_ms": 65.449
+          },
+          "duration_ms": 68.00500000827014
+        }
+      ],
+      "blocking_waterfall_candidates": [
+        {
+          "cdp_id": "34584.130",
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/pages/page.js",
+          "start_ms": 2213.2080078125,
+          "wait_ms": 7.171999999999999,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "34584.131",
+          "path": "/admin/api/reads?site=82&resource=pages&page=1&page_size=20&ordering=-updated_at",
+          "start_ms": 2552.22705078125,
+          "wait_ms": null,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "34584.132",
+          "path": "/admin/api/reads?site=82&resource=pages&page=1&page_size=20&ordering=-updated_at",
+          "start_ms": 2560.947998046875,
+          "wait_ms": 129.425,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "34584.133",
+          "path": "/admin/favicon.ico",
+          "start_ms": 2569.255126953125,
+          "wait_ms": 65.449,
+          "initiator_type": "other"
+        }
+      ],
+      "waterfall_note": "Start offsets are relative to navigation initiation; temporal sequences are candidates, not proof of causal blocking.",
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 1,
+        "sql_count": 18,
+        "sql_ms": 12.846,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "747a7306-9bba-48b7-aa25-e4e962d8bfb9"
+        ],
+        "browser_parent_matches": 1
+      }
+    },
+    {
+      "scenario": "cached_section_return",
+      "cache_state": "warm",
+      "navigation_id": "0d31d95e-67f9-4d3a-adae-38fed505bfe0",
+      "site_id": 82,
+      "section": "dashboard",
+      "duration_ms": 170.84590000000026,
+      "dashboard_usable_ms": 170.84590000000026,
+      "requests": 2,
+      "transferred_bytes": 3712,
+      "response_transferred_bytes": 3712,
+      "request_payload_bytes": 0,
+      "duplicate_endpoints": [],
+      "cancelled_requests": 0,
+      "failed_requests": 0,
+      "browser_measure_ms": 172.7000000178814,
+      "browser_measure_scope": "current-document",
+      "in_flight_at_usable_boundary": 1,
+      "waterfall": [
+        {
+          "cdp_id": "34584.134",
+          "method": "GET",
+          "path": "/admin/sites/82/admin",
+          "action_id": null,
+          "start_ms": 34.35107421875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "0d31d95e-67f9-4d3a-adae-38fed505bfe0",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 2254,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 52.257000000000005
+          },
+          "duration_ms": 66.87700000475161
+        },
+        {
+          "cdp_id": "34584.135",
+          "method": "GET",
+          "path": "/admin/favicon.ico",
+          "action_id": null,
+          "start_ms": 161.2548828125,
+          "initiator_type": "other",
+          "initiator_request_id": null,
+          "request_id": "0d31d95e-67f9-4d3a-adae-38fed505bfe0",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1458,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 27.38
+          },
+          "duration_ms": 28.641000011703
+        }
+      ],
+      "blocking_waterfall_candidates": [
+        {
+          "cdp_id": "34584.135",
+          "path": "/admin/favicon.ico",
+          "start_ms": 161.2548828125,
+          "wait_ms": 27.38,
+          "initiator_type": "other"
+        }
+      ],
+      "waterfall_note": "Start offsets are relative to navigation initiation; temporal sequences are candidates, not proof of causal blocking.",
+      "server": {
+        "django_requests": 0,
+        "next_api_spans": 0,
+        "sql_count": 0,
+        "sql_ms": 0,
+        "duplicate_endpoints": [],
+        "request_ids": [],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "cached_section_transition",
+      "cache_state": "warm",
+      "navigation_id": "9cd5affa-1e05-4e65-b8ee-fff03d320de0",
+      "site_id": 82,
+      "section": "pages",
+      "duration_ms": 292.91229999999996,
+      "dashboard_usable_ms": null,
+      "requests": 2,
+      "transferred_bytes": 4226,
+      "response_transferred_bytes": 4226,
+      "request_payload_bytes": 0,
+      "duplicate_endpoints": [],
+      "cancelled_requests": 0,
+      "failed_requests": 0,
+      "browser_measure_ms": 294.2000000178814,
+      "browser_measure_scope": "current-document",
+      "in_flight_at_usable_boundary": 1,
+      "waterfall": [
+        {
+          "cdp_id": "34584.136",
+          "method": "GET",
+          "path": "/admin/sites/82/admin/pages",
+          "action_id": null,
+          "start_ms": 46.941162109375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "9cd5affa-1e05-4e65-b8ee-fff03d320de0",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 2768,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 48.689
+          },
+          "duration_ms": 61.08499999390915
+        },
+        {
+          "cdp_id": "34584.137",
+          "method": "GET",
+          "path": "/admin/favicon.ico",
+          "action_id": null,
+          "start_ms": 278.6650390625,
+          "initiator_type": "other",
+          "initiator_request_id": null,
+          "request_id": "9cd5affa-1e05-4e65-b8ee-fff03d320de0",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1458,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 32.841
+          },
+          "duration_ms": 34.32299999985844
+        }
+      ],
+      "blocking_waterfall_candidates": [
+        {
+          "cdp_id": "34584.137",
+          "path": "/admin/favicon.ico",
+          "start_ms": 278.6650390625,
+          "wait_ms": 32.841,
+          "initiator_type": "other"
+        }
+      ],
+      "waterfall_note": "Start offsets are relative to navigation initiation; temporal sequences are candidates, not proof of causal blocking.",
+      "server": {
+        "django_requests": 0,
+        "next_api_spans": 0,
+        "sql_count": 0,
+        "sql_ms": 0,
+        "duplicate_endpoints": [],
+        "request_ids": [],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "cold_site_switch",
+      "cache_state": "cold",
+      "navigation_id": "92637715-9ea1-447f-9718-8c4306f22750",
+      "site_id": 83,
+      "section": "dashboard",
+      "duration_ms": 526.113599999997,
+      "dashboard_usable_ms": 526.113599999997,
+      "requests": 9,
+      "transferred_bytes": 10113,
+      "response_transferred_bytes": 10113,
+      "request_payload_bytes": 0,
+      "duplicate_endpoints": [
+        {
+          "endpoint": "GET /admin/api/workspace/sites/?page=1&page_size=20",
+          "count": 2
+        },
+        {
+          "endpoint": "GET /admin/api/reads?site=83&resource=dashboard-summary",
+          "count": 2
+        },
+        {
+          "endpoint": "GET /admin/api/reads?site=83&resource=dashboard-activity",
+          "count": 2
+        }
+      ],
+      "cancelled_requests": 3,
+      "failed_requests": 0,
+      "browser_measure_ms": 527.5,
+      "browser_measure_scope": "current-document",
+      "in_flight_at_usable_boundary": 1,
+      "waterfall": [
+        {
+          "cdp_id": "35524.114",
+          "method": "GET",
+          "path": "/admin/api/workspace/sites/?page=1&page_size=20",
+          "action_id": null,
+          "start_ms": 66.14501953125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "92637715-9ea1-447f-9718-8c4306f22750",
+          "status": null,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 0,
+          "failed": true,
+          "cancelled": true,
+          "network_error": "net::ERR_ABORTED"
+        },
+        {
+          "cdp_id": "35524.115",
+          "method": "GET",
+          "path": "/admin/api/workspace/sites/?page=1&page_size=20",
+          "action_id": null,
+          "start_ms": 67.9580078125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "92637715-9ea1-447f-9718-8c4306f22750",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1898,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 70.515
+          },
+          "duration_ms": 72.37999999779277
+        },
+        {
+          "cdp_id": "35524.116",
+          "method": "GET",
+          "path": "/admin/api/workspace/?site=83",
+          "action_id": null,
+          "start_ms": 219.857177734375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "92637715-9ea1-447f-9718-8c4306f22750",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1427,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 73.41199999999999
+          },
+          "duration_ms": 75.80900000175461
+        },
+        {
+          "cdp_id": "35524.117",
+          "method": "GET",
+          "path": "/admin/sites/83/admin",
+          "action_id": null,
+          "start_ms": 221.47509765625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "92637715-9ea1-447f-9718-8c4306f22750",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 3652,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 65.38799999999999
+          },
+          "duration_ms": 77.87000000826083
+        },
+        {
+          "cdp_id": "35524.118",
+          "method": "GET",
+          "path": "/admin/api/reads?site=83&resource=dashboard-summary",
+          "action_id": null,
+          "start_ms": 374.739990234375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "92637715-9ea1-447f-9718-8c4306f22750",
+          "status": null,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 0,
+          "failed": true,
+          "cancelled": true,
+          "network_error": "net::ERR_ABORTED"
+        },
+        {
+          "cdp_id": "35524.119",
+          "method": "GET",
+          "path": "/admin/api/reads?site=83&resource=dashboard-summary",
+          "action_id": null,
+          "start_ms": 380.462158203125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "97afa355-36d4-41bb-8cbe-18ca7db6f353",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 815,
+          "navigation_id": null,
+          "server_timing": "bff;dur=53.329, upstream;dur=42.594, encode;dur=0.107",
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 113.407
+          },
+          "duration_ms": 116.53999998816289
+        },
+        {
+          "cdp_id": "35524.120",
+          "method": "GET",
+          "path": "/admin/favicon.ico",
+          "action_id": null,
+          "start_ms": 383.3349609375,
+          "initiator_type": "other",
+          "initiator_request_id": null,
+          "request_id": "92637715-9ea1-447f-9718-8c4306f22750",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1458,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 60.632
+          },
+          "duration_ms": 62.21800000639632
+        },
+        {
+          "cdp_id": "35524.121",
+          "method": "GET",
+          "path": "/admin/api/reads?site=83&resource=dashboard-activity",
+          "action_id": null,
+          "start_ms": 515.30078125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "92637715-9ea1-447f-9718-8c4306f22750",
+          "status": null,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 0,
+          "failed": true,
+          "cancelled": true,
+          "network_error": "net::ERR_ABORTED"
+        },
+        {
+          "cdp_id": "35524.122",
+          "method": "GET",
+          "path": "/admin/api/reads?site=83&resource=dashboard-activity",
+          "action_id": null,
+          "start_ms": 516.72998046875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "3356746c-bcc6-400b-8ceb-b4c7015775d0",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 863,
+          "navigation_id": null,
+          "server_timing": "bff;dur=42.199, upstream;dur=35.873, encode;dur=0.107",
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 84.17099999999999
+          },
+          "duration_ms": 86.33400002145208
+        }
+      ],
+      "blocking_waterfall_candidates": [
+        {
+          "cdp_id": "35524.116",
+          "path": "/admin/api/workspace/?site=83",
+          "start_ms": 219.857177734375,
+          "wait_ms": 73.41199999999999,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "35524.117",
+          "path": "/admin/sites/83/admin",
+          "start_ms": 221.47509765625,
+          "wait_ms": 65.38799999999999,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "35524.118",
+          "path": "/admin/api/reads?site=83&resource=dashboard-summary",
+          "start_ms": 374.739990234375,
+          "wait_ms": null,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "35524.119",
+          "path": "/admin/api/reads?site=83&resource=dashboard-summary",
+          "start_ms": 380.462158203125,
+          "wait_ms": 113.407,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "35524.120",
+          "path": "/admin/favicon.ico",
+          "start_ms": 383.3349609375,
+          "wait_ms": 60.632,
+          "initiator_type": "other"
+        },
+        {
+          "cdp_id": "35524.121",
+          "path": "/admin/api/reads?site=83&resource=dashboard-activity",
+          "start_ms": 515.30078125,
+          "wait_ms": null,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "35524.122",
+          "path": "/admin/api/reads?site=83&resource=dashboard-activity",
+          "start_ms": 516.72998046875,
+          "wait_ms": 84.17099999999999,
+          "initiator_type": "script"
+        }
+      ],
+      "waterfall_note": "Start offsets are relative to navigation initiation; temporal sequences are candidates, not proof of causal blocking.",
+      "server": {
+        "django_requests": 4,
+        "next_api_spans": 5,
+        "sql_count": 50,
+        "sql_ms": 37.811,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "36022983-a039-4afd-9434-1300682df2f2",
+          "77bb49d2-4852-43ed-b22f-a47d5aae8cbd",
+          "97afa355-36d4-41bb-8cbe-18ca7db6f353",
+          "3356746c-bcc6-400b-8ceb-b4c7015775d0"
+        ],
+        "browser_parent_matches": 4
+      }
+    },
+    {
+      "scenario": "warm_site_switch",
+      "cache_state": "warm",
+      "navigation_id": "45070f40-3134-474d-9d34-803f56906932",
+      "site_id": 83,
+      "section": "dashboard",
+      "duration_ms": 246.5896999999968,
+      "dashboard_usable_ms": 246.5896999999968,
+      "requests": 2,
+      "transferred_bytes": 5113,
+      "response_transferred_bytes": 5113,
+      "request_payload_bytes": 0,
+      "duplicate_endpoints": [],
+      "cancelled_requests": 0,
+      "failed_requests": 0,
+      "browser_measure_ms": 248.09999999403954,
+      "browser_measure_scope": "current-document",
+      "in_flight_at_usable_boundary": 1,
+      "waterfall": [
+        {
+          "cdp_id": "35524.127",
+          "method": "GET",
+          "path": "/admin/sites/83/admin",
+          "action_id": null,
+          "start_ms": 117.6259765625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "45070f40-3134-474d-9d34-803f56906932",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 3655,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 41.347
+          },
+          "duration_ms": 50.07400002796203
+        },
+        {
+          "cdp_id": "35524.128",
+          "method": "GET",
+          "path": "/admin/favicon.ico",
+          "action_id": null,
+          "start_ms": 235.01904296875,
+          "initiator_type": "other",
+          "initiator_request_id": null,
+          "request_id": "45070f40-3134-474d-9d34-803f56906932",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1458,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 34.489999999999995
+          },
+          "duration_ms": 35.75599999749102
+        }
+      ],
+      "blocking_waterfall_candidates": [
+        {
+          "cdp_id": "35524.127",
+          "path": "/admin/sites/83/admin",
+          "start_ms": 117.6259765625,
+          "wait_ms": 41.347,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "35524.128",
+          "path": "/admin/favicon.ico",
+          "start_ms": 235.01904296875,
+          "wait_ms": 34.489999999999995,
+          "initiator_type": "other"
+        }
+      ],
+      "waterfall_note": "Start offsets are relative to navigation initiation; temporal sequences are candidates, not proof of causal blocking.",
+      "server": {
+        "django_requests": 0,
+        "next_api_spans": 0,
+        "sql_count": 0,
+        "sql_ms": 0,
+        "duplicate_endpoints": [],
+        "request_ids": [],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "same_site_menu_navigation",
+      "cache_state": "cold",
+      "navigation_id": "86241df0-0224-456c-8ccc-c94d0754b706",
+      "site_id": 83,
+      "section": "posts",
+      "duration_ms": 2937.2123999999967,
+      "dashboard_usable_ms": null,
+      "requests": 9,
+      "transferred_bytes": 2136007,
+      "response_transferred_bytes": 2136007,
+      "request_payload_bytes": 0,
+      "duplicate_endpoints": [
+        {
+          "endpoint": "GET /admin/api/reads?site=83&resource=posts&page=1&page_size=20&ordering=-created_at",
+          "count": 2
+        },
+        {
+          "endpoint": "GET /admin/api/reads?site=83&resource=categories&page=1&page_size=100&ordering=name",
+          "count": 2
+        },
+        {
+          "endpoint": "GET /admin/api/reads?site=83&resource=tags&page=1&page_size=100&ordering=name",
+          "count": 2
+        }
+      ],
+      "cancelled_requests": 3,
+      "failed_requests": 0,
+      "browser_measure_ms": 2939.9000000059605,
+      "browser_measure_scope": "current-document",
+      "in_flight_at_usable_boundary": 0,
+      "waterfall": [
+        {
+          "cdp_id": "35524.129",
+          "method": "GET",
+          "path": "/admin/sites/83/admin/posts",
+          "action_id": null,
+          "start_ms": 50.509033203125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "86241df0-0224-456c-8ccc-c94d0754b706",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 2776,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 2085.781
+          },
+          "duration_ms": 2102.236000006087
+        },
+        {
+          "cdp_id": "35524.130",
+          "method": "GET",
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/posts/page.js",
+          "action_id": null,
+          "start_ms": 2150.3330078125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "86241df0-0224-456c-8ccc-c94d0754b706",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 2126311,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0.239,
+            "connect_ms": 0.9420000000000002,
+            "wait_ms": 7.407
+          },
+          "duration_ms": 262.29300000704825
+        },
+        {
+          "cdp_id": "35524.131",
+          "method": "GET",
+          "path": "/admin/api/reads?site=83&resource=posts&page=1&page_size=20&ordering=-created_at",
+          "action_id": null,
+          "start_ms": 2581.046875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "86241df0-0224-456c-8ccc-c94d0754b706",
+          "status": null,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 0,
+          "failed": true,
+          "cancelled": true,
+          "network_error": "net::ERR_ABORTED"
+        },
+        {
+          "cdp_id": "35524.132",
+          "method": "GET",
+          "path": "/admin/api/reads?site=83&resource=categories&page=1&page_size=100&ordering=name",
+          "action_id": null,
+          "start_ms": 2584.26513671875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "86241df0-0224-456c-8ccc-c94d0754b706",
+          "status": null,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 0,
+          "failed": true,
+          "cancelled": true,
+          "network_error": "net::ERR_ABORTED"
+        },
+        {
+          "cdp_id": "35524.133",
+          "method": "GET",
+          "path": "/admin/api/reads?site=83&resource=tags&page=1&page_size=100&ordering=name",
+          "action_id": null,
+          "start_ms": 2586.412109375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "86241df0-0224-456c-8ccc-c94d0754b706",
+          "status": null,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 0,
+          "failed": true,
+          "cancelled": true,
+          "network_error": "net::ERR_ABORTED"
+        },
+        {
+          "cdp_id": "35524.134",
+          "method": "GET",
+          "path": "/admin/api/reads?site=83&resource=posts&page=1&page_size=20&ordering=-created_at",
+          "action_id": null,
+          "start_ms": 2591.459228515625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "fa3b1db1-671b-48ba-ac99-6cfa36e8e9e6",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 3377,
+          "navigation_id": null,
+          "server_timing": "bff;dur=86.048, upstream;dur=70.109, encode;dur=0.397",
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0.02100000000000002,
+            "connect_ms": 1.052,
+            "wait_ms": 195.54
+          },
+          "duration_ms": 201.26500001060776
+        },
+        {
+          "cdp_id": "35524.135",
+          "method": "GET",
+          "path": "/admin/api/reads?site=83&resource=categories&page=1&page_size=100&ordering=name",
+          "action_id": null,
+          "start_ms": 2593.838134765625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "4aeb8a8a-c11d-4b67-adeb-d3b3d254a4e9",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 941,
+          "navigation_id": null,
+          "server_timing": "bff;dur=51.718, upstream;dur=35.602, encode;dur=0.094",
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0.017000000000000015,
+            "connect_ms": 1.256,
+            "wait_ms": 159.05800000000002
+          },
+          "duration_ms": 163.97400002460927
+        },
+        {
+          "cdp_id": "35524.136",
+          "method": "GET",
+          "path": "/admin/api/reads?site=83&resource=tags&page=1&page_size=100&ordering=name",
+          "action_id": null,
+          "start_ms": 2595.9619140625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "36b3c72f-0a79-4a40-b4e4-8998b81bfe42",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1144,
+          "navigation_id": null,
+          "server_timing": "bff;dur=76.445, upstream;dur=58.960, encode;dur=0.102",
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0.018000000000000016,
+            "connect_ms": 1.052,
+            "wait_ms": 182.381
+          },
+          "duration_ms": 186.85100000584498
+        },
+        {
+          "cdp_id": "35524.137",
+          "method": "GET",
+          "path": "/admin/favicon.ico",
+          "action_id": null,
+          "start_ms": 2627.221923828125,
+          "initiator_type": "other",
+          "initiator_request_id": null,
+          "request_id": "86241df0-0224-456c-8ccc-c94d0754b706",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1458,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0.052999999999999936,
+            "connect_ms": 2.368,
+            "wait_ms": 97.67099999999999
+          },
+          "duration_ms": 102.85200001089834
+        }
+      ],
+      "blocking_waterfall_candidates": [
+        {
+          "cdp_id": "35524.130",
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/posts/page.js",
+          "start_ms": 2150.3330078125,
+          "wait_ms": 7.407,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "35524.131",
+          "path": "/admin/api/reads?site=83&resource=posts&page=1&page_size=20&ordering=-created_at",
+          "start_ms": 2581.046875,
+          "wait_ms": null,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "35524.132",
+          "path": "/admin/api/reads?site=83&resource=categories&page=1&page_size=100&ordering=name",
+          "start_ms": 2584.26513671875,
+          "wait_ms": null,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "35524.133",
+          "path": "/admin/api/reads?site=83&resource=tags&page=1&page_size=100&ordering=name",
+          "start_ms": 2586.412109375,
+          "wait_ms": null,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "35524.134",
+          "path": "/admin/api/reads?site=83&resource=posts&page=1&page_size=20&ordering=-created_at",
+          "start_ms": 2591.459228515625,
+          "wait_ms": 195.54,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "35524.135",
+          "path": "/admin/api/reads?site=83&resource=categories&page=1&page_size=100&ordering=name",
+          "start_ms": 2593.838134765625,
+          "wait_ms": 159.05800000000002,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "35524.136",
+          "path": "/admin/api/reads?site=83&resource=tags&page=1&page_size=100&ordering=name",
+          "start_ms": 2595.9619140625,
+          "wait_ms": 182.381,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "35524.137",
+          "path": "/admin/favicon.ico",
+          "start_ms": 2627.221923828125,
+          "wait_ms": 97.67099999999999,
+          "initiator_type": "other"
+        }
+      ],
+      "waterfall_note": "Start offsets are relative to navigation initiation; temporal sequences are candidates, not proof of causal blocking.",
+      "server": {
+        "django_requests": 3,
+        "next_api_spans": 3,
+        "sql_count": 38,
+        "sql_ms": 43.096000000000004,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "4aeb8a8a-c11d-4b67-adeb-d3b3d254a4e9",
+          "36b3c72f-0a79-4a40-b4e4-8998b81bfe42",
+          "fa3b1db1-671b-48ba-ac99-6cfa36e8e9e6"
+        ],
+        "browser_parent_matches": 3
+      }
+    },
+    {
+      "scenario": "cached_section_return",
+      "cache_state": "warm",
+      "navigation_id": "fdb1de27-40c1-4cfd-b50b-bce0a3963e8f",
+      "site_id": 83,
+      "section": "dashboard",
+      "duration_ms": 171.3536000000022,
+      "dashboard_usable_ms": 171.3536000000022,
+      "requests": 2,
+      "transferred_bytes": 3711,
+      "response_transferred_bytes": 3711,
+      "request_payload_bytes": 0,
+      "duplicate_endpoints": [],
+      "cancelled_requests": 0,
+      "failed_requests": 0,
+      "browser_measure_ms": 172.5,
+      "browser_measure_scope": "current-document",
+      "in_flight_at_usable_boundary": 1,
+      "waterfall": [
+        {
+          "cdp_id": "35524.138",
+          "method": "GET",
+          "path": "/admin/sites/83/admin",
+          "action_id": null,
+          "start_ms": 35.54296875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "fdb1de27-40c1-4cfd-b50b-bce0a3963e8f",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 2253,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 53.899
+          },
+          "duration_ms": 68.40800002100877
+        },
+        {
+          "cdp_id": "35524.139",
+          "method": "GET",
+          "path": "/admin/favicon.ico",
+          "action_id": null,
+          "start_ms": 159.993896484375,
+          "initiator_type": "other",
+          "initiator_request_id": null,
+          "request_id": "fdb1de27-40c1-4cfd-b50b-bce0a3963e8f",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1458,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 25.85
+          },
+          "duration_ms": 27.073000004747882
+        }
+      ],
+      "blocking_waterfall_candidates": [
+        {
+          "cdp_id": "35524.139",
+          "path": "/admin/favicon.ico",
+          "start_ms": 159.993896484375,
+          "wait_ms": 25.85,
+          "initiator_type": "other"
+        }
+      ],
+      "waterfall_note": "Start offsets are relative to navigation initiation; temporal sequences are candidates, not proof of causal blocking.",
+      "server": {
+        "django_requests": 0,
+        "next_api_spans": 0,
+        "sql_count": 0,
+        "sql_ms": 0,
+        "duplicate_endpoints": [],
+        "request_ids": [],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "cached_section_transition",
+      "cache_state": "warm",
+      "navigation_id": "68ac5665-6ed3-4310-b9c1-084ed741a5f4",
+      "site_id": 83,
+      "section": "posts",
+      "duration_ms": 200.1736000000019,
+      "dashboard_usable_ms": null,
+      "requests": 2,
+      "transferred_bytes": 4235,
+      "response_transferred_bytes": 4235,
+      "request_payload_bytes": 0,
+      "duplicate_endpoints": [],
+      "cancelled_requests": 0,
+      "failed_requests": 0,
+      "browser_measure_ms": 201.40000000596046,
+      "browser_measure_scope": "current-document",
+      "in_flight_at_usable_boundary": 1,
+      "waterfall": [
+        {
+          "cdp_id": "35524.140",
+          "method": "GET",
+          "path": "/admin/sites/83/admin/posts",
+          "action_id": null,
+          "start_ms": 46.64599609375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "68ac5665-6ed3-4310-b9c1-084ed741a5f4",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 2777,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 43.685
+          },
+          "duration_ms": 53.02700001630001
+        },
+        {
+          "cdp_id": "35524.141",
+          "method": "GET",
+          "path": "/admin/favicon.ico",
+          "action_id": null,
+          "start_ms": 191.68505859375,
+          "initiator_type": "other",
+          "initiator_request_id": null,
+          "request_id": "68ac5665-6ed3-4310-b9c1-084ed741a5f4",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1458,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 26.923
+          },
+          "duration_ms": 28.634000016609207
+        }
+      ],
+      "blocking_waterfall_candidates": [
+        {
+          "cdp_id": "35524.141",
+          "path": "/admin/favicon.ico",
+          "start_ms": 191.68505859375,
+          "wait_ms": 26.923,
+          "initiator_type": "other"
+        }
+      ],
+      "waterfall_note": "Start offsets are relative to navigation initiation; temporal sequences are candidates, not proof of causal blocking.",
+      "server": {
+        "django_requests": 0,
+        "next_api_spans": 0,
+        "sql_count": 0,
+        "sql_ms": 0,
+        "duplicate_endpoints": [],
+        "request_ids": [],
+        "browser_parent_matches": 0
+      }
+    }
+  ],
+  "failures": [],
+  "trace_summary": {
+    "all_api_samples_correlated": true,
+    "django_requests": 33,
+    "next_api_spans": 24,
+    "navigation_samples_missing_django_spans": [
+      "64244ac5-f4b6-4881-a1a3-8b2544c90f8f",
+      "0d31d95e-67f9-4d3a-adae-38fed505bfe0",
+      "9cd5affa-1e05-4e65-b8ee-fff03d320de0",
+      "45070f40-3134-474d-9d34-803f56906932",
+      "fdb1de27-40c1-4cfd-b50b-bce0a3963e8f",
+      "68ac5665-6ed3-4310-b9c1-084ed741a5f4"
+    ],
+    "note": "No upstream requests may be legitimate for a fully cached transition; inspect browser waterfall before interpreting missing spans."
+  }
+}

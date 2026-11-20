@@ -249,7 +249,7 @@ describe("SitePostEditor", () => {
     fireEvent.change(screen.getByRole("textbox", { name: "Permalink slug" }), { target: { value: "new-campus-story" } });
     const seo = { meta_title: "Campus research", meta_description: "Research at the university" };
     fireEvent.change(screen.getByRole("textbox", { name: "SEO metadata (JSON object)" }), { target: { value: JSON.stringify(seo) } });
-    const body = screen.getByRole("textbox", { name: "Article body" });
+    const body = await screen.findByRole("textbox", { name: "Article body" });
     body.innerHTML = "<p>Story body</p>"; fireEvent.input(body);
     fireEvent.click(screen.getByRole("button", { name: "Save Draft" }));
     await waitFor(() => expect(createSitePost).toHaveBeenCalledWith(11, expect.objectContaining({
@@ -299,7 +299,7 @@ describe("SitePostEditor", () => {
   it("previews the Site draft through the shared safe block renderer", async () => {
     renderEditor("edit", { postId: "post-1" });
     await screen.findByRole("heading", { name: "Edit Post" });
-    const body = screen.getByRole("textbox", { name: "Article body" });
+    const body = await screen.findByRole("textbox", { name: "Article body" });
     body.innerHTML = '<h2>Safe</h2><script>alert(1)</script><a href="javascript:alert(2)">bad</a>';
     fireEvent.input(body);
     fireEvent.click(screen.getByRole("button", { name: "Preview draft" }));
@@ -315,7 +315,7 @@ describe("SitePostEditor", () => {
     const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
     renderEditor("edit", { postId: "post-1" });
     await screen.findByRole("heading", { name: "Edit Post" });
-    const body = screen.getByRole("textbox", { name: "Article body" });
+    const body = await screen.findByRole("textbox", { name: "Article body" });
     body.innerHTML = "<h2>Unsaved report</h2><p><strong>Keep this text</strong></p>"; fireEvent.input(body);
     fireEvent.click(screen.getByRole("button", { name: "Save Draft" }));
     await screen.findByText("Please retry this save.");
@@ -334,7 +334,7 @@ describe("SitePostEditor", () => {
     updateSitePost.mockResolvedValue({ ok: false, error: { status: 409, code: "conflict", message: "A newer revision exists.", details: null, requestId: "stale" } });
     renderEditor("edit", { postId: "post-1" });
     await screen.findByRole("heading", { name: "Edit Post" });
-    const body = screen.getByRole("textbox", { name: "Article body" });
+    const body = await screen.findByRole("textbox", { name: "Article body" });
     body.innerHTML = "<p>My private work</p>"; fireEvent.input(body);
     fireEvent.click(screen.getByRole("button", { name: "Save Draft" }));
     await screen.findByText(/A newer revision exists.*Keep your text/);
@@ -352,7 +352,7 @@ describe("SitePostEditor", () => {
       .mockResolvedValueOnce(result({ ...post(), etag: '"post-v2"', editor_document: { schema_version: 1, html: "<p>Server body</p>" } }));
     renderEditor("edit", { postId: "post-1" });
     await screen.findByRole("heading", { name: "Edit Post" });
-    const body = screen.getByRole("textbox", { name: "Article body" });
+    const body = await screen.findByRole("textbox", { name: "Article body" });
     body.innerHTML = "<p>My private work</p>"; fireEvent.input(body);
     fireEvent.click(screen.getByRole("button", { name: "Save Draft" }));
     await screen.findByRole("button", { name: "Keep my text & refresh" });

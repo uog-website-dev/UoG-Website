@@ -5,7 +5,7 @@
  * Platform Administration or one authorized Site. Discovery is lazy and
  * separate; Django still decides every request.
  */
-import { createContext, createElement, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { createContext, createElement, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { normalizeAdminPathname, siteWorkspaceId } from "@/navigation";
 import type { SiteStatus } from "@uog/types";
@@ -115,8 +115,8 @@ export function WorkspaceProvider({children}: {children: ReactNode}) {
   }, [environment.client, environment.identity, siteId, result.dataUpdatedAt]);
   const data = result.data;
   const awaitingValidation = visit.current.after > 0 && result.dataUpdatedAt <= visit.current.after;
-  const state: WorkspaceState = result.isError ? {status: "error", signedOut: result.error instanceof ApiError && result.error.status === 401}
-    : data && !awaitingValidation ? {status: "ready", data, refreshing: result.isFetching} : {status: "loading"};
+  const state = useMemo<WorkspaceState>(() => result.isError ? {status: "error", signedOut: result.error instanceof ApiError && result.error.status === 401}
+    : data && !awaitingValidation ? {status: "ready", data, refreshing: result.isFetching} : {status: "loading"}, [result.isError, result.error, data, awaitingValidation, result.isFetching]);
   useEffect(() => {
     // A selection hides the previous editor immediately, before the RSC route arrives.
     void environment.client.cancelQueries({predicate: query => query.queryKey[2] !== siteId});
@@ -127,7 +127,7 @@ export function WorkspaceProvider({children}: {children: ReactNode}) {
     if (path !== href) {router.replace(href); return;}
     setPending(null);
   }, [pending, state.status, data, routeSite, path, router]);
-  const select = (site: Pick<WorkspaceSite, "id" | "name">) => {
+  const select = useCallback((site: Pick<WorkspaceSite, "id" | "name">) => {
     if (!Number.isSafeInteger(site.id) || site.id < 1) return false;
     if (!confirmSiteSwitch(site.id)) return false;
     const href = siteSwitchHref(site.id, path);
@@ -136,10 +136,13 @@ export function WorkspaceProvider({children}: {children: ReactNode}) {
     setPending({site, href});
     router.push(href);
     return true;
-  };
+  }, [path, router]);
+  const cancel = useCallback(() => setPending(null), []);
+  const navigationValue = useMemo(() => ({pending, select, cancel}), [pending, select, cancel]);
+  const workspaceValue = useMemo(() => ({siteId, state}), [siteId, state]);
   const authorization = state.status === "ready" ? JSON.stringify({platform: data?.platformPermissions, permissions: data?.site?.permissions, modules: data?.site?.enabledModuleCodes, status: data?.site?.status}) : "blocked";
-  return createElement(NavigationContext.Provider, {value: {pending, select, cancel: () => setPending(null)}},
-    createElement(WorkspaceContext.Provider, {value: {siteId, state}},
+  return createElement(NavigationContext.Provider, {value: navigationValue},
+    createElement(WorkspaceContext.Provider, {value: workspaceValue},
       createElement(AuthorizationScope, {authorization, siteId, children})));
 }
 

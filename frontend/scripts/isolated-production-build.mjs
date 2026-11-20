@@ -1,5 +1,5 @@
 /**
- * Copy the frontend tree without development .next output and build it.
+ * Copy the frontend tree without development .next output and build admin-web.
  * The copy lives under /tmp so the running dev servers keep their own .next.
  * Dependency directories are symlinked, not duplicated.
  */
@@ -9,6 +9,7 @@ import { spawnSync } from "node:child_process";
 
 const source = "/workspace";
 const dest = "/tmp/uog-frontend-build";
+const startedAt = performance.now();
 
 function copySource() {
   rmSync(dest, { recursive: true, force: true });
@@ -51,7 +52,15 @@ function copySource() {
 }
 
 copySource();
-const built = spawnSync("pnpm", ["build"], { cwd: dest, stdio: "inherit" });
-console.log(`isolated admin build present: ${lstatSync(join(dest, "apps/admin-web/.next"), { throwIfNoEntry: false })?.isDirectory() === true}`);
-console.log(`isolated public build present: ${lstatSync(join(dest, "apps/public-web/.next"), { throwIfNoEntry: false })?.isDirectory() === true}`);
-process.exit(built.status ?? 1);
+const built = spawnSync("pnpm", ["--filter", "@uog/admin-web...", "build"], { cwd: dest, stdio: "inherit" });
+const adminBuildPresent = lstatSync(join(dest, "apps/admin-web/.next"), { throwIfNoEntry: false })?.isDirectory() === true;
+const exitCode = built.status ?? 1;
+if (exitCode === 0 && !adminBuildPresent) throw new Error("Admin production build output is missing");
+console.log(`isolated admin build present: ${adminBuildPresent}`);
+console.log(JSON.stringify({
+  event: "uog.frontend.production-build",
+  duration_ms: Number((performance.now() - startedAt).toFixed(1)),
+  exit_code: exitCode,
+  isolated_admin_build: adminBuildPresent,
+}));
+process.exit(exitCode);

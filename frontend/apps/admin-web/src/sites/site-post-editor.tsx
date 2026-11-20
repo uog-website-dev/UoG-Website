@@ -7,6 +7,7 @@ import {useSiteQuery} from "@/data/query-cache";
  */
 import { useEffect, useMemo, useRef, useState } from "react";
 import Alert from "@mui/material/Alert";
+import Skeleton from "@mui/material/Skeleton";
 import { APP_BASE_PATH } from "@/base-path";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -29,6 +30,7 @@ import {
 } from "@uog/ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 
 import {
   createSiteTaxonomy,
@@ -46,10 +48,10 @@ import type {
 } from "@/app/sites/post-actions";
 import { unwrap } from "@/organizations/contract";
 
-import { MediaPickerDialog } from "./media-picker";
+import { LazyMediaPickerDialog as MediaPickerDialog } from "./lazy-media-picker";
+import {RenderProbe} from "@/performance/render-probe";
 import { ContentWorkflowButtons, ContentWorkflowDialog } from "./content-workflow";
 import type { WorkflowAction } from "./content-workflow";
-import { PostRichEditor } from "./post-rich-editor";
 
 const PERMISSIONS = {
   view: "content.posts.view",
@@ -57,6 +59,10 @@ const PERMISSIONS = {
   update: "content.posts.update",
 } as const;
 const EMPTY_TAXONOMY: SiteTaxonomyRecord[] = [];
+const PostRichEditor = dynamic(
+  () => import("./post-rich-editor").then((module) => module.PostRichEditor),
+  { loading: () => <Box role="status" aria-label="Loading article editor" sx={{ minHeight: 460 }}><Skeleton aria-hidden variant="rounded" height={460} /></Box> },
+);
 
 interface PostForm {
   title: string;
@@ -761,7 +767,7 @@ function SitePostEditorContent({
               Article body *
             </Typography>
             {!form.legacy ? (
-              <PostRichEditor
+              <RenderProbe id="rich-text"><PostRichEditor
                 siteId={siteId}
                 canUseMedia={canUseMedia}
                 canUploadMedia={canUploadMedia}
@@ -770,7 +776,7 @@ function SitePostEditorContent({
                 disabled={!settingsEnabled}
                 onSave={() => void savePost()}
                 error={bodyFieldError}
-              />
+              /></RenderProbe>
             ) : (
               <Box component="section" aria-label="Post content blocks" sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
                 {bodyFieldError ? <Alert severity="error" role="alert">{bodyFieldError}</Alert> : null}

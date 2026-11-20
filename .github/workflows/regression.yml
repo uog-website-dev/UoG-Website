@@ -98,3 +98,5 @@ jobs:
           pnpm test
           pnpm typecheck
           pnpm build
+          pnpm --filter @uog/admin-web perf:bundles
+          pnpm --filter @uog/admin-web perf:test

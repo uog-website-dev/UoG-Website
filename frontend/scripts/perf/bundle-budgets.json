@@ -1,0 +1,18 @@
+{
+  "reference": "P0-PERF-009",
+  "route_brotli_bytes": {
+    "shell": 275000,
+    "dashboard": 290000,
+    "pages": 295000,
+    "posts": 295000,
+    "media": 305000,
+    "pageEditor": 300000,
+    "postEditor": 315000,
+    "builder": 335000
+  },
+  "render_profile": {
+    "unrelated_parent_updates": 4,
+    "max_consumer_renders": 1
+  },
+  "status": "PROPOSED engineering regression ceilings; QA/Product acceptance pending"
+}

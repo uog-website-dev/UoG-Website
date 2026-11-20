@@ -1,0 +1,69 @@
+﻿{
+  "profiling": "0",
+  "files": [
+    {
+      "file": "apps/admin-web/src/sites/site-admin-frame.tsx",
+      "sha256": "6ff9328dcf1416236b7127e907486c451c45dd2e4ae240c159ce999edbddfe51"
+    },
+    {
+      "file": "apps/admin-web/src/data/query-cache.tsx",
+      "sha256": "a864595f0f0e00d3f06a8beafe2149caf426f6855849efddf813ee16ec106c67"
+    },
+    {
+      "file": "apps/admin-web/src/workspace.ts",
+      "sha256": "1a04893cb0514d006de19eb4665ad328d3da1d39220267d3b2f8e70143ae8a28"
+    },
+    {
+      "file": "apps/admin-web/src/sites/site-workspace.tsx",
+      "sha256": "5e4630541c1624921ff81c1ab54822cf5678139bc07b414ba2d1921b06c39b1e"
+    },
+    {
+      "file": "apps/admin-web/src/sites/lazy-media-picker.tsx",
+      "sha256": "cccd9414577075fe52a353711b3922c63379988b49a61a172118d88cdf419ec1"
+    },
+    {
+      "file": "apps/admin-web/src/sites/media-picker-model.ts",
+      "sha256": "4159b58ae6a012f7f173c78e8734f8b0fafa3d612f539af9fca46511b63f969b"
+    },
+    {
+      "file": "apps/admin-web/src/sites/media-upload-model.ts",
+      "sha256": "90dd841a9e50c016b8b66c408bf6603d0d19bb6a7985f9492987fef38b41ee2b"
+    },
+    {
+      "file": "apps/admin-web/src/sites/media-library.tsx",
+      "sha256": "d02c27c26c0a362884292ed41d018b4ccadd8bea21b5a9e9a0d38afd14f096d3"
+    },
+    {
+      "file": "apps/admin-web/src/sites/media-upload-panel.tsx",
+      "sha256": "380aa1b17e5b180c62fd7147b0556676abc77d2eb09f188e8e92c3b89d2bf020"
+    },
+    {
+      "file": "apps/admin-web/src/sites/content-media-builder.tsx",
+      "sha256": "b3803b19054c5732933e9423d20b044ca8bdbf320ed57e2c6ddd6fef0648fa22"
+    },
+    {
+      "file": "apps/admin-web/src/sites/media-block-editor.tsx",
+      "sha256": "73de8b865fdb67c33143151b46e856095aa44d1c726f90aa410fde9e3db4e27b"
+    },
+    {
+      "file": "apps/admin-web/src/sites/site-page-editor.tsx",
+      "sha256": "9f0757160a77bce00c701dc6e8fa489d6f1d2d87318e2112b105cb1f4c3220dd"
+    },
+    {
+      "file": "apps/admin-web/src/sites/site-post-editor.tsx",
+      "sha256": "7a9519915a6d8a8f68751eccb91a60f35d471b98339d0bef81c990a64571fb96"
+    },
+    {
+      "file": "apps/admin-web/src/sites/visual-builder.tsx",
+      "sha256": "84ce77bc997df87b4ce170e41c159843385c45757c5e35bfbdea0cf6111f5e1f"
+    },
+    {
+      "file": "apps/admin-web/src/performance/render-probe.tsx",
+      "sha256": "dd9282c1d980f427f36af9755cd242dbfed7ee0723293d0fdede1d5ef749de0d"
+    },
+    {
+      "file": "apps/admin-web/next.config.ts",
+      "sha256": "190ecf926211f0127e41cc3268eff5cc03189ea2b8afe5ae5139a79a816c3e31"
+    }
+  ]
+}

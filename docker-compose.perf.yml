@@ -28,6 +28,8 @@ services:
       API_BASE_URL: http://perf-backend:8000/api
       PERF_INSTRUMENTATION_ENABLED: '1'
       PERF_NEXT_MODE: ${PERF_NEXT_MODE:-production}
+      PERF_RENDER_PROFILING: ${PERF_RENDER_PROFILING:-0}
+      NEXT_PUBLIC_RENDER_PROFILING: ${PERF_RENDER_PROFILING:-0}
       AUTH_URL: http://localhost:8088
       SITE_ORIGIN: http://localhost:8088
     healthcheck:

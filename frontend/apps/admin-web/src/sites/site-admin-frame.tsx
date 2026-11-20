@@ -7,7 +7,7 @@
  * so this frame only keeps the active Site visible: name, status, code and
  * owning organization. Only the editable content boundary remounts per Site.
  */
-import { createContext, useContext, useEffect, useRef } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef } from "react";
 import type { ReactNode } from "react";
 import BusinessIcon from "@mui/icons-material/Business";
 import LanguageRoundedIcon from "@mui/icons-material/LanguageRounded";
@@ -110,7 +110,7 @@ export function SiteAdminFrame({
   const current = sections.find(
     (section) => isSiteSectionActive(section,site.id,currentPath),
   );
-  const value = { site, enabledModuleCodes, permissions };
+  const value = useMemo(() => ({site, enabledModuleCodes, permissions}), [site, enabledModuleCodes, permissions]);
   const chip = siteStatusChip(site.status);
   const dashboardHref = siteAdminHref(site.id);
   const onDashboard = currentPath === dashboardHref || currentPath === `${dashboardHref}/`;

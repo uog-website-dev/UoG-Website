@@ -1,5 +1,5 @@
 "use client";
-import {createContext, useContext, useEffect, useRef, useState, type ReactNode} from "react";
+import {createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode} from "react";
 import {QueryCache, QueryClient, QueryClientProvider, useQuery} from "@tanstack/react-query";
 import {ApiError} from "@uog/api-client";
 import {accessFailureWasReported} from "@/organizations/contract";
@@ -50,7 +50,8 @@ export function QueryScope({identity, siteId, children, onDenied, authorization 
     previousSite.current = siteId;
     if (previous !== siteId) void client.cancelQueries({predicate: query => query.queryKey[2] === previous});
   }, [client, siteId]);
-  return <QueryClientProvider client={client}><Environment.Provider value={{client, identity, siteId, authorization}}><MutationInvalidation/>{children}</Environment.Provider></QueryClientProvider>;
+  const environment = useMemo(() => ({client, identity, siteId, authorization}), [client, identity, siteId, authorization]);
+  return <QueryClientProvider client={client}><Environment.Provider value={environment}><MutationInvalidation/>{children}</Environment.Provider></QueryClientProvider>;
 }
 
 export function useQueryEnvironment() {
@@ -61,7 +62,8 @@ export function useQueryEnvironment() {
 
 export function AuthorizationScope({authorization, siteId, children}: {authorization: string; siteId?: number | null; children: ReactNode}) {
   const parent = useQueryEnvironment();
-  const environment = {...parent, siteId: siteId === undefined ? parent.siteId : siteId};
+  const scopedSite = siteId === undefined ? parent.siteId : siteId;
+  const environment = useMemo(() => ({...parent, siteId: scopedSite, authorization}), [parent, scopedSite, authorization]);
   useEffect(() => {
     if (authorization !== "blocked") window.dispatchEvent(new CustomEvent("uog:authorization:context", {
       detail: {identity: environment.identity, site: environment.siteId, authorization},
@@ -70,7 +72,7 @@ export function AuthorizationScope({authorization, siteId, children}: {authoriza
     void environment.client.cancelQueries(obsolete);
     environment.client.removeQueries(obsolete);
   }, [authorization, environment.client, environment.identity, environment.siteId]);
-  return <Environment.Provider value={{...environment, authorization}}>{children}</Environment.Provider>;
+  return <Environment.Provider value={environment}>{children}</Environment.Provider>;
 }
 
 export function useSiteQuery<T>(siteId: number, resource: string, params: unknown, read: (signal: AbortSignal) => Promise<T>, options: {
@@ -114,13 +116,13 @@ export const RELATED: Record<string, readonly string[]> = {
 };
 export function useInvalidateSite() {
   const environment = useQueryEnvironment();
-  return (siteId: number, domain: keyof typeof RELATED) => {
+  return useCallback((siteId: number, domain: keyof typeof RELATED) => {
     const resources = RELATED[domain] ?? [domain];
     const matches = (query: QueryIdentity) => query.queryKey[1] === environment.identity
       && query.queryKey[2] === siteId && resources.includes(String(query.queryKey[4]));
     // Cancel before invalidation so a pre-mutation response cannot replace the save.
     invalidate(environment.client, matches);
-  };
+  }, [environment.client, environment.identity]);
 }
 
 export function MutationInvalidation() {

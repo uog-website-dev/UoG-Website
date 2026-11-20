@@ -5,6 +5,8 @@ import { APP_BASE_PATH } from "./src/base-path";
 const nextConfig: NextConfig = {
   // The admin console is served under /admin by the nginx reverse proxy.
   basePath: APP_BASE_PATH,
+  // Separate diagnostic build; release measurements keep this disabled.
+  reactProductionProfiling: process.env.PERF_RENDER_PROFILING === "1",
   // OAuth callback query values must not enter benchmark container logs.
   ...(process.env.PERF_INSTRUMENTATION_ENABLED === "1" ? { logging: { incomingRequests: false } } : {}),
   experimental: { serverActions: { bodySizeLimit: "4mb" } },

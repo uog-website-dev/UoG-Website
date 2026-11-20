@@ -1,0 +1,7 @@
+{
+  "status": "FAIL",
+  "mode": "production",
+  "phase": "dashboard",
+  "message": "Profiling build did not emit React samples",
+  "rows": []
+}

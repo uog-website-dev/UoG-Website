@@ -22,8 +22,8 @@ import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { APP_BASE_PATH } from "@/base-path";
-import { MediaPickerDialog } from "./media-picker";
-import type { MediaPickerResult } from "./media-picker";
+import { LazyMediaPickerDialog as MediaPickerDialog } from "./lazy-media-picker";
+import type { MediaPickerResult } from "./media-picker-model";
 import { articleHref, normalizeArticleDocument } from "@uog/ui";
 
 function ToolButton({

@@ -1,0 +1,314 @@
+{
+  "status": "PASS",
+  "mode": "development",
+  "react_profiling": false,
+  "browser": "157.0.4341.60",
+  "method": "Single diagnostic per deep link, HTTP script cache disabled, shared authenticated session; includes hydration/code and data, not a p95 population. New pages reset CDP CPU counters. Long tasks and CLS exclude recent-input shifts; no content or credentials recorded.",
+  "rows": [
+    {
+      "name": "dashboard",
+      "usable_ms": 2167.0202,
+      "cls": 0.07263572446469908,
+      "overflow": false,
+      "long_tasks": 2,
+      "long_task_ms": 340,
+      "script_duration_ms": 412.298,
+      "layout_duration_ms": 71.25,
+      "js_assets": [
+        {
+          "path": "/admin/_next/static/chunks/webpack.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app-pages-internals.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/loading.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/error.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/page.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/layout.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/not-found.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/main-app.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/loading.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/page.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/layout.js",
+          "cache": "no-store, must-revalidate"
+        }
+      ],
+      "immutable_assets": 0,
+      "private_responses": 3,
+      "react_profiles": []
+    },
+    {
+      "name": "pages",
+      "usable_ms": 2584.911,
+      "cls": 0.10547198783215181,
+      "overflow": false,
+      "long_tasks": 3,
+      "long_task_ms": 534,
+      "script_duration_ms": 561.302,
+      "layout_duration_ms": 50.281,
+      "js_assets": [
+        {
+          "path": "/admin/_next/static/chunks/webpack.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app-pages-internals.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/loading.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/error.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/layout.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/not-found.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/loading.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/main-app.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/page.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/pages/page.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/layout.js",
+          "cache": "no-store, must-revalidate"
+        }
+      ],
+      "immutable_assets": 0,
+      "private_responses": 3,
+      "react_profiles": []
+    },
+    {
+      "name": "postEditor",
+      "usable_ms": 11540.6941,
+      "cls": 0.02626909812644676,
+      "overflow": false,
+      "long_tasks": 3,
+      "long_task_ms": 536,
+      "script_duration_ms": 664.614,
+      "layout_duration_ms": 81.808,
+      "js_assets": [
+        {
+          "path": "/admin/_next/static/chunks/webpack.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app-pages-internals.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/loading.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/error.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/layout.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/not-found.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/loading.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/main-app.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/page.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/posts/new/page.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/layout.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/_app-pages-browser_src_sites_post-rich-editor_tsx.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/_app-pages-browser_src_sites_media-picker_tsx.js",
+          "cache": "no-store, must-revalidate"
+        }
+      ],
+      "immutable_assets": 0,
+      "private_responses": 1,
+      "react_profiles": [],
+      "picker_additional_js": 1,
+      "editor_and_picker": "PASS"
+    },
+    {
+      "name": "pageEditor",
+      "usable_ms": 6709.3531,
+      "cls": 0.06856296971450616,
+      "overflow": false,
+      "long_tasks": 4,
+      "long_task_ms": 565,
+      "script_duration_ms": 527.4159999999999,
+      "layout_duration_ms": 46.275999999999996,
+      "js_assets": [
+        {
+          "path": "/admin/_next/static/chunks/webpack.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app-pages-internals.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/loading.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/error.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/layout.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/not-found.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/main-app.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/loading.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/pages/new/page.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/page.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/layout.js",
+          "cache": "no-store, must-revalidate"
+        }
+      ],
+      "immutable_assets": 0,
+      "private_responses": 1,
+      "react_profiles": []
+    },
+    {
+      "name": "builder",
+      "usable_ms": 6603.189900000001,
+      "cls": 0.011111111111111112,
+      "overflow": false,
+      "long_tasks": 4,
+      "long_task_ms": 1002,
+      "script_duration_ms": 932.2040000000001,
+      "layout_duration_ms": 38.739000000000004,
+      "js_assets": [
+        {
+          "path": "/admin/_next/static/chunks/webpack.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app-pages-internals.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/pages/%5BpageId%5D/builder/loading.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/error.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/layout.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/not-found.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/main-app.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/loading.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/page.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/pages/%5BpageId%5D/builder/page.js",
+          "cache": "no-store, must-revalidate"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/layout.js",
+          "cache": "no-store, must-revalidate"
+        }
+      ],
+      "immutable_assets": 0,
+      "private_responses": 1,
+      "react_profiles": []
+    }
+  ]
+}

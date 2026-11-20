@@ -1,0 +1,816 @@
+{
+  "status": "PASS",
+  "mode": "production",
+  "browser": "157.0.4341.60",
+  "method": "Single diagnostic per deep link, HTTP script cache disabled, shared authenticated session; includes hydration/code and data, not a p95 population. New pages reset CDP CPU counters. Long tasks and CLS exclude recent-input shifts; no content or credentials recorded.",
+  "rows": [
+    {
+      "name": "dashboard",
+      "usable_ms": 384.7650000000003,
+      "cls": 0.07263572446469908,
+      "overflow": false,
+      "long_tasks": 0,
+      "long_task_ms": 0,
+      "script_duration_ms": 112.179,
+      "layout_duration_ms": 45.178999999999995,
+      "js_assets": [
+        {
+          "path": "/admin/_next/static/chunks/webpack-bf84fd345c3be81c.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/main-app-79ae7b7f2d6b6f32.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/2674-224e0703860a4115.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/fd9bffea-61bce6436ccff5b9.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/382-5b2605eef8411181.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/5870-6c8b2471b40f71aa.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/3766-a7968beddd72a59e.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/9584-8c839d3aeaf3a047.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/7972-5d7bf30362f02d54.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/5744-2658b92e3ddd83b0.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/3089-0e3274da014ed282.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/7832-59471f02fa932d98.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/8450-916f83899a6bbcee.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/5003-da2ded2d182656ab.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/page-f5e47ecb2f9736ec.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/6840-992b238b1f988447.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/5712-1106f07dba4e074d.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/4439-8f200bb33b0e83e8.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/2449-ba6365679b88b463.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/1508-8219244033a9deac.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/7858-ed3a54b164190dd6.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/loading-c7b67aefe27024da.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/4831-e808be59af709d70.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/302-833d95b9db9b224d.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/8462-99d30f73d2c945fd.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/6822-548f8ac3bf5b3398.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/9408-d754db044c1560ff.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/page-36f15a6785f63a85.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/loading-84b2cee593f612e6.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/layout-ba25108b78db90f4.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/4080-98c321470c05103f.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/error-d3a5fe40dfc751e7.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/not-found-f1b8d8a349918af2.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/layout-fc57dfd3be6c21bf.js",
+          "cache": "public, max-age=31536000, immutable"
+        }
+      ],
+      "immutable_assets": 35,
+      "private_responses": 3
+    },
+    {
+      "name": "pages",
+      "usable_ms": 446.53450000000066,
+      "cls": 0.10547198783215181,
+      "overflow": false,
+      "long_tasks": 0,
+      "long_task_ms": 0,
+      "script_duration_ms": 144.636,
+      "layout_duration_ms": 45.073,
+      "js_assets": [
+        {
+          "path": "/admin/_next/static/chunks/webpack-bf84fd345c3be81c.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/main-app-79ae7b7f2d6b6f32.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/2674-224e0703860a4115.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/382-5b2605eef8411181.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/5744-2658b92e3ddd83b0.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/fd9bffea-61bce6436ccff5b9.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/3766-a7968beddd72a59e.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/5870-6c8b2471b40f71aa.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/9584-8c839d3aeaf3a047.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/4439-8f200bb33b0e83e8.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/5712-1106f07dba4e074d.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/1508-8219244033a9deac.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/7972-5d7bf30362f02d54.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/2449-ba6365679b88b463.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/7832-59471f02fa932d98.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/3089-0e3274da014ed282.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/9408-d754db044c1560ff.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/6822-548f8ac3bf5b3398.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/5003-da2ded2d182656ab.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/pages/page-e5eaddcca3df17a8.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/6840-992b238b1f988447.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/loading-c7b67aefe27024da.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/2632-85c3498b041c8d87.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/7858-ed3a54b164190dd6.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/8462-99d30f73d2c945fd.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/302-833d95b9db9b224d.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/4831-e808be59af709d70.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/loading-84b2cee593f612e6.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/layout-ba25108b78db90f4.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/page-36f15a6785f63a85.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/4080-98c321470c05103f.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/error-d3a5fe40dfc751e7.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/layout-fc57dfd3be6c21bf.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/not-found-f1b8d8a349918af2.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/pages/%5BpageId%5D/builder/loading-4e1721432eb7db80.js",
+          "cache": "public, max-age=31536000, immutable"
+        }
+      ],
+      "immutable_assets": 36,
+      "private_responses": 3
+    },
+    {
+      "name": "postEditor",
+      "usable_ms": 336.2406000000001,
+      "cls": 0.02621273582175926,
+      "overflow": false,
+      "long_tasks": 1,
+      "long_task_ms": 73,
+      "script_duration_ms": 153.24699999999999,
+      "layout_duration_ms": 50.922000000000004,
+      "js_assets": [
+        {
+          "path": "/admin/_next/static/chunks/webpack-bf84fd345c3be81c.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/main-app-79ae7b7f2d6b6f32.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/2674-224e0703860a4115.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/3766-a7968beddd72a59e.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/fd9bffea-61bce6436ccff5b9.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/5870-6c8b2471b40f71aa.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/382-5b2605eef8411181.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/9584-8c839d3aeaf3a047.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/5744-2658b92e3ddd83b0.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/5712-1106f07dba4e074d.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/1508-8219244033a9deac.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/4439-8f200bb33b0e83e8.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/2449-ba6365679b88b463.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/7972-5d7bf30362f02d54.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/3089-0e3274da014ed282.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/302-833d95b9db9b224d.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/7577-6d6c128c303696d3.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/235-68302e3a230ddc40.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/4831-e808be59af709d70.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/4867-ee6d4d2fd83e5d70.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/9408-d754db044c1560ff.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/7832-59471f02fa932d98.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/6840-992b238b1f988447.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/5003-da2ded2d182656ab.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/posts/new/page-e2a75e2046ea6113.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/loading-c7b67aefe27024da.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/7858-ed3a54b164190dd6.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/6764-638d8c7bb4ce5a4f.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/5473-8186c822a9ca499a.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/6822-548f8ac3bf5b3398.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/8462-99d30f73d2c945fd.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/loading-84b2cee593f612e6.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/page-36f15a6785f63a85.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/4080-98c321470c05103f.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/layout-ba25108b78db90f4.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/layout-fc57dfd3be6c21bf.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/error-d3a5fe40dfc751e7.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/not-found-f1b8d8a349918af2.js",
+          "cache": "public, max-age=31536000, immutable"
+        }
+      ],
+      "immutable_assets": 39,
+      "private_responses": 1,
+      "picker_additional_js": 0,
+      "editor_and_picker": "PASS"
+    },
+    {
+      "name": "pageEditor",
+      "usable_ms": 4138.258699999999,
+      "cls": 0.06856296971450616,
+      "overflow": false,
+      "long_tasks": 0,
+      "long_task_ms": 0,
+      "script_duration_ms": 111.89399999999999,
+      "layout_duration_ms": 48.2,
+      "js_assets": [
+        {
+          "path": "/admin/_next/static/chunks/webpack-bf84fd345c3be81c.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/main-app-79ae7b7f2d6b6f32.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/2674-224e0703860a4115.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/382-5b2605eef8411181.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/3766-a7968beddd72a59e.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/5870-6c8b2471b40f71aa.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/fd9bffea-61bce6436ccff5b9.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/5744-2658b92e3ddd83b0.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/9584-8c839d3aeaf3a047.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/5712-1106f07dba4e074d.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/1508-8219244033a9deac.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/4439-8f200bb33b0e83e8.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/7972-5d7bf30362f02d54.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/2449-ba6365679b88b463.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/3089-0e3274da014ed282.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/7577-6d6c128c303696d3.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/9408-d754db044c1560ff.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/8038-fa791ed1654bb1c2.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/235-68302e3a230ddc40.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/7832-59471f02fa932d98.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/6840-992b238b1f988447.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/5003-da2ded2d182656ab.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/6822-548f8ac3bf5b3398.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/6764-638d8c7bb4ce5a4f.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/pages/new/page-b73ad333e3f4f03b.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/loading-c7b67aefe27024da.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/7858-ed3a54b164190dd6.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/244-e98c3b81b3c8747d.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/302-833d95b9db9b224d.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/4831-e808be59af709d70.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/8462-99d30f73d2c945fd.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/loading-84b2cee593f612e6.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/page-36f15a6785f63a85.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/layout-ba25108b78db90f4.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/4080-98c321470c05103f.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/error-d3a5fe40dfc751e7.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/layout-fc57dfd3be6c21bf.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/not-found-f1b8d8a349918af2.js",
+          "cache": "public, max-age=31536000, immutable"
+        }
+      ],
+      "immutable_assets": 39,
+      "private_responses": 1
+    },
+    {
+      "name": "builder",
+      "usable_ms": 383.6867999999995,
+      "cls": 0.011111111111111112,
+      "overflow": false,
+      "long_tasks": 1,
+      "long_task_ms": 104,
+      "script_duration_ms": 176.185,
+      "layout_duration_ms": 23.666,
+      "js_assets": [
+        {
+          "path": "/admin/_next/static/chunks/webpack-bf84fd345c3be81c.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/main-app-79ae7b7f2d6b6f32.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/2674-224e0703860a4115.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/382-5b2605eef8411181.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/3766-a7968beddd72a59e.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/5870-6c8b2471b40f71aa.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/fd9bffea-61bce6436ccff5b9.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/5744-2658b92e3ddd83b0.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/9584-8c839d3aeaf3a047.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/5712-1106f07dba4e074d.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/2449-ba6365679b88b463.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/4439-8f200bb33b0e83e8.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/1508-8219244033a9deac.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/7972-5d7bf30362f02d54.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/3089-0e3274da014ed282.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/7577-6d6c128c303696d3.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/235-68302e3a230ddc40.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/4831-e808be59af709d70.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/302-833d95b9db9b224d.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/709-1f591a2ed0322a08.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/663-5228026b97e950eb.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/7832-59471f02fa932d98.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/9408-d754db044c1560ff.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/6840-992b238b1f988447.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/5003-da2ded2d182656ab.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/522-4bc4018068eb1b7c.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/6822-548f8ac3bf5b3398.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/6764-638d8c7bb4ce5a4f.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/pages/%5BpageId%5D/builder/loading-4e1721432eb7db80.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/7858-ed3a54b164190dd6.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/pages/%5BpageId%5D/builder/page-fdde8aaf36b87b9b.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/loading-c7b67aefe27024da.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/8462-99d30f73d2c945fd.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/page-36f15a6785f63a85.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/4080-98c321470c05103f.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/layout-ba25108b78db90f4.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/error-d3a5fe40dfc751e7.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/layout-fc57dfd3be6c21bf.js",
+          "cache": "public, max-age=31536000, immutable"
+        },
+        {
+          "path": "/admin/_next/static/chunks/app/not-found-f1b8d8a349918af2.js",
+          "cache": "public, max-age=31536000, immutable"
+        }
+      ],
+      "immutable_assets": 40,
+      "private_responses": 1
+    }
+  ]
+}
