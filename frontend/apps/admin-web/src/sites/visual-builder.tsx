@@ -1,11 +1,12 @@
 "use client";
 
 import {useSiteDraftGuard} from "./site-draft-guard";
+import {RenderProbe} from "@/performance/render-probe";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { KeyboardEvent } from "react";
 import Link from "next/link";
-import { HomepageTemplateCatalogue } from "./homepage-template-catalogue";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -19,6 +20,7 @@ import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import MenuItem from "@mui/material/MenuItem";
 import Paper from "@mui/material/Paper";
+import Skeleton from "@mui/material/Skeleton";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import TextField from "@mui/material/TextField";
@@ -64,7 +66,7 @@ import {
 import type { SitePagePreview, SitePageRecord, SiteSectionTemplate } from "@/app/sites/page-actions";
 import { unwrap, reportActionResult } from "@/organizations/contract";
 import { APP_BASE_PATH } from "@/base-path";
-import { MediaPickerDialog } from "@/sites/media-picker";
+import { LazyMediaPickerDialog as MediaPickerDialog } from "@/sites/lazy-media-picker";
 import type { MediaPickerResult } from "@/sites/media-picker";
 import { ContentWorkflowButtons, ContentWorkflowDialog } from "@/sites/content-workflow";
 import type { WorkflowAction } from "@/sites/content-workflow";
@@ -75,7 +77,6 @@ import {
   widgetPropsPath, presentationSchema,
 } from "./visual-builder-model";
 import type { InsertionContext, TreeEntry } from "./visual-builder-model";
-import { InspectorFields } from "./visual-builder-inspector";
 import { WidgetIcon } from "./visual-builder-icons";
 import { PREVIEW_VIEWPORTS, usePreviewScale, type PreviewViewport } from "./visual-builder-preview";
 import {
@@ -93,6 +94,15 @@ import {
   type VisualDragPayload,
 } from "./visual-builder-dnd";
 
+const HomepageTemplateCatalogue = dynamic(
+  () => import("./homepage-template-catalogue").then((module) => module.HomepageTemplateCatalogue),
+  { loading: () => <Box role="status" aria-label="Loading homepage templates"><Skeleton aria-hidden variant="rounded" height={220} /></Box> },
+);
+const InspectorFields = dynamic(
+  () => import("./visual-builder-inspector").then((module) => module.InspectorFields),
+  { loading: () => <Box role="status" aria-label="Loading widget controls" sx={{ minHeight: 180 }}><Skeleton aria-hidden variant="rounded" height={180} /></Box> },
+);
+
 export interface VisualBuilderProps {
   siteId:number;siteName:string;pageId:string;builderEnabled:boolean|null;permissions:readonly string[];
 }
@@ -105,7 +115,7 @@ export function VisualBuilder(props:VisualBuilderProps) {
   if(!props.builderEnabled) return <Alert severity="warning">Visual Builder is disabled. Enable the VISUAL_BUILDER module for this Site to continue.</Alert>;
   if(!props.permissions.includes("content.pages.update")) return <Alert severity="warning">You do not have access to edit visual Pages in this Site.</Alert>;
   if(!Number.isSafeInteger(props.siteId) || props.siteId<1 || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(props.pageId)) return <Alert severity="error">This Page route is invalid.</Alert>;
-  return <BuilderWorkspace key={`${props.siteId}:${props.pageId}`} {...props}/>;
+  return <RenderProbe id="visual-builder"><BuilderWorkspace key={`${props.siteId}:${props.pageId}`} {...props}/></RenderProbe>;
 }
 
 function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProps) {

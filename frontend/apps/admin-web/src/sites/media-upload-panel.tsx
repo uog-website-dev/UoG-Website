@@ -10,17 +10,14 @@ import { updateSiteMedia } from "@/app/sites/media-actions";
 import type { MediaAssetRecord, UploadPolicy } from "@/app/sites/media-actions";
 import { unwrap } from "@/organizations/contract";
 import { APP_BASE_PATH } from "@/base-path";
+import { mediaBytes, mediaCategories } from "./media-upload-model";
+
+export { mediaBytes, mediaCategories } from "./media-upload-model";
 
 type Phase = "queued" | "uploading" | "metadata" | "complete" | "error";
 interface UploadEntry {
   key: string; file: File; name: string; categories: string; alt: string;
   phase: Phase; error?: string; asset?: MediaAssetRecord;
-}
-export function mediaCategories(value: string): string[] {
-  return [...new Map(value.split(",").map(v => v.trim()).filter(Boolean).map(v => [v.toLocaleLowerCase(), v])).values()];
-}
-export function mediaBytes(bytes: number): string {
-  return bytes < 1024 ? `${bytes} B` : bytes < 1048576 ? `${(bytes / 1024).toFixed(1)} KB` : `${(bytes / 1048576).toFixed(1)} MB`;
 }
 function requestKey(): string {
   if (typeof crypto.randomUUID === "function") return crypto.randomUUID();
@@ -44,10 +41,12 @@ function LocalPreview({file}: {file: File}) {
 }
 
 /** Separate retry identities and bounded parallel uploads, with recoverable metadata saves. */
-export function MediaUploadPanel({siteId, policy, inputRef, onAccepted, onBusyChange}: {
+export function MediaUploadPanel({siteId, policy, inputRef, onAccepted, onBusyChange, onReady}: {
   siteId: number; policy: UploadPolicy; inputRef: RefObject<HTMLInputElement | null>;
   onAccepted: (asset: MediaAssetRecord) => void; onBusyChange?: (busy: boolean) => void;
+  onReady?: (ready: boolean) => void;
 }) {
+  useEffect(() => {onReady?.(true); return () => onReady?.(false);}, [onReady]);
   const [entries, setEntries] = useState<UploadEntry[]>([]);
   const [busy, setBusy] = useState(false);
   const [dragging, setDragging] = useState(false);

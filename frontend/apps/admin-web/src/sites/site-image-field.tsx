@@ -8,7 +8,9 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import { getSiteMedia } from "@/app/sites/media-actions";
 import { APP_BASE_PATH } from "@/base-path";
-import { MediaPickerDialog, type MediaPickerResult, isEligibleReadyImage } from "@/sites/media-picker";
+import { LazyMediaPickerDialog as MediaPickerDialog } from "@/sites/lazy-media-picker";
+import { isEligibleReadyImage } from "@/sites/media-picker-model";
+import type { MediaPickerResult } from "@/sites/media-picker-model";
 
 export interface SiteImageSelection {
   assetId: string | null;

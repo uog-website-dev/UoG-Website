@@ -121,6 +121,7 @@ stages:
               artifact: 'openapi-schema'
 
           - script: |
+              set -euo pipefail
               corepack enable
               cd frontend
               pnpm install --frozen-lockfile
@@ -130,6 +131,8 @@ stages:
               # images.
               pnpm test
               pnpm build
+              pnpm --filter @uog/admin-web perf:bundles
+              pnpm --filter @uog/admin-web perf:test
             displayName: 'Test and Build Frontend'
       
       - job: DockerAndArtifacts

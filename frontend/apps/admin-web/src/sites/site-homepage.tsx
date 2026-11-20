@@ -12,9 +12,11 @@ import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import MenuItem from "@mui/material/MenuItem";
 import Paper from "@mui/material/Paper";
+import Skeleton from "@mui/material/Skeleton";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useToast } from "@uog/ui";
 
 import { ApiError } from "@uog/api-client";
@@ -24,8 +26,12 @@ import type { SitePageRecord } from "@/app/sites/page-actions";
 import { unwrap } from "@/organizations/contract";
 import { siteAdminHref } from "@/sites/site-admin";
 import { useSiteAdmin } from "@/sites/site-admin-frame";
-import { HomepageTemplateCatalogue } from "./homepage-template-catalogue";
 import { ViewPublicSite } from "@/sites/view-public-site";
+
+const HomepageTemplateCatalogue = dynamic(
+  () => import("./homepage-template-catalogue").then((module) => module.HomepageTemplateCatalogue),
+  { loading: () => <Box role="status" aria-label="Loading homepage templates"><Skeleton aria-hidden variant="rounded" height={220} /></Box> },
+);
 
 function eligibleCandidate(page: SitePageRecord): boolean {
   return page.status === "PUBLISHED" && Boolean(page.can_set_homepage);

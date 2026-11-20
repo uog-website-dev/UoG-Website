@@ -32,7 +32,7 @@ beforeEach(() => {
 it("saves a featured asset identity and editable alternative text", async () => {
   render(<ToastProvider><SitePostEditor siteId={11} postsEnabled mediaEnabled permissions={permissions} mode="edit" postId="post-1" /></ToastProvider>);
   fireEvent.click(await screen.findByRole("button",{name:"Choose featured image"}));
-  fireEvent.click(screen.getByRole("button",{name:"Select campus image"}));
+  fireEvent.click(await screen.findByRole("button",{name:"Select campus image"}));
   const alt = screen.getByRole("textbox",{name:"Featured image alternative text"});
   expect(alt).toHaveProperty("value","Campus gardens");
   fireEvent.change(alt,{target:{value:"Gardens around the university library"}});
@@ -66,7 +66,7 @@ it("inserts inline images with a stable placement ID and requires alternative te
   try {
     render(<PostRichEditor siteId={11} canUseMedia value="<p>Body</p>" onChange={changed} onSave={() => {}} />);
     fireEvent.click(screen.getByRole("button",{name:"Insert image"}));
-    fireEvent.click(screen.getByRole("button",{name:"Select campus image"}));
+    fireEvent.click(await screen.findByRole("button",{name:"Select campus image"}));
     const alt = await screen.findByRole("textbox",{name:"Image alternative text"});
     fireEvent.change(alt,{target:{value:""}});
     expect(screen.getByRole("button",{name:"Insert image"})).toHaveProperty("disabled",true);

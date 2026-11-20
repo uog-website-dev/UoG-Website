@@ -15,17 +15,18 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import MenuItem from "@mui/material/MenuItem";
+import Skeleton from "@mui/material/Skeleton";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { validateVisualLayout } from "@uog/types";
 import type { VisualLayout } from "@uog/types";
 import { ApiError } from "@uog/api-client";
+import dynamic from "next/dynamic";
 import { PublicPageView, useToast } from "@uog/ui";
 import type { PublicPageDocument } from "@uog/ui";
 import { useRouter } from "next/navigation";
 
 import {
-  MediaBlockEditor,
   createEmptyGalleryBlock,
   createEmptyImageBlock,
   createEmptySliderBlock,
@@ -34,7 +35,8 @@ import {
 } from "@/sites/content-media-builder";
 import { listSiteSidebars } from "@/app/sites/sidebar-actions";
 import type { SidebarRecord } from "@/app/sites/sidebar-actions";
-import { MediaPickerDialog, type MediaPickerResult } from "@/sites/media-picker";
+import { LazyMediaPickerDialog as MediaPickerDialog } from "@/sites/lazy-media-picker";
+import type { MediaPickerResult } from "@/sites/media-picker-model";
 import { imageRefForAsset } from "@/sites/site-image-field";
 import {
   createSitePage,
@@ -48,6 +50,11 @@ import type {
 } from "@/app/sites/page-actions";
 import { unwrap } from "@/organizations/contract";
 import { APP_BASE_PATH } from "@/base-path";
+
+const MediaBlockEditor = dynamic(
+  () => import("@/sites/media-block-editor").then((module) => module.MediaBlockEditor),
+  { loading: () => <Box role="status" aria-label="Loading media block controls"><Skeleton aria-hidden variant="rounded" height={72} /></Box> },
+);
 
 export interface PageLanguages {
   defaultLanguage: string;
@@ -612,15 +619,17 @@ function SitePageEditorContent({
             <Paper key={`block-${index}`} variant="outlined" sx={{ p: 1.5, display: "flex", flexDirection: "column", gap: 1 }}>
               <Typography variant="caption">Block {index + 1}{mediaBlock ? ` · ${mediaBlock.type}` : " · edit structured JSON"}</Typography>
               {mediaBlock && permissions.includes("content.media.view") ? (
-                <MediaBlockEditor
-                  siteId={siteId}
-                  value={mediaBlock}
-                  canUpload={permissions.includes("content.media.upload")}
-                  onChange={(next) => setForm((current) => ({
-                    ...current,
-                    blocks: current.blocks.map((item, itemIndex) => itemIndex === index ? JSON.stringify(next, null, 2) : item),
-                  }))}
-                />
+                <Box sx={{ minHeight: mediaBlock.type === "image" ? 88 : Math.max(300, (mediaBlock.type === "slider" ? mediaBlock.slides.length : mediaBlock.images.length) * 300 + 48) }}>
+                  <MediaBlockEditor
+                    siteId={siteId}
+                    value={mediaBlock}
+                    canUpload={permissions.includes("content.media.upload")}
+                    onChange={(next) => setForm((current) => ({
+                      ...current,
+                      blocks: current.blocks.map((item, itemIndex) => itemIndex === index ? JSON.stringify(next, null, 2) : item),
+                    }))}
+                  />
+                </Box>
               ) : null}
               <TextField
                 label={`Block ${index + 1} JSON`}

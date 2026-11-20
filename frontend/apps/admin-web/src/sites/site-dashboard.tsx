@@ -23,6 +23,7 @@ import Skeleton from "@mui/material/Skeleton";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
 import {useEffect, useRef, useState, type ReactNode} from "react";
+import {RenderProbe} from "@/performance/render-probe";
 import {queryKey, useQueryEnvironment, useSiteQuery} from "@/data/query-cache";
 
 import {getSiteDashboardSummary, getSiteDashboardActivity} from "@/data/read-client";
@@ -155,6 +156,9 @@ function SummaryCardView({sectionKey, siteId, state}: {sectionKey: SummarySectio
 }
 
 export function SiteDashboard() {
+  return <RenderProbe id="dashboard"><DashboardContent/></RenderProbe>;
+}
+function DashboardContent() {
   const admin = useSiteAdmin();
   const siteId = admin.site.id;
   const environment = useQueryEnvironment();

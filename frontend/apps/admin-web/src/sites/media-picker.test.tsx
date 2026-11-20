@@ -24,10 +24,10 @@ vi.mock("@/app/sites/media-actions", () => ({
 import { MediaPickerDialog, type MediaPickerResult } from "./media-picker";
 import { SiteImageField } from "./site-image-field";
 import {
-  MediaBlockEditor,
   parseMediaBlock,
   type SliderBlockValue,
 } from "./content-media-builder";
+import { MediaBlockEditor } from "./media-block-editor";
 
 const ready = {
   id: "11111111-1111-4111-8111-111111111111",

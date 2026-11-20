@@ -1,0 +1,77 @@
+{
+  "method": "Parsed Next.js development server compilation durations; only normalized route names, durations and module counts are retained.",
+  "mode": "development",
+  "compile_events": 14,
+  "first_compilation_by_route": [
+    {
+      "route": "/",
+      "duration_ms": 8900,
+      "modules": 2482
+    },
+    {
+      "route": "/api/session",
+      "duration_ms": 5200,
+      "modules": 2476
+    },
+    {
+      "route": "/_not-found",
+      "duration_ms": 2700,
+      "modules": 2755
+    },
+    {
+      "route": "/api/auth/[...nextauth]",
+      "duration_ms": 2600,
+      "modules": 2780
+    },
+    {
+      "route": "/domains",
+      "duration_ms": 2300,
+      "modules": 2794
+    },
+    {
+      "route": "/api/workspace",
+      "duration_ms": 435,
+      "modules": 1754
+    },
+    {
+      "route": "/api/workspace/sites",
+      "duration_ms": 736,
+      "modules": 2802
+    },
+    {
+      "route": "/sites/[id]/admin",
+      "duration_ms": 1453,
+      "modules": 2825
+    },
+    {
+      "route": "/api/reads",
+      "duration_ms": 757,
+      "modules": 2828
+    },
+    {
+      "route": "/sites/[id]/admin/pages",
+      "duration_ms": 1191,
+      "modules": 2851
+    },
+    {
+      "route": "/sites/[id]/admin/posts",
+      "duration_ms": 1206,
+      "modules": 2865
+    },
+    {
+      "route": "/sites/[id]/admin/posts/new",
+      "duration_ms": 6500,
+      "modules": 2966
+    },
+    {
+      "route": "/sites/[id]/admin/pages/new",
+      "duration_ms": 2000,
+      "modules": 3013
+    },
+    {
+      "route": "/sites/[id]/admin/pages/[pageId]/builder",
+      "duration_ms": 2300,
+      "modules": 3157
+    }
+  ]
+}

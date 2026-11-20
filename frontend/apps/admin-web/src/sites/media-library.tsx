@@ -4,6 +4,7 @@ import {usePageBoundary} from "@/data/page-boundary";
 import {useSectionState} from "@/data/section-state";
 import { useEffect, useRef, useState } from "react";
 import { Alert, Box, Button, Chip, Typography, TextField, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Paper, ToggleButton, ToggleButtonGroup, Skeleton, IconButton } from "@mui/material";
+import dynamic from "next/dynamic";
 import { ApiError } from "@uog/api-client";
 import {useSiteQuery} from "@/data/query-cache";
 import { getMediaUploadPolicy, getSiteMedia, updateSiteMedia, getMediaReferences, removeSiteMedia } from "@/app/sites/media-actions";
@@ -14,7 +15,8 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import OpenInFullRoundedIcon from "@mui/icons-material/OpenInFullRounded";
 import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
 import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
-import { MediaUploadPanel, mediaBytes, mediaCategories } from "@/sites/media-upload-panel";
+import {mediaBytes, mediaCategories} from "@/sites/media-upload-model";
+const MediaUploadPanel = dynamic(() => import("./media-upload-panel").then(module=>module.MediaUploadPanel), {loading:()=> <Box role="status" aria-label="Loading upload controls" sx={{minHeight:190}}><Skeleton aria-hidden variant="rounded" height={190}/></Box>});
 import { APP_BASE_PATH } from "@/base-path";
 
 const IN_USE_MESSAGE = "This asset is in use by a draft, publication or nested placement and cannot be deleted. The library card and metadata are unchanged.";
@@ -69,6 +71,7 @@ function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, imag
 
   const uploadInput = useRef<HTMLInputElement | null>(null);
   const [uploadBusy, setUploadBusy] = useState(false);
+  const [uploadReady,setUploadReady] = useState(false);
   const rows = useSiteQuery(siteId, "media", {filters, page, picker: Boolean(onSelect), imagesOnly}, async (signal) => unwrap(await listSiteMedia(siteId, {
     ...filters, page,
     ...(onSelect ? imagesOnly ? { ready_images: true } : { status: "READY" as const } : imagesOnly ? { type: "image" as const } : {}),
@@ -153,9 +156,9 @@ function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, imag
   return <Box data-perf-section="media" data-perf-pending={rows.loading || policy.loading ? "true" : "false"} component="section" aria-label="Site media library" sx={{ display: "grid", gap: 2.5, minWidth: 0, bgcolor: "grey.50", p: { xs: 1.5, sm: 2.5 }, borderRadius: 2 }}>
     <Box sx={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:2,flexWrap:"wrap"}}>
       <Box><Typography variant="h5" component="h2" fontWeight={600}>{onSelect ? "Choose media" : "Media Library"}</Typography><Typography variant="body2" color="text.secondary" sx={{mt:0.5}}>Your Site's images and documents, in one place.</Typography></Box>
-      {canUpload && policy.data ? <Button variant="contained" disabled={uploadBusy} startIcon={<CloudUploadOutlinedIcon />} onClick={() => uploadInput.current?.click()}>Upload files</Button> : null}
+      {canUpload && policy.data ? <Button variant="contained" disabled={uploadBusy || !uploadReady} startIcon={<CloudUploadOutlinedIcon />} onClick={() => uploadInput.current?.click()}>Upload files</Button> : null}
     </Box>
-    {canUpload && policy.data ? <MediaUploadPanel siteId={siteId} policy={policy.data} inputRef={uploadInput} onBusyChange={setUploadBusy} onAccepted={() => { setWatchUntil(Date.now()+120000); setPage(1); rows.reload(); }} /> : null}
+    {canUpload ? <Box sx={{minHeight:190}}>{policy.data ? <MediaUploadPanel siteId={siteId} policy={policy.data} inputRef={uploadInput} onReady={setUploadReady} onBusyChange={setUploadBusy} onAccepted={() => { setWatchUntil(Date.now()+120000); setPage(1); rows.reload(); }} /> : policy.error ? <Alert severity="error" sx={{minHeight:190}} action={<Button onClick={policy.reload}>Retry upload policy</Button>}>Upload policy unavailable.</Alert> : <Skeleton aria-label="Loading upload policy" variant="rounded" height={190}/>}</Box> : null}
     <Box component="form" role="search" aria-label="Search Site media" onSubmit={(event) => {
       event.preventDefault(); setFilters({ search, ...(status ? { status } : {}), ...(type ? { type } : {}) }); setPage(1);
     }} sx={{ display: "flex", gap: 1.5, flexWrap: "wrap", bgcolor:"background.paper", p:2, borderRadius:2, boxShadow:1, alignItems:"center" }}>
@@ -173,7 +176,6 @@ function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, imag
 
     {removalNotice ? <Alert severity="success">{removalNotice}</Alert> : null}
     {pollError ? <Alert severity="warning">Automatic updates are paused or delayed. Use Refresh media to check again.</Alert> : null}
-    {policy.error ? <Alert severity="error">Upload policy unavailable. Refresh the page to try again.</Alert> : null}
     {rows.refreshing ? <Typography role="status" variant="caption">Refreshing media?</Typography> : null}
     {rows.error ? <Alert severity="error" action={<Button onClick={() => rows.reload()}>Retry media</Button>}>Media could not be loaded. {rows.error.message}</Alert> : null}
     <Box sx={{ display: "flex", gap: 2, justifyContent: "space-between", flexWrap: "wrap", alignItems: "center" }}>

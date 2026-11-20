@@ -1,0 +1,19 @@
+
+ RUN  v5.0.5 /workspace/apps/admin-web
+
+stdout | src/data/provider-render-profile.test.tsx > profiles context consumers across unrelated parent updates: site-frame
+{"event":"uog.provider.profile","kind":"site-frame","parent_updates":4,"consumer_renders":5,"consumer_render_ms":0.041192999999793756,"profiler_commits":1,"profiler_duration_ms":0.2592899999997371}
+
+stdout | src/data/provider-render-profile.test.tsx > profiles context consumers across unrelated parent updates: query-scope
+{"event":"uog.provider.profile","kind":"query-scope","parent_updates":4,"consumer_renders":5,"consumer_render_ms":0.01683999999977459,"profiler_commits":1,"profiler_duration_ms":0.14224299999932555}
+
+stdout | src/data/provider-render-profile.test.tsx > profiles context consumers across unrelated parent updates: authorization-scope
+{"event":"uog.provider.profile","kind":"authorization-scope","parent_updates":4,"consumer_renders":5,"consumer_render_ms":0.014965000000302098,"profiler_commits":1,"profiler_duration_ms":0.16923600000063743}
+
+ ✓ src/data/provider-render-profile.test.tsx (3 tests) 226ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  19:21:21
+   Duration  2.19s (environment 30%, transform 28%, import 22%, tests 11%, setup 8%, worker 1%)
+

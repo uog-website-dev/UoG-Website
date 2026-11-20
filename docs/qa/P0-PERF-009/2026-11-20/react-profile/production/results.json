@@ -1,0 +1,3732 @@
+{
+  "metadata": {
+    "run": "93e4059f-6a38-4a21-8e44-c203d8c972f9",
+    "mode": "production",
+    "release_baseline": false,
+    "budgets_status": "PROPOSED",
+    "method": "nearest-rank percentiles",
+    "samples_per_scenario": 2,
+    "sites": [
+      {
+        "id": 81,
+        "name": "Performance Site 01",
+        "code": "PERF001-01"
+      },
+      {
+        "id": 82,
+        "name": "Performance Site 02",
+        "code": "PERF001-02"
+      },
+      {
+        "id": 83,
+        "name": "Performance Site 03",
+        "code": "PERF001-03"
+      },
+      {
+        "id": 84,
+        "name": "Performance Site 04",
+        "code": "PERF001-04"
+      },
+      {
+        "id": 85,
+        "name": "Performance Site 05",
+        "code": "PERF001-05"
+      },
+      {
+        "id": 86,
+        "name": "Performance Site 06",
+        "code": "PERF001-06"
+      },
+      {
+        "id": 87,
+        "name": "Performance Site 07",
+        "code": "PERF001-07"
+      },
+      {
+        "id": 88,
+        "name": "Performance Site 08",
+        "code": "PERF001-08"
+      },
+      {
+        "id": 89,
+        "name": "Performance Site 09",
+        "code": "PERF001-09"
+      },
+      {
+        "id": 90,
+        "name": "Performance Site 10",
+        "code": "PERF001-10"
+      },
+      {
+        "id": 91,
+        "name": "Performance Site 11",
+        "code": "PERF001-11"
+      },
+      {
+        "id": 92,
+        "name": "Performance Site 12",
+        "code": "PERF001-12"
+      },
+      {
+        "id": 93,
+        "name": "Performance Site 13",
+        "code": "PERF001-13"
+      },
+      {
+        "id": 94,
+        "name": "Performance Site 14",
+        "code": "PERF001-14"
+      },
+      {
+        "id": 95,
+        "name": "Performance Site 15",
+        "code": "PERF001-15"
+      },
+      {
+        "id": 96,
+        "name": "Performance Site 16",
+        "code": "PERF001-16"
+      },
+      {
+        "id": 97,
+        "name": "Performance Site 17",
+        "code": "PERF001-17"
+      },
+      {
+        "id": 98,
+        "name": "Performance Site 18",
+        "code": "PERF001-18"
+      },
+      {
+        "id": 99,
+        "name": "Performance Site 19",
+        "code": "PERF001-19"
+      },
+      {
+        "id": 100,
+        "name": "Performance Site 20",
+        "code": "PERF001-20"
+      },
+      {
+        "id": 101,
+        "name": "Performance Site 21",
+        "code": "PERF001-21"
+      }
+    ],
+    "counts_per_site": {
+      "sites": 21,
+      "pages": 40,
+      "posts": 100,
+      "media": 80
+    },
+    "api_cache_definition": "First versus immediate repeat per Site/resource; server caches retained",
+    "automatic_prefetch": "Content rail uses explicit hover/focus intent with 180 ms dwell and 1 s throttle; normal prefetch on other links remains; pre-initiation traffic is outside measured navigation",
+    "network": {
+      "profile": "loopback, unthrottled",
+      "cpu_slowdown": 1,
+      "viewport": [
+        1440,
+        1000
+      ]
+    },
+    "browser": "157.0.4341.60",
+    "started_at": "2026-11-20T19:57:14.171Z",
+    "cold_definition": "fresh browser context and HTTP cache; target Site absent from Next router cache; application/database caches retained",
+    "warm_definition": "same browser context; previously visited target; no forced invalidation",
+    "session_policy": "Independent real Keycloak browser sign-in before every cold/warm iteration; login is excluded from timings; each pair uses one active session",
+    "authentication_role": "Site Administrator on 21 benchmark Sites; no platform role",
+    "sampling_warning": "SMOKE: p95 is a small-sample diagnostic; use >=30 per scenario for acceptance.",
+    "react_profiling": true,
+    "section_matrix": false,
+    "dashboard_probes": false,
+    "interaction": "Searchable Workspace dialog; discovery is included in switch timing",
+    "site_switch_policy": "Preserve authorized section root; read caches scoped to session/Site/authorization; 30-second context lease, 5-minute inactive GC; mutable forms reset",
+    "cache_policy": "PERF-005: scoped navigation controls plus PERF-004 30-second in-memory context/read lease, five-minute inactive GC; scoped reuse on Site return, disposal on session change and purge on Site authorization change",
+    "source": {
+      "commit": "2714f255d6373a79a1b96eb770ef51c3f4e30b9c",
+      "files": {
+        "frontend/pnpm-lock.yaml": "516e90afe0f99d95d769e22b47b1f015a88aab8aa03cb67c22297697090c27ed",
+        "frontend/apps/admin-web/next.config.ts": "190ecf926211f0127e41cc3268eff5cc03189ea2b8afe5ae5139a79a816c3e31",
+        "frontend/apps/admin-web/src/performance/navigation-timing.tsx": "5ae49a3d0721db6406f140d04785071586fbddd733f9509d7f67604640591c41",
+        "frontend/apps/admin-web/src/performance/server-fetch.ts": "6df44067d627d99965b38d20d14fc709c83994221a10e0af77f7d0b27870c6fc",
+        "backend/apps/core/middleware.py": "aef9dbf6543c43586be96366acf6f65694e6403bbbbb0a360398a73283c3e115",
+        "backend/config/settings.py": "0219c7cdd36c4da29044936b468a485e19f461c80d6e36ad72866f2a64bff6f9",
+        "backend/apps/core/dashboard.py": "125968a98430530633287a130e9a4f68a7f42a063a6be2c916d53b656861c1de",
+        "backend/apps/core/dashboard_cache.py": "80ac104fe0268f72f7b553be3d9d5917f9017677a6b877de3b85f91134284387",
+        "docker-compose.perf.yml": "b9ccde8b8d3a0f444b95bd158ce5f0656ec17706e0767d2282ca0d0e56d3e840",
+        "infrastructure/nginx/performance.conf": "ec724e71f51b3c294b99f446a894a894ebe14215becb34d8559c9b3f7b9b3187",
+        "scripts/perf/benchmark.cjs": "1d225508313c5a059ad0719a0891458d77b2f6d039d29de0b342a391784d8378",
+        "scripts/perf/metrics.cjs": "9d72e8d220486acf9044cfa237f6ab14607ad3b0e6c5b2621fe3ca92b95edc32",
+        "scripts/perf/package-lock.json": "33fd08047cf72c63ff406030f7b2240bec02f7c3f3027a13f25a889e2f5695cb",
+        "backend/apps/sites/api/workspace.py": "1931b100f70057fc6db296e337d9edf98ad7bbf87e2cf3e00dd33adf0b731e1e",
+        "backend/apps/authorization/services.py": "55fad39610b3e6a723e02acb94fa622dd6f19634e54af2289b098df94b0331fb",
+        "frontend/apps/admin-web/src/workspace.ts": "1a04893cb0514d006de19eb4665ad328d3da1d39220267d3b2f8e70143ae8a28",
+        "frontend/apps/admin-web/src/workspace-switcher.tsx": "e02f83034d6ff69650c42ce3265e810b60b7424e2e13b9cce94b8383ce246dab",
+        "frontend/apps/admin-web/src/workspace-proxy.ts": "cc4595993e98cd7668c3881325ba5a5f9eed5a44aa5e64d25935a3a38f0fb75c",
+        "frontend/apps/admin-web/src/sites/site-workspace.tsx": "5e4630541c1624921ff81c1ab54822cf5678139bc07b414ba2d1921b06c39b1e",
+        "frontend/apps/admin-web/src/sites/site-admin-frame.tsx": "6ff9328dcf1416236b7127e907486c451c45dd2e4ae240c159ce999edbddfe51",
+        "frontend/apps/admin-web/src/sites/site-admin.ts": "daaa05f12fc21e927883cefc1b8d2203fbbc6565c4e3854762ae9a4a6b3fcc8b",
+        "frontend/apps/admin-web/src/sites/site-draft-guard.ts": "13570d99e0d27d1927cfc6faf8364069bcb67215a352cfbd1ac3573b7865d05d",
+        "frontend/apps/admin-web/src/sites/site-page-editor.tsx": "9f0757160a77bce00c701dc6e8fa489d6f1d2d87318e2112b105cb1f4c3220dd",
+        "frontend/apps/admin-web/src/data/query-cache.tsx": "a864595f0f0e00d3f06a8beafe2149caf426f6855849efddf813ee16ec106c67",
+        "frontend/apps/admin-web/src/data/section-state.ts": "972b27f3a3946b7613af6b23ce6b40ed35cf16717b63531e6330f2e65bae36c9",
+        "frontend/apps/admin-web/src/data/page-boundary.ts": "2058afbf300205798c43f009db88b73feb5275a33f82fa9ef088865006bf4474",
+        "frontend/apps/admin-web/src/data/section-prefetch.ts": "ac23fa05cf01086ddf46203bc220f6f0b5f6f18b5f591e9978646fa318c7251c",
+        "frontend/apps/admin-web/src/sidebar.tsx": "4c7abfeb8b451e4d24b06c7beac19387ba4056883a85cfb4a96e39b24004caaf",
+        "frontend/apps/admin-web/src/data/admin-query-provider.tsx": "d20fedf4f2368c197eca202233cd16d0b959a90a4c7eb2b36b8633acc920ec77",
+        "frontend/apps/admin-web/src/cache-identity.ts": "06370d064539971eef6e3cf48d18ec1bb9808ee77fe004bf460e3d2a94cfec54",
+        "frontend/apps/admin-web/src/organizations/contract.ts": "a274260e4f322e4e5fa13d8aeb97bebf8465a18477ad951011a8775787ca4a94",
+        "frontend/apps/admin-web/src/sites/media-library.tsx": "d02c27c26c0a362884292ed41d018b4ccadd8bea21b5a9e9a0d38afd14f096d3",
+        "frontend/apps/admin-web/src/sites/site-pages.tsx": "d16a9f18494f732b9953f5d0db2846c687f1f3e81a3a828f6ed9b7f0a7513aff",
+        "frontend/apps/admin-web/src/sites/site-dashboard.tsx": "2759efa13cfb1e266ad65c45b77ce37202077d8eed932eb266dac680fd30d3e4",
+        "frontend/apps/admin-web/src/app/sites/dashboard-actions.ts": "d485327242ab72b988a4b3ff047b520287ef9250d0c66056cc85a70477c86f97",
+        "frontend/apps/admin-web/src/sites/site-posts.tsx": "08675425a4dc2729b1ee653952bb79be57832ca20f1e414b766ceb556c9e82f5",
+        "frontend/apps/admin-web/src/sites/site-menus.tsx": "e104bdeb72774e3164421a77215a074b96e4ff9ca6b6902570fb29e62cc6701c",
+        "frontend/apps/admin-web/src/app/sites/[id]/admin/layout.tsx": "986af14214d9c0531d74dd7a81e32ba7aa1b1b12c2ac9be4e37423a9f70c1258"
+      }
+    },
+    "run_status": "complete",
+    "authentication": {
+      "landing_path": "/admin",
+      "error_code": null,
+      "session_cookie_present": true
+    },
+    "completed_at": "2026-11-20T19:57:24.486Z",
+    "verified_server_mode": "production"
+  },
+  "summary": {
+    "first_site_visit": {
+      "n": 1,
+      "p50_ms": 731.2362000000003,
+      "p95_ms": 731.2362000000003,
+      "budget_ms": null,
+      "budget_status": "PROPOSED",
+      "within_proposed_budget": null
+    },
+    "dashboard_usable": {
+      "n": 7,
+      "p50_ms": 113.4411,
+      "p95_ms": 731.2362000000003,
+      "budget_ms": 1500,
+      "budget_status": "PROPOSED",
+      "within_proposed_budget": true
+    },
+    "paginated_list_api": {
+      "n": 12,
+      "p50_ms": 43,
+      "p95_ms": 54.69999998807907,
+      "budget_ms": 400,
+      "budget_status": "PROPOSED",
+      "within_proposed_budget": true
+    },
+    "workspace_api": {
+      "n": 4,
+      "p50_ms": 28.19999998807907,
+      "p95_ms": 34.89999997615814,
+      "budget_ms": 500,
+      "budget_status": "PROPOSED",
+      "within_proposed_budget": true
+    },
+    "cold_site_switch": {
+      "n": 2,
+      "p50_ms": 293.22369999999955,
+      "p95_ms": 390.90400000000045,
+      "budget_ms": 2000,
+      "budget_status": "PROPOSED",
+      "within_proposed_budget": true
+    },
+    "warm_site_switch": {
+      "n": 2,
+      "p50_ms": 94.26430000000073,
+      "p95_ms": 113.4411,
+      "budget_ms": 1000,
+      "budget_status": "PROPOSED",
+      "within_proposed_budget": true
+    },
+    "same_site_menu_navigation": {
+      "n": 2,
+      "p50_ms": 231.9421999999995,
+      "p95_ms": 249.30329999999958,
+      "budget_ms": null,
+      "budget_status": "PROPOSED",
+      "within_proposed_budget": null
+    },
+    "cached_section_return": {
+      "n": 2,
+      "p50_ms": 88.03519999999935,
+      "p95_ms": 101.86319999999978,
+      "budget_ms": 300,
+      "budget_status": "PROPOSED",
+      "within_proposed_budget": true
+    },
+    "cached_section_transition": {
+      "n": 2,
+      "p50_ms": 78.71280000000115,
+      "p95_ms": 108.61450000000059,
+      "budget_ms": 500,
+      "budget_status": "PROPOSED",
+      "within_proposed_budget": true
+    }
+  },
+  "by_cache_state": {
+    "cold": {
+      "first_site_visit": {
+        "n": 1,
+        "p50_ms": 731.2362000000003,
+        "p95_ms": 731.2362000000003,
+        "budget_ms": null,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": null
+      },
+      "dashboard_usable": {
+        "n": 3,
+        "p50_ms": 390.90400000000045,
+        "p95_ms": 731.2362000000003,
+        "budget_ms": 1500,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": true
+      },
+      "paginated_list_api": {
+        "n": 6,
+        "p50_ms": 43,
+        "p95_ms": 51.900000005960464,
+        "budget_ms": 400,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": true
+      },
+      "workspace_api": {
+        "n": 2,
+        "p50_ms": 28.19999998807907,
+        "p95_ms": 34.89999997615814,
+        "budget_ms": 500,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": true
+      },
+      "cold_site_switch": {
+        "n": 2,
+        "p50_ms": 293.22369999999955,
+        "p95_ms": 390.90400000000045,
+        "budget_ms": 2000,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": true
+      },
+      "same_site_menu_navigation": {
+        "n": 2,
+        "p50_ms": 231.9421999999995,
+        "p95_ms": 249.30329999999958,
+        "budget_ms": null,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": null
+      }
+    },
+    "warm": {
+      "paginated_list_api": {
+        "n": 6,
+        "p50_ms": 42.400000005960464,
+        "p95_ms": 54.69999998807907,
+        "budget_ms": 400,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": true
+      },
+      "workspace_api": {
+        "n": 2,
+        "p50_ms": 27.69999998807907,
+        "p95_ms": 34.60000002384186,
+        "budget_ms": 500,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": true
+      },
+      "warm_site_switch": {
+        "n": 2,
+        "p50_ms": 94.26430000000073,
+        "p95_ms": 113.4411,
+        "budget_ms": 1000,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": true
+      },
+      "dashboard_usable": {
+        "n": 4,
+        "p50_ms": 94.26430000000073,
+        "p95_ms": 113.4411,
+        "budget_ms": 1500,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": true
+      },
+      "cached_section_return": {
+        "n": 2,
+        "p50_ms": 88.03519999999935,
+        "p95_ms": 101.86319999999978,
+        "budget_ms": 300,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": true
+      },
+      "cached_section_transition": {
+        "n": 2,
+        "p50_ms": 78.71280000000115,
+        "p95_ms": 108.61450000000059,
+        "budget_ms": 500,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": true
+      }
+    }
+  },
+  "samples": [
+    {
+      "scenario": "first_site_visit",
+      "cache_state": "cold",
+      "navigation_id": "88dbdf12-e1d4-4d49-8b7f-f282e296ff26",
+      "site_id": 81,
+      "section": "dashboard",
+      "duration_ms": 731.2362000000003,
+      "dashboard_usable_ms": 731.2362000000003,
+      "requests": 21,
+      "transferred_bytes": 37073,
+      "response_transferred_bytes": 37073,
+      "request_payload_bytes": 0,
+      "duplicate_endpoints": [
+        {
+          "endpoint": "GET /admin/sites/81/admin",
+          "count": 2
+        }
+      ],
+      "cancelled_requests": 0,
+      "failed_requests": 0,
+      "browser_measure_ms": 732.7000000178814,
+      "browser_measure_scope": "current-document",
+      "in_flight_at_usable_boundary": 1,
+      "waterfall": [
+        {
+          "cdp_id": "37292.151",
+          "method": "GET",
+          "path": "/admin/api/workspace/sites/?page=1&page_size=20",
+          "action_id": null,
+          "start_ms": 115.303955078125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "88dbdf12-e1d4-4d49-8b7f-f282e296ff26",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1898,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 43.159
+          },
+          "duration_ms": 44.388000009348616
+        },
+        {
+          "cdp_id": "37292.152",
+          "method": "GET",
+          "path": "/admin/api/workspace/?site=81",
+          "action_id": null,
+          "start_ms": 259.31103515625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "88dbdf12-e1d4-4d49-8b7f-f282e296ff26",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1427,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 123.632
+          },
+          "duration_ms": 124.80600000708364
+        },
+        {
+          "cdp_id": "37292.153",
+          "method": "GET",
+          "path": "/admin/sites/81/admin",
+          "action_id": null,
+          "start_ms": 259.81396484375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "88dbdf12-e1d4-4d49-8b7f-f282e296ff26",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 2576,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 16.751
+          },
+          "duration_ms": 31.68100002221763
+        },
+        {
+          "cdp_id": "37292.154",
+          "method": "GET",
+          "path": "/admin/_next/static/chunks/8450-916f83899a6bbcee.js",
+          "action_id": null,
+          "start_ms": 281.658203125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "88dbdf12-e1d4-4d49-8b7f-f282e296ff26",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 4883,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 8.895000000000001
+          },
+          "duration_ms": 11.499999993247911
+        },
+        {
+          "cdp_id": "37292.155",
+          "method": "GET",
+          "path": "/admin/_next/static/chunks/6840-95da5c1855624230.js",
+          "action_id": null,
+          "start_ms": 281.942138671875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "88dbdf12-e1d4-4d49-8b7f-f282e296ff26",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 6021,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 10.665
+          },
+          "duration_ms": 16.31999999517575
+        },
+        {
+          "cdp_id": "37292.156",
+          "method": "GET",
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/page-1645723ae80d2e60.js",
+          "action_id": null,
+          "start_ms": 282.3408203125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "88dbdf12-e1d4-4d49-8b7f-f282e296ff26",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 7107,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 10.472
+          },
+          "duration_ms": 16.793000017059967
+        },
+        {
+          "cdp_id": "37292.157",
+          "method": "GET",
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/loading-c8d53755b2fad8f5.js",
+          "action_id": null,
+          "start_ms": 283.4189453125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "88dbdf12-e1d4-4d49-8b7f-f282e296ff26",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 768,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 11.691
+          },
+          "duration_ms": 17.69800001056865
+        },
+        {
+          "cdp_id": "37292.158",
+          "method": "GET",
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/layout-d44737bb7310bdb3.js",
+          "action_id": null,
+          "start_ms": 284.914794921875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "88dbdf12-e1d4-4d49-8b7f-f282e296ff26",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 3894,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 11.706
+          },
+          "duration_ms": 19.744999997783452
+        },
+        {
+          "cdp_id": "37292.159",
+          "method": "GET",
+          "path": "/admin/favicon.ico",
+          "action_id": null,
+          "start_ms": 308.7880859375,
+          "initiator_type": "other",
+          "initiator_request_id": null,
+          "request_id": "88dbdf12-e1d4-4d49-8b7f-f282e296ff26",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1479,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 5.623
+          },
+          "duration_ms": 6.886000017402694
+        },
+        {
+          "cdp_id": "37292.160",
+          "method": "GET",
+          "path": "/admin/sites/81/admin",
+          "action_id": null,
+          "start_ms": 405.6240234375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "88dbdf12-e1d4-4d49-8b7f-f282e296ff26",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 523,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 8.870999999999999
+          },
+          "duration_ms": 19.34400000027381
+        },
+        {
+          "cdp_id": "37292.161",
+          "method": "GET",
+          "path": "/admin/sites/81/admin/sidebars",
+          "action_id": null,
+          "start_ms": 405.773193359375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "88dbdf12-e1d4-4d49-8b7f-f282e296ff26",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 534,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 27.138
+          },
+          "duration_ms": 41.843999992124736
+        },
+        {
+          "cdp_id": "37292.162",
+          "method": "GET",
+          "path": "/admin/sites/81/admin/builder",
+          "action_id": null,
+          "start_ms": 405.9970703125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "88dbdf12-e1d4-4d49-8b7f-f282e296ff26",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 534,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 15.306
+          },
+          "duration_ms": 35.795000003417954
+        },
+        {
+          "cdp_id": "37292.163",
+          "method": "GET",
+          "path": "/admin/sites/81/admin/homepage",
+          "action_id": null,
+          "start_ms": 406.27587890625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "88dbdf12-e1d4-4d49-8b7f-f282e296ff26",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 535,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 32.511
+          },
+          "duration_ms": 42.170000000623986
+        },
+        {
+          "cdp_id": "37292.164",
+          "method": "GET",
+          "path": "/admin/sites/81/admin/users",
+          "action_id": null,
+          "start_ms": 406.606201171875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "88dbdf12-e1d4-4d49-8b7f-f282e296ff26",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 532,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 37.344
+          },
+          "duration_ms": 42.86000001593493
+        },
+        {
+          "cdp_id": "37292.165",
+          "method": "GET",
+          "path": "/admin/api/reads?site=81&resource=dashboard-summary",
+          "action_id": null,
+          "start_ms": 626.363037109375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "b92d9f33-1970-4978-a7a6-548e8377e095",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 815,
+          "navigation_id": null,
+          "server_timing": "bff;dur=74.665, upstream;dur=44.669, encode;dur=0.075",
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 81.754
+          },
+          "duration_ms": 83.46199998049997
+        },
+        {
+          "cdp_id": "37292.166",
+          "method": "GET",
+          "path": "/admin/sites/81/admin/pages/new",
+          "action_id": null,
+          "start_ms": 631.18896484375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "88dbdf12-e1d4-4d49-8b7f-f282e296ff26",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 538,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 8.270999999999999
+          },
+          "duration_ms": 24.636999994982034
+        },
+        {
+          "cdp_id": "37292.167",
+          "method": "GET",
+          "path": "/admin/sites/81/admin/menus",
+          "action_id": null,
+          "start_ms": 631.425048828125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "88dbdf12-e1d4-4d49-8b7f-f282e296ff26",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 533,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 14.42
+          },
+          "duration_ms": 33.211000001756474
+        },
+        {
+          "cdp_id": "37292.168",
+          "method": "GET",
+          "path": "/admin/sites/81/admin/pages",
+          "action_id": null,
+          "start_ms": 631.673095703125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "88dbdf12-e1d4-4d49-8b7f-f282e296ff26",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 533,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 20.825
+          },
+          "duration_ms": 38.563999987673014
+        },
+        {
+          "cdp_id": "37292.169",
+          "method": "GET",
+          "path": "/admin/sites/81/admin/posts",
+          "action_id": null,
+          "start_ms": 631.869873046875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "88dbdf12-e1d4-4d49-8b7f-f282e296ff26",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 533,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 27.527
+          },
+          "duration_ms": 39.89700000965968
+        },
+        {
+          "cdp_id": "37292.170",
+          "method": "GET",
+          "path": "/admin/sites/81/admin/media",
+          "action_id": null,
+          "start_ms": 632.0830078125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "88dbdf12-e1d4-4d49-8b7f-f282e296ff26",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 533,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 34.135
+          },
+          "duration_ms": 41.145000024698675
+        },
+        {
+          "cdp_id": "37292.171",
+          "method": "GET",
+          "path": "/admin/api/reads?site=81&resource=dashboard-activity",
+          "action_id": null,
+          "start_ms": 725.364990234375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "a782c14f-9177-46de-bd08-909e42ae4b60",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 877,
+          "navigation_id": null,
+          "server_timing": "bff;dur=52.741, upstream;dur=49.681, encode;dur=0.077",
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 58.851
+          },
+          "duration_ms": 60.62900001415983
+        }
+      ],
+      "blocking_waterfall_candidates": [
+        {
+          "cdp_id": "37292.151",
+          "path": "/admin/api/workspace/sites/?page=1&page_size=20",
+          "start_ms": 115.303955078125,
+          "wait_ms": 43.159,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "37292.152",
+          "path": "/admin/api/workspace/?site=81",
+          "start_ms": 259.31103515625,
+          "wait_ms": 123.632,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "37292.153",
+          "path": "/admin/sites/81/admin",
+          "start_ms": 259.81396484375,
+          "wait_ms": 16.751,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "37292.154",
+          "path": "/admin/_next/static/chunks/8450-916f83899a6bbcee.js",
+          "start_ms": 281.658203125,
+          "wait_ms": 8.895000000000001,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "37292.155",
+          "path": "/admin/_next/static/chunks/6840-95da5c1855624230.js",
+          "start_ms": 281.942138671875,
+          "wait_ms": 10.665,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "37292.156",
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/page-1645723ae80d2e60.js",
+          "start_ms": 282.3408203125,
+          "wait_ms": 10.472,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "37292.157",
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/loading-c8d53755b2fad8f5.js",
+          "start_ms": 283.4189453125,
+          "wait_ms": 11.691,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "37292.158",
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/layout-d44737bb7310bdb3.js",
+          "start_ms": 284.914794921875,
+          "wait_ms": 11.706,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "37292.159",
+          "path": "/admin/favicon.ico",
+          "start_ms": 308.7880859375,
+          "wait_ms": 5.623,
+          "initiator_type": "other"
+        },
+        {
+          "cdp_id": "37292.160",
+          "path": "/admin/sites/81/admin",
+          "start_ms": 405.6240234375,
+          "wait_ms": 8.870999999999999,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "37292.161",
+          "path": "/admin/sites/81/admin/sidebars",
+          "start_ms": 405.773193359375,
+          "wait_ms": 27.138,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "37292.162",
+          "path": "/admin/sites/81/admin/builder",
+          "start_ms": 405.9970703125,
+          "wait_ms": 15.306,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "37292.163",
+          "path": "/admin/sites/81/admin/homepage",
+          "start_ms": 406.27587890625,
+          "wait_ms": 32.511,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "37292.164",
+          "path": "/admin/sites/81/admin/users",
+          "start_ms": 406.606201171875,
+          "wait_ms": 37.344,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "37292.165",
+          "path": "/admin/api/reads?site=81&resource=dashboard-summary",
+          "start_ms": 626.363037109375,
+          "wait_ms": 81.754,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "37292.166",
+          "path": "/admin/sites/81/admin/pages/new",
+          "start_ms": 631.18896484375,
+          "wait_ms": 8.270999999999999,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "37292.167",
+          "path": "/admin/sites/81/admin/menus",
+          "start_ms": 631.425048828125,
+          "wait_ms": 14.42,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "37292.168",
+          "path": "/admin/sites/81/admin/pages",
+          "start_ms": 631.673095703125,
+          "wait_ms": 20.825,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "37292.169",
+          "path": "/admin/sites/81/admin/posts",
+          "start_ms": 631.869873046875,
+          "wait_ms": 27.527,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "37292.170",
+          "path": "/admin/sites/81/admin/media",
+          "start_ms": 632.0830078125,
+          "wait_ms": 34.135,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "37292.171",
+          "path": "/admin/api/reads?site=81&resource=dashboard-activity",
+          "start_ms": 725.364990234375,
+          "wait_ms": 58.851,
+          "initiator_type": "script"
+        }
+      ],
+      "waterfall_note": "Start offsets are relative to navigation initiation; temporal sequences are candidates, not proof of causal blocking.",
+      "server": {
+        "django_requests": 4,
+        "next_api_spans": 4,
+        "sql_count": 50,
+        "sql_ms": 52.948,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "6b00d017-5912-48b9-af3b-25702f1ae794",
+          "15fb4d8d-7e53-4be4-a0c0-013dd6573da9",
+          "b92d9f33-1970-4978-a7a6-548e8377e095",
+          "a782c14f-9177-46de-bd08-909e42ae4b60"
+        ],
+        "browser_parent_matches": 4
+      }
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 81,
+      "navigation_id": "a4e581e7-e89c-492c-b83b-cd94664057fe",
+      "status": 200,
+      "duration_ms": 36.900000005960464,
+      "request_id": "a4e581e7-e89c-492c-b83b-cd94664057fe",
+      "sql_count": 18,
+      "sql_ms": 9.661,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 0,
+        "sql_count": 18,
+        "sql_ms": 9.661,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "a4e581e7-e89c-492c-b83b-cd94664057fe"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 81,
+      "navigation_id": "f8e8d8e3-5259-4724-8243-1e094e0bc9ca",
+      "status": 200,
+      "duration_ms": 38.900000005960464,
+      "request_id": "f8e8d8e3-5259-4724-8243-1e094e0bc9ca",
+      "sql_count": 18,
+      "sql_ms": 10.279,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 0,
+        "sql_count": 18,
+        "sql_ms": 10.279,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "f8e8d8e3-5259-4724-8243-1e094e0bc9ca"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 81,
+      "navigation_id": "882b6274-6192-4a12-b8f2-5348b211ce34",
+      "status": 200,
+      "duration_ms": 46,
+      "request_id": "882b6274-6192-4a12-b8f2-5348b211ce34",
+      "sql_count": 18,
+      "sql_ms": 15.891,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 0,
+        "sql_count": 18,
+        "sql_ms": 15.891,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "882b6274-6192-4a12-b8f2-5348b211ce34"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 81,
+      "navigation_id": "91334239-4e1e-4dfd-a1c8-e52394d6a72f",
+      "status": 200,
+      "duration_ms": 48.400000005960464,
+      "request_id": "91334239-4e1e-4dfd-a1c8-e52394d6a72f",
+      "sql_count": 18,
+      "sql_ms": 15.149,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 0,
+        "sql_count": 18,
+        "sql_ms": 15.149,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "91334239-4e1e-4dfd-a1c8-e52394d6a72f"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 81,
+      "navigation_id": "92f78bd5-f79d-4408-beda-3986a8683082",
+      "status": 200,
+      "duration_ms": 45.099999994039536,
+      "request_id": "92f78bd5-f79d-4408-beda-3986a8683082",
+      "sql_count": 16,
+      "sql_ms": 14.652,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 0,
+        "sql_count": 16,
+        "sql_ms": 14.652,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "92f78bd5-f79d-4408-beda-3986a8683082"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 81,
+      "navigation_id": "b9222b90-2f7b-4046-829a-d3e85acfc5bf",
+      "status": 200,
+      "duration_ms": 37.900000005960464,
+      "request_id": "b9222b90-2f7b-4046-829a-d3e85acfc5bf",
+      "sql_count": 16,
+      "sql_ms": 12.051,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 0,
+        "sql_count": 16,
+        "sql_ms": 12.051,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "b9222b90-2f7b-4046-829a-d3e85acfc5bf"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 82,
+      "navigation_id": "460ce17b-f645-4d90-aa93-ae9d9ec3d878",
+      "status": 200,
+      "duration_ms": 43,
+      "request_id": "460ce17b-f645-4d90-aa93-ae9d9ec3d878",
+      "sql_count": 18,
+      "sql_ms": 12.716,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 0,
+        "sql_count": 18,
+        "sql_ms": 12.716,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "460ce17b-f645-4d90-aa93-ae9d9ec3d878"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 82,
+      "navigation_id": "72d96141-6c44-455a-beea-7c9851e34cae",
+      "status": 200,
+      "duration_ms": 42.400000005960464,
+      "request_id": "72d96141-6c44-455a-beea-7c9851e34cae",
+      "sql_count": 18,
+      "sql_ms": 12.194,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 0,
+        "sql_count": 18,
+        "sql_ms": 12.194,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "72d96141-6c44-455a-beea-7c9851e34cae"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 82,
+      "navigation_id": "a08898f2-809f-4e36-a008-cec442083476",
+      "status": 200,
+      "duration_ms": 51.900000005960464,
+      "request_id": "a08898f2-809f-4e36-a008-cec442083476",
+      "sql_count": 18,
+      "sql_ms": 17.086,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 0,
+        "sql_count": 18,
+        "sql_ms": 17.086,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "a08898f2-809f-4e36-a008-cec442083476"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 82,
+      "navigation_id": "e77ed8c9-3732-4c19-9f07-5ec155c9fc85",
+      "status": 200,
+      "duration_ms": 54.69999998807907,
+      "request_id": "e77ed8c9-3732-4c19-9f07-5ec155c9fc85",
+      "sql_count": 18,
+      "sql_ms": 17.015,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 0,
+        "sql_count": 18,
+        "sql_ms": 17.015,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "e77ed8c9-3732-4c19-9f07-5ec155c9fc85"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 82,
+      "navigation_id": "d6613427-2851-4989-8a79-192fc3b7a5d9",
+      "status": 200,
+      "duration_ms": 40.30000001192093,
+      "request_id": "d6613427-2851-4989-8a79-192fc3b7a5d9",
+      "sql_count": 16,
+      "sql_ms": 13.153,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 0,
+        "sql_count": 16,
+        "sql_ms": 13.153,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "d6613427-2851-4989-8a79-192fc3b7a5d9"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 82,
+      "navigation_id": "96ecfa26-ca3e-4bc9-8851-95edc051d9d5",
+      "status": 200,
+      "duration_ms": 45.20000001788139,
+      "request_id": "96ecfa26-ca3e-4bc9-8851-95edc051d9d5",
+      "sql_count": 16,
+      "sql_ms": 14.838,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 0,
+        "sql_count": 16,
+        "sql_ms": 14.838,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "96ecfa26-ca3e-4bc9-8851-95edc051d9d5"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "e57e784f-ea0d-4dae-af2b-3055f07948b4",
+      "site_id": 81,
+      "status": 200,
+      "duration_ms": 34.89999997615814,
+      "request_id": "e57e784f-ea0d-4dae-af2b-3055f07948b4",
+      "site": 81,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 1,
+        "sql_count": 10,
+        "sql_ms": 6.328,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "6c1d7826-4152-472b-b40d-b6db17b58565"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "a7d60f5f-384f-4109-a619-643ca2c51447",
+      "site_id": 81,
+      "status": 200,
+      "duration_ms": 34.60000002384186,
+      "request_id": "a7d60f5f-384f-4109-a619-643ca2c51447",
+      "site": 81,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 1,
+        "sql_count": 10,
+        "sql_ms": 6.142,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "b83a30da-e627-45e1-8ff4-17fcda5068ec"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "29fc2527-e0ec-402d-babe-310ccf490c42",
+      "site_id": 82,
+      "status": 200,
+      "duration_ms": 28.19999998807907,
+      "request_id": "29fc2527-e0ec-402d-babe-310ccf490c42",
+      "site": 82,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 1,
+        "sql_count": 10,
+        "sql_ms": 4.273,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "0b94d5d2-64bf-4761-887a-1e7c7df30ebe"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "0ec85862-87ea-4a8b-be45-9ea834b9ac55",
+      "site_id": 82,
+      "status": 200,
+      "duration_ms": 27.69999998807907,
+      "request_id": "0ec85862-87ea-4a8b-be45-9ea834b9ac55",
+      "site": 82,
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 1,
+        "sql_count": 10,
+        "sql_ms": 4.435,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "7b5ca7d3-3062-42b7-822e-4582254e6aad"
+        ],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "cold_site_switch",
+      "cache_state": "cold",
+      "navigation_id": "6312da70-6d94-40c5-8ffe-3730bd26ca1c",
+      "site_id": 82,
+      "section": "dashboard",
+      "duration_ms": 293.22369999999955,
+      "dashboard_usable_ms": 293.22369999999955,
+      "requests": 16,
+      "transferred_bytes": 14376,
+      "response_transferred_bytes": 14376,
+      "request_payload_bytes": 0,
+      "duplicate_endpoints": [
+        {
+          "endpoint": "GET /admin/sites/82/admin",
+          "count": 2
+        }
+      ],
+      "cancelled_requests": 0,
+      "failed_requests": 0,
+      "browser_measure_ms": 294.59999999403954,
+      "browser_measure_scope": "current-document",
+      "in_flight_at_usable_boundary": 1,
+      "waterfall": [
+        {
+          "cdp_id": "24812.238",
+          "method": "GET",
+          "path": "/admin/api/workspace/sites/?page=1&page_size=20",
+          "action_id": null,
+          "start_ms": 59.43603515625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "6312da70-6d94-40c5-8ffe-3730bd26ca1c",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1898,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 35.63
+          },
+          "duration_ms": 36.980000004405156
+        },
+        {
+          "cdp_id": "24812.239",
+          "method": "GET",
+          "path": "/admin/api/workspace/?site=82",
+          "action_id": null,
+          "start_ms": 149.97607421875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "6312da70-6d94-40c5-8ffe-3730bd26ca1c",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1427,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 55.771
+          },
+          "duration_ms": 57.13100000866689
+        },
+        {
+          "cdp_id": "24812.240",
+          "method": "GET",
+          "path": "/admin/sites/82/admin",
+          "action_id": null,
+          "start_ms": 150.31494140625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "6312da70-6d94-40c5-8ffe-3730bd26ca1c",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 2565,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 9.121
+          },
+          "duration_ms": 18.60599999781698
+        },
+        {
+          "cdp_id": "24812.241",
+          "method": "GET",
+          "path": "/admin/favicon.ico",
+          "action_id": null,
+          "start_ms": 179.56396484375,
+          "initiator_type": "other",
+          "initiator_request_id": null,
+          "request_id": "6312da70-6d94-40c5-8ffe-3730bd26ca1c",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1479,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 3.56
+          },
+          "duration_ms": 4.704999999376014
+        },
+        {
+          "cdp_id": "24812.242",
+          "method": "GET",
+          "path": "/admin/api/reads?site=82&resource=dashboard-summary",
+          "action_id": null,
+          "start_ms": 215.955078125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "d3a27e1a-1442-409b-9c6b-06240fe1c9c6",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 815,
+          "navigation_id": null,
+          "server_timing": "bff;dur=59.603, upstream;dur=57.798, encode;dur=0.073",
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 67.212
+          },
+          "duration_ms": 69.40599999506958
+        },
+        {
+          "cdp_id": "24812.243",
+          "method": "GET",
+          "path": "/admin/sites/82/admin",
+          "action_id": null,
+          "start_ms": 224.27783203125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "6312da70-6d94-40c5-8ffe-3730bd26ca1c",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 523,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 7.295
+          },
+          "duration_ms": 14.2070000001695
+        },
+        {
+          "cdp_id": "24812.244",
+          "method": "GET",
+          "path": "/admin/sites/82/admin/sidebars",
+          "action_id": null,
+          "start_ms": 224.407958984375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "6312da70-6d94-40c5-8ffe-3730bd26ca1c",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 534,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 11.128
+          },
+          "duration_ms": 29.22600001329556
+        },
+        {
+          "cdp_id": "24812.245",
+          "method": "GET",
+          "path": "/admin/sites/82/admin/builder",
+          "action_id": null,
+          "start_ms": 224.85400390625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "6312da70-6d94-40c5-8ffe-3730bd26ca1c",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 534,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 18.225
+          },
+          "duration_ms": 31.56699999817647
+        },
+        {
+          "cdp_id": "24812.246",
+          "method": "GET",
+          "path": "/admin/sites/82/admin/homepage",
+          "action_id": null,
+          "start_ms": 225.032958984375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "6312da70-6d94-40c5-8ffe-3730bd26ca1c",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 536,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 19.401000000000003
+          },
+          "duration_ms": 37.68600002513267
+        },
+        {
+          "cdp_id": "24812.247",
+          "method": "GET",
+          "path": "/admin/sites/82/admin/users",
+          "action_id": null,
+          "start_ms": 225.22705078125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "6312da70-6d94-40c5-8ffe-3730bd26ca1c",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 533,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 24.056
+          },
+          "duration_ms": 41.49500001221895
+        },
+        {
+          "cdp_id": "24812.248",
+          "method": "GET",
+          "path": "/admin/sites/82/admin/pages/new",
+          "action_id": null,
+          "start_ms": 234.803955078125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "6312da70-6d94-40c5-8ffe-3730bd26ca1c",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 538,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 21.368
+          },
+          "duration_ms": 36.28500000922941
+        },
+        {
+          "cdp_id": "24812.249",
+          "method": "GET",
+          "path": "/admin/sites/82/admin/menus",
+          "action_id": null,
+          "start_ms": 249.322998046875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "6312da70-6d94-40c5-8ffe-3730bd26ca1c",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 533,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 12.066999999999998
+          },
+          "duration_ms": 34.44700001273304
+        },
+        {
+          "cdp_id": "24812.250",
+          "method": "GET",
+          "path": "/admin/sites/82/admin/pages",
+          "action_id": null,
+          "start_ms": 250.218994140625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "6312da70-6d94-40c5-8ffe-3730bd26ca1c",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 533,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 13.433
+          },
+          "duration_ms": 34.220000001369044
+        },
+        {
+          "cdp_id": "24812.251",
+          "method": "GET",
+          "path": "/admin/sites/82/admin/posts",
+          "action_id": null,
+          "start_ms": 261.93603515625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "6312da70-6d94-40c5-8ffe-3730bd26ca1c",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 533,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 13.639999999999999
+          },
+          "duration_ms": 22.644000011496246
+        },
+        {
+          "cdp_id": "24812.252",
+          "method": "GET",
+          "path": "/admin/sites/82/admin/media",
+          "action_id": null,
+          "start_ms": 264.1630859375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "6312da70-6d94-40c5-8ffe-3730bd26ca1c",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 533,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 16.005
+          },
+          "duration_ms": 21.265999996103346
+        },
+        {
+          "cdp_id": "24812.253",
+          "method": "GET",
+          "path": "/admin/api/reads?site=82&resource=dashboard-activity",
+          "action_id": null,
+          "start_ms": 290.173095703125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "59b95bea-8aff-452b-9fd2-302ddf32d0df",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 862,
+          "navigation_id": null,
+          "server_timing": "bff;dur=25.728, upstream;dur=23.532, encode;dur=0.066",
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 31.73
+          },
+          "duration_ms": 33.6269999970682
+        }
+      ],
+      "blocking_waterfall_candidates": [
+        {
+          "cdp_id": "24812.239",
+          "path": "/admin/api/workspace/?site=82",
+          "start_ms": 149.97607421875,
+          "wait_ms": 55.771,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "24812.240",
+          "path": "/admin/sites/82/admin",
+          "start_ms": 150.31494140625,
+          "wait_ms": 9.121,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "24812.241",
+          "path": "/admin/favicon.ico",
+          "start_ms": 179.56396484375,
+          "wait_ms": 3.56,
+          "initiator_type": "other"
+        },
+        {
+          "cdp_id": "24812.242",
+          "path": "/admin/api/reads?site=82&resource=dashboard-summary",
+          "start_ms": 215.955078125,
+          "wait_ms": 67.212,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "24812.243",
+          "path": "/admin/sites/82/admin",
+          "start_ms": 224.27783203125,
+          "wait_ms": 7.295,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "24812.244",
+          "path": "/admin/sites/82/admin/sidebars",
+          "start_ms": 224.407958984375,
+          "wait_ms": 11.128,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "24812.245",
+          "path": "/admin/sites/82/admin/builder",
+          "start_ms": 224.85400390625,
+          "wait_ms": 18.225,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "24812.246",
+          "path": "/admin/sites/82/admin/homepage",
+          "start_ms": 225.032958984375,
+          "wait_ms": 19.401000000000003,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "24812.247",
+          "path": "/admin/sites/82/admin/users",
+          "start_ms": 225.22705078125,
+          "wait_ms": 24.056,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "24812.248",
+          "path": "/admin/sites/82/admin/pages/new",
+          "start_ms": 234.803955078125,
+          "wait_ms": 21.368,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "24812.249",
+          "path": "/admin/sites/82/admin/menus",
+          "start_ms": 249.322998046875,
+          "wait_ms": 12.066999999999998,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "24812.250",
+          "path": "/admin/sites/82/admin/pages",
+          "start_ms": 250.218994140625,
+          "wait_ms": 13.433,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "24812.251",
+          "path": "/admin/sites/82/admin/posts",
+          "start_ms": 261.93603515625,
+          "wait_ms": 13.639999999999999,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "24812.252",
+          "path": "/admin/sites/82/admin/media",
+          "start_ms": 264.1630859375,
+          "wait_ms": 16.005,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "24812.253",
+          "path": "/admin/api/reads?site=82&resource=dashboard-activity",
+          "start_ms": 290.173095703125,
+          "wait_ms": 31.73,
+          "initiator_type": "script"
+        }
+      ],
+      "waterfall_note": "Start offsets are relative to navigation initiation; temporal sequences are candidates, not proof of causal blocking.",
+      "server": {
+        "django_requests": 4,
+        "next_api_spans": 4,
+        "sql_count": 50,
+        "sql_ms": 40.903000000000006,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "fc6b605f-1c63-44da-856b-e758e395a38b",
+          "7275b152-def3-4e8f-88a7-730a8f6a654c",
+          "d3a27e1a-1442-409b-9c6b-06240fe1c9c6",
+          "59b95bea-8aff-452b-9fd2-302ddf32d0df"
+        ],
+        "browser_parent_matches": 4
+      }
+    },
+    {
+      "scenario": "warm_site_switch",
+      "cache_state": "warm",
+      "navigation_id": "d1f07543-ae75-4e6a-8427-b7c487f60fa0",
+      "site_id": 82,
+      "section": "dashboard",
+      "duration_ms": 113.4411,
+      "dashboard_usable_ms": 113.4411,
+      "requests": 1,
+      "transferred_bytes": 1479,
+      "response_transferred_bytes": 1479,
+      "request_payload_bytes": 0,
+      "duplicate_endpoints": [],
+      "cancelled_requests": 0,
+      "failed_requests": 0,
+      "browser_measure_ms": 114.5,
+      "browser_measure_scope": "current-document",
+      "in_flight_at_usable_boundary": 0,
+      "waterfall": [
+        {
+          "cdp_id": "24812.258",
+          "method": "GET",
+          "path": "/admin/favicon.ico",
+          "action_id": null,
+          "start_ms": 104.85498046875,
+          "initiator_type": "other",
+          "initiator_request_id": null,
+          "request_id": "d1f07543-ae75-4e6a-8427-b7c487f60fa0",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1479,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 7.455
+          },
+          "duration_ms": 8.950999996159226
+        }
+      ],
+      "blocking_waterfall_candidates": [
+        {
+          "cdp_id": "24812.258",
+          "path": "/admin/favicon.ico",
+          "start_ms": 104.85498046875,
+          "wait_ms": 7.455,
+          "initiator_type": "other"
+        }
+      ],
+      "waterfall_note": "Start offsets are relative to navigation initiation; temporal sequences are candidates, not proof of causal blocking.",
+      "server": {
+        "django_requests": 0,
+        "next_api_spans": 0,
+        "sql_count": 0,
+        "sql_ms": 0,
+        "duplicate_endpoints": [],
+        "request_ids": [],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "same_site_menu_navigation",
+      "cache_state": "cold",
+      "navigation_id": "9565f4a6-840d-4f37-8d5e-261e5fea965f",
+      "site_id": 82,
+      "section": "pages",
+      "duration_ms": 231.9421999999995,
+      "dashboard_usable_ms": null,
+      "requests": 22,
+      "transferred_bytes": 38262,
+      "response_transferred_bytes": 38262,
+      "request_payload_bytes": 0,
+      "duplicate_endpoints": [
+        {
+          "endpoint": "GET /admin/sites/82/admin/pages",
+          "count": 2
+        }
+      ],
+      "cancelled_requests": 0,
+      "failed_requests": 0,
+      "browser_measure_ms": 234,
+      "browser_measure_scope": "current-document",
+      "in_flight_at_usable_boundary": 5,
+      "waterfall": [
+        {
+          "cdp_id": "24812.259",
+          "method": "GET",
+          "path": "/admin/sites/82/admin/pages",
+          "action_id": null,
+          "start_ms": 53.5478515625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "9565f4a6-840d-4f37-8d5e-261e5fea965f",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1858,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 5.773000000000001
+          },
+          "duration_ms": 12.828000006265938
+        },
+        {
+          "cdp_id": "24812.260",
+          "method": "GET",
+          "path": "/admin/_next/static/chunks/1703-f032cef91a1f38bc.js",
+          "action_id": null,
+          "start_ms": 65.258056640625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "9565f4a6-840d-4f37-8d5e-261e5fea965f",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 3911,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 4.752000000000001
+          },
+          "duration_ms": 7.602999976370484
+        },
+        {
+          "cdp_id": "24812.261",
+          "method": "GET",
+          "path": "/admin/_next/static/chunks/8015-e3bd6c6ca881f4f6.js",
+          "action_id": null,
+          "start_ms": 65.7958984375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "9565f4a6-840d-4f37-8d5e-261e5fea965f",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 8103,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 5.789
+          },
+          "duration_ms": 8.81999998819083
+        },
+        {
+          "cdp_id": "24812.262",
+          "method": "GET",
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/pages/page-e647d3772c5e06a8.js",
+          "action_id": null,
+          "start_ms": 66.3291015625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "9565f4a6-840d-4f37-8d5e-261e5fea965f",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 3491,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 6.568
+          },
+          "duration_ms": 9.484000009251758
+        },
+        {
+          "cdp_id": "24812.263",
+          "method": "GET",
+          "path": "/admin/api/reads?site=82&resource=pages&page=1&page_size=20&ordering=-updated_at",
+          "action_id": null,
+          "start_ms": 114.902099609375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "85448dad-6db3-4b34-b4fd-608d77e1681f",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 2680,
+          "navigation_id": null,
+          "server_timing": "bff;dur=67.129, upstream;dur=54.488, encode;dur=0.470",
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 73.527
+          },
+          "duration_ms": 75.7090000261087
+        },
+        {
+          "cdp_id": "24812.264",
+          "method": "GET",
+          "path": "/admin/favicon.ico",
+          "action_id": null,
+          "start_ms": 116.796142578125,
+          "initiator_type": "other",
+          "initiator_request_id": null,
+          "request_id": "9565f4a6-840d-4f37-8d5e-261e5fea965f",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1479,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 7.279999999999999
+          },
+          "duration_ms": 8.956999983638525
+        },
+        {
+          "cdp_id": "24812.265",
+          "method": "GET",
+          "path": "/admin/sites/82/admin/pages",
+          "action_id": null,
+          "start_ms": 220.134033203125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "9565f4a6-840d-4f37-8d5e-261e5fea965f",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1696,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 8.668
+          },
+          "duration_ms": 73.32699999096803
+        },
+        {
+          "cdp_id": "24812.266",
+          "method": "GET",
+          "path": "/admin/sites/82/admin/pages/1606ec25-9fc4-430c-88a8-25a769a13044/preview",
+          "action_id": null,
+          "start_ms": 223.458984375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "9565f4a6-840d-4f37-8d5e-261e5fea965f",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 600,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 25.901
+          },
+          "duration_ms": 45.04100000485778
+        },
+        {
+          "cdp_id": "24812.267",
+          "method": "GET",
+          "path": "/admin/sites/82/admin/pages/1606ec25-9fc4-430c-88a8-25a769a13044/edit",
+          "action_id": null,
+          "start_ms": 223.930908203125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "9565f4a6-840d-4f37-8d5e-261e5fea965f",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 579,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 14.447
+          },
+          "duration_ms": 34.91799999028444
+        },
+        {
+          "cdp_id": "24812.268",
+          "method": "GET",
+          "path": "/admin/sites/82/admin/pages/1606ec25-9fc4-430c-88a8-25a769a13044/builder",
+          "action_id": null,
+          "start_ms": 224.553955078125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "9565f4a6-840d-4f37-8d5e-261e5fea965f",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1531,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 30.895
+          },
+          "duration_ms": 69.38800000352785
+        },
+        {
+          "cdp_id": "24812.269",
+          "method": "GET",
+          "path": "/admin/sites/82/admin/pages/348d843e-1114-4928-8ec3-12ce4f2e12cf/preview",
+          "action_id": null,
+          "start_ms": 225.213134765625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "9565f4a6-840d-4f37-8d5e-261e5fea965f",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 597,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 36.046
+          },
+          "duration_ms": 44.251999992411584
+        },
+        {
+          "cdp_id": "24812.270",
+          "method": "GET",
+          "path": "/admin/sites/82/admin/pages/348d843e-1114-4928-8ec3-12ce4f2e12cf/edit",
+          "action_id": null,
+          "start_ms": 252.764892578125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "9565f4a6-840d-4f37-8d5e-261e5fea965f",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 580,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 14.129
+          },
+          "duration_ms": 23.427999985869974
+        },
+        {
+          "cdp_id": "24812.271",
+          "method": "GET",
+          "path": "/admin/sites/82/admin/pages/348d843e-1114-4928-8ec3-12ce4f2e12cf/builder",
+          "action_id": null,
+          "start_ms": 265.3349609375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "9565f4a6-840d-4f37-8d5e-261e5fea965f",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1532,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 8.386000000000001
+          },
+          "duration_ms": 41.74100002273917
+        },
+        {
+          "cdp_id": "24812.272",
+          "method": "GET",
+          "path": "/admin/sites/82/admin/pages/34f39fde-60cf-444b-9215-11136c018138/preview",
+          "action_id": null,
+          "start_ms": 265.77587890625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "9565f4a6-840d-4f37-8d5e-261e5fea965f",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 600,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 16.865
+          },
+          "duration_ms": 28.5730000177864
+        },
+        {
+          "cdp_id": "24812.273",
+          "method": "GET",
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/pages/%5BpageId%5D/builder/loading-4e1721432eb7db80.js",
+          "action_id": null,
+          "start_ms": 266.2021484375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "9565f4a6-840d-4f37-8d5e-261e5fea965f",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 2076,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 29.997999999999998
+          },
+          "duration_ms": 35.5099999869708
+        },
+        {
+          "cdp_id": "24812.274",
+          "method": "GET",
+          "path": "/admin/sites/82/admin/pages/34f39fde-60cf-444b-9215-11136c018138/edit",
+          "action_id": null,
+          "start_ms": 270.79296875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "9565f4a6-840d-4f37-8d5e-261e5fea965f",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 579,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 15.873
+          },
+          "duration_ms": 29.684999986784533
+        },
+        {
+          "cdp_id": "24812.275",
+          "method": "GET",
+          "path": "/admin/sites/82/admin/pages/34f39fde-60cf-444b-9215-11136c018138/builder",
+          "action_id": null,
+          "start_ms": 271.700927734375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "9565f4a6-840d-4f37-8d5e-261e5fea965f",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1531,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 10.785
+          },
+          "duration_ms": 64.44799999007955
+        },
+        {
+          "cdp_id": "24812.276",
+          "method": "GET",
+          "path": "/admin/sites/82/admin/pages/3d263b32-5892-4bff-954e-e4b8d54ec034/preview",
+          "action_id": null,
+          "start_ms": 272.47998046875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "9565f4a6-840d-4f37-8d5e-261e5fea965f",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 600,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 13.624
+          },
+          "duration_ms": 48.38799999561161
+        },
+        {
+          "cdp_id": "24812.277",
+          "method": "GET",
+          "path": "/admin/sites/82/admin/pages/3d263b32-5892-4bff-954e-e4b8d54ec034/edit",
+          "action_id": null,
+          "start_ms": 289.705078125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "9565f4a6-840d-4f37-8d5e-261e5fea965f",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 578,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 19.238999999999997
+          },
+          "duration_ms": 36.09199999482371
+        },
+        {
+          "cdp_id": "24812.278",
+          "method": "GET",
+          "path": "/admin/sites/82/admin/pages/3d263b32-5892-4bff-954e-e4b8d54ec034/builder",
+          "action_id": null,
+          "start_ms": 290.284912109375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "9565f4a6-840d-4f37-8d5e-261e5fea965f",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1531,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 18.535
+          },
+          "duration_ms": 47.972000000299886
+        },
+        {
+          "cdp_id": "24812.279",
+          "method": "GET",
+          "path": "/admin/sites/82/admin/pages/6fdb8a03-704f-440f-af6f-b956287170c8/preview",
+          "action_id": null,
+          "start_ms": 300.195068359375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "9565f4a6-840d-4f37-8d5e-261e5fea965f",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 600,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 23.148
+          },
+          "duration_ms": 35.18800000892952
+        },
+        {
+          "cdp_id": "24812.280",
+          "method": "GET",
+          "path": "/admin/sites/82/admin/pages/6fdb8a03-704f-440f-af6f-b956287170c8/builder",
+          "action_id": null,
+          "start_ms": 316.5068359375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "9565f4a6-840d-4f37-8d5e-261e5fea965f",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1530,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 15.135
+          },
+          "duration_ms": 22.239999991143122
+        }
+      ],
+      "blocking_waterfall_candidates": [
+        {
+          "cdp_id": "24812.263",
+          "path": "/admin/api/reads?site=82&resource=pages&page=1&page_size=20&ordering=-updated_at",
+          "start_ms": 114.902099609375,
+          "wait_ms": 73.527,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "24812.264",
+          "path": "/admin/favicon.ico",
+          "start_ms": 116.796142578125,
+          "wait_ms": 7.279999999999999,
+          "initiator_type": "other"
+        },
+        {
+          "cdp_id": "24812.265",
+          "path": "/admin/sites/82/admin/pages",
+          "start_ms": 220.134033203125,
+          "wait_ms": 8.668,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "24812.266",
+          "path": "/admin/sites/82/admin/pages/1606ec25-9fc4-430c-88a8-25a769a13044/preview",
+          "start_ms": 223.458984375,
+          "wait_ms": 25.901,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "24812.267",
+          "path": "/admin/sites/82/admin/pages/1606ec25-9fc4-430c-88a8-25a769a13044/edit",
+          "start_ms": 223.930908203125,
+          "wait_ms": 14.447,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "24812.268",
+          "path": "/admin/sites/82/admin/pages/1606ec25-9fc4-430c-88a8-25a769a13044/builder",
+          "start_ms": 224.553955078125,
+          "wait_ms": 30.895,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "24812.269",
+          "path": "/admin/sites/82/admin/pages/348d843e-1114-4928-8ec3-12ce4f2e12cf/preview",
+          "start_ms": 225.213134765625,
+          "wait_ms": 36.046,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "24812.270",
+          "path": "/admin/sites/82/admin/pages/348d843e-1114-4928-8ec3-12ce4f2e12cf/edit",
+          "start_ms": 252.764892578125,
+          "wait_ms": 14.129,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "24812.271",
+          "path": "/admin/sites/82/admin/pages/348d843e-1114-4928-8ec3-12ce4f2e12cf/builder",
+          "start_ms": 265.3349609375,
+          "wait_ms": 8.386000000000001,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "24812.272",
+          "path": "/admin/sites/82/admin/pages/34f39fde-60cf-444b-9215-11136c018138/preview",
+          "start_ms": 265.77587890625,
+          "wait_ms": 16.865,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "24812.273",
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/pages/%5BpageId%5D/builder/loading-4e1721432eb7db80.js",
+          "start_ms": 266.2021484375,
+          "wait_ms": 29.997999999999998,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "24812.274",
+          "path": "/admin/sites/82/admin/pages/34f39fde-60cf-444b-9215-11136c018138/edit",
+          "start_ms": 270.79296875,
+          "wait_ms": 15.873,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "24812.275",
+          "path": "/admin/sites/82/admin/pages/34f39fde-60cf-444b-9215-11136c018138/builder",
+          "start_ms": 271.700927734375,
+          "wait_ms": 10.785,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "24812.276",
+          "path": "/admin/sites/82/admin/pages/3d263b32-5892-4bff-954e-e4b8d54ec034/preview",
+          "start_ms": 272.47998046875,
+          "wait_ms": 13.624,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "24812.277",
+          "path": "/admin/sites/82/admin/pages/3d263b32-5892-4bff-954e-e4b8d54ec034/edit",
+          "start_ms": 289.705078125,
+          "wait_ms": 19.238999999999997,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "24812.278",
+          "path": "/admin/sites/82/admin/pages/3d263b32-5892-4bff-954e-e4b8d54ec034/builder",
+          "start_ms": 290.284912109375,
+          "wait_ms": 18.535,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "24812.279",
+          "path": "/admin/sites/82/admin/pages/6fdb8a03-704f-440f-af6f-b956287170c8/preview",
+          "start_ms": 300.195068359375,
+          "wait_ms": 23.148,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "24812.280",
+          "path": "/admin/sites/82/admin/pages/6fdb8a03-704f-440f-af6f-b956287170c8/builder",
+          "start_ms": 316.5068359375,
+          "wait_ms": 15.135,
+          "initiator_type": "script"
+        }
+      ],
+      "waterfall_note": "Start offsets are relative to navigation initiation; temporal sequences are candidates, not proof of causal blocking.",
+      "server": {
+        "django_requests": 1,
+        "next_api_spans": 1,
+        "sql_count": 18,
+        "sql_ms": 17.355,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "85448dad-6db3-4b34-b4fd-608d77e1681f"
+        ],
+        "browser_parent_matches": 1
+      }
+    },
+    {
+      "scenario": "cached_section_return",
+      "cache_state": "warm",
+      "navigation_id": "a5908b1a-2b3a-45b5-a62a-cea06fa772bc",
+      "site_id": 82,
+      "section": "dashboard",
+      "duration_ms": 88.03519999999935,
+      "dashboard_usable_ms": 88.03519999999935,
+      "requests": 2,
+      "transferred_bytes": 2999,
+      "response_transferred_bytes": 2999,
+      "request_payload_bytes": 0,
+      "duplicate_endpoints": [],
+      "cancelled_requests": 0,
+      "failed_requests": 0,
+      "browser_measure_ms": 90.2999999821186,
+      "browser_measure_scope": "current-document",
+      "in_flight_at_usable_boundary": 1,
+      "waterfall": [
+        {
+          "cdp_id": "24812.281",
+          "method": "GET",
+          "path": "/admin/sites/82/admin",
+          "action_id": null,
+          "start_ms": 51.583984375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "a5908b1a-2b3a-45b5-a62a-cea06fa772bc",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1520,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 6.309
+          },
+          "duration_ms": 10.164999985136092
+        },
+        {
+          "cdp_id": "24812.282",
+          "method": "GET",
+          "path": "/admin/favicon.ico",
+          "action_id": null,
+          "start_ms": 79.120849609375,
+          "initiator_type": "other",
+          "initiator_request_id": null,
+          "request_id": "a5908b1a-2b3a-45b5-a62a-cea06fa772bc",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1479,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 7.169
+          },
+          "duration_ms": 9.621000004699454
+        }
+      ],
+      "blocking_waterfall_candidates": [],
+      "waterfall_note": "Start offsets are relative to navigation initiation; temporal sequences are candidates, not proof of causal blocking.",
+      "server": {
+        "django_requests": 0,
+        "next_api_spans": 0,
+        "sql_count": 0,
+        "sql_ms": 0,
+        "duplicate_endpoints": [],
+        "request_ids": [],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "cached_section_transition",
+      "cache_state": "warm",
+      "navigation_id": "622ac2d0-2ee0-4064-8373-863826779286",
+      "site_id": 82,
+      "section": "pages",
+      "duration_ms": 108.61450000000059,
+      "dashboard_usable_ms": null,
+      "requests": 1,
+      "transferred_bytes": 1479,
+      "response_transferred_bytes": 1479,
+      "request_payload_bytes": 0,
+      "duplicate_endpoints": [],
+      "cancelled_requests": 0,
+      "failed_requests": 0,
+      "browser_measure_ms": 111.09999999403954,
+      "browser_measure_scope": "current-document",
+      "in_flight_at_usable_boundary": 0,
+      "waterfall": [
+        {
+          "cdp_id": "24812.283",
+          "method": "GET",
+          "path": "/admin/favicon.ico",
+          "action_id": null,
+          "start_ms": 95.306884765625,
+          "initiator_type": "other",
+          "initiator_request_id": null,
+          "request_id": "622ac2d0-2ee0-4064-8373-863826779286",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1479,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 6.329000000000001
+          },
+          "duration_ms": 8.172999980160967
+        }
+      ],
+      "blocking_waterfall_candidates": [],
+      "waterfall_note": "Start offsets are relative to navigation initiation; temporal sequences are candidates, not proof of causal blocking.",
+      "server": {
+        "django_requests": 0,
+        "next_api_spans": 0,
+        "sql_count": 0,
+        "sql_ms": 0,
+        "duplicate_endpoints": [],
+        "request_ids": [],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "cold_site_switch",
+      "cache_state": "cold",
+      "navigation_id": "54eb6c86-e63b-4ce8-9fe4-17588032afe9",
+      "site_id": 83,
+      "section": "dashboard",
+      "duration_ms": 390.90400000000045,
+      "dashboard_usable_ms": 390.90400000000045,
+      "requests": 16,
+      "transferred_bytes": 14381,
+      "response_transferred_bytes": 14381,
+      "request_payload_bytes": 0,
+      "duplicate_endpoints": [
+        {
+          "endpoint": "GET /admin/sites/83/admin",
+          "count": 2
+        }
+      ],
+      "cancelled_requests": 0,
+      "failed_requests": 0,
+      "browser_measure_ms": 393.80000001192093,
+      "browser_measure_scope": "current-document",
+      "in_flight_at_usable_boundary": 1,
+      "waterfall": [
+        {
+          "cdp_id": "36324.238",
+          "method": "GET",
+          "path": "/admin/api/workspace/sites/?page=1&page_size=20",
+          "action_id": null,
+          "start_ms": 58.19091796875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "54eb6c86-e63b-4ce8-9fe4-17588032afe9",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1898,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 42.410000000000004
+          },
+          "duration_ms": 43.92899997765198
+        },
+        {
+          "cdp_id": "36324.239",
+          "method": "GET",
+          "path": "/admin/api/workspace/?site=83",
+          "action_id": null,
+          "start_ms": 197.657958984375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "54eb6c86-e63b-4ce8-9fe4-17588032afe9",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1427,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 54.739
+          },
+          "duration_ms": 56.08500001835637
+        },
+        {
+          "cdp_id": "36324.240",
+          "method": "GET",
+          "path": "/admin/sites/83/admin",
+          "action_id": null,
+          "start_ms": 197.991943359375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "54eb6c86-e63b-4ce8-9fe4-17588032afe9",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 2565,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 9.515
+          },
+          "duration_ms": 15.02500000060536
+        },
+        {
+          "cdp_id": "36324.241",
+          "method": "GET",
+          "path": "/admin/favicon.ico",
+          "action_id": null,
+          "start_ms": 222.636962890625,
+          "initiator_type": "other",
+          "initiator_request_id": null,
+          "request_id": "54eb6c86-e63b-4ce8-9fe4-17588032afe9",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1479,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 4.288
+          },
+          "duration_ms": 5.9680000122170895
+        },
+        {
+          "cdp_id": "36324.242",
+          "method": "GET",
+          "path": "/admin/api/reads?site=83&resource=dashboard-summary",
+          "action_id": null,
+          "start_ms": 280.251220703125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "70555b3b-105b-4b5c-b45e-90b131cb42d6",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 815,
+          "navigation_id": null,
+          "server_timing": "bff;dur=88.004, upstream;dur=83.638, encode;dur=0.174",
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 96.43599999999999
+          },
+          "duration_ms": 100.06200001225807
+        },
+        {
+          "cdp_id": "36324.243",
+          "method": "GET",
+          "path": "/admin/sites/83/admin",
+          "action_id": null,
+          "start_ms": 298.714111328125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "54eb6c86-e63b-4ce8-9fe4-17588032afe9",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 524,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 10.009
+          },
+          "duration_ms": 16.7760000040289
+        },
+        {
+          "cdp_id": "36324.244",
+          "method": "GET",
+          "path": "/admin/sites/83/admin/sidebars",
+          "action_id": null,
+          "start_ms": 299.218994140625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "54eb6c86-e63b-4ce8-9fe4-17588032afe9",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 535,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 11.707999999999998
+          },
+          "duration_ms": 33.04599999682978
+        },
+        {
+          "cdp_id": "36324.245",
+          "method": "GET",
+          "path": "/admin/sites/83/admin/builder",
+          "action_id": null,
+          "start_ms": 299.760986328125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "54eb6c86-e63b-4ce8-9fe4-17588032afe9",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 535,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 25.695999999999998
+          },
+          "duration_ms": 46.61600000690669
+        },
+        {
+          "cdp_id": "36324.246",
+          "method": "GET",
+          "path": "/admin/sites/83/admin/homepage",
+          "action_id": null,
+          "start_ms": 300.4130859375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "54eb6c86-e63b-4ce8-9fe4-17588032afe9",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 536,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 19.612
+          },
+          "duration_ms": 39.81200000271201
+        },
+        {
+          "cdp_id": "36324.247",
+          "method": "GET",
+          "path": "/admin/sites/83/admin/users",
+          "action_id": null,
+          "start_ms": 301.9189453125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "54eb6c86-e63b-4ce8-9fe4-17588032afe9",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 533,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 32.939
+          },
+          "duration_ms": 51.78999999770895
+        },
+        {
+          "cdp_id": "36324.248",
+          "method": "GET",
+          "path": "/admin/sites/83/admin/pages/new",
+          "action_id": null,
+          "start_ms": 312.225830078125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "54eb6c86-e63b-4ce8-9fe4-17588032afe9",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 538,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 29.317999999999998
+          },
+          "duration_ms": 47.701000003144145
+        },
+        {
+          "cdp_id": "36324.249",
+          "method": "GET",
+          "path": "/admin/sites/83/admin/menus",
+          "action_id": null,
+          "start_ms": 326.721923828125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "54eb6c86-e63b-4ce8-9fe4-17588032afe9",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 533,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 18.538
+          },
+          "duration_ms": 38.27000001911074
+        },
+        {
+          "cdp_id": "36324.250",
+          "method": "GET",
+          "path": "/admin/sites/83/admin/pages",
+          "action_id": null,
+          "start_ms": 334.138916015625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "54eb6c86-e63b-4ce8-9fe4-17588032afe9",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 533,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 17.149
+          },
+          "duration_ms": 39.523999992525205
+        },
+        {
+          "cdp_id": "36324.251",
+          "method": "GET",
+          "path": "/admin/sites/83/admin/posts",
+          "action_id": null,
+          "start_ms": 343.384033203125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "54eb6c86-e63b-4ce8-9fe4-17588032afe9",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 534,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 16.557000000000002
+          },
+          "duration_ms": 34.37300000223331
+        },
+        {
+          "cdp_id": "36324.252",
+          "method": "GET",
+          "path": "/admin/sites/83/admin/media",
+          "action_id": null,
+          "start_ms": 348.9169921875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "54eb6c86-e63b-4ce8-9fe4-17588032afe9",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 533,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 18.088
+          },
+          "duration_ms": 29.74599998560734
+        },
+        {
+          "cdp_id": "36324.253",
+          "method": "GET",
+          "path": "/admin/api/reads?site=83&resource=dashboard-activity",
+          "action_id": null,
+          "start_ms": 384.81103515625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "b9133773-aced-47fc-9143-a06f85332963",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 863,
+          "navigation_id": null,
+          "server_timing": "bff;dur=44.180, upstream;dur=39.796, encode;dur=0.209",
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 52.074
+          },
+          "duration_ms": 54.93199999909848
+        }
+      ],
+      "blocking_waterfall_candidates": [
+        {
+          "cdp_id": "36324.239",
+          "path": "/admin/api/workspace/?site=83",
+          "start_ms": 197.657958984375,
+          "wait_ms": 54.739,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "36324.240",
+          "path": "/admin/sites/83/admin",
+          "start_ms": 197.991943359375,
+          "wait_ms": 9.515,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "36324.241",
+          "path": "/admin/favicon.ico",
+          "start_ms": 222.636962890625,
+          "wait_ms": 4.288,
+          "initiator_type": "other"
+        },
+        {
+          "cdp_id": "36324.242",
+          "path": "/admin/api/reads?site=83&resource=dashboard-summary",
+          "start_ms": 280.251220703125,
+          "wait_ms": 96.43599999999999,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "36324.243",
+          "path": "/admin/sites/83/admin",
+          "start_ms": 298.714111328125,
+          "wait_ms": 10.009,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "36324.244",
+          "path": "/admin/sites/83/admin/sidebars",
+          "start_ms": 299.218994140625,
+          "wait_ms": 11.707999999999998,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "36324.245",
+          "path": "/admin/sites/83/admin/builder",
+          "start_ms": 299.760986328125,
+          "wait_ms": 25.695999999999998,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "36324.246",
+          "path": "/admin/sites/83/admin/homepage",
+          "start_ms": 300.4130859375,
+          "wait_ms": 19.612,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "36324.247",
+          "path": "/admin/sites/83/admin/users",
+          "start_ms": 301.9189453125,
+          "wait_ms": 32.939,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "36324.248",
+          "path": "/admin/sites/83/admin/pages/new",
+          "start_ms": 312.225830078125,
+          "wait_ms": 29.317999999999998,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "36324.249",
+          "path": "/admin/sites/83/admin/menus",
+          "start_ms": 326.721923828125,
+          "wait_ms": 18.538,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "36324.250",
+          "path": "/admin/sites/83/admin/pages",
+          "start_ms": 334.138916015625,
+          "wait_ms": 17.149,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "36324.251",
+          "path": "/admin/sites/83/admin/posts",
+          "start_ms": 343.384033203125,
+          "wait_ms": 16.557000000000002,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "36324.252",
+          "path": "/admin/sites/83/admin/media",
+          "start_ms": 348.9169921875,
+          "wait_ms": 18.088,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "36324.253",
+          "path": "/admin/api/reads?site=83&resource=dashboard-activity",
+          "start_ms": 384.81103515625,
+          "wait_ms": 52.074,
+          "initiator_type": "script"
+        }
+      ],
+      "waterfall_note": "Start offsets are relative to navigation initiation; temporal sequences are candidates, not proof of causal blocking.",
+      "server": {
+        "django_requests": 4,
+        "next_api_spans": 4,
+        "sql_count": 50,
+        "sql_ms": 52.053,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "8eb845e0-d32c-4887-8ec7-ef406d286380",
+          "e01bc0eb-8052-4c0c-a94b-549d7caa76ca",
+          "70555b3b-105b-4b5c-b45e-90b131cb42d6",
+          "b9133773-aced-47fc-9143-a06f85332963"
+        ],
+        "browser_parent_matches": 4
+      }
+    },
+    {
+      "scenario": "warm_site_switch",
+      "cache_state": "warm",
+      "navigation_id": "ad7df4be-11a7-4c6d-980c-bf0e4443d294",
+      "site_id": 83,
+      "section": "dashboard",
+      "duration_ms": 94.26430000000073,
+      "dashboard_usable_ms": 94.26430000000073,
+      "requests": 1,
+      "transferred_bytes": 1479,
+      "response_transferred_bytes": 1479,
+      "request_payload_bytes": 0,
+      "duplicate_endpoints": [],
+      "cancelled_requests": 0,
+      "failed_requests": 0,
+      "browser_measure_ms": 96.19999998807907,
+      "browser_measure_scope": "current-document",
+      "in_flight_at_usable_boundary": 1,
+      "waterfall": [
+        {
+          "cdp_id": "36324.258",
+          "method": "GET",
+          "path": "/admin/favicon.ico",
+          "action_id": null,
+          "start_ms": 88.7001953125,
+          "initiator_type": "other",
+          "initiator_request_id": null,
+          "request_id": "ad7df4be-11a7-4c6d-980c-bf0e4443d294",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1479,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 5.056
+          },
+          "duration_ms": 6.678000005194917
+        }
+      ],
+      "blocking_waterfall_candidates": [],
+      "waterfall_note": "Start offsets are relative to navigation initiation; temporal sequences are candidates, not proof of causal blocking.",
+      "server": {
+        "django_requests": 0,
+        "next_api_spans": 0,
+        "sql_count": 0,
+        "sql_ms": 0,
+        "duplicate_endpoints": [],
+        "request_ids": [],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "same_site_menu_navigation",
+      "cache_state": "cold",
+      "navigation_id": "5a66cef8-6c93-4544-8c17-18dc5ce232fa",
+      "site_id": 83,
+      "section": "posts",
+      "duration_ms": 249.30329999999958,
+      "dashboard_usable_ms": null,
+      "requests": 10,
+      "transferred_bytes": 25072,
+      "response_transferred_bytes": 25072,
+      "request_payload_bytes": 0,
+      "duplicate_endpoints": [
+        {
+          "endpoint": "GET /admin/sites/83/admin/posts",
+          "count": 2
+        }
+      ],
+      "cancelled_requests": 0,
+      "failed_requests": 0,
+      "browser_measure_ms": 250.40000000596046,
+      "browser_measure_scope": "current-document",
+      "in_flight_at_usable_boundary": 1,
+      "waterfall": [
+        {
+          "cdp_id": "36324.259",
+          "method": "GET",
+          "path": "/admin/sites/83/admin/posts",
+          "action_id": null,
+          "start_ms": 60.988037109375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "5a66cef8-6c93-4544-8c17-18dc5ce232fa",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1858,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 6.558
+          },
+          "duration_ms": 10.094999975990504
+        },
+        {
+          "cdp_id": "36324.260",
+          "method": "GET",
+          "path": "/admin/_next/static/chunks/1703-f032cef91a1f38bc.js",
+          "action_id": null,
+          "start_ms": 79.803955078125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "5a66cef8-6c93-4544-8c17-18dc5ce232fa",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 3911,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 7.611000000000001
+          },
+          "duration_ms": 8.904000016627833
+        },
+        {
+          "cdp_id": "36324.261",
+          "method": "GET",
+          "path": "/admin/_next/static/chunks/3150-74f60198d8857982.js",
+          "action_id": null,
+          "start_ms": 80.094970703125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "5a66cef8-6c93-4544-8c17-18dc5ce232fa",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 4170,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 5.421
+          },
+          "duration_ms": 7.981000002473593
+        },
+        {
+          "cdp_id": "36324.262",
+          "method": "GET",
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/posts/page-a03f391f6faa558c.js",
+          "action_id": null,
+          "start_ms": 80.35400390625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "5a66cef8-6c93-4544-8c17-18dc5ce232fa",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 5957,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 5.146
+          },
+          "duration_ms": 6.976999982725829
+        },
+        {
+          "cdp_id": "36324.263",
+          "method": "GET",
+          "path": "/admin/api/reads?site=83&resource=posts&page=1&page_size=20&ordering=-created_at",
+          "action_id": null,
+          "start_ms": 119.833984375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "b0294f95-0132-49ca-97b3-69e615c6ac8c",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 3377,
+          "navigation_id": null,
+          "server_timing": "bff;dur=93.269, upstream;dur=67.156, encode;dur=0.420",
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 98.759
+          },
+          "duration_ms": 100.99300000001676
+        },
+        {
+          "cdp_id": "36324.264",
+          "method": "GET",
+          "path": "/admin/api/reads?site=83&resource=categories&page=1&page_size=100&ordering=name",
+          "action_id": null,
+          "start_ms": 120.51806640625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "12075c8f-219f-4668-af15-5015ca54c2d0",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 941,
+          "navigation_id": null,
+          "server_timing": "bff;dur=51.521, upstream;dur=27.381, encode;dur=0.142",
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 57.913
+          },
+          "duration_ms": 62.37400000100024
+        },
+        {
+          "cdp_id": "36324.265",
+          "method": "GET",
+          "path": "/admin/api/reads?site=83&resource=tags&page=1&page_size=100&ordering=name",
+          "action_id": null,
+          "start_ms": 121.113037109375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "b44239bd-6393-4bcd-bc02-d64212b1bbc2",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1144,
+          "navigation_id": null,
+          "server_timing": "bff;dur=74.237, upstream;dur=57.507, encode;dur=0.119",
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 89.708
+          },
+          "duration_ms": 92.30899999965914
+        },
+        {
+          "cdp_id": "36324.266",
+          "method": "GET",
+          "path": "/admin/favicon.ico",
+          "action_id": null,
+          "start_ms": 129.553955078125,
+          "initiator_type": "other",
+          "initiator_request_id": null,
+          "request_id": "5a66cef8-6c93-4544-8c17-18dc5ce232fa",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1479,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 12.073
+          },
+          "duration_ms": 13.932000001659617
+        },
+        {
+          "cdp_id": "36324.267",
+          "method": "GET",
+          "path": "/admin/sites/83/admin/posts/new",
+          "action_id": null,
+          "start_ms": 130.683837890625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "5a66cef8-6c93-4544-8c17-18dc5ce232fa",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 538,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 17.39
+          },
+          "duration_ms": 21.436999988509342
+        },
+        {
+          "cdp_id": "36324.268",
+          "method": "GET",
+          "path": "/admin/sites/83/admin/posts",
+          "action_id": null,
+          "start_ms": 246.427978515625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "5a66cef8-6c93-4544-8c17-18dc5ce232fa",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1697,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 6.101
+          },
+          "duration_ms": 10.775000002468005
+        }
+      ],
+      "blocking_waterfall_candidates": [
+        {
+          "cdp_id": "36324.263",
+          "path": "/admin/api/reads?site=83&resource=posts&page=1&page_size=20&ordering=-created_at",
+          "start_ms": 119.833984375,
+          "wait_ms": 98.759,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "36324.264",
+          "path": "/admin/api/reads?site=83&resource=categories&page=1&page_size=100&ordering=name",
+          "start_ms": 120.51806640625,
+          "wait_ms": 57.913,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "36324.265",
+          "path": "/admin/api/reads?site=83&resource=tags&page=1&page_size=100&ordering=name",
+          "start_ms": 121.113037109375,
+          "wait_ms": 89.708,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "36324.266",
+          "path": "/admin/favicon.ico",
+          "start_ms": 129.553955078125,
+          "wait_ms": 12.073,
+          "initiator_type": "other"
+        },
+        {
+          "cdp_id": "36324.267",
+          "path": "/admin/sites/83/admin/posts/new",
+          "start_ms": 130.683837890625,
+          "wait_ms": 17.39,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "36324.268",
+          "path": "/admin/sites/83/admin/posts",
+          "start_ms": 246.427978515625,
+          "wait_ms": 6.101,
+          "initiator_type": "script"
+        }
+      ],
+      "waterfall_note": "Start offsets are relative to navigation initiation; temporal sequences are candidates, not proof of causal blocking.",
+      "server": {
+        "django_requests": 3,
+        "next_api_spans": 3,
+        "sql_count": 38,
+        "sql_ms": 42.243,
+        "duplicate_endpoints": [],
+        "request_ids": [
+          "12075c8f-219f-4668-af15-5015ca54c2d0",
+          "b44239bd-6393-4bcd-bc02-d64212b1bbc2",
+          "b0294f95-0132-49ca-97b3-69e615c6ac8c"
+        ],
+        "browser_parent_matches": 3
+      }
+    },
+    {
+      "scenario": "cached_section_return",
+      "cache_state": "warm",
+      "navigation_id": "fb7650c8-a4ff-4d14-a843-9730e9342d30",
+      "site_id": 83,
+      "section": "dashboard",
+      "duration_ms": 101.86319999999978,
+      "dashboard_usable_ms": 101.86319999999978,
+      "requests": 2,
+      "transferred_bytes": 2997,
+      "response_transferred_bytes": 2997,
+      "request_payload_bytes": 0,
+      "duplicate_endpoints": [],
+      "cancelled_requests": 0,
+      "failed_requests": 0,
+      "browser_measure_ms": 104.19999998807907,
+      "browser_measure_scope": "current-document",
+      "in_flight_at_usable_boundary": 1,
+      "waterfall": [
+        {
+          "cdp_id": "36324.269",
+          "method": "GET",
+          "path": "/admin/sites/83/admin",
+          "action_id": null,
+          "start_ms": 61.548828125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "fb7650c8-a4ff-4d14-a843-9730e9342d30",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1518,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 5.165
+          },
+          "duration_ms": 7.566999993287027
+        },
+        {
+          "cdp_id": "36324.270",
+          "method": "GET",
+          "path": "/admin/favicon.ico",
+          "action_id": null,
+          "start_ms": 93.218994140625,
+          "initiator_type": "other",
+          "initiator_request_id": null,
+          "request_id": "fb7650c8-a4ff-4d14-a843-9730e9342d30",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1479,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 5.771
+          },
+          "duration_ms": 7.8270000230986625
+        }
+      ],
+      "blocking_waterfall_candidates": [],
+      "waterfall_note": "Start offsets are relative to navigation initiation; temporal sequences are candidates, not proof of causal blocking.",
+      "server": {
+        "django_requests": 0,
+        "next_api_spans": 0,
+        "sql_count": 0,
+        "sql_ms": 0,
+        "duplicate_endpoints": [],
+        "request_ids": [],
+        "browser_parent_matches": 0
+      }
+    },
+    {
+      "scenario": "cached_section_transition",
+      "cache_state": "warm",
+      "navigation_id": "ef01d72c-001e-46b3-8d71-2f3b8bfd1785",
+      "site_id": 83,
+      "section": "posts",
+      "duration_ms": 78.71280000000115,
+      "dashboard_usable_ms": null,
+      "requests": 1,
+      "transferred_bytes": 1479,
+      "response_transferred_bytes": 1479,
+      "request_payload_bytes": 0,
+      "duplicate_endpoints": [],
+      "cancelled_requests": 0,
+      "failed_requests": 0,
+      "browser_measure_ms": 79.90000000596046,
+      "browser_measure_scope": "current-document",
+      "in_flight_at_usable_boundary": 0,
+      "waterfall": [
+        {
+          "cdp_id": "36324.271",
+          "method": "GET",
+          "path": "/admin/favicon.ico",
+          "action_id": null,
+          "start_ms": 69.738037109375,
+          "initiator_type": "other",
+          "initiator_request_id": null,
+          "request_id": "ef01d72c-001e-46b3-8d71-2f3b8bfd1785",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1479,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 3.5759999999999996
+          },
+          "duration_ms": 4.868999996688217
+        }
+      ],
+      "blocking_waterfall_candidates": [],
+      "waterfall_note": "Start offsets are relative to navigation initiation; temporal sequences are candidates, not proof of causal blocking.",
+      "server": {
+        "django_requests": 0,
+        "next_api_spans": 0,
+        "sql_count": 0,
+        "sql_ms": 0,
+        "duplicate_endpoints": [],
+        "request_ids": [],
+        "browser_parent_matches": 0
+      }
+    }
+  ],
+  "failures": [],
+  "trace_summary": {
+    "all_api_samples_correlated": true,
+    "django_requests": 32,
+    "next_api_spans": 20,
+    "navigation_samples_missing_django_spans": [
+      "d1f07543-ae75-4e6a-8427-b7c487f60fa0",
+      "a5908b1a-2b3a-45b5-a62a-cea06fa772bc",
+      "622ac2d0-2ee0-4064-8373-863826779286",
+      "ad7df4be-11a7-4c6d-980c-bf0e4443d294",
+      "fb7650c8-a4ff-4d14-a843-9730e9342d30",
+      "ef01d72c-001e-46b3-8d71-2f3b8bfd1785"
+    ],
+    "note": "No upstream requests may be legitimate for a fully cached transition; inspect browser waterfall before interpreting missing spans."
+  }
+}
