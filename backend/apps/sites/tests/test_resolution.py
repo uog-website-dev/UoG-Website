@@ -175,6 +175,7 @@ def test_configured_institutional_hosts_resolve_only_their_own_site(client):
     assert college_context.status_code == 200
     assert college_context.json()["site"]["code"] == "INFORMATICS"
     assert college_context.json()["domain"] == "informatics.uog.edu.et"
+    assert college_context.json()["canonical_domain"] == "informatics.uog.edu.et"
     assert college_context.json()["configuration"]["display_name"] == "College of Informatics"
     assert root_context.json()["configuration"] != college_context.json()["configuration"]
     spoofed = client.get("/api/v1/site-context/", HTTP_HOST="localhost", HTTP_X_FORWARDED_HOST="uog.edu.et")
@@ -210,6 +211,8 @@ def test_configured_institutional_hosts_resolve_only_their_own_site(client):
     SiteDomain.objects.create(site=main, hostname="www.uog.edu.et", status="ACTIVE")
     added = client.get("/api/v1/site-context/", HTTP_HOST="www.uog.edu.et")
     assert added.status_code == 200 and added.json()["site"]["code"] == "MAIN"
+    assert added.json()["domain"] == "www.uog.edu.et"
+    assert added.json()["canonical_domain"] == "uog.edu.et"
     assert _site_migrations() == migrations
 
     retired = SiteDomain.objects.get(hostname="www.informatics.uog.edu.et")

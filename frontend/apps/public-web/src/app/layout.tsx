@@ -6,8 +6,6 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "University of Gondar — Public Portal",
-  description:
-    "Public website of the University of Gondar Digital Platform (development).",
 };
 
 export default function RootLayout({

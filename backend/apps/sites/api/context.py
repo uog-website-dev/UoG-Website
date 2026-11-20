@@ -9,7 +9,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from ..models import Site
+from ..models import Site, SiteDomain
 
 
 class ResolvedSiteSerializer(serializers.Serializer):
@@ -27,6 +27,7 @@ class PublicConfigurationSerializer(serializers.Serializer):
 class SiteContextSerializer(serializers.Serializer):
     site = ResolvedSiteSerializer(allow_null=True)
     domain = serializers.CharField(allow_null=True)
+    canonical_domain = serializers.CharField(allow_null=True)
     configuration = PublicConfigurationSerializer(allow_null=True)
     modules = serializers.ListField(child=serializers.CharField())
 
@@ -44,7 +45,7 @@ class SiteContextView(APIView):
     def get(self, request):
         site = getattr(request, "site", None)
         if site is None:
-            body = {"site": None, "domain": None, "configuration": None, "modules": []}
+            body = {"site": None, "domain": None, "canonical_domain": None, "configuration": None, "modules": []}
         else:
             current = Site.objects.select_related("organization_unit").get(pk=site.pk)
             body = {
@@ -55,6 +56,9 @@ class SiteContextView(APIView):
                     "organization_unit": current.organization_unit_id,
                 },
                 "domain": request.site_domain.hostname,
+                "canonical_domain": SiteDomain.objects.filter(
+                    site=current, is_primary=True, status="ACTIVE",
+                ).values_list("hostname", flat=True).first(),
                 "configuration": {
                     "display_name": current.configuration["identity"]["display_name"],
                     "theme": current.configuration["presentation"]["theme"],

@@ -18,6 +18,8 @@ import { PublicSiteFrame } from "./public-site-frame";
 
 const informatics = {
   site: { id: 2, code: "INFORMATICS", name: "Informatics" },
+  domain: "informatics.uog.edu.et",
+  canonical_domain: "informatics.uog.edu.et",
   configuration: { display_name: "College of Informatics", theme: "institutional" },
   modules: ["PAGES", "POSTS", "MENUS"],
 };
@@ -30,6 +32,8 @@ const medicine = {
 
 const main = {
   site: { id: 1, code: "MAIN", name: "University of Gondar" },
+  domain: "uog.edu.et",
+  canonical_domain: "uog.edu.et",
   configuration: { display_name: "University of Gondar", theme: "institutional" },
   modules: ["PAGES", "POSTS", "MENUS"],
 };
@@ -43,6 +47,8 @@ describe("siteFromContext", () => {
       "College of Medicine",
     ]);
     expect(hosts.map((site) => site.id)).toEqual([1, 2, 3]);
+    expect(hosts.map((site) => site.domain)).toEqual(["uog.edu.et", "informatics.uog.edu.et", null]);
+    expect(hosts.map((site) => site.canonicalDomain)).toEqual(["uog.edu.et", "informatics.uog.edu.et", null]);
     expect(hosts[2]?.theme).toBe("high-contrast");
     expect(hosts[1]?.modules.posts).toBe(true);
     expect(hosts[2]?.modules.posts).toBe(false);

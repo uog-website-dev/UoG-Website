@@ -4,6 +4,8 @@ Open Site Administration > Posts and choose Create Post or Edit. Post settings p
 
 The title supports up to 255 characters. Permalink slugs support up to 128 characters using lowercase letters, numbers and single hyphens. The public path is `/posts/{slug}` within the active Site hostname and language. Slugs are unique within that Site and language across drafts and published Posts. Separate Sites can use the same slug. Reserved values are `new`, `edit`, `create`, `admin`, `api`, `preview`, `feed`, `search`, `rss`, `atom` and `index`.
 
+On a published Post detail route, the public renderer uses `seo.meta_title` when present, otherwise the Post title. It uses `seo.meta_description` when present; otherwise it uses the published excerpt, falling back to the Site display name when the excerpt is empty. The same values are emitted in Open Graph title and description fields. Draft Post metadata is not available to the public route.
+
 A duplicate permalink produces a field error. Editing the value clears the rejected value's error and enables another save. Excerpts use the existing optional text field and existing request/revision size limits. Categories and tags are optional.
 
 The taxonomy menus load every active page of choices for the current Site. Unavailable selections show their IDs and can be removed from the menu. Reload categories and tags refreshes the choices while retaining the draft. Site ownership and active eligibility are rechecked during the transactional write.
