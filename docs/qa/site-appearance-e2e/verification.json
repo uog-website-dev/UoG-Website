@@ -1,0 +1,57 @@
+{
+  "story": "P4-SITE-001",
+  "checked_at": "2026-11-20",
+  "result": "PASS",
+  "acceptance_criteria": {
+    "AC-01": {
+      "status": "PASS",
+      "evidence": [
+        "backend/tests/test_site_appearance_api.py::test_site_admin_appearance_api_save_isolated_and_cannot_edit_global_defaults",
+        "backend/apps/sites/tests/test_configuration.py::test_partial_update_changes_only_the_selected_site",
+        "frontend/apps/admin-web/src/sites/site-form.test.tsx::saves a selected Site logo and approved appearance, then reopens with effective values"
+      ]
+    },
+    "AC-02": {
+      "status": "PASS",
+      "evidence": [
+        "backend/tests/test_site_appearance_api.py checks the saved configuration on a fresh GET",
+        "frontend/apps/admin-web/src/sites/site-form.test.tsx reopens with the saved logo and theme"
+      ]
+    },
+    "AC-03": {
+      "status": "PASS",
+      "evidence": "backend/apps/sites/tests/test_configuration.py::test_logo_must_be_a_ready_image_owned_by_the_updated_site"
+    },
+    "AC-04": {
+      "status": "PASS",
+      "evidence": "backend/tests/test_site_appearance_api.py checks rejection of unsupported themes and arbitrary colors"
+    },
+    "AC-05": {
+      "status": "PASS",
+      "evidence": "backend/tests/test_site_appearance_api.py verifies a Site Administrator receives 403 when patching global Site Template defaults"
+    },
+    "AC-06": {
+      "status": "PASS",
+      "evidence": "backend/tests/test_site_appearance_api.py verifies Site B is unchanged and rejects a Site A administrator's Site B write"
+    },
+    "AC-07": {
+      "status": "PASS",
+      "evidence": "scripts/qa-site-appearance-browser.cjs renders a Site with no logo in headless Edge and checks the UoG fallback header"
+    },
+    "AC-08": {
+      "status": "PASS",
+      "evidence": "backend/tests/test_site_appearance_api.py checks rejection of custom_css and custom_js; backend/apps/sites/tests/test_configuration.py has equivalent schema-negative cases"
+    }
+  },
+  "browser_e2e": "scripts/qa-site-appearance-browser.cjs",
+  "browser_results": "docs/qa/site-appearance-e2e/results.json",
+  "screenshots": [
+    "docs/qa/site-appearance-e2e/fallback-branding.png",
+    "docs/qa/site-appearance-e2e/site-logo.png",
+    "docs/qa/site-appearance-e2e/unavailable-logo-fallback.png"
+  ],
+  "notes": [
+    "The Edge browser check ran against the local public frontend and backend using the Site's resolved hostname. Logo success, failure fallback, and private URL rejection were exercised with controlled API responses.",
+    "Site Administrator authorization and appearance writes were exercised through the real DRF API test client; frontend form selection/save/reopen was exercised in the admin component suite."
+  ]
+}

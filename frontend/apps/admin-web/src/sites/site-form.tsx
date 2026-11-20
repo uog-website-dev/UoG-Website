@@ -36,6 +36,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
 import { useRouter } from "next/navigation";
 import {
   FormErrorSummary,
@@ -45,6 +46,8 @@ import {
   useToast,
 } from "@uog/ui";
 import type { Organization, Site, SiteConfiguration, SiteTemplate } from "@uog/types";
+import { SiteImageField } from "@/sites/site-image-field";
+import { APP_BASE_PATH } from "@/base-path";
 
 import {
   createSite,
@@ -583,7 +586,7 @@ export function SiteForm({ site }: SiteFormProps) {
       <Box sx={{ borderTop: 1, borderColor: "divider", pt: 2.5, display: "flex", flexDirection: "column", gap: 2 }}>
         <Box>
           <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-            Settings
+            Site appearance and settings
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Typed, allowlisted configuration fields only (schema v1) — there is
@@ -594,16 +597,26 @@ export function SiteForm({ site }: SiteFormProps) {
         </Box>
 
         <FormField
-          label="Display name"
+          label="Public site title"
           name="display_name"
           value={values.display_name}
           onChange={setField("display_name")}
           error={allErrors.display_name}
           hint={
             originByKey?.get("display_name") ??
-            "Leave blank to use the site name everywhere."
+            "Leave blank to use the Site name. This changes this Site only."
           }
         />
+
+        {site ? <SiteImageField
+          siteId={site.id}
+          label="Site logo"
+          value={{ assetId: values.logo_asset_id, alt: values.display_name.trim() || values.name || "Site logo" }}
+          onChange={(next) => setValues((previous) => ({ ...previous, logo_asset_id: next.assetId }))}
+          optional
+          canUpload
+          helperText="Choose a ready PNG, JPEG, or WebP image from this Site’s Media Library. Other Sites’ media is not available."
+        /> : <Typography variant="body2" color="text.secondary">Create the Site first, then choose its logo from its own Media Library.</Typography>}
 
         <Box id="site-enabled-languages">
           <Typography variant="overline" color="text.secondary">
@@ -661,6 +674,23 @@ export function SiteForm({ site }: SiteFormProps) {
               {allErrors.theme ??
                 (originByKey?.get("theme") ?? "Approved themes only.")}
             </Typography>
+          </Box>
+
+          <Box
+            component="section"
+            aria-label="Appearance preview"
+            sx={{ gridColumn: { sm: "1 / -1" }, border: 1, borderColor: "divider", borderRadius: 2, overflow: "hidden" }}
+          >
+            <Typography variant="overline" sx={{ display: "block", px: 2, pt: 1, color: "text.secondary" }}>Preview</Typography>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2, minHeight: 88, px: 2, py: 1.5, bgcolor: values.theme === "high-contrast" ? "#000000" : "#003366", color: "#ffffff" }}>
+              {values.logo_asset_id && site ? <Box component="img" alt="" src={`${APP_BASE_PATH}/sites/${site.id}/media/${values.logo_asset_id}/image?variant=thumbnail`} sx={{ width: 56, height: 56, objectFit: "contain", bgcolor: "#ffffff", borderRadius: 1 }} /> : <Box aria-hidden sx={{ width: 56, height: 56, display: "grid", placeItems: "center", border: "1px solid currentColor", borderRadius: 1, fontWeight: 700 }}>UoG</Box>}
+              <Box sx={{ minWidth: 0 }}>
+                <Typography fontWeight={700} sx={{ overflowWrap: "anywhere" }}>{values.display_name.trim() || values.name || "Site title"}</Typography>
+                <Typography variant="caption" sx={{ opacity: 0.85 }}>{values.theme === "high-contrast" ? "High contrast · approved black and white palette" : "Institutional · approved navy and gold palette"}</Typography>
+              </Box>
+              <Divider orientation="vertical" flexItem sx={{ ml: "auto", borderColor: values.theme === "high-contrast" ? "#ffff00" : "#FFB81C", borderRightWidth: 4 }} />
+            </Box>
+            <Typography variant="caption" color="text.secondary" sx={{ display: "block", px: 2, py: 1 }}>Colors come from the selected approved theme. Custom CSS and arbitrary colors are not supported.</Typography>
           </Box>
 
           <Box sx={{ display: "flex", flexDirection: "column" }}>

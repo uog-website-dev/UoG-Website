@@ -81,6 +81,8 @@ export interface SiteFormValues {
   template: string;
   /** Configuration: `""` means null (fall back to `Site.name`). */
   display_name: string;
+  /** Current or selected ready image from this Site's Media Library. */
+  logo_asset_id: string | null;
   /** Enabled language codes; must include `default_language`. */
   enabled_languages: string[];
   theme: string;
@@ -104,6 +106,7 @@ export function emptySiteForm(): SiteFormValues {
     is_main: false,
     template: "",
     display_name: "",
+    logo_asset_id: null,
     enabled_languages: ["en", "am"],
     theme: "institutional",
     show_search: false,
@@ -122,11 +125,18 @@ export function formValuesFromSite(site: Site): SiteFormValues {
     is_main: site.is_main,
     template: site.template === null ? "" : String(site.template),
     display_name: site.configuration.identity.display_name ?? "",
+    logo_asset_id: logoAssetId(site.configuration.identity.logo_ref),
     enabled_languages: [...site.configuration.language.enabled],
     theme: site.configuration.presentation.theme,
     show_search: site.configuration.behavior.show_search,
     show_language_switcher: site.configuration.behavior.show_language_switcher,
   };
+}
+
+function logoAssetId(reference: string | null | undefined): string | null {
+  if (!reference) return null;
+  const value = reference.trim().replace(/^sites\/\d+\/assets\//, "");
+  return /^[0-9a-f]{32}$/i.test(value) || /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(value) ? value : null;
 }
 
 /**
@@ -251,6 +261,7 @@ export function buildConfigurationChanges(
   return {
     identity: {
       display_name: values.display_name.trim() === "" ? null : values.display_name.trim(),
+      logo_ref: values.logo_asset_id?.replaceAll("-", "").toLowerCase() ?? null,
     },
     language: { enabled: values.enabled_languages },
     presentation: {

@@ -134,7 +134,7 @@ def _validate_current(document, *, default_language):
         raise ValidationError({"configuration": "Enabled languages must include the Site default language."})
     presentation = document["presentation"]
     _exact_keys(presentation, ("theme",), "Configuration presentation does not match the approved schema.")
-    if presentation["theme"] not in THEMES:
+    if not isinstance(presentation["theme"], str) or presentation["theme"] not in THEMES:
         raise ValidationError({"configuration": "Presentation theme is not approved."})
     navigation = document["navigation"]
     _exact_keys(navigation, ("items",), "Configuration navigation does not match the approved schema.")

@@ -29,6 +29,7 @@ export interface PublicSiteContext {
   domain: string | null;
   /** Configured primary public hostname for canonical links. */
   canonicalDomain: string | null;
+  logoUrl: string | null;
   theme: "institutional" | "high-contrast";
   modules: { pages: boolean; posts: boolean; menus: boolean };
 }
@@ -40,6 +41,7 @@ export const EMPTY_SITE: PublicSiteContext = {
   displayName: "University of Gondar",
   domain: null,
   canonicalDomain: null,
+  logoUrl: null,
   theme: "institutional",
   modules: { pages: false, posts: false, menus: false },
 };
@@ -52,7 +54,7 @@ export function siteFromContext(status: number, body: unknown): PublicSiteContex
     site?: { id?: unknown; code?: unknown; name?: unknown } | null;
     domain?: unknown;
     canonical_domain?: unknown;
-    configuration?: { display_name?: unknown; theme?: unknown } | null;
+    configuration?: { display_name?: unknown; theme?: unknown; logo_url?: unknown } | null;
     modules?: unknown;
   };
   const site = row.site;
@@ -72,6 +74,7 @@ export function siteFromContext(status: number, body: unknown): PublicSiteContex
     displayName: typeof display === "string" && display.trim() ? display.trim() : site.name.trim(),
     domain: typeof row.domain === "string" && /^[a-z0-9.-]+$/i.test(row.domain) ? row.domain.toLowerCase() : null,
     canonicalDomain: typeof row.canonical_domain === "string" && /^[a-z0-9.-]+$/i.test(row.canonical_domain) ? row.canonical_domain.toLowerCase() : null,
+    logoUrl: row.configuration?.logo_url === "/api/v1/site-context/identity/logo/" ? row.configuration.logo_url : null,
     theme,
     modules: {
       pages: modules.includes("PAGES"),
