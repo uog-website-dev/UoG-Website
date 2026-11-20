@@ -12,6 +12,7 @@ import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 
 import type { PublicSiteContext } from "./public-site";
+import { SiteBrandingLockup } from "./site-branding";
 
 export function PublicSiteFrame({
   site,
@@ -28,9 +29,11 @@ export function PublicSiteFrame({
         display: "flex",
         flexDirection: "column",
         gap: 3,
-        ...(site.theme === "high-contrast" ? { bgcolor: "#000", color: "#fff" } : {}),
+        bgcolor: "background.default",
+        color: "text.primary",
       }}
     >
+      {site.id !== null ? <SiteBrandingLockup site={site} compact /> : null}
       <Typography
         variant="h1"
         component="h1"

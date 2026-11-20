@@ -88,6 +88,14 @@ are stored on that Site; the platform or template defaults are not changed.
 Public context returns a logo route only when the same Site's logo is still
 eligible. Missing or unavailable logos use the accessible UoG brand fallback.
 
+The public renderer resolves that configuration from the current request Host
+through `GET /api/v1/site-context/`; callers cannot choose a Site id. The
+response is `private, no-store` and varies by Host. Public pages resolve it for
+each document request and refresh it when a background tab becomes active.
+This is the publication policy for Site title, logo and theme changes: they
+appear on the next page request or tab refocus without editing Pages or
+homepage templates.
+
 ## Domains
 
 Hostnames are normalized and globally unique. A duplicate returns 409.

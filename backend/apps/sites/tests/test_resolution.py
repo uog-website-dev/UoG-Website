@@ -178,6 +178,16 @@ def test_configured_institutional_hosts_resolve_only_their_own_site(client):
     assert college_context.json()["canonical_domain"] == "informatics.uog.edu.et"
     assert college_context.json()["configuration"]["display_name"] == "College of Informatics"
     assert root_context.json()["configuration"] != college_context.json()["configuration"]
+    assert "no-store" in root_context["Cache-Control"]
+    assert "Host" in root_context["Vary"]
+    apply_site_configuration(informatics.pk, {
+        "identity": {"display_name": "College of Informatics updated"},
+        "presentation": {"theme": "institutional"},
+    })
+    refreshed = client.get("/api/v1/site-context/", HTTP_HOST="informatics.uog.edu.et")
+    assert refreshed.status_code == 200
+    assert refreshed.json()["configuration"]["display_name"] == "College of Informatics updated"
+    assert refreshed.json()["configuration"]["theme"] == "institutional"
     spoofed = client.get("/api/v1/site-context/", HTTP_HOST="localhost", HTTP_X_FORWARDED_HOST="uog.edu.et")
     assert spoofed.status_code == 200 and spoofed.json()["site"] is None
     alias = client.get("/news?lang=en", HTTP_HOST="www.informatics.uog.edu.et")

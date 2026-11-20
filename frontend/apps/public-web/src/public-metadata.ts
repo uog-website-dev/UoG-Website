@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import * as http from "node:http";
 import * as https from "node:https";
-import { pageMetadata, postMetadata, safePagePath, siteFromContext } from "@uog/ui";
+import { EMPTY_SITE, pageMetadata, postMetadata, safePagePath, siteFromContext } from "@uog/ui";
 import type { PublicSiteContext } from "@uog/ui";
 
 const API = process.env.API_BASE_URL ?? "http://backend:8000/api";
@@ -30,13 +30,18 @@ async function requestPublicApi(path: string, host: string): Promise<{ status: n
   } catch { return null; }
 }
 
+/** Resolve public Site branding from the request Host without accepting Site ids. */
+export async function publicSiteForHost(host: string | null): Promise<PublicSiteContext> {
+  if (!host || /[\s,/@\\]/.test(host)) return EMPTY_SITE;
+  const response = await requestPublicApi("", host);
+  return siteFromContext(response?.status ?? 0, response?.body ?? null);
+}
+
 async function resolvedSite(): Promise<{ site: PublicSiteContext; origin: string } | null> {
   const incoming = await headers();
   const requestHost = incoming.get("host");
-  if (!requestHost || /[\s,/@\\]/.test(requestHost)) return null;
   try {
-    const response = await requestPublicApi("", requestHost);
-    const site = siteFromContext(response?.status ?? 0, response?.body ?? null);
+    const site = await publicSiteForHost(requestHost);
     if (!site.id || !site.canonicalDomain) return null;
     const forwarded = incoming.get("x-forwarded-proto")?.split(",")[0]?.trim();
     const localHost = site.canonicalDomain === "localhost" || site.canonicalDomain.endsWith(".uog.local");

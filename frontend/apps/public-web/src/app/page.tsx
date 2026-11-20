@@ -26,29 +26,21 @@ import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
 import Typography from "@mui/material/Typography";
 import { ApiError, createApiClient } from "@uog/api-client";
-import { pageFromResponse, pageMetadata, PublicPageView, publicFetchInit, sameSite, siteFromContext } from "@uog/ui";
+import { pageFromResponse, pageMetadata, PublicPageView, publicFetchInit, sameSite, usePublicSiteBranding } from "@uog/ui";
 import type { PublicPageDocument } from "@uog/ui";
 import type { HealthReport } from "@uog/types";
 
-const PUBLIC_HOMEPAGE_PATH = "/api/v1/site-context/homepage/";
-
-/** Shape of `GET /api/v1/site-context/` (see apps/sites/api/context.py). */
 interface SiteContext {
-  site: {
-    id: number;
-    code: string;
-    name: string;
-    organization_unit: number;
-  } | null;
+  site: { id: number; code: string; name: string; organization_unit: number } | null;
   domain: string | null;
-  configuration: {
-    display_name: string | null;
-    theme: string;
-  } | null;
+  configuration: { display_name: string | null; theme: string } | null;
   modules: string[];
 }
 
+const PUBLIC_HOMEPAGE_PATH = "/api/v1/site-context/homepage/";
+
 export default function HomePage() {
+  const resolved = usePublicSiteBranding();
   const [homepage, setHomepage] = useState<PublicPageDocument | null>(null);
   const [homepageReady, setHomepageReady] = useState(false);
   const [health, setHealth] = useState<HealthReport | null>(null);
@@ -104,13 +96,12 @@ export default function HomePage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const resolved = siteContext ? siteFromContext(200, siteContext) : null;
-  const visibleHomepage = resolved?.modules.pages && homepage && sameSite(homepage.site, resolved.id)
+  const visibleHomepage = resolved.modules.pages && homepage && sameSite(homepage.site, resolved.id)
     ? homepage
     : null;
 
   useEffect(() => {
-    if (!resolved || !visibleHomepage) return;
+    if (!resolved.id || !visibleHomepage) return;
     const metadata = pageMetadata(resolved, visibleHomepage);
     document.title = metadata.title;
     let description = document.querySelector('meta[name="description"]');

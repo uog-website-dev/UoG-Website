@@ -17,6 +17,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
+import { SiteBrandingLockup, usePublicSiteBranding } from "./site-branding";
 
 import { publicFetchInit } from "./public-site";
 import type {PublicMenuNode} from "./site-navigation";
@@ -408,6 +409,7 @@ function PageSidebar({ page, preview }: { page: PublicPageDocument; preview: boo
 }
 
 export function PublicPageView({ page, privateMediaBase, viewportWidth, hideTitle = false }: { page: PublicPageDocument | null; privateMediaBase?: string; viewportWidth?: number; hideTitle?: boolean }): ReactNode {
+  const site = usePublicSiteBranding();
   if (!page) {
     return (
       <Typography role="status" color="text.secondary">
@@ -433,7 +435,7 @@ export function PublicPageView({ page, privateMediaBase, viewportWidth, hideTitl
   };
   return (
     <PrivateMediaBase.Provider value={privateMediaBase ?? null}>
-      <Box data-page-layout={shell} sx={{
+      <Box data-page-layout={shell} data-site-code={site.code ?? ""} sx={{
         display: "grid", width: "100%", minWidth: 0, gap: { xs: 3, md: 4 },
         gridTemplateColumns: columns, gridTemplateAreas: areas,
       }}>
@@ -442,6 +444,7 @@ export function PublicPageView({ page, privateMediaBase, viewportWidth, hideTitl
           aria-labelledby="public-page-title"
           sx={{ gridArea: "content", display: "flex", flexDirection: "column", gap: 2, minWidth: 0, width: "100%", maxWidth: contentWidth, mx: "auto", overflowWrap: "anywhere" }}
         >
+          {site.id !== null ? <SiteBrandingLockup site={site} compact /> : null}
           <Typography id="public-page-title" variant="h3" component="h1" sx={titleHidden ? {position:"absolute",width:1,height:1,p:0,m:-1,overflow:"hidden",clipPath:"inset(50%)",whiteSpace:"nowrap"} : { overflowWrap: "anywhere" }}>
           {page.title}
         </Typography>
