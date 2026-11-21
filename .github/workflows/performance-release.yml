@@ -1,0 +1,41 @@
+name: Performance release evidence gate
+on:
+  workflow_dispatch:
+    inputs:
+      evidence_run:
+        description: Trusted Actions run containing redacted performance-release-evidence artifact
+        required: true
+      expected_commit:
+        description: Full commit SHA of the measured build
+        required: true
+permissions:
+  contents: read
+  actions: read
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    environment: performance-release-review
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: performance-release-evidence
+          path: evidence
+          run-id: ${{ inputs.evidence_run }}
+          github-token: ${{ github.token }}
+      - name: Verify measured commit
+        env:
+          EXPECTED_COMMIT: ${{ inputs.expected_commit }}
+        run: |
+          node -e "const d=require('./evidence/final/production/results.json');if(!/^[a-f0-9]{40}$/.test(process.env.EXPECTED_COMMIT)||d.metadata.source.commit!==process.env.EXPECTED_COMMIT)process.exit(1)"
+      - name: Enforce performance and review policy
+        run: |
+          node scripts/perf/release-gate.cjs evidence/final/production/results.json docs/performance/release-policy.json --release --evidence evidence/manifest.json > gate.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: performance-release-gate
+          path: gate.json

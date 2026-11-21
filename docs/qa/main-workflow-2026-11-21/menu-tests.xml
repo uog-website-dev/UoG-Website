@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="21" failures="0" errors="0" time="7.24529294">
+    <testsuite name="src/sites/menu-items.test.tsx" timestamp="2026-11-21T03:16:50.590Z" hostname="ff47f131e439" tests="7" failures="0" errors="0" skipped="0" time="2.817682738">
+        <testcase classname="src/sites/menu-items.test.tsx" name="MenuItemTree &gt; moves, nests and lifts items from the keyboard for this Site only" time="0.851332776">
+        </testcase>
+        <testcase classname="src/sites/menu-items.test.tsx" name="MenuItemTree &gt; reorders by dropping an item onto a sibling" time="0.260560821">
+        </testcase>
+        <testcase classname="src/sites/menu-items.test.tsx" name="MenuItemTree &gt; blocks an unsafe external URL and an unavailable Page" time="0.288866806">
+        </testcase>
+        <testcase classname="src/sites/menu-items.test.tsx" name="MenuItemTree &gt; saves a Page target and removes a leaf" time="0.676184816">
+        </testcase>
+        <testcase classname="src/sites/menu-items.test.tsx" name="MenuItemTree &gt; reports a version conflict and does not send the stale change again" time="0.305639654">
+        </testcase>
+        <testcase classname="src/sites/menu-items.test.tsx" name="MenuItemTree &gt; warns when Pages cannot be loaded and keeps an unavailable target visible" time="0.112516151">
+        </testcase>
+        <testcase classname="src/sites/menu-items.test.tsx" name="adds typed news and same-Site category destinations" time="0.319880585">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-menus.test.tsx" timestamp="2026-11-21T03:16:50.596Z" hostname="ff47f131e439" tests="14" failures="0" errors="0" skipped="0" time="4.427610202">
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; waits for an item save and refreshed menu ETag before publishing" time="1.460059789">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; reorders the header with the keyboard-reachable move control and only for this Site" time="0.426394707">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; shows the reloaded menu order after a move" time="0.527117169">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; creates an unassigned local menu and renames it without changing placement" time="0.603171919">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; treats a missing inheritance field as no delivery policy" time="0.153353104">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; ignores malformed inheritance entries without crashing or inventing a policy" time="0.149078499">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; states that an empty inheritance list adds no parent menu" time="0.080614115">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; explains central and inherited ownership and does not edit a central menu" time="0.245159164">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; shows an empty list and hides writes without menu permission" time="0.032873061">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; shows the load error and keeps the selected Site on the request" time="0.020708333">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; blocks protected reads and changes when the MENUS module is off" time="0.006068735">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="creates another named menu even after header and footer are occupied" time="0.298354366">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="selects and searches the directory without showing another Site&apos;s menu" time="0.241547421">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="loads only the selected item tree and ignores a late response for another menu" time="0.17982379">
+        </testcase>
+    </testsuite>
+</testsuites>

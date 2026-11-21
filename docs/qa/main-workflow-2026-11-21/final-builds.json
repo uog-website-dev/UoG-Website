@@ -1,0 +1,19 @@
+{
+  "admin": {
+    "command": "node scripts/isolated-production-build.mjs",
+    "exit_code": 0,
+    "duration_ms": 72958.8,
+    "isolated_admin_build": true
+  },
+  "public": {
+    "command": "pnpm --filter @uog/public-web build",
+    "exit_code": 0,
+    "log": "public-build.txt"
+  },
+  "typechecks": {
+    "admin": 0,
+    "public": 0,
+    "log": "typecheck-final.txt"
+  },
+  "production_browser_workflow": false
+}

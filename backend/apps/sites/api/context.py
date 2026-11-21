@@ -56,7 +56,7 @@ class SiteContextView(APIView):
                     "name": current.name,
                     "organization_unit": current.organization_unit_id,
                 },
-                "domain": request.site_domain.hostname,
+                "domain": request.site_domain.hostname if request.site_domain else None,
                 "canonical_domain": SiteDomain.objects.filter(
                     site=current, is_primary=True, status="ACTIVE",
                 ).values_list("hostname", flat=True).first(),

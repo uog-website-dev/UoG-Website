@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "checks": [
+    "Direct Pages link and browser back/forward preserve scoped Pages/Posts views",
+    "Delayed 503 read leaves shell usable, shows retry, and recovers to real Site rows",
+    "Session loss denies direct protected GETs and clears protected content on reload"
+  ]
+}

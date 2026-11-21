@@ -1,0 +1,14 @@
+{
+  "checks": [
+    "one shared initial bootstrap; no eager Site discovery",
+    "Site selection performs one new bootstrap",
+    "direct-link refresh restores the correct Site",
+    "unknown Site context is denied without metadata",
+    "failed Site change hides prior Site context",
+    "explicit retry restores the requested Site"
+  ],
+  "bootstrap_requests": 6,
+  "discovery_requests": 2,
+  "status": "PASS",
+  "browser": "157.0.4341.60"
+}

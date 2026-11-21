@@ -26,21 +26,21 @@ print(json.dumps(result))`));
   }
   result.checks.push('Two-Site API counts reconcile with independent grouped/source queries; real Redis repeat hits');
   phase='browser essentials';const actions=[];
-  page.on('request',request=>{if(request.method()==='POST'&&request.headers()['next-action'])actions.push(request.headers()['next-action']);});
+  page.on('request',request=>{if(request.method()==='GET'&&new URL(request.url()).pathname.endsWith('/api/reads')&&['dashboard-summary','dashboard-activity'].includes(new URL(request.url()).searchParams.get('resource')))actions.push(new URL(request.url()).searchParams.get('resource'));});
   await page.goto(origin+'/admin');await page.getByRole('button',{name:'Sign in with Keycloak',exact:true}).click();await page.locator('#username').fill(seed.actor.username);await page.locator('#password').fill(seed.actor.password);await page.locator('#kc-login').click();await page.waitForURL(url=>url.origin===origin&&/^\/admin\/?$/.test(url.pathname));
   actions.length=0; // Authentication itself is a separate server action.
   const choose=async id=>{await page.getByRole('button',{name:'Workspace',exact:true}).first().click();await page.locator(`[data-workspace-site="${id}"]`).click();};
   const ready=async id=>{await page.locator(`[data-perf-site-id="${id}"]`).waitFor();await page.waitForFunction(()=>document.querySelectorAll('[data-perf-section="dashboard"] section dl').length===5);};
   await choose(a);await ready(a);await page.waitForFunction(()=>document.querySelector('[data-dashboard-secondary-pending]')?.getAttribute('data-dashboard-secondary-pending')==='false');
-  assert.equal(actions.length,2,'Dashboard called more than one summary and one activity action');const[summaryAction,activityAction]=actions;
-  result.essential_actions=1;result.secondary_actions=1;result.checks.push('Five summary cards use one essential action; activity is a separate action');
+  assert.equal(actions.length,2,'Dashboard must request one summary and one activity read');assert.equal(new Set(actions).size,2,'Duplicate dashboard endpoint read');
+  result.essential_reads=1;result.secondary_reads=1;result.checks.push('Five summary cards use one essential GET; activity uses one independent GET');
   phase='delayed/failed secondary';let release,enteredResolve;const entered=new Promise(resolve=>{enteredResolve=resolve;}),held=new Promise(resolve=>{release=resolve;});
-  await page.route('**/admin/**',async route=>{if(route.request().method()==='POST'&&route.request().headers()['next-action']===activityAction){enteredResolve();await held;await route.abort('failed');}else await route.continue();});
+  await page.route('**/admin/**',async route=>{if(route.request().method()==='GET'&&new URL(route.request().url()).searchParams.get('resource')==='dashboard-activity'){enteredResolve();await held;await route.abort('failed');}else await route.continue();});
   await page.reload();await entered;await ready(a);assert(await page.getByText(/Loading recent activity/).isVisible());
   release();await page.getByText('Recent activity is unavailable. Summary counts remain available.').waitFor();assert.equal(await page.locator('[data-perf-section="dashboard"] section dl').count(),5);
   await page.unroute('**/admin/**');result.checks.push('Held secondary leaves all essentials visible; transport failure shows independent retry UI');
   phase='slow summary';let resume,startedResolve;const started=new Promise(resolve=>{startedResolve=resolve;}),pending=new Promise(resolve=>{resume=resolve;});
-  await page.route('**/admin/**',async route=>{if(route.request().method()==='POST'&&route.request().headers()['next-action']===summaryAction){startedResolve();await pending;await route.continue();}else await route.continue();});
+  await page.route('**/admin/**',async route=>{if(route.request().method()==='GET'&&new URL(route.request().url()).searchParams.get('resource')==='dashboard-summary'){startedResolve();await pending;await route.continue();}else await route.continue();});
   await page.reload();await started;assert(await page.getByRole('link',{name:'Create page',exact:true}).isVisible());assert.equal(await page.locator('[data-perf-section="dashboard"] section dl').count(),0);resume();await ready(a);await page.unroute('**/admin/**');result.checks.push('Slow essential request retains quick actions and honest first-load skeletons, then recovers');
   phase='disabled module';moduleState(false);disabled=true;await choose(b);await page.locator(`[data-perf-site-id="${b}"]`).waitFor();await page.getByText(/Not enabled for this Site: Posts/).waitFor();assert.equal(await page.getByRole('region',{name:'Posts',exact:true}).count(),0);
   const gated=await context.request.get(`${origin}/api/workspace/dashboard/?site=${b}`,{headers});assert(!('posts' in (await gated.json()).sections));moduleState(true);disabled=false;result.checks.push('Disabling POSTS hides its card/counts on Site B without changing Site A; managed module restored');

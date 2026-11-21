@@ -126,6 +126,31 @@ def test_platform_host_has_no_site_and_cache_and_cookies_stay_separated(client, 
     assert client.get("/health/live").status_code == 200
 
 
+def test_development_platform_host_serves_the_active_main_site_public_context(sites, client, settings):
+    settings.ALLOWED_HOSTS = ["testserver", "localhost", "127.0.0.1"]
+    settings.DEBUG = True
+    root = OrganizationUnit.objects.get(code="UOG")
+    main = Site.objects.create(
+        organization_unit=root, code="MAIN", name="Main Site", is_main=True,
+    )
+    activate_site(main.pk)
+    SiteDomain.objects.create(
+        site=main, hostname="main.uog.edu.et", is_primary=True, status="ACTIVE",
+    )
+
+    context = client.get("/api/v1/site-context/", HTTP_HOST="localhost")
+    assert context.status_code == 200
+    assert context.json()["site"]["code"] == "MAIN"
+    assert context.json()["domain"] is None
+    assert context.json()["canonical_domain"] == "main.uog.edu.et"
+    assert client.get("/api/v1/site-context/", HTTP_HOST="127.0.0.1").json()["site"]["code"] == "MAIN"
+
+    # The fallback is limited to public delivery and to development.
+    assert client.get("/health/live", HTTP_HOST="localhost").status_code == 200
+    settings.DEBUG = False
+    assert client.get("/api/v1/site-context/", HTTP_HOST="localhost").json()["site"] is None
+
+
 def test_alias_redirect_keeps_path_and_query_and_rejects_open_redirects(sites):
     kept, _ = _call("computing.uog.edu.et", path="/news/events?lang=en&page=2")
     assert kept.status_code == 302

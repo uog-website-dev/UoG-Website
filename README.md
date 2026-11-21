@@ -50,6 +50,11 @@ its OIDC clients, and the Celery beat schedule.
 | MinIO console | http://localhost:9001 |
 | Direct ports | backend :8000, public-web :3000, admin-web :3001 |
 
+In development, `http://localhost` renders the active **Main** Site's published
+homepage. Other Sites are previewed through their configured hostname (for
+example `www.uog.local`); see
+[docs/development/domain-management.md](docs/development/domain-management.md).
+
 ## Testing credentials
 
 All values below are the **development defaults** from `.env.example`;

@@ -445,7 +445,7 @@ export function PublicPageView({ page, privateMediaBase, viewportWidth, hideTitl
           sx={{ gridArea: "content", display: "flex", flexDirection: "column", gap: 2, minWidth: 0, width: "100%", maxWidth: contentWidth, mx: "auto", overflowWrap: "anywhere" }}
         >
           {site.id !== null ? <SiteBrandingLockup site={site} compact /> : null}
-          <Typography id="public-page-title" variant="h3" component="h1" sx={titleHidden ? {position:"absolute",width:1,height:1,p:0,m:-1,overflow:"hidden",clipPath:"inset(50%)",whiteSpace:"nowrap"} : { overflowWrap: "anywhere" }}>
+          <Typography id="public-page-title" variant="h3" component="h1" sx={titleHidden ? {position:"absolute",left:0,top:0,width:1,height:1,p:0,m:-1,overflow:"hidden",clipPath:"inset(50%)",whiteSpace:"nowrap"} : { overflowWrap: "anywhere" }}>
           {page.title}
         </Typography>
       {page.layout_unavailable ? <Typography role="status">This page content is currently unavailable.</Typography> : page.visual_layout ? <VisualLayoutView layout={page.visual_layout} siteId={page.site} pageTitle={page.title} pageId={page.id} preview={Boolean(privateMediaBase)} mediaBase={privateMediaBase} viewportWidth={viewportWidth} /> : <BlockList blocks={page.blocks} siteId={page.site} />}

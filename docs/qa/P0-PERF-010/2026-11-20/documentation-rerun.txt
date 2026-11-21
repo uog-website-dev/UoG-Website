@@ -1,0 +1,4 @@
+..............                                                           [100%]
+
+-------------- generated xml file: /tmp/perf010-documentation.xml --------------
+

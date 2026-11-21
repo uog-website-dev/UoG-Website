@@ -4,6 +4,8 @@ One public-web application serves every Site. The browser does not send a Site i
 
 A platform host such as `localhost` resolves to no Site. An unknown or inactive hostname is a 404 and does not borrow another Site.
 
+In development (`DEBUG=True`), the public Site-context routes under `/api/v1/site-context/` use the active **Main** Site when the Host is a platform host (`localhost`/`127.0.0.1`). That lets `http://localhost` show the Main Site's assigned homepage without a `*.uog.local` hosts entry. Production (`DEBUG=False`), other platform routes, and non-public API paths still resolve no Site. Use a Site hostname such as `www.uog.local` to preview any other Site.
+
 ## What each hostname renders
 
 - Homepage: the published homepage for that Site, including its SEO title and description.

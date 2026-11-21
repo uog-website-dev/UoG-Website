@@ -1,6 +1,12 @@
 """Choose request.site from the Host header and the SiteDomain table.
 
 This is routing, not authorization. X-Forwarded-Host is never read.
+
+In development only, a platform host (``localhost``/``127.0.0.1``) serves
+the public Site-context routes of the active Main Site. That lets a developer
+open ``http://localhost`` without adding a ``*.uog.local`` hosts entry.
+Production (``DEBUG=False``) never applies this fallback, and every other
+platform route still resolves no Site.
 """
 from urllib.parse import urlunsplit
 
@@ -12,6 +18,9 @@ from apps.core.cache import bind_cache_site, reset_cache_site
 
 from .allowed_hosts import bind_resolved_host, reset_resolved_host
 from .selectors.domains import resolve_hostname
+
+#: Public delivery routes that may use the development Main Site fallback.
+PUBLIC_CONTEXT_PREFIX = "/api/v1/site-context/"
 
 
 class SiteResolutionMiddleware:
@@ -29,6 +38,14 @@ class SiteResolutionMiddleware:
             if host is None:
                 return _vary(_closed())
             if _platform_request(host):
+                site = _development_public_site(request) if settings.DEBUG else None
+                if site is None:
+                    return _vary(self.get_response(request))
+                request.site = site
+                request.enabled_module_codes = _enabled_module_codes(site)
+                reset_cache_site(cache_token)
+                cache_token = bind_cache_site(site.pk)
+                host_token = bind_resolved_host(host)
                 return _vary(self.get_response(request))
             resolved = resolve_hostname(host)
             if resolved is None:
@@ -79,6 +96,18 @@ def _platform_request(host):
             names.add(str(pattern).lower())
     names.add("testserver")
     return host.lower() in names
+
+
+def _development_public_site(request):
+    """Active Main Site for public delivery on a platform host in development."""
+    if not request.path.startswith(PUBLIC_CONTEXT_PREFIX):
+        return None
+    from .models import Site
+    return (
+        Site.objects.filter(is_main=True, status=Site.Status.ACTIVE)
+        .only("id")
+        .first()
+    )
 
 
 def _closed():

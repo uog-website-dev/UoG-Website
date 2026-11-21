@@ -1,0 +1,194 @@
+apps/cms/tests/test_blocks.py: 15
+
+apps/cms/tests/test_category_archives.py: 10
+
+apps/cms/tests/test_content.py: 12
+
+apps/cms/tests/test_homepage.py: 5
+
+apps/cms/tests/test_homepage_assignment.py: 8
+
+apps/cms/tests/test_homepage_templates.py: 19
+
+apps/cms/tests/test_layout_contract.py: 117
+
+apps/cms/tests/test_membership_authorization.py: 8
+
+apps/cms/tests/test_menu_api.py: 22
+
+apps/cms/tests/test_menu_delivery.py: 7
+
+apps/cms/tests/test_menu_destinations.py: 7
+
+apps/cms/tests/test_menu_directory.py: 4
+
+apps/cms/tests/test_menu_integrity.py: 29
+
+apps/cms/tests/test_menu_locations.py: 12
+
+apps/cms/tests/test_menu_preview.py: 8
+
+apps/cms/tests/test_menus.py: 13
+
+apps/cms/tests/test_module.py: 8
+
+apps/cms/tests/test_multi_site.py: 4
+
+apps/cms/tests/test_page_api.py: 12
+
+apps/cms/tests/test_page_redirects.py: 7
+
+apps/cms/tests/test_page_shell_layouts.py: 9
+
+apps/cms/tests/test_pages.py: 12
+
+apps/cms/tests/test_post_media.py: 16
+
+apps/cms/tests/test_post_workflow_migration.py: 1
+
+apps/cms/tests/test_post_working_drafts.py: 5
+
+apps/cms/tests/test_posts_api.py: 35
+
+apps/cms/tests/test_public_news.py: 17
+
+apps/cms/tests/test_public_posts.py: 6
+
+apps/cms/tests/test_public_site_hosts.py: 1
+
+apps/cms/tests/test_realm_role_authorization.py: 5
+
+apps/cms/tests/test_revision_api.py: 3
+
+apps/cms/tests/test_revisions.py: 6
+
+apps/cms/tests/test_role_retirement.py: 6
+
+apps/cms/tests/test_serializers.py: 9
+
+apps/cms/tests/test_sidebar_widgets.py: 9
+
+apps/cms/tests/test_sidebars.py: 12
+
+apps/cms/tests/test_visual_builder_module.py: 1
+
+apps/cms/tests/test_widget_runtime.py: 6
+
+apps/cms/tests/test_workflow.py: 15
+
+apps/cms/tests/test_workflow_api.py: 4
+
+apps/cms/tests/test_working_draft.py: 5
+
+apps/organizations/tests/test_hierarchy.py: 22
+
+apps/organizations/tests/test_lifecycle.py: 23
+
+apps/organizations/tests/test_module.py: 9
+
+apps/organizations/tests/test_organization_types.py: 27
+
+apps/organizations/tests/test_organization_units.py: 36
+
+apps/sites/tests/test_configuration.py: 20
+
+apps/sites/tests/test_module.py: 7
+
+apps/sites/tests/test_module_registry.py: 3
+
+apps/sites/tests/test_resolution.py: 7
+
+apps/sites/tests/test_site.py: 43
+
+apps/sites/tests/test_site_domain.py: 14
+
+apps/sites/tests/test_site_module.py: 2
+
+apps/sites/tests/test_site_template.py: 4
+
+tests/test_account_profile_migration.py: 1
+
+tests/test_accounts.py: 13
+
+tests/test_api.py: 2
+
+tests/test_api_query_scaling.py: 6
+
+tests/test_audit.py: 11
+
+tests/test_authorization.py: 11
+
+tests/test_cache.py: 3
+
+tests/test_central_module_management.py: 16
+
+tests/test_dashboard.py: 15
+
+tests/test_documentation.py: 14
+
+tests/test_effective_permissions.py: 4
+
+tests/test_health.py: 4
+
+tests/test_media_assets.py: 18
+
+tests/test_media_derivatives.py: 11
+
+tests/test_media_discovery.py: 16
+
+tests/test_media_editable_metadata.py: 9
+
+tests/test_media_fixes.py: 6
+
+tests/test_media_removal.py: 10
+
+tests/test_media_uploads.py: 16
+
+tests/test_module_management_audit.py: 17
+
+tests/test_module_transactions.py: 7
+
+tests/test_oidc.py: 16
+
+tests/test_organization_audit.py: 9
+
+tests/test_organization_discovery_api.py: 63
+
+tests/test_organization_hierarchy_api.py: 20
+
+tests/test_organization_readiness.py: 4
+
+tests/test_organizations_api.py: 38
+
+tests/test_performance_instrumentation.py: 3
+
+tests/test_post_media_race.py: 1
+
+tests/test_section_templates.py: 5
+
+tests/test_site_appearance_api.py: 1
+
+tests/test_site_foundation.py: 3
+
+tests/test_site_module_availability_api.py: 2
+
+tests/test_site_navigation_summary.py: 2
+
+tests/test_site_user_creation.py: 24
+
+tests/test_sites_api.py: 12
+
+tests/test_sprint3_integrated_review.py: 3
+
+tests/test_tasks.py: 5
+
+tests/test_visual_drafts.py: 12
+
+tests/test_visual_layout_media.py: 3
+
+tests/test_visual_publication.py: 8
+
+tests/test_workspace.py: 12
+
+
+

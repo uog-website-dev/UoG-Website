@@ -1,0 +1,2 @@
+.................                                                        [100%]
+----------- generated xml file: /tmp/main-resolution-regression.xml ------------

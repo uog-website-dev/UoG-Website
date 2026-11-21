@@ -1,0 +1,2 @@
+JUNIT report written to /tmp/perf010-frontend.xml
+

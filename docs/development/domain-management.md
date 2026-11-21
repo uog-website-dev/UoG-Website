@@ -145,8 +145,9 @@ curl -si -H "Host: unknown.uog.local"     http://localhost/api/v1/site-context/ 
 # Deactivate a Site's active primary via the console (choose a replacement),
 # deactivate the replacement too — the Site's hostnames then answer 404.
 
-# Platform host resolves no Site
-curl -si http://localhost/api/v1/site-context/                                   # 200 — site: null
+# Platform host resolves no Site in production; with DEBUG=True the public
+# Site-context routes serve the active Main Site so http://localhost works.
+curl -si http://localhost/api/v1/site-context/                                   # dev: MAIN; prod: site: null
 
 # Header spoofing is ignored
 curl -si -H "Host: informatics.uog.local" -H "X-Forwarded-Host: medicine.uog.local" \

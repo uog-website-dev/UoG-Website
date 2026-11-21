@@ -1,0 +1,16 @@
+{
+  "NCPU": 12,
+  "MemTotal": 8167538688,
+  "OperatingSystem": "Docker Desktop",
+  "Architecture": "x86_64",
+  "ServerVersion": "29.9.3",
+  "host_cpu": "13th Gen Intel Core i7-1355U",
+  "network": "loopback unthrottled",
+  "viewport": [
+    1440,
+    1000
+  ],
+  "production_build": "Next.js production, React diagnostic profiling disabled",
+  "rehearsal_contention": "Initial benchmark overlapped backend/frontend regression jobs; not acceptance evidence",
+  "final_conditions": "Final timing run started after regression jobs completed; normal background services retained"
+}

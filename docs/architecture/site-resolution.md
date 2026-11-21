@@ -28,6 +28,11 @@ before a request reaches Django. Django applies this resolver to the Host
 that proxy forwards. A resolved Site hostname is allowed only for that
 request; it is not added to `ALLOWED_HOSTS`.
 
+With `DEBUG=True` only, the public Site-context routes
+(`/api/v1/site-context/…`) resolve the active Main Site on a platform host,
+so `http://localhost` renders that Site's assigned homepage. Production
+(`DEBUG=False`) and every non-public route keep the platform host Site-free.
+
 `GET /api/v1/site-context/` returns the selected Site code, owner, hostname,
 public display name, theme, and enabled module codes. Anonymous callers may
 read it. It grants no

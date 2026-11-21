@@ -16,6 +16,7 @@ from apps.cms.services.publication_cache import current_publication_version
 from apps.cms.tests.test_public_site_hosts import _host, _publish
 from apps.cms.tests.support import transition_with_site_role
 from apps.sites.models import Site, Module
+from apps.sites.services.lifecycle import activate_site
 from apps.sites.services.modules import disable_module_for_site, enable_module_for_site
 
 pytestmark = pytest.mark.django_db
@@ -111,6 +112,31 @@ def test_unpublished_selection_uses_empty_fallback_without_other_site_cache_chan
     assert again.json() == medicine.json()
     assert again["X-Publication-Version"] == medicine["X-Publication-Version"]
     a.refresh_from_db(); assert a.homepage_id == second.pk
+
+
+def test_development_platform_host_serves_the_assigned_main_homepage(world, settings):
+    a, b, actor, client, first, second, foreign, draft, ha, hb = world
+    settings.ALLOWED_HOSTS = ["testserver", "localhost", "127.0.0.1"]
+    settings.DEBUG = True
+    main = Site.objects.create(
+        organization_unit=a.organization_unit.parent, code="MAIN", name="Main Site", is_main=True,
+    )
+    activate_site(main.pk)
+    enable_module_for_site(main.pk, Module.objects.get(code="PAGES").pk)
+    UserRoleAssignment.objects.create(
+        user=actor, role=Role.objects.get(code="site-administrator"),
+        scope="SITE", organization=main.organization_unit, site=main,
+    )
+    home = _publish(Page.objects.create(site=main, title="Main assigned home", slug="home"))
+    assert assign(client, main, home).status_code == 200
+    main.refresh_from_db()
+    assert main.homepage_id == home.pk
+
+    response = client.get("/api/v1/site-context/homepage/", HTTP_HOST="localhost")
+    assert response.status_code == 200, response.content
+    assert response.json()["title"] == "Main assigned home"
+    assert response.json()["site"] == main.pk
+    assert "Host" in response["Vary"]
 
 
 def test_previous_homepage_revision_can_be_restored_republished_and_remains_in_history(world):

@@ -1,0 +1,87 @@
+{
+  "status": "FAIL",
+  "release_authorized": false,
+  "policy_status": "PROPOSED",
+  "errors": [
+    "cached_pages_return: p50 budget exceeded",
+    "cached_pages_return: p95 budget exceeded",
+    "cached_posts_return: p50 budget exceeded",
+    "cached_posts_return: p95 budget exceeded",
+    "cached_menus_return: p95 budget exceeded",
+    "sign-offs must bind the evidence manifest hash",
+    "budget/methodology approval missing",
+    "QA sign-off missing",
+    "Security sign-off missing"
+  ],
+  "metrics": {
+    "warm_site_switch": {
+      "n": 30,
+      "p50_ms": 124.62259999997332,
+      "p95_ms": 149.68539999998757
+    },
+    "cold_site_switch": {
+      "n": 30,
+      "p50_ms": 330.82120000000214,
+      "p95_ms": 390.0728999999992
+    },
+    "cached_section_return": {
+      "n": 30,
+      "p50_ms": 87.69670000000042,
+      "p95_ms": 104.11520000000019
+    },
+    "cached_section_transition": {
+      "n": 30,
+      "p50_ms": 84.46549999999115,
+      "p95_ms": 104.2896000000037
+    },
+    "workspace_api": {
+      "n": 60,
+      "p50_ms": 25.900000005960464,
+      "p95_ms": 32.400000005960464
+    },
+    "paginated_list_api": {
+      "n": 180,
+      "p50_ms": 35.5,
+      "p95_ms": 58.80000001192093
+    },
+    "dashboard_summary_api": {
+      "n": 60,
+      "p50_ms": 23.30000001192093,
+      "p95_ms": 36.400000005960464
+    },
+    "cached_pages_return": {
+      "n": 30,
+      "p50_ms": 301.64989999998943,
+      "p95_ms": 323.79759999999806
+    },
+    "cached_posts_return": {
+      "n": 30,
+      "p50_ms": 304.03189999999813,
+      "p95_ms": 317.35409999999683
+    },
+    "cached_menus_return": {
+      "n": 30,
+      "p50_ms": 183.3055999999924,
+      "p95_ms": 326.3350999999966
+    },
+    "cached_media_return": {
+      "n": 30,
+      "p50_ms": 229.8534000000218,
+      "p95_ms": 281.7557000000015
+    },
+    "dashboard_usable": {
+      "n": 91,
+      "p50_ms": 126.25950000000012,
+      "p95_ms": 372.2623999999996
+    },
+    "same_site_menu_navigation": {
+      "n": 30,
+      "p50_ms": 229.0216000000073,
+      "p95_ms": 423.00930000000517
+    }
+  },
+  "inputs": {
+    "results_sha256": "259299d761c7f366a533b84b31e8af16a489ee04e87c05c33d6f68d7295f9262",
+    "policy_sha256": "0eaf2075200ca9015d07b56efdd301630ed2eb5672c0023ceb2563a9c9680672"
+  }
+}

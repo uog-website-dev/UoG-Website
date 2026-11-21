@@ -8,7 +8,7 @@ const {chromium} = require(process.env.UOG_QA_PLAYWRIGHT_ROOT || 'playwright-cor
  try {
   context = await browser.newContext({viewport: {width: 1440, height: 1000}}); const page = await context.newPage(); page.setDefaultTimeout(30000);
   let actions = 0;
-  page.on('request', request => {if (request.method() === 'POST' && request.headers()['next-action']) actions++;});
+  page.on('request', request => {if ((request.method() === 'POST' && request.headers()['next-action']) || (request.method() === 'GET' && new URL(request.url()).pathname.endsWith('/api/reads'))) actions++;});
   await page.goto(origin + '/admin'); await page.getByRole('button', {name: 'Sign in with Keycloak', exact: true}).click();
   await page.locator('#username').fill(seed.actor.username); await page.locator('#password').fill(seed.actor.password); await page.locator('#kc-login').click();
   await page.waitForURL(url => url.origin === origin && /^\/admin\/?$/.test(url.pathname));
@@ -38,8 +38,8 @@ const {chromium} = require(process.env.UOG_QA_PLAYWRIGHT_ROOT || 'playwright-cor
    }, name);
    await section(a, name); await page.waitForTimeout(100);
    const flashes = await page.evaluate(() => {window.__cacheObserver.disconnect(); return window.__cacheFlashes;});
-   const calls = actions - before; assert.equal(calls, 0, 'Cached section repeated a Server Action read'); assert.equal(flashes, 0, 'Cached section showed a loading skeleton');
-   result.cached_returns.push({section: name, server_action_reads: calls, loading_flashes: flashes});
+   const calls = actions - before; assert.equal(calls, 0, 'Cached section repeated a scoped read'); assert.equal(flashes, 0, 'Cached section showed a loading skeleton');
+   result.cached_returns.push({section: name, scoped_read_calls: calls, loading_flashes: flashes});
   };
   await cachedReturn('pages'); phase = 'Posts return'; await cachedReturn('posts');
   phase = 'Menus return'; await section(a, 'menus'); await section(a, 'pages'); await cachedReturn('menus');

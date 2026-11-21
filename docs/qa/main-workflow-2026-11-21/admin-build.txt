@@ -1,0 +1,68 @@
+Scope: 5 of 7 workspace projects
+apps/admin-web build$ next build
+apps/admin-web build:    ▲ Next.js 15.5.28
+apps/admin-web build:    - Experiments (use with caution):
+apps/admin-web build:      · serverActions
+apps/admin-web build:    Creating an optimized production build ...
+apps/admin-web build:  ✓ Compiled successfully in 27.4s
+apps/admin-web build:    Linting and checking validity of types ...
+apps/admin-web build:    Collecting page data ...
+apps/admin-web build:    Generating static pages (0/16) ...
+apps/admin-web build:    Generating static pages (4/16) 
+apps/admin-web build:    Generating static pages (8/16) 
+apps/admin-web build:    Generating static pages (12/16) 
+apps/admin-web build:  ✓ Generating static pages (16/16)
+apps/admin-web build:    Finalizing page optimization ...
+apps/admin-web build:    Collecting build traces ...
+apps/admin-web build: Route (app)                                                                 Size  First Load JS
+apps/admin-web build: ┌ ƒ /                                                                    7.05 kB         180 kB
+apps/admin-web build: ├ ƒ /_not-found                                                            158 B         104 kB
+apps/admin-web build: ├ ƒ /access                                                              5.61 kB         186 kB
+apps/admin-web build: ├ ƒ /api/access                                                            158 B         104 kB
+apps/admin-web build: ├ ƒ /api/auth/[...nextauth]                                                158 B         104 kB
+apps/admin-web build: ├ ƒ /api/reads                                                             158 B         104 kB
+apps/admin-web build: ├ ƒ /api/session                                                           158 B         104 kB
+apps/admin-web build: ├ ƒ /api/session/expired                                                   158 B         104 kB
+apps/admin-web build: ├ ƒ /api/workspace                                                         158 B         104 kB
+apps/admin-web build: ├ ƒ /api/workspace/sites                                                   158 B         104 kB
+apps/admin-web build: ├ ƒ /domains                                                             10.3 kB         294 kB
+apps/admin-web build: ├ ƒ /modules                                                             18.7 kB         308 kB
+apps/admin-web build: ├ ƒ /organizations                                                       5.85 kB         306 kB
+apps/admin-web build: ├ ƒ /organizations/[id]                                                  7.69 kB         292 kB
+apps/admin-web build: ├ ƒ /organizations/[id]/edit                                               915 B         288 kB
+apps/admin-web build: ├ ƒ /organizations/hierarchy                                             5.22 kB         290 kB
+apps/admin-web build: ├ ƒ /organizations/new                                                     220 B         287 kB
+apps/admin-web build: ├ ƒ /sites                                                               12.4 kB         308 kB
+apps/admin-web build: ├ ƒ /sites/[id]                                                          13.1 kB         349 kB
+apps/admin-web build: ├ ƒ /sites/[id]/admin                                                    11.3 kB         186 kB
+apps/admin-web build: ├ ƒ /sites/[id]/admin/builder                                            2.25 kB         316 kB
+apps/admin-web build: ├ ƒ /sites/[id]/admin/homepage                                           8.32 kB         298 kB
+apps/admin-web build: ├ ƒ /sites/[id]/admin/media                                              16.4 kB         222 kB
+apps/admin-web build: ├ ƒ /sites/[id]/admin/menus                                              2.56 kB         318 kB
+apps/admin-web build: ├ ƒ /sites/[id]/admin/menus/preview                                      5.56 kB         295 kB
+apps/admin-web build: ├ ƒ /sites/[id]/admin/pages                                              2.23 kB         316 kB
+apps/admin-web build: ├ ƒ /sites/[id]/admin/pages/[pageId]/builder                             30.4 kB         338 kB
+apps/admin-web build: ├ ƒ /sites/[id]/admin/pages/[pageId]/edit                                  494 B         307 kB
+apps/admin-web build: ├ ƒ /sites/[id]/admin/pages/[pageId]/preview                             5.11 kB         295 kB
+apps/admin-web build: ├ ƒ /sites/[id]/admin/pages/new                                            468 B         307 kB
+apps/admin-web build: ├ ƒ /sites/[id]/admin/posts                                              2.17 kB         314 kB
+apps/admin-web build: ├ ƒ /sites/[id]/admin/posts/[postId]/edit                                  458 B         319 kB
+apps/admin-web build: ├ ƒ /sites/[id]/admin/posts/[postId]/preview                             5.13 kB         295 kB
+apps/admin-web build: ├ ƒ /sites/[id]/admin/posts/new                                            436 B         319 kB
+apps/admin-web build: ├ ƒ /sites/[id]/admin/sidebars                                           7.62 kB         297 kB
+apps/admin-web build: ├ ƒ /sites/[id]/admin/users                                              20.5 kB         223 kB
+apps/admin-web build: ├ ƒ /sites/[id]/edit                                                       864 B         295 kB
+apps/admin-web build: ├ ƒ /sites/[id]/media-upload                                               158 B         104 kB
+apps/admin-web build: ├ ƒ /sites/[id]/media/[assetId]/image                                      158 B         104 kB
+apps/admin-web build: ├ ƒ /sites/[id]/modules                                                  8.76 kB         296 kB
+apps/admin-web build: ├ ƒ /sites/[id]/pages/[pageId]/preview-media/[revision]/[assetId]/image    158 B         104 kB
+apps/admin-web build: ├ ƒ /sites/[id]/pages/[pageId]/widget-data                                 158 B         104 kB
+apps/admin-web build: └ ƒ /sites/new                                                             222 B         295 kB
+apps/admin-web build: + First Load JS shared by all                                             103 kB
+apps/admin-web build:   ├ chunks/5870-6c8b2471b40f71aa.js                                      46.9 kB
+apps/admin-web build:   ├ chunks/fd9bffea-61bce6436ccff5b9.js                                  54.2 kB
+apps/admin-web build:   └ other shared chunks (total)                                          2.28 kB
+apps/admin-web build: ƒ  (Dynamic)  server-rendered on demand
+apps/admin-web build: Done
+isolated admin build present: true
+{"event":"uog.frontend.production-build","duration_ms":94139.9,"exit_code":0,"isolated_admin_build":true}
