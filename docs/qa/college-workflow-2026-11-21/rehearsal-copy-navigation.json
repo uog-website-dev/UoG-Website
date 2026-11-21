@@ -1,0 +1,86 @@
+{
+  "run": "collegeqa-b5e2f44c",
+  "checks": [
+    {
+      "name": "UI uploads approved image into Main private media library",
+      "status": "PASS"
+    },
+    {
+      "name": "UI publishes distinct Primary Header menu",
+      "status": "PASS"
+    },
+    {
+      "name": "UI publishes distinct Footer menu",
+      "status": "PASS"
+    },
+    {
+      "name": "UI publishes distinct Page Sidebar menu",
+      "status": "PASS"
+    },
+    {
+      "name": "Anonymous visitor cannot read saved draft article",
+      "status": "PASS"
+    },
+    {
+      "name": "posts role handoff publishes College review collegeqa-b5e2f44c university news",
+      "status": "PASS"
+    },
+    {
+      "name": "pages role handoff publishes College review collegeqa-b5e2f44c university information",
+      "status": "PASS"
+    },
+    {
+      "name": "pages role handoff publishes College review collegeqa-b5e2f44c homepage",
+      "status": "PASS"
+    },
+    {
+      "name": "Editor template and builder draft publishes through review and is assigned as active Site homepage",
+      "status": "PASS"
+    },
+    {
+      "name": "Viewer cannot create active Site Pages through direct UI or forged API request",
+      "status": "PASS"
+    },
+    {
+      "name": "Anonymous active Site homepage, featured news and right sidebar render with distinct menu locations on desktop/mobile",
+      "status": "PASS"
+    }
+  ],
+  "menus": {
+    "Primary Header": "College review collegeqa-b5e2f44c College navigation",
+    "Footer": "College review collegeqa-b5e2f44c College resources",
+    "Page Sidebar": "College review collegeqa-b5e2f44c College information"
+  },
+  "current_step": "editor pages",
+  "media": "collegeqa-b5e2f44c-campus.png",
+  "status": "FAIL",
+  "path": "/admin/sites/19/admin/pages",
+  "article": {
+    "id": "a8a51a84-d677-45f5-8ccf-28dca0fe2468",
+    "title": "College review collegeqa-b5e2f44c university news",
+    "slug": "collegeqa-b5e2f44c-news",
+    "published": true
+  },
+  "sidebarDefinition": {
+    "name": "College review collegeqa-b5e2f44c sidebar"
+  },
+  "sidebarPage": {
+    "title": "College review collegeqa-b5e2f44c university information",
+    "slug": "collegeqa-b5e2f44c-information",
+    "published": true
+  },
+  "homepage": {
+    "id": "cecb0ef4-e593-4dc2-9d4e-5edd4c0987b8",
+    "title": "College review collegeqa-b5e2f44c homepage",
+    "template_saved": true,
+    "published": true,
+    "originalRevision": 5,
+    "assigned": true
+  },
+  "negative": {
+    "viewer_create_status": 403
+  },
+  "last_stage": "public",
+  "phase": "login",
+  "error": "page.waitForURL: Timeout 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"domcontentloaded\"\n============================================================"
+}

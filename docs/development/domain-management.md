@@ -249,3 +249,20 @@ behaviour itself is asserted by the backend suites above (all runs on
   is production machinery from the backend.
 - `.local` is mDNS-reserved: for real browser navigation during development,
   map the seed hostnames in the local hosts file.
+
+## Troubleshooting a missing college homepage or navigation
+
+The hostname in the browser must be an **active Site Domain** for the intended
+Site. A hosts/DNS entry pointing to nginx is not enough: `coi.uog.edu.et` and
+`coi.uog.local` are separate hostnames. To use both, add and activate the local
+name as an alias in that Site's Domain Overview. Leave alias redirection off
+when the development name should render locally; the production primary may
+remain unchanged. Never solve an unknown hostname by falling back to another
+Site or accepting a Site ID from the public request.
+
+If branding is generic and no homepage/menu appears, check domain resolution
+first (`/api/v1/site-context/` on that exact hostname). Once it returns the
+correct Site, check PAGES/MENUS availability, published homepage eligibility,
+and published menu/location assignments. Registering a missing alias does not
+require republishing otherwise eligible content. Unknown hostnames now show a
+distinct unresolved-Site message instead of the empty-homepage explanation.

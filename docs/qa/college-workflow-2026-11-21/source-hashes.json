@@ -1,0 +1,11 @@
+{
+  "scripts/qa-college-inventory.py": "82177b0af53433bc848d96db657801dcf11785757a8ccc9dc6836582feb2f304",
+  "scripts/qa-college-isolation.py": "f9d24d092d6c785ed94c2d44210d138f8ecb5fb4346d85e0b5740522c86da11a",
+  "scripts/qa-college-main-snapshot.py": "dd2627391474f3bcac11319389a09c85167f3c81c45dd83ff991d52661674c2a",
+  "scripts/qa-college-public.cjs": "2ac76556e12eaf4fed12551dd96d69aaf5a094d8a6ba12f21f425921b273323e",
+  "scripts/qa-college-workflow-cleanup.py": "c31c8e9835b3921d5b00761e8d9ba2a838618dbaf60e61b452fd1c7bfa58d51e",
+  "scripts/qa-college-workflow-run.ps1": "8f72f899cc892ff556e505879bcf50f473026163278eecb8bb2433d91da88ed9",
+  "scripts/qa-college-workflow-session.py": "6fc2120bcebc9beaccd4f1745630763cc4606e41fee880ae55769157076d9111",
+  "scripts/qa-college-workflow-setup.py": "4869145285dd86fd76a36878925a93dc977cfc48aa4900cf6ba8809ae2f6e3ee",
+  "scripts/qa-main-workflow-browser.cjs": "a456c7698e9aa3d48a7bdcc3373a2232ec85b806aae877fd67752693e5b3aaae"
+}
