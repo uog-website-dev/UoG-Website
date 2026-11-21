@@ -59,7 +59,7 @@ function SectionRow({row,siteId,pageTitle,width}:{row:LayoutSection;siteId:numbe
     data-resolved-breakpoint={resolved.breakpoint}
     data-resolved-gap={resolved.gap}
     data-resolved-stack={resolved.stack ? "true" : "false"}
-    sx={{display:"grid",gridTemplateColumns:columns,...presentationStyle(resolved),...decorativeStyle(row.style)}}
+    sx={{display:"grid",gridTemplateColumns:columns,...presentationStyle(resolved),...decorativeStyle(row.style),...(resolved.tone==="muted" && !row.style?.padding ? {p:{xs:2.5,md:4}} : {}),...(resolved.tone==="muted" && !row.style?.radius ? {borderRadius:2} : {})}}
   >
     {row.columns.map((column) => (
       <Box key={column.id} data-node-id={column.id} sx={{minWidth:0,display:"flex",flexDirection:"column",gap:2}}>
@@ -80,7 +80,7 @@ export function VisualLayoutView({layout,siteId,pageTitle,pageId,preview=false,m
   const postBindings=/"type":"(?:post_title|post_excerpt|featured_image)"/.test(JSON.stringify(layout));
   return <WidgetRuntimeProvider siteId={siteId} pageId={pageId} preview={preview} mediaBase={mediaBase}>
     {preview && postBindings?<PostPreviewSelector/>:null}
-    <Box ref={rootRef} data-layout-version="1" data-viewport-width={width} sx={{display:"grid",gap:3,minWidth:0,overflowWrap:"anywhere",containerType:"inline-size",containerName:"visual-layout"}}>
+    <Box ref={rootRef} data-layout-version="1" data-viewport-width={width} sx={{display:"grid",gap:{xs:4,md:6},minWidth:0,overflowWrap:"anywhere",containerType:"inline-size",containerName:"visual-layout"}}>
       {checked.value.rows.map((row) => (
         <SectionRow key={row.id} row={row} siteId={siteId} pageTitle={pageTitle} width={width}/>
       ))}

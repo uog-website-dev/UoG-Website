@@ -133,10 +133,10 @@ export function formValuesFromSite(site: Site): SiteFormValues {
   };
 }
 
-function logoAssetId(reference: string | null | undefined): string | null {
+export function logoAssetId(reference: string | null | undefined): string | null {
   if (!reference) return null;
   const value = reference.trim().replace(/^sites\/\d+\/assets\//, "");
-  return /^[0-9a-f]{32}$/i.test(value) || /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(value) ? value : null;
+  return /^[0-9a-f]{32}$/i.test(value) || /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(value) ? value.toLowerCase().replace(/^([0-9a-f]{8})([0-9a-f]{4})([0-9a-f]{4})([0-9a-f]{4})([0-9a-f]{12})$/, "$1-$2-$3-$4-$5") : null;
 }
 
 /**

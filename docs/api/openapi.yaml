@@ -56912,7 +56912,10 @@ components:
         logo_url:
           type: string
           nullable: true
+        branding_revision:
+          type: string
       required:
+      - branding_revision
       - display_name
       - logo_url
       - theme

@@ -57,16 +57,56 @@ or media URL from the browser. The response is `private, no-store` and varies
 by Host; public clients also request it with `cache: no-store`.
 
 Every document request receives the current configuration during server
-rendering. A public tab refreshes the configuration when it returns to the
+rendering. Public context includes an opaque `branding_revision` derived from
+the effective public identity, eligible logo and module availability. It contains
+no storage references or credentials. A public tab refreshes the configuration when it returns to the
 foreground, so a saved Site Appearance change is visible on the next request
 or tab refocus without editing Page or Builder documents. Logo delivery is
-also `private, no-store`. When a logo is absent or unavailable, the shared
+also `private, no-store`. Header/footer logo URLs carry this revision as a safe
+`v` query parameter, and dynamic Site Title/Logo widgets revalidate identity
+data when the revision changes. Earlier image failures retry on context refresh.
+Overlapping focus requests are cancelled so an older response cannot restore
+stale branding. When a logo is absent or unavailable, the shared
 brand mark renders the UoG text fallback; no broken or private media URL is
 shown.
 
 The Main Site and child Sites use the same `PublicSiteChrome`, Site branding
 lockup and Material UI theme tokens. `institutional` uses UoG navy/gold with
 high contrast text; `high-contrast` uses black/white with yellow accents.
-Header, footer, Page/homepage document headers, article banners and supported
+Header, footer, article banners and supported
 visual-layout sections use those shared tokens. Branding stays bound to the
 request Site and is not copied into individual Page or Builder content.
+
+
+## Configure Appearance in Site Administration
+
+Choose the active Site in the workspace selector, then select **Appearance** in
+its navigation. For example, Informatics uses
+`/admin/sites/16/admin/appearance`. The entry and direct route require the
+Site-scoped `sites.update` permission; an ordinary Editor or Viewer cannot use
+this screen. Django rechecks permissions and ownership on the API request.
+
+Set the public Site title, select a ready image from that Site's Media Library,
+and choose Institutional or High contrast. Save appearance updates only
+`identity.display_name`, `identity.logo_ref` and `presentation.theme` through the
+existing conditional configuration API. A missing logo uses the approved UoG
+text mark. Supplied logo images have a transparent presentation background,
+no border and a standard 60px desktop / 56px mobile size. Custom
+colors, CSS, JavaScript and global template defaults are not editable here.
+
+Configuration saves are effective immediately; there is no separate branding
+publication workflow. Public tabs observe changes on their next page load or
+return to the foreground. They do not poll in the background. Existing Page
+revisions and publication snapshots are unchanged. A failed or conflicting save
+preserves form edits and offers an explicit reload of current settings.
+
+
+The real-browser regression is `scripts/qa-site-branding-refresh.cjs`. It accepts
+a private stdin seed with disposable Site-admin credentials, changes the title
+and approved theme through Appearance, verifies header/footer/dynamic identity
+refresh and Main Site independence, reopens settings, checks the authenticated
+logo preview and mobile accessibility, then restores the original appearance.
+[Recorded browser results](../qa/site-branding-refresh/2026-11-21/results.json)
+and [mobile screen](../qa/site-branding-refresh/2026-11-21/appearance-mobile.png)
+are available. The test identities were disabled and their Site grants revoked
+after verification; no credentials are included in these artifacts.

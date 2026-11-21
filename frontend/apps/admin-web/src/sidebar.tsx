@@ -11,6 +11,7 @@
  * Site-scoped permissions. Links use `next/link` so the Next.js `basePath`
  * (`/admin`) is applied — plain `<a>` tags would escape the console.
  */
+import PaletteOutlinedIcon from "@mui/icons-material/PaletteOutlined";
 import CloseIcon from "@mui/icons-material/Close";
 import AccountBalanceRoundedIcon from "@mui/icons-material/AccountBalanceRounded";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
@@ -57,6 +58,7 @@ const SITE_SECTION_ICONS: Record<SiteSection["key"], SvgIconComponent> = {
   sidebars: AccountTreeIcon,
   builder: ViewQuiltIcon,
   homepage: HomeOutlinedIcon,
+  appearance: PaletteOutlinedIcon,
   posts: ArticleIcon,
   menus: AccountTreeIcon,
   media: ArticleIcon,
@@ -69,6 +71,7 @@ const SITE_SECTION_DESCRIPTIONS: Record<SiteSection["key"], string> = {
   sidebars: "Reusable Page navigation regions",
   builder: "Compose a visual Page layout",
   homepage: "Assign the published Site root",
+  appearance: "Site logo, public title and theme",
   posts: "News and announcements",
   menus: "Header and footer navigation",
   media: "Private Site media library",

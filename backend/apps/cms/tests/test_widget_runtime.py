@@ -174,3 +174,34 @@ def test_site_logo_configuration_cannot_resolve_foreign_asset(world, client):
         remove_asset(actor, b.pk, foreign.pk)
     foreign.refresh_from_db()
     assert foreign.deleted_at is None
+
+
+def test_public_branding_revision_tracks_logo_and_title_without_changing_other_sites(world, client):
+    from apps.sites.services.configuration import apply_site_configuration
+    a,b,ha,hb,page = world
+    actor = _actor(a)
+    def context(host):
+        result=client.get("/api/v1/site-context/",HTTP_HOST=host)
+        assert result.status_code==200
+        assert "no-store" in result["Cache-Control"]
+        return result.json()["configuration"]
+    before=context(ha)
+    peer=context(hb)
+    assert len(before["branding_revision"])==64
+    assert context(ha)==before
+    logos=[]
+    with _media_write_session(actor,a.pk):
+        for number in range(2):
+            image=MediaAsset.objects.create(site=a,storage_reference=f"platform-private:sites/{a.pk}/logo/{uuid.uuid4()}",original_filename=f"logo-{number}.png",detected_mime="image/png",byte_count=10,checksum="c"*64,status="PENDING",created_by=actor,updated_by=actor)
+            image.status="READY";image.save(update_fields=["status"]);logos.append(image)
+    revisions=[before["branding_revision"]]
+    for image in logos:
+        apply_site_configuration(a.pk,{"identity":{"logo_ref":str(image.pk)}})
+        updated=context(ha)
+        assert updated["logo_url"]=="/api/v1/site-context/identity/logo/"
+        revisions.append(updated["branding_revision"])
+        assert context(hb)==peer
+    assert len(set(revisions))==3
+    apply_site_configuration(a.pk,{"identity":{"display_name":"Updated title"}})
+    assert context(ha)["branding_revision"] not in revisions
+    assert context(hb)==peer

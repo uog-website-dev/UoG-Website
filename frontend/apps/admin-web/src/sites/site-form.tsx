@@ -611,6 +611,7 @@ export function SiteForm({ site }: SiteFormProps) {
         {site ? <SiteImageField
           siteId={site.id}
           label="Site logo"
+          editAltText={false}
           value={{ assetId: values.logo_asset_id, alt: values.display_name.trim() || values.name || "Site logo" }}
           onChange={(next) => setValues((previous) => ({ ...previous, logo_asset_id: next.assetId }))}
           optional

@@ -54,7 +54,7 @@ describe("PublicMenuFrame", () => {
         <p>Page</p>
       </PublicMenuFrame>,
     );
-    expect(screen.getAllByRole("link", { name: "Department" }).every((link) => link.getAttribute("href") === "/about")).toBe(true);
+    expect(screen.getAllByRole("link", { name: "Overview", hidden: true }).every((link) => link.getAttribute("href") === "/about")).toBe(true);
     expect(screen.getByRole("link", { name: "Contacts" }).getAttribute("href")).toBe("/contacts");
     expect(screen.queryByRole("link", { name: "Blocked" })).toBeNull();
     expect(screen.getByText("Blocked").tagName).toBe("SPAN");

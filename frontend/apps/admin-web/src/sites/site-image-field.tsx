@@ -25,6 +25,8 @@ interface SiteImageFieldProps {
   /** When true, show a clear Remove image control. */
   optional?: boolean;
   canUpload?: boolean;
+  /** Branding derives accessible text from the Site title instead of editing placement alt text. */
+  editAltText?: boolean;
   disabled?: boolean;
   helperText?: string;
 }
@@ -55,6 +57,7 @@ function SiteImageFieldInner({
   onChange,
   optional = false,
   canUpload = false,
+  editAltText = true,
   disabled = false,
   helperText = "Describe the image for screen readers. Prefer the library alt text when it fits.",
 }: SiteImageFieldProps) {
@@ -135,7 +138,7 @@ function SiteImageFieldInner({
         </Button>
         {optional && value.assetId ? (
           <Button
-            color="warning"
+            color="inherit"
             disabled={disabled}
             onClick={() => onChange({ assetId: null, alt: value.alt })}
           >
@@ -143,7 +146,7 @@ function SiteImageFieldInner({
           </Button>
         ) : null}
       </Box>
-      <TextField
+      {editAltText ? <TextField
         label="Alt text"
         value={value.alt}
         onChange={(event) => onChange({ assetId: value.assetId, alt: event.target.value })}
@@ -152,7 +155,7 @@ function SiteImageFieldInner({
         minRows={2}
         inputProps={{ maxLength: 255, "aria-label": `${label} alt text` }}
         helperText={helperText}
-      />
+      /> : <Typography variant="caption" color="text.secondary">{helperText}</Typography>}
       <MediaPickerDialog
         open={open}
         siteId={siteId}

@@ -18,14 +18,21 @@ export function usePublicSiteBranding(): PublicSiteContext {
   return useContext(PublicSiteBrandingContext);
 }
 
+/** Keep the route host-scoped while changing its identity after an approved update. */
+export function publicLogoSource(site: PublicSiteContext): string | null {
+  if (site.logoUrl !== "/api/v1/site-context/identity/logo/") return null;
+  return /^[a-f0-9]{64}$/.test(site.brandingRevision ?? "")
+    ? `${site.logoUrl}?v=${site.brandingRevision}` : site.logoUrl;
+}
+
 /** Responsive, Site-bound logo with a branded text fallback and no broken-image state. */
-export function SiteBrandingMark({ site, size = 40 }: { site: PublicSiteContext; size?: number }) {
-  const validLogo = site.logoUrl === "/api/v1/site-context/identity/logo/";
+export function SiteBrandingMark({ site, size = 56 }: { site: PublicSiteContext; size?: number }) {
+  const source = publicLogoSource(site);
   const [failed, setFailed] = useState(false);
-  useEffect(() => setFailed(false), [site.id, site.logoUrl]);
+  useEffect(() => setFailed(false), [site]);
   const dimensions = { xs: Math.max(32, size - 4), sm: size };
 
-  if (!validLogo || failed) {
+  if (!source || failed) {
     return (
       <Box
         role="img"
@@ -36,8 +43,7 @@ export function SiteBrandingMark({ site, size = 40 }: { site: PublicSiteContext;
           flex: "0 0 auto",
           display: "grid",
           placeItems: "center",
-          border: 1,
-          borderColor: "divider",
+          border: 0,
           borderRadius: 1,
           bgcolor: "secondary.main",
           color: "secondary.contrastText",
@@ -54,7 +60,7 @@ export function SiteBrandingMark({ site, size = 40 }: { site: PublicSiteContext;
   return (
     <Box
       component="img"
-      src="/api/v1/site-context/identity/logo/"
+      src={source}
       alt={`${site.displayName} logo`}
       referrerPolicy="no-referrer"
       onError={() => setFailed(true)}
@@ -63,11 +69,10 @@ export function SiteBrandingMark({ site, size = 40 }: { site: PublicSiteContext;
         height: dimensions,
         flex: "0 0 auto",
         objectFit: "contain",
-        bgcolor: "common.white",
-        border: 1,
-        borderColor: "divider",
-        borderRadius: 1,
-        p: 0.25,
+        bgcolor: "transparent",
+        border: 0,
+        borderRadius: 0,
+        boxSizing: "border-box",
       }}
     />
   );
@@ -90,7 +95,7 @@ export function SiteBrandingLockup({
       data-site-branding={site.code ?? "university"}
       sx={{ display: "inline-flex", alignItems: "center", gap: compact ? 1 : 1.5, minWidth: 0 }}
     >
-      <SiteBrandingMark site={site} size={compact ? 32 : 44} />
+      <SiteBrandingMark site={site} size={compact ? 44 : 60} />
       <Typography
         component="span"
         variant={compact ? "subtitle2" : "subtitle1"}

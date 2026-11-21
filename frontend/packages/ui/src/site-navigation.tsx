@@ -60,11 +60,11 @@ function NavigationLink({item,context,children}:{item:PublicMenuNode;context:Lin
  const href=item.unavailable?null:destination(item.href,context.siteOrigin,context.currentPath);
  if(!href)return <Box component="span" aria-disabled={item.unavailable||undefined} sx={{overflowWrap:"anywhere"}}>{children??item.label}{item.unavailable?" (unavailable)":""}</Box>;
  const active=current(href,context.currentPath,context.siteOrigin);
- return <Link href={href} aria-current={active?"page":undefined} target={context.openLinksInNewTab?"_blank":undefined} rel={context.openLinksInNewTab?"noopener noreferrer":undefined} onClick={()=>context.onNavigate?.()} color="inherit" underline={active?"always":"hover"} sx={{display:"inline-flex",alignItems:"center",minHeight:44,maxWidth:"100%",overflowWrap:"anywhere",fontWeight:active?700:undefined,"&:focus-visible":{outline:"3px solid currentColor",outlineOffset:2,borderRadius:0.5}}}>{children??item.label}</Link>;
+ return <Link href={href} aria-current={active?"page":undefined} target={context.openLinksInNewTab?"_blank":undefined} rel={context.openLinksInNewTab?"noopener noreferrer":undefined} onClick={()=>context.onNavigate?.()} color="inherit" underline="none" sx={{display:"inline-flex",alignItems:"center",minHeight:44,maxWidth:"100%",overflowWrap:"anywhere",fontWeight:active?700:600,px:0.75,borderBottom:"2px solid",borderColor:active?"currentColor":"transparent","&:hover":{borderColor:"currentColor"},"&:focus-visible":{outline:"3px solid currentColor",outlineOffset:2,borderRadius:0.5}}}>{children??item.label}</Link>;
 }
-function MenuLinks({items,context,depth=0}:{items:PublicMenuNode[];context:LinkContext;depth?:number}){
+function MenuLinks({items,context,depth=0,horizontal=false}:{items:PublicMenuNode[];context:LinkContext;depth?:number;horizontal?:boolean}){
  if(depth>=4)return null;
- return <Box component="ul" sx={{listStyle:"none",m:0,p:0,pl:depth?2:0,minWidth:0}}>
+ return <Box component="ul" sx={{listStyle:"none",m:0,p:0,pl:depth?2:0,minWidth:0,display:horizontal?"flex":"block",flexWrap:"wrap",alignItems:"center",columnGap:3}}>
   {items.slice(0,1000).map((item,index)=><Box component="li" key={`${index}-${item.href}`} sx={{py:0.25,minWidth:0,overflowWrap:"anywhere"}}>
    <NavigationLink item={item} context={context}/>
    {item.children?.length?<MenuLinks items={item.children} context={context} depth={depth+1}/>:null}
@@ -79,11 +79,11 @@ export function SiteNavigation({items,label,mobile=false,dropdown=false,currentP
  const context:LinkContext={currentPath:currentPath??browserPath,siteOrigin,openLinksInNewTab};
  if(!items.length)return null;
  if(dropdown)return <Box component="nav" aria-label={label} sx={{minWidth:0,overflowWrap:"anywhere"}}>
-  <Box component="ul" sx={{display:"flex",flexWrap:"wrap",gap:1,listStyle:"none",m:0,p:0}}>
+  <Box component="ul" sx={{display:"flex",flexWrap:"wrap",columnGap:3,rowGap:1,listStyle:"none",m:0,p:0}}>
    {items.map((item,index)=><Box component="li" key={`${index}-${item.label}`} sx={{position:"relative",minWidth:0,maxWidth:"100%"}}>
     {item.children?.length?<Box component="details" onKeyDown={event=>{if(event.key==="Escape"){event.preventDefault();event.stopPropagation();const details=event.currentTarget as HTMLDetailsElement;details.open=false;details.querySelector('summary')?.focus();}}} sx={{"& > summary":{cursor:"pointer",minHeight:44,p:1,fontWeight:600,"&:focus-visible":{outline:"3px solid currentColor",outlineOffset:2}}}}>
      <Box component="summary">{item.label}</Box>
-     <Box sx={{bgcolor:"background.paper",color:"text.primary",boxShadow:4,borderRadius:2,p:2,maxWidth:"100%",zIndex:4,"@container visual-layout (min-width: 768px)":{position:"absolute",minWidth:240}}}>
+     <Box sx={{bgcolor:"background.paper",color:"text.primary",boxShadow:4,borderRadius:2,p:2,maxWidth:"100%",zIndex:4,"@media (min-width: 900px)":{position:"absolute",minWidth:240,maxWidth:"min(320px,80vw)",right:0}}}>
       <NavigationLink item={item} context={context}>Overview</NavigationLink><MenuLinks items={item.children} context={context} depth={1}/>
      </Box>
     </Box>:<NavigationLink item={item} context={context}/>}
@@ -92,13 +92,13 @@ export function SiteNavigation({items,label,mobile=false,dropdown=false,currentP
  </Box>;
  return <Box component="nav" aria-label={label} sx={{px:2,py:mobile?1:0.5,minWidth:0,maxWidth:"100%"}}>
   {mobile?<>
-   <Box sx={{display:{xs:"none",md:"block"}}}><MenuLinks items={items} context={context}/></Box>
-   <IconButton aria-label={`Open ${label.toLowerCase()}`} aria-expanded={open} aria-controls={menuId} onClick={()=>setOpen(true)} sx={{display:{xs:"inline-flex",md:"none"},"&:focus-visible":{outline:"3px solid currentColor",outlineOffset:2}}}><MenuIcon/></IconButton>
+   <Box sx={{display:{xs:"none",md:"block"}}}><SiteNavigation items={items} label={`${label} desktop`} dropdown currentPath={context.currentPath} siteOrigin={siteOrigin} openLinksInNewTab={openLinksInNewTab}/></Box>
+   <IconButton aria-label={`Open ${label.toLowerCase()}`} aria-expanded={open} aria-controls={menuId} onClick={()=>setOpen(true)} sx={{color:"inherit",display:{xs:"inline-flex",md:"none"},"&:focus-visible":{outline:"3px solid currentColor",outlineOffset:2}}}><MenuIcon/></IconButton>
    <Drawer anchor="left" open={open} onClose={()=>setOpen(false)}><Box sx={{width:280,maxWidth:"100vw",boxSizing:"border-box",p:2}} id={menuId}>
     <IconButton aria-label={`Close ${label.toLowerCase()}`} onClick={()=>setOpen(false)} sx={{"&:focus-visible":{outline:"3px solid currentColor",outlineOffset:2}}}><CloseIcon/></IconButton>
     <Box component="div" role="navigation" aria-label={label}><MenuLinks items={items} context={{...context,onNavigate:()=>setOpen(false)}}/></Box>
    </Box></Drawer>
-  </>:<MenuLinks items={items} context={context}/>}
+  </>:<MenuLinks items={items} context={context} horizontal={label!=="Page sidebar"}/> }
  </Box>;
 }
 export function PublicMenuFrame({utility=[],header,footer,children,...context}:{header:PublicMenuNode[];footer:PublicMenuNode[];utility?:PublicMenuNode[];children:ReactNode;currentPath?:string;siteOrigin?:string;openLinksInNewTab?:boolean}){

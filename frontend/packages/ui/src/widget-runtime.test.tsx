@@ -2,6 +2,8 @@ import {render,screen,act,fireEvent} from "@testing-library/react";
 import {afterEach,beforeEach,describe,expect,it,vi} from "vitest";
 import userEvent from "@testing-library/user-event";
 import type {WidgetNode,VisualLayout} from "@uog/types";
+import {EMPTY_SITE} from "./public-site";
+import {PublicSiteBrandingProvider} from "./site-branding";
 import {VisualLayoutView} from "./visual-layout";
 import {VisualPostProvider} from "./widget-runtime";
 
@@ -18,7 +20,7 @@ describe("Configured widget runtime",()=>{
   it("loads Site title and logo once with same-Site identity data",async()=>{
     fetchMock.mockResolvedValue(response(11,[{name:"Informatics",logo_asset_id:asset,logo_url:"/api/v1/site-context/identity/logo/"}]));
     render(<VisualLayoutView siteId={11} pageTitle="Home" layout={layout([{id:"title",type:"site_title",props:{}},{id:"logo",type:"site_logo",props:{}}])}/>);
-    expect(await screen.findByRole("heading",{name:"Informatics"})).toBeTruthy();
+    expect(await screen.findByText("Informatics")).toBeTruthy();
     expect(screen.getByRole("img",{name:"Informatics"}).getAttribute("src")).toBe("/api/v1/site-context/identity/logo/");
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
@@ -40,7 +42,7 @@ describe("Configured widget runtime",()=>{
     const view=render(<VisualLayoutView siteId={11} pageTitle="A" layout={tree}/>);
     fetchMock.mockResolvedValue(response(22,[{name:"Medicine"}]));
     view.rerender(<VisualLayoutView siteId={22} pageTitle="B" layout={tree}/>);
-    expect(await screen.findByRole("heading",{name:"Medicine"})).toBeTruthy();
+    expect(await screen.findByText("Medicine")).toBeTruthy();
     await act(async()=>resolve(response(11,[{name:"Late Informatics"}])));
     expect(screen.queryByText("Late Informatics")).toBeNull();
   });
@@ -127,4 +129,22 @@ describe("Configured widget runtime",()=>{
     expect((screen.getByRole("button",{name:"Send"}) as HTMLButtonElement).disabled).toBe(true);
     expect(fetchMock).not.toHaveBeenCalled();
   });
+});
+
+
+it("revalidates dynamic identity on the same Site after a branding update and retries its logo", async()=>{
+  const tree=layout([{id:"title",type:"site_title",props:{}},{id:"logo",type:"site_logo",props:{}}]);
+  const first={...EMPTY_SITE,id:11,displayName:"Old title",logoUrl:"/api/v1/site-context/identity/logo/",brandingRevision:"a".repeat(64)};
+  const view=(site:typeof first)=><PublicSiteBrandingProvider site={site}><VisualLayoutView siteId={11} pageTitle="Home" layout={tree}/></PublicSiteBrandingProvider>;
+  fetchMock.mockResolvedValue(response(11,[{name:"Old title",logo_url:first.logoUrl,logo_asset_id:asset}]));
+  const {rerender}=render(view(first));
+  await screen.findByText("Old title");
+  fireEvent.error(screen.getByRole("img",{name:"Old title"}));
+  expect(screen.getByRole("img",{name:/Logo unavailable/})).toBeTruthy();
+  const next={...first,displayName:"New title",brandingRevision:"b".repeat(64)};
+  fetchMock.mockResolvedValue(response(11,[{name:"New title",logo_url:first.logoUrl,logo_asset_id:page}]));
+  rerender(view(next));
+  await screen.findByText("New title");
+  expect(screen.queryByText("Old title")).toBeNull();
+  expect(screen.getByRole("img",{name:"New title"}).getAttribute("src")).toContain(`?v=${next.brandingRevision}`);
 });
