@@ -1,0 +1,96 @@
+# Onboarding another eligible college Site
+
+
+
+
+
+Use the same Site, IAM, Media, Page, Post, Menu and Builder services as Main. Do not add college-specific routes, IDs or renderer branches.
+
+
+
+
+
+1. In platform administration, select the existing college/department Organization. Create or select its Site; confirm it is a child Site and ACTIVE. Review existing content/homepage before changing configuration.
+
+
+2. Register and activate a unique hostname in Site Domains, make the intended domain primary and configure DNS/reverse-proxy routing. Development `*.uog.local` names need local DNS or hosts resolution. Production must use real configured domains; the development localhost/Main fallback is not college routing.
+
+
+3. Through platform module management enable PAGES, POSTS, MENUS, MEDIA and VISUAL_BUILDER subject to dependency rules. Do not globally enable unrelated capabilities or copy Main Site assignments. The captured pilot already had PAGES/POSTS/MENUS/VISUAL_BUILDER; MEDIA was added through the canonical guarded module service.
+
+
+4. In Site Administration ? Users create/add staff and assign canonical **Site-scoped** roles. Use separate Editor, Reviewer and Publisher/Site Administrator identities for separation of duties. No organization/platform role is needed for college editorial work. Expiration/revocation and inactive users must remain effective.
+
+
+5. Upload approved images through Media; supply name and alt text and wait for READY. Reuse asset IDs through pickers rather than copying storage objects or private object paths.
+
+
+6. Create distinct local menus for header, footer and sidebar. Add same-Site published destinations (the news listing is `/posts`), publish each menu, then save and publish its location assignment. Do not replace Main assignments. Draft menu changes must remain private.
+
+
+7. Create a reusable sidebar with the local menu. Create an information Page, select Right Sidebar, assign the sidebar and enter content. Save, submit, review and publish through existing CMS actions.
+
+
+8. Create the news draft in the Post editor, apply supported formatting and select the uploaded featured image with alt text. Confirm anonymous draft denial, then submit/review/publish.
+
+
+9. Create a Page and open Visual Builder from Pages. Choose **College/Department** from Homepage templates, preview, apply, customize and save. Review and publish. The Site Administrator assigns the eligible same-Site published Page as homepage. The catalogue is a starting layout, not a second homepage model.
+
+
+10. Open the configured college hostname anonymously on desktop and phone. Confirm college Site identity, college-only dynamic news, Page/sidebar content, distinct navigation locations and no horizontal overflow. Confirm an unknown hostname remains unresolved.
+
+
+11. Capture Main Site configuration/public hashes and browser output before and after. Exercise forged foreign IDs against Pages, Posts, Media, Menus, sidebars and homepage assignment; also test a Main-only identity against college resources. Denied operations must leave all source records unchanged.
+
+
+12. Retain evidence and obtain QA/Product review before acceptance. A functional walkthrough does not clear independent performance release blockers.
+
+
+
+
+
+## Repeating this review harness
+
+
+
+
+
+The setup helper is development-only (`DEBUG` required). Default pilot is the existing `CAES` Site; `QA_COLLEGE_SITE_CODE` in the private setup input can select another existing eligible college. It refuses Main. It creates only disposable Keycloak identities, canonical Site memberships and module prerequisites; all editorial records are created through the browser UI. Thus identity provisioning and module setup are fixture prerequisites, **not evidence that the platform/Site provisioning screens were operated in this run**. Those shared provisioning screens have separate regression coverage.
+
+
+
+
+
+Copy `sprint3_live_review.py`, `qa-college-workflow-setup.py` and `qa-college-workflow-session.py` into backend `/tmp`. Pipe private local configuration to setup, never log it. The credential journal stays at `/tmp/college-workflow-session.json` (0600). Copy generated `/tmp/main-workflow-campus.png` to local `.git/task-data/main-workflow-campus.png`. Install pinned Playwright with `npm ci --prefix scripts/perf` if required.
+
+
+
+
+
+Set `UOG_QA_OUTPUT` to a new evidence directory. Capture `qa-college-main-snapshot.py` before and after; use `sys.argv.append('after')` for the latter. The read-only snapshot exports hashes/counts, not stored media keys. Capture `qa-college-public.cjs before` with a public-only `public-targets.json` containing the pilot hostname, Main hostname, expected visible headings/article labels and menu labels. These are test inputs, not application configuration.
+
+
+
+
+
+Prefer `scripts/qa-college-workflow-run.ps1 -OutputDirectory <new-directory>` after setup: it refreshes private credentials separately for each UI stage. Alternatively refresh the private session helper and pipe stdout directly into `node scripts/qa-main-workflow-browser.cjs <stage>`. Do not save or tee that stream. The common driver reads template, headings, menu labels and publication role from the seed; Main defaults are preserved. Stages `media`, `menus`, `article`, `page`, `homepage`, `negative` and `public` can resume the same run. College intentionally skips the Main-specific revision-restore stage. Filenames include the run ID to distinguish repeated uploads. Retain failed attempts before resuming. Refresh bearer credentials for the direct negative stage if a long walkthrough outlasts them.
+
+
+
+
+
+After the UI publishes both Sites' required fixtures, run `qa-college-isolation.py` through Django with private configuration stdin. It uses real HTTP/Keycloak, creates one disposable **Main-only** observer for the reverse matrix, and sends denied mutations/invalid reference creations. It briefly disables/re-enables pilot POSTS through the canonical module service in a `finally` block. Do not run that step during real editorial work. Reconcile hashes, collect inventory with `qa-college-inventory.py` and run `qa-college-public.cjs after`.
+
+
+
+
+
+Scan evidence for credentials before attaching it. Run `qa-college-workflow-cleanup.py` with private configuration; it validates generated usernames and allowed scope, disables generated Keycloak/Django identities, revokes their memberships and removes the private journal. It retains the active college and published review content. Rerun anonymous public verification after cleanup. If a helper fails, keep the private recovery journal and resolve/retry; never discard generated identity IDs or archive an institutional Site.
+
+
+
+
+
+The supplied public target file describes the captured run only. For another run derive IDs/hostnames and expected labels from that run's UI/configuration. No hardcoded college identity is needed in application code. Attach the report, screenshots, JUnit and traces to the actual Issue/PR and obtain human sign-off.
+
+

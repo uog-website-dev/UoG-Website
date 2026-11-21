@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="25" failures="0" errors="0" time="20.302175298">
+    <testsuite name="src/sites/post-workflow.test.tsx" timestamp="2026-11-21T10:12:28.020Z" hostname="ff47f131e439" tests="6" failures="0" errors="0" skipped="0" time="8.845905511">
+        <testcase classname="src/sites/post-workflow.test.tsx" name="ignores a former Site&apos;s completed save after its editor unmounts" time="1.217068648">
+        </testcase>
+        <testcase classname="src/sites/post-workflow.test.tsx" name="ignores a former Site&apos;s late working-draft redirect" time="0.684062455">
+        </testcase>
+        <testcase classname="src/sites/post-workflow.test.tsx" name="submits the saved revision and displays the backend-confirmed status" time="1.650029255">
+        </testcase>
+        <testcase classname="src/sites/post-workflow.test.tsx" name="prevents transitions while unsaved text exists and retains text after a rejected transition" time="2.207756983">
+        </testcase>
+        <testcase classname="src/sites/post-workflow.test.tsx" name="lets a scoped reviewer read and reject with a required comment" time="2.344323226">
+        </testcase>
+        <testcase classname="src/sites/post-workflow.test.tsx" name="opens a working draft from the published revision and previews in a new tab from the sticky bar" time="0.738444867">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-homepage.test.tsx" timestamp="2026-11-21T10:12:28.028Z" hostname="ff47f131e439" tests="5" failures="0" errors="0" skipped="0" time="1.903314701">
+        <testcase classname="src/sites/site-homepage.test.tsx" name="Homepage Settings &gt; shows the effective live homepage and its unpublished working draft" time="0.5268061">
+        </testcase>
+        <testcase classname="src/sites/site-homepage.test.tsx" name="Homepage Settings &gt; lists only eligible same-Site published Pages and assigns with authoritative success" time="0.679456754">
+        </testcase>
+        <testcase classname="src/sites/site-homepage.test.tsx" name="Homepage Settings &gt; keeps the confirmed selection when eligibility is lost between list and submit" time="0.241209944">
+        </testcase>
+        <testcase classname="src/sites/site-homepage.test.tsx" name="Homepage Settings &gt; shows fallback state when the assigned Page is no longer published" time="0.147851917">
+        </testcase>
+        <testcase classname="src/sites/site-homepage.test.tsx" name="Homepage Settings &gt; resets assignment context when switching Sites" time="0.303720813">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-menus.test.tsx" timestamp="2026-11-21T10:12:28.039Z" hostname="ff47f131e439" tests="14" failures="0" errors="0" skipped="0" time="9.552955086">
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; waits for an item save and refreshed menu ETag before publishing" time="2.771636892">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; reorders the header with the keyboard-reachable move control and only for this Site" time="0.866266286">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; shows the reloaded menu order after a move" time="0.822272191">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; creates an unassigned local menu and renames it without changing placement" time="1.235900714">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; treats a missing inheritance field as no delivery policy" time="0.35049703">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; ignores malformed inheritance entries without crashing or inventing a policy" time="0.361971653">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; states that an empty inheritance list adds no parent menu" time="0.299972705">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; explains central and inherited ownership and does not edit a central menu" time="0.848526737">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; shows an empty list and hides writes without menu permission" time="0.071391712">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; shows the load error and keeps the selected Site on the request" time="0.053484995">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="SiteMenusPanel &gt; blocks protected reads and changes when the MENUS module is off" time="0.01730618">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="creates another named menu even after header and footer are occupied" time="0.723617397">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="selects and searches the directory without showing another Site&apos;s menu" time="0.681945295">
+        </testcase>
+        <testcase classname="src/sites/site-menus.test.tsx" name="loads only the selected item tree and ignores a late response for another menu" time="0.437363242">
+        </testcase>
+    </testsuite>
+</testsuites>

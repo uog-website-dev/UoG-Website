@@ -35,7 +35,8 @@ export default function HomePage(){
   description.setAttribute("content",metadata.description);
  },[site,visible]);
  return <Box sx={{minWidth:0,width:"100%",overflowWrap:"anywhere"}}>
-  {loading?<Box role="status" sx={{display:"flex",alignItems:"center",gap:2,py:4}}><CircularProgress size={24}/><Typography>Loading homepage...</Typography></Box>
+  {!site.id?<Alert severity="warning">No Site is configured for this hostname.</Alert>
+   :loading?<Box role="status" sx={{display:"flex",alignItems:"center",gap:2,py:4}}><CircularProgress size={24}/><Typography>Loading homepage...</Typography></Box>
    :error?<Alert severity="warning" action={<Button onClick={()=>location.reload()}>Retry</Button>}>{error}</Alert>
    :<PublicPageView page={visible}/>}
  </Box>;

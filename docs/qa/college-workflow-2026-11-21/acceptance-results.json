@@ -1,0 +1,20 @@
+{
+  "criteria": {
+    "AC01": "PASS",
+    "AC02": "PASS",
+    "AC03": "PASS",
+    "AC04": "PASS",
+    "AC05": "PASS",
+    "AC06": "PASS",
+    "AC07": "PASS",
+    "AC08": "PENDING_EXTERNAL_ISSUE_ATTACHMENT_AND_APPROVAL"
+  },
+  "release_approved": false,
+  "main_content_configuration_unchanged": true,
+  "production_browser_workflow": false,
+  "module_reenabled": true,
+  "temporary_accounts_disabled": 9,
+  "frontend_builds_reused_unchanged_sources": true,
+  "perf010_blocker_cleared": false,
+  "provisioning_screens_operated_in_this_run": false
+}
