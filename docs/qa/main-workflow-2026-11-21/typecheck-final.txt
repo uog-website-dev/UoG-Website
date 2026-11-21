@@ -1,0 +1,8 @@
+
+> @uog/admin-web@0.1.0 typecheck /workspace/apps/admin-web
+> tsc --noEmit
+
+
+> @uog/public-web@0.1.0 typecheck /workspace/apps/public-web
+> tsc --noEmit
+

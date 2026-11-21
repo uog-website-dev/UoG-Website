@@ -124,7 +124,10 @@ function LocalMenuEditor({
   const [editingTag, setEditingTag] = useState(state.etag);
   const [name, setName] = useState(menu.name);
   const [location, setLocation] = useState<MenuPlace>(PLACES.includes(menu.location as MenuPlace) ? menu.location as MenuPlace : "");
-  const [busy, setBusy] = useState(false);
+  const [menuBusy, setBusy] = useState(false);
+  const [itemBusy, setItemBusy] = useState(false);
+  const [awaitingItemVersion, setAwaitingItemVersion] = useState<string | null>(null);
+  const busy = menuBusy || itemBusy || awaitingItemVersion === state.etag;
 
   async function save(event: FormEvent) {
     event.preventDefault();
@@ -213,6 +216,8 @@ function LocalMenuEditor({
         targets={targets}
         enabled={moduleOn && canWrite}
         onChanged={onChanged}
+        onBusyChange={setItemBusy}
+        onSaved={() => setAwaitingItemVersion(state.etag)}
         showAvailability={false}
       />
     </Box>
@@ -348,7 +353,7 @@ export function SiteMenusPanel({
                     taken={taken}
                     canWrite={canWrite}
                     canPublish={canPublish}
-                    moduleOn={moduleOn && !navigation.loading && (state.itemsLoaded !== false || selectedTree.data?.menu.id === state.menu.id)}
+                    moduleOn={moduleOn && !navigation.loading && !navigation.refreshing && !selectedTree.refreshing && (state.itemsLoaded !== false || selectedTree.data?.menu.id === state.menu.id)}
                     targets={targets}
                     onChanged={reloadMenus}
                   />

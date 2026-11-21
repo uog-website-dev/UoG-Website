@@ -1,0 +1,17 @@
+{
+  "run": "mainqa-8995d437",
+  "criteria": {
+    "AC01": "PASS",
+    "AC02": "PASS",
+    "AC03": "PASS",
+    "AC04": "PASS",
+    "AC05": "PASS",
+    "AC06": "PASS",
+    "AC07": "PASS",
+    "AC08": "PENDING_ISSUE_ATTACHMENT_AND_REVIEW"
+  },
+  "release_approved": false,
+  "production_browser_workflow": false,
+  "accounts_disabled": true,
+  "previous_perf010_blocker_cleared": false
+}

@@ -86,6 +86,28 @@ beforeEach(() => {
 });
 
 describe("SiteMenusPanel", () => {
+  it("waits for an item save and refreshed menu ETag before publishing", async () => {
+    const initial = headerState(); initial.menu.is_active = false;
+    loadSiteNavigation.mockResolvedValue({ok:true,data:navigation({menus:[initial]})});
+    let complete!: (value: unknown) => void;
+    createMenuLink.mockImplementationOnce(() => new Promise(resolve => { complete = resolve; }));
+    setMenuActive.mockResolvedValue({ok:true,data:{}});
+    renderPanel();
+    const publish = await screen.findByRole("button", {name:"Publish Header"});
+    const form = screen.getByRole("form",{name:"Add to Header"});
+    fireEvent.change(within(form).getByRole("textbox",{name:"Item label"}),{target:{value:"Admissions"}});
+    fireEvent.change(within(form).getByRole("textbox",{name:"Path"}),{target:{value:"/admissions"}});
+    fireEvent.click(within(form).getByRole("button",{name:"Add link"}));
+    await waitFor(()=>expect((publish as HTMLButtonElement).disabled).toBe(true));
+    expect(setMenuActive).not.toHaveBeenCalled();
+    const refreshed={...initial,etag:'"menu-1-v4"'};
+    loadSiteNavigation.mockResolvedValue({ok:true,data:navigation({menus:[refreshed]})});
+    complete({ok:true,data:{}});
+    await waitFor(()=>expect((screen.getByRole("button",{name:"Publish Header"}) as HTMLButtonElement).disabled).toBe(false));
+    fireEvent.click(screen.getByRole("button",{name:"Publish Header"}));
+    await waitFor(()=>expect(setMenuActive).toHaveBeenCalledWith(11,"menu-1",'"menu-1-v4"',true));
+  });
+
   it("reorders the header with the keyboard-reachable move control and only for this Site", async () => {
     renderPanel(11);
     expect(await screen.findByText(/Menus for Site 11/)).toBeTruthy();

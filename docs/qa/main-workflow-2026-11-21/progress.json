@@ -1,0 +1,94 @@
+{
+  "run": "mainqa-8995d437",
+  "checks": [
+    {
+      "name": "UI uploads approved image into Main private media library",
+      "status": "PASS"
+    },
+    {
+      "name": "UI publishes distinct Primary Header menu",
+      "status": "PASS"
+    },
+    {
+      "name": "Anonymous visitor cannot read saved draft article",
+      "status": "PASS"
+    },
+    {
+      "name": "Anonymous visitor cannot read saved draft article",
+      "status": "PASS"
+    },
+    {
+      "name": "posts role handoff publishes Main review mainqa-8995d437 university news",
+      "status": "PASS"
+    },
+    {
+      "name": "UI publishes distinct Footer menu",
+      "status": "PASS"
+    },
+    {
+      "name": "UI publishes distinct Page Sidebar menu",
+      "status": "PASS"
+    },
+    {
+      "name": "pages role handoff publishes Main review mainqa-8995d437 university information",
+      "status": "PASS"
+    },
+    {
+      "name": "pages role handoff publishes Main review mainqa-8995d437 homepage",
+      "status": "PASS"
+    },
+    {
+      "name": "Editor template and builder draft publishes through review and is assigned as Main homepage",
+      "status": "PASS"
+    },
+    {
+      "name": "Anonymous Main homepage, featured news and right sidebar render with distinct menu locations on desktop/mobile",
+      "status": "PASS"
+    },
+    {
+      "name": "Previous homepage revision restores and republishes; interim root exposes no private draft",
+      "status": "PASS"
+    },
+    {
+      "name": "Viewer cannot create Main Pages through direct UI or forged API request",
+      "status": "PASS"
+    }
+  ],
+  "menus": {
+    "Primary Header": "Main review mainqa-8995d437 Main navigation",
+    "Footer": "Main review mainqa-8995d437 University resources",
+    "Page Sidebar": "Main review mainqa-8995d437 In this section"
+  },
+  "media": "main-workflow-campus.png",
+  "status": "PASS",
+  "path": null,
+  "current_step": "viewer pages/new",
+  "article": {
+    "id": "b45dd70a-8329-440e-9884-54fb4e7b6fc0",
+    "title": "Main review mainqa-8995d437 university news",
+    "slug": "mainqa-8995d437-news",
+    "published": true
+  },
+  "last_stage": "public",
+  "sidebarDefinition": {
+    "name": "Main review mainqa-8995d437 sidebar"
+  },
+  "sidebarPage": {
+    "title": "Main review mainqa-8995d437 university information",
+    "slug": "mainqa-8995d437-information",
+    "published": true
+  },
+  "homepage": {
+    "id": "556e24dc-7110-4e24-bc4a-06665db51934",
+    "title": "Main review mainqa-8995d437 homepage",
+    "template_saved": true,
+    "published": true,
+    "originalRevision": 5,
+    "assigned": true,
+    "revised": true,
+    "restored": true
+  },
+  "negative": {
+    "viewer_create_status": 403
+  }
+}

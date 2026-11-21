@@ -1,0 +1,12 @@
+{
+  "frontend/apps/admin-web/src/sites/menu-items.tsx": "da7962737fb8d105ee7f442c831380fb51c67c00c1b62c94e44a4c452aebe00f",
+  "frontend/apps/admin-web/src/sites/site-menus.tsx": "4f821b878e58712f4671f9c02e68e51fe4f3433cf47db522e08d4bd69370e834",
+  "frontend/apps/admin-web/src/sites/site-menus.test.tsx": "d725c1559a9f5cd2f1a3faff89e72e5f1da024aa979effe85fc7d130dd77a846",
+  "frontend/apps/admin-web/src/sites/main-public-home.test.tsx": "3e554bd2d5eb04f36db548638148ab11df6a8434d55747c77004cba2e1504fb6",
+  "frontend/apps/public-web/src/app/page.tsx": "a2e9631125bb536eb1615c82e41e01dbfe0edad44d5f4f037d8323a042d68803",
+  "frontend/packages/ui/src/public-page.tsx": "ad1c441ad412f0ed3f1eb13bdaf7944503cc8538f6ce62bed2e9529a03722371",
+  "scripts/qa-main-workflow-browser.cjs": "76d2f90fde2b756a9f1b4af39d99ee1a09a3fb511cf36cf1314f662d2cf527e2",
+  "scripts/qa-main-workflow-setup.py": "b288609628afa3e22a6fba0bd9dd63eb71ae33e5e40b8a9081faf648b88fe059",
+  "scripts/qa-main-workflow-session.py": "0ae85c05ecdfaad15c979531aa3d42bbc1f22dd435e41af89501915972e15e30",
+  "scripts/qa-main-workflow-cleanup.py": "0305200eb517cac6add725ebcded3c264935d354875e542746faad1062a86ccf"
+}

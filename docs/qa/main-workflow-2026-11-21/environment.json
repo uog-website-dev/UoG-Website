@@ -1,0 +1,79 @@
+{
+  "base_commit": "a26ed8a4a2e3ebca9899996e2e38c309ec0b027e",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "browser": "Microsoft Edge (Playwright Chromium driver)",
+  "viewport_desktop": [
+    1440,
+    1000
+  ],
+  "viewport_mobile": [
+    390,
+    844
+  ],
+  "site": 17,
+  "hostname": "www.uog.local",
+  "runtime": "Docker Compose development services, real Django/PostgreSQL/Keycloak/Redis/MinIO/Celery/Next.js; production builds verified separately",
+  "services": [
+    {
+      "Service": "backend",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "celery-beat",
+      "State": "running",
+      "Health": ""
+    },
+    {
+      "Service": "celery-worker",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "frontend-admin",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "frontend-public",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "keycloak",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "keycloak-db",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "minio",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "nginx",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "postgres",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "redis-broker",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "redis-cache",
+      "State": "running",
+      "Health": "healthy"
+    }
+  ],
+  "playwright_version": "1.65.0"
+}

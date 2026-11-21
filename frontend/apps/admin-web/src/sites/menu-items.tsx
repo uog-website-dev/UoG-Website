@@ -144,12 +144,16 @@ export function MenuItemTree({
   enabled,
   onChanged,
   showAvailability = true,
+  onBusyChange,
+  onSaved,
 }: {
   siteId: number;
   state: MenuLocationState;
   targets?: MenuTargets;
   enabled: boolean;
-  onChanged: () => void;
+  onChanged: () => void | Promise<void>;
+  onBusyChange?: (busy: boolean) => void;
+  onSaved?: () => void;
   /** The menu editor shows this once. Nested trees must not repeat it. */
   showAvailability?: boolean;
 }) {
@@ -165,7 +169,7 @@ export function MenuItemTree({
     if (!result.ok) {
       if (result.error.status === 409) {
         setConflict("This menu was saved by someone else. The latest items were reloaded and your change was not applied.");
-        onChanged();
+        await onChanged();
         return;
       }
       toast.error(result.error.message);
@@ -173,16 +177,19 @@ export function MenuItemTree({
     }
     setConflict(null);
     after?.();
-    onChanged();
+    await onChanged();
+    onSaved?.();
   }
 
   async function run<T>(action: () => Promise<ActionResult<T>>, after?: () => void) {
     setBusy(true);
+    onBusyChange?.(true);
     setNotice(null);
     try {
       await commit(await action(), after);
     } finally {
       setBusy(false);
+      onBusyChange?.(false);
     }
   }
 
