@@ -1,0 +1,43 @@
+{
+  "reference": "P0-PERF-010",
+  "status": "PASS",
+  "commit": "664f644086f1ad1464b505f66a6e7abb96a059f8",
+  "checks": {
+    "browser": "PASS",
+    "backend": "PASS",
+    "frontend": "PASS",
+    "build": "PASS",
+    "api_load": "PASS",
+    "service_health": "PASS",
+    "openapi": "PASS"
+  },
+  "resolved_failures": [
+    {
+      "test": "tests.test_documentation::test_schema_validates_without_warnings_and_describes_live_contract",
+      "rerun": "documentation.xml"
+    }
+  ],
+  "artifacts_sha256": {
+    "browser-final/workspace.json": "cfbb4c3dbca8de78c551959e798092c8cc81c847189ae223cdb1951e2008ff24",
+    "browser-final/switch.json": "c98d1e74f08779bfb56499c11eac229eef36ff509a5eb26c3a5d0ecb40470c42",
+    "browser-final/sections.json": "1d99753fa6116c0ff94606ec163080ed321d06c655c5082d8381d559b6225614",
+    "browser-final/cache.json": "f47e3471d35fca0d79162a78f3e1102034f3f0b681f723e9d93ebe7dbaf07117",
+    "browser-final/dashboard.json": "1a5bec3140d130a9524845ef786cdf979a7bac2bdb26d9c41d09d237fe62a5d8",
+    "browser-final/browser-reads.json": "4a2177309cedf7ecc9bfcbff98d9d281ef352e42e612836c6fa5f6a83ae9b892",
+    "browser-final/recovery.json": "8a4e569b93efa769d2809b2c4e0b9aef5d1dd2c18a88ece9ae0f436f0f98a5c8",
+    "browser-final/isolation.json": "d062ad09974b21ca7789c9fffd48cdd03b2f969ca82369947529cc682167fe80",
+    "full-backend.xml": "92b820e483f0e1bf82d3a1dfcf377450aa8a82465b576dcfa82728a27185f175",
+    "documentation.xml": "a5f6b83a576fbfba007f3500c8011546fa87b781b43185d5a3edb4e2ef1bbde6",
+    "minio.xml": "965e8e68a2a46ae30b3a7cb8a6c90da9d795be1c1916145ba481e1c2dc6fb1ca",
+    "frontend.xml": "e0dd29aedd743d324392056f43e517509f3e0f106a14ff29bb67d8cec87acf47",
+    "shared-frontend.json": "7699a0f06a696e4aa0d2e39396555d634433c2a7ab88d171e9177b909e384ce9",
+    "bundles.json": "066c0a0c1efce28a34c2818d79c751cec0cfb77424d455f1f3a32a759583dc34",
+    "public-build.json": "7933bcfc58bae699a964650c1213323256081e377cc066b542edc842900531f3",
+    "api-load.json": "fa7b212e3d6706ab04375a5d8b3f6825592e63bd294cb1e6ca300f95b760ec1d",
+    "service-health.json": "d073691b43a490e481e5be331ed0c7ce5c6ea301a953e8d177aa5918cbcac354",
+    "openapi.json": "60e09d91d2840d0a9f4db70e13ba288fa9f86ab19c6440393639f51546897bed",
+    "final/production/results.json": "259299d761c7f366a533b84b31e8af16a489ee04e87c05c33d6f68d7295f9262"
+  },
+  "errors": [],
+  "approval": "NOT_GRANTED; QA and Security must review and bind their approval to this file hash"
+}

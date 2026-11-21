@@ -1,0 +1,84 @@
+{
+  "reference": "P0-PERF-010",
+  "status": "PROPOSED",
+  "approved_by": null,
+  "approved_at": null,
+  "notes": "p50 ceilings conservatively equal existing proposed p95 ceilings; all require Product/QA approval. Not release authorization. Duplicate budget counts scoped read GETs only. First same-Site section navigation 1000 ms is a proposed new ceiling; first process visit remains a single diagnostic.",
+  "minimum_sites": 21,
+  "minimum_samples": 30,
+  "scenarios": {
+    "warm_site_switch": {
+      "p50_ms": 1000,
+      "p95_ms": 1000,
+      "max_duplicate_reads": 0
+    },
+    "cold_site_switch": {
+      "p50_ms": 2000,
+      "p95_ms": 2000,
+      "max_duplicate_reads": 0
+    },
+    "cached_section_return": {
+      "p50_ms": 300,
+      "p95_ms": 300,
+      "max_duplicate_reads": 0
+    },
+    "cached_section_transition": {
+      "p50_ms": 500,
+      "p95_ms": 500,
+      "max_duplicate_reads": 0
+    },
+    "workspace_api": {
+      "p50_ms": 500,
+      "p95_ms": 500
+    },
+    "paginated_list_api": {
+      "p50_ms": 400,
+      "p95_ms": 400
+    },
+    "dashboard_summary_api": {
+      "p50_ms": 500,
+      "p95_ms": 500
+    },
+    "cached_pages_return": {
+      "p50_ms": 300,
+      "p95_ms": 300,
+      "max_duplicate_reads": 0
+    },
+    "cached_posts_return": {
+      "p50_ms": 300,
+      "p95_ms": 300,
+      "max_duplicate_reads": 0
+    },
+    "cached_menus_return": {
+      "p50_ms": 300,
+      "p95_ms": 300,
+      "max_duplicate_reads": 0
+    },
+    "cached_media_return": {
+      "p50_ms": 300,
+      "p95_ms": 300,
+      "max_duplicate_reads": 0
+    },
+    "dashboard_usable": {
+      "p50_ms": 1500,
+      "p95_ms": 1500
+    },
+    "same_site_menu_navigation": {
+      "p50_ms": 1000,
+      "p95_ms": 1000,
+      "max_duplicate_reads": 0
+    }
+  },
+  "signoffs": {
+    "qa": {
+      "approved": false,
+      "reviewer": null,
+      "at": null
+    },
+    "security": {
+      "approved": false,
+      "reviewer": null,
+      "at": null
+    }
+  }
+}

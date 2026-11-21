@@ -1,0 +1,37 @@
+[
+    {
+        "script":  "workspace-check.cjs",
+        "evidence":  "workspace.json",
+        "exit_code":  0
+    },
+    {
+        "script":  "site-switch-check.cjs",
+        "evidence":  "switch.json",
+        "exit_code":  0
+    },
+    {
+        "script":  "section-check.cjs",
+        "evidence":  "sections.json",
+        "exit_code":  0
+    },
+    {
+        "script":  "cache-check.cjs",
+        "evidence":  "cache.json",
+        "exit_code":  0
+    },
+    {
+        "script":  "dashboard-check.cjs",
+        "evidence":  "dashboard.json",
+        "exit_code":  0
+    },
+    {
+        "script":  "read-check.cjs",
+        "evidence":  "browser-reads.json",
+        "exit_code":  0
+    },
+    {
+        "script":  "recovery-check.cjs",
+        "evidence":  "recovery.json",
+        "exit_code":  1
+    }
+]

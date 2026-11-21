@@ -1,0 +1,4 @@
+{
+  "status": "PASS",
+  "command": "pnpm --filter @uog/ui --filter @uog/api-client --filter @uog/types test"
+}

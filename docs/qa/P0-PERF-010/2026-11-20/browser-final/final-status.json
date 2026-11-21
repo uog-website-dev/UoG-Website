@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "checks": {
+    "workspace": "PASS",
+    "switch": "PASS",
+    "sections": "PASS",
+    "cache": "PASS",
+    "dashboard": "PASS",
+    "browser-reads": "PASS",
+    "recovery": "PASS",
+    "isolation": "PASS"
+  },
+  "note": "Final per-check results. Recovery rerun after correcting button selector; raw prior suite exit retained in suite.json and browser-final-run.txt."
+}

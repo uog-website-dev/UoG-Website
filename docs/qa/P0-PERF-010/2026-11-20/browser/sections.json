@@ -1,0 +1,38 @@
+{
+  "status": "PASS",
+  "checks": [
+    "All four section searches and list order restored; Pages/Posts sorting and pagination and Media layout/pagination retained; shell stable",
+    "Site B Media opens with its own default filters, without an unsaved-draft prompt"
+  ],
+  "sections": [
+    {
+      "section": "pages",
+      "restored": true,
+      "list_reads": 0,
+      "workspace_reads": 0,
+      "loading_flashes": 0
+    },
+    {
+      "section": "posts",
+      "restored": true,
+      "list_reads": 0,
+      "workspace_reads": 0,
+      "loading_flashes": 0
+    },
+    {
+      "section": "menus",
+      "restored": true,
+      "list_reads": 0,
+      "workspace_reads": 0,
+      "loading_flashes": 0
+    },
+    {
+      "section": "media",
+      "restored": true,
+      "list_reads": 0,
+      "workspace_reads": 0,
+      "loading_flashes": 0
+    }
+  ],
+  "browser": "157.0.4341.60"
+}

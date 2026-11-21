@@ -1,0 +1,6110 @@
+{
+  "metadata": {
+    "run": "7c398898-9018-454b-9386-1701d6154ad2",
+    "mode": "production",
+    "release_baseline": true,
+    "budgets_status": "PROPOSED",
+    "method": "nearest-rank percentiles",
+    "samples_per_scenario": 30,
+    "sites": [
+      {
+        "id": 81,
+        "name": "Performance Site 01",
+        "code": "PERF001-01"
+      },
+      {
+        "id": 82,
+        "name": "Performance Site 02",
+        "code": "PERF001-02"
+      },
+      {
+        "id": 83,
+        "name": "Performance Site 03",
+        "code": "PERF001-03"
+      },
+      {
+        "id": 84,
+        "name": "Performance Site 04",
+        "code": "PERF001-04"
+      },
+      {
+        "id": 85,
+        "name": "Performance Site 05",
+        "code": "PERF001-05"
+      },
+      {
+        "id": 86,
+        "name": "Performance Site 06",
+        "code": "PERF001-06"
+      },
+      {
+        "id": 87,
+        "name": "Performance Site 07",
+        "code": "PERF001-07"
+      },
+      {
+        "id": 88,
+        "name": "Performance Site 08",
+        "code": "PERF001-08"
+      },
+      {
+        "id": 89,
+        "name": "Performance Site 09",
+        "code": "PERF001-09"
+      },
+      {
+        "id": 90,
+        "name": "Performance Site 10",
+        "code": "PERF001-10"
+      },
+      {
+        "id": 91,
+        "name": "Performance Site 11",
+        "code": "PERF001-11"
+      },
+      {
+        "id": 92,
+        "name": "Performance Site 12",
+        "code": "PERF001-12"
+      },
+      {
+        "id": 93,
+        "name": "Performance Site 13",
+        "code": "PERF001-13"
+      },
+      {
+        "id": 94,
+        "name": "Performance Site 14",
+        "code": "PERF001-14"
+      },
+      {
+        "id": 95,
+        "name": "Performance Site 15",
+        "code": "PERF001-15"
+      },
+      {
+        "id": 96,
+        "name": "Performance Site 16",
+        "code": "PERF001-16"
+      },
+      {
+        "id": 97,
+        "name": "Performance Site 17",
+        "code": "PERF001-17"
+      },
+      {
+        "id": 98,
+        "name": "Performance Site 18",
+        "code": "PERF001-18"
+      },
+      {
+        "id": 99,
+        "name": "Performance Site 19",
+        "code": "PERF001-19"
+      },
+      {
+        "id": 100,
+        "name": "Performance Site 20",
+        "code": "PERF001-20"
+      },
+      {
+        "id": 101,
+        "name": "Performance Site 21",
+        "code": "PERF001-21"
+      }
+    ],
+    "counts_per_site": {
+      "sites": 21,
+      "pages": 40,
+      "posts": 100,
+      "media": 80
+    },
+    "api_cache_definition": "First versus immediate repeat per Site/resource; server caches retained",
+    "automatic_prefetch": "Content rail uses explicit hover/focus intent with 180 ms dwell and 1 s throttle; normal prefetch on other links remains; pre-initiation traffic is outside measured navigation",
+    "network": {
+      "profile": "loopback, unthrottled",
+      "cpu_slowdown": 1,
+      "viewport": [
+        1440,
+        1000
+      ]
+    },
+    "browser": "157.0.4341.60",
+    "started_at": "2026-11-20T20:20:23.136Z",
+    "cold_definition": "fresh browser context and HTTP cache; target Site absent from Next router cache; application/database caches retained",
+    "warm_definition": "same browser context; previously visited target; no forced invalidation",
+    "session_policy": "Independent real Keycloak browser sign-in before every cold/warm iteration; login is excluded from timings; each pair uses one active session",
+    "authentication_role": "Site Administrator on 21 benchmark Sites; no platform role",
+    "sampling_warning": null,
+    "react_profiling": false,
+    "section_matrix": true,
+    "dashboard_probes": true,
+    "interaction": "Searchable Workspace dialog; discovery is included in switch timing",
+    "site_switch_policy": "Preserve authorized section root; read caches scoped to session/Site/authorization; 30-second context lease, 5-minute inactive GC; mutable forms reset",
+    "cache_policy": "PERF-005: scoped navigation controls plus PERF-004 30-second in-memory context/read lease, five-minute inactive GC; scoped reuse on Site return, disposal on session change and purge on Site authorization change",
+    "source": {
+      "commit": "664f644086f1ad1464b505f66a6e7abb96a059f8",
+      "files": {
+        "frontend/pnpm-lock.yaml": "516e90afe0f99d95d769e22b47b1f015a88aab8aa03cb67c22297697090c27ed",
+        "frontend/apps/admin-web/next.config.ts": "190ecf926211f0127e41cc3268eff5cc03189ea2b8afe5ae5139a79a816c3e31",
+        "frontend/apps/admin-web/src/performance/navigation-timing.tsx": "5ae49a3d0721db6406f140d04785071586fbddd733f9509d7f67604640591c41",
+        "frontend/apps/admin-web/src/performance/server-fetch.ts": "6df44067d627d99965b38d20d14fc709c83994221a10e0af77f7d0b27870c6fc",
+        "backend/apps/core/middleware.py": "aef9dbf6543c43586be96366acf6f65694e6403bbbbb0a360398a73283c3e115",
+        "backend/config/settings.py": "0219c7cdd36c4da29044936b468a485e19f461c80d6e36ad72866f2a64bff6f9",
+        "backend/apps/core/dashboard.py": "125968a98430530633287a130e9a4f68a7f42a063a6be2c916d53b656861c1de",
+        "backend/apps/core/dashboard_cache.py": "80ac104fe0268f72f7b553be3d9d5917f9017677a6b877de3b85f91134284387",
+        "docker-compose.perf.yml": "b9ccde8b8d3a0f444b95bd158ce5f0656ec17706e0767d2282ca0d0e56d3e840",
+        "infrastructure/nginx/performance.conf": "ec724e71f51b3c294b99f446a894a894ebe14215becb34d8559c9b3f7b9b3187",
+        "scripts/perf/benchmark.cjs": "1d225508313c5a059ad0719a0891458d77b2f6d039d29de0b342a391784d8378",
+        "scripts/perf/metrics.cjs": "9d72e8d220486acf9044cfa237f6ab14607ad3b0e6c5b2621fe3ca92b95edc32",
+        "scripts/perf/package-lock.json": "33fd08047cf72c63ff406030f7b2240bec02f7c3f3027a13f25a889e2f5695cb",
+        "backend/apps/sites/api/workspace.py": "1931b100f70057fc6db296e337d9edf98ad7bbf87e2cf3e00dd33adf0b731e1e",
+        "backend/apps/authorization/services.py": "55fad39610b3e6a723e02acb94fa622dd6f19634e54af2289b098df94b0331fb",
+        "frontend/apps/admin-web/src/workspace.ts": "1a04893cb0514d006de19eb4665ad328d3da1d39220267d3b2f8e70143ae8a28",
+        "frontend/apps/admin-web/src/workspace-switcher.tsx": "e02f83034d6ff69650c42ce3265e810b60b7424e2e13b9cce94b8383ce246dab",
+        "frontend/apps/admin-web/src/workspace-proxy.ts": "cc4595993e98cd7668c3881325ba5a5f9eed5a44aa5e64d25935a3a38f0fb75c",
+        "frontend/apps/admin-web/src/sites/site-workspace.tsx": "5e4630541c1624921ff81c1ab54822cf5678139bc07b414ba2d1921b06c39b1e",
+        "frontend/apps/admin-web/src/sites/site-admin-frame.tsx": "0e1c20b725e52a281d4389e921eb6f28edcf613fee3b71b07e2c29ba336fd4d1",
+        "frontend/apps/admin-web/src/sites/site-admin.ts": "daaa05f12fc21e927883cefc1b8d2203fbbc6565c4e3854762ae9a4a6b3fcc8b",
+        "frontend/apps/admin-web/src/sites/site-draft-guard.ts": "13570d99e0d27d1927cfc6faf8364069bcb67215a352cfbd1ac3573b7865d05d",
+        "frontend/apps/admin-web/src/sites/site-page-editor.tsx": "6364fb5ac6179ee9dfbd9264d82b0d0d3ab11ad54245c4b0056c4e7741e798aa",
+        "frontend/apps/admin-web/src/data/query-cache.tsx": "a864595f0f0e00d3f06a8beafe2149caf426f6855849efddf813ee16ec106c67",
+        "frontend/apps/admin-web/src/data/section-state.ts": "972b27f3a3946b7613af6b23ce6b40ed35cf16717b63531e6330f2e65bae36c9",
+        "frontend/apps/admin-web/src/data/page-boundary.ts": "2058afbf300205798c43f009db88b73feb5275a33f82fa9ef088865006bf4474",
+        "frontend/apps/admin-web/src/data/section-prefetch.ts": "ac23fa05cf01086ddf46203bc220f6f0b5f6f18b5f591e9978646fa318c7251c",
+        "frontend/apps/admin-web/src/sidebar.tsx": "4c7abfeb8b451e4d24b06c7beac19387ba4056883a85cfb4a96e39b24004caaf",
+        "frontend/apps/admin-web/src/data/admin-query-provider.tsx": "d20fedf4f2368c197eca202233cd16d0b959a90a4c7eb2b36b8633acc920ec77",
+        "frontend/apps/admin-web/src/cache-identity.ts": "06370d064539971eef6e3cf48d18ec1bb9808ee77fe004bf460e3d2a94cfec54",
+        "frontend/apps/admin-web/src/organizations/contract.ts": "a274260e4f322e4e5fa13d8aeb97bebf8465a18477ad951011a8775787ca4a94",
+        "frontend/apps/admin-web/src/sites/media-library.tsx": "d02c27c26c0a362884292ed41d018b4ccadd8bea21b5a9e9a0d38afd14f096d3",
+        "frontend/apps/admin-web/src/sites/site-pages.tsx": "b56b4424f5e9687b8144576c14cc1a6c92a93da0e1996fbae88e44fea8bf1ef5",
+        "frontend/apps/admin-web/src/sites/site-dashboard.tsx": "2759efa13cfb1e266ad65c45b77ce37202077d8eed932eb266dac680fd30d3e4",
+        "frontend/apps/admin-web/src/app/sites/dashboard-actions.ts": "d485327242ab72b988a4b3ff047b520287ef9250d0c66056cc85a70477c86f97",
+        "frontend/apps/admin-web/src/sites/site-posts.tsx": "5b4d32fbebd9aa3aef7962e1d575120a27658f77e551d0bcaa080554c9ff0689",
+        "frontend/apps/admin-web/src/sites/site-menus.tsx": "e104bdeb72774e3164421a77215a074b96e4ff9ca6b6902570fb29e62cc6701c",
+        "frontend/apps/admin-web/src/app/sites/[id]/admin/layout.tsx": "986af14214d9c0531d74dd7a81e32ba7aa1b1b12c2ac9be4e37423a9f70c1258"
+      }
+    },
+    "run_status": "failed",
+    "authentication": {
+      "landing_path": "/admin",
+      "error_code": null,
+      "session_cookie_present": true
+    },
+    "completed_at": "2026-11-20T20:21:09.111Z"
+  },
+  "summary": {
+    "first_site_visit": {
+      "n": 1,
+      "p50_ms": 1746.031,
+      "p95_ms": 1746.031,
+      "budget_ms": null,
+      "budget_status": "PROPOSED",
+      "within_proposed_budget": null
+    },
+    "dashboard_usable": {
+      "n": 1,
+      "p50_ms": 1746.031,
+      "p95_ms": 1746.031,
+      "budget_ms": 1500,
+      "budget_status": "PROPOSED",
+      "within_proposed_budget": false
+    },
+    "paginated_list_api": {
+      "n": 180,
+      "p50_ms": 100.7000000178814,
+      "p95_ms": 312.69999998807907,
+      "budget_ms": 400,
+      "budget_status": "PROPOSED",
+      "within_proposed_budget": true
+    },
+    "workspace_api": {
+      "n": 60,
+      "p50_ms": 72.10000002384186,
+      "p95_ms": 121.19999998807907,
+      "budget_ms": 500,
+      "budget_status": "PROPOSED",
+      "within_proposed_budget": true
+    },
+    "dashboard_summary_api": {
+      "n": 42,
+      "p50_ms": 66.80000001192093,
+      "p95_ms": 87.10000002384186,
+      "budget_ms": 500,
+      "budget_status": "PROPOSED",
+      "within_proposed_budget": true
+    }
+  },
+  "by_cache_state": {
+    "cold": {
+      "first_site_visit": {
+        "n": 1,
+        "p50_ms": 1746.031,
+        "p95_ms": 1746.031,
+        "budget_ms": null,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": null
+      },
+      "dashboard_usable": {
+        "n": 1,
+        "p50_ms": 1746.031,
+        "p95_ms": 1746.031,
+        "budget_ms": 1500,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": false
+      },
+      "paginated_list_api": {
+        "n": 90,
+        "p50_ms": 101.09999999403954,
+        "p95_ms": 344.59999999403954,
+        "budget_ms": 400,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": true
+      },
+      "workspace_api": {
+        "n": 30,
+        "p50_ms": 73.19999998807907,
+        "p95_ms": 142.5,
+        "budget_ms": 500,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": true
+      },
+      "dashboard_summary_api": {
+        "n": 21,
+        "p50_ms": 79.80000001192093,
+        "p95_ms": 95.90000000596046,
+        "budget_ms": 500,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": true
+      }
+    },
+    "warm": {
+      "paginated_list_api": {
+        "n": 90,
+        "p50_ms": 98.10000002384186,
+        "p95_ms": 260.90000000596046,
+        "budget_ms": 400,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": true
+      },
+      "workspace_api": {
+        "n": 30,
+        "p50_ms": 70.59999999403954,
+        "p95_ms": 121.19999998807907,
+        "budget_ms": 500,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": true
+      },
+      "dashboard_summary_api": {
+        "n": 21,
+        "p50_ms": 52,
+        "p95_ms": 66.80000001192093,
+        "budget_ms": 500,
+        "budget_status": "PROPOSED",
+        "within_proposed_budget": true
+      }
+    }
+  },
+  "samples": [
+    {
+      "scenario": "first_site_visit",
+      "cache_state": "cold",
+      "navigation_id": "b619db51-c5bc-41b3-a478-d3fea36c69f8",
+      "site_id": 81,
+      "section": "dashboard",
+      "duration_ms": 1746.031,
+      "dashboard_usable_ms": 1746.031,
+      "requests": 21,
+      "transferred_bytes": 37059,
+      "response_transferred_bytes": 37059,
+      "request_payload_bytes": 0,
+      "duplicate_endpoints": [
+        {
+          "endpoint": "GET /admin/sites/81/admin",
+          "count": 2
+        }
+      ],
+      "cancelled_requests": 0,
+      "failed_requests": 0,
+      "browser_measure_ms": 1750.5,
+      "browser_measure_scope": "current-document",
+      "in_flight_at_usable_boundary": 1,
+      "waterfall": [
+        {
+          "cdp_id": "23244.151",
+          "method": "GET",
+          "path": "/admin/api/workspace/sites/?page=1&page_size=20",
+          "action_id": null,
+          "start_ms": 488.01416015625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "b619db51-c5bc-41b3-a478-d3fea36c69f8",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1898,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 406.776
+          },
+          "duration_ms": 409.8670000093989
+        },
+        {
+          "cdp_id": "23244.152",
+          "method": "GET",
+          "path": "/admin/api/workspace/?site=81",
+          "action_id": null,
+          "start_ms": 1002.52001953125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "b619db51-c5bc-41b3-a478-d3fea36c69f8",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1427,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 144.1
+          },
+          "duration_ms": 146.60799998091534
+        },
+        {
+          "cdp_id": "23244.153",
+          "method": "GET",
+          "path": "/admin/sites/81/admin",
+          "action_id": null,
+          "start_ms": 1004.097900390625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "b619db51-c5bc-41b3-a478-d3fea36c69f8",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 2583,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 32.730000000000004
+          },
+          "duration_ms": 56.72900000354275
+        },
+        {
+          "cdp_id": "23244.154",
+          "method": "GET",
+          "path": "/admin/_next/static/chunks/8450-916f83899a6bbcee.js",
+          "action_id": null,
+          "start_ms": 1047.8388671875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "b619db51-c5bc-41b3-a478-d3fea36c69f8",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 4883,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 16.208000000000002
+          },
+          "duration_ms": 20.68600000347942
+        },
+        {
+          "cdp_id": "23244.155",
+          "method": "GET",
+          "path": "/admin/_next/static/chunks/6840-1e369462576c95cd.js",
+          "action_id": null,
+          "start_ms": 1048.446044921875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "b619db51-c5bc-41b3-a478-d3fea36c69f8",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 6161,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 16.841
+          },
+          "duration_ms": 22.50399999320507
+        },
+        {
+          "cdp_id": "23244.156",
+          "method": "GET",
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/page-15b767cf94dd8dc3.js",
+          "action_id": null,
+          "start_ms": 1048.9208984375,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "b619db51-c5bc-41b3-a478-d3fea36c69f8",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 7048,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 25.099999999999998
+          },
+          "duration_ms": 31.13899999880232
+        },
+        {
+          "cdp_id": "23244.157",
+          "method": "GET",
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/loading-c719207a74dd9eb1.js",
+          "action_id": null,
+          "start_ms": 1050.097900390625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "b619db51-c5bc-41b3-a478-d3fea36c69f8",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 772,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 21.593999999999998
+          },
+          "duration_ms": 26.02300001308322
+        },
+        {
+          "cdp_id": "23244.158",
+          "method": "GET",
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/layout-159e04b750575d34.js",
+          "action_id": null,
+          "start_ms": 1053.64501953125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "b619db51-c5bc-41b3-a478-d3fea36c69f8",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 3780,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 21.808
+          },
+          "duration_ms": 31.76099999109283
+        },
+        {
+          "cdp_id": "23244.159",
+          "method": "GET",
+          "path": "/admin/favicon.ico",
+          "action_id": null,
+          "start_ms": 1093.473876953125,
+          "initiator_type": "other",
+          "initiator_request_id": null,
+          "request_id": "b619db51-c5bc-41b3-a478-d3fea36c69f8",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 1479,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 9.421
+          },
+          "duration_ms": 12.421999999787658
+        },
+        {
+          "cdp_id": "23244.160",
+          "method": "GET",
+          "path": "/admin/sites/81/admin",
+          "action_id": null,
+          "start_ms": 1184.656982421875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "b619db51-c5bc-41b3-a478-d3fea36c69f8",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 524,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 11.734
+          },
+          "duration_ms": 31.86200000345707
+        },
+        {
+          "cdp_id": "23244.161",
+          "method": "GET",
+          "path": "/admin/sites/81/admin/sidebars",
+          "action_id": null,
+          "start_ms": 1185.222900390625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "b619db51-c5bc-41b3-a478-d3fea36c69f8",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 535,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 27.37
+          },
+          "duration_ms": 73.98399998783134
+        },
+        {
+          "cdp_id": "23244.162",
+          "method": "GET",
+          "path": "/admin/sites/81/admin/builder",
+          "action_id": null,
+          "start_ms": 1185.7529296875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "b619db51-c5bc-41b3-a478-d3fea36c69f8",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 535,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 46.271
+          },
+          "duration_ms": 89.37599998898804
+        },
+        {
+          "cdp_id": "23244.163",
+          "method": "GET",
+          "path": "/admin/sites/81/admin/homepage",
+          "action_id": null,
+          "start_ms": 1186.2939453125,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "b619db51-c5bc-41b3-a478-d3fea36c69f8",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 536,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 67.443
+          },
+          "duration_ms": 92.41899999324232
+        },
+        {
+          "cdp_id": "23244.164",
+          "method": "GET",
+          "path": "/admin/sites/81/admin/users",
+          "action_id": null,
+          "start_ms": 1186.796875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "b619db51-c5bc-41b3-a478-d3fea36c69f8",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 533,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 80.343
+          },
+          "duration_ms": 93.80000000237487
+        },
+        {
+          "cdp_id": "23244.165",
+          "method": "GET",
+          "path": "/admin/api/reads?site=81&resource=dashboard-summary",
+          "action_id": null,
+          "start_ms": 1432.112060546875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "d82bb9d1-7650-4362-9e7e-dfe0b86c8650",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 816,
+          "navigation_id": null,
+          "server_timing": "bff;dur=237.597, upstream;dur=149.254, encode;dur=0.303",
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 255.061
+          },
+          "duration_ms": 259.7010000026785
+        },
+        {
+          "cdp_id": "23244.166",
+          "method": "GET",
+          "path": "/admin/sites/81/admin/pages/new",
+          "action_id": null,
+          "start_ms": 1440.41796875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "b619db51-c5bc-41b3-a478-d3fea36c69f8",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 538,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 17.264
+          },
+          "duration_ms": 48.990000010235235
+        },
+        {
+          "cdp_id": "23244.167",
+          "method": "GET",
+          "path": "/admin/sites/81/admin/menus",
+          "action_id": null,
+          "start_ms": 1440.989013671875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "b619db51-c5bc-41b3-a478-d3fea36c69f8",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 533,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 26.363
+          },
+          "duration_ms": 67.1440000005532
+        },
+        {
+          "cdp_id": "23244.168",
+          "method": "GET",
+          "path": "/admin/sites/81/admin/pages",
+          "action_id": null,
+          "start_ms": 1441.419921875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "b619db51-c5bc-41b3-a478-d3fea36c69f8",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 534,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 43.177
+          },
+          "duration_ms": 85.26000002166256
+        },
+        {
+          "cdp_id": "23244.169",
+          "method": "GET",
+          "path": "/admin/sites/81/admin/posts",
+          "action_id": null,
+          "start_ms": 1441.871826171875,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "b619db51-c5bc-41b3-a478-d3fea36c69f8",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 534,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 78.50200000000001
+          },
+          "duration_ms": 97.46200000518002
+        },
+        {
+          "cdp_id": "23244.170",
+          "method": "GET",
+          "path": "/admin/sites/81/admin/media",
+          "action_id": null,
+          "start_ms": 1442.291015625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "b619db51-c5bc-41b3-a478-d3fea36c69f8",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 533,
+          "navigation_id": null,
+          "server_timing": null,
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 59.592
+          },
+          "duration_ms": 96.59499998087995
+        },
+        {
+          "cdp_id": "23244.171",
+          "method": "GET",
+          "path": "/admin/api/reads?site=81&resource=dashboard-activity",
+          "action_id": null,
+          "start_ms": 1737.385009765625,
+          "initiator_type": "script",
+          "initiator_request_id": null,
+          "request_id": "ddea33f9-6aa1-4d43-b1f1-f7ff19f1a77c",
+          "status": 200,
+          "request_payload_bytes": 0,
+          "encoded_bytes": 877,
+          "navigation_id": null,
+          "server_timing": "bff;dur=90.634, upstream;dur=79.264, encode;dur=0.380",
+          "from_disk_cache": false,
+          "timing": {
+            "dns_ms": 0,
+            "connect_ms": 0,
+            "wait_ms": 108.90899999999999
+          },
+          "duration_ms": 116.45100000896491
+        }
+      ],
+      "blocking_waterfall_candidates": [
+        {
+          "cdp_id": "23244.151",
+          "path": "/admin/api/workspace/sites/?page=1&page_size=20",
+          "start_ms": 488.01416015625,
+          "wait_ms": 406.776,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "23244.152",
+          "path": "/admin/api/workspace/?site=81",
+          "start_ms": 1002.52001953125,
+          "wait_ms": 144.1,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "23244.153",
+          "path": "/admin/sites/81/admin",
+          "start_ms": 1004.097900390625,
+          "wait_ms": 32.730000000000004,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "23244.154",
+          "path": "/admin/_next/static/chunks/8450-916f83899a6bbcee.js",
+          "start_ms": 1047.8388671875,
+          "wait_ms": 16.208000000000002,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "23244.155",
+          "path": "/admin/_next/static/chunks/6840-1e369462576c95cd.js",
+          "start_ms": 1048.446044921875,
+          "wait_ms": 16.841,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "23244.156",
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/page-15b767cf94dd8dc3.js",
+          "start_ms": 1048.9208984375,
+          "wait_ms": 25.099999999999998,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "23244.157",
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/loading-c719207a74dd9eb1.js",
+          "start_ms": 1050.097900390625,
+          "wait_ms": 21.593999999999998,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "23244.158",
+          "path": "/admin/_next/static/chunks/app/sites/%5Bid%5D/admin/layout-159e04b750575d34.js",
+          "start_ms": 1053.64501953125,
+          "wait_ms": 21.808,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "23244.159",
+          "path": "/admin/favicon.ico",
+          "start_ms": 1093.473876953125,
+          "wait_ms": 9.421,
+          "initiator_type": "other"
+        },
+        {
+          "cdp_id": "23244.160",
+          "path": "/admin/sites/81/admin",
+          "start_ms": 1184.656982421875,
+          "wait_ms": 11.734,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "23244.161",
+          "path": "/admin/sites/81/admin/sidebars",
+          "start_ms": 1185.222900390625,
+          "wait_ms": 27.37,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "23244.162",
+          "path": "/admin/sites/81/admin/builder",
+          "start_ms": 1185.7529296875,
+          "wait_ms": 46.271,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "23244.163",
+          "path": "/admin/sites/81/admin/homepage",
+          "start_ms": 1186.2939453125,
+          "wait_ms": 67.443,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "23244.164",
+          "path": "/admin/sites/81/admin/users",
+          "start_ms": 1186.796875,
+          "wait_ms": 80.343,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "23244.165",
+          "path": "/admin/api/reads?site=81&resource=dashboard-summary",
+          "start_ms": 1432.112060546875,
+          "wait_ms": 255.061,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "23244.166",
+          "path": "/admin/sites/81/admin/pages/new",
+          "start_ms": 1440.41796875,
+          "wait_ms": 17.264,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "23244.167",
+          "path": "/admin/sites/81/admin/menus",
+          "start_ms": 1440.989013671875,
+          "wait_ms": 26.363,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "23244.168",
+          "path": "/admin/sites/81/admin/pages",
+          "start_ms": 1441.419921875,
+          "wait_ms": 43.177,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "23244.169",
+          "path": "/admin/sites/81/admin/posts",
+          "start_ms": 1441.871826171875,
+          "wait_ms": 78.50200000000001,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "23244.170",
+          "path": "/admin/sites/81/admin/media",
+          "start_ms": 1442.291015625,
+          "wait_ms": 59.592,
+          "initiator_type": "script"
+        },
+        {
+          "cdp_id": "23244.171",
+          "path": "/admin/api/reads?site=81&resource=dashboard-activity",
+          "start_ms": 1737.385009765625,
+          "wait_ms": 108.90899999999999,
+          "initiator_type": "script"
+        }
+      ],
+      "waterfall_note": "Start offsets are relative to navigation initiation; temporal sequences are candidates, not proof of causal blocking."
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 81,
+      "navigation_id": "642bee46-125d-42b4-bd6d-1eca7050f766",
+      "status": 200,
+      "duration_ms": 140,
+      "request_id": "642bee46-125d-42b4-bd6d-1eca7050f766",
+      "sql_count": 18,
+      "sql_ms": 37.814
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 81,
+      "navigation_id": "76011ecc-891f-4360-8367-3a7b1707b894",
+      "status": 200,
+      "duration_ms": 416.7999999821186,
+      "request_id": "76011ecc-891f-4360-8367-3a7b1707b894",
+      "sql_count": 18,
+      "sql_ms": 22.367
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 81,
+      "navigation_id": "99bad9be-827b-4112-9f79-7be9d356ac03",
+      "status": 200,
+      "duration_ms": 1301.5999999940395,
+      "request_id": "99bad9be-827b-4112-9f79-7be9d356ac03",
+      "sql_count": 18,
+      "sql_ms": 402.248
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 81,
+      "navigation_id": "e052ac57-6976-43f0-8b69-cc81ee017d9c",
+      "status": 200,
+      "duration_ms": 353.59999999403954,
+      "request_id": "e052ac57-6976-43f0-8b69-cc81ee017d9c",
+      "sql_count": 18,
+      "sql_ms": 39.827
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 81,
+      "navigation_id": "b730bcfb-2a49-4ca8-a0cc-d89fe7883f4b",
+      "status": 200,
+      "duration_ms": 1512.9000000059605,
+      "request_id": "b730bcfb-2a49-4ca8-a0cc-d89fe7883f4b",
+      "sql_count": 16,
+      "sql_ms": 128.249
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 81,
+      "navigation_id": "c2c86d53-7344-49c5-97c2-c6e5a1d812a8",
+      "status": 200,
+      "duration_ms": 1070.9000000059605,
+      "request_id": "c2c86d53-7344-49c5-97c2-c6e5a1d812a8",
+      "sql_count": 16,
+      "sql_ms": 25.301
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 82,
+      "navigation_id": "933d2dca-809a-42f3-ba2a-e7cb9b7b27b7",
+      "status": 200,
+      "duration_ms": 472.5,
+      "request_id": "933d2dca-809a-42f3-ba2a-e7cb9b7b27b7",
+      "sql_count": 18,
+      "sql_ms": 24.374
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 82,
+      "navigation_id": "4a29c728-b344-4d5f-a83a-02f1fe8c1bbc",
+      "status": 200,
+      "duration_ms": 260.90000000596046,
+      "request_id": "4a29c728-b344-4d5f-a83a-02f1fe8c1bbc",
+      "sql_count": 18,
+      "sql_ms": 19.55
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 82,
+      "navigation_id": "e0958c1e-5187-4ac8-9dc0-51090d2b6759",
+      "status": 200,
+      "duration_ms": 564.1999999880791,
+      "request_id": "e0958c1e-5187-4ac8-9dc0-51090d2b6759",
+      "sql_count": 18,
+      "sql_ms": 83.64
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 82,
+      "navigation_id": "98ff5d98-fab8-4f85-b905-3d6ee273dc98",
+      "status": 200,
+      "duration_ms": 186.59999999403954,
+      "request_id": "98ff5d98-fab8-4f85-b905-3d6ee273dc98",
+      "sql_count": 18,
+      "sql_ms": 34.75
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 82,
+      "navigation_id": "1e88d208-9eff-42c9-b98b-c6146acd12a9",
+      "status": 200,
+      "duration_ms": 344.59999999403954,
+      "request_id": "1e88d208-9eff-42c9-b98b-c6146acd12a9",
+      "sql_count": 16,
+      "sql_ms": 53.546
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 82,
+      "navigation_id": "20988d6b-801f-412c-a209-e31daa7d305d",
+      "status": 200,
+      "duration_ms": 288.59999999403954,
+      "request_id": "20988d6b-801f-412c-a209-e31daa7d305d",
+      "sql_count": 16,
+      "sql_ms": 25.237
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 83,
+      "navigation_id": "4b6664c8-16fc-4df9-9cfd-a3ad92df1c63",
+      "status": 200,
+      "duration_ms": 143.5,
+      "request_id": "4b6664c8-16fc-4df9-9cfd-a3ad92df1c63",
+      "sql_count": 18,
+      "sql_ms": 28.996
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 83,
+      "navigation_id": "61d6de4c-d8e6-4686-b4fd-a556d768400c",
+      "status": 200,
+      "duration_ms": 135,
+      "request_id": "61d6de4c-d8e6-4686-b4fd-a556d768400c",
+      "sql_count": 18,
+      "sql_ms": 36.289
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 83,
+      "navigation_id": "14135947-cf51-413f-9dd4-d34957797e65",
+      "status": 200,
+      "duration_ms": 193.90000000596046,
+      "request_id": "14135947-cf51-413f-9dd4-d34957797e65",
+      "sql_count": 18,
+      "sql_ms": 67.412
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 83,
+      "navigation_id": "51b88010-1885-4aec-a07b-a309c81dd07c",
+      "status": 200,
+      "duration_ms": 164.80000001192093,
+      "request_id": "51b88010-1885-4aec-a07b-a309c81dd07c",
+      "sql_count": 18,
+      "sql_ms": 42.953
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 83,
+      "navigation_id": "ffdd7766-5647-4b3d-9e4c-3963e06983b7",
+      "status": 200,
+      "duration_ms": 312.69999998807907,
+      "request_id": "ffdd7766-5647-4b3d-9e4c-3963e06983b7",
+      "sql_count": 16,
+      "sql_ms": 37.068
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 83,
+      "navigation_id": "73ad1eaa-6f4b-44b2-acc9-e3aa6fee5a92",
+      "status": 200,
+      "duration_ms": 257.90000000596046,
+      "request_id": "73ad1eaa-6f4b-44b2-acc9-e3aa6fee5a92",
+      "sql_count": 16,
+      "sql_ms": 22.008
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 84,
+      "navigation_id": "6ba6a5e0-cae4-47fc-a97f-271a7bc57d49",
+      "status": 200,
+      "duration_ms": 96.69999998807907,
+      "request_id": "6ba6a5e0-cae4-47fc-a97f-271a7bc57d49",
+      "sql_count": 18,
+      "sql_ms": 22.543
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 84,
+      "navigation_id": "6e86a786-f807-42c1-a20c-3e6bf0b9b36b",
+      "status": 200,
+      "duration_ms": 104.2000000178814,
+      "request_id": "6e86a786-f807-42c1-a20c-3e6bf0b9b36b",
+      "sql_count": 18,
+      "sql_ms": 25.344
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 84,
+      "navigation_id": "5bf554a4-2317-4c60-8463-7ff92e8c27b7",
+      "status": 200,
+      "duration_ms": 216.5,
+      "request_id": "5bf554a4-2317-4c60-8463-7ff92e8c27b7",
+      "sql_count": 18,
+      "sql_ms": 66.069
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 84,
+      "navigation_id": "e3557e07-8127-4dc6-96f8-71a6f7177984",
+      "status": 200,
+      "duration_ms": 189.5,
+      "request_id": "e3557e07-8127-4dc6-96f8-71a6f7177984",
+      "sql_count": 18,
+      "sql_ms": 43.037
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 84,
+      "navigation_id": "15faeccf-82db-4b74-956b-3460d38e49b8",
+      "status": 200,
+      "duration_ms": 166.7999999821186,
+      "request_id": "15faeccf-82db-4b74-956b-3460d38e49b8",
+      "sql_count": 16,
+      "sql_ms": 30.532
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 84,
+      "navigation_id": "f05b0d12-8457-4ea3-acd5-8574571e1067",
+      "status": 200,
+      "duration_ms": 118.7000000178814,
+      "request_id": "f05b0d12-8457-4ea3-acd5-8574571e1067",
+      "sql_count": 16,
+      "sql_ms": 25.906
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 85,
+      "navigation_id": "b50b263e-88c5-4392-ad89-f5768162b58e",
+      "status": 200,
+      "duration_ms": 93.09999999403954,
+      "request_id": "b50b263e-88c5-4392-ad89-f5768162b58e",
+      "sql_count": 18,
+      "sql_ms": 30.076
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 85,
+      "navigation_id": "511d39c9-6f66-4303-a644-3beb7c12a020",
+      "status": 200,
+      "duration_ms": 96.39999997615814,
+      "request_id": "511d39c9-6f66-4303-a644-3beb7c12a020",
+      "sql_count": 18,
+      "sql_ms": 30.545
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 85,
+      "navigation_id": "c9b2e392-b181-4ece-99a6-35c97a43a13c",
+      "status": 200,
+      "duration_ms": 120.5,
+      "request_id": "c9b2e392-b181-4ece-99a6-35c97a43a13c",
+      "sql_count": 18,
+      "sql_ms": 46.148
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 85,
+      "navigation_id": "6663e990-dd1f-4a74-affb-2c1d3dbb5679",
+      "status": 200,
+      "duration_ms": 142.5,
+      "request_id": "6663e990-dd1f-4a74-affb-2c1d3dbb5679",
+      "sql_count": 18,
+      "sql_ms": 39.704
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 85,
+      "navigation_id": "f19b5a58-ceda-42b3-bda6-ef1b8d72fff9",
+      "status": 200,
+      "duration_ms": 136.69999998807907,
+      "request_id": "f19b5a58-ceda-42b3-bda6-ef1b8d72fff9",
+      "sql_count": 16,
+      "sql_ms": 45.967
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 85,
+      "navigation_id": "b9ccd787-07ab-439a-b817-61a9c1217b35",
+      "status": 200,
+      "duration_ms": 137.80000001192093,
+      "request_id": "b9ccd787-07ab-439a-b817-61a9c1217b35",
+      "sql_count": 16,
+      "sql_ms": 35.483
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 86,
+      "navigation_id": "254ba0b3-6038-4242-8683-5b240c8f78dc",
+      "status": 200,
+      "duration_ms": 175.59999999403954,
+      "request_id": "254ba0b3-6038-4242-8683-5b240c8f78dc",
+      "sql_count": 18,
+      "sql_ms": 63.582
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 86,
+      "navigation_id": "e5a02ded-b73f-4e5d-b3eb-25145f4131cc",
+      "status": 200,
+      "duration_ms": 125.69999998807907,
+      "request_id": "e5a02ded-b73f-4e5d-b3eb-25145f4131cc",
+      "sql_count": 18,
+      "sql_ms": 41.905
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 86,
+      "navigation_id": "d71ff8ee-d40f-4300-bea7-3ccc24ec8e77",
+      "status": 200,
+      "duration_ms": 140.90000000596046,
+      "request_id": "d71ff8ee-d40f-4300-bea7-3ccc24ec8e77",
+      "sql_count": 18,
+      "sql_ms": 68.633
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 86,
+      "navigation_id": "94403fe0-68c6-4f47-b4af-cd96fbd10e1f",
+      "status": 200,
+      "duration_ms": 93.30000001192093,
+      "request_id": "94403fe0-68c6-4f47-b4af-cd96fbd10e1f",
+      "sql_count": 18,
+      "sql_ms": 31.86
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 86,
+      "navigation_id": "23df3ced-019b-4d0b-aaf6-136e8f9cb42d",
+      "status": 200,
+      "duration_ms": 94.7000000178814,
+      "request_id": "23df3ced-019b-4d0b-aaf6-136e8f9cb42d",
+      "sql_count": 16,
+      "sql_ms": 25.311
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 86,
+      "navigation_id": "1cca532e-c067-468e-9b7c-479cc8b18178",
+      "status": 200,
+      "duration_ms": 93.09999999403954,
+      "request_id": "1cca532e-c067-468e-9b7c-479cc8b18178",
+      "sql_count": 16,
+      "sql_ms": 27.806
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 87,
+      "navigation_id": "feaf0fe6-935c-498d-83e0-8eba6913f9ce",
+      "status": 200,
+      "duration_ms": 78.2000000178814,
+      "request_id": "feaf0fe6-935c-498d-83e0-8eba6913f9ce",
+      "sql_count": 18,
+      "sql_ms": 21.634
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 87,
+      "navigation_id": "b4a6cd82-4a83-4e9c-9a54-9d233def823b",
+      "status": 200,
+      "duration_ms": 84.5,
+      "request_id": "b4a6cd82-4a83-4e9c-9a54-9d233def823b",
+      "sql_count": 18,
+      "sql_ms": 25.048
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 87,
+      "navigation_id": "6b7c5f20-3da3-4b97-ac71-9789da4871d1",
+      "status": 200,
+      "duration_ms": 108.30000001192093,
+      "request_id": "6b7c5f20-3da3-4b97-ac71-9789da4871d1",
+      "sql_count": 18,
+      "sql_ms": 38.433
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 87,
+      "navigation_id": "9d4e3d00-e472-4fbb-90a9-b82aab05cc85",
+      "status": 200,
+      "duration_ms": 122.19999998807907,
+      "request_id": "9d4e3d00-e472-4fbb-90a9-b82aab05cc85",
+      "sql_count": 18,
+      "sql_ms": 34.046
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 87,
+      "navigation_id": "bab6a0bc-322b-4882-9bd3-468149364869",
+      "status": 200,
+      "duration_ms": 92.5,
+      "request_id": "bab6a0bc-322b-4882-9bd3-468149364869",
+      "sql_count": 16,
+      "sql_ms": 24.962
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 87,
+      "navigation_id": "5a4382b7-5eca-4b2f-a1e3-bca0b67a6f84",
+      "status": 200,
+      "duration_ms": 83,
+      "request_id": "5a4382b7-5eca-4b2f-a1e3-bca0b67a6f84",
+      "sql_count": 16,
+      "sql_ms": 26.526
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 88,
+      "navigation_id": "05a8bda1-9955-4e96-a3fc-1e3d587ac3da",
+      "status": 200,
+      "duration_ms": 93.2999999821186,
+      "request_id": "05a8bda1-9955-4e96-a3fc-1e3d587ac3da",
+      "sql_count": 18,
+      "sql_ms": 29.607
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 88,
+      "navigation_id": "c8d46035-6759-4163-814e-05d3b7c985d7",
+      "status": 200,
+      "duration_ms": 101.90000000596046,
+      "request_id": "c8d46035-6759-4163-814e-05d3b7c985d7",
+      "sql_count": 18,
+      "sql_ms": 31.71
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 88,
+      "navigation_id": "1fa55315-e00c-4144-a1cb-ec2263baaa02",
+      "status": 200,
+      "duration_ms": 185.7000000178814,
+      "request_id": "1fa55315-e00c-4144-a1cb-ec2263baaa02",
+      "sql_count": 18,
+      "sql_ms": 35.217
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 88,
+      "navigation_id": "d86e6a3a-6ed7-40e9-b66b-4b23c2ba0e60",
+      "status": 200,
+      "duration_ms": 93.90000000596046,
+      "request_id": "d86e6a3a-6ed7-40e9-b66b-4b23c2ba0e60",
+      "sql_count": 18,
+      "sql_ms": 29.606
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 88,
+      "navigation_id": "4fbc86f0-5bd0-4a82-8a6b-6851eb189e7f",
+      "status": 200,
+      "duration_ms": 111.5,
+      "request_id": "4fbc86f0-5bd0-4a82-8a6b-6851eb189e7f",
+      "sql_count": 16,
+      "sql_ms": 25.535
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 88,
+      "navigation_id": "ab982824-cd0b-48d4-8258-7c08eaacc63c",
+      "status": 200,
+      "duration_ms": 95.59999999403954,
+      "request_id": "ab982824-cd0b-48d4-8258-7c08eaacc63c",
+      "sql_count": 16,
+      "sql_ms": 25.723
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 89,
+      "navigation_id": "6397f66c-3615-42e1-85f8-6ee677562812",
+      "status": 200,
+      "duration_ms": 93.5,
+      "request_id": "6397f66c-3615-42e1-85f8-6ee677562812",
+      "sql_count": 18,
+      "sql_ms": 32.038
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 89,
+      "navigation_id": "74d306f0-d933-4545-b554-470360ce41d6",
+      "status": 200,
+      "duration_ms": 108.5,
+      "request_id": "74d306f0-d933-4545-b554-470360ce41d6",
+      "sql_count": 18,
+      "sql_ms": 32.451
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 89,
+      "navigation_id": "de1a4fea-e0df-49ff-8846-873d193db267",
+      "status": 200,
+      "duration_ms": 138.5,
+      "request_id": "de1a4fea-e0df-49ff-8846-873d193db267",
+      "sql_count": 18,
+      "sql_ms": 50.723
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 89,
+      "navigation_id": "b3525c8e-8ed9-4709-a382-d367607e4d5d",
+      "status": 200,
+      "duration_ms": 135.80000001192093,
+      "request_id": "b3525c8e-8ed9-4709-a382-d367607e4d5d",
+      "sql_count": 18,
+      "sql_ms": 39.204
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 89,
+      "navigation_id": "16b814aa-2048-4b3d-9dc7-9e8136bdc7d3",
+      "status": 200,
+      "duration_ms": 98.80000001192093,
+      "request_id": "16b814aa-2048-4b3d-9dc7-9e8136bdc7d3",
+      "sql_count": 16,
+      "sql_ms": 27.465
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 89,
+      "navigation_id": "4b07b76f-21c9-41f2-8c5c-e82d4526af27",
+      "status": 200,
+      "duration_ms": 92.59999999403954,
+      "request_id": "4b07b76f-21c9-41f2-8c5c-e82d4526af27",
+      "sql_count": 16,
+      "sql_ms": 25.611
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 90,
+      "navigation_id": "3dea5529-6e9a-4d4f-a5f1-7e3945b3d3e0",
+      "status": 200,
+      "duration_ms": 86,
+      "request_id": "3dea5529-6e9a-4d4f-a5f1-7e3945b3d3e0",
+      "sql_count": 18,
+      "sql_ms": 25.954
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 90,
+      "navigation_id": "c6997765-ab4d-4841-8b02-99d5a8495b42",
+      "status": 200,
+      "duration_ms": 92.19999998807907,
+      "request_id": "c6997765-ab4d-4841-8b02-99d5a8495b42",
+      "sql_count": 18,
+      "sql_ms": 29.556
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 90,
+      "navigation_id": "7779e14a-8c13-40b1-b20c-56244c9399a9",
+      "status": 200,
+      "duration_ms": 103.40000000596046,
+      "request_id": "7779e14a-8c13-40b1-b20c-56244c9399a9",
+      "sql_count": 18,
+      "sql_ms": 36.858
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 90,
+      "navigation_id": "c99dfc55-b826-4feb-bed5-55519e06f766",
+      "status": 200,
+      "duration_ms": 108.09999999403954,
+      "request_id": "c99dfc55-b826-4feb-bed5-55519e06f766",
+      "sql_count": 18,
+      "sql_ms": 32.344
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 90,
+      "navigation_id": "6cac7e0a-d57c-4690-b7c5-9356974d4181",
+      "status": 200,
+      "duration_ms": 97.30000001192093,
+      "request_id": "6cac7e0a-d57c-4690-b7c5-9356974d4181",
+      "sql_count": 16,
+      "sql_ms": 26.334
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 90,
+      "navigation_id": "4030c939-81b6-4b85-8aa5-017b81c57f18",
+      "status": 200,
+      "duration_ms": 92.80000001192093,
+      "request_id": "4030c939-81b6-4b85-8aa5-017b81c57f18",
+      "sql_count": 16,
+      "sql_ms": 27.219
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 91,
+      "navigation_id": "b9c889ef-e2f8-411e-afce-bbd6b5f177fa",
+      "status": 200,
+      "duration_ms": 94,
+      "request_id": "b9c889ef-e2f8-411e-afce-bbd6b5f177fa",
+      "sql_count": 18,
+      "sql_ms": 28.623
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 91,
+      "navigation_id": "97158957-34e3-4a58-9ffd-3e28d199ec90",
+      "status": 200,
+      "duration_ms": 109.09999999403954,
+      "request_id": "97158957-34e3-4a58-9ffd-3e28d199ec90",
+      "sql_count": 18,
+      "sql_ms": 26.272
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 91,
+      "navigation_id": "a6291247-f624-455d-bc4a-0fa6a6ac7874",
+      "status": 200,
+      "duration_ms": 117.5,
+      "request_id": "a6291247-f624-455d-bc4a-0fa6a6ac7874",
+      "sql_count": 18,
+      "sql_ms": 37.134
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 91,
+      "navigation_id": "ca110ccb-d91a-4b73-aec8-b31d8242c590",
+      "status": 200,
+      "duration_ms": 142.39999997615814,
+      "request_id": "ca110ccb-d91a-4b73-aec8-b31d8242c590",
+      "sql_count": 18,
+      "sql_ms": 47.219
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 91,
+      "navigation_id": "2d47e5a1-ec6a-45ab-b1ea-375a3f67128c",
+      "status": 200,
+      "duration_ms": 110.09999999403954,
+      "request_id": "2d47e5a1-ec6a-45ab-b1ea-375a3f67128c",
+      "sql_count": 16,
+      "sql_ms": 30.853
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 91,
+      "navigation_id": "745a0c2b-28de-4e8e-8271-f98bf8c31b5a",
+      "status": 200,
+      "duration_ms": 118,
+      "request_id": "745a0c2b-28de-4e8e-8271-f98bf8c31b5a",
+      "sql_count": 16,
+      "sql_ms": 32.889
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 92,
+      "navigation_id": "46bc89bf-9277-4d33-8257-63de0fd61fbc",
+      "status": 200,
+      "duration_ms": 105.30000001192093,
+      "request_id": "46bc89bf-9277-4d33-8257-63de0fd61fbc",
+      "sql_count": 18,
+      "sql_ms": 31.323
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 92,
+      "navigation_id": "18f6af80-84bb-49bd-9b12-444862907cee",
+      "status": 200,
+      "duration_ms": 91.90000000596046,
+      "request_id": "18f6af80-84bb-49bd-9b12-444862907cee",
+      "sql_count": 18,
+      "sql_ms": 26.685
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 92,
+      "navigation_id": "114d1b59-0334-48bd-ae1d-6f4f6092b984",
+      "status": 200,
+      "duration_ms": 114,
+      "request_id": "114d1b59-0334-48bd-ae1d-6f4f6092b984",
+      "sql_count": 18,
+      "sql_ms": 38.472
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 92,
+      "navigation_id": "b75960f7-a2c6-4b4e-8d5d-0a47521c3240",
+      "status": 200,
+      "duration_ms": 118.69999998807907,
+      "request_id": "b75960f7-a2c6-4b4e-8d5d-0a47521c3240",
+      "sql_count": 18,
+      "sql_ms": 37.596
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 92,
+      "navigation_id": "fc8d4d98-6289-4e39-a900-f3b3488a0aa0",
+      "status": 200,
+      "duration_ms": 103.7000000178814,
+      "request_id": "fc8d4d98-6289-4e39-a900-f3b3488a0aa0",
+      "sql_count": 16,
+      "sql_ms": 32.468
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 92,
+      "navigation_id": "c6034271-2a6c-4445-84d7-91babf39e507",
+      "status": 200,
+      "duration_ms": 115.5,
+      "request_id": "c6034271-2a6c-4445-84d7-91babf39e507",
+      "sql_count": 16,
+      "sql_ms": 26.621
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 93,
+      "navigation_id": "14b43e98-1647-4434-a27e-0c5d5a55c154",
+      "status": 200,
+      "duration_ms": 103.5,
+      "request_id": "14b43e98-1647-4434-a27e-0c5d5a55c154",
+      "sql_count": 18,
+      "sql_ms": 35.63
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 93,
+      "navigation_id": "0f01484f-c28d-4ba8-aa1e-e19ae0f7fbb9",
+      "status": 200,
+      "duration_ms": 101.40000000596046,
+      "request_id": "0f01484f-c28d-4ba8-aa1e-e19ae0f7fbb9",
+      "sql_count": 18,
+      "sql_ms": 27.441
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 93,
+      "navigation_id": "ef17c0dd-1807-4556-a14c-e6f2b03af9c3",
+      "status": 200,
+      "duration_ms": 111.2000000178814,
+      "request_id": "ef17c0dd-1807-4556-a14c-e6f2b03af9c3",
+      "sql_count": 18,
+      "sql_ms": 35.019
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 93,
+      "navigation_id": "1b969e88-20de-4b90-b024-9608e2355c8c",
+      "status": 200,
+      "duration_ms": 114.30000001192093,
+      "request_id": "1b969e88-20de-4b90-b024-9608e2355c8c",
+      "sql_count": 18,
+      "sql_ms": 36.233
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 93,
+      "navigation_id": "8796b4da-4fd5-48f8-9e1c-2e44569d4f5c",
+      "status": 200,
+      "duration_ms": 328.7000000178814,
+      "request_id": "8796b4da-4fd5-48f8-9e1c-2e44569d4f5c",
+      "sql_count": 16,
+      "sql_ms": 24.462
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 93,
+      "navigation_id": "259ef151-ee4a-4c9b-b284-2fa70ef2cf12",
+      "status": 200,
+      "duration_ms": 96.7999999821186,
+      "request_id": "259ef151-ee4a-4c9b-b284-2fa70ef2cf12",
+      "sql_count": 16,
+      "sql_ms": 23.528
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 94,
+      "navigation_id": "d6d34637-c416-4277-8890-96356431329e",
+      "status": 200,
+      "duration_ms": 88.80000001192093,
+      "request_id": "d6d34637-c416-4277-8890-96356431329e",
+      "sql_count": 18,
+      "sql_ms": 25.731
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 94,
+      "navigation_id": "99615026-a88e-412f-b8f3-c9d99b551ad5",
+      "status": 200,
+      "duration_ms": 100.5,
+      "request_id": "99615026-a88e-412f-b8f3-c9d99b551ad5",
+      "sql_count": 18,
+      "sql_ms": 29.741
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 94,
+      "navigation_id": "72937eb6-a93a-4ba7-9fda-95fb582081ec",
+      "status": 200,
+      "duration_ms": 131.2000000178814,
+      "request_id": "72937eb6-a93a-4ba7-9fda-95fb582081ec",
+      "sql_count": 18,
+      "sql_ms": 36.243
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 94,
+      "navigation_id": "3a3be745-512f-4e72-a3ab-23ab95e328ae",
+      "status": 200,
+      "duration_ms": 98.10000002384186,
+      "request_id": "3a3be745-512f-4e72-a3ab-23ab95e328ae",
+      "sql_count": 18,
+      "sql_ms": 33.711
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 94,
+      "navigation_id": "b2965365-d7da-41df-ac9d-c3ef716bfc11",
+      "status": 200,
+      "duration_ms": 101.7000000178814,
+      "request_id": "b2965365-d7da-41df-ac9d-c3ef716bfc11",
+      "sql_count": 16,
+      "sql_ms": 26.283
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 94,
+      "navigation_id": "6055d9c5-19cc-4c0a-9ac3-2ec2705f34e6",
+      "status": 200,
+      "duration_ms": 92.19999998807907,
+      "request_id": "6055d9c5-19cc-4c0a-9ac3-2ec2705f34e6",
+      "sql_count": 16,
+      "sql_ms": 23.884
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 95,
+      "navigation_id": "45fd3473-db07-4cbd-b716-fe8243e246ad",
+      "status": 200,
+      "duration_ms": 108.59999999403954,
+      "request_id": "45fd3473-db07-4cbd-b716-fe8243e246ad",
+      "sql_count": 18,
+      "sql_ms": 35.864
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 95,
+      "navigation_id": "49ca291f-1b52-421c-8cc0-36612bb16aaa",
+      "status": 200,
+      "duration_ms": 91.2000000178814,
+      "request_id": "49ca291f-1b52-421c-8cc0-36612bb16aaa",
+      "sql_count": 18,
+      "sql_ms": 31.534
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 95,
+      "navigation_id": "a353cea9-4110-49cf-b062-4aed53ad6d1e",
+      "status": 200,
+      "duration_ms": 112.19999998807907,
+      "request_id": "a353cea9-4110-49cf-b062-4aed53ad6d1e",
+      "sql_count": 18,
+      "sql_ms": 36.464
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 95,
+      "navigation_id": "d0256521-6437-4072-a253-2ee743d8c28f",
+      "status": 200,
+      "duration_ms": 110.5,
+      "request_id": "d0256521-6437-4072-a253-2ee743d8c28f",
+      "sql_count": 18,
+      "sql_ms": 41.021
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 95,
+      "navigation_id": "6b6dddb5-92ed-43db-82dc-a1769e235867",
+      "status": 200,
+      "duration_ms": 79.59999999403954,
+      "request_id": "6b6dddb5-92ed-43db-82dc-a1769e235867",
+      "sql_count": 16,
+      "sql_ms": 24.752
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 95,
+      "navigation_id": "087bf458-5aca-4596-ad57-92843bb2aefb",
+      "status": 200,
+      "duration_ms": 68.30000001192093,
+      "request_id": "087bf458-5aca-4596-ad57-92843bb2aefb",
+      "sql_count": 16,
+      "sql_ms": 22.085
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 96,
+      "navigation_id": "9b2e37b6-2c76-466b-99be-ec1ff5a1e8cc",
+      "status": 200,
+      "duration_ms": 86.19999998807907,
+      "request_id": "9b2e37b6-2c76-466b-99be-ec1ff5a1e8cc",
+      "sql_count": 18,
+      "sql_ms": 28.057
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 96,
+      "navigation_id": "e04a17bd-49ca-49a2-882c-0bd7b30f0894",
+      "status": 200,
+      "duration_ms": 87.5,
+      "request_id": "e04a17bd-49ca-49a2-882c-0bd7b30f0894",
+      "sql_count": 18,
+      "sql_ms": 28.989
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 96,
+      "navigation_id": "ccc4b4d4-90d2-4c0c-94e9-5fc6e2c827f2",
+      "status": 200,
+      "duration_ms": 101.09999999403954,
+      "request_id": "ccc4b4d4-90d2-4c0c-94e9-5fc6e2c827f2",
+      "sql_count": 18,
+      "sql_ms": 30.213
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 96,
+      "navigation_id": "6f178e1a-ae89-4ad5-ba65-06b76bcfc592",
+      "status": 200,
+      "duration_ms": 109.30000001192093,
+      "request_id": "6f178e1a-ae89-4ad5-ba65-06b76bcfc592",
+      "sql_count": 18,
+      "sql_ms": 36.605
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 96,
+      "navigation_id": "642deec6-f226-4824-8c7c-ea7ba05ce357",
+      "status": 200,
+      "duration_ms": 90.90000000596046,
+      "request_id": "642deec6-f226-4824-8c7c-ea7ba05ce357",
+      "sql_count": 16,
+      "sql_ms": 27.214
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 96,
+      "navigation_id": "79bb9485-cc0d-4c51-a115-10542d5b0808",
+      "status": 200,
+      "duration_ms": 97.30000001192093,
+      "request_id": "79bb9485-cc0d-4c51-a115-10542d5b0808",
+      "sql_count": 16,
+      "sql_ms": 30.507
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 97,
+      "navigation_id": "6729eca9-b574-4736-a166-2beab46f58c2",
+      "status": 200,
+      "duration_ms": 100.5,
+      "request_id": "6729eca9-b574-4736-a166-2beab46f58c2",
+      "sql_count": 18,
+      "sql_ms": 32.852
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 97,
+      "navigation_id": "7705071d-76d8-4134-9563-5c94d29cbcf6",
+      "status": 200,
+      "duration_ms": 104.30000001192093,
+      "request_id": "7705071d-76d8-4134-9563-5c94d29cbcf6",
+      "sql_count": 18,
+      "sql_ms": 30.8
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 97,
+      "navigation_id": "2972f010-56b9-4f98-b41b-222c08b71874",
+      "status": 200,
+      "duration_ms": 131.09999999403954,
+      "request_id": "2972f010-56b9-4f98-b41b-222c08b71874",
+      "sql_count": 18,
+      "sql_ms": 46.822
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 97,
+      "navigation_id": "daed06db-428b-40d4-bec0-5b5282307f4d",
+      "status": 200,
+      "duration_ms": 119.7000000178814,
+      "request_id": "daed06db-428b-40d4-bec0-5b5282307f4d",
+      "sql_count": 18,
+      "sql_ms": 43.063
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 97,
+      "navigation_id": "407d1fcf-8911-40f7-84b2-0513827d0cae",
+      "status": 200,
+      "duration_ms": 75,
+      "request_id": "407d1fcf-8911-40f7-84b2-0513827d0cae",
+      "sql_count": 16,
+      "sql_ms": 24.542
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 97,
+      "navigation_id": "8d418393-b70f-4c2c-a93a-1412d6e7ee67",
+      "status": 200,
+      "duration_ms": 80.69999998807907,
+      "request_id": "8d418393-b70f-4c2c-a93a-1412d6e7ee67",
+      "sql_count": 16,
+      "sql_ms": 26.025
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 98,
+      "navigation_id": "656af5dc-273a-40b6-8223-52ec3b42b56c",
+      "status": 200,
+      "duration_ms": 100.7000000178814,
+      "request_id": "656af5dc-273a-40b6-8223-52ec3b42b56c",
+      "sql_count": 18,
+      "sql_ms": 30.816
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 98,
+      "navigation_id": "bf7b130b-1e7e-4bd4-a17a-7aa757ef26a1",
+      "status": 200,
+      "duration_ms": 90,
+      "request_id": "bf7b130b-1e7e-4bd4-a17a-7aa757ef26a1",
+      "sql_count": 18,
+      "sql_ms": 28.792
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 98,
+      "navigation_id": "57e208e5-8fbc-4537-a930-f9f03b2b4dbc",
+      "status": 200,
+      "duration_ms": 98.39999997615814,
+      "request_id": "57e208e5-8fbc-4537-a930-f9f03b2b4dbc",
+      "sql_count": 18,
+      "sql_ms": 33.509
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 98,
+      "navigation_id": "33b16797-1294-46a5-8fe3-ac28658cde97",
+      "status": 200,
+      "duration_ms": 93,
+      "request_id": "33b16797-1294-46a5-8fe3-ac28658cde97",
+      "sql_count": 18,
+      "sql_ms": 31.347
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 98,
+      "navigation_id": "4604ffb0-7e0b-472f-9013-c6d415623de0",
+      "status": 200,
+      "duration_ms": 73.7999999821186,
+      "request_id": "4604ffb0-7e0b-472f-9013-c6d415623de0",
+      "sql_count": 16,
+      "sql_ms": 23.503
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 98,
+      "navigation_id": "45797040-6660-4682-a2d2-4cd2752da58d",
+      "status": 200,
+      "duration_ms": 81.59999999403954,
+      "request_id": "45797040-6660-4682-a2d2-4cd2752da58d",
+      "sql_count": 16,
+      "sql_ms": 25.561
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 99,
+      "navigation_id": "38e78d89-c316-4c77-b0b0-de03b044c0f1",
+      "status": 200,
+      "duration_ms": 74.2999999821186,
+      "request_id": "38e78d89-c316-4c77-b0b0-de03b044c0f1",
+      "sql_count": 18,
+      "sql_ms": 22.903
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 99,
+      "navigation_id": "bbf2feb2-b503-4018-b56e-ed05e65cd14e",
+      "status": 200,
+      "duration_ms": 104.90000000596046,
+      "request_id": "bbf2feb2-b503-4018-b56e-ed05e65cd14e",
+      "sql_count": 18,
+      "sql_ms": 29.239
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 99,
+      "navigation_id": "f3b0821c-46ea-4825-aad3-eed8dcf05736",
+      "status": 200,
+      "duration_ms": 105.80000001192093,
+      "request_id": "f3b0821c-46ea-4825-aad3-eed8dcf05736",
+      "sql_count": 18,
+      "sql_ms": 34.675
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 99,
+      "navigation_id": "25662921-c1f3-4adc-85b0-7f8bb31a6bd0",
+      "status": 200,
+      "duration_ms": 108,
+      "request_id": "25662921-c1f3-4adc-85b0-7f8bb31a6bd0",
+      "sql_count": 18,
+      "sql_ms": 40.676
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 99,
+      "navigation_id": "1fc6dced-4ccb-4715-bd7d-b3f1cbfd020d",
+      "status": 200,
+      "duration_ms": 78.7999999821186,
+      "request_id": "1fc6dced-4ccb-4715-bd7d-b3f1cbfd020d",
+      "sql_count": 16,
+      "sql_ms": 26.474
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 99,
+      "navigation_id": "9cde0150-3479-4e86-87da-7c429d40b290",
+      "status": 200,
+      "duration_ms": 70,
+      "request_id": "9cde0150-3479-4e86-87da-7c429d40b290",
+      "sql_count": 16,
+      "sql_ms": 24.847
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 100,
+      "navigation_id": "885c0c36-c61b-4435-b8e2-e0161258a2f7",
+      "status": 200,
+      "duration_ms": 79,
+      "request_id": "885c0c36-c61b-4435-b8e2-e0161258a2f7",
+      "sql_count": 18,
+      "sql_ms": 26.039
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 100,
+      "navigation_id": "c01a7f23-0280-414e-b2da-e4d79d1cfbc1",
+      "status": 200,
+      "duration_ms": 73.40000000596046,
+      "request_id": "c01a7f23-0280-414e-b2da-e4d79d1cfbc1",
+      "sql_count": 18,
+      "sql_ms": 23.471
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 100,
+      "navigation_id": "f95246d8-9e6d-493c-b378-568a4fde4056",
+      "status": 200,
+      "duration_ms": 94.5,
+      "request_id": "f95246d8-9e6d-493c-b378-568a4fde4056",
+      "sql_count": 18,
+      "sql_ms": 29.239
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 100,
+      "navigation_id": "4f01a648-ba6a-41cc-9b77-b2dc0e9ffb92",
+      "status": 200,
+      "duration_ms": 105.40000000596046,
+      "request_id": "4f01a648-ba6a-41cc-9b77-b2dc0e9ffb92",
+      "sql_count": 18,
+      "sql_ms": 34.565
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 100,
+      "navigation_id": "2f365c33-11de-45e8-b6e1-6e1be605849a",
+      "status": 200,
+      "duration_ms": 80.59999999403954,
+      "request_id": "2f365c33-11de-45e8-b6e1-6e1be605849a",
+      "sql_count": 16,
+      "sql_ms": 27.756
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 100,
+      "navigation_id": "5cd114cb-213f-4f3f-9830-091d6a5dacba",
+      "status": 200,
+      "duration_ms": 90.2999999821186,
+      "request_id": "5cd114cb-213f-4f3f-9830-091d6a5dacba",
+      "sql_count": 16,
+      "sql_ms": 29.504
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 101,
+      "navigation_id": "46961c62-a56d-42d2-a5b8-7ed143f4f477",
+      "status": 200,
+      "duration_ms": 112.90000000596046,
+      "request_id": "46961c62-a56d-42d2-a5b8-7ed143f4f477",
+      "sql_count": 18,
+      "sql_ms": 37.122
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 101,
+      "navigation_id": "f114d1be-b8ba-48db-a85f-92a7a09c78b5",
+      "status": 200,
+      "duration_ms": 126.59999999403954,
+      "request_id": "f114d1be-b8ba-48db-a85f-92a7a09c78b5",
+      "sql_count": 18,
+      "sql_ms": 37.779
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 101,
+      "navigation_id": "4e46d0d6-ae89-4cb6-9de6-41036541fa9e",
+      "status": 200,
+      "duration_ms": 112.69999998807907,
+      "request_id": "4e46d0d6-ae89-4cb6-9de6-41036541fa9e",
+      "sql_count": 18,
+      "sql_ms": 39.236
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 101,
+      "navigation_id": "a0cb22b7-2ad9-4cfb-ae0f-abcc7e076705",
+      "status": 200,
+      "duration_ms": 111.59999999403954,
+      "request_id": "a0cb22b7-2ad9-4cfb-ae0f-abcc7e076705",
+      "sql_count": 18,
+      "sql_ms": 38.864
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 101,
+      "navigation_id": "66b7b774-28b6-44fd-8e1f-7d9d6ede6c51",
+      "status": 200,
+      "duration_ms": 84.5,
+      "request_id": "66b7b774-28b6-44fd-8e1f-7d9d6ede6c51",
+      "sql_count": 16,
+      "sql_ms": 27.448
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 101,
+      "navigation_id": "13e7ff65-31b1-45e7-9e4f-30971d52efb8",
+      "status": 200,
+      "duration_ms": 86.40000000596046,
+      "request_id": "13e7ff65-31b1-45e7-9e4f-30971d52efb8",
+      "sql_count": 16,
+      "sql_ms": 26.245
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 81,
+      "navigation_id": "95e2b4ae-0976-41e2-acf0-a3609afbb11d",
+      "status": 200,
+      "duration_ms": 114.59999999403954,
+      "request_id": "95e2b4ae-0976-41e2-acf0-a3609afbb11d",
+      "sql_count": 18,
+      "sql_ms": 30.005
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 81,
+      "navigation_id": "f438ad6d-2005-4fe9-a1bf-4708f81025bb",
+      "status": 200,
+      "duration_ms": 95.2999999821186,
+      "request_id": "f438ad6d-2005-4fe9-a1bf-4708f81025bb",
+      "sql_count": 18,
+      "sql_ms": 31.887
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 81,
+      "navigation_id": "1b2d1f7b-f1d1-44cd-a8d4-4d6f0d2d8762",
+      "status": 200,
+      "duration_ms": 100.39999997615814,
+      "request_id": "1b2d1f7b-f1d1-44cd-a8d4-4d6f0d2d8762",
+      "sql_count": 18,
+      "sql_ms": 33.809
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 81,
+      "navigation_id": "f61ed970-9bc0-43b7-a4ad-939f71c02ca0",
+      "status": 200,
+      "duration_ms": 111.59999999403954,
+      "request_id": "f61ed970-9bc0-43b7-a4ad-939f71c02ca0",
+      "sql_count": 18,
+      "sql_ms": 35.077
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 81,
+      "navigation_id": "5387b400-5035-454c-a091-a45805aec9ac",
+      "status": 200,
+      "duration_ms": 68.69999998807907,
+      "request_id": "5387b400-5035-454c-a091-a45805aec9ac",
+      "sql_count": 16,
+      "sql_ms": 20.497
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 81,
+      "navigation_id": "4d33a7cc-cbc5-4ed5-9198-ea3d57e9d595",
+      "status": 200,
+      "duration_ms": 71.5,
+      "request_id": "4d33a7cc-cbc5-4ed5-9198-ea3d57e9d595",
+      "sql_count": 16,
+      "sql_ms": 21.6
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 82,
+      "navigation_id": "310052b8-8f76-423f-9160-3fa79272f51d",
+      "status": 200,
+      "duration_ms": 80.09999999403954,
+      "request_id": "310052b8-8f76-423f-9160-3fa79272f51d",
+      "sql_count": 18,
+      "sql_ms": 25.596
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 82,
+      "navigation_id": "00c1fe77-0e2f-46a4-89c7-92d4a22af223",
+      "status": 200,
+      "duration_ms": 80.7000000178814,
+      "request_id": "00c1fe77-0e2f-46a4-89c7-92d4a22af223",
+      "sql_count": 18,
+      "sql_ms": 23.803
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 82,
+      "navigation_id": "3aebdb2e-9639-4b15-b6f3-c0012b915cfd",
+      "status": 200,
+      "duration_ms": 108.2000000178814,
+      "request_id": "3aebdb2e-9639-4b15-b6f3-c0012b915cfd",
+      "sql_count": 18,
+      "sql_ms": 34.232
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 82,
+      "navigation_id": "c2130200-422f-4489-b695-64510fdd4fde",
+      "status": 200,
+      "duration_ms": 92.59999999403954,
+      "request_id": "c2130200-422f-4489-b695-64510fdd4fde",
+      "sql_count": 18,
+      "sql_ms": 31.325
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 82,
+      "navigation_id": "74664160-e470-4267-83ed-903b3acccd82",
+      "status": 200,
+      "duration_ms": 71.5,
+      "request_id": "74664160-e470-4267-83ed-903b3acccd82",
+      "sql_count": 16,
+      "sql_ms": 21.069
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 82,
+      "navigation_id": "f3c0157b-a46e-4ae6-84c8-3b19f2513985",
+      "status": 200,
+      "duration_ms": 71.59999999403954,
+      "request_id": "f3c0157b-a46e-4ae6-84c8-3b19f2513985",
+      "sql_count": 16,
+      "sql_ms": 21.313
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 83,
+      "navigation_id": "a7119774-80ae-4074-a0c7-fe93d76072e2",
+      "status": 200,
+      "duration_ms": 81.09999999403954,
+      "request_id": "a7119774-80ae-4074-a0c7-fe93d76072e2",
+      "sql_count": 18,
+      "sql_ms": 27.213
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 83,
+      "navigation_id": "99401e73-d702-4450-8d3c-cc27b4ee2059",
+      "status": 200,
+      "duration_ms": 94.69999998807907,
+      "request_id": "99401e73-d702-4450-8d3c-cc27b4ee2059",
+      "sql_count": 18,
+      "sql_ms": 26.762
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 83,
+      "navigation_id": "b17e1e2d-c59a-4345-8058-09ab6d795800",
+      "status": 200,
+      "duration_ms": 109.30000001192093,
+      "request_id": "b17e1e2d-c59a-4345-8058-09ab6d795800",
+      "sql_count": 18,
+      "sql_ms": 35.836
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 83,
+      "navigation_id": "4b0402c4-fec7-49d1-8882-5576088441ef",
+      "status": 200,
+      "duration_ms": 102.09999999403954,
+      "request_id": "4b0402c4-fec7-49d1-8882-5576088441ef",
+      "sql_count": 18,
+      "sql_ms": 36.417
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 83,
+      "navigation_id": "a7b48db3-9f7f-42e3-ac09-823f60be98ea",
+      "status": 200,
+      "duration_ms": 111.2000000178814,
+      "request_id": "a7b48db3-9f7f-42e3-ac09-823f60be98ea",
+      "sql_count": 16,
+      "sql_ms": 38.845
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 83,
+      "navigation_id": "bf1510e0-901a-4b99-9768-f42d98778798",
+      "status": 200,
+      "duration_ms": 85.40000000596046,
+      "request_id": "bf1510e0-901a-4b99-9768-f42d98778798",
+      "sql_count": 16,
+      "sql_ms": 26.887
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 84,
+      "navigation_id": "f7d7fe1b-0f3f-478a-b8c9-caa1366811f3",
+      "status": 200,
+      "duration_ms": 98,
+      "request_id": "f7d7fe1b-0f3f-478a-b8c9-caa1366811f3",
+      "sql_count": 18,
+      "sql_ms": 29.572
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 84,
+      "navigation_id": "3f550242-1f1d-48b8-9184-4cbae6bb9704",
+      "status": 200,
+      "duration_ms": 90.19999998807907,
+      "request_id": "3f550242-1f1d-48b8-9184-4cbae6bb9704",
+      "sql_count": 18,
+      "sql_ms": 29.314
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 84,
+      "navigation_id": "153e3455-1e16-4a1c-afa7-e45abc04ae33",
+      "status": 200,
+      "duration_ms": 108.30000001192093,
+      "request_id": "153e3455-1e16-4a1c-afa7-e45abc04ae33",
+      "sql_count": 18,
+      "sql_ms": 35.429
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 84,
+      "navigation_id": "bc22ab5a-8f4a-4f77-9cd9-f08103205b8e",
+      "status": 200,
+      "duration_ms": 85,
+      "request_id": "bc22ab5a-8f4a-4f77-9cd9-f08103205b8e",
+      "sql_count": 18,
+      "sql_ms": 27.213
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 84,
+      "navigation_id": "23e42b8c-a802-41c9-94a0-5951e7d28423",
+      "status": 200,
+      "duration_ms": 66.69999998807907,
+      "request_id": "23e42b8c-a802-41c9-94a0-5951e7d28423",
+      "sql_count": 16,
+      "sql_ms": 21.805
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 84,
+      "navigation_id": "5f7bd57c-3385-4a0d-bbcf-b6a9ff0833b4",
+      "status": 200,
+      "duration_ms": 87.7999999821186,
+      "request_id": "5f7bd57c-3385-4a0d-bbcf-b6a9ff0833b4",
+      "sql_count": 16,
+      "sql_ms": 25.648
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 85,
+      "navigation_id": "2279ab09-4da8-49cd-93d3-9a418acc2489",
+      "status": 200,
+      "duration_ms": 93.2999999821186,
+      "request_id": "2279ab09-4da8-49cd-93d3-9a418acc2489",
+      "sql_count": 18,
+      "sql_ms": 30.604
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 85,
+      "navigation_id": "c9d97bd0-307d-4dab-b163-38e315b4bf29",
+      "status": 200,
+      "duration_ms": 79.5,
+      "request_id": "c9d97bd0-307d-4dab-b163-38e315b4bf29",
+      "sql_count": 18,
+      "sql_ms": 21.15
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 85,
+      "navigation_id": "76d43e68-90fe-40be-99e4-f66041e616aa",
+      "status": 200,
+      "duration_ms": 79.90000000596046,
+      "request_id": "76d43e68-90fe-40be-99e4-f66041e616aa",
+      "sql_count": 18,
+      "sql_ms": 26.992
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 85,
+      "navigation_id": "c6f2eb26-a0e2-4490-95f8-ccd018691906",
+      "status": 200,
+      "duration_ms": 74.80000001192093,
+      "request_id": "c6f2eb26-a0e2-4490-95f8-ccd018691906",
+      "sql_count": 18,
+      "sql_ms": 25.07
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 85,
+      "navigation_id": "d58929c2-d7b1-4963-84f4-e34598d45d50",
+      "status": 200,
+      "duration_ms": 76.19999998807907,
+      "request_id": "d58929c2-d7b1-4963-84f4-e34598d45d50",
+      "sql_count": 16,
+      "sql_ms": 20.646
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 85,
+      "navigation_id": "f5efc1db-0d85-419b-b24b-ca02331ae40d",
+      "status": 200,
+      "duration_ms": 63,
+      "request_id": "f5efc1db-0d85-419b-b24b-ca02331ae40d",
+      "sql_count": 16,
+      "sql_ms": 19.001
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 86,
+      "navigation_id": "be7c3211-dae8-4a00-8bd2-2a75fa93f17c",
+      "status": 200,
+      "duration_ms": 95.40000000596046,
+      "request_id": "be7c3211-dae8-4a00-8bd2-2a75fa93f17c",
+      "sql_count": 18,
+      "sql_ms": 31.555
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 86,
+      "navigation_id": "1a852213-bf2c-4ad0-88d6-1933d67d7f60",
+      "status": 200,
+      "duration_ms": 134.7999999821186,
+      "request_id": "1a852213-bf2c-4ad0-88d6-1933d67d7f60",
+      "sql_count": 18,
+      "sql_ms": 27.62
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 86,
+      "navigation_id": "bf156549-0a33-4595-9b08-d882c2669757",
+      "status": 200,
+      "duration_ms": 98.89999997615814,
+      "request_id": "bf156549-0a33-4595-9b08-d882c2669757",
+      "sql_count": 18,
+      "sql_ms": 37.735
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 86,
+      "navigation_id": "389f84f3-64ca-46d3-9196-64e25c6ce210",
+      "status": 200,
+      "duration_ms": 104.09999999403954,
+      "request_id": "389f84f3-64ca-46d3-9196-64e25c6ce210",
+      "sql_count": 18,
+      "sql_ms": 38.017
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 86,
+      "navigation_id": "08f17462-37ac-4a60-9d31-24c1f7c3f070",
+      "status": 200,
+      "duration_ms": 72.80000001192093,
+      "request_id": "08f17462-37ac-4a60-9d31-24c1f7c3f070",
+      "sql_count": 16,
+      "sql_ms": 21.562
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 86,
+      "navigation_id": "cfa47cf0-5ace-4dbc-bc29-00470bc817bb",
+      "status": 200,
+      "duration_ms": 85.69999998807907,
+      "request_id": "cfa47cf0-5ace-4dbc-bc29-00470bc817bb",
+      "sql_count": 16,
+      "sql_ms": 26.852
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 87,
+      "navigation_id": "3d15d511-3dae-4620-a2ae-4237b2594a87",
+      "status": 200,
+      "duration_ms": 112.2000000178814,
+      "request_id": "3d15d511-3dae-4620-a2ae-4237b2594a87",
+      "sql_count": 18,
+      "sql_ms": 40.028
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 87,
+      "navigation_id": "12ca10d6-44da-4cfc-a8aa-e1d97c2ef5cd",
+      "status": 200,
+      "duration_ms": 104.10000002384186,
+      "request_id": "12ca10d6-44da-4cfc-a8aa-e1d97c2ef5cd",
+      "sql_count": 18,
+      "sql_ms": 32.904
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 87,
+      "navigation_id": "00d81047-ea77-4f72-a768-f1bbd2b6fcd4",
+      "status": 200,
+      "duration_ms": 116.90000000596046,
+      "request_id": "00d81047-ea77-4f72-a768-f1bbd2b6fcd4",
+      "sql_count": 18,
+      "sql_ms": 40.571
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 87,
+      "navigation_id": "667d7833-9d49-484f-b95b-d2e8c0de376d",
+      "status": 200,
+      "duration_ms": 104.7000000178814,
+      "request_id": "667d7833-9d49-484f-b95b-d2e8c0de376d",
+      "sql_count": 18,
+      "sql_ms": 32.042
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 87,
+      "navigation_id": "0569b86c-0c6b-4223-bb89-9570f266cdb4",
+      "status": 200,
+      "duration_ms": 75.30000001192093,
+      "request_id": "0569b86c-0c6b-4223-bb89-9570f266cdb4",
+      "sql_count": 16,
+      "sql_ms": 22.11
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 87,
+      "navigation_id": "e6fd695a-0231-4236-a189-890fea48c468",
+      "status": 200,
+      "duration_ms": 78.69999998807907,
+      "request_id": "e6fd695a-0231-4236-a189-890fea48c468",
+      "sql_count": 16,
+      "sql_ms": 24.207
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 88,
+      "navigation_id": "54839244-9ee2-48b5-8cfb-564e5833b411",
+      "status": 200,
+      "duration_ms": 89.59999999403954,
+      "request_id": "54839244-9ee2-48b5-8cfb-564e5833b411",
+      "sql_count": 18,
+      "sql_ms": 26.725
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 88,
+      "navigation_id": "896e9ee8-c275-46e0-8439-84979912344d",
+      "status": 200,
+      "duration_ms": 93.39999997615814,
+      "request_id": "896e9ee8-c275-46e0-8439-84979912344d",
+      "sql_count": 18,
+      "sql_ms": 31.323
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 88,
+      "navigation_id": "e2c3c32e-da60-4ac6-add9-49485efd885a",
+      "status": 200,
+      "duration_ms": 97.40000000596046,
+      "request_id": "e2c3c32e-da60-4ac6-add9-49485efd885a",
+      "sql_count": 18,
+      "sql_ms": 32.075
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 88,
+      "navigation_id": "a75010a2-7c58-4340-8669-8eaee01aa582",
+      "status": 200,
+      "duration_ms": 118.69999998807907,
+      "request_id": "a75010a2-7c58-4340-8669-8eaee01aa582",
+      "sql_count": 18,
+      "sql_ms": 40.701
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 88,
+      "navigation_id": "d6aa90e0-89a3-4aa8-82ff-610b15ef1376",
+      "status": 200,
+      "duration_ms": 84,
+      "request_id": "d6aa90e0-89a3-4aa8-82ff-610b15ef1376",
+      "sql_count": 16,
+      "sql_ms": 26.115
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 88,
+      "navigation_id": "f36d8a34-6233-46f2-a451-bbab56497d9e",
+      "status": 200,
+      "duration_ms": 86.80000001192093,
+      "request_id": "f36d8a34-6233-46f2-a451-bbab56497d9e",
+      "sql_count": 16,
+      "sql_ms": 28.831
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "pages",
+      "site_id": 89,
+      "navigation_id": "1c080a48-b263-4685-a935-0516d5fc6911",
+      "status": 200,
+      "duration_ms": 102.5,
+      "request_id": "1c080a48-b263-4685-a935-0516d5fc6911",
+      "sql_count": 18,
+      "sql_ms": 33.239
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "pages",
+      "site_id": 89,
+      "navigation_id": "11373b08-8e62-4213-82b4-9983ce7dbd4e",
+      "status": 200,
+      "duration_ms": 93,
+      "request_id": "11373b08-8e62-4213-82b4-9983ce7dbd4e",
+      "sql_count": 18,
+      "sql_ms": 30.966
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "posts",
+      "site_id": 89,
+      "navigation_id": "ad5391ec-f3b7-48ee-ac52-b9ef7528be94",
+      "status": 200,
+      "duration_ms": 116.80000001192093,
+      "request_id": "ad5391ec-f3b7-48ee-ac52-b9ef7528be94",
+      "sql_count": 18,
+      "sql_ms": 34.483
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "posts",
+      "site_id": 89,
+      "navigation_id": "b3c14f88-4f4b-4916-9cd2-74431943fb18",
+      "status": 200,
+      "duration_ms": 114,
+      "request_id": "b3c14f88-4f4b-4916-9cd2-74431943fb18",
+      "sql_count": 18,
+      "sql_ms": 41.322
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "cold",
+      "resource": "assets",
+      "site_id": 89,
+      "navigation_id": "645397a9-e470-4ff4-b2fb-b3a0d04fcfc5",
+      "status": 200,
+      "duration_ms": 89.69999998807907,
+      "request_id": "645397a9-e470-4ff4-b2fb-b3a0d04fcfc5",
+      "sql_count": 16,
+      "sql_ms": 26.051
+    },
+    {
+      "scenario": "paginated_list_api",
+      "cache_state": "warm",
+      "resource": "assets",
+      "site_id": 89,
+      "navigation_id": "1dd90386-e429-45c6-a283-b1c0fbb0a2e3",
+      "status": 200,
+      "duration_ms": 74,
+      "request_id": "1dd90386-e429-45c6-a283-b1c0fbb0a2e3",
+      "sql_count": 16,
+      "sql_ms": 23.978
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "83f1a3dd-789c-4065-bd49-9db5954e6504",
+      "site_id": 81,
+      "status": 200,
+      "duration_ms": 72.10000002384186,
+      "request_id": "83f1a3dd-789c-4065-bd49-9db5954e6504",
+      "site": 81
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "37c4a854-b6ff-4f2f-bbce-a37fcec14783",
+      "site_id": 81,
+      "status": 200,
+      "duration_ms": 70.19999998807907,
+      "request_id": "37c4a854-b6ff-4f2f-bbce-a37fcec14783",
+      "site": 81
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "2c88a3d9-b5c9-4abd-9dd9-0fc7da9d4800",
+      "site_id": 82,
+      "status": 200,
+      "duration_ms": 70.7000000178814,
+      "request_id": "2c88a3d9-b5c9-4abd-9dd9-0fc7da9d4800",
+      "site": 82
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "6cb71cd7-5f69-40dc-8469-110e6d8fe50a",
+      "site_id": 82,
+      "status": 200,
+      "duration_ms": 67.90000000596046,
+      "request_id": "6cb71cd7-5f69-40dc-8469-110e6d8fe50a",
+      "site": 82
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "e50ebd50-5549-4b03-a4ef-633bb781a7e2",
+      "site_id": 83,
+      "status": 200,
+      "duration_ms": 69.69999998807907,
+      "request_id": "e50ebd50-5549-4b03-a4ef-633bb781a7e2",
+      "site": 83
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "9f39c05f-c6ba-4465-84c3-0e223d488e87",
+      "site_id": 83,
+      "status": 200,
+      "duration_ms": 65.2999999821186,
+      "request_id": "9f39c05f-c6ba-4465-84c3-0e223d488e87",
+      "site": 83
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "22d61c17-4608-43e3-95e3-c990fb9d95c4",
+      "site_id": 84,
+      "status": 200,
+      "duration_ms": 66.10000002384186,
+      "request_id": "22d61c17-4608-43e3-95e3-c990fb9d95c4",
+      "site": 84
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "3899f8fc-0f25-4652-8ad6-86809c6f072c",
+      "site_id": 84,
+      "status": 200,
+      "duration_ms": 66.2999999821186,
+      "request_id": "3899f8fc-0f25-4652-8ad6-86809c6f072c",
+      "site": 84
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "650de913-1f0c-4ba5-930c-396100022642",
+      "site_id": 85,
+      "status": 200,
+      "duration_ms": 74,
+      "request_id": "650de913-1f0c-4ba5-930c-396100022642",
+      "site": 85
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "d0791b79-9ff3-4732-9aa6-30004e54531e",
+      "site_id": 85,
+      "status": 200,
+      "duration_ms": 61,
+      "request_id": "d0791b79-9ff3-4732-9aa6-30004e54531e",
+      "site": 85
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "82b1fc70-1f55-461c-a807-8a205d2c59d2",
+      "site_id": 86,
+      "status": 200,
+      "duration_ms": 73.59999999403954,
+      "request_id": "82b1fc70-1f55-461c-a807-8a205d2c59d2",
+      "site": 86
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "3eced0b0-4cdf-4b8f-890c-1a18f505b6b1",
+      "site_id": 86,
+      "status": 200,
+      "duration_ms": 81.90000000596046,
+      "request_id": "3eced0b0-4cdf-4b8f-890c-1a18f505b6b1",
+      "site": 86
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "ca0ee9de-f5b5-4055-811b-d732614a7bef",
+      "site_id": 87,
+      "status": 200,
+      "duration_ms": 85.5,
+      "request_id": "ca0ee9de-f5b5-4055-811b-d732614a7bef",
+      "site": 87
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "08aed966-2788-4ef5-a847-36cd964dea63",
+      "site_id": 87,
+      "status": 200,
+      "duration_ms": 72.90000000596046,
+      "request_id": "08aed966-2788-4ef5-a847-36cd964dea63",
+      "site": 87
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "f1241b53-32bc-45dd-ab85-353f15cfe74b",
+      "site_id": 88,
+      "status": 200,
+      "duration_ms": 64.59999999403954,
+      "request_id": "f1241b53-32bc-45dd-ab85-353f15cfe74b",
+      "site": 88
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "c20adc60-c2fb-4922-a41c-07d452363212",
+      "site_id": 88,
+      "status": 200,
+      "duration_ms": 68.19999998807907,
+      "request_id": "c20adc60-c2fb-4922-a41c-07d452363212",
+      "site": 88
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "d68ecc05-8af6-4dd6-b62b-ad1ebf1cf7ac",
+      "site_id": 89,
+      "status": 200,
+      "duration_ms": 60.099999994039536,
+      "request_id": "d68ecc05-8af6-4dd6-b62b-ad1ebf1cf7ac",
+      "site": 89
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "54e78bd9-ec04-4673-bd44-96c4cc4038ac",
+      "site_id": 89,
+      "status": 200,
+      "duration_ms": 65.5,
+      "request_id": "54e78bd9-ec04-4673-bd44-96c4cc4038ac",
+      "site": 89
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "5b6bee4e-83ba-455c-90b6-e1f363a7bb6d",
+      "site_id": 90,
+      "status": 200,
+      "duration_ms": 64.2999999821186,
+      "request_id": "5b6bee4e-83ba-455c-90b6-e1f363a7bb6d",
+      "site": 90
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "91e2f7ca-877a-4f2f-80c0-8385db5852a9",
+      "site_id": 90,
+      "status": 200,
+      "duration_ms": 62.30000001192093,
+      "request_id": "91e2f7ca-877a-4f2f-80c0-8385db5852a9",
+      "site": 90
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "0389de0d-a712-4a1d-a660-55546e848038",
+      "site_id": 91,
+      "status": 200,
+      "duration_ms": 64.09999999403954,
+      "request_id": "0389de0d-a712-4a1d-a660-55546e848038",
+      "site": 91
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "8a0a9c63-dcc7-44f9-ab0a-4d9272f8f6ae",
+      "site_id": 91,
+      "status": 200,
+      "duration_ms": 63.5,
+      "request_id": "8a0a9c63-dcc7-44f9-ab0a-4d9272f8f6ae",
+      "site": 91
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "23732751-65a1-409a-a187-a1be9cef5d88",
+      "site_id": 92,
+      "status": 200,
+      "duration_ms": 67.7999999821186,
+      "request_id": "23732751-65a1-409a-a187-a1be9cef5d88",
+      "site": 92
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "d97b3de4-6078-49a5-9ed6-0e6d52a34bba",
+      "site_id": 92,
+      "status": 200,
+      "duration_ms": 60.70000001788139,
+      "request_id": "d97b3de4-6078-49a5-9ed6-0e6d52a34bba",
+      "site": 92
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "c9db9c69-92e1-4253-8cc9-22c9f82b2d73",
+      "site_id": 93,
+      "status": 200,
+      "duration_ms": 59.900000005960464,
+      "request_id": "c9db9c69-92e1-4253-8cc9-22c9f82b2d73",
+      "site": 93
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "3d7de584-40f3-4638-b880-11588be0d8f2",
+      "site_id": 93,
+      "status": 200,
+      "duration_ms": 72.2999999821186,
+      "request_id": "3d7de584-40f3-4638-b880-11588be0d8f2",
+      "site": 93
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "62b0d72e-4fe4-4412-926d-7775d42aa452",
+      "site_id": 94,
+      "status": 200,
+      "duration_ms": 66.80000001192093,
+      "request_id": "62b0d72e-4fe4-4412-926d-7775d42aa452",
+      "site": 94
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "a416cc63-6466-41f0-b514-f80135d91fdd",
+      "site_id": 94,
+      "status": 200,
+      "duration_ms": 92.90000000596046,
+      "request_id": "a416cc63-6466-41f0-b514-f80135d91fdd",
+      "site": 94
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "6a9ccac9-7c87-422c-83f7-c72a090f150e",
+      "site_id": 95,
+      "status": 200,
+      "duration_ms": 79.5,
+      "request_id": "6a9ccac9-7c87-422c-83f7-c72a090f150e",
+      "site": 95
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "b04f7129-8981-4f9d-b8eb-bdea1e99c900",
+      "site_id": 95,
+      "status": 200,
+      "duration_ms": 73.5,
+      "request_id": "b04f7129-8981-4f9d-b8eb-bdea1e99c900",
+      "site": 95
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "088bf03a-618a-4f0f-9072-c33ef2642464",
+      "site_id": 96,
+      "status": 200,
+      "duration_ms": 68,
+      "request_id": "088bf03a-618a-4f0f-9072-c33ef2642464",
+      "site": 96
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "498b447f-86d4-4f23-8f2b-59b2be2c1ec8",
+      "site_id": 96,
+      "status": 200,
+      "duration_ms": 73.2000000178814,
+      "request_id": "498b447f-86d4-4f23-8f2b-59b2be2c1ec8",
+      "site": 96
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "e9e99193-6d7b-4b17-94b5-90b87c7c44ee",
+      "site_id": 97,
+      "status": 200,
+      "duration_ms": 69.10000002384186,
+      "request_id": "e9e99193-6d7b-4b17-94b5-90b87c7c44ee",
+      "site": 97
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "7dcf3443-ad88-4bcf-85f0-837d864d57f2",
+      "site_id": 97,
+      "status": 200,
+      "duration_ms": 71,
+      "request_id": "7dcf3443-ad88-4bcf-85f0-837d864d57f2",
+      "site": 97
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "2fd2d39f-918b-4138-bd15-2730f13ca5d6",
+      "site_id": 98,
+      "status": 200,
+      "duration_ms": 74.09999999403954,
+      "request_id": "2fd2d39f-918b-4138-bd15-2730f13ca5d6",
+      "site": 98
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "9fd317f6-f8f7-4fb9-bcc9-f59ff68a44c4",
+      "site_id": 98,
+      "status": 200,
+      "duration_ms": 67.40000000596046,
+      "request_id": "9fd317f6-f8f7-4fb9-bcc9-f59ff68a44c4",
+      "site": 98
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "f82fe9b0-6e57-48db-9489-52a68b3b5a34",
+      "site_id": 99,
+      "status": 200,
+      "duration_ms": 118.7000000178814,
+      "request_id": "f82fe9b0-6e57-48db-9489-52a68b3b5a34",
+      "site": 99
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "8ccc2fc6-8bbf-4453-8d7b-3993d83b8a4e",
+      "site_id": 99,
+      "status": 200,
+      "duration_ms": 72.59999999403954,
+      "request_id": "8ccc2fc6-8bbf-4453-8d7b-3993d83b8a4e",
+      "site": 99
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "cbc88726-bee2-46bc-be79-61c6630d6925",
+      "site_id": 100,
+      "status": 200,
+      "duration_ms": 73.19999998807907,
+      "request_id": "cbc88726-bee2-46bc-be79-61c6630d6925",
+      "site": 100
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "e3a206f4-0498-4be2-b983-6c1955a1ec3f",
+      "site_id": 100,
+      "status": 200,
+      "duration_ms": 76.89999997615814,
+      "request_id": "e3a206f4-0498-4be2-b983-6c1955a1ec3f",
+      "site": 100
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "c0b5f0bd-9098-4fbb-b388-30480d15405f",
+      "site_id": 101,
+      "status": 200,
+      "duration_ms": 85.5,
+      "request_id": "c0b5f0bd-9098-4fbb-b388-30480d15405f",
+      "site": 101
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "e3b31f6f-b209-476d-ba9b-e5a9a04551d8",
+      "site_id": 101,
+      "status": 200,
+      "duration_ms": 120.5,
+      "request_id": "e3b31f6f-b209-476d-ba9b-e5a9a04551d8",
+      "site": 101
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "f3ec1d8e-8e29-4eb1-b369-ff1059999850",
+      "site_id": 81,
+      "status": 200,
+      "duration_ms": 94.59999999403954,
+      "request_id": "f3ec1d8e-8e29-4eb1-b369-ff1059999850",
+      "site": 81
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "55ce91b3-7715-4f5c-bc88-b2bb86c6e644",
+      "site_id": 81,
+      "status": 200,
+      "duration_ms": 119.80000001192093,
+      "request_id": "55ce91b3-7715-4f5c-bc88-b2bb86c6e644",
+      "site": 81
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "6d7d3890-00d1-4541-a54a-494dacbe2d5c",
+      "site_id": 82,
+      "status": 200,
+      "duration_ms": 142.5,
+      "request_id": "6d7d3890-00d1-4541-a54a-494dacbe2d5c",
+      "site": 82
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "118454b0-126b-4c10-87db-0d7367fa29e4",
+      "site_id": 82,
+      "status": 200,
+      "duration_ms": 121.19999998807907,
+      "request_id": "118454b0-126b-4c10-87db-0d7367fa29e4",
+      "site": 82
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "8e4ecb52-2336-4371-b579-9558a5647472",
+      "site_id": 83,
+      "status": 200,
+      "duration_ms": 76.90000000596046,
+      "request_id": "8e4ecb52-2336-4371-b579-9558a5647472",
+      "site": 83
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "779c3b8d-4db9-46ca-b008-03f15e833865",
+      "site_id": 83,
+      "status": 200,
+      "duration_ms": 95,
+      "request_id": "779c3b8d-4db9-46ca-b008-03f15e833865",
+      "site": 83
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "693f96c5-a2c0-4821-83e2-33770e900689",
+      "site_id": 84,
+      "status": 200,
+      "duration_ms": 95,
+      "request_id": "693f96c5-a2c0-4821-83e2-33770e900689",
+      "site": 84
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "b80ddfa5-e6e4-486f-b3f0-da4eb8cfc0e1",
+      "site_id": 84,
+      "status": 200,
+      "duration_ms": 146,
+      "request_id": "b80ddfa5-e6e4-486f-b3f0-da4eb8cfc0e1",
+      "site": 84
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "6e83fb7e-f15d-40ce-93da-1f0ee23ec80b",
+      "site_id": 85,
+      "status": 200,
+      "duration_ms": 262.2000000178814,
+      "request_id": "6e83fb7e-f15d-40ce-93da-1f0ee23ec80b",
+      "site": 85
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "13a1db81-d710-442d-a3bc-da1e6c6caeca",
+      "site_id": 85,
+      "status": 200,
+      "duration_ms": 77.59999999403954,
+      "request_id": "13a1db81-d710-442d-a3bc-da1e6c6caeca",
+      "site": 85
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "6b583991-b9ea-4a97-abde-487157071a02",
+      "site_id": 86,
+      "status": 200,
+      "duration_ms": 91.40000000596046,
+      "request_id": "6b583991-b9ea-4a97-abde-487157071a02",
+      "site": 86
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "f6e88369-e952-4603-a198-1d227eec4630",
+      "site_id": 86,
+      "status": 200,
+      "duration_ms": 70.59999999403954,
+      "request_id": "f6e88369-e952-4603-a198-1d227eec4630",
+      "site": 86
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "ec5f9755-c9cf-408e-ad67-1c8a6f208260",
+      "site_id": 87,
+      "status": 200,
+      "duration_ms": 71.7000000178814,
+      "request_id": "ec5f9755-c9cf-408e-ad67-1c8a6f208260",
+      "site": 87
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "df56b601-7fe0-4e85-8728-720df6af00ff",
+      "site_id": 87,
+      "status": 200,
+      "duration_ms": 69.7000000178814,
+      "request_id": "df56b601-7fe0-4e85-8728-720df6af00ff",
+      "site": 87
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "a459a295-2f60-454e-8b24-68e6d1956b1e",
+      "site_id": 88,
+      "status": 200,
+      "duration_ms": 75.39999997615814,
+      "request_id": "a459a295-2f60-454e-8b24-68e6d1956b1e",
+      "site": 88
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "ca8d0e96-22a6-4bd2-be73-f64bd0909384",
+      "site_id": 88,
+      "status": 200,
+      "duration_ms": 61.69999998807907,
+      "request_id": "ca8d0e96-22a6-4bd2-be73-f64bd0909384",
+      "site": 88
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "cold",
+      "navigation_id": "2b36a1bd-5238-46a6-abe8-88a5c69793fd",
+      "site_id": 89,
+      "status": 200,
+      "duration_ms": 80.09999999403954,
+      "request_id": "2b36a1bd-5238-46a6-abe8-88a5c69793fd",
+      "site": 89
+    },
+    {
+      "scenario": "workspace_api",
+      "cache_state": "warm",
+      "navigation_id": "adb9aa13-993f-4735-b4d2-d204b4751805",
+      "site_id": 89,
+      "status": 200,
+      "duration_ms": 61.70000001788139,
+      "request_id": "adb9aa13-993f-4735-b4d2-d204b4751805",
+      "site": 89
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "cold",
+      "navigation_id": "86c80d3e-1504-4cd0-a0cd-e15699066400",
+      "site_id": 81,
+      "status": 200,
+      "duration_ms": 75.5,
+      "request_id": "86c80d3e-1504-4cd0-a0cd-e15699066400",
+      "site": 81,
+      "cache_hit": false,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "warm",
+      "navigation_id": "8167dbf5-552e-49d4-b0e2-26246c033038",
+      "site_id": 81,
+      "status": 200,
+      "duration_ms": 45.69999998807907,
+      "request_id": "8167dbf5-552e-49d4-b0e2-26246c033038",
+      "site": 81,
+      "cache_hit": true,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "cold",
+      "navigation_id": "9b5a0f2c-d2f1-4b02-b613-602f32f90598",
+      "site_id": 82,
+      "status": 200,
+      "duration_ms": 75.69999998807907,
+      "request_id": "9b5a0f2c-d2f1-4b02-b613-602f32f90598",
+      "site": 82,
+      "cache_hit": false,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "warm",
+      "navigation_id": "6489a095-5add-4de0-98c7-b11c47e835c7",
+      "site_id": 82,
+      "status": 200,
+      "duration_ms": 50.400000005960464,
+      "request_id": "6489a095-5add-4de0-98c7-b11c47e835c7",
+      "site": 82,
+      "cache_hit": true,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "cold",
+      "navigation_id": "15053c04-9960-49be-be79-29c5945e1275",
+      "site_id": 83,
+      "status": 200,
+      "duration_ms": 69,
+      "request_id": "15053c04-9960-49be-be79-29c5945e1275",
+      "site": 83,
+      "cache_hit": false,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "warm",
+      "navigation_id": "28595c23-df21-40a0-a3f2-d0e90c910f68",
+      "site_id": 83,
+      "status": 200,
+      "duration_ms": 47.900000005960464,
+      "request_id": "28595c23-df21-40a0-a3f2-d0e90c910f68",
+      "site": 83,
+      "cache_hit": true,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "cold",
+      "navigation_id": "c9ea36a5-5b25-4ace-bb63-768a587ae36c",
+      "site_id": 84,
+      "status": 200,
+      "duration_ms": 69.69999998807907,
+      "request_id": "c9ea36a5-5b25-4ace-bb63-768a587ae36c",
+      "site": 84,
+      "cache_hit": false,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "warm",
+      "navigation_id": "2a13d4d3-5b75-4162-b699-75de2bd42f9e",
+      "site_id": 84,
+      "status": 200,
+      "duration_ms": 47.099999994039536,
+      "request_id": "2a13d4d3-5b75-4162-b699-75de2bd42f9e",
+      "site": 84,
+      "cache_hit": true,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "cold",
+      "navigation_id": "c69125c1-9c14-4689-a392-9e532896dfac",
+      "site_id": 85,
+      "status": 200,
+      "duration_ms": 84.5,
+      "request_id": "c69125c1-9c14-4689-a392-9e532896dfac",
+      "site": 85,
+      "cache_hit": false,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "warm",
+      "navigation_id": "0ed6a4b9-4232-4629-8b2b-68c1691a59b5",
+      "site_id": 85,
+      "status": 200,
+      "duration_ms": 47.900000005960464,
+      "request_id": "0ed6a4b9-4232-4629-8b2b-68c1691a59b5",
+      "site": 85,
+      "cache_hit": true,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "cold",
+      "navigation_id": "18462841-6261-4dc3-8755-9cf769b5cb6a",
+      "site_id": 86,
+      "status": 200,
+      "duration_ms": 79.80000001192093,
+      "request_id": "18462841-6261-4dc3-8755-9cf769b5cb6a",
+      "site": 86,
+      "cache_hit": false,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "warm",
+      "navigation_id": "840cb456-145f-4d7b-baed-922565682b05",
+      "site_id": 86,
+      "status": 200,
+      "duration_ms": 60.70000001788139,
+      "request_id": "840cb456-145f-4d7b-baed-922565682b05",
+      "site": 86,
+      "cache_hit": true,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "cold",
+      "navigation_id": "cb458194-d91f-486e-8fac-f689bb3405fc",
+      "site_id": 87,
+      "status": 200,
+      "duration_ms": 82.7999999821186,
+      "request_id": "cb458194-d91f-486e-8fac-f689bb3405fc",
+      "site": 87,
+      "cache_hit": false,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "warm",
+      "navigation_id": "95359ada-2734-438c-8f07-9adf94f9b4c7",
+      "site_id": 87,
+      "status": 200,
+      "duration_ms": 66.80000001192093,
+      "request_id": "95359ada-2734-438c-8f07-9adf94f9b4c7",
+      "site": 87,
+      "cache_hit": true,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "cold",
+      "navigation_id": "3da1577b-3c4f-4438-a69d-86a038440d90",
+      "site_id": 88,
+      "status": 200,
+      "duration_ms": 87.10000002384186,
+      "request_id": "3da1577b-3c4f-4438-a69d-86a038440d90",
+      "site": 88,
+      "cache_hit": false,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "warm",
+      "navigation_id": "e3409cce-2cf1-4b29-ae45-19072e5aa732",
+      "site_id": 88,
+      "status": 200,
+      "duration_ms": 54.400000005960464,
+      "request_id": "e3409cce-2cf1-4b29-ae45-19072e5aa732",
+      "site": 88,
+      "cache_hit": true,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "cold",
+      "navigation_id": "d0f20462-3801-40ba-b3f6-818f38710e45",
+      "site_id": 89,
+      "status": 200,
+      "duration_ms": 76,
+      "request_id": "d0f20462-3801-40ba-b3f6-818f38710e45",
+      "site": 89,
+      "cache_hit": false,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "warm",
+      "navigation_id": "2a7763e3-2fd6-4eb7-99b3-fcfd173c6acc",
+      "site_id": 89,
+      "status": 200,
+      "duration_ms": 55.69999998807907,
+      "request_id": "2a7763e3-2fd6-4eb7-99b3-fcfd173c6acc",
+      "site": 89,
+      "cache_hit": true,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "cold",
+      "navigation_id": "f70bd2f5-8429-4379-815c-390c38fb31ef",
+      "site_id": 90,
+      "status": 200,
+      "duration_ms": 83.69999998807907,
+      "request_id": "f70bd2f5-8429-4379-815c-390c38fb31ef",
+      "site": 90,
+      "cache_hit": false,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "warm",
+      "navigation_id": "4fc55542-fad2-4de9-8092-c78bd446407b",
+      "site_id": 90,
+      "status": 200,
+      "duration_ms": 57.900000005960464,
+      "request_id": "4fc55542-fad2-4de9-8092-c78bd446407b",
+      "site": 90,
+      "cache_hit": true,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "cold",
+      "navigation_id": "f3fd042b-f25f-46e8-bbc4-2c9e13030377",
+      "site_id": 91,
+      "status": 200,
+      "duration_ms": 87.09999999403954,
+      "request_id": "f3fd042b-f25f-46e8-bbc4-2c9e13030377",
+      "site": 91,
+      "cache_hit": false,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "warm",
+      "navigation_id": "1514620d-e465-419d-8553-b635a6cf2968",
+      "site_id": 91,
+      "status": 200,
+      "duration_ms": 60,
+      "request_id": "1514620d-e465-419d-8553-b635a6cf2968",
+      "site": 91,
+      "cache_hit": true,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "cold",
+      "navigation_id": "b7585952-6d3c-4224-8711-71bd28a61657",
+      "site_id": 92,
+      "status": 200,
+      "duration_ms": 95.90000000596046,
+      "request_id": "b7585952-6d3c-4224-8711-71bd28a61657",
+      "site": 92,
+      "cache_hit": false,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "warm",
+      "navigation_id": "a82b17e0-1e65-4d25-858b-0a6e3ae3db33",
+      "site_id": 92,
+      "status": 200,
+      "duration_ms": 57.29999998211861,
+      "request_id": "a82b17e0-1e65-4d25-858b-0a6e3ae3db33",
+      "site": 92,
+      "cache_hit": true,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "cold",
+      "navigation_id": "3ea8eccb-161f-457f-ab3c-b904513e281b",
+      "site_id": 93,
+      "status": 200,
+      "duration_ms": 80.19999998807907,
+      "request_id": "3ea8eccb-161f-457f-ab3c-b904513e281b",
+      "site": 93,
+      "cache_hit": false,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "warm",
+      "navigation_id": "f742ca22-0a6e-48e5-9367-58da8893ac83",
+      "site_id": 93,
+      "status": 200,
+      "duration_ms": 52.099999994039536,
+      "request_id": "f742ca22-0a6e-48e5-9367-58da8893ac83",
+      "site": 93,
+      "cache_hit": true,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "cold",
+      "navigation_id": "b4457647-5c7f-4f58-872d-da5de4ecbd7e",
+      "site_id": 94,
+      "status": 200,
+      "duration_ms": 73.09999999403954,
+      "request_id": "b4457647-5c7f-4f58-872d-da5de4ecbd7e",
+      "site": 94,
+      "cache_hit": false,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "warm",
+      "navigation_id": "4f202148-c029-49c3-9eab-1c2f46cf9b6f",
+      "site_id": 94,
+      "status": 200,
+      "duration_ms": 50.69999998807907,
+      "request_id": "4f202148-c029-49c3-9eab-1c2f46cf9b6f",
+      "site": 94,
+      "cache_hit": true,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "cold",
+      "navigation_id": "e5e34ca8-dd15-4537-b3b7-33dd375f6adb",
+      "site_id": 95,
+      "status": 200,
+      "duration_ms": 76.2999999821186,
+      "request_id": "e5e34ca8-dd15-4537-b3b7-33dd375f6adb",
+      "site": 95,
+      "cache_hit": false,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "warm",
+      "navigation_id": "a42d2ce1-e02c-4e79-bff4-e5c6f2acef74",
+      "site_id": 95,
+      "status": 200,
+      "duration_ms": 44.70000001788139,
+      "request_id": "a42d2ce1-e02c-4e79-bff4-e5c6f2acef74",
+      "site": 95,
+      "cache_hit": true,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "cold",
+      "navigation_id": "af1390d4-298f-416a-b654-4b496d797332",
+      "site_id": 96,
+      "status": 200,
+      "duration_ms": 72.69999998807907,
+      "request_id": "af1390d4-298f-416a-b654-4b496d797332",
+      "site": 96,
+      "cache_hit": false,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "warm",
+      "navigation_id": "ac64caca-af7d-4946-a319-5359d7f04dda",
+      "site_id": 96,
+      "status": 200,
+      "duration_ms": 47.900000005960464,
+      "request_id": "ac64caca-af7d-4946-a319-5359d7f04dda",
+      "site": 96,
+      "cache_hit": true,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "cold",
+      "navigation_id": "d88abf8b-b0b9-494b-b05d-c8b6461a3399",
+      "site_id": 97,
+      "status": 200,
+      "duration_ms": 72.5,
+      "request_id": "d88abf8b-b0b9-494b-b05d-c8b6461a3399",
+      "site": 97,
+      "cache_hit": false,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "warm",
+      "navigation_id": "f75c75af-4a05-46ff-b0f9-68a2e2eecc0f",
+      "site_id": 97,
+      "status": 200,
+      "duration_ms": 48,
+      "request_id": "f75c75af-4a05-46ff-b0f9-68a2e2eecc0f",
+      "site": 97,
+      "cache_hit": true,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "cold",
+      "navigation_id": "1a73d226-e900-4844-9a2c-f8244e171d5c",
+      "site_id": 98,
+      "status": 200,
+      "duration_ms": 62.400000005960464,
+      "request_id": "1a73d226-e900-4844-9a2c-f8244e171d5c",
+      "site": 98,
+      "cache_hit": false,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "warm",
+      "navigation_id": "7d1502e2-4e79-4b80-bffe-8b3571cf7747",
+      "site_id": 98,
+      "status": 200,
+      "duration_ms": 48.30000001192093,
+      "request_id": "7d1502e2-4e79-4b80-bffe-8b3571cf7747",
+      "site": 98,
+      "cache_hit": true,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "cold",
+      "navigation_id": "cc0c78ab-fea3-470f-9df0-8f930160560a",
+      "site_id": 99,
+      "status": 200,
+      "duration_ms": 85.39999997615814,
+      "request_id": "cc0c78ab-fea3-470f-9df0-8f930160560a",
+      "site": 99,
+      "cache_hit": false,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "warm",
+      "navigation_id": "055b5a62-e144-499b-91b9-cab0782f3a6c",
+      "site_id": 99,
+      "status": 200,
+      "duration_ms": 76.90000000596046,
+      "request_id": "055b5a62-e144-499b-91b9-cab0782f3a6c",
+      "site": 99,
+      "cache_hit": true,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "cold",
+      "navigation_id": "ce39d7e6-6d5e-435f-b9f3-b1e26a8005c0",
+      "site_id": 100,
+      "status": 200,
+      "duration_ms": 114.19999998807907,
+      "request_id": "ce39d7e6-6d5e-435f-b9f3-b1e26a8005c0",
+      "site": 100,
+      "cache_hit": false,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "warm",
+      "navigation_id": "b98f7f27-e0c9-412d-8d8c-960b489c8da1",
+      "site_id": 100,
+      "status": 200,
+      "duration_ms": 62.900000005960464,
+      "request_id": "b98f7f27-e0c9-412d-8d8c-960b489c8da1",
+      "site": 100,
+      "cache_hit": true,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "cold",
+      "navigation_id": "1cb5b011-28e6-4669-b776-ff6a02f4f15c",
+      "site_id": 101,
+      "status": 200,
+      "duration_ms": 80.09999999403954,
+      "request_id": "1cb5b011-28e6-4669-b776-ff6a02f4f15c",
+      "site": 101,
+      "cache_hit": false,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    },
+    {
+      "scenario": "dashboard_summary_api",
+      "cache_state": "warm",
+      "navigation_id": "468d4f0f-10e7-4730-b1f1-cf5a2d4aad2f",
+      "site_id": 101,
+      "status": 200,
+      "duration_ms": 52,
+      "request_id": "468d4f0f-10e7-4730-b1f1-cf5a2d4aad2f",
+      "site": 101,
+      "cache_hit": true,
+      "sections": {
+        "media": {
+          "status": "ready",
+          "counts": {
+            "total": 80
+          }
+        },
+        "menus": {
+          "status": "ready",
+          "counts": {
+            "total": 4,
+            "active": 4,
+            "items": 48
+          }
+        },
+        "pages": {
+          "status": "ready",
+          "counts": {
+            "total": 40,
+            "DRAFT": 32,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 8,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "posts": {
+          "status": "ready",
+          "counts": {
+            "total": 100,
+            "DRAFT": 80,
+            "IN_REVIEW": 0,
+            "APPROVED": 0,
+            "PUBLISHED": 20,
+            "UNPUBLISHED": 0,
+            "ARCHIVED": 0
+          }
+        },
+        "users": {
+          "status": "ready",
+          "counts": {
+            "total": 1
+          }
+        }
+      }
+    }
+  ],
+  "failures": [
+    {
+      "page_origin": "http://localhost:8088",
+      "page_pathname": "/admin/sites/81/admin",
+      "type": "AssertionError",
+      "message": "Redis hit/miss expectation failed\n\ntrue !== false\n"
+    }
+  ]
+}

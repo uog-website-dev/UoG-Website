@@ -1,0 +1,114 @@
+powershell :  uog-backend Copying scripts/sprint3_live_review.py to uog-backend:/tmp/sprint3_live_review.py
+
+At line:3 char:1
+
++ powershell -NoProfile -File scripts/perf/run.ps1 -Mode production -Si ...
+
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    + CategoryInfo          : NotSpecified: ( uog-backend Co..._live_review.py:String) [], RemoteException
+
+    + FullyQualifiedErrorId : NativeCommandError
+
+ 
+
+ uog-backend Copied scripts/sprint3_live_review.py to uog-backend:/tmp/sprint3_live_review.py
+
+ uog-backend Copying scripts/perf/seed.py to uog-backend:/tmp/seed.py
+
+ uog-backend Copied scripts/perf/seed.py to uog-backend:/tmp/seed.py
+
+ uog-backend Copying scripts/perf/prepare-session.py to uog-backend:/tmp/prepare-session.py
+
+ uog-backend Copied scripts/perf/prepare-session.py to uog-backend:/tmp/prepare-session.py
+
+Seeded 38 registered permissions and 7 standard roles. No user assignments were created.
+
+{"event": "perf.seed.progress", "site": 81, "pages": 40, "posts": 100, "media": 80}
+
+{"event": "perf.seed.progress", "site": 82, "pages": 40, "posts": 100, "media": 80}
+
+{"event": "perf.seed.progress", "site": 83, "pages": 40, "posts": 100, "media": 80}
+
+{"event": "perf.seed.progress", "site": 84, "pages": 40, "posts": 100, "media": 80}
+
+{"event": "perf.seed.progress", "site": 85, "pages": 40, "posts": 100, "media": 80}
+
+{"event": "perf.seed.progress", "site": 86, "pages": 40, "posts": 100, "media": 80}
+
+{"event": "perf.seed.progress", "site": 87, "pages": 40, "posts": 100, "media": 80}
+
+{"event": "perf.seed.progress", "site": 88, "pages": 40, "posts": 100, "media": 80}
+
+{"event": "perf.seed.progress", "site": 89, "pages": 40, "posts": 100, "media": 80}
+
+{"event": "perf.seed.progress", "site": 90, "pages": 40, "posts": 100, "media": 80}
+
+{"event": "perf.seed.progress", "site": 91, "pages": 40, "posts": 100, "media": 80}
+
+{"event": "perf.seed.progress", "site": 92, "pages": 40, "posts": 100, "media": 80}
+
+{"event": "perf.seed.progress", "site": 93, "pages": 40, "posts": 100, "media": 80}
+
+{"event": "perf.seed.progress", "site": 94, "pages": 40, "posts": 100, "media": 80}
+
+{"event": "perf.seed.progress", "site": 95, "pages": 40, "posts": 100, "media": 80}
+
+{"event": "perf.seed.progress", "site": 96, "pages": 40, "posts": 100, "media": 80}
+
+{"event": "perf.seed.progress", "site": 97, "pages": 40, "posts": 100, "media": 80}
+
+{"event": "perf.seed.progress", "site": 98, "pages": 40, "posts": 100, "media": 80}
+
+{"event": "perf.seed.progress", "site": 99, "pages": 40, "posts": 100, "media": 80}
+
+{"event": "perf.seed.progress", "site": 100, "pages": 40, "posts": 100, "media": 80}
+
+{"event": "perf.seed.progress", "site": 101, "pages": 40, "posts": 100, "media": 80}
+
+{"event": "perf.seed.complete", "sites": 21, "counts_per_site": {"sites": 21, "pages": 40, "posts": 100, "media": 80}, "private_session": "/tmp/perf001-session.json"}
+
+ Container uog-perf-admin Recreate 
+
+ Container uog-perf-backend Recreate 
+
+ Container uog-perf-backend Recreated 
+
+ Container uog-perf-admin Recreated 
+
+ Container uog-perf-gateway Recreate 
+
+ Container uog-perf-gateway Recreated 
+
+ Container uog-perf-admin Starting 
+
+ Container uog-perf-backend Starting 
+
+ Container uog-perf-admin Started 
+
+ Container uog-perf-backend Started 
+
+ Container uog-perf-gateway Starting 
+
+ Container uog-perf-gateway Started 
+
+{"phase":"auth_redirect","origin":"http://localhost:8088","path":"/admin"}
+
+{"landing_path":"/admin","error_code":null,"session_cookie_present":true}
+
+{"scenario":"first_site_visit","cache_state":"cold","sample":1,"duration_ms":1746,"requests":21}
+
+Browser/API smoke benchmark failed; inspect the redacted results file
+
+At D:\Projects\Website_Project\UoG-Website\scripts\perf\run.ps1:44 char:20
+
++ ... STEXITCODE){throw "Browser/API smoke benchmark failed; inspect the re ...
+
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    + CategoryInfo          : OperationStopped: (Browser/API smo...ed results file:String) [], RuntimeException
+
+    + FullyQualifiedErrorId : Browser/API smoke benchmark failed; inspect the redacted results file
+
+ 
+

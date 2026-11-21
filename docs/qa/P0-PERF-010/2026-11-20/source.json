@@ -1,0 +1,31 @@
+{
+  "base_commit": "664f644086f1ad1464b505f66a6e7abb96a059f8",
+  "working_tree_source_sha256": {
+    ".github/workflows/regression.yml": "cbc75fa2325e77afd23adefe1472345d2725aaae8d8304ad0c7b86453a0f8404",
+    "azure-pipelines.yml": "0ef49355610dede3aa37fa2d05b8f14b1e403cb9d170128d57f5c3fab41569b1",
+    "backend/tests/test_documentation.py": "7106607f677e3bebd9141078c56bcfb6196af7cef645724f37373a3b63378345",
+    "docs/api/openapi.yaml": "843a2c76927382af769b68c94ec82407977cc917425e6c302a5f3fd2a9a1883d",
+    "infrastructure/nginx/performance.conf": "db5832e9103b1ba991414a7e4b9cab575fa4e9f943519acc3d29db0ee248f53e",
+    "scripts/perf/api-load.py": "0e09095c507c34682bdfe3fd111fd21c36f436a19179027c65de40f216900dc3",
+    "scripts/perf/benchmark.cjs": "6a14f7781f5c20b51252753751f92b01b41e7162f4353e13bacb9341fa4b2bda",
+    "scripts/perf/cache-check.cjs": "00fba0ed7f0a53c9ec8f8314b3d45add2d02ffb922f718980465efbf83a72a8b",
+    "scripts/perf/dashboard-check.cjs": "8c9de5408185d3624f698c70e89c61f77dee2651da1ebb06995b92d459400ce9",
+    "scripts/perf/package.json": "e3583a763b7c956503851a15ec88c40f18e874918089bf6e332c0f2843db5b69",
+    "scripts/perf/section-check.cjs": "dded871d3b2e97f672acceac43740fd1146b07f67e9fc8c5ee7eab6d2a88c674",
+    "scripts/perf/site-switch-check.cjs": "dada5ad5bbcdc22194281bfd3bde931acb0e940e88ea77d8e4acabbb851a49e1",
+    ".github/workflows/performance-release.yml": "d3d7081517fd5b4d2e646ceab8c9e0d55fa538201fe730ec04d9393c5c0e3ae7",
+    "docs/performance/P0-PERF-010.md": "b1eeee1a380de39903299df3cb2f61ab78a012c76f4750d65da5a0e05b5ef819",
+    "docs/performance/release-policy.json": "0eaf2075200ca9015d07b56efdd301630ed2eb5672c0023ceb2563a9c9680672",
+    "scripts/perf/collect-release-evidence.py": "a2234c1a46c15f51325db146eb49f64f00f3c89b6f854890750e83dd89233ab7",
+    "scripts/perf/evidence_test.py": "bbfafb3e73ad96d3253dbc2345350757bd06f2e65681cf9b9fa774770a92cc8e",
+    "scripts/perf/isolation-check.cjs": "1b0e978479c79cc840ae67fda0dcf88aa2b846fa46527ff09903a8ecd99141fa",
+    "scripts/perf/recovery-check.cjs": "cf801c0f9d7087c21b43eaf64782a146e45695ef3d9794ad922c7ed9711b0d84",
+    "scripts/perf/release-check.ps1": "85407fee40e6035637b46396b07c03b4be046bbb51b21f3f7e8c9508bff8dfaa",
+    "scripts/perf/release-dashboard.test.cjs": "671f316121bc3da79aea7c39130dc25276e8364e40b1ef9f75a0f610cdfcf40c",
+    "scripts/perf/release-discovery.test.cjs": "cbea4d73ccc1622e7cdda2b1b3c9be7e2664110e43040dc7db7e76de78481ed5",
+    "scripts/perf/release-gate.cjs": "b8a97ace09e4b25bf0bf0b7eb86d1de0509eddf61a8072fb76d405d8702c4e70",
+    "scripts/perf/release-gate.test.cjs": "0d825547fcf55314a45a09a78532cbb09a99ee5467dff091d1c327c525d7d14e",
+    "scripts/perf/release-report.cjs": "94407f08afc3d7decbc7182e344538f22c9775272827549746a853f4ed24b152"
+  },
+  "note": "Harness/CI/schema/test changes; no CMS application runtime edits. Rerun on immutable release commit before sign-off."
+}

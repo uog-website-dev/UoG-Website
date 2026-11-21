@@ -1,0 +1,1 @@
+{"status": "PASS", "validation": "spectacular --validate --fail-on-warn", "baseline_matches": true}

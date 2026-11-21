@@ -1,0 +1,152 @@
+TAP version 13
+
+# Subtest: records compile durations without retaining request data
+
+ok 1 - records compile durations without retaining request data
+
+  ---
+
+  duration_ms: 60.0864
+
+  type: 'test'
+
+  ...
+
+# Subtest: fails explicitly when the server log has no compilation events
+
+ok 2 - fails explicitly when the server log has no compilation events
+
+  ---
+
+  duration_ms: 35.357
+
+  type: 'test'
+
+  ...
+
+# Subtest: nearest-rank p50/p95 includes slow samples and never marks budgets approved
+
+ok 3 - nearest-rank p50/p95 includes slow samples and never marks budgets approved
+
+  ---
+
+  duration_ms: 1.3784
+
+  type: 'test'
+
+  ...
+
+# Subtest: URL recording drops tokens, arbitrary search and cache-busting query values
+
+ok 4 - URL recording drops tokens, arbitrary search and cache-busting query values
+
+  ---
+
+  duration_ms: 0.4927
+
+  type: 'test'
+
+  ...
+
+# Subtest: duplicate endpoint and transfer totals preserve action identity
+
+ok 5 - duplicate endpoint and transfer totals preserve action identity
+
+  ---
+
+  duration_ms: 0.6
+
+  type: 'test'
+
+  ...
+
+# Subtest: dashboard usable budget uses raw usability marks, not request duration
+
+ok 6 - dashboard usable budget uses raw usability marks, not request duration
+
+  ---
+
+  duration_ms: 0.9265
+
+  type: 'test'
+
+  ...
+
+# Subtest: searchable discovery is diagnostic while duplicate bootstrap remains fatal
+
+ok 7 - searchable discovery is diagnostic while duplicate bootstrap remains fatal
+
+  ---
+
+  duration_ms: 0.985
+
+  type: 'test'
+
+  ...
+
+# Subtest: recomputes nearest-rank percentiles rather than trusting summary
+
+ok 8 - recomputes nearest-rank percentiles rather than trusting summary
+
+  ---
+
+  duration_ms: 1.8994
+
+  type: 'test'
+
+  ...
+
+# Subtest: fails closed for development, profiling, partial, uncorrelated and undersampled evidence
+
+ok 9 - fails closed for development, profiling, partial, uncorrelated and undersampled evidence
+
+  ---
+
+  duration_ms: 0.4503
+
+  type: 'test'
+
+  ...
+
+# Subtest: counts duplicate scoped GET reads and requires network evidence
+
+ok 10 - counts duplicate scoped GET reads and requires network evidence
+
+  ---
+
+  duration_ms: 0.2364
+
+  type: 'test'
+
+  ...
+
+# Subtest: proposed budgets cannot authorize release; both named sign-offs required
+
+ok 11 - proposed budgets cannot authorize release; both named sign-offs required
+
+  ---
+
+  duration_ms: 0.2621
+
+  type: 'test'
+
+  ...
+
+1..11
+
+# tests 11
+
+# suites 0
+
+# pass 11
+
+# fail 0
+
+# cancelled 0
+
+# skipped 0
+
+# todo 0
+
+# duration_ms 167.8118
+

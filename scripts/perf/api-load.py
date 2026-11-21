@@ -24,7 +24,7 @@ review = Review.__new__(Review)
 review.config = lambda key, default=None: config.get(key, default)
 token = review.token(data['actor']['username'], data['actor']['password'])
 sites = [row['id'] for row in data['sites']]
-assert len(sites) >= 20
+assert len(sites) >= 21
 paths = {
     'bootstrap': '/api/workspace/?site={site}',
     'switcher': '/api/workspace/sites/?page_size=20',
@@ -58,6 +58,24 @@ def read(kind, number):
                 'request_id': response.headers.get('X-Request-ID'),
                 'cache_hit': body.get('cache',{}).get('hit')}
 
+# Independent database counts across all managed Sites, not list-derived totals.
+from django.db.models import Count
+from apps.cms.models import Page
+from apps.api.models import Post
+expected = {}
+for model, kind in ((Page, 'pages'), (Post, 'posts')):
+    for row in model.objects.filter(site_id__in=sites).values('site_id', 'status').annotate(n=Count('pk')):
+        expected.setdefault(row['site_id'], {}).setdefault(kind, {})[row['status']] = row['n']
+for site in sites:
+    req = urllib.request.Request('http://perf-backend:8000/api/workspace/dashboard/?site=' + str(site), headers={'Authorization': 'Bearer ' + token, 'Host': 'localhost'})
+    with urllib.request.urlopen(req, timeout=30) as response:
+        body = json.load(response)
+        for kind in ('pages', 'posts'):
+            actual = body['sections'][kind]['counts']
+            source = expected.get(site, {}).get(kind, {})
+            assert actual['total'] == sum(source.values()), 'Dashboard total differs from source records'
+            assert all(actual[status] == count for status, count in source.items()), 'Dashboard status count differs'
+
 # Warm each endpoint before timed batches; no compilation or write load.
 for kind in paths: read(kind, 0)
 samples = []
@@ -71,4 +89,4 @@ for kind in paths:
     summary[kind] = {key: {'p50': pct([r[key] for r in rows],.5), 'p95': pct([r[key] for r in rows],.95)}
                      for key in ('duration_ms','sql_count','sql_ms','bytes')}
 print(json.dumps({'method':'Real HTTP / PostgreSQL / Redis / Keycloak bearer; 4 concurrent clients; 60 reads per endpoint across 21 Sites; 2 synchronous Gunicorn workers',
-                  'summary':summary,'samples':samples,'failures':[]}, indent=2))
+                  'dashboard_sites_reconciled':len(sites),'summary':summary,'samples':samples,'failures':[]}, indent=2))

@@ -1,0 +1,6 @@
+{
+  "status": "PASS",
+  "command": "pnpm --filter @uog/public-web build",
+  "isolated": true,
+  "note": "Built in existing isolated /tmp frontend copy; ordinary public service unchanged"
+}

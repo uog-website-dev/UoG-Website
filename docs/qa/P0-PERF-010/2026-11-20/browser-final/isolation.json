@@ -1,0 +1,29 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "resource": "pages",
+      "foreign_read": "DENIED",
+      "foreign_write": "DENIED",
+      "source_unchanged": true
+    },
+    {
+      "resource": "posts",
+      "foreign_read": "DENIED",
+      "foreign_write": "DENIED",
+      "source_unchanged": true
+    },
+    {
+      "resource": "menus",
+      "foreign_read": "DENIED",
+      "foreign_write": "DENIED",
+      "source_unchanged": true
+    },
+    {
+      "resource": "assets",
+      "foreign_read": "DENIED",
+      "foreign_write": "DENIED",
+      "source_unchanged": true
+    }
+  ]
+}

@@ -1,0 +1,144 @@
+Scope: 3 of 7 workspace projects
+
+packages/api-client test$ vitest run
+
+packages/api-client test:  RUN  v5.0.5 /workspace/packages/api-client
+
+packages/api-client test:  ✓ src/hostname.test.ts (8 tests) 60ms
+
+packages/api-client test:  ✓ src/errors.test.ts (16 tests) 288ms
+
+packages/api-client test:  ✓ src/adapters/media.test.ts (5 tests) 195ms
+
+packages/api-client test:  ✓ src/adapters/sites-modules.test.ts (15 tests) 273ms
+
+packages/api-client test:  ✓ src/index.test.ts (6 tests) 292ms
+
+packages/api-client test:  ✓ src/adapters/iam.test.ts (30 tests) 352ms
+
+packages/api-client test:  ✓ src/adapters/adapters.test.ts (59 tests) 408ms
+
+packages/api-client test:  ✓ src/adapters/sites-domains.test.ts (27 tests) 515ms
+
+packages/api-client test:  Test Files  8 passed (8)
+
+packages/api-client test:       Tests  166 passed (166)
+
+packages/api-client test:    Start at  20:34:08
+
+packages/api-client test:    Duration  2.07s (transform 38%, tests 32%, import 28%, worker 3%)
+
+packages/api-client test: Done
+
+packages/ui test$ vitest run
+
+packages/ui test:  RUN  v5.0.5 /workspace/packages/ui
+
+packages/ui test:  ✓ src/visual-layout.test.tsx (66 tests) 3501ms
+
+packages/ui test:    ✓ shared visual layout fixtures (61)
+
+packages/ui test:      ✓ renders three ordered columns and the scoped Slider without mutating IDs 414ms
+
+packages/ui test:    ✓ shared renderer preview/public parity (3)
+
+packages/ui test:      ✓ produces the same content structure for approved fixtures on both surfaces 1832ms
+
+packages/ui test:      ✓ keeps Slider, Tabs and Accordion behavior equivalent across surfaces 875ms
+
+packages/ui test:  ✓ src/widget-runtime.test.tsx (10 tests) 4182ms
+
+packages/ui test:    ✓ Configured widget runtime (10)
+
+packages/ui test:      ✓ loads Site title and logo once with same-Site identity data 392ms
+
+packages/ui test:      ✓ filters the published Loop Grid using the active taxonomy selection 308ms
+
+packages/ui test:      ✓ validates contact fields and correlates an unchanged retry 2689ms
+
+packages/ui test:  ✓ src/site-navigation.test.tsx (14 tests) 1992ms
+
+packages/ui test:    ✓ PublicMenuFrame (3)
+
+packages/ui test:      ✓ shows this Site's header and footer and does not link unsafe URLs 315ms
+
+packages/ui test:      ✓ opens the mobile header from the keyboard and closes it with Escape 779ms
+
+packages/ui test:      ✓ closes the mobile header from its close button 336ms
+
+packages/ui test:    ✓ closes the mobile menu after activating a nested link and restores the trigger 325ms
+
+packages/ui test:  ✓ src/filter-controls.test.tsx (9 tests) 1645ms
+
+packages/ui test:    ✓ FilterBar (6)
+
+packages/ui test:      ✓ renders as a labelled search landmark 600ms
+
+packages/ui test:  ✓ src/public-page.test.tsx (11 tests) 937ms
+
+packages/ui test:  ✓ src/data-table.test.tsx (16 tests) 992ms
+
+packages/ui test:  ✓ src/confirm-dialog.test.tsx (7 tests) 933ms
+
+packages/ui test:    ✓ ConfirmDialog (7)
+
+packages/ui test:      ✓ exposes the title and description via aria wiring 395ms
+
+packages/ui test:  ✓ src/responsive-layout.test.tsx (9 tests) 456ms
+
+packages/ui test:    ✓ preview and public parity at viewport boundaries (3)
+
+packages/ui test:      ✓ emits the same resolved gap/stack attributes for preview and public at each width 372ms
+
+packages/ui test:  ✓ src/visual-presentation.test.tsx (3 tests) 997ms
+
+packages/ui test:    ✓ Professional visual presentation (3)
+
+packages/ui test:      ✓ renders and operates the same hero carousel in public 698ms
+
+packages/ui test:  ✓ src/public-post.test.tsx (11 tests) 1053ms
+
+packages/ui test:    ✓ PublicPostFeed and PublicPostDetail (7)
+
+packages/ui test:      ✓ renders responsive news cards and a detail body without script or javascript targets 655ms
+
+packages/ui test:  ✓ src/form-fields.test.tsx (10 tests) 661ms
+
+packages/ui test:  ✓ src/pagination.test.tsx (10 tests) 690ms
+
+packages/ui test:  ✓ src/toast.test.tsx (5 tests) 688ms
+
+packages/ui test:    ✓ useToast (5)
+
+packages/ui test:      ✓ shows a success toast that can be dismissed 430ms
+
+packages/ui test:  ✓ src/page-shell.test.tsx (5 tests) 543ms
+
+packages/ui test:  ✓ src/reusable-sidebar.test.tsx (8 tests) 518ms
+
+packages/ui test:  ✓ src/article-document.test.tsx (3 tests) 465ms
+
+packages/ui test:  ✓ src/useAsync.test.tsx (11 tests) 341ms
+
+packages/ui test:  ✓ src/sprint3-runtime-evidence.test.tsx (1 test) 203ms
+
+packages/ui test:  ✓ src/public-site.test.tsx (6 tests) 431ms
+
+packages/ui test:  ✓ src/theme.test.ts (4 tests) 7ms
+
+packages/ui test:  Test Files  20 passed (20)
+
+packages/ui test:       Tests  219 passed (219)
+
+packages/ui test:    Start at  20:34:11
+
+packages/ui test:    Duration  42.35s (tests 27%, environment 27%, import 26%, transform 13%, setup 7%)
+
+packages/ui test: Environment  jsdom was created 20 times · 20.88s total, 27% of tracked time
+
+packages/ui test:              create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+
+packages/ui test:              learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+packages/ui test: Done
+

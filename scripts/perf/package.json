@@ -3,7 +3,7 @@
     "version":  "0.1.0",
     "private":  true,
     "scripts":  {
-                    "test":  "node --test metrics.test.cjs"
+                    "test":  "node --test *.test.cjs"
                 },
     "dependencies":  {
                          "playwright-core":  "1.65.0"

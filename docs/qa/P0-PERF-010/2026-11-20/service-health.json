@@ -1,0 +1,60 @@
+{
+  "status": "PASS",
+  "services": [
+    {
+      "service": "celery-worker",
+      "state": "running",
+      "health": "healthy"
+    },
+    {
+      "service": "keycloak",
+      "state": "running",
+      "health": "healthy"
+    },
+    {
+      "service": "keycloak-db",
+      "state": "running",
+      "health": "healthy"
+    },
+    {
+      "service": "minio",
+      "state": "running",
+      "health": "healthy"
+    },
+    {
+      "service": "perf-admin",
+      "state": "running",
+      "health": "healthy"
+    },
+    {
+      "service": "perf-backend",
+      "state": "running",
+      "health": "healthy"
+    },
+    {
+      "service": "perf-gateway",
+      "state": "running",
+      "health": ""
+    },
+    {
+      "service": "postgres",
+      "state": "running",
+      "health": "healthy"
+    },
+    {
+      "service": "redis-broker",
+      "state": "running",
+      "health": "healthy"
+    },
+    {
+      "service": "redis-cache",
+      "state": "running",
+      "health": "healthy"
+    }
+  ],
+  "http": {
+    "/admin": 200,
+    "/health/ready": 200
+  },
+  "note": "Isolated perf gateway used; ordinary nginx/public frontend were not started by this task"
+}

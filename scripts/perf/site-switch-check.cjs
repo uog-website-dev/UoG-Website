@@ -14,7 +14,7 @@ const {chromium} = require(process.env.UOG_QA_PLAYWRIGHT_ROOT || 'playwright-cor
  };
  try {
   const context = await browser.newContext({viewport: {width: 1440, height: 1000}}), page = await context.newPage(); page.setDefaultTimeout(30000);
-  let reads = 0; page.on('request', request => {if (request.method() === 'POST' && request.headers()['next-action']) reads++;});
+  let reads = 0; page.on('request', request => {if ((request.method() === 'POST' && request.headers()['next-action']) || (request.method() === 'GET' && new URL(request.url()).pathname.endsWith('/api/reads'))) reads++;});
   await page.goto(origin + '/admin'); await page.getByRole('button', {name: 'Sign in with Keycloak', exact: true}).click();
   await page.locator('#username').fill(seed.actor.username); await page.locator('#password').fill(seed.actor.password); await page.locator('#kc-login').click();
   await page.waitForURL(url => url.origin === origin && /^\/admin\/?$/.test(url.pathname));
