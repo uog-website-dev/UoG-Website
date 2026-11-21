@@ -27,9 +27,10 @@ export function WorkspaceSwitcher({state, onNavigate}: {state: WorkspaceState; o
     window.dispatchEvent(new CustomEvent("uog:navigation:request", {detail: {target: `${APP_BASE_PATH}${href}`}}));
     setOpen(false); onNavigate?.(); router.push(href);
   };
+  const workspaceLabel = navigation?.pending?.site.name ?? data?.site?.name ?? "Choose workspace";
   return <>
-    <Button aria-label="Workspace" variant="outlined" fullWidth disabled={!data && !navigation?.pending && state.status !== "error"} onClick={() => setOpen(true)} aria-busy={!!navigation?.pending}>
-      {navigation?.pending?.site.name ?? data?.site?.name ?? "Choose workspace"}
+    <Button aria-label={`Workspace: ${workspaceLabel}`} variant="outlined" fullWidth disabled={!data && !navigation?.pending && state.status !== "error"} onClick={() => setOpen(true)} aria-busy={!!navigation?.pending}>
+      {workspaceLabel}
     </Button>
     {open ? <Dialog open onClose={() => setOpen(false)} fullWidth maxWidth="sm" aria-labelledby="workspace-title">
       <DialogTitle id="workspace-title">Choose workspace</DialogTitle>

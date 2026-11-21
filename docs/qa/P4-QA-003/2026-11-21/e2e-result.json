@@ -1,0 +1,9 @@
+{
+  "status": "PARTIAL_HISTORICAL_MUTATION_WORKFLOWS_CURRENT_READ_SCANS",
+  "current": "32 live public/authoring navigation viewport scans; authenticated Keycloak sessions",
+  "historical": [
+    "docs/qa/main-workflow-2026-11-21/README.md",
+    "docs/qa/college-workflow-2026-11-21/README.md"
+  ],
+  "missing": "Fresh complete create/review/publish workflow and authoritative CI review for the immutable release candidate"
+}

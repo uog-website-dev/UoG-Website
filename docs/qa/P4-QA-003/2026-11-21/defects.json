@@ -1,0 +1,46 @@
+{
+  "severity_basis": "Proposed triage; axe impact is not organizational security severity. Human disposition pending.",
+  "defects": [
+    {
+      "id": "QA-REG-001",
+      "severity": "medium",
+      "status": "OPEN",
+      "owner": "Platform/foundation maintainers",
+      "finding": "Two backend foundation contract tests fail; see backend.xml/log.",
+      "disposition": "Reconcile intended DEBUG-only localhost/Main behavior with foundation expectations; the other failure flags hostname text in a middleware comment. Do not relax unknown-host or production isolation guards."
+    },
+    {
+      "id": "QA-REG-002",
+      "severity": "medium",
+      "status": "OPEN_TRIAGE",
+      "owner": "Admin frontend/QA",
+      "finding": "Full frontend suite failed media-picker-save selection feedback and visual-builder undo/redo timing. Both files pass focused rerun.",
+      "disposition": "Retain initial failure. Investigate timing/test reliability and obtain a clean stable full-suite run; a focused pass does not waive full-suite failure."
+    },
+    {
+      "id": "QA-A11Y-001",
+      "severity": "medium",
+      "status": "OPEN_TRIAGE",
+      "owner": "Frontend/accessibility reviewers",
+      "finding": "Automated color-contrast findings in Page/Post authoring; axe impact serious.",
+      "disposition": "Review foreground/background and disabled-control exemption context, fix confirmed failures or record explicitly approved exceptions. No exception accepted yet."
+    },
+    {
+      "id": "QA-A11Y-002",
+      "severity": "medium",
+      "status": "OPEN",
+      "owner": "Frontend/accessibility reviewers",
+      "finding": "Visible label text is missing from accessible names on authoring controls; axe label-content-name-mismatch, impact serious.",
+      "disposition": "Use route/selector screenshots to fix accessible names and repeat desktop/mobile scans plus speech/keyboard review."
+    }
+  ],
+  "accepted_risks": [],
+  "release_gaps": [
+    "500-user production-like measurement",
+    "Infrastructure recovery/rollback/log evidence",
+    "Named PR and release approvals",
+    "Story/Issue reconciliation",
+    "Manual accessibility review",
+    "Prior Sprint 1\u00e2\u20ac\u201c3/PERF-010 gate reconciliation"
+  ]
+}

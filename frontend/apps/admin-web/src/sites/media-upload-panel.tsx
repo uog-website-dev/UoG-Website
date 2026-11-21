@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { RefObject } from "react";
 import { Alert, Box, Button, Chip, IconButton, LinearProgress, Paper, Stack, TextField, Typography } from "@mui/material";
 import UploadFileRoundedIcon from "@mui/icons-material/UploadFileRounded";
@@ -46,6 +46,7 @@ export function MediaUploadPanel({siteId, policy, inputRef, onAccepted, onBusyCh
   onAccepted: (asset: MediaAssetRecord) => void; onBusyChange?: (busy: boolean) => void;
   onReady?: (ready: boolean) => void;
 }) {
+  const dropLabelId=useId(),dropHelpId=useId();
   useEffect(() => {onReady?.(true); return () => onReady?.(false);}, [onReady]);
   const [entries, setEntries] = useState<UploadEntry[]>([]);
   const [busy, setBusy] = useState(false);
@@ -134,18 +135,23 @@ export function MediaUploadPanel({siteId, policy, inputRef, onAccepted, onBusyCh
   const pending = entries.length-completed;
   return <Box sx={{display:"grid",gap:2}}>
     <input ref={inputRef} type="file" multiple accept={policy.mime_types.join(",")} aria-label="Upload media file" style={{display:"none"}} disabled={busy} onChange={event => { add(Array.from(event.target.files ?? [])); event.target.value=""; }} />
-    <Box role="button" tabIndex={0} aria-label="Drop files to upload or browse" aria-disabled={busy}
+    <Box
       onClick={() => { if (!busy) inputRef.current?.click(); }}
-      onKeyDown={event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); if (!busy) inputRef.current?.click(); } }}
       onDragEnter={event => { event.preventDefault(); if (Array.from(event.dataTransfer.types).includes("Files")) { dragDepth.current++; setDragging(true); } }}
       onDragOver={event => { event.preventDefault(); event.dataTransfer.dropEffect=busy?"none":"copy"; }}
       onDragLeave={event => { event.preventDefault(); if (--dragDepth.current<=0) { dragDepth.current=0; setDragging(false); } }}
       onDrop={event => { event.preventDefault(); dragDepth.current=0; setDragging(false); add(Array.from(event.dataTransfer.files)); }}
-      sx={{border:"2px dashed",borderColor:dragging?"primary.main":"grey.300",borderRadius:2,bgcolor:dragging?"primary.50":"background.paper",minHeight:190,p:3,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:1,cursor:busy?"wait":"pointer",transition:"background-color 150ms,border-color 150ms","&:hover":{borderColor:"primary.main",bgcolor:"action.hover"},"&:focus-visible":{outline:"3px solid",outlineColor:"primary.main",outlineOffset:3}}}>
+      sx={{border:"2px dashed",borderColor:dragging?"primary.main":"grey.300",borderRadius:2,bgcolor:dragging?"primary.50":"background.paper",minHeight:190,p:3,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:1,cursor:busy?"wait":"pointer",transition:"background-color 150ms,border-color 150ms","&:hover":{borderColor:"primary.main",bgcolor:"action.hover"},"&:focus-within":{outline:"3px solid",outlineColor:"primary.main",outlineOffset:3}}}>
+      <Box component="button" type="button" disabled={busy} aria-labelledby={dropLabelId} aria-describedby={dropHelpId}
+        onClick={event=>{event.stopPropagation();if(!busy)inputRef.current?.click();}}
+        sx={{display:"flex",flexDirection:"column",alignItems:"center",gap:1,alignSelf:"stretch",border:0,p:0,bgcolor:"transparent",font:"inherit",color:"inherit",cursor:busy?"wait":"pointer"}}>
       <UploadFileRoundedIcon sx={{fontSize:42,color:dragging?"primary.main":"text.secondary",mb:0.5}} />
-      <Typography><strong>Drop files to upload</strong> or <Box component="span" sx={{color:"primary.main"}}>click to browse</Box></Typography>
+      <Typography component="span" id={dropLabelId}><strong>Drop files to upload</strong> or <Box component="span" sx={{color:"primary.main"}}>click to browse</Box></Typography>
+      </Box>
+      <Box id={dropHelpId}>
       <Typography variant="body2" color="text.secondary" align="center">Select one or multiple files. Add names, categories and alt text before uploading.</Typography>
       <Typography variant="caption" color="text.secondary" align="center">PNG, JPEG, WebP up to {mediaBytes(policy.image_max_bytes)} | PDF up to {mediaBytes(policy.pdf_max_bytes)} | Text up to {mediaBytes(policy.text_max_bytes)}</Typography>
+      </Box>
     </Box>
     {notice ? <Alert severity="info">{notice}</Alert> : null}
     {entries.length ? <Paper variant="outlined" sx={{p:{xs:1.5,sm:2},borderRadius:2}}>

@@ -1,0 +1,81 @@
+{
+  "date": "2026-11-21",
+  "timezone": "Africa/Addis_Ababa",
+  "candidate_commit": "63d297cc691077ee08f59c93a4b9237c33c00361",
+  "source": "Committed application at test start; review tooling/evidence is uncommitted",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "docker_resources": "12 CPUs; 8167538688 bytes memory",
+  "runtime": "Local development Docker Compose; regression suites ran concurrently, so durations are not load benchmarks",
+  "requested_environment_label": "QA",
+  "qa_load_endpoint": null,
+  "network": "Loopback, no browser CPU/network throttling; *.uog.local maps to 127.0.0.1",
+  "sites": {
+    "main": 17,
+    "pilot": 19
+  },
+  "browser": "Edge headless, version recorded in accessibility.json",
+  "axe_version": "4.14.0",
+  "automated_target": "WCAG 2.1 A/AA tags",
+  "services": [
+    {
+      "Service": "backend",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "celery-beat",
+      "State": "running",
+      "Health": ""
+    },
+    {
+      "Service": "celery-worker",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "frontend-admin",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "frontend-public",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "keycloak",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "keycloak-db",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "minio",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "nginx",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "postgres",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "redis-broker",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "redis-cache",
+      "State": "running",
+      "Health": "healthy"
+    }
+  ]
+}

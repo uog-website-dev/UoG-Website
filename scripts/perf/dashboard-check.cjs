@@ -29,7 +29,7 @@ print(json.dumps(result))`));
   page.on('request',request=>{if(request.method()==='GET'&&new URL(request.url()).pathname.endsWith('/api/reads')&&['dashboard-summary','dashboard-activity'].includes(new URL(request.url()).searchParams.get('resource')))actions.push(new URL(request.url()).searchParams.get('resource'));});
   await page.goto(origin+'/admin');await page.getByRole('button',{name:'Sign in with Keycloak',exact:true}).click();await page.locator('#username').fill(seed.actor.username);await page.locator('#password').fill(seed.actor.password);await page.locator('#kc-login').click();await page.waitForURL(url=>url.origin===origin&&/^\/admin\/?$/.test(url.pathname));
   actions.length=0; // Authentication itself is a separate server action.
-  const choose=async id=>{await page.getByRole('button',{name:'Workspace',exact:true}).first().click();await page.locator(`[data-workspace-site="${id}"]`).click();};
+  const choose=async id=>{await page.getByRole('button',{name:/^Workspace:/,exact:true}).first().click();await page.locator(`[data-workspace-site="${id}"]`).click();};
   const ready=async id=>{await page.locator(`[data-perf-site-id="${id}"]`).waitFor();await page.waitForFunction(()=>document.querySelectorAll('[data-perf-section="dashboard"] section dl').length===5);};
   await choose(a);await ready(a);await page.waitForFunction(()=>document.querySelector('[data-dashboard-secondary-pending]')?.getAttribute('data-dashboard-secondary-pending')==='false');
   assert.equal(actions.length,2,'Dashboard must request one summary and one activity read');assert.equal(new Set(actions).size,2,'Duplicate dashboard endpoint read');

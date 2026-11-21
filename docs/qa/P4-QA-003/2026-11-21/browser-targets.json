@@ -1,0 +1,16 @@
+[
+  {
+    "name": "main",
+    "host": "www.uog.local",
+    "article": "mainqa-8995d437-news",
+    "page": "mainqa-8995d437-information",
+    "navigation_label": "Main navigation"
+  },
+  {
+    "name": "college",
+    "host": "caes.uog.local",
+    "article": "collegeqa-b5e2f44c-news",
+    "page": "collegeqa-b5e2f44c-information",
+    "navigation_label": "College navigation"
+  }
+]

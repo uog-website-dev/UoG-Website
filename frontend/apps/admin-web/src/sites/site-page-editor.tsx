@@ -460,7 +460,7 @@ function SitePageEditorContent({
       component="section"
       variant="outlined"
       aria-labelledby="page-editor-title"
-      sx={{ borderRadius: 3, p: { xs: 2, sm: 3 }, display: "flex", flexDirection: "column", gap: 2 }}
+      sx={{ borderRadius: 3, p: { xs: 2, sm: 3 }, display: "flex", flexDirection: "column", gap: 2, "& .MuiFormHelperText-root.Mui-disabled": { color: "text.secondary" } }}
     >
       <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 2 }}>
         <Box>

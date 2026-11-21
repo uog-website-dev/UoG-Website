@@ -100,7 +100,7 @@ describe("MediaLibrary", () => {
   it("loads scoped details and saves only persisted alt text", async () => {
     listSiteMedia.mockResolvedValue(page([asset]));
     render(<MediaLibrary siteId={11} canUpload />);
-    fireEvent.click(await screen.findByRole("button", { name: "Details for campus.png" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Edit details for campus.png" }));
     const field = await screen.findByLabelText("Alt text");
     await waitFor(() => expect((field as HTMLInputElement).value).toBe("Campus"));
     expect(screen.getByText("Thumbnail: not generated")).toBeTruthy();
@@ -114,7 +114,7 @@ describe("MediaLibrary", () => {
   it("shows readonly metadata without a save control", async () => {
     listSiteMedia.mockResolvedValue(page([asset]));
     render(<MediaLibrary siteId={11} canUpload={false} />);
-    fireEvent.click(await screen.findByRole("button", { name: "Details for campus.png" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Edit details for campus.png" }));
     const field = await screen.findByLabelText("Alt text");
     expect((field as HTMLInputElement).disabled).toBe(true);
     expect(screen.queryByRole("button", { name: "Save changes" })).toBeNull();
@@ -156,7 +156,7 @@ describe("MediaLibrary", () => {
     listSiteMedia.mockResolvedValue(page([asset]));
     getMediaReferences.mockResolvedValueOnce({ ok: true, data: { asset_id: asset.id, references: [galleryRef] } });
     const view = render(<MediaLibrary siteId={11} canUpload={false} canDelete />);
-    fireEvent.click(await screen.findByRole("button", { name: "Details for campus.png" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Edit details for campus.png" }));
     await screen.findByText(/References: 1/);
     expect(await screen.findByText("This asset is in use and cannot be deleted.")).toBeTruthy();
     expect(screen.getByText("PUBLIC: gallery-1 / images.asset / image-1")).toBeTruthy();
@@ -165,7 +165,7 @@ describe("MediaLibrary", () => {
     expect(screen.getAllByText("campus.png").length).toBeGreaterThan(0);
     view.unmount();
     render(<MediaLibrary siteId={11} canUpload={false} canDelete />);
-    fireEvent.click(await screen.findByRole("button", { name: "Details for campus.png" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Edit details for campus.png" }));
     await screen.findByText(/References: 0/);
     fireEvent.click(screen.getByRole("button", { name: "Delete unused asset" }));
     expect(removeSiteMedia).not.toHaveBeenCalled();
@@ -183,7 +183,7 @@ describe("MediaLibrary", () => {
       error: { status: 409, code: "conflict", message: "Asset is still referenced by a draft, publication or placement.", details: null, requestId: null },
     });
     render(<MediaLibrary siteId={11} canUpload={false} canDelete />);
-    fireEvent.click(await screen.findByRole("button", { name: "Details for campus.png" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Edit details for campus.png" }));
     await screen.findByText(/References: 0/);
     fireEvent.click(screen.getByRole("button", { name: "Delete unused asset" }));
     fireEvent.click(screen.getByRole("button", { name: "Confirm deletion" }));
@@ -201,7 +201,7 @@ describe("MediaLibrary", () => {
       error: { status: 503, code: "service_unavailable", message: "Connection interrupted", details: null, requestId: null },
     });
     render(<MediaLibrary siteId={11} canUpload />);
-    fireEvent.click(await screen.findByRole("button", { name: "Details for campus.png" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Edit details for campus.png" }));
     const field = await screen.findByLabelText("Alt text");
     fireEvent.change(field, { target: { value: "Draft campus description" } });
     fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
@@ -216,7 +216,7 @@ describe("MediaLibrary", () => {
     getSiteMedia.mockResolvedValue({ ok: true, data: asset });
     updateSiteMedia.mockResolvedValue({ ok: true, data: updated });
     const view = render(<MediaLibrary siteId={11} canUpload canDelete />);
-    fireEvent.click(await screen.findByRole("button", { name: "Details for campus.png" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Edit details for campus.png" }));
     expect(await screen.findByText("This asset is in use and cannot be deleted.")).toBeTruthy();
     expect((screen.getByRole("button", { name: "Delete unused asset" }) as HTMLButtonElement).disabled).toBe(true);
     const field = await screen.findByLabelText("Alt text");
@@ -229,7 +229,7 @@ describe("MediaLibrary", () => {
     view.unmount();
     render(<MediaLibrary siteId={11} canUpload canDelete />);
     expect(await screen.findByText("Alt text: Campus gallery hero")).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Details for campus.png" }));
+    fireEvent.click(screen.getByRole("button", { name: "Edit details for campus.png" }));
     await waitFor(() => expect((screen.getByLabelText("Alt text") as HTMLInputElement).value).toBe("Campus gallery hero"));
   });
 
@@ -237,7 +237,7 @@ describe("MediaLibrary", () => {
     listSiteMedia.mockResolvedValue(page([asset]));
     getMediaReferences.mockResolvedValue({ ok: false, error: { message: "Unavailable", status: 503 } });
     render(<MediaLibrary siteId={11} canUpload={false} canDelete />);
-    fireEvent.click(await screen.findByRole("button", { name: "Details for campus.png" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Edit details for campus.png" }));
     await screen.findByText(/temporary transport problem/);
     expect((screen.getByRole("button", { name: "Delete unused asset" }) as HTMLButtonElement).disabled).toBe(true);
     expect(removeSiteMedia).not.toHaveBeenCalled();
@@ -338,7 +338,7 @@ describe("Quiet processing updates and previews", () => {
     listSiteMedia.mockResolvedValue(page([pending]));
     getSiteMedia.mockResolvedValue({ ok: true, data: pending });
     render(<MediaLibrary siteId={11} canUpload={false} />);
-    fireEvent.click(await screen.findByRole("button", { name: "Details for campus.png" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Edit details for campus.png" }));
     await screen.findByText("Thumbnail: processing");
     expect(screen.queryByRole("img")).toBeNull();
     let resolve!: (value: unknown) => void;
@@ -368,7 +368,7 @@ it("renames and categorizes an asset without changing its original filename", as
   listSiteMedia.mockResolvedValue(page([asset]));
   updateSiteMedia.mockResolvedValue({ ok: true, data: updated });
   render(<MediaLibrary siteId={11} canUpload />);
-  fireEvent.click(await screen.findByRole("button", { name: "Details for campus.png" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Edit details for campus.png" }));
   const name = await screen.findByLabelText("Media name");
   await waitFor(() => expect((name as HTMLInputElement).value).toBe("campus.png"));
   fireEvent.change(name, { target: { value: "Campus festival" } });
@@ -396,7 +396,7 @@ it("opens the scoped display image in an immersive viewer and clears it on Site 
 it("keeps unsaved metadata when expanding and closing the image", async () => {
   listSiteMedia.mockResolvedValue(page([asset]));
   render(<MediaLibrary siteId={11} canUpload />);
-  fireEvent.click(await screen.findByRole("button", {name:"Details for campus.png"}));
+  fireEvent.click(await screen.findByRole("button", {name:"Edit details for campus.png"}));
   const field = await screen.findByLabelText("Media name");
   await waitFor(()=>expect((field as HTMLInputElement).value).toBe("campus.png"));
   fireEvent.change(field,{target:{value:"Unsaved name"}});

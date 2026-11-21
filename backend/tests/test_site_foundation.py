@@ -9,7 +9,7 @@ from django.core.management import CommandError, call_command, get_commands
 from django.db import connection
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
-from django.test import Client
+from django.test import Client, override_settings
 
 from apps.organizations.models import OrganizationUnit
 from apps.sites.models import Module, Site, SiteTemplate
@@ -108,7 +108,10 @@ def test_representative_foundation_resolves_each_site_from_data(admin):
     spoofed = admin.get(CONTEXT, HTTP_HOST="informatics.uog.local", HTTP_X_FORWARDED_HOST="medicine.uog.local")
     assert spoofed.status_code == 200 and spoofed.json()["site"]["code"] == "INFORMATICS"
     assert admin.get(CONTEXT, HTTP_HOST="unknown.uog.local").status_code == 404
-    assert admin.get(CONTEXT, HTTP_HOST="localhost").json()["site"] is None
+    with override_settings(DEBUG=True):
+        assert admin.get(CONTEXT, HTTP_HOST="localhost").json()["site"]["id"] == by_code["MAIN"]["id"]
+    with override_settings(DEBUG=False):
+        assert admin.get(CONTEXT, HTTP_HOST="localhost").json()["site"] is None
     anonymous = Client().get(CONTEXT, HTTP_HOST="medicine.uog.local")
     assert anonymous.status_code == 200 and anonymous.json()["site"]["id"] == by_code["MEDICINE"]["id"]
     assert admin.get(

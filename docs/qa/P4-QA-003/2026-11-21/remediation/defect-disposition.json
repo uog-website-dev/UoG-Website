@@ -1,0 +1,32 @@
+{
+  "QA-REG-001": {
+    "status": "RESOLVED_IN_WORKTREE",
+    "evidence": "backend.xml",
+    "fix": "Keep data-driven routing; explicitly test DEBUG-only Main fallback and production no-fallback. Remove institutional hostname example from runtime comment."
+  },
+  "QA-REG-002": {
+    "status": "RESOLVED_AUTOMATED",
+    "evidence": "frontend.log",
+    "fix": "Wait for asynchronous asset preview; assert actual Builder row order through undo/redo with synchronous state actions and awaited deferred canvas."
+  },
+  "QA-A11Y-001": {
+    "status": "RESOLVED_AUTOMATED",
+    "evidence": "accessibility.json",
+    "fix": "Readable placeholder and disabled helper-text colors."
+  },
+  "QA-A11Y-002": {
+    "status": "RESOLVED_AUTOMATED",
+    "evidence": "accessibility.json",
+    "fix": "Visible labels included in accessible names; native upload button with separate help text. Loading skeleton has a valid status role."
+  },
+  "external_release_gaps": {
+    "status": "OPEN",
+    "items": [
+      "Approved QA endpoint/workload and 500-user p95 evidence",
+      "Infrastructure-owned backup/restore, rollback and operational review",
+      "Authoritative story/PR/review traceability and external Issue attachment",
+      "Manual accessibility review and named Product Owner/QA/Security/infrastructure sign-offs",
+      "Immutable committed release candidate and remote CI/release-gate verification"
+    ]
+  }
+}

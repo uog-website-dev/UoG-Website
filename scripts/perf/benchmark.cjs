@@ -1,6 +1,6 @@
 // PERF-002: lazy discovery is included in measured Site switches.
 async function chooseSite(page,id,name){
- await page.getByRole('button',{name:'Workspace',exact:true}).first().click();
+ await page.getByRole('button',{name:/^Workspace:/,exact:true}).first().click();
  await page.getByRole('button',{name:'Next Sites',exact:true}).waitFor();
  if(await page.locator(`[data-workspace-site="${id}"]`).count()===0){
   assert(name,'Off-page Site discovery requires its managed fixture name');
@@ -86,7 +86,7 @@ const {spawnSync}=require('node:child_process');
   await page.getByRole('button',{name:'Sign in with Keycloak',exact:true}).click();await page.locator('#username').fill(seed.actor.username);await page.locator('#password').fill(seed.actor.password);await page.locator('#kc-login').click();console.log(JSON.stringify({phase:'auth_redirect',origin:new URL(page.url()).origin,path:new URL(page.url()).pathname}));await page.waitForURL(u=>u.origin===origin&&/^\/admin\/?$/.test(u.pathname),{waitUntil:'domcontentloaded',timeout:30000});await page.waitForLoadState('domcontentloaded');
   metadata.authentication={landing_path:new URL(page.url()).pathname,error_code:new URL(page.url()).searchParams.get('error'),session_cookie_present:(await login.cookies()).some(c=>c.name.includes('session-token'))};console.log(JSON.stringify(metadata.authentication));assert(metadata.authentication.session_cookie_present&&!metadata.authentication.error_code,'Real browser sign-in did not establish a usable session');
 
-  await page.getByRole('button',{name:'Workspace',exact:true}).first().waitFor();
+  await page.getByRole('button',{name:/^Workspace:/,exact:true}).first().waitFor();
   await measure(login,page,'first_site_visit',seed.sites[0].id,'dashboard',()=>chooseSite(page,seed.sites[0].id,seed.sites[0].name),'cold');
   // Direct Django API timings come first, while the separately issued token is fresh.
   for(let i=0;i<n;i++)for(const resource of ['pages','posts','assets'])for(const cache of ['cold','warm']){
