@@ -8,6 +8,7 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Alert from "@mui/material/Alert";
 import Link from "@mui/material/Link";
+import {usePublicSiteBranding, publicLogoSource} from "./site-branding";
 import { menusFromResponse, SiteNavigation } from "./site-navigation";
 
 export interface WidgetPost {
@@ -40,13 +41,17 @@ export function WidgetRuntimeProvider(props:{siteId:number|null;pageId?:string;p
 
 function WidgetScopeProvider({siteId,pageId,preview=false,mediaBase,children}:{siteId:number|null;pageId?:string;preview?:boolean;mediaBase?:string;children:ReactNode}) {
   const inheritedPost=useContext(PostContext);
+  const branding=usePublicSiteBranding();
+  const identityRevision=branding.id===siteId
+    ? branding.brandingRevision ?? JSON.stringify([branding.displayName,branding.theme,branding.logoUrl]) : "";
   const [filters,setFilters]=useState({category:"",tag:""});
   const [post,setPost]=useState<WidgetPost|null>(null);
   const pending=useRef(new Map<string,Promise<WidgetEnvelope>>());
   const controllers=useRef(new Set<AbortController>());
   useEffect(()=>()=>{controllers.current.forEach(controller=>controller.abort());pending.current.clear();},[]);
   const load=useCallback((query:Record<string,string>)=>{
-    const key=new URLSearchParams(query).toString();
+    const params=new URLSearchParams(query).toString();
+    const key=JSON.stringify([identityRevision,params]);
     const existing=pending.current.get(key);
     if(existing)return existing;
     const controller=new AbortController();
@@ -60,7 +65,7 @@ function WidgetScopeProvider({siteId,pageId,preview=false,mediaBase,children}:{s
         if(prefix===undefined)throw new Error("Preview data is unavailable.");
         endpoint=`${prefix}/sites/${siteId}/pages/${pageId}/widget-data`;
       }
-      const response=await fetch(`${endpoint}?${key}`,{cache:"no-store",signal:controller.signal,headers:{Accept:"application/json"}});
+      const response=await fetch(`${endpoint}?${params}`,{cache:"no-store",signal:controller.signal,headers:{Accept:"application/json"}});
       if(!response.ok)throw new Error(response.status===404?"This content source is unavailable for this Site.":"Content could not be loaded. Try again.");
       const body=await response.json() as WidgetEnvelope;
       if(body.site!==siteId || !Array.isArray(body.results))throw new Error("Content does not belong to the active Site.");
@@ -69,7 +74,7 @@ function WidgetScopeProvider({siteId,pageId,preview=false,mediaBase,children}:{s
     pending.current.set(key,request);
     void request.finally(()=>{pending.current.delete(key);controllers.current.delete(controller);}).catch(()=>{});
     return request;
-  },[siteId,pageId,preview,mediaBase]);
+  },[siteId,pageId,preview,mediaBase,identityRevision]);
   return <ScopeContext.Provider value={{siteId,pageId,preview,mediaBase,filters,
     setFilter:(key,value)=>setFilters(current=>({...current,[key]:value})),selectPost:setPost,load}}>
     <PostContext.Provider value={post??inheritedPost}>{children}</PostContext.Provider>
@@ -100,9 +105,9 @@ function DataState({error,retry}:{error:string|null;retry:()=>void}) {
 export function SiteTitleWidget() {
   const scope=useContext(ScopeContext);
   const state=useWidgetData({source:"identity"});
-  if(scope?.siteId===null)return <Typography component="h1" variant="h4" color="text.secondary" sx={{fontWeight:700,overflowWrap:"anywhere",my:0}}>Site title placeholder</Typography>;
+  if(scope?.siteId===null)return <Typography component="p" variant="h4" color="text.secondary" sx={{fontWeight:700,overflowWrap:"anywhere",my:0}}>Site title placeholder</Typography>;
   if(!state.data)return <DataState {...state}/>;
-  return <Typography component="h1" variant="h4" sx={{fontWeight:700,overflowWrap:"anywhere",my:0}}>{String(state.data.results[0]?.name??"")}</Typography>;
+  return <Typography component="p" variant="h4" sx={{fontWeight:700,overflowWrap:"anywhere",my:0}}>{String(state.data.results[0]?.name??"")}</Typography>;
 }
 
 export function MenuWidget({menu_code}:{menu_code:string}) {
@@ -120,15 +125,19 @@ function libraryBase(scope:WidgetScope) {
 }
 
 export function SiteLogoWidget() {
+  const branding=usePublicSiteBranding();
   const scope=useContext(ScopeContext);
   const state=useWidgetData({source:"identity"});
   const [failed,setFailed]=useState(false);
+  const identityKey=JSON.stringify(state.data?.results[0] ?? null);
+  useEffect(()=>setFailed(false),[branding,identityKey]);
   if(scope?.siteId===null)return <Box role="img" aria-label="Site logo placeholder" sx={{minHeight:56,minWidth:96,p:1,border:"1px dashed",borderColor:"divider",display:"grid",placeItems:"center",color:"text.secondary",textAlign:"center",fontSize:"0.8rem"}}>Site logo placeholder</Box>;
   if(!state.data)return <DataState {...state}/>;
   const identity=state.data.results[0];
   const name=String(identity?.name??"");
   const asset=identity?.logo_asset_id;
   let src=typeof identity?.logo_url==="string" && identity.logo_url==="/api/v1/site-context/identity/logo/" ? identity.logo_url:null;
+  if(!scope?.preview && branding.id===scope?.siteId && src)src=publicLogoSource(branding);
   if(scope?.preview && typeof asset==="string" && uuid.test(asset)){
     const base=libraryBase(scope);
     src=base?`${base.endsWith("/media")?base:`${base}/media`}/${asset}/image?variant=display`:null;

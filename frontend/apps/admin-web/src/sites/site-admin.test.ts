@@ -121,3 +121,11 @@ describe("site administration matrix", () => {
     expect(canActivateCentralModules(["platform.sites.manage_registry"])).toBe(true);
   });
 });
+
+
+it("exposes Appearance to Site settings editors without requiring a CMS module",()=>{
+  const section=sectionByKey("appearance");
+  expect(sectionDecision(section,{enabledModuleCodes:[],permissions:["sites.update"]})).toBe("visible");
+  expect(sectionDecision(section,editor)).toBe("permission_denied");
+  expect(siteSwitchHref(22,"/sites/11/admin/appearance",{enabledModuleCodes:[],permissions:["sites.update"]})).toBe("/sites/22/admin/appearance");
+});

@@ -32,3 +32,9 @@ describe("Site appearance configuration", () => {
     expect(changes.presentation).not.toHaveProperty("primary_color");
   });
 });
+
+
+it("normalizes compact stored logo IDs before using authenticated media routes",()=>{
+  const current=defaultSiteConfiguration("en-us");current.identity.logo_ref=logo.replaceAll("-","");
+  expect(formValuesFromSite(site(current)).logo_asset_id).toBe(logo);
+});

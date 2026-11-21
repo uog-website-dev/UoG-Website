@@ -1,0 +1,25 @@
+{
+  "run": "p4brand-af31dda4",
+  "results": [
+    {
+      "check": "real Site Administrator saves title/theme; header/footer/widget refresh without navigation; logo reloads; Main Site unchanged",
+      "status": "PASS"
+    },
+    {
+      "check": "Appearance reopens with persisted effective values",
+      "status": "PASS"
+    },
+    {
+      "check": "persisted logo loads from the authenticated Site-scoped image route",
+      "status": "PASS"
+    },
+    {
+      "check": "mobile Appearance form: no horizontal overflow or automated WCAG A/AA violations",
+      "status": "PASS"
+    },
+    {
+      "check": "original Site appearance restored",
+      "status": "PASS"
+    }
+  ]
+}

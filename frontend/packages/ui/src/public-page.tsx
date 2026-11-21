@@ -17,7 +17,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
-import { SiteBrandingLockup, usePublicSiteBranding } from "./site-branding";
+import { usePublicSiteBranding } from "./site-branding";
 
 import { publicFetchInit } from "./public-site";
 import type {PublicMenuNode} from "./site-navigation";
@@ -229,7 +229,7 @@ export function BlockView({ block, siteId }: { block: PublicBlock; siteId?: numb
   if (block.type === "heading" && block.text) {
     const level = block.level === 2 || block.level === 3 || block.level === 4 ? block.level : 2;
     return (
-      <Typography variant={`h${level}` as "h2"} component={`h${level}` as "h2"} sx={{ mt: 2 }}>
+      <Typography variant={`h${level}` as "h2"} component={`h${level}` as "h2"} sx={{ mt: 2, fontSize: {2:"clamp(1.65rem,3.2cqi,2.65rem)",3:"clamp(1.3rem,2.5cqi,1.85rem)",4:"1.25rem"}[level], lineHeight:1.2, letterSpacing:"-.025em" }}>
         {block.text}
       </Typography>
     );
@@ -305,7 +305,7 @@ function MediaCollection({block,siteId}:{block:PublicBlock;siteId?:number|null})
   const items=block.type==="slider" ? block.slides ?? [] : block.images ?? [];
   const current=Math.min(position,Math.max(0,items.length-1));
   const shown=block.type==="slider" ? items.slice(current,current+1) : items;
-  return <Box component="section" aria-label={block.type==="slider" ? "Image slider" : "Image gallery"} aria-roledescription={block.type==="slider"?"carousel":undefined} sx={{display:"grid",gridTemplateColumns:block.type==="gallery"?"repeat(auto-fit,minmax(min(100%,240px),1fr))":"minmax(0,1fr)",gap:2,minWidth:0,overflowWrap:"anywhere"}}>
+  return <Box component="section" aria-label={block.type==="slider" ? "Image slider" : "Image gallery"} aria-roledescription={block.type==="slider"?"carousel":undefined} sx={{"& figure img":{display:"block",width:"100%",maxHeight:block.type==="slider"?560:360,objectFit:"cover",borderRadius:2},"& figcaption":{mt:1,color:"text.secondary",fontSize:".9rem"},display:"grid",gridTemplateColumns:block.type==="gallery"?"repeat(auto-fit,minmax(min(100%,240px),1fr))":"minmax(0,1fr)",gap:2,minWidth:0,overflowWrap:"anywhere"}}>
     {shown.map((item) => <Box component="figure" key={`${siteId}-${item.id}-${item.asset_id}`} sx={{m:0}}>
       <PublishedImage block={{type:"image",ref:`sites/${siteId}/assets/${item.asset_id}`,alt:item.alt}} siteId={siteId} />
       {item.caption ? <Typography component="figcaption">{item.caption}</Typography> : null}
@@ -328,7 +328,7 @@ function PublishedImage({ block, siteId }: { block: PublicBlock; siteId?: number
   const url = privateBase ? `${privateBase}/${assetId}/image` : `/api/v1/site-context/media/${assetId}/`;
   return <picture>
     <source media="(max-width: 600px)" srcSet={`${url}?variant=thumbnail`} />
-    <Box component="img" src={`${url}?variant=display`} alt={block.alt ?? ""} loading="lazy" onError={() => setFailed(true)} sx={{ maxWidth: "100%", height: "auto" }} />
+    <Box component="img" src={`${url}?variant=display`} alt={block.alt ?? ""} loading="lazy" onError={() => setFailed(true)} sx={{ display:"block", width:"100%", maxWidth: "100%", maxHeight:560, height: "auto", objectFit:"cover" }} />
   </picture>;
 }
 
@@ -444,7 +444,6 @@ export function PublicPageView({ page, privateMediaBase, viewportWidth, hideTitl
           aria-labelledby="public-page-title"
           sx={{ gridArea: "content", display: "flex", flexDirection: "column", gap: 2, minWidth: 0, width: "100%", maxWidth: contentWidth, mx: "auto", overflowWrap: "anywhere" }}
         >
-          {site.id !== null ? <SiteBrandingLockup site={site} compact /> : null}
           <Typography id="public-page-title" variant="h3" component="h1" sx={titleHidden ? {position:"absolute",left:0,top:0,width:1,height:1,p:0,m:-1,overflow:"hidden",clipPath:"inset(50%)",whiteSpace:"nowrap"} : { overflowWrap: "anywhere" }}>
           {page.title}
         </Typography>

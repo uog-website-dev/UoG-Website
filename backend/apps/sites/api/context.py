@@ -3,6 +3,9 @@
 This reports routing context. It does not authenticate the caller or grant
 access to another Site's records.
 """
+import hashlib
+import json
+
 from drf_spectacular.utils import extend_schema
 from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
@@ -23,6 +26,7 @@ class PublicConfigurationSerializer(serializers.Serializer):
     display_name = serializers.CharField(allow_null=True)
     theme = serializers.CharField()
     logo_url = serializers.CharField(allow_null=True)
+    branding_revision = serializers.CharField()
 
 
 class SiteContextSerializer(serializers.Serializer):
@@ -49,6 +53,21 @@ class SiteContextView(APIView):
             body = {"site": None, "domain": None, "canonical_domain": None, "configuration": None, "modules": []}
         else:
             current = Site.objects.select_related("organization_unit").get(pk=site.pk)
+            from apps.cms.api.widget_runtime import logo_asset
+            asset = logo_asset(current)
+            public_identity = {
+                "display_name": current.configuration["identity"]["display_name"],
+                "theme": current.configuration["presentation"]["theme"],
+                "logo_url": "/api/v1/site-context/identity/logo/" if asset else None,
+            }
+            # Hash only public identity and opaque media identity; no storage keys.
+            revision = hashlib.sha256(json.dumps([
+                current.pk, current.name, public_identity,
+                str(asset.pk) if asset else None,
+                asset.updated_at.isoformat() if asset else None,
+                sorted(request.enabled_module_codes),
+            ], sort_keys=True).encode()).hexdigest()
+            public_identity["branding_revision"] = revision
             body = {
                 "site": {
                     "id": current.pk,
@@ -60,11 +79,7 @@ class SiteContextView(APIView):
                 "canonical_domain": SiteDomain.objects.filter(
                     site=current, is_primary=True, status="ACTIVE",
                 ).values_list("hostname", flat=True).first(),
-                "configuration": {
-                    "display_name": current.configuration["identity"]["display_name"],
-                    "theme": current.configuration["presentation"]["theme"],
-                    "logo_url": self._logo_url(current),
-                },
+                "configuration": public_identity,
                 "modules": sorted(request.enabled_module_codes),
             }
         response = Response(body)

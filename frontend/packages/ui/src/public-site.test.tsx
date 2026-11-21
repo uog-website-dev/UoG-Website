@@ -139,7 +139,7 @@ describe("PublicSiteFrame", () => {
 });
 
 describe("Site-bound Page and homepage branding", () => {
-  it("uses the current Site logo and title from shared context without Page-specific logo data", () => {
+  it("keeps Site scope without repeating shell branding inside Page content", () => {
     const page = pageFromResponse(200, {
       status: "PUBLISHED",
       title: "About our college",
@@ -154,8 +154,8 @@ describe("Site-bound Page and homepage branding", () => {
         <PublicPageView page={page} />
       </PublicSiteBrandingProvider>,
     );
-    const logo = screen.getByRole("img", { name: "College of Informatics logo" }) as HTMLImageElement;
-    expect(logo.getAttribute("src")).toBe("/api/v1/site-context/identity/logo/");
+    expect(screen.queryByRole("img")).toBeNull();
+    expect(screen.getByRole("heading", { name: "About our college" })).toBeTruthy();
     expect(container.querySelector('[data-site-code="INFORMATICS"]')).toBeTruthy();
 
     const medicinePage = { ...page!, site: 3 };
@@ -164,7 +164,7 @@ describe("Site-bound Page and homepage branding", () => {
         <PublicPageView page={medicinePage} />
       </PublicSiteBrandingProvider>,
     );
-    expect(screen.getByRole("img", { name: "College of Medicine logo fallback" })).toBeTruthy();
+    expect(screen.queryByRole("img")).toBeNull();
     expect(container.querySelector('[data-site-code="MEDICINE"]')).toBeTruthy();
     expect(container.querySelector('img[src="/api/v1/site-context/identity/logo/"]')).toBeNull();
   });
@@ -185,4 +185,37 @@ describe("Site-bound Page and homepage branding", () => {
     expect(screen.getByRole("img", { name: "College of Informatics logo fallback" })).toBeTruthy();
     expect(container.querySelector("img[src*='private']")).toBeNull();
   });
+});
+
+
+it("shows the configured logo without a painted background or border", () => {
+  render(<SiteBrandingLockup site={siteFromContext(200, informatics)} inverse />);
+  const logo = screen.getByRole("img", {name: "College of Informatics logo"});
+  const style = getComputedStyle(logo);
+  expect(style.backgroundColor).toBe("rgba(0, 0, 0, 0)");
+  expect(style.borderTopWidth).toBe("0px");
+  expect(style.padding).toBe("");
+});
+
+
+it("reloads the host-scoped logo on a branding revision change and recovers from an earlier failure", () => {
+  const first={...siteFromContext(200,informatics),brandingRevision:"a".repeat(64)};
+  const {rerender}=render(<SiteBrandingMark site={first}/>);
+  const image=screen.getByRole("img",{name:"College of Informatics logo"});
+  expect(image.getAttribute("src")).toBe(`/api/v1/site-context/identity/logo/?v=${first.brandingRevision}`);
+  fireEvent.error(image);
+  expect(screen.getByRole("img",{name:/logo fallback/})).toBeTruthy();
+  const next={...first,brandingRevision:"b".repeat(64)};
+  rerender(<SiteBrandingMark site={next}/>);
+  expect(screen.getByRole("img",{name:"College of Informatics logo"}).getAttribute("src")).toBe(`/api/v1/site-context/identity/logo/?v=${next.brandingRevision}`);
+});
+
+
+it("retries a transient logo failure on a successful refresh of the same branding revision",()=>{
+  const site={...siteFromContext(200,informatics),brandingRevision:"a".repeat(64)};
+  const {rerender}=render(<SiteBrandingMark site={site}/>);
+  fireEvent.error(screen.getByRole("img",{name:"College of Informatics logo"}));
+  expect(screen.getByRole("img",{name:/logo fallback/})).toBeTruthy();
+  rerender(<SiteBrandingMark site={{...site}}/>);
+  expect(screen.getByRole("img",{name:"College of Informatics logo"})).toBeTruthy();
 });
