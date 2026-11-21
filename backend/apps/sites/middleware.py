@@ -4,7 +4,7 @@ This is routing, not authorization. X-Forwarded-Host is never read.
 
 In development only, a platform host (``localhost``/``127.0.0.1``) serves
 the public Site-context routes of the active Main Site. That lets a developer
-open ``http://localhost`` without adding a ``*.uog.local`` hosts entry.
+open ``http://localhost`` without adding a registered development hostname to the hosts file.
 Production (``DEBUG=False``) never applies this fallback, and every other
 platform route still resolves no Site.
 """

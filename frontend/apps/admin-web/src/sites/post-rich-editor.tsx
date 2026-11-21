@@ -314,7 +314,7 @@ export function PostRichEditor({
               top: 24,
               left: 24,
               right: 24,
-              color: "text.disabled",
+              color: "text.secondary",
               pointerEvents: "none",
               fontSize: "1.05rem",
               lineHeight: 1.8,

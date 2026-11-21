@@ -16,7 +16,7 @@ describe("Media upload queue",()=>{
   const send=vi.spyOn(globalThis,"fetch");
   send.mockImplementation(async(input)=>new Response(JSON.stringify(asset(String(input).includes("first.png")?"one":"two")),{status:202}));
   const accept=vi.fn();render(<Harness accept={accept}/>);
-  fireEvent.drop(screen.getByRole("button",{name:"Drop files to upload or browse"}),{dataTransfer:{files:[new File(["first"],"first.png",{type:"image/png"}),new File(["second"],"second.png",{type:"image/png"})]}});
+  fireEvent.drop(screen.getByRole("button",{name:"Drop files to upload or click to browse"}),{dataTransfer:{files:[new File(["first"],"first.png",{type:"image/png"}),new File(["second"],"second.png",{type:"image/png"})]}});
   fireEvent.change(screen.getByLabelText("Media name for first.png"),{target:{value:"Campus festival"}});
   fireEvent.change(screen.getByLabelText("Categories for first.png"),{target:{value:"Campus, Events"}});
   fireEvent.change(screen.getByLabelText("Alt text for first.png"),{target:{value:"Students at the festival"}});

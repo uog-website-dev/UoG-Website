@@ -98,14 +98,14 @@ describe("DesktopSidebar — platform workspace", () => {
       expect(linkNamed(label)).toBeUndefined();
     }
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    fireEvent.click(screen.getByRole("button", {name: "Workspace"}));
+    fireEvent.click(screen.getByRole("button", {name: /^Workspace:/}));
     expect(await screen.findByRole("button", {name: "Medicine"})).toBeTruthy();
 
   });
 
   it("switches to a Site workspace from the keyboard-operable selector", async () => {
     render(<DesktopSidebar />);
-    const selector = await screen.findByRole("button", {name: "Workspace"});
+    const selector = await screen.findByRole("button", {name: /^Workspace:/});
     await waitFor(() => expect(selector).toHaveProperty("disabled", false));
     fireEvent.click(selector);
     fireEvent.click(await screen.findByRole("button", {name: "Medicine"}));
@@ -165,7 +165,7 @@ describe("DesktopSidebar — Site workspace", () => {
     // MENUS is enabled but menu.read was not granted; POSTS is not enabled.
     expect(within(nav).queryAllByRole("link").some((link) => link.textContent?.includes("Menus"))).toBe(false);
     expect(within(nav).queryAllByRole("link").some((link) => link.textContent?.includes("Posts"))).toBe(false);
-    expect(screen.getByRole("button", {name: "Workspace"}).textContent).toContain("Informatics");
+    expect(screen.getByRole("button", {name: /^Workspace:/}).textContent).toContain("Informatics");
     expect(fetchMock).toHaveBeenCalledWith("/admin/api/workspace/?site=2", expect.objectContaining({ cache: "no-store" }));
   });
 

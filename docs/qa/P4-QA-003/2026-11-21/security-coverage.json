@@ -1,0 +1,1090 @@
+{
+  "basis": "Current full backend JUnit; name-based traceability index, not code-coverage percentage or proof of exhaustive security review",
+  "groups": {
+    "RBAC": {
+      "matched": 40,
+      "failed": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "class": "tests.test_accounts",
+          "test": "test_me_with_an_expired_token_is_rejected",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_api_query_scaling",
+          "test": "test_permission_filter_preserves_multiple_roles_and_expiry",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_authorization",
+          "test": "test_unknown_permissions_expired_and_revoked_assignments_fail_closed",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_authorization",
+          "test": "test_permission_catalog_is_read_only_and_unknown_codes_cannot_be_added",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_authorization",
+          "test": "test_last_active_site_administrator_cannot_be_revoked",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_dashboard",
+          "test": "test_cached_counts_do_not_survive_access_removal[revoked]",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_dashboard",
+          "test": "test_cached_counts_do_not_survive_access_removal[expired]",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_documentation",
+          "test": "test_session_can_open_staff_docs_but_cannot_bypass_bearer_api_permissions",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_effective_permissions",
+          "test": "test_site_roles_return_their_registered_permissions",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_effective_permissions",
+          "test": "test_platform_administrator_policy_is_the_approved_capability_set",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_effective_permissions",
+          "test": "test_scope_ownership_expiry_revocation_and_inactive_grants",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_effective_permissions",
+          "test": "test_invalid_users_scopes_and_foreign_inspection_do_not_disclose_grants",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_organization_discovery_api",
+          "test": "test_discovery_permissions_precede_parameter_validation",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_workspace",
+          "test": "test_live_access_removal_is_not_restored_by_etag[revoked]",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_workspace",
+          "test": "test_live_access_removal_is_not_restored_by_etag[expired]",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_workspace",
+          "test": "test_disabled_permission_removes_bootstrap_and_discovery_access",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_workspace",
+          "test": "test_bulk_discovery_matches_canonical_permission_decisions[SITE]",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_workspace",
+          "test": "test_bulk_discovery_matches_canonical_permission_decisions[ORGANIZATION]",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_workspace",
+          "test": "test_bulk_discovery_matches_canonical_permission_decisions[PLATFORM]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_homepage_assignment",
+          "test": "test_permission_module_and_database_backstops",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_homepage_templates",
+          "test": "test_permissions_isolation_expiration_and_module_contract",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_homepage_templates",
+          "test": "test_apply_rejects_unauthorized_invalid_and_cross_site_targets_atomically",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_api",
+          "test": "test_permission_codes_and_publication_are_independent",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_api",
+          "test": "test_disabled_permission_is_denied_even_with_platform_administrator_grant",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_directory",
+          "test": "test_unauthorized_and_module_disabled_requests_cannot_create_or_retire",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_integrity",
+          "test": "test_inactive_actor_and_revoked_assignments_do_not_grant_access",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_integrity",
+          "test": "test_menu_enablement_api_preserves_records_and_rejects_unauthorized_users",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_preview",
+          "test": "test_unauthorized_and_foreign_previews_do_not_disclose_content",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_page_shell_layouts",
+          "test": "test_permissions_site_and_module_gates_precede_layout_changes",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_post_media",
+          "test": "test_media_permission_and_modules_gate_direct_attachment",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_posts_api",
+          "test": "test_article_site_permission_and_module_gates",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_sidebars",
+          "test": "test_foreign_assignment_permissions_and_protected_deletion",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_workflow",
+          "test": "test_state_machine_permissions_snapshot_and_publish_idempotency",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_central_module_management",
+          "test": "test_central_apply_uses_platform_permission_in_production",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_media_removal",
+          "test": "test_foreign_or_unauthorized_removal_has_no_effect",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_media_uploads",
+          "test": "test_transfer_lease_blocks_parallel_retry_and_expired_attempt_can_be_reconciled",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_media_uploads",
+          "test": "test_http_rejects_forged_bytes_oversize_paths_and_unauthorized_requests",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_role_retirement",
+          "test": "test_covered_grants_and_inactive_users_do_not_gain_new_assignments",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_role_retirement",
+          "test": "test_drop_is_guarded_and_rollback_cannot_resurrect_revoked_grant",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_oidc",
+          "test": "test_expired_token_is_rejected",
+          "status": "PASS"
+        }
+      ]
+    },
+    "IDOR_BOLA": {
+      "matched": 68,
+      "failed": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "class": "tests.test_dashboard",
+          "test": "test_foreign_unknown_anonymous_and_query_validation",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_effective_permissions",
+          "test": "test_invalid_users_scopes_and_foreign_inspection_do_not_disclose_grants",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_site_user_creation",
+          "test": "test_foreign_site_denied_before_provider",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_sites_api",
+          "test": "test_site_lifecycle_configuration_domains_and_cross_site_ids",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_workspace",
+          "test": "test_foreign_unknown_anonymous_and_ambiguous_context",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.organizations.tests.test_organization_units",
+          "test": "test_database_foreign_keys_reject_missing_references[parent_id]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.organizations.tests.test_organization_units",
+          "test": "test_database_foreign_keys_reject_missing_references[organization_type_id]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_homepage_assignment",
+          "test": "test_assignment_rejects_draft_foreign_and_preserves_revisions",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_homepage_assignment",
+          "test": "test_unpublished_selection_uses_empty_fallback_without_other_site_cache_changes",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_homepage_templates",
+          "test": "test_unknown_components_versions_and_site_bound_assets_are_rejected[foreign]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_homepage_templates",
+          "test": "test_forged_input_stale_version_and_deterministic_cross_site_catalogue",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_homepage_templates",
+          "test": "test_apply_rejects_unauthorized_invalid_and_cross_site_targets_atomically",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_homepage_templates",
+          "test": "test_apply_rejects_forged_cross_site_media_before_persisting",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_api",
+          "test": "test_cross_site_scope_foreign_parent_and_forged_claims_are_rejected",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_api",
+          "test": "test_local_location_edit_cross_site_block_and_central_menu_authority",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_directory",
+          "test": "test_identifiers_are_site_unique_and_immutable_and_foreign_records_stay_scoped",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_integrity",
+          "test": "test_authorized_services_deny_foreign_site_and_unsafe_cross_site_opt_in",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_locations",
+          "test": "test_foreign_administrator_cannot_read_or_change_existing_assignments[read]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_locations",
+          "test": "test_foreign_administrator_cannot_read_or_change_existing_assignments[draft]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_locations",
+          "test": "test_foreign_administrator_cannot_read_or_change_existing_assignments[publish]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_preview",
+          "test": "test_unauthorized_and_foreign_previews_do_not_disclose_content",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_preview",
+          "test": "test_public_projection_omits_foreign_and_unpublished_branches",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menus",
+          "test": "test_internal_targets_stay_on_the_site_unless_cross_site_is_explicit",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_multi_site",
+          "test": "test_one_sites_rows_never_appear_in_another_sites_query",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_pages",
+          "test": "test_the_same_route_is_free_in_another_site_or_locale",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_post_media",
+          "test": "test_invalid_media_is_atomic[foreign_featured]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_post_media",
+          "test": "test_invalid_media_is_atomic[foreign_inline]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_post_media",
+          "test": "test_post_public_media_eligibility_and_foreign_host",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_post_working_drafts",
+          "test": "test_reviewer_comments_invalid_states_and_foreign_site_denial",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_posts_api",
+          "test": "test_duplicate_slug_and_cross_site_taxonomy_return_actionable_errors",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_posts_api",
+          "test": "test_post_seo_rejects_markup_limits_and_foreign_site_image[seo0-seo.meta_title]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_posts_api",
+          "test": "test_post_seo_rejects_markup_limits_and_foreign_site_image[seo1-seo.meta_description]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_posts_api",
+          "test": "test_post_seo_rejects_markup_limits_and_foreign_site_image[seo2-seo.og_image_ref]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_posts_api",
+          "test": "test_post_metadata_rejects_foreign_and_inactive_taxonomy[Category-categories]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_posts_api",
+          "test": "test_post_metadata_rejects_foreign_and_inactive_taxonomy[Tag-tags]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_public_news",
+          "test": "test_invalid_or_foreign_scope_queries_are_rejected[page_size=0]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_public_news",
+          "test": "test_invalid_or_foreign_scope_queries_are_rejected[page_size=-1]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_public_news",
+          "test": "test_invalid_or_foreign_scope_queries_are_rejected[page_size=101]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_public_news",
+          "test": "test_invalid_or_foreign_scope_queries_are_rejected[page_size=abc]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_public_news",
+          "test": "test_invalid_or_foreign_scope_queries_are_rejected[page_size=1.5]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_public_news",
+          "test": "test_invalid_or_foreign_scope_queries_are_rejected[page_size=]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_public_news",
+          "test": "test_invalid_or_foreign_scope_queries_are_rejected[page=0]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_public_news",
+          "test": "test_invalid_or_foreign_scope_queries_are_rejected[page=-1]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_public_news",
+          "test": "test_invalid_or_foreign_scope_queries_are_rejected[page=abc]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_public_news",
+          "test": "test_invalid_or_foreign_scope_queries_are_rejected[page_size=2&page_size=3]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_public_news",
+          "test": "test_invalid_or_foreign_scope_queries_are_rejected[site=999]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_public_news",
+          "test": "test_invalid_or_foreign_scope_queries_are_rejected[site_id=999]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_realm_role_authorization",
+          "test": "test_realm_platform_admin_cannot_read_or_mutate_another_site",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_sidebar_widgets",
+          "test": "test_component_schema_and_foreign_reference_rejections_are_atomic[foreign-page]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_sidebar_widgets",
+          "test": "test_component_schema_and_foreign_reference_rejections_are_atomic[duplicate-page]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_sidebar_widgets",
+          "test": "test_component_schema_and_foreign_reference_rejections_are_atomic[unknown-field]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_sidebar_widgets",
+          "test": "test_component_schema_and_foreign_reference_rejections_are_atomic[invalid-limit]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_sidebar_widgets",
+          "test": "test_component_schema_and_foreign_reference_rejections_are_atomic[bool-limit]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_sidebar_widgets",
+          "test": "test_component_schema_and_foreign_reference_rejections_are_atomic[missing-title]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_sidebars",
+          "test": "test_invalid_components_are_atomic_and_field_addressed[foreign]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_sidebars",
+          "test": "test_foreign_assignment_permissions_and_protected_deletion",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_sidebars",
+          "test": "test_assignment_and_definition_validation_never_changes_foreign_or_locked_data",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_widget_runtime",
+          "test": "test_contact_validation_replay_and_foreign_host_have_no_partial_writes",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_widget_runtime",
+          "test": "test_site_logo_configuration_cannot_resolve_foreign_asset",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_media_assets",
+          "test": "test_two_site_selectors_updates_and_reassignment_never_expose_foreign_metadata",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_media_assets",
+          "test": "test_reference_database_rejects_foreign_page_and_asset",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_media_editable_metadata",
+          "test": "test_legacy_name_falls_back_and_protected_or_foreign_edits_are_atomic",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_media_removal",
+          "test": "test_foreign_or_unauthorized_removal_has_no_effect",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_section_templates",
+          "test": "test_foreign_template_insert_leaves_layout_unchanged",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_sprint3_integrated_review",
+          "test": "test_negative_foreign_module_race_and_safe_deletion",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_visual_drafts",
+          "test": "test_foreign_item_failure_has_identity_and_rolls_back_everything",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_visual_layout_media",
+          "test": "test_foreign_visual_media_rejected_before_creating_a_page",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.organizations.tests.test_organization_types",
+          "test": "test_future_unit_foreign_key_can_protect_a_referenced_type",
+          "status": "PASS"
+        }
+      ]
+    },
+    "draft_exposure": {
+      "matched": 43,
+      "failed": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "class": "tests.test_dashboard",
+          "test": "test_foreign_unknown_anonymous_and_query_validation",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_organization_hierarchy_api",
+          "test": "test_hierarchy_anonymous_and_viewer_denied[tree/]",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_organization_hierarchy_api",
+          "test": "test_hierarchy_anonymous_and_viewer_denied[1/children/]",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_organization_hierarchy_api",
+          "test": "test_hierarchy_anonymous_and_viewer_denied[1/ancestors/]",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_organization_hierarchy_api",
+          "test": "test_hierarchy_anonymous_and_viewer_denied[1/descendants/]",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_organization_hierarchy_api",
+          "test": "test_hierarchy_anonymous_and_viewer_denied[1/subtree/]",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_organizations_api",
+          "test": "test_anonymous_denied_before_validation[get-]",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_organizations_api",
+          "test": "test_anonymous_denied_before_validation[post-]",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_organizations_api",
+          "test": "test_anonymous_denied_before_validation[get-1/]",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_organizations_api",
+          "test": "test_anonymous_denied_before_validation[patch-1/]",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_organizations_api",
+          "test": "test_anonymous_denied_before_validation[post-1/archive/]",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_organizations_api",
+          "test": "test_anonymous_denied_before_validation[post-1/deactivate/]",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_site_user_creation",
+          "test": "test_anonymous_denied",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_sites_api",
+          "test": "test_anonymous_and_non_admin_are_rejected[get-/api/v1/sites/]",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_sites_api",
+          "test": "test_anonymous_and_non_admin_are_rejected[post-/api/v1/sites/]",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_sites_api",
+          "test": "test_anonymous_and_non_admin_are_rejected[post-/api/v1/sites/1/domains/]",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_sites_api",
+          "test": "test_anonymous_and_non_admin_are_rejected[get-/api/v1/site-templates/]",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_sites_api",
+          "test": "test_anonymous_and_non_admin_are_rejected[post-/api/v1/modules/]",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_sites_api",
+          "test": "test_anonymous_and_non_admin_are_rejected[get-/api/v1/modules/]",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_workspace",
+          "test": "test_foreign_unknown_anonymous_and_ambiguous_context",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_homepage_assignment",
+          "test": "test_unpublished_selection_uses_empty_fallback_without_other_site_cache_changes",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_delivery",
+          "test": "test_unpublished_targets_and_inactive_branches_are_omitted",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_locations",
+          "test": "test_unpublished_menu_and_stale_versions_do_not_replace_public",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_locations",
+          "test": "test_anonymous_assignment_request_is_denied_without_creating_a_row",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_preview",
+          "test": "test_unpublished_destinations_are_unlinked_in_private_preview_and_absent_publicly",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_preview",
+          "test": "test_public_projection_omits_foreign_and_unpublished_branches",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_page_shell_layouts",
+          "test": "test_draft_layout_is_private_until_reviewed_publication",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_pages",
+          "test": "test_draft_and_hidden_pages_are_not_publicly_served",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_post_working_drafts",
+          "test": "test_post_working_draft_preserves_publication_until_reviewed_promotion",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_public_news",
+          "test": "test_future_drafts_unpublished_and_unsnapshotted_posts_are_excluded",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_public_posts",
+          "test": "test_public_feed_detail_site_taxonomy_draft_and_host_isolation",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_public_posts",
+          "test": "test_draft_metadata_retains_previous_publication_until_workflow_republishes",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_revisions",
+          "test": "test_unpublished_restore_keeps_published_revisions_immutable",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_workflow",
+          "test": "test_approved_published_and_unpublished_content_can_be_archived[APPROVED]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_workflow",
+          "test": "test_approved_published_and_unpublished_content_can_be_archived[PUBLISHED]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_workflow",
+          "test": "test_approved_published_and_unpublished_content_can_be_archived[UNPUBLISHED]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_working_draft",
+          "test": "test_unpublish_archive_and_failed_publication_leave_the_public_snapshot",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_working_draft",
+          "test": "test_post_publication_does_not_use_page_working_drafts",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_central_module_management",
+          "test": "test_site_admins_and_anonymous_callers_cannot_use_central_management",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_visual_drafts",
+          "test": "test_public_snapshot_independent_of_visual_working_draft",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_visual_publication",
+          "test": "test_approved_slides_freeze_while_later_private_draft_and_restore_differ",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_post_workflow_migration",
+          "test": "test_post_working_draft_migration_reverse_and_upgrade_preserve_legacy_publication",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_working_draft",
+          "test": "test_concurrent_working_draft_publication_applies_once",
+          "status": "PASS"
+        }
+      ]
+    },
+    "stored_XSS_safe_rendering": {
+      "matched": 45,
+      "failed": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "class": "tests.test_organization_audit",
+          "test": "test_api_actor_request_peer_and_sanitized_snapshots",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_organization_audit",
+          "test": "test_metadata_only_and_description_only_changes_are_recorded_without_values",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_organization_audit",
+          "test": "test_api_audit_failure_is_sanitized_503_and_rolls_back",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_blocks",
+          "test": "test_malicious_rich_text_is_sanitized_on_write_and_cannot_execute",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_blocks",
+          "test": "test_mutation_via_update_also_persists_the_sanitized_payload",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_category_archives",
+          "test": "test_archive_rejects_invalid_query[tag=<script>]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_layout_contract",
+          "test": "test_database_contract_cases[unsafe-link]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_layout_contract",
+          "test": "test_database_contract_cases[unsafe-style]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_api",
+          "test": "test_unsafe_targets_return_typed_errors_without_writes[javascript:alert(1)]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_api",
+          "test": "test_unsafe_targets_return_typed_errors_without_writes[data:text/html,bad]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_api",
+          "test": "test_unsafe_targets_return_typed_errors_without_writes[//evil.example]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_api",
+          "test": "test_unsafe_targets_return_typed_errors_without_writes[https://example.com/%0d%0aLocation:evil]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_integrity",
+          "test": "test_unsafe_urls_fail_model_and_database_validation[https://example.com/%0d%0aLocation:evil]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_integrity",
+          "test": "test_unsafe_urls_fail_model_and_database_validation[https://example.com/%00]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_integrity",
+          "test": "test_unsafe_urls_fail_model_and_database_validation[https://example.com/%250a]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_integrity",
+          "test": "test_unsafe_urls_fail_model_and_database_validation[https://example.com/%5c/evil]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_integrity",
+          "test": "test_unsafe_urls_fail_model_and_database_validation[https://example.com/%]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_integrity",
+          "test": "test_unsafe_urls_fail_model_and_database_validation[https://example.com:99999/path]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_integrity",
+          "test": "test_unsafe_urls_fail_model_and_database_validation[https://user@example.com]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_integrity",
+          "test": "test_unsafe_urls_fail_model_and_database_validation[javascript:alert(1)]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_integrity",
+          "test": "test_unsafe_urls_fail_model_and_database_validation[data:text/html,bad]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_integrity",
+          "test": "test_unsafe_urls_fail_model_and_database_validation[//example.com]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_integrity",
+          "test": "test_unsafe_urls_fail_model_and_database_validation[https://example.com/\\x1f]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_integrity",
+          "test": "test_unsafe_urls_fail_model_and_database_validation[https://example.com/\\x7f]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_integrity",
+          "test": "test_unsafe_urls_fail_model_and_database_validation[https://example.com\\\\@evil.com]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_integrity",
+          "test": "test_unsafe_urls_fail_model_and_database_validation[https://[invalid]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_integrity",
+          "test": "test_unsafe_urls_fail_model_and_database_validation[https://example.com:abc]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_integrity",
+          "test": "test_unsafe_urls_fail_model_and_database_validation[ https://example.com]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_integrity",
+          "test": "test_authorized_services_deny_foreign_site_and_unsafe_cross_site_opt_in",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menus",
+          "test": "test_external_urls_reject_unsafe_schemes_and_redirects[javascript:alert(1)]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menus",
+          "test": "test_external_urls_reject_unsafe_schemes_and_redirects[data:text/html,hi]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menus",
+          "test": "test_external_urls_reject_unsafe_schemes_and_redirects[vbscript:msgbox(1)]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menus",
+          "test": "test_external_urls_reject_unsafe_schemes_and_redirects[file:///etc/passwd]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menus",
+          "test": "test_external_urls_reject_unsafe_schemes_and_redirects[//evil.example/path]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menus",
+          "test": "test_external_urls_reject_unsafe_schemes_and_redirects[https://user:secret@example.com/path]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menus",
+          "test": "test_external_urls_reject_unsafe_schemes_and_redirects[https://example.com/path\\r\\nLocation: https://evil.example]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menus",
+          "test": "test_external_urls_reject_unsafe_schemes_and_redirects[http://example.com/a b]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_page_shell_layouts",
+          "test": "test_unknown_layout_does_not_persist[<script>]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_posts_api",
+          "test": "test_article_title_sanitization_and_legacy_compatibility",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_posts_api",
+          "test": "test_post_seo_rejects_markup_limits_and_foreign_site_image[seo1-seo.meta_description]",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_visual_drafts",
+          "test": "test_hostile_visual_writes_are_rejected_atomically[script-url]",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_visual_drafts",
+          "test": "test_hostile_visual_writes_are_rejected_atomically[style-token]",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_visual_drafts",
+          "test": "test_hostile_visual_writes_are_rejected_atomically[unexpected-property]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_layout_contract",
+          "test": "test_shared_contract_cases[unsafe-link]",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_layout_contract",
+          "test": "test_shared_contract_cases[unsafe-style]",
+          "status": "PASS"
+        }
+      ]
+    },
+    "module_disable": {
+      "matched": 14,
+      "failed": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "class": "apps.cms.tests.test_menu_api",
+          "test": "test_disabled_module_blocks_api_mutations_but_not_admin_inspection",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_delivery",
+          "test": "test_disabled_module_hides_public_menus_without_deleting_rows",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_destinations",
+          "test": "test_news_category_options_scope_and_disabled_module",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_directory",
+          "test": "test_unauthorized_and_module_disabled_requests_cannot_create_or_retire",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_integrity",
+          "test": "test_disabled_module_denies_all_mutations_but_retains_records",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_locations",
+          "test": "test_role_module_gate_and_audit",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_menu_preview",
+          "test": "test_disabled_module_blocks_private_and_public_and_extra_scope_parameters_are_rejected",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_page_shell_layouts",
+          "test": "test_permissions_site_and_module_gates_precede_layout_changes",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_post_working_drafts",
+          "test": "test_preview_working_copy_and_review_are_scoped_and_module_gated",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_posts_api",
+          "test": "test_article_site_permission_and_module_gates",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_public_posts",
+          "test": "test_post_publication_pagination_cache_and_disabled_module",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_public_site_hosts",
+          "test": "test_main_and_two_colleges_stay_isolated_through_publish_and_module_gates",
+          "status": "PASS"
+        },
+        {
+          "class": "apps.cms.tests.test_sidebars",
+          "test": "test_changed_dependency_blocks_publication_and_module_gate_hides_cached_sidebar",
+          "status": "PASS"
+        },
+        {
+          "class": "tests.test_visual_drafts",
+          "test": "test_reviewer_cannot_save_and_disabled_pages_rejects_draft_writes",
+          "status": "PASS"
+        }
+      ]
+    }
+  }
+}

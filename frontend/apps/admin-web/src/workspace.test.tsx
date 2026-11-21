@@ -73,8 +73,9 @@ it("keeps an unsaved editor mounted during successful same-Site revalidation", a
 it("loads discovery only on open, pages explicitly and rejects stale search results", async () => {
   request.mockImplementation(async (url: string) => url.includes("/sites/?") ? Response.json({count: 21, results: [{id: 2, name: "Medicine"}]}) : Response.json(fixture(1)));
   render(<WorkspaceProvider><Switcher/></WorkspaceProvider>);
-  const button = screen.getByRole("button", {name: "Workspace"});
+  const button = screen.getByRole("button", {name: /^Workspace:/});
   await waitFor(() => expect(button).toHaveProperty("disabled", false));
+  expect(button.getAttribute("aria-label")).toContain(button.textContent!.trim());
   expect(request).toHaveBeenCalledTimes(1);
   fireEvent.click(button);
   await screen.findByRole("button", {name: "Medicine"});

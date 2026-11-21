@@ -1,0 +1,8 @@
+{
+  "workspace_enter": true,
+  "workspace_escape_and_focus_restoration": true,
+  "upload_enter": true,
+  "upload_space": true,
+  "cancel_no_upload": true,
+  "editorial_writes": false
+}

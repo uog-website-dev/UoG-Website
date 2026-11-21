@@ -220,18 +220,25 @@ describe("Visual Builder workspace",()=>{
     expect(open).not.toHaveBeenCalled();
   });
   it("undo and redo restore layout order and selection, and a divergent edit clears redo",async()=>{
-    const user=userEvent.setup();load.mockResolvedValue({ok:true,data:record({metadata:{visual_layout:starterLayout()}})});
-    render(<VisualBuilder {...props}/>);
+    const user=userEvent.setup(),tree=starterLayout();load.mockResolvedValue({ok:true,data:record({metadata:{visual_layout:tree}})});
+    const {container}=render(<VisualBuilder {...props}/>);
+    const ids=tree.rows.map(row=>row.id);
+    const order=()=>Array.from(container.querySelectorAll("[data-node-id]")).map(node=>node.getAttribute("data-node-id")).filter(id=>ids.includes(id!));
     await user.click(await screen.findByRole("tab",{name:"Structure"}));
     await user.click((await screen.findAllByRole("button",{name:/Select Headline/}))[0]!);
     expect((screen.getByRole("textbox",{name:"Text"}) as HTMLInputElement).value).toBe("Welcome to your Site");
-    await user.click(screen.getByText("Row layout controls"));
-    await user.click(screen.getByRole("button",{name:"Move row 2 up"}));
-    await user.click(screen.getByRole("button",{name:"Undo"}));
+    fireEvent.click(screen.getByText("Row layout controls"));
+    await waitFor(()=>expect(order()).toEqual(ids));
+    fireEvent.click(screen.getByRole("button",{name:"Move row 2 up"}));
+    await waitFor(()=>expect(order()).toEqual([ids[1],ids[0],...ids.slice(2)]));
+    fireEvent.click(screen.getByRole("button",{name:"Undo"}));
+    await waitFor(()=>expect(order()).toEqual(ids));
     expect((screen.getByRole("button",{name:"Redo"}) as HTMLButtonElement).disabled).toBe(false);
-    await user.click(screen.getByRole("button",{name:"Redo"}));
-    await user.click(screen.getByRole("button",{name:"Undo"}));
-    await user.click(screen.getAllByRole("button",{name:"Add row"})[0]!);
+    fireEvent.click(screen.getByRole("button",{name:"Redo"}));
+    await waitFor(()=>expect(order()).toEqual([ids[1],ids[0],...ids.slice(2)]));
+    fireEvent.click(screen.getByRole("button",{name:"Undo"}));
+    await waitFor(()=>expect(order()).toEqual(ids));
+    fireEvent.click(screen.getAllByRole("button",{name:"Add row"})[0]!);
     expect((screen.getByRole("button",{name:"Redo"}) as HTMLButtonElement).disabled).toBe(true);
   });
   it("keeps Ctrl+Z for the builder outside inspector fields and clears history on Page switch",async()=>{

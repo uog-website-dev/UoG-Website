@@ -1,0 +1,29 @@
+{
+  "backend": {
+    "tests": 1185,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "frontend": {
+    "tests": 1057,
+    "passed": 1057,
+    "failed": 0,
+    "admin_executed": 672,
+    "unchanged_api_client_and_ui_cache_hits": 385
+  },
+  "automated_wcag_scans": {
+    "passed": 32,
+    "failed": 0,
+    "manual_review": "PENDING"
+  },
+  "typecheck": "PASS",
+  "builds": {
+    "admin": 0,
+    "public": 0,
+    "isolated": true
+  },
+  "release_gate": "NO_GO_EXTERNAL_EVIDENCE_AND_APPROVALS_PENDING",
+  "original_evidence": "../README.md",
+  "worktree_status": "Uncommitted remediation; no release approval claimed"
+}

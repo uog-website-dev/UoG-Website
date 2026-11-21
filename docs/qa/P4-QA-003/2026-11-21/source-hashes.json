@@ -1,0 +1,10 @@
+{
+  ".github/workflows/regression.yml": "e6303020fe89ec80c2643da95fc533df2bbe5b9e58284681417be5c62b32a0b8",
+  "azure-pipelines.yml": "23fc14f42a2eed2e5fe4b4c6524aa3e8448c55a7a2508e322628e0f1c798b293",
+  "scripts/qa-release-a11y.cjs": "b480c27be596c5b3a12229a683816b5bc48516668529245026c5f31b6d6fceab",
+  "scripts/qa-release-gate.py": "5be2c112c50b06038473669152e9349acac3b4947af4d3a136ba76db2bd35709",
+  "scripts/qa-release-gate.test.py": "921a39c8d5ee021522d10d759c1b70355f5e4fb3eabb3f34adc5868ca056c8f0",
+  "scripts/qa-release-inventory.py": "cb16a13b3329319267ab46de40578f7180a27b944875835a733acc971fc94c96",
+  "scripts/qa-release-report.py": "8b83508a914eda84ac66316af389ba9d7be2667d251b88cda8675f9b4d4f26e2",
+  "scripts/qa-release-session.py": "031e8c66c096a6ecf96fb1208ca2fd6d9735a8c550bfd5a78a552435afa7120c"
+}

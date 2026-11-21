@@ -1,0 +1,461 @@
+{
+  "run": "p4gate-e3fee806",
+  "browser": "158.0.4370.33",
+  "axe": "4.14.0",
+  "target": "WCAG 2.1 A/AA automated subset; human audit and screen-reader review pending",
+  "excluded": "Next.js development portal only",
+  "rows": [
+    {
+      "route": "main-home",
+      "width": 1440,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "nodes": 1
+        },
+        {
+          "id": "color-contrast",
+          "nodes": 2
+        }
+      ],
+      "passes": 24,
+      "documentWidth": 1440
+    },
+    {
+      "route": "main-home",
+      "width": 390,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "nodes": 1
+        },
+        {
+          "id": "color-contrast",
+          "nodes": 2
+        }
+      ],
+      "passes": 25,
+      "documentWidth": 390
+    },
+    {
+      "route": "main-news",
+      "width": 1440,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 2
+        }
+      ],
+      "passes": 27,
+      "documentWidth": 1440
+    },
+    {
+      "route": "main-news",
+      "width": 390,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 2
+        }
+      ],
+      "passes": 27,
+      "documentWidth": 390
+    },
+    {
+      "route": "main-article",
+      "width": 1440,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [],
+      "passes": 24,
+      "documentWidth": 1440
+    },
+    {
+      "route": "main-article",
+      "width": 390,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [],
+      "passes": 25,
+      "documentWidth": 390
+    },
+    {
+      "route": "main-sidebar",
+      "width": 1440,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [],
+      "passes": 23,
+      "documentWidth": 1440
+    },
+    {
+      "route": "main-sidebar",
+      "width": 390,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [],
+      "passes": 24,
+      "documentWidth": 390
+    },
+    {
+      "route": "college-home",
+      "width": 1440,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "nodes": 1
+        },
+        {
+          "id": "color-contrast",
+          "nodes": 2
+        }
+      ],
+      "passes": 24,
+      "documentWidth": 1440
+    },
+    {
+      "route": "college-home",
+      "width": 390,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "nodes": 1
+        },
+        {
+          "id": "color-contrast",
+          "nodes": 2
+        }
+      ],
+      "passes": 25,
+      "documentWidth": 390
+    },
+    {
+      "route": "college-news",
+      "width": 1440,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 2
+        }
+      ],
+      "passes": 27,
+      "documentWidth": 1440
+    },
+    {
+      "route": "college-news",
+      "width": 390,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 2
+        }
+      ],
+      "passes": 27,
+      "documentWidth": 390
+    },
+    {
+      "route": "college-article",
+      "width": 1440,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [],
+      "passes": 24,
+      "documentWidth": 1440
+    },
+    {
+      "route": "college-article",
+      "width": 390,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [],
+      "passes": 25,
+      "documentWidth": 390
+    },
+    {
+      "route": "college-sidebar",
+      "width": 1440,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [],
+      "passes": 23,
+      "documentWidth": 1440
+    },
+    {
+      "route": "college-sidebar",
+      "width": 390,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [],
+      "passes": 24,
+      "documentWidth": 390
+    },
+    {
+      "route": "main-admin-pages-new",
+      "width": 1440,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 6
+        }
+      ],
+      "passes": 28,
+      "documentWidth": 1440
+    },
+    {
+      "route": "main-admin-pages-new",
+      "width": 390,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 5
+        }
+      ],
+      "passes": 27,
+      "documentWidth": 390
+    },
+    {
+      "route": "main-admin-posts-new",
+      "width": 1440,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "nodes": 8
+        },
+        {
+          "id": "color-contrast",
+          "nodes": 7
+        }
+      ],
+      "passes": 28,
+      "documentWidth": 1440
+    },
+    {
+      "route": "main-admin-posts-new",
+      "width": 390,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "nodes": 8
+        },
+        {
+          "id": "color-contrast",
+          "nodes": 4
+        }
+      ],
+      "passes": 27,
+      "documentWidth": 390
+    },
+    {
+      "route": "main-admin-menus",
+      "width": 1440,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "nodes": 1
+        },
+        {
+          "id": "color-contrast",
+          "nodes": 1
+        }
+      ],
+      "passes": 28,
+      "documentWidth": 1440
+    },
+    {
+      "route": "main-admin-menus",
+      "width": 390,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "nodes": 1
+        },
+        {
+          "id": "color-contrast",
+          "nodes": 1
+        }
+      ],
+      "passes": 27,
+      "documentWidth": 390
+    },
+    {
+      "route": "college-admin-pages-new",
+      "width": 1440,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 6
+        }
+      ],
+      "passes": 28,
+      "documentWidth": 1440
+    },
+    {
+      "route": "college-admin-pages-new",
+      "width": 390,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 4
+        }
+      ],
+      "passes": 27,
+      "documentWidth": 390
+    },
+    {
+      "route": "college-admin-posts-new",
+      "width": 1440,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 5
+        }
+      ],
+      "passes": 28,
+      "documentWidth": 1440
+    },
+    {
+      "route": "college-admin-posts-new",
+      "width": 390,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "nodes": 8
+        },
+        {
+          "id": "color-contrast",
+          "nodes": 4
+        }
+      ],
+      "passes": 27,
+      "documentWidth": 390
+    },
+    {
+      "route": "college-admin-menus",
+      "width": 1440,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "nodes": 1
+        },
+        {
+          "id": "color-contrast",
+          "nodes": 1
+        }
+      ],
+      "passes": 28,
+      "documentWidth": 1440
+    },
+    {
+      "route": "college-admin-menus",
+      "width": 390,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "aria-prohibited-attr",
+          "nodes": 1
+        },
+        {
+          "id": "color-contrast",
+          "nodes": 1
+        }
+      ],
+      "passes": 27,
+      "documentWidth": 390
+    },
+    {
+      "route": "main-admin-media",
+      "width": 1440,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 2
+        }
+      ],
+      "passes": 29,
+      "documentWidth": 1440
+    },
+    {
+      "route": "main-admin-media",
+      "width": 390,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 2
+        }
+      ],
+      "passes": 29,
+      "documentWidth": 390
+    },
+    {
+      "route": "college-admin-media",
+      "width": 1440,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 2
+        }
+      ],
+      "passes": 29,
+      "documentWidth": 1440
+    },
+    {
+      "route": "college-admin-media",
+      "width": 390,
+      "status": "AUTOMATED_PASS",
+      "violations": [],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 2
+        }
+      ],
+      "passes": 29,
+      "documentWidth": 390
+    }
+  ]
+}

@@ -158,7 +158,7 @@ function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, imag
       <Box><Typography variant="h5" component="h2" fontWeight={600}>{onSelect ? "Choose media" : "Media Library"}</Typography><Typography variant="body2" color="text.secondary" sx={{mt:0.5}}>Your Site's images and documents, in one place.</Typography></Box>
       {canUpload && policy.data ? <Button variant="contained" disabled={uploadBusy || !uploadReady} startIcon={<CloudUploadOutlinedIcon />} onClick={() => uploadInput.current?.click()}>Upload files</Button> : null}
     </Box>
-    {canUpload ? <Box sx={{minHeight:190}}>{policy.data ? <MediaUploadPanel siteId={siteId} policy={policy.data} inputRef={uploadInput} onReady={setUploadReady} onBusyChange={setUploadBusy} onAccepted={() => { setWatchUntil(Date.now()+120000); setPage(1); rows.reload(); }} /> : policy.error ? <Alert severity="error" sx={{minHeight:190}} action={<Button onClick={policy.reload}>Retry upload policy</Button>}>Upload policy unavailable.</Alert> : <Skeleton aria-label="Loading upload policy" variant="rounded" height={190}/>}</Box> : null}
+    {canUpload ? <Box sx={{minHeight:190}}>{policy.data ? <MediaUploadPanel siteId={siteId} policy={policy.data} inputRef={uploadInput} onReady={setUploadReady} onBusyChange={setUploadBusy} onAccepted={() => { setWatchUntil(Date.now()+120000); setPage(1); rows.reload(); }} /> : policy.error ? <Alert severity="error" sx={{minHeight:190}} action={<Button onClick={policy.reload}>Retry upload policy</Button>}>Upload policy unavailable.</Alert> : <Skeleton role="status" aria-label="Loading upload policy" variant="rounded" height={190}/>}</Box> : null}
     <Box component="form" role="search" aria-label="Search Site media" onSubmit={(event) => {
       event.preventDefault(); setFilters({ search, ...(status ? { status } : {}), ...(type ? { type } : {}) }); setPage(1);
     }} sx={{ display: "flex", gap: 1.5, flexWrap: "wrap", bgcolor:"background.paper", p:2, borderRadius:2, boxShadow:1, alignItems:"center" }}>
@@ -202,7 +202,7 @@ function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, imag
           {asset.processing_state === "FAILED" ? <Typography role="status" variant="caption" color="error">Processing failed: {asset.processing_error_code || "Validation failed"}.</Typography> : null}
           <Typography variant="caption" color="text.secondary" sx={{whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>Alt text: {asset.alt_text || "Not set"}</Typography>
           <Box sx={{display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:1,mt:"auto"}}>
-            <Button size="small" aria-label={`Details for ${asset.original_filename}`} onClick={() => { altTextDirty.current=false; setDetailId(asset.id); setMetadataError(null); setMetadataNotice(null); }}>Edit details</Button>
+            <Button size="small" aria-label={`Edit details for ${asset.original_filename}`} onClick={() => { altTextDirty.current=false; setDetailId(asset.id); setMetadataError(null); setMetadataNotice(null); }}>Edit details</Button>
             {onSelect ? <Button variant="contained" size="small" disabled={rows.refreshing || Boolean(rows.error) || failedPreviews.has(previewKey(asset))} onClick={() => onSelect(asset)}>Select {asset.original_filename}</Button> : null}
           </Box>
         </Box>
