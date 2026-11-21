@@ -1,0 +1,651 @@
+{
+  "run": "collegeqa-b5e2f44c",
+  "rows": [
+    {
+      "case": "admin: GET foreign MAIN pages",
+      "status": 403,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "admin: PATCH foreign MAIN pages",
+      "status": 403,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "admin: foreign pages ID in own Site path",
+      "status": 404,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "admin: GET foreign MAIN posts",
+      "status": 403,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "admin: PATCH foreign MAIN posts",
+      "status": 403,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "admin: foreign posts ID in own Site path",
+      "status": 404,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "admin: GET foreign MAIN menus",
+      "status": 403,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "admin: PATCH foreign MAIN menus",
+      "status": 403,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "admin: foreign menus ID in own Site path",
+      "status": 404,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "admin: GET foreign MAIN sidebars",
+      "status": 403,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "admin: PATCH foreign MAIN sidebars",
+      "status": 403,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "admin: foreign sidebars ID in own Site path",
+      "status": 404,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "admin: GET foreign MAIN assets",
+      "status": 403,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "admin: PATCH foreign MAIN assets",
+      "status": 403,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "admin: foreign assets ID in own Site path",
+      "status": 404,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "admin: assign foreign Site homepage",
+      "status": 403,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "admin: assign foreign Page as own homepage",
+      "status": 404,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "main-observer: GET foreign CAES pages",
+      "status": 403,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "main-observer: PATCH foreign CAES pages",
+      "status": 403,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "main-observer: foreign pages ID in own Site path",
+      "status": 404,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "main-observer: GET foreign CAES posts",
+      "status": 403,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "main-observer: PATCH foreign CAES posts",
+      "status": 403,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "main-observer: foreign posts ID in own Site path",
+      "status": 404,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "main-observer: GET foreign CAES menus",
+      "status": 403,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "main-observer: PATCH foreign CAES menus",
+      "status": 403,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "main-observer: foreign menus ID in own Site path",
+      "status": 404,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "main-observer: GET foreign CAES sidebars",
+      "status": 403,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "main-observer: PATCH foreign CAES sidebars",
+      "status": 403,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "main-observer: foreign sidebars ID in own Site path",
+      "status": 404,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "main-observer: GET foreign CAES assets",
+      "status": 403,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "main-observer: PATCH foreign CAES assets",
+      "status": 403,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "main-observer: foreign assets ID in own Site path",
+      "status": 404,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "main-observer: assign foreign Site homepage",
+      "status": 403,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "main-observer: assign foreign Page as own homepage",
+      "status": 404,
+      "expected_status": [
+        403,
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "Authorized college create with forged Main asset ID",
+      "status": 400,
+      "expected_status": [
+        400
+      ],
+      "pass": true
+    },
+    {
+      "case": "Authorized college sidebar create with Main menu ID",
+      "status": 400,
+      "expected_status": [
+        400
+      ],
+      "pass": true
+    },
+    {
+      "case": "Authorized college Page create with Main sidebar ID",
+      "status": 400,
+      "expected_status": [
+        400
+      ],
+      "pass": true
+    },
+    {
+      "case": "Disabled college POSTS blocks direct create",
+      "status": 400,
+      "expected_status": [
+        400
+      ],
+      "pass": true
+    },
+    {
+      "case": "unknown hostname /api/v1/site-context/",
+      "status": 404,
+      "expected_status": [
+        404
+      ],
+      "pass": true
+    },
+    {
+      "case": "unknown hostname /api/v1/site-context/homepage/",
+      "status": 404,
+      "expected_status": [
+        404
+      ],
+      "pass": true
+    }
+  ],
+  "all_pass": true,
+  "rejected_writes_atomic": true,
+  "trace": [
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/17/pages/556e24dc-7110-4e24-bc4a-06665db51934/",
+      "status": 200,
+      "request_id": "85f0659e-e2d0-4804-8ba5-e55d127cb9bb"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/17/pages/556e24dc-7110-4e24-bc4a-06665db51934/",
+      "status": 403,
+      "request_id": "3f2d79f5-ea4a-49ba-8088-36927ec2ff1c"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/sites/17/pages/556e24dc-7110-4e24-bc4a-06665db51934/",
+      "status": 403,
+      "request_id": "feafc453-1611-46ee-bd0f-21c5a880f83d"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/19/pages/556e24dc-7110-4e24-bc4a-06665db51934/",
+      "status": 404,
+      "request_id": "e9551f95-f82a-4c2b-acfc-23394352cd8c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/17/posts/b45dd70a-8329-440e-9884-54fb4e7b6fc0/",
+      "status": 200,
+      "request_id": "5ef9957f-e31d-46a0-923b-10ac0b7fbf34"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/17/posts/b45dd70a-8329-440e-9884-54fb4e7b6fc0/",
+      "status": 403,
+      "request_id": "99f1c534-bc03-4cd6-93d7-2209474adaa0"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/sites/17/posts/b45dd70a-8329-440e-9884-54fb4e7b6fc0/",
+      "status": 403,
+      "request_id": "0c71eca9-a910-4f75-a6b2-7c9f5b715f3b"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/19/posts/b45dd70a-8329-440e-9884-54fb4e7b6fc0/",
+      "status": 404,
+      "request_id": "c2b7c534-616a-49d3-bd8b-b9aebb7c5e95"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/17/menus/4a17da5b-1769-4341-8957-9de883c53ec9/",
+      "status": 200,
+      "request_id": "92c409d2-5bda-4371-a4cc-386a66e733d3"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/17/menus/4a17da5b-1769-4341-8957-9de883c53ec9/",
+      "status": 403,
+      "request_id": "fe782a21-e5d6-4a15-9bc6-3c80cdaf7aeb"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/sites/17/menus/4a17da5b-1769-4341-8957-9de883c53ec9/",
+      "status": 403,
+      "request_id": "2bd72598-446f-4fd6-8fc9-9be7d4cb7a2f"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/19/menus/4a17da5b-1769-4341-8957-9de883c53ec9/",
+      "status": 404,
+      "request_id": "1cb63990-1441-4477-a9b0-945607eb2fd0"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/17/sidebars/ea9254b4-1a70-4c8e-b99c-5289cc33b785/",
+      "status": 200,
+      "request_id": "b438aa15-e8ba-4453-8f44-b98101dc5f70"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/17/sidebars/ea9254b4-1a70-4c8e-b99c-5289cc33b785/",
+      "status": 403,
+      "request_id": "e8ecc474-8ceb-4ff1-b010-c67e71101509"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/sites/17/sidebars/ea9254b4-1a70-4c8e-b99c-5289cc33b785/",
+      "status": 403,
+      "request_id": "30e65dd1-7b0a-4d44-8c33-e3437eb94996"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/19/sidebars/ea9254b4-1a70-4c8e-b99c-5289cc33b785/",
+      "status": 404,
+      "request_id": "18293f10-d1ec-49d9-9070-17cb250600de"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/17/assets/fd88bd06-a48b-47ec-b73b-8d5772001c53/",
+      "status": 200,
+      "request_id": "df498cf8-5f72-4707-b814-db0a4ad9e65e"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/17/assets/fd88bd06-a48b-47ec-b73b-8d5772001c53/",
+      "status": 403,
+      "request_id": "0b0a2259-4126-44f7-835a-91f267b3ce3a"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/sites/17/assets/fd88bd06-a48b-47ec-b73b-8d5772001c53/",
+      "status": 403,
+      "request_id": "97fd1f58-21ca-4216-8d78-48bf963c26aa"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/19/assets/fd88bd06-a48b-47ec-b73b-8d5772001c53/",
+      "status": 404,
+      "request_id": "08c5ce49-307d-4468-9031-ecf0c1b53ed2"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/sites/17/pages/556e24dc-7110-4e24-bc4a-06665db51934/homepage/",
+      "status": 403,
+      "request_id": "d804cad2-d731-44a5-a8e1-0d1e1cbcd6af"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/sites/19/pages/556e24dc-7110-4e24-bc4a-06665db51934/homepage/",
+      "status": 404,
+      "request_id": "f87744b0-2042-4023-9e43-c3dd01652ec5"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/19/pages/378a0ec9-cbd0-497a-9ce6-c55be86c602e/",
+      "status": 200,
+      "request_id": "2de6efad-d361-4fcc-acf4-c1cde15447cf"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/19/pages/378a0ec9-cbd0-497a-9ce6-c55be86c602e/",
+      "status": 403,
+      "request_id": "d622616d-0d9f-4926-bcc9-45020b5a187e"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/sites/19/pages/378a0ec9-cbd0-497a-9ce6-c55be86c602e/",
+      "status": 403,
+      "request_id": "97164f39-baba-459e-94ad-a8e984803838"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/17/pages/378a0ec9-cbd0-497a-9ce6-c55be86c602e/",
+      "status": 404,
+      "request_id": "862e51e1-d264-4084-8d8c-718978288718"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/19/posts/a8a51a84-d677-45f5-8ccf-28dca0fe2468/",
+      "status": 200,
+      "request_id": "40cb2041-af15-47aa-a20b-a9a44909f5b9"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/19/posts/a8a51a84-d677-45f5-8ccf-28dca0fe2468/",
+      "status": 403,
+      "request_id": "aa82033b-fd2b-4412-a8d9-a73a2137d02e"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/sites/19/posts/a8a51a84-d677-45f5-8ccf-28dca0fe2468/",
+      "status": 403,
+      "request_id": "5f596259-061d-4a8c-91af-66f3bb21270e"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/17/posts/a8a51a84-d677-45f5-8ccf-28dca0fe2468/",
+      "status": 404,
+      "request_id": "2f908c88-f602-4286-943a-72a034daab30"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/19/menus/59bac7ca-945e-403d-bb3b-e9929375adce/",
+      "status": 200,
+      "request_id": "e0695b65-85a8-418e-ba6a-3fd0ab7bb4b9"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/19/menus/59bac7ca-945e-403d-bb3b-e9929375adce/",
+      "status": 403,
+      "request_id": "60376b41-caa4-48e1-a1fc-05a93e2700f0"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/sites/19/menus/59bac7ca-945e-403d-bb3b-e9929375adce/",
+      "status": 403,
+      "request_id": "118931f5-1280-40f4-808c-0c2ef36270b9"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/17/menus/59bac7ca-945e-403d-bb3b-e9929375adce/",
+      "status": 404,
+      "request_id": "3658f203-edb9-415c-a0b3-9c2aef92890c"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/19/sidebars/a6fd4177-044c-4b55-8d45-0ff84ad7299d/",
+      "status": 200,
+      "request_id": "ce520a09-e3bc-4e58-a42f-f7a52bb4fd93"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/19/sidebars/a6fd4177-044c-4b55-8d45-0ff84ad7299d/",
+      "status": 403,
+      "request_id": "9db7071b-d398-4c4d-a838-a0b0a9385229"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/sites/19/sidebars/a6fd4177-044c-4b55-8d45-0ff84ad7299d/",
+      "status": 403,
+      "request_id": "f480d2d3-dee8-4fcf-8d14-041f3bd0230e"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/17/sidebars/a6fd4177-044c-4b55-8d45-0ff84ad7299d/",
+      "status": 404,
+      "request_id": "56d7d843-2b90-44b6-914f-228e454adcd2"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/19/assets/160dc1e3-5109-4586-b5c4-8b8187aa4f1e/",
+      "status": 200,
+      "request_id": "38b478d9-9b15-4293-860d-ab0c8bf337f4"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/19/assets/160dc1e3-5109-4586-b5c4-8b8187aa4f1e/",
+      "status": 403,
+      "request_id": "078b7188-683e-4e46-aab9-8ebb2bd43619"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/sites/19/assets/160dc1e3-5109-4586-b5c4-8b8187aa4f1e/",
+      "status": 403,
+      "request_id": "a8ad835e-2521-4aa3-bed4-24d5622ab6c9"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sites/17/assets/160dc1e3-5109-4586-b5c4-8b8187aa4f1e/",
+      "status": 404,
+      "request_id": "a8ac91cf-908f-4b67-a723-0302907fc3af"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/sites/19/pages/cecb0ef4-e593-4dc2-9d4e-5edd4c0987b8/homepage/",
+      "status": 403,
+      "request_id": "4d0db6f0-e57c-45c1-9396-3de4f9cdbbec"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/sites/17/pages/cecb0ef4-e593-4dc2-9d4e-5edd4c0987b8/homepage/",
+      "status": 404,
+      "request_id": "55ad3a2b-fceb-42e6-9d6d-bf0f6b9db8a6"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/sites/19/posts/",
+      "status": 400,
+      "request_id": "d1232875-935f-4b7e-a801-e6f8a34e02fe"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/sites/19/sidebars/",
+      "status": 400,
+      "request_id": "1cc09ca3-56a0-4f58-8b24-aba6d0a65ee2"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/sites/19/pages/",
+      "status": 400,
+      "request_id": "f97526cf-ce04-4b7a-8975-f7d9479414bf"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/sites/19/posts/",
+      "status": 400,
+      "request_id": "6751f881-2b6c-439c-aedd-ebd6563dafc6"
+    }
+  ]
+}

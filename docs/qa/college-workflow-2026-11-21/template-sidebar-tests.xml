@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="15" failures="0" errors="0" time="10.794336783">
+    <testsuite name="src/sites/homepage-template-catalogue.test.tsx" timestamp="2026-11-21T10:13:13.114Z" hostname="ff47f131e439" tests="9" failures="0" errors="0" skipped="0" time="4.998105891">
+        <testcase classname="src/sites/homepage-template-catalogue.test.tsx" name="browses three templates and responsive non-mutating previews with keyboard focus" time="1.376161162">
+        </testcase>
+        <testcase classname="src/sites/homepage-template-catalogue.test.tsx" name="requires explicit selection and confirmation and returns a prepared unsaved document" time="0.561165232">
+        </testcase>
+        <testcase classname="src/sites/homepage-template-catalogue.test.tsx" name="shows unavailable reasons and never enables incompatible template selection" time="0.089677141">
+        </testcase>
+        <testcase classname="src/sites/homepage-template-catalogue.test.tsx" name="blocks unauthorized users before fetching" time="0.020108457">
+        </testcase>
+        <testcase classname="src/sites/homepage-template-catalogue.test.tsx" name="clears former Site data and ignores stale responses" time="0.210771695">
+        </testcase>
+        <testcase classname="src/sites/homepage-template-catalogue.test.tsx" name="keeps the canvas unchanged on prepare failure and supports retry" time="0.625054198">
+        </testcase>
+        <testcase classname="src/sites/homepage-template-catalogue.test.tsx" name="loads a real approved layout through the shared renderer" time="0.197841718">
+        </testcase>
+        <testcase classname="src/sites/homepage-template-catalogue.test.tsx" name="requires confirmation before applying a template as a new Page draft and opens the result" time="0.847165575">
+        </testcase>
+        <testcase classname="src/sites/homepage-template-catalogue.test.tsx" name="fetches a fresh revision tag before replacing an existing draft" time="1.065341409">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/sites/site-sidebars.test.tsx" timestamp="2026-11-21T10:13:13.127Z" hostname="ff47f131e439" tests="6" failures="0" errors="0" skipped="0" time="5.796230892">
+        <testcase classname="src/sites/site-sidebars.test.tsx" name="creates a named sidebar using an existing Menu reference" time="2.536849971">
+        </testcase>
+        <testcase classname="src/sites/site-sidebars.test.tsx" name="requires a name and component, without discarding the form" time="0.382431308">
+        </testcase>
+        <testcase classname="src/sites/site-sidebars.test.tsx" name="retains edits after a rejected save and supplies the current version" time="0.833771702">
+        </testcase>
+        <testcase classname="src/sites/site-sidebars.test.tsx" name="excludes stale results after a Site change" time="0.383576672">
+        </testcase>
+        <testcase classname="src/sites/site-sidebars.test.tsx" name="offers no write controls to a read-only user and gates Menu use" time="0.224361229">
+        </testcase>
+        <testcase classname="src/sites/site-sidebars.test.tsx" name="configures and reorders approved content sources without requiring MENUS" time="1.430203004">
+        </testcase>
+    </testsuite>
+</testsuites>

@@ -1,0 +1,80 @@
+{
+  "base_commit": "72ab91847c5d02d4f518521547111a1d4033bcf5",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "browser": "Edge headless via Playwright",
+  "desktop": [
+    1440,
+    1000
+  ],
+  "mobile": [
+    390,
+    844
+  ],
+  "services": [
+    {
+      "Service": "backend",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "celery-beat",
+      "State": "running",
+      "Health": ""
+    },
+    {
+      "Service": "celery-worker",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "frontend-admin",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "frontend-public",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "keycloak",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "keycloak-db",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "minio",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "nginx",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "postgres",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "redis-broker",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "redis-cache",
+      "State": "running",
+      "Health": "healthy"
+    }
+  ],
+  "development_browser_workflow": true,
+  "production_browser_workflow": false,
+  "hostname_mapping": "Chromium *.uog.local -> 127.0.0.1; real active SiteDomain caes.uog.local",
+  "pilot_site": 19,
+  "main_site": 17
+}

@@ -1,0 +1,14 @@
+{
+  "frontend_sources_match_previous_verified_build": {
+    "frontend/apps/admin-web/src/sites/menu-items.tsx": true,
+    "frontend/apps/admin-web/src/sites/site-menus.tsx": true,
+    "frontend/apps/admin-web/src/sites/site-menus.test.tsx": true,
+    "frontend/apps/admin-web/src/sites/main-public-home.test.tsx": true,
+    "frontend/apps/public-web/src/app/page.tsx": true,
+    "frontend/packages/ui/src/public-page.tsx": true
+  },
+  "previous_evidence": "../main-workflow-2026-11-21/final-builds.json",
+  "new_application_code": false,
+  "new_migrations": false,
+  "reason": "This change adds/generalizes QA harnesses only; unchanged application frontend production builds are reused, focused component and real-browser tests were rerun."
+}

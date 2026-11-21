@@ -1,0 +1,27 @@
+{
+  "main_unchanged": true,
+  "college_news_only": true,
+  "foreign_site_parameter_safe": true,
+  "unknown_host_status": 404,
+  "mobile_no_overflow": true,
+  "keyboard_mobile_menu": true,
+  "college_page_copy": true,
+  "responses": [
+    {
+      "route": "/api/v1/site-context/",
+      "status": 200
+    },
+    {
+      "route": "/api/v1/site-context/homepage/",
+      "status": 200
+    },
+    {
+      "route": "/api/v1/site-context/posts/",
+      "status": 200
+    },
+    {
+      "route": "/api/v1/site-context/posts/?site=17",
+      "status": 400
+    }
+  ]
+}

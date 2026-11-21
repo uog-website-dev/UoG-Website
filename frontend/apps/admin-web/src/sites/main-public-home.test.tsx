@@ -30,3 +30,9 @@ it("aborts an obsolete Site read and ignores its late result",async()=>{
 it("provides a recoverable error for a failed homepage read",async()=>{
  vi.stubGlobal("fetch",vi.fn().mockResolvedValue(response({},503)));render(<HomePage/>);await screen.findByText("The homepage is temporarily unavailable.");expect(screen.getByRole("button",{name:"Retry"})).toBeTruthy();
 });
+
+it("distinguishes an unresolved hostname from a Site with no published homepage",()=>{
+ context.site={...context.site,id:0};const read=vi.fn();vi.stubGlobal("fetch",read);render(<HomePage/>);
+ expect(screen.getByRole("alert").textContent).toContain("No Site is configured for this hostname.");
+ expect(screen.queryByText("This Site has no published page to show.")).toBeNull();expect(read).not.toHaveBeenCalled();
+});

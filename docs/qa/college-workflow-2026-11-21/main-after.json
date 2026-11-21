@@ -1,0 +1,139 @@
+{
+  "main_site": 17,
+  "hostname": "www.uog.local",
+  "models": {
+    "api.page": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "api.post": {
+      "count": 1,
+      "sha256": "fb6c9ee9b1b0981beec41f83154d5ffbab9f84cd825fe62d2883cad4600a5f8a"
+    },
+    "api.category": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "api.tag": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "sites.sitemoduleoperationchange": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "sites.site": {
+      "count": 1,
+      "sha256": "3b1cad49ad0ded94f3b1dc52863fe0902919f002b629d6efd0c576b0492a9fcd"
+    },
+    "sites.sitedomain": {
+      "count": 1,
+      "sha256": "5f7f833b4c318c6ba722088106dd3024978dc9d8cd56673b0c679c2c0f65dc59"
+    },
+    "sites.sitemodule": {
+      "count": 5,
+      "sha256": "e1c5fe41681bdca01fa6e9be327bd2e470d981f1a21371a223de0fdd6f359fcb"
+    },
+    "cms.sitecontent": {
+      "count": 4,
+      "sha256": "42c947d1bf828584e431651cc60ef092ae6075565f37f599e8899d3fdf5b7f10"
+    },
+    "cms.page": {
+      "count": 3,
+      "sha256": "54945b84763f0a1cff2a2812186d59c8ff8fd9752c7d330ec86764d44f38e4f8"
+    },
+    "cms.pageredirect": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "cms.contentworkflowtransition": {
+      "count": 17,
+      "sha256": "dd7a778a180b9b86d59bc4d15f22c848cd87dde516a4674552240bb1803efa1c"
+    },
+    "cms.publishedcontentsnapshot": {
+      "count": 5,
+      "sha256": "31c5321db04df47851ddc17fbedda7cded0e0c784ad1640bb91f5e2a04f8b920"
+    },
+    "cms.contentrevision": {
+      "count": 25,
+      "sha256": "bd3f6c0ff5ae8e49e8bc82a3807ec42ee45e2318a240cb2d85664f83823ca8d7"
+    },
+    "cms.sitepublicationversion": {
+      "count": 1,
+      "sha256": "94b926cc5f81f23a641bed386e5ddf980aadc37901e69899ede170c8b1270912"
+    },
+    "cms.menu": {
+      "count": 3,
+      "sha256": "30853e207001af0af02b43a75c26073144faf710c6f76624605a816be2e1f539"
+    },
+    "cms.menuitem": {
+      "count": 3,
+      "sha256": "1763f1581d7e40178e39a2f65a3e1e67eb6abcae0ca27537665f47cb4bfc542a"
+    },
+    "cms.menuinheritance": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "cms.menudeliveryversion": {
+      "count": 3,
+      "sha256": "d78ab954586f6b037fbd9c3ca07f57129e7101940280956da0e147fb2a2341d4"
+    },
+    "cms.contactsubmission": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "cms.sectiontemplate": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "cms.sidebar": {
+      "count": 1,
+      "sha256": "0709b98f5689fca35757d60e837a6231a02f3eccc9247d070287830c9a5cbea9"
+    },
+    "cms.menulocationassignment": {
+      "count": 3,
+      "sha256": "98e4b09d2404fbcf212aa785144bc18195b7e11a54ad1611418e9beb952ffbf1"
+    },
+    "media.mediaasset": {
+      "count": 1,
+      "sha256": "3535d0fbaa501f654ef8875b8aac6980648bdc79ad223b8f5976d7bd2271322e"
+    },
+    "media.mediaassetreference": {
+      "count": 4,
+      "sha256": "2db94bb97d44ec21a22a1a6b7d00fbe3d9a621e0be9823b4693ead935703fffd"
+    },
+    "media.mediaupload": {
+      "count": 1,
+      "sha256": "ea71387fcf75ae64a737121f54982506b9405943679c1b080e90688f0e9f9053"
+    },
+    "media.mediausage": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  },
+  "public": {
+    "/api/v1/site-context/": {
+      "status": 200,
+      "sha256": "95046ab218d89779bf4a791b5f35553f8b918e699463f6d87cfc3f8694a7902d"
+    },
+    "/api/v1/site-context/homepage/": {
+      "status": 200,
+      "sha256": "567d4c03f0ebe9178e3e02147d51a8ca61ab60f32d4e8f31e7b9df77250e04ae"
+    },
+    "/api/v1/site-context/posts/": {
+      "status": 200,
+      "sha256": "9db1d78ad91c02f966045660a820f296aac5a4323a7909e4977c7792f4b41f7f"
+    },
+    "/api/v1/site-context/menus/?location=header": {
+      "status": 200,
+      "sha256": "e8588cf61eefc46d82eacc4a577d31b28e95382baf82c897b90243a8896be426"
+    },
+    "/api/v1/site-context/menus/?location=footer": {
+      "status": 200,
+      "sha256": "c89aa111ba55c5f20ecca6d7becb2f5559dc905c7e52469b836b990cd477e834"
+    }
+  },
+  "changed_models": [],
+  "changed_public_routes": [],
+  "unchanged": true
+}
