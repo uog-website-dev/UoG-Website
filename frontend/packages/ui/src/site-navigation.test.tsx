@@ -54,6 +54,7 @@ describe("PublicMenuFrame", () => {
         <p>Page</p>
       </PublicMenuFrame>,
     );
+    fireEvent.click(screen.getByRole("button", {name:"Department"}));
     expect(screen.getAllByRole("link", { name: "Overview", hidden: true }).every((link) => link.getAttribute("href") === "/about")).toBe(true);
     expect(screen.getByRole("link", { name: "Contacts" }).getAttribute("href")).toBe("/contacts");
     expect(screen.queryByRole("link", { name: "Blocked" })).toBeNull();
@@ -75,6 +76,7 @@ describe("PublicMenuFrame", () => {
     const drawerPaper = document.querySelector(".MuiDrawer-paper");
     expect(drawerPaper).toBeTruthy();
     const drawer = within(drawerPaper as HTMLElement);
+    await user.click(drawer.getByRole("button",{name:"Department"}));
     expect(drawer.getByRole("link", { name: "People" })).toBeTruthy();
     expect(open.getAttribute("aria-expanded")).toBe("true");
     await user.keyboard("{Escape}");
@@ -113,6 +115,7 @@ it('closes the mobile menu after activating a nested link and restores the trigg
  render(<SiteNavigation label="Test navigation" items={header} mobile/>);
  const open=screen.getByRole('button',{name:'Open test navigation'});fireEvent.click(open);
  const drawer=within(document.querySelector('.MuiDrawer-paper') as HTMLElement);
+ fireEvent.click(drawer.getByRole('button',{name:'Department'}));
  const link=drawer.getByRole('link',{name:'People'});link.addEventListener('click',event=>event.preventDefault());fireEvent.click(link);
  await waitFor(()=>expect(document.querySelector('.MuiDrawer-paper')).toBeNull());
  expect(open.getAttribute('aria-expanded')).toBe('false');
@@ -124,12 +127,12 @@ it('bounds malformed trees and rejects encoded controls and error response trees
  expect(menusFromResponse(500,{locations:{header}})).toEqual({header:[],footer:[]});
  for(const href of ['/bad%0aheader','https://example.com/%5cpath','/bad%ZZ'])expect(safeMenuHref(href)).toBeNull();
 });
-it('supports native nested disclosure by keyboard and returns focus on Escape', async () => {
+it('opens a disclosure with ArrowDown and returns focus on Escape', async () => {
  const user=userEvent.setup();render(<SiteNavigation label="Dropdown" items={header} dropdown/>);
- const summary=screen.getByText('Department');summary.focus();await user.keyboard('{Enter}');
- // Native browser toggling is verified in E2E; the component handles Escape explicitly.
- const details=summary.closest('details')!;details.open=true;fireEvent.keyDown(details,{key:'Escape'});
- expect(details.open).toBe(false);expect(document.activeElement).toBe(summary);
+ const trigger=screen.getByRole('button',{name:'Department'});trigger.focus();await user.keyboard('{ArrowDown}');
+ expect(trigger.getAttribute('aria-expanded')).toBe('true');
+ expect(document.activeElement).toBe(screen.getByRole('link',{name:'Overview'}));
+ await user.keyboard('{Escape}');expect(trigger.getAttribute('aria-expanded')).toBe('false');expect(document.activeElement).toBe(trigger);
 });
 
 it('escapes hostile labels on public and preview surfaces and keeps empty frames stable', () => {
@@ -149,4 +152,34 @@ it('tracks the actual public browser pathname and history navigation',async()=>{
   await waitFor(()=>expect(screen.getByRole('link',{name:'Contacts'}).getAttribute('aria-current')).toBe('page'));
   expect(screen.getByRole('link',{name:'People'}).getAttribute('aria-current')).toBeNull();
  }finally{window.history.replaceState({},'',previous);}
+});
+
+
+it('keeps one dropdown open, switches on hover, and closes on outside click',async()=>{
+ const user=userEvent.setup();const items=[header[0]!,{label:"Research",href:"/research",children:[{label:"Projects",href:"/projects"}]}];
+ render(<><SiteNavigation label="Primary" items={items} dropdown/><button>Outside</button></>);
+ const first=screen.getByRole('button',{name:'Department'}),second=screen.getByRole('button',{name:'Research'});
+ await user.hover(first);expect(first.getAttribute('aria-expanded')).toBe('true');
+ await user.hover(second);expect(first.getAttribute('aria-expanded')).toBe('false');expect(second.getAttribute('aria-expanded')).toBe('true');
+ expect(screen.queryByRole('region',{name:'Department links'})).toBeNull();expect(screen.getAllByRole('region')).toHaveLength(1);
+ await user.click(screen.getByRole('button',{name:'Outside'}));expect(second.getAttribute('aria-expanded')).toBe('false');
+});
+it('closes disclosures across separate navigation instances and on focus leaving',async()=>{
+ const user=userEvent.setup();render(<><SiteNavigation label="Header" items={header} dropdown/><SiteNavigation label="Body" items={[{label:"Other",href:"/other",children:[{label:"More",href:"/more"}]}]} dropdown/><button>After navigation</button></>);
+ const first=screen.getByRole('button',{name:'Department'}),second=screen.getByRole('button',{name:'Other'});
+ await user.click(first);await user.click(second);expect(first.getAttribute('aria-expanded')).toBe('false');expect(second.getAttribute('aria-expanded')).toBe('true');
+ screen.getByRole('button',{name:'After navigation'}).focus();await waitFor(()=>expect(second.getAttribute('aria-expanded')).toBe('false'));
+});
+it('uses column groups for nested navigation and preserves every destination',async()=>{
+ const user=userEvent.setup();render(<SiteNavigation label="Primary" dropdown items={[{label:"Academics",href:"/academics",children:[{label:"Colleges",href:"/colleges",children:[{label:"Informatics",href:"/informatics"}]},{label:"Institutes",href:"/institutes",children:[{label:"Technology",href:"/technology"}]}]}]}/>);
+ await user.click(screen.getByRole('button',{name:'Academics'}));
+ expect(screen.getByRole('link',{name:'Informatics'}).getAttribute('href')).toBe('/informatics');
+ expect(screen.getByRole('link',{name:'View all institutes'}).getAttribute('href')).toBe('/institutes');
+});
+
+
+it('skips unavailable root labels when moving between top-level controls',async()=>{
+ const user=userEvent.setup();render(<SiteNavigation label="Primary" dropdown items={[...header,{label:"News",href:"/posts"}]}/>);
+ screen.getByRole('button',{name:'Department'}).focus();await user.keyboard('{ArrowRight}');
+ expect(document.activeElement).toBe(screen.getByRole('link',{name:'News'}));
 });

@@ -1,8 +1,11 @@
 "use client";
 
 /** Shared host-scoped navigation for public output and authenticated previews. */
-import {useEffect,useId,useState} from "react";
+import {useEffect,useId,useRef,useState} from "react";
 import type {ReactNode} from "react";
+import ButtonBase from "@mui/material/ButtonBase";
+import Typography from "@mui/material/Typography";
+import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
@@ -56,11 +59,11 @@ function current(href:string,path:string,origin?:string):boolean {
   return link.origin===page.origin&&clean(link.pathname)===clean(page.pathname)&&(!link.search||link.search===page.search)&&(!link.hash||link.hash===page.hash);
  }catch{return false;}
 }
-function NavigationLink({item,context,children}:{item:PublicMenuNode;context:LinkContext;children?:ReactNode}){
+function NavigationLink({item,context,children,rootTrigger=false,rootIndex}:{item:PublicMenuNode;context:LinkContext;children?:ReactNode;rootTrigger?:boolean;rootIndex?:number}){
  const href=item.unavailable?null:destination(item.href,context.siteOrigin,context.currentPath);
  if(!href)return <Box component="span" aria-disabled={item.unavailable||undefined} sx={{overflowWrap:"anywhere"}}>{children??item.label}{item.unavailable?" (unavailable)":""}</Box>;
  const active=current(href,context.currentPath,context.siteOrigin);
- return <Link href={href} aria-current={active?"page":undefined} target={context.openLinksInNewTab?"_blank":undefined} rel={context.openLinksInNewTab?"noopener noreferrer":undefined} onClick={()=>context.onNavigate?.()} color="inherit" underline="none" sx={{display:"inline-flex",alignItems:"center",minHeight:44,maxWidth:"100%",overflowWrap:"anywhere",fontWeight:active?700:600,px:0.75,borderBottom:"2px solid",borderColor:active?"currentColor":"transparent","&:hover":{borderColor:"currentColor"},"&:focus-visible":{outline:"3px solid currentColor",outlineOffset:2,borderRadius:0.5}}}>{children??item.label}</Link>;
+ return <Link data-nav-index={rootIndex} data-nav-trigger={rootTrigger||undefined} href={href} aria-current={active?"page":undefined} target={context.openLinksInNewTab?"_blank":undefined} rel={context.openLinksInNewTab?"noopener noreferrer":undefined} onClick={()=>context.onNavigate?.()} color="inherit" underline="none" sx={{display:"inline-flex",alignItems:"center",minHeight:44,maxWidth:"100%",overflowWrap:"anywhere",fontWeight:active?700:600,px:0.75,borderBottom:"2px solid",borderColor:active?"currentColor":"transparent","&:hover":{borderColor:"currentColor"},"&:focus-visible":{outline:"3px solid currentColor",outlineOffset:2,borderRadius:0.5}}}>{children??item.label}</Link>;
 }
 function MenuLinks({items,context,depth=0,horizontal=false}:{items:PublicMenuNode[];context:LinkContext;depth?:number;horizontal?:boolean}){
  if(depth>=4)return null;
@@ -71,6 +74,123 @@ function MenuLinks({items,context,depth=0,horizontal=false}:{items:PublicMenuNod
   </Box>)}
  </Box>;
 }
+const OPEN_EVENT="uog:site-navigation-open";
+
+/** Conventional disclosure navigation: native buttons/links, not an application menubar. */
+function DropdownNavigation({items,label,context}:{items:PublicMenuNode[];label:string;context:LinkContext}) {
+ const id=useId();
+ const root=useRef<HTMLElement|null>(null);
+ const [active,setActive]=useState<number|null>(null);
+ const [left,setLeft]=useState(0),[height,setHeight]=useState(640);
+ const focusEdge=useRef<"first"|"last"|null>(null);
+ const hoverOpened=useRef(false);
+ const triggerAt=(index:number)=>root.current?.querySelector<HTMLElement>(`[data-nav-index="${index}"]`);
+ function activate(index:number) {
+  const bounds=root.current?.getBoundingClientRect(),trigger=triggerAt(index)?.getBoundingClientRect();
+  const grouped=items[index]?.children?.some(child=>child.children?.length);
+  const panelWidth=Math.min(grouped?760:360,window.innerWidth-32);
+  setLeft(bounds&&trigger?Math.max(16-bounds.left,Math.min(trigger.left-bounds.left,Math.min(bounds.right,window.innerWidth-16)-bounds.left-panelWidth)):0);
+  setHeight(Math.min(640,Math.max(160,window.innerHeight-(bounds?.bottom??0)-20)));
+  document.dispatchEvent(new CustomEvent(OPEN_EVENT,{detail:id}));
+  setActive(index);
+ }
+ useEffect(()=>{
+  const outside=(event:PointerEvent)=>{if(!root.current?.contains(event.target as Node))setActive(null);};
+  const another=(event:Event)=>{if((event as CustomEvent<string>).detail!==id)setActive(null);};
+  const resize=()=>setActive(null);
+  document.addEventListener("pointerdown",outside);document.addEventListener(OPEN_EVENT,another);window.addEventListener("resize",resize);
+  return()=>{document.removeEventListener("pointerdown",outside);document.removeEventListener(OPEN_EVENT,another);window.removeEventListener("resize",resize);};
+ },[id]);
+ useEffect(()=>{setActive(null);},[items,context.currentPath]);
+ useEffect(()=>{
+  if(active===null||!focusEdge.current)return;
+  const links=root.current?.querySelectorAll<HTMLElement>("[data-nav-panel] a[href]");
+  const target=focusEdge.current==="last"?links?.[links.length-1]:links?.[0];focusEdge.current=null;target?.focus();
+ },[active]);
+ const panelContext={...context,onNavigate:()=>{setActive(null);context.onNavigate?.();}};
+ function topKey(event:React.KeyboardEvent,index:number) {
+  if(event.altKey||event.ctrlKey||event.metaKey)return;
+  hoverOpened.current=false;
+  if(event.key==="ArrowRight"||event.key==="ArrowLeft"){
+   event.preventDefault();const step=event.key==="ArrowRight"?1:-1;let next=index;
+   for(let count=0;count<items.length;count++){next=(next+step+items.length)%items.length;if(triggerAt(next))break;}
+   triggerAt(next)?.focus();if(active!==null){if(items[next]?.children?.length)activate(next);else setActive(null);}
+  } else if((event.key==="ArrowDown"||event.key==="ArrowUp")&&items[index]?.children?.length){
+   event.preventDefault();focusEdge.current=event.key==="ArrowUp"?"last":"first";
+   if(active===index){const links=root.current?.querySelectorAll<HTMLElement>("[data-nav-panel] a[href]");(event.key==="ArrowUp"?links?.[links.length-1]:links?.[0])?.focus();focusEdge.current=null;}else activate(index);
+  }
+ }
+ return <Box component="nav" ref={root} aria-label={label}
+  onPointerLeave={event=>{if(event.pointerType==="mouse")setActive(null);}}
+  onBlurCapture={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node|null))setActive(null);}}
+  onKeyDown={event=>{if(event.key==="Escape"&&active!==null){event.preventDefault();event.stopPropagation();const index=active;setActive(null);triggerAt(index)?.focus();}}}
+  sx={{position:"relative",minWidth:0,overflowWrap:"anywhere","& [data-nav-trigger]":{minHeight:60,px:1.5,borderBottomWidth:3,"&:focus-visible":{outlineColor:"secondary.main",outlineOffset:-4}}}}>
+  <Box component="ul" sx={{display:"flex",flexWrap:"wrap",gap:0,listStyle:"none",m:0,p:0}}>
+   {items.map((item,index)=>{
+    const expanded=active===index;
+    const grouped=Boolean(item.children?.some(child=>child.children?.length));
+    const width=grouped?760:360;
+    return <Box component="li" key={`${index}-${item.label}`} sx={{minWidth:0,maxWidth:"100%"}}
+     onPointerEnter={event=>{if(event.pointerType==="mouse"){if(item.children?.length){hoverOpened.current=true;activate(index);}else setActive(null);}}}>
+     {item.children?.length?<>
+      <ButtonBase type="button" data-nav-trigger data-nav-index={index} aria-expanded={expanded} aria-controls={expanded?`${id}-${index}`:undefined}
+       onClick={()=>{if(hoverOpened.current){hoverOpened.current=false;activate(index);}else expanded?setActive(null):activate(index);}} onKeyDown={event=>topKey(event,index)}
+       onFocus={()=>{if(active!==null&&active!==index)activate(index);}}
+       sx={{minHeight:60,px:1.5,gap:.75,color:"inherit",font:"inherit",fontWeight:650,borderBottom:"3px solid",borderColor:expanded?"secondary.main":"transparent",bgcolor:expanded?"action.selected":"transparent","&:hover":{bgcolor:"action.hover"},"&:focus-visible":{outline:"3px solid",outlineColor:"secondary.main",outlineOffset:-4}}}>
+       {item.label}<ExpandMoreRoundedIcon aria-hidden sx={{fontSize:18,opacity:.8,transform:expanded?"rotate(180deg)":"none",transition:"transform 150ms ease","@media (prefers-reduced-motion: reduce)":{transition:"none"}}}/>
+      </ButtonBase>
+      {expanded?<Box id={`${id}-${index}`} data-nav-panel role="region" aria-label={`${item.label} links`}
+       sx={{position:"absolute",top:"100%",left,width,maxWidth:"calc(100vw - 32px)",maxHeight:height,overflowY:"auto",overscrollBehavior:"contain",zIndex:30,bgcolor:"background.paper",color:"text.primary",border:1,borderColor:"divider",borderTop:"3px solid",borderTopColor:"secondary.main",borderRadius:"0 0 12px 12px",boxShadow:6,p:{xs:2,md:3},boxSizing:"border-box","& a":{display:"flex",minHeight:40,width:"100%",boxSizing:"border-box",fontWeight:400,px:1,py:.75,borderBottom:0,borderRadius:1,"&:hover":{bgcolor:"action.hover",color:"primary.main"}},"& ul":{pl:0}}}>
+       <NavigationPanel item={item} context={panelContext}/>
+      </Box>:null}
+     </>:<Box onKeyDown={event=>topKey(event,index)} onFocus={()=>setActive(null)}><NavigationLink item={item} context={panelContext} rootTrigger rootIndex={index}/></Box>}
+    </Box>;
+   })}
+  </Box>
+ </Box>;
+}
+
+function NavigationPanel({item,context}:{item:PublicMenuNode;context:LinkContext}) {
+ const children=item.children??[];
+ const groups=children.filter(child=>child.children?.length);
+ const sections:{group?:PublicMenuNode;leaves:PublicMenuNode[]}[]=[];
+ for(const child of children){
+  if(child.children?.length)sections.push({group:child,leaves:[]});
+  else {const previous=sections[sections.length-1];if(previous&&!previous.group)previous.leaves.push(child);else sections.push({leaves:[child]});}
+ }
+ const hasOverview=Boolean(safeMenuHref(item.href))&&!children.some(child=>!child.children?.length&&child.href===item.href);
+ return <>
+  <Box sx={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:2,pb:1.5,mb:1.5,borderBottom:1,borderColor:"divider"}}>
+   <Typography component="p" variant="overline" sx={{fontWeight:800,letterSpacing:".09em",color:"primary.main"}}>{item.label}</Typography>
+   {hasOverview?<Box sx={{flexShrink:0}}><NavigationLink item={item} context={context}>Overview</NavigationLink></Box>:null}
+  </Box>
+  {groups.length?<Box sx={{display:"grid",gridTemplateColumns:{xs:"minmax(0,1fr)",md:`repeat(${Math.min(3,sections.length)},minmax(0,1fr))`},gap:3}}>
+   {sections.map(({group,leaves},index)=><Box key={`${index}-${group?.label??"general"}`} sx={{minWidth:0}}>
+    <Typography component="p" variant="overline" sx={{fontWeight:800,letterSpacing:".06em",mb:1,pb:1,borderBottom:1,borderColor:"divider"}}>{group?.label??"General"}</Typography>
+    <MenuLinks items={group?.children??leaves} context={context} depth={1}/>
+    {group&&safeMenuHref(group.href)&&group.href!==item.href?<NavigationLink item={group} context={context}>View all {group.label.toLowerCase()}</NavigationLink>:null}
+   </Box>)}
+  </Box>:<MenuLinks items={children} context={context} depth={1}/>}
+ </>;
+}
+
+function MobileMenuLinks({items,context,depth=0}:{items:PublicMenuNode[];context:LinkContext;depth?:number}) {
+ const [active,setActive]=useState<number|null>(null);
+ const id=useId();
+ if(depth>=4)return null;
+ return <Box component="ul" sx={{listStyle:"none",p:0,m:0,pl:depth?1.5:0,"& a":{width:"100%",boxSizing:"border-box",py:.75,borderBottom:0}}}>
+  {items.map((item,index)=><Box component="li" key={`${index}-${item.label}`} sx={{borderBottom:depth?0:1,borderColor:"divider"}}>
+   {item.children?.length?<>
+    <ButtonBase type="button" aria-expanded={active===index} aria-controls={active===index?`${id}-${index}`:undefined} onClick={()=>setActive(active===index?null:index)}
+     sx={{width:"100%",justifyContent:"space-between",textAlign:"start",gap:1,minHeight:48,px:1,font:"inherit",fontWeight:650,borderRadius:1,"&:focus-visible":{outline:"3px solid",outlineColor:"primary.main",outlineOffset:-3}}}>
+     {item.label}<ExpandMoreRoundedIcon aria-hidden sx={{fontSize:20,transform:active===index?"rotate(180deg)":"none"}}/>
+    </ButtonBase>
+    {active===index?<Box id={`${id}-${index}`} sx={{pb:1.5}}><NavigationLink item={item} context={context}>Overview</NavigationLink><MobileMenuLinks items={item.children} context={context} depth={depth+1}/></Box>:null}
+   </>:<NavigationLink item={item} context={context}/>}
+  </Box>)}
+ </Box>;
+}
+
 export function SiteNavigation({items,label,mobile=false,dropdown=false,currentPath,siteOrigin,openLinksInNewTab=false}:{items:PublicMenuNode[];label:string;mobile?:boolean;dropdown?:boolean;currentPath?:string;siteOrigin?:string;openLinksInNewTab?:boolean}){
  const [open,setOpen]=useState(false),[browserPath,setBrowserPath]=useState("");
  const menuId=useId();
@@ -78,25 +198,14 @@ export function SiteNavigation({items,label,mobile=false,dropdown=false,currentP
  useEffect(()=>{setOpen(false);},[items,currentPath]);
  const context:LinkContext={currentPath:currentPath??browserPath,siteOrigin,openLinksInNewTab};
  if(!items.length)return null;
- if(dropdown)return <Box component="nav" aria-label={label} sx={{minWidth:0,overflowWrap:"anywhere"}}>
-  <Box component="ul" sx={{display:"flex",flexWrap:"wrap",columnGap:3,rowGap:1,listStyle:"none",m:0,p:0}}>
-   {items.map((item,index)=><Box component="li" key={`${index}-${item.label}`} sx={{position:"relative",minWidth:0,maxWidth:"100%"}}>
-    {item.children?.length?<Box component="details" onKeyDown={event=>{if(event.key==="Escape"){event.preventDefault();event.stopPropagation();const details=event.currentTarget as HTMLDetailsElement;details.open=false;details.querySelector('summary')?.focus();}}} sx={{"& > summary":{cursor:"pointer",minHeight:44,p:1,fontWeight:600,"&:focus-visible":{outline:"3px solid currentColor",outlineOffset:2}}}}>
-     <Box component="summary">{item.label}</Box>
-     <Box sx={{bgcolor:"background.paper",color:"text.primary",boxShadow:4,borderRadius:2,p:2,maxWidth:"100%",zIndex:4,"@media (min-width: 900px)":{position:"absolute",minWidth:240,maxWidth:"min(320px,80vw)",right:0}}}>
-      <NavigationLink item={item} context={context}>Overview</NavigationLink><MenuLinks items={item.children} context={context} depth={1}/>
-     </Box>
-    </Box>:<NavigationLink item={item} context={context}/>}
-   </Box>)}
-  </Box>
- </Box>;
+ if(dropdown)return <DropdownNavigation items={items} label={label} context={context}/>;
  return <Box component="nav" aria-label={label} sx={{px:2,py:mobile?1:0.5,minWidth:0,maxWidth:"100%"}}>
   {mobile?<>
-   <Box sx={{display:{xs:"none",md:"block"}}}><SiteNavigation items={items} label={`${label} desktop`} dropdown currentPath={context.currentPath} siteOrigin={siteOrigin} openLinksInNewTab={openLinksInNewTab}/></Box>
-   <IconButton aria-label={`Open ${label.toLowerCase()}`} aria-expanded={open} aria-controls={menuId} onClick={()=>setOpen(true)} sx={{color:"inherit",display:{xs:"inline-flex",md:"none"},"&:focus-visible":{outline:"3px solid currentColor",outlineOffset:2}}}><MenuIcon/></IconButton>
-   <Drawer anchor="left" open={open} onClose={()=>setOpen(false)}><Box sx={{width:280,maxWidth:"100vw",boxSizing:"border-box",p:2}} id={menuId}>
-    <IconButton aria-label={`Close ${label.toLowerCase()}`} onClick={()=>setOpen(false)} sx={{"&:focus-visible":{outline:"3px solid currentColor",outlineOffset:2}}}><CloseIcon/></IconButton>
-    <Box component="div" role="navigation" aria-label={label}><MenuLinks items={items} context={{...context,onNavigate:()=>setOpen(false)}}/></Box>
+   <Box sx={{display:{xs:"none",lg:"block"}}}><SiteNavigation items={items} label={`${label} desktop`} dropdown currentPath={context.currentPath} siteOrigin={siteOrigin} openLinksInNewTab={openLinksInNewTab}/></Box>
+   <IconButton aria-label={`Open ${label.toLowerCase()}`} aria-expanded={open} aria-controls={menuId} onClick={()=>setOpen(true)} sx={{color:"inherit",display:{xs:"inline-flex",lg:"none"},"&:focus-visible":{outline:"3px solid currentColor",outlineOffset:2}}}><MenuIcon/></IconButton>
+   <Drawer anchor="left" open={open} onClose={()=>setOpen(false)}><Box sx={{width:340,maxWidth:"100vw",boxSizing:"border-box",p:2}} id={menuId}>
+    <Box sx={{display:"flex",alignItems:"center",justifyContent:"space-between",mb:2,pb:1,borderBottom:1,borderColor:"divider"}}><Typography fontWeight={800}>Navigation</Typography><IconButton aria-label={`Close ${label.toLowerCase()}`} onClick={()=>setOpen(false)} sx={{"&:focus-visible":{outline:"3px solid currentColor",outlineOffset:2}}}><CloseIcon/></IconButton></Box>
+    <Box component="div" role="navigation" aria-label={label}><MobileMenuLinks items={items} context={{...context,onNavigate:()=>setOpen(false)}}/></Box>
    </Box></Drawer>
   </>:<MenuLinks items={items} context={context} horizontal={label!=="Page sidebar"}/> }
  </Box>;
