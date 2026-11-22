@@ -23,6 +23,17 @@ Both projections and the shared client bound menu trees to four levels and 1,000
 
 ## Accessibility and responsive behavior
 
-Exact same-origin pathname matches receive `aria-current="page"`, bold text and underline; a parent pathname alone does not match a child route. A configured query/hash must also match. Links wrap and have visible focus outlines and touch targets. Mobile navigation has an explicitly labelled trigger and close control, bounded viewport width, Escape dismissal, focus restoration and dismissal after navigation. Native nested disclosure summaries remain keyboard operable; Escape returns focus to the summary.
+Exact same-origin pathname matches receive `aria-current="page"`, bold text and underline; a parent pathname alone does not match a child route. A configured query/hash must also match. Links wrap and have visible focus outlines and touch targets. Mobile navigation has an explicitly labelled trigger and close control, bounded viewport width, Escape dismissal, focus restoration and dismissal after navigation. Desktop disclosures use native buttons with chevrons and `aria-expanded`. Only one dropdown is open across the header and any Page navigation. Hovering another top-level item switches the open panel; leaving navigation, clicking outside, following a link or moving focus outside closes it. Escape closes the panel and returns focus to its trigger. Enter/Space toggle; ArrowDown/ArrowUp focus the first/last destination; ArrowLeft/ArrowRight move between available top-level controls. Tab retains normal document focus order.
+
+Grouped destinations use ordered columns with section labels, a theme-accent top border and a viewport-bounded scrolling panel. Flat menus use compact panels aligned below their trigger and clamped to navigation bounds. Below 1200px, the header uses a single primary drawer and expandable, single-open sibling groups; utility links remain directly visible. Reduced-motion preferences disable chevron animation. Menu content, publication, assignment and Site isolation rules are unchanged.
 
 See [verification evidence](qa/menu-rendering-2026-11-15/README.md) and the [OpenAPI baseline](api/openapi.yaml). Existing domain-link helper changes in this workspace are independent of this navigation story.
+
+
+The anonymous Main Site regression runs with `node scripts/qa-header-navigation.cjs`
+against the published sample menu. It covers hover switching, outside/leave
+closing, click toggle, keyboard focus, compact tablet navigation, nested mobile
+groups, viewport bounds and automated WCAG A/AA scans. See the
+[2026-11-22 results](qa/header-navigation-2026-11-22/results.json),
+[desktop example](qa/header-navigation-2026-11-22/academics-desktop.png) and
+[mobile example](qa/header-navigation-2026-11-22/mobile-navigation.png).

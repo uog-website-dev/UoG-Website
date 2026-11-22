@@ -1,0 +1,33 @@
+{
+  "date": "2026-11-22",
+  "checks": [
+    {
+      "check": "single open panel, hover switching, pointer leave and bounded two-column Academics layout",
+      "status": "PASS",
+      "geometry": {
+        "left": 520,
+        "right": 1280,
+        "bottom": 658.90625,
+        "width": 1440,
+        "height": 1000,
+        "columns": "343px 343px"
+      }
+    },
+    {
+      "check": "click toggle, ArrowDown/Right, Escape focus restoration and outside click",
+      "status": "PASS"
+    },
+    {
+      "check": "1024px compact header, 390px nested mobile accordion, sibling closing, drawer Escape and focus restoration",
+      "status": "PASS"
+    },
+    {
+      "check": "automated WCAG A/AA 390px",
+      "status": "PASS"
+    },
+    {
+      "check": "automated WCAG A/AA 1440px",
+      "status": "PASS"
+    }
+  ]
+}
