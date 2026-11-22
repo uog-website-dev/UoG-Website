@@ -4,30 +4,31 @@ import { useId, useLayoutEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import LandscapeOutlined from "@mui/icons-material/LandscapeOutlined";
+import ArrowBackRounded from "@mui/icons-material/ArrowBackRounded";
+import ArrowForwardRounded from "@mui/icons-material/ArrowForwardRounded";
+import type {Theme} from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import type { LayoutStyle, WidgetPropsMap } from "@uog/types";
 import { BlockView } from "./public-page";
 import { safeMenuHref } from "./site-navigation";
 
-const backgrounds = {
-  none:"transparent", paper:"#ffffff", mist:"#f4f7fb", navy:"#003366", blue:"#086ca4", gold:"#ffb81c",
-  blue_gradient:"linear-gradient(120deg,#086ca4,#354eb8)",
-  navy_gradient:"linear-gradient(120deg,#003366,#075478)",
-};
 const sizes = {
   sm:"clamp(1rem,2cqi,1.5rem)", md:"clamp(1.25rem,3cqi,2rem)",
   lg:"clamp(1.5rem,4cqi,3rem)", xl:"clamp(2rem,5cqi,4rem)", display:"clamp(2.25rem,6cqi,5rem)",
 };
 
 export function decorativeStyle(style:LayoutStyle={}) {
+  const background=(theme:Theme)=>({none:'transparent',paper:theme.palette.background.paper,mist:theme.palette.action.hover,navy:theme.palette.primary.dark,blue:theme.palette.primary.main,gold:theme.palette.secondary.main,blue_gradient:`linear-gradient(120deg,${theme.palette.primary.main},${theme.palette.primary.light})`,navy_gradient:`linear-gradient(120deg,${theme.palette.primary.dark},${theme.palette.primary.main})`})[style.background??'none'];
   const height={natural:"auto",compact:200,medium:360,tall:520}[style.image_height??"natural"];
   return {
+    ...(style.content_width?{width:"100%",maxWidth:{full:"100%",wide:1280,reading:880}[style.content_width],mx:"auto"}:{}),
     p:{none:0,sm:1.5,md:3,lg:5,xl:8}[style.padding??"none"],
-    color:{default:"inherit",brand:"#003366",inverse:"#ffffff",muted:"#526174"}[style.text_color??"default"],
-    ...(style.background ? {background:backgrounds[style.background]} : {}),
+    color:(theme:Theme)=>({default:"inherit",brand:theme.palette.primary.main,inverse:theme.palette.primary.contrastText,muted:theme.palette.text.secondary})[style.text_color??"default"],
+    ...(style.background ? {background} : {}),
     borderRadius:{none:0,sm:1,md:2,lg:4,pill:12}[style.radius??"none"],
     border:style.border && style.border!=="none"?"1px solid":undefined,
-    borderColor:style.border==="brand"?"#003366":"#dfe5ec",
+    borderColor:style.border==="brand"?"primary.main":"divider",
     boxShadow:{none:0,sm:1,md:3,lg:6}[style.shadow??"none"],
     ...(style.text_size ? {"& h2,& h3,& h4":{fontSize:sizes[style.text_size],lineHeight:1.15}} : {}),
     ...(style.image_fit || style.image_height || style.image_position ? {
@@ -67,10 +68,10 @@ export function HeroView({props,siteId,width}:{props:WidgetPropsMap["hero_image"
   </>;
   const media=<Box sx={{minWidth:0,minHeight:split && wide?height:280,position:overlay?"absolute":"relative",inset:overlay?0:undefined,
     order:mode==="split_reverse" && wide?2:0,
-    clipPath:props.mask==="curve" && wide && split?"ellipse(98% 100% at 0% 50%)":undefined,
+    clipPath:props.mask==="curve" && wide && split?(mode==="split_reverse"?"ellipse(98% 100% at 100% 50%)":"ellipse(98% 100% at 0% 50%)"):undefined,
     borderRadius:props.mask==="rounded"?4:0,overflow:"hidden",
     "& picture":{display:"block",height:"100%"},"& img":{display:"block",width:"100%",height:"100%",minHeight:split&&wide?height:280,objectFit:"cover",objectPosition:props.image_position??"center"},
-  }}><BlockView block={{type:"image",ref:`sites/${siteId}/assets/${props.asset_id}`,alt:props.alt}} siteId={siteId}/></Box>;
+  }}>{siteId===null?<Box role="img" aria-label="Site image preview placeholder" sx={{minHeight:280,height:'100%',display:'grid',alignContent:'center',justifyItems:'center',gap:2,p:3,bgcolor:'action.hover'}}><LandscapeOutlined sx={{fontSize:100,opacity:.5}}/><Typography>{props.alt}</Typography></Box>:<BlockView block={{type:"image",ref:`sites/${siteId}/assets/${props.asset_id}`,alt:props.alt}} siteId={siteId}/>}</Box>;
   return <Box ref={root} sx={{position:"relative",display:"grid",gridTemplateColumns:split&&wide?"minmax(0,1fr) minmax(0,1fr)":"minmax(0,1fr)",minHeight:overlay?height:undefined,isolation:"isolate",overflow:"hidden"}}>
     {media}
     {overlay?<Box aria-hidden="true" sx={{position:"absolute",inset:0,background:"linear-gradient(90deg,rgba(0,25,50,.88),rgba(0,25,50,.3))"}}/>:null}
@@ -88,11 +89,12 @@ export function ContentCarousel({items,label="Content carousel"}:{items:{id:stri
   const position=Math.min(selected,Math.max(0,items.length-1));
   if(!items.length)return <Typography role="status">No slides are available.</Typography>;
   return <Box component="section" aria-label={label} aria-roledescription="carousel" sx={{display:"grid",gap:2,minWidth:0}}>
-    <Box id={panelId} role="group" aria-roledescription="slide" aria-label={`${position+1} of ${items.length}`} key={items[position]!.id}>{items[position]!.content}</Box>
+    <Box sx={{"@keyframes slideAppear":{from:{opacity:.4},to:{opacity:1}},"@media (prefers-reduced-motion: no-preference)":{animation:"slideAppear 220ms ease-out"}}} id={panelId} role="group" aria-roledescription="slide" aria-label={`${position+1} of ${items.length}`} key={items[position]!.id}>{items[position]!.content}</Box>
     {items.length>1?<Box sx={{display:"flex",gap:1,alignItems:"center",justifyContent:"center",flexWrap:"wrap"}}>
-      <Button type="button" variant="outlined" aria-controls={panelId} disabled={position===0} onClick={()=>setSelected(position-1)} sx={{minHeight:44,"&:focus-visible":{outline:"3px solid currentColor",outlineOffset:3}}}>Previous slide</Button>
+      <Button type="button" variant="outlined" aria-controls={panelId} disabled={position===0} onClick={()=>setSelected(position-1)} sx={{minHeight:44,"&:focus-visible":{outline:"3px solid currentColor",outlineOffset:3}}} aria-label="Previous slide"><ArrowBackRounded/></Button>
+      <Box sx={{display:"flex",gap:.5,flexWrap:"wrap"}}>{items.map((item,index)=><Button key={item.id} type="button" aria-label={`Go to slide ${index+1}`} aria-current={position===index?"true":undefined} aria-controls={panelId} onClick={()=>setSelected(index)} sx={{minWidth:44,minHeight:44,p:0}}><Box aria-hidden sx={{width:position===index?22:9,height:9,borderRadius:8,bgcolor:position===index?"primary.main":"action.disabled"}}/></Button>)}</Box>
       <Typography aria-live="polite" aria-atomic="true">{position+1} of {items.length}</Typography>
-      <Button type="button" variant="outlined" aria-controls={panelId} disabled={position===items.length-1} onClick={()=>setSelected(position+1)} sx={{minHeight:44,"&:focus-visible":{outline:"3px solid currentColor",outlineOffset:3}}}>Next slide</Button>
+      <Button type="button" variant="outlined" aria-controls={panelId} disabled={position===items.length-1} onClick={()=>setSelected(position+1)} sx={{minHeight:44,"&:focus-visible":{outline:"3px solid currentColor",outlineOffset:3}}} aria-label="Next slide"><ArrowForwardRounded/></Button>
     </Box>:null}
   </Box>;
 }

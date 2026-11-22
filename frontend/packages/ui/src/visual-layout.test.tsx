@@ -1,15 +1,13 @@
 import { render, screen, fireEvent, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { validateVisualLayout, widgetRegistry, adaptLegacyBlocks } from "@uog/types";
 import type { VisualLayout, WidgetNode } from "@uog/types";
 import fixtures from "../../types/src/layout/fixtures.json";
 import { PublicPageView, pageFromResponse } from "./public-page";
 
-const DYNAMIC_FALLBACK = new Set([
-  "lottie_player","blog","recent_posts","post_carousel","taxonomy",
-  "breadcrumbs","loop_carousel","table_of_contents",
-]);
+// jsdom has no SVG animation engine; actual player controls are exercised in Edge.
+vi.mock('./approved-animation',()=>({ApprovedAnimation:()=> <div role="img" aria-label="Approved animation"/>}));
 
 function structureSignature(container: HTMLElement): string[] {
   return [...container.querySelectorAll("[data-node-id],[data-widget-type],[data-layout-version]")].map((node) => {
@@ -100,9 +98,7 @@ describe("shared renderer preview/public parity", () => {
       expect(structureSignature(previewView.container)).toEqual(publicStructure);
       const type = fixture.name.replace("catalog-", "");
       expect(previewView.container.querySelector(`[data-widget-type="${type}"]`)).toBeTruthy();
-      if (DYNAMIC_FALLBACK.has(type)) {
-        expect(within(previewView.container).getByRole("status").textContent).toMatch(/unavailable/i);
-      }
+      expect(previewView.container.querySelector('[data-fallback="integration"]')).toBeNull();
       previewView.unmount();
     }
   });
@@ -216,7 +212,8 @@ describe("shared renderer preview/public parity", () => {
     expect(validateVisualLayout(layout).ok).toBe(true);
     const mixed = render(<PublicPageView page={pageDoc(layout, "Mixed")} />);
     expect(screen.getByText("example")).toBeTruthy();
-    expect(within(mixed.container).getByRole("status").textContent).toMatch(/unavailable/i);
+    expect(within(mixed.container).getByRole("status").textContent).toMatch(/Loading content/i);
+    expect(mixed.container.querySelector("[data-fallback=integration]")).toBeNull();
     expect(screen.getByRole("link", { name: "Safe" }).getAttribute("href")).toBe("/about");
     expect(mixed.container.innerHTML).not.toContain("/admin/");
     expect(mixed.container.innerHTML).not.toContain("javascript:");

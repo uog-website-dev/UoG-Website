@@ -1,0 +1,20 @@
+﻿import {cleanup,render,screen,fireEvent,waitFor} from '@testing-library/react';
+import {afterEach,expect,it,vi} from 'vitest';
+import {defaultSiteFooter} from '@uog/types';
+import {SiteFooterPanel} from './site-footer-panel';
+const actions=vi.hoisted(()=>({getSiteFooter:vi.fn(),updateSiteFooter:vi.fn()}));
+vi.mock('@/app/sites/footer-actions',()=>actions);
+vi.mock('./site-admin-frame',()=>({useSiteAdmin:()=>({site:{id:16,name:'Informatics'},enabledModuleCodes:['MENUS']})}));
+vi.mock('./site-draft-guard',()=>({useSiteDraftGuard:vi.fn()}));
+afterEach(()=>{cleanup();vi.clearAllMocks();});
+it('preserves unsaved text after a rejected concurrent save',async()=>{
+ actions.getSiteFooter.mockResolvedValue({ok:true,data:{etag:'"v1"',data:{site:16,version:1,settings:defaultSiteFooter(),menu_items:[],site_origin:'http://coi.uog.local',branding:{name:'Informatics',theme:'institutional',logo_asset_id:null}}}});
+ actions.updateSiteFooter.mockResolvedValue({ok:false,error:{status:412,message:'Conflict',code:'precondition_failed'}});
+ render(<SiteFooterPanel/>);
+ const input=await screen.findByRole('textbox',{name:'Short description'});
+ fireEvent.change(input,{target:{value:'My unsaved introduction'}});
+ fireEvent.click(screen.getByRole('button',{name:'Save footer'}));
+ await screen.findByText(/Footer changed in another session/);
+ expect((input as HTMLInputElement).value).toBe('My unsaved introduction');
+ expect(actions.updateSiteFooter).toHaveBeenCalledWith(16,'"v1"',expect.objectContaining({description:'My unsaved introduction'}));
+});

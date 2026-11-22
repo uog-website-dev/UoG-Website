@@ -4,7 +4,9 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
-import { UogFooter, UogHeader, UogThemeProvider, ToastProvider } from "@uog/ui";
+import {UogFooter,UogHeader} from "@uog/ui/shell";
+import {UogThemeProvider} from "@uog/ui/theme-provider";
+import {ToastProvider} from "@uog/ui/toast";
 
 import { redirect } from "next/navigation";
 

@@ -1,0 +1,128 @@
+[
+  {
+    "host": "www.uog.local",
+    "width": 390,
+    "sizes": [
+      {
+        "width": 358,
+        "top": 493.265625
+      },
+      {
+        "width": 358,
+        "top": 640.453125
+      },
+      {
+        "width": 358,
+        "top": 743.640625
+      }
+    ],
+    "overflow": false,
+    "violations": [],
+    "fixture": true
+  },
+  {
+    "host": "www.uog.local",
+    "width": 768,
+    "sizes": [
+      {
+        "width": 348,
+        "top": 596.90625
+      },
+      {
+        "width": 348,
+        "top": 596.90625
+      },
+      {
+        "width": 348,
+        "top": 744.09375
+      }
+    ],
+    "overflow": false,
+    "violations": [],
+    "fixture": true
+  },
+  {
+    "host": "www.uog.local",
+    "width": 1440,
+    "sizes": [
+      {
+        "width": 260,
+        "top": 345.234375
+      },
+      {
+        "width": 260,
+        "top": 345.234375
+      },
+      {
+        "width": 260,
+        "top": 345.234375
+      }
+    ],
+    "overflow": false,
+    "violations": [],
+    "fixture": true
+  },
+  {
+    "host": "coi.uog.local",
+    "width": 390,
+    "sizes": [
+      {
+        "width": 358,
+        "top": 494.0625
+      },
+      {
+        "width": 358,
+        "top": 641.25
+      },
+      {
+        "width": 358,
+        "top": 744.4375
+      }
+    ],
+    "overflow": false,
+    "violations": [],
+    "fixture": true
+  },
+  {
+    "host": "coi.uog.local",
+    "width": 768,
+    "sizes": [
+      {
+        "width": 348,
+        "top": 597.390625
+      },
+      {
+        "width": 348,
+        "top": 597.390625
+      },
+      {
+        "width": 348,
+        "top": 744.578125
+      }
+    ],
+    "overflow": false,
+    "violations": [],
+    "fixture": true
+  },
+  {
+    "host": "coi.uog.local",
+    "width": 1440,
+    "sizes": [
+      {
+        "width": 260,
+        "top": 596.078125
+      },
+      {
+        "width": 260,
+        "top": 596.078125
+      },
+      {
+        "width": 260,
+        "top": 596.078125
+      }
+    ],
+    "overflow": false,
+    "violations": [],
+    "fixture": true
+  }
+]

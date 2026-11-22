@@ -30,7 +30,7 @@ export function SiteBrandingMark({ site, size = 56 }: { site: PublicSiteContext;
   const source = publicLogoSource(site);
   const [failed, setFailed] = useState(false);
   useEffect(() => setFailed(false), [site]);
-  const dimensions = { xs: Math.max(32, size - 4), sm: size };
+  const dimensions = size;
 
   if (!source || failed) {
     return (
@@ -48,7 +48,7 @@ export function SiteBrandingMark({ site, size = 56 }: { site: PublicSiteContext;
           bgcolor: "secondary.main",
           color: "secondary.contrastText",
           fontWeight: 800,
-          fontSize: { xs: "0.7rem", sm: "0.8rem" },
+          fontSize: size>=80?`${Math.round(size*.22)}px`:{ xs: "0.7rem", sm: "0.8rem" },
           lineHeight: 1,
         }}
       >
@@ -95,7 +95,7 @@ export function SiteBrandingLockup({
       data-site-branding={site.code ?? "university"}
       sx={{ display: "inline-flex", alignItems: "center", gap: compact ? 1 : 1.5, minWidth: 0 }}
     >
-      <SiteBrandingMark site={site} size={compact ? 44 : 60} />
+      <SiteBrandingMark site={site} size={compact ? 44 : 75} />
       <Typography
         component="span"
         variant={compact ? "subtitle2" : "subtitle1"}

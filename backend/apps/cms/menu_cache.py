@@ -13,6 +13,13 @@ def invalidate_menu_state(
     site_id, location, is_global, *, using=DEFAULT_DB_ALIAS,
 ):
     from .menu_models import MenuInheritance
+    # Named menus may be assigned to slots unrelated to their legacy location,
+    # including additional footer columns. Refresh the owner's explicit slots.
+    from .menu_assignment_models import MenuLocationAssignment
+    slots=MenuLocationAssignment.objects.using(using).filter(site_id=site_id,is_published=True).values_list('location',flat=True)
+    for slot in slots:
+        if slot!=location:
+            _bump({site_id},slot,using=using)
     if not location: return
 
     affected = {site_id}

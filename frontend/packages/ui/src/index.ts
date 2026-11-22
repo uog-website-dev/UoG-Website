@@ -1,4 +1,4 @@
-export { uogTheme, uogColors } from "./theme";
+export { highContrastTheme, uogTheme, uogColors } from "./theme";
 export { UogThemeProvider } from "./UogThemeProvider";
 export { UogHeader, UogFooter } from "./UogShell";
 export { PublicSiteBrandingProvider, SiteBrandingLockup, SiteBrandingMark, usePublicSiteBranding } from "./site-branding";
@@ -70,3 +70,7 @@ export type { ArticleDocument } from "./article-document";
 export type { ToastApi, ToastOptions } from "./toast";
 
 export { WidgetRuntimeProvider } from "./widget-runtime";
+
+export {PublicSiteFooter} from "./site-footer";
+
+export {PublicSiteSearch} from "./public-site-search";

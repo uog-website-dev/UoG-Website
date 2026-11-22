@@ -1,6 +1,6 @@
 """Workflow controls derived from the Site roles the workflow service enforces."""
 from .models import ContentRole, ContentStatus
-from .authorization import cms_grant_allows
+from .authorization import cms_grant_allows, cms_administrator_allows
 
 
 def available_workflow_actions(content, request, *, context=None):
@@ -21,6 +21,10 @@ def available_workflow_actions(content, request, *, context=None):
         snapshots[key] = {role for role in ContentRole.values if cms_grant_allows(user, content.site_id, [role])}
     content_roles = snapshots[key]
 
+    administrators = context.setdefault("workflow_administrator_snapshots", {}) if context is not None else {}
+    if key not in administrators:
+        administrators[key] = cms_administrator_allows(user, content.site_id)
+    administrator = administrators[key]
     actions = []
     if content.status == ContentStatus.APPROVED and "visual_layout" in content.metadata and ContentRole.AUTHOR in content_roles:
         actions.append("revise")
@@ -29,10 +33,12 @@ def available_workflow_actions(content, request, *, context=None):
     if (
         content.status == ContentStatus.IN_REVIEW
         and ContentRole.REVIEWER in content_roles
-        and user.pk not in {content.created_by_id, content.submitted_by_id}
+        and (administrator or user.pk not in {content.created_by_id, content.submitted_by_id})
     ):
-        actions.extend(("approve", "reject"))
-    if content.status == ContentStatus.APPROVED and ContentRole.PUBLISHER in content_roles:
+        actions.append("approve")
+        if user.pk not in {content.created_by_id, content.submitted_by_id}:
+            actions.append("reject")
+    if (content.status == ContentStatus.APPROVED or (administrator and content.status in {ContentStatus.DRAFT, ContentStatus.IN_REVIEW, ContentStatus.UNPUBLISHED})) and ContentRole.PUBLISHER in content_roles:
         actions.append("publish")
     if content.status == ContentStatus.PUBLISHED and ContentRole.PUBLISHER in content_roles:
         actions.append("unpublish")

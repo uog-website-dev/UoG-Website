@@ -21,7 +21,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import IconButton from "@mui/material/IconButton";
-import { UogFooter, UogHeader } from "@uog/ui";
+import { UogFooter, UogHeader } from "@uog/ui/shell";
 import type { ReactNode } from "react";
 
 import { useSessionWatch } from "@/session-watch";

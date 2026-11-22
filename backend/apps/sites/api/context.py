@@ -13,6 +13,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from ..models import Site, SiteDomain
+from .footer import FooterSettingsSerializer,public_footer
 
 
 class ResolvedSiteSerializer(serializers.Serializer):
@@ -27,6 +28,7 @@ class PublicConfigurationSerializer(serializers.Serializer):
     theme = serializers.CharField()
     logo_url = serializers.CharField(allow_null=True)
     branding_revision = serializers.CharField()
+    footer = FooterSettingsSerializer()
 
 
 class SiteContextSerializer(serializers.Serializer):
@@ -68,6 +70,7 @@ class SiteContextView(APIView):
                 sorted(request.enabled_module_codes),
             ], sort_keys=True).encode()).hexdigest()
             public_identity["branding_revision"] = revision
+            public_identity["footer"] = public_footer(current)
             body = {
                 "site": {
                     "id": current.pk,

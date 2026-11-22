@@ -160,8 +160,10 @@ class ContentWorkflowActionView(APIView):
             "require POSTS enabled for that Site. Authorization uses the "
             "action's Site CMS role assignment or an active database "
             "platform-administrator assignment. Keycloak realm roles and "
-            "body-supplied roles do not grant access. An author cannot "
-            "review their own content. Publishing records an immutable "
+            "body-supplied roles do not grant access. Live Site administrators may "
+            "publish drafts, in-review and unpublished content directly; internal "
+            "submission and administrative approval are audited atomically. Other "
+            "authors cannot review their own content. Publishing records an immutable "
             "snapshot, audit event and cache generation change. A repeated "
             "publish is idempotent."
         ),

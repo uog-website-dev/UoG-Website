@@ -6,7 +6,11 @@
   "main": "src/index.ts",
   "types": "src/index.ts",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./shell": "./src/UogShell.tsx",
+    "./theme-provider": "./src/UogThemeProvider.tsx",
+    "./toast": "./src/toast.tsx",
+    "./public-site": "./src/public-site.ts"
   },
   "scripts": {
     "test": "vitest run",
@@ -14,27 +18,29 @@
   },
   "dependencies": {
     "@emotion/cache": "11.14.0",
-    "@uog/api-client": "workspace:*",
-    "@uog/types": "workspace:*",
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.1",
     "@mui/icons-material": "6.5.0",
     "@mui/material": "6.5.0",
     "@mui/material-nextjs": "6.5.0",
+    "@uog/api-client": "workspace:*",
+    "@uog/types": "workspace:*",
+    "lottie-web": "5.13.0",
+    "parse5": "7.3.0",
     "react": "19.2.9",
-    "react-dom": "19.2.9",
-    "parse5": "7.3.0"
+    "react-dom": "19.2.9"
   },
   "devDependencies": {
     "@testing-library/dom": "10.4.0",
     "@testing-library/react": "16.1.0",
     "@testing-library/user-event": "14.5.2",
     "@types/node": "22.10.5",
-    "@uog/config": "workspace:*",
     "@types/react": "19.2.9",
     "@types/react-dom": "19.2.4",
+    "@uog/config": "workspace:*",
     "jsdom": "25.0.1",
     "typescript": "5.6.3",
     "vitest": "5.0.5"
-  }
+  },
+  "sideEffects": false
 }

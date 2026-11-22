@@ -71,6 +71,7 @@ PROFILES["hero"]["properties"].update({
  "actions":items({"label":TEXT,"href":HREF}),
 })
 PROFILES["link"]["properties"].update({"variant":{"enum":["text","solid","outline"]}})
+PROFILES["source"]["properties"]["presentation"] = {"enum": ["grid", "list", "featured"]}
 CATALOG = {
  "hero_image":"hero", "image_slider":"media_items", "image_grid":"media_items",
  "layout_slider":"layout_items", "simple_masonry":"layout_items", "anything_carousel":"layout_items",
@@ -88,6 +89,7 @@ CATALOG = {
 }
 def presentation_schema():
     return obj({"align": {"enum": ["start", "center", "end"]},
+                 "content_width": {"enum": ["full", "wide", "reading"]},
                  "tone": {"enum": ["default", "muted", "brand"]},
                  "gap": { "enum": ["none","sm","md","lg"] },
                  "padding":{"enum":["none","sm","md","lg","xl"]},
@@ -232,7 +234,7 @@ def main():
                 path.write_text(content, encoding="utf-8")
 
     if args.check:
-        frozen = ROOT / "backend/apps/cms/migrations/layout_v1_schema.json"
+        frozen = ROOT / "backend/apps/cms/migrations/0028_layout_schema.json"
         if json.loads(frozen.read_text(encoding="utf-8")) != build_schema(): raise SystemExit("Frozen migration schema drift")
     types_path=ROOT / "frontend/packages/types/src/layout/generated.ts"
     content=types_source()

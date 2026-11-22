@@ -20,7 +20,11 @@ export const categories: {label:string; shortLabel:string; types:WidgetType[]}[]
 ];
 export const uid = () => crypto.randomUUID();
 export const labelFor = (type:string) => registry.find(entry=>entry.type===type)?.label ?? type;
-export const schemaFor = (type:WidgetType) => leaves.find(schema=>schema.properties?.type?.const===type)!.properties!.props!;
+export const schemaFor = (type:WidgetType) => {
+  const schema=leaves.find(schema=>schema.properties?.type?.const===type)!.properties!.props!;
+  // Restrict authoring choices without invalidating legacy stored animation codes.
+  return type==="lottie_player"?{...schema,properties:{...schema.properties,animation_code:{...schema.properties!.animation_code,enum:["campus","research","community","item-example","example"]}}}:schema;
+};
 export const presentationSchema = layoutSchema.properties.rows.items.properties.style as PropertySchema;
 export const emptyLayout = ():VisualLayout => ({schema_version:1,rows:[]});
 

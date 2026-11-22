@@ -11,7 +11,7 @@ from apps.audit.context import (
 )
 from apps.audit.writer import record_event
 
-from ..authorization import cms_grant_allows
+from ..authorization import cms_grant_allows, cms_administrator_allows
 from ..models import (
     ContentRole,
     ContentEditConflict,
@@ -88,6 +88,21 @@ def transition_content(
             actor, site_id=content.site_id, role=required_role,
             roles=roles, using=using,
         )
+        administrator = cms_administrator_allows(actor, content.site_id, using=using)
+        if action == "publish" and administrator and content.status in {
+            ContentStatus.DRAFT, ContentStatus.UNPUBLISHED, ContentStatus.IN_REVIEW,
+        }:
+            # Keep the existing DB state machine, immutable revisions and audit
+            # history. All intermediate steps roll back if publication fails.
+            note = "Direct publication authorized by Site administrator."
+            if content.status == ContentStatus.UNPUBLISHED:
+                transition_content(content.pk, action="restore", actor=actor, comment=note, using=using)
+                content.refresh_from_db(using=using)
+            if content.status == ContentStatus.DRAFT:
+                transition_content(content.pk, action="submit", actor=actor, comment=note, using=using)
+            transition_content(content.pk, action="approve", actor=actor, comment=note, using=using)
+            return transition_content(content.pk, action="publish", actor=actor,
+                                      comment=comment or note, using=using)
         source, target, _ = _action_transition(action, content.status)
 
         if action == "publish" and content.status == ContentStatus.PUBLISHED:
@@ -100,7 +115,7 @@ def transition_content(
                 ),
             })
 
-        if action in {"approve", "reject"} and _is_author(actor, content):
+        if action in {"approve", "reject"} and _is_author(actor, content) and not (action == "approve" and administrator):
             raise PermissionDenied(
                 "The author and submitter cannot review their own content."
             )
@@ -391,7 +406,7 @@ def _create_publication_snapshot(content, *, using, approval=None):
             "visibility": content.visibility,
             "position": content.position,
             "is_homepage": content.is_homepage,
-            "parent_id": content.parent_id,
+            "parent_id": str(content.parent_id) if content.parent_id else None,
         })
     elif content._meta.model_name == "post":
         author = content.author

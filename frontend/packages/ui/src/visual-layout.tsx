@@ -11,10 +11,12 @@ import {
   validateVisualLayout,
 } from "@uog/types";
 import type { LayoutSection, VisualLayout, WidgetNode } from "@uog/types";
+import {ApprovedAnimation} from "./approved-animation";
+import {ApprovedIcon,Countdown,VideoPlayer,LocationMap,TableOfContents} from "./utility-widgets";
 import { BlockView } from "./public-page";
 import { ContentCarousel, decorativeStyle, HeroView, PresentationLink } from "./visual-presentation";
 import {WidgetRuntimeProvider, SiteTitleWidget, SiteLogoWidget, LoopGridWidget, TaxonomyFilterWidget,
-  PostTitleWidget, PostExcerptWidget, FeaturedImageWidget, ContactFormWidget, PostPreviewSelector, MenuWidget} from "./widget-runtime";
+  BreadcrumbsWidget, TaxonomyWidget, PostTitleWidget, PostExcerptWidget, FeaturedImageWidget, ContactFormWidget, PostPreviewSelector, MenuWidget} from "./widget-runtime";
 
 const tokenGap = {none:0,sm:1,md:2,lg:4} as const;
 const focusRing = {"&:focus-visible":{outline:"3px solid",outlineColor:"primary.main",outlineOffset:2}} as const;
@@ -25,7 +27,7 @@ function presentationStyle(resolved:{align:string;tone:string;gap:"none"|"sm"|"m
     textAlign:resolved.align === "center" ? "center" as const : resolved.align === "end" ? "end" as const : "start" as const,
     gap:tokenGap[resolved.gap],
     bgcolor:resolved.tone === "muted" ? "background.paper" : branded ? "primary.main" : "transparent",
-    color:branded ? "primary.contrastText" : "text.primary",
+    color:branded ? "primary.contrastText" : "inherit",
   };
 }
 
@@ -59,7 +61,7 @@ function SectionRow({row,siteId,pageTitle,width}:{row:LayoutSection;siteId:numbe
     data-resolved-breakpoint={resolved.breakpoint}
     data-resolved-gap={resolved.gap}
     data-resolved-stack={resolved.stack ? "true" : "false"}
-    sx={{display:"grid",gridTemplateColumns:columns,...presentationStyle(resolved),...decorativeStyle(row.style),...(resolved.tone==="muted" && !row.style?.padding ? {p:{xs:2.5,md:4}} : {}),...(resolved.tone==="muted" && !row.style?.radius ? {borderRadius:2} : {})}}
+    sx={{width:"100%",mx:"auto",maxWidth:row.style?.content_width==="wide"?1280:row.style?.content_width==="reading"?880:undefined,display:"grid",gridTemplateColumns:columns,...presentationStyle(resolved),...decorativeStyle(row.style),...(resolved.tone==="muted" && !row.style?.padding ? {p:{xs:2.5,md:4}} : {}),...(resolved.tone==="muted" && !row.style?.radius ? {borderRadius:2} : {})}}
   >
     {row.columns.map((column) => (
       <Box key={column.id} data-node-id={column.id} sx={{minWidth:0,display:"flex",flexDirection:"column",gap:2}}>
@@ -177,7 +179,13 @@ function VisualWidget({widget,siteId,pageTitle,viewportWidth}:{widget:WidgetNode
     case "site_title":body=<SiteTitleWidget/>;break;
     case "site_logo":body=<SiteLogoWidget/>;break;
     case "menu":body=<MenuWidget menu_code={widget.props.menu_code}/>;break;
-    case "loop_grid":body=<LoopGridWidget {...widget.props}/>;break;
+    case "loop_grid":case "blog":body=<LoopGridWidget {...widget.props}/>;break;
+    case "recent_posts":body=<LoopGridWidget {...widget.props} presentation="list"/>;break;
+    case "post_carousel":case "loop_carousel":body=<LoopGridWidget {...widget.props} carousel/>;break;
+    case "taxonomy":body=<TaxonomyWidget {...widget.props}/>;break;
+    case "breadcrumbs":body=<BreadcrumbsWidget pageTitle={pageTitle}/>;break;
+    case "table_of_contents":body=<TableOfContents {...widget.props}/>;break;
+    case "lottie_player":body=<ApprovedAnimation {...widget.props}/>;break;
     case "taxonomy_filter":body=<TaxonomyFilterWidget {...widget.props}/>;break;
     case "post_title":body=<PostTitleWidget/>;break;
     case "post_excerpt":body=<PostExcerptWidget/>;break;
@@ -187,7 +195,8 @@ function VisualWidget({widget,siteId,pageTitle,viewportWidth}:{widget:WidgetNode
     case "editor":body=<BlockView block={{type:"paragraph",html:widget.props.html}} siteId={siteId}/>;break;
     case "hero_image":body=<HeroView props={widget.props} siteId={siteId} width={viewportWidth}/>;break;
     case "image":body=<BlockView block={{type:"image",ref:`sites/${siteId}/assets/${widget.props.asset_id}`,alt:widget.props.alt}} siteId={siteId}/>;break;
-    case "image_slider":case "image_grid":body=<BlockView block={{type:widget.type === "image_slider" ? "slider":"gallery",slides:widget.props.items,images:widget.props.items}} siteId={siteId}/>;break;
+    case "image_slider":body=<ContentCarousel label="Image slider" items={widget.props.items.map(item=>({id:item.id,content:<Box component="figure" sx={{m:0,"& img":{width:"100%",maxHeight:560,objectFit:"cover",borderRadius:2}}}><BlockView block={{type:"image",ref:`sites/${siteId}/assets/${item.asset_id}`,alt:item.alt}} siteId={siteId}/>{item.caption?<Typography component="figcaption" sx={{mt:1,color:"text.secondary"}}>{item.caption}</Typography>:null}</Box>}))}/>;break;
+    case "image_grid":body=<BlockView block={{type:"gallery",images:widget.props.items}} siteId={siteId}/>;break;
     case "button":body=<PresentationLink {...widget.props}/>;break;
     case "button_grid":case "social_media_buttons":body=<Box sx={{display:"flex",gap:2,flexWrap:"wrap"}}>{widget.props.items.map(item=><BlockView key={item.id} block={{type:"button",label:item.label,href:item.href}} siteId={siteId}/>)}</Box>;break;
     case "layout_slider":case "anything_carousel":body=<ContentCarousel items={widget.props.items.map(item=>({id:item.id,content:<Box sx={{display:"grid",gap:2}}>{item.children.map(child=><VisualWidget key={child.id} widget={child} siteId={siteId} pageTitle={pageTitle} viewportWidth={viewportWidth}/>)}</Box>}))}/>;break;
@@ -195,17 +204,17 @@ function VisualWidget({widget,siteId,pageTitle,viewportWidth}:{widget:WidgetNode
     case "tabs":body=<TabsWidget items={widget.props.items}/>;break;
     case "accordion":body=<AccordionWidget items={widget.props.items}/>;break;
     case "call_to_action":case "author_box":body=<Box><Typography variant="h3">{widget.props.title}</Typography><Typography>{widget.props.text}</Typography>{widget.props.href && widget.props.label?<BlockView block={{type:"button",href:widget.props.href,label:widget.props.label}}/>:null}</Box>;break;
-    case "features":body=<Box sx={{display:"grid",gap:2}}>{widget.props.items.map(item=><Box key={item.id}><Typography variant="h3">{item.title}</Typography><Typography>{item.text}</Typography></Box>)}</Box>;break;
+    case "features":body=<Box sx={{display:"grid",gap:2}}>{widget.props.items.map(item=><Box key={item.id} data-item-id={item.id}><Typography variant="h3">{item.title}</Typography><Typography>{item.text}</Typography></Box>)}</Box>;break;
     case "testimonials":body=<Box component="blockquote"><Typography>{widget.props.text}</Typography><Typography component="cite">{widget.props.attribution}</Typography></Box>;break;
     case "page_title":body=<Typography variant="h2">{pageTitle}</Typography>;break;
     case "alert":body=<Typography role="note">{widget.props.text}</Typography>;break;
     case "menu_anchor":body=<Box id={widget.props.anchor}/>;break;
-    case "countdown":body=<Typography>{widget.props.label}: <time dateTime={widget.props.ends_at}>{widget.props.ends_at}</time></Typography>;break;
-    case "video_player":body=<Link href={widget.props.provider === "youtube" ? `https://www.youtube.com/watch?v=${widget.props.video_id}` : `https://vimeo.com/${widget.props.video_id}`} rel="noopener noreferrer">{widget.props.title}</Link>;break;
-    case "google_maps":body=<Link href={`https://www.google.com/maps?q=${widget.props.latitude},${widget.props.longitude}&z=${widget.props.zoom}`} rel="noopener noreferrer">{widget.props.title}</Link>;break;
-    case "icon":body=<Typography>{widget.props.label}</Typography>;break;
+    case "countdown":body=<Countdown {...widget.props}/>;break;
+    case "video_player":body=<VideoPlayer {...widget.props}/>;break;
+    case "google_maps":body=<LocationMap {...widget.props}/>;break;
+    case "icon":body=<ApprovedIcon {...widget.props}/>;break;
     case "price_table":body=<Box><Typography variant="h3">{widget.props.title}</Typography><Typography>{widget.props.price}</Typography><ul>{widget.props.items.map(item=><li key={item.id}>{item.text}</li>)}</ul><BlockView block={{type:"button",label:widget.props.label,href:widget.props.href}}/></Box>;break;
-    default:body=<Typography color="text.secondary" role="status" data-fallback="integration">This content is currently unavailable.</Typography>;
+    default:{const unreachable:never=widget;throw new Error(`Missing widget renderer: ${String(unreachable)}`);}
   }
   return <Box
     data-node-id={widget.id}

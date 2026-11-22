@@ -85,7 +85,13 @@ class NavigationPreviewOutput(serializers.Serializer):
 
 class LocationInput(StrictFields, serializers.Serializer):
     version = serializers.IntegerField(min_value=0)
-    menu = serializers.UUIDField(allow_null=True)
+    menu = serializers.UUIDField(allow_null=True, required=False)
+    menus = serializers.ListField(child=serializers.UUIDField(), max_length=4, required=False)
+
+    def validate(self, attrs):
+        if ('menu' in attrs) == ('menus' in attrs):
+            raise serializers.ValidationError({'menus':'Supply either menu or menus, not both.'})
+        return attrs
     replace = serializers.BooleanField(default=False)
 
 class LocationPublishInput(StrictFields, serializers.Serializer):
@@ -97,6 +103,8 @@ class LocationOutput(serializers.Serializer):
     version = serializers.IntegerField()
     draft_menu = serializers.UUIDField(allow_null=True)
     published_menu = serializers.UUIDField(allow_null=True)
+    draft_menus = serializers.ListField(child=serializers.UUIDField())
+    published_menus = serializers.ListField(child=serializers.UUIDField())
     is_published = serializers.BooleanField()
     has_changes = serializers.BooleanField()
 
@@ -318,13 +326,13 @@ class MenuViewSet(MenuAPIBase):
         with menu_errors(),hierarchy_write():
             return Response(location_state(self._site()))
 
-    @extend_schema(parameters=[OpenApiParameter("location",str,OpenApiParameter.PATH,enum=["header","secondary","footer","sidebar"])],request=LocationInput,responses=LocationOutput,description="menu.write. Save a Site-local assignment draft. version is required; occupied-slot changes require replace=true. menu=null saves an explicit unassignment draft.")
+    @extend_schema(parameters=[OpenApiParameter("location",str,OpenApiParameter.PATH,enum=["header","secondary","footer","sidebar"])],request=LocationInput,responses=LocationOutput,description="menu.write. Save a Site-local assignment draft. version is required; occupied-slot changes require replace=true. menu=null saves an explicit unassignment draft. Footer alternatively accepts ordered menus (0-4 distinct same-Site IDs), one equal-width column per menu.")
     @action(detail=False,methods=["post"],url_path=r"locations/(?P<location>[a-z-]+)/draft")
     def location_draft(self,request,*args,**kwargs):
         from ..services.menu_locations import write_location
         with menu_errors(),hierarchy_write():
             site=self._site();body=self._input(LocationInput)
-            return Response(write_location(site.pk,kwargs['location'],actor=request.user,expected=body['version'],menu_id=body['menu'],replace=body['replace']))
+            return Response(write_location(site.pk,kwargs['location'],actor=request.user,expected=body['version'],menu_id=body.get('menu'),menu_ids=body.get('menus'),replace=body['replace']))
 
     @extend_schema(parameters=[OpenApiParameter("location",str,OpenApiParameter.PATH,enum=["header","secondary","footer","sidebar"])],request=LocationPublishInput,responses=LocationOutput,description="menu.publish. Atomically promote the slot draft; selected menus must already be published. Null promotion suppresses legacy fallback without deleting menus. Stale versions return 409.")
     @action(detail=False,methods=["post"],url_path=r"locations/(?P<location>[a-z-]+)/publish")

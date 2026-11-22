@@ -59,3 +59,12 @@ describe("shared content workflow", () => {
     expect(onConfirm).toHaveBeenCalled();
   });
 });
+
+
+it("offers direct administrator publication when the backend authorizes it", () => {
+  const onAction = vi.fn();
+  render(<ContentWorkflowButtons title="Site homepage" available={["publish", "restore"]} disabled={false} onAction={onAction}/>);
+  fireEvent.click(screen.getByRole("button", {name:"Publish Site homepage"}));
+  expect(onAction).toHaveBeenCalledWith("publish");
+  expect(screen.queryByRole("button", {name:/Approve/})).toBeNull();
+});

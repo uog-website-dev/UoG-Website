@@ -50,6 +50,7 @@ export function PublicSiteChrome({ children, initialSite = EMPTY_SITE }: { child
     <Container maxWidth="lg" sx={{
       py: { xs: 3, md: 5 }, display: "flex", flexDirection: "column", minHeight: "65vh",
       "& [data-layout-version] p": { lineHeight: 1.75 },
+      "&:has([data-page-bleed='true'])": {maxWidth:"none",px:0,py:0},
     }}>
       {children}
     </Container>

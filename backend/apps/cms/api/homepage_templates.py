@@ -25,7 +25,23 @@ from .pages import SITE_PARAMETER, PageSerializer, ensure_pages_module_enabled, 
 from .visual_drafts import VisualLayoutField
 
 
+class TemplateMediaSlot(serializers.Serializer):
+    code = serializers.CharField()
+    label = serializers.CharField()
+    node_ids = serializers.ListField(child=serializers.CharField())
+
+class TemplateAssetInput(StrictFields, serializers.Serializer):
+    asset_id = serializers.UUIDField()
+    alt = serializers.CharField(min_length=1,max_length=255)
+
+class TemplateBindingsField(serializers.DictField):
+    def to_internal_value(self,data):
+        if isinstance(data,dict) and len(data)>8:
+            raise serializers.ValidationError("Choose at most eight image slots.")
+        return super().to_internal_value(data)
+
 class HomepageTemplateOutput(serializers.Serializer):
+    media_slots = TemplateMediaSlot(many=True,default=list)
     manifest_version = serializers.IntegerField()
     id = serializers.CharField()
     version = serializers.IntegerField()
@@ -38,6 +54,7 @@ class HomepageTemplateOutput(serializers.Serializer):
 
 
 class PrepareInput(StrictFields, serializers.Serializer):
+    assets = TemplateBindingsField(child=TemplateAssetInput(),required=False,default=dict)
     template_id = serializers.SlugField(max_length=80)
     version = serializers.IntegerField(min_value=1)
 
@@ -49,6 +66,7 @@ class PrepareOutput(serializers.Serializer):
 
 
 class ApplyInput(StrictFields, serializers.Serializer):
+    assets = TemplateBindingsField(child=TemplateAssetInput(),required=False,default=dict)
     template_id = serializers.SlugField(max_length=80)
     version = serializers.IntegerField(min_value=1)
     mode = serializers.ChoiceField(choices=("new", "replace"))
@@ -98,7 +116,10 @@ class HomepageTemplatePrepare(HomepageTemplateCatalogue):
         payload = PrepareInput(data=request.data)
         payload.is_valid(raise_exception=True)
         try:
-            result = prepare_template(site.pk, payload.validated_data["template_id"], payload.validated_data["version"])
+            if payload.validated_data["assets"]:
+                from apps.media.selectors import authorize
+                authorize(request.user,site.pk)
+            result = prepare_template(site.pk, payload.validated_data["template_id"], payload.validated_data["version"],assets=payload.validated_data["assets"])
         except DomainValidationError as error:
             raise ValidationError(error.message_dict) from error
         return Response(PrepareOutput(result).data)
@@ -118,7 +139,10 @@ class HomepageTemplateApply(HomepageTemplateCatalogue):
         payload.is_valid(raise_exception=True)
         values = payload.validated_data
         try:
-            template = prepare_template(site.pk, values["template_id"], values["version"])
+            if values["assets"]:
+                from apps.media.selectors import authorize
+                authorize(request.user,site.pk)
+            template = prepare_template(site.pk, values["template_id"], values["version"],assets=values["assets"])
             layout = validate_layout(template["visual_layout"])
             validate_layout_media(layout, site_id=site.pk)
         except DomainValidationError as error:

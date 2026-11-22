@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import * as http from "node:http";
 import * as https from "node:https";
-import { EMPTY_SITE, pageMetadata, postMetadata, safePagePath, siteFromContext } from "@uog/ui";
-import type { PublicSiteContext } from "@uog/ui";
+import { EMPTY_SITE, pageMetadata, postMetadata, safePagePath, siteFromContext } from "@uog/ui/public-site";
+import type { PublicSiteContext } from "@uog/ui/public-site";
 
 const API = process.env.API_BASE_URL ?? "http://backend:8000/api";
 

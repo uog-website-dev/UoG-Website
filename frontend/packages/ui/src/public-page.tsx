@@ -435,7 +435,7 @@ export function PublicPageView({ page, privateMediaBase, viewportWidth, hideTitl
   };
   return (
     <PrivateMediaBase.Provider value={privateMediaBase ?? null}>
-      <Box data-page-layout={shell} data-site-code={site.code ?? ""} sx={{
+      <Box data-page-layout={shell} data-page-bleed={shell==="FULL_WIDTH"&&page.visual_layout?.settings?.content_width==="full"?"true":undefined} data-site-code={site.code ?? ""} sx={{
         display: "grid", width: "100%", minWidth: 0, gap: { xs: 3, md: 4 },
         gridTemplateColumns: columns, gridTemplateAreas: areas,
       }}>

@@ -314,6 +314,7 @@ export async function setMenuActive(
 export interface MenuLocationRecord {
   location: string; label: string; version: number;
   draft_menu: string | null; published_menu: string | null;
+  draft_menus?: string[]; published_menus?: string[];
   is_published: boolean; has_changes: boolean;
 }
 export async function loadMenuLocations(site: number): Promise<ActionResult<MenuLocationRecord[]>> {
@@ -336,4 +337,9 @@ export async function loadNavigationPreview(site:number,menu?:string):Promise<Ac
   if(!data||data.site!==site||data.preview!==true||!data.locations||typeof data.locations!=="object"||Array.isArray(data.locations))throw new Error("Preview is not available in this Site.");
   return data;
  });
+}
+
+
+export async function saveFooterMenus(site: number, version: number, menus: string[], replace: boolean): Promise<ActionResult<MenuLocationRecord>> {
+  return invalidated(site, "menus", attempt(async () => (await client()).post<MenuLocationRecord>(siteMenuPath(site,"locations/footer/draft/"),{version,menus,replace})));
 }

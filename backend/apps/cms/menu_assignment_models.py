@@ -10,6 +10,8 @@ class MenuLocationAssignment(models.Model):
     location=models.CharField(max_length=16,choices=tuple(MENU_SLOTS.items()))
     draft_menu=models.ForeignKey('cms.Menu',null=True,blank=True,on_delete=models.PROTECT,related_name='draft_assignments')
     published_menu=models.ForeignKey('cms.Menu',null=True,blank=True,on_delete=models.PROTECT,related_name='published_assignments')
+    draft_menus=models.JSONField(default=list,blank=True)
+    published_menus=models.JSONField(default=list,blank=True)
     is_published=models.BooleanField(default=False)
     version=models.PositiveIntegerField(default=1)
     updated_by=models.ForeignKey(settings.AUTH_USER_MODEL,null=True,on_delete=models.SET_NULL,related_name='+')
@@ -20,6 +22,18 @@ class MenuLocationAssignment(models.Model):
         require_menus_module(self.site_id)
         if self.location not in locations_for_site(self.site):
             raise ValidationError({'location':'This location is not supported by the Site template.'})
+        from .menu_models import Menu
+        from uuid import UUID
+        for field in ('draft_menus', 'published_menus'):
+            values = getattr(self, field)
+            try:
+                valid = isinstance(values, list) and len(values) <= 4 and all(isinstance(v, str) and str(UUID(v)) == v for v in values) and len(set(values)) == len(values)
+            except (ValueError, TypeError, AttributeError):
+                valid = False
+            if not valid or (values and self.location != 'footer'):
+                raise ValidationError({field:'Choose up to four distinct footer menus.'})
+            if values and Menu.objects.filter(pk__in=values, site_id=self.site_id, is_global=False).count() != len(values):
+                raise ValidationError({field:'Choose local menus owned by this Site.'})
         for field in ('draft_menu','published_menu'):
             menu=getattr(self,field)
             if menu and (menu.site_id!=self.site_id or menu.is_global):

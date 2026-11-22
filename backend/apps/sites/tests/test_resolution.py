@@ -197,7 +197,7 @@ def test_configured_institutional_hosts_resolve_only_their_own_site(client):
     assert root_context.status_code == 200
     assert root_context.json()["site"]["code"] == "MAIN"
     assert len(root_context.json()["configuration"]["branding_revision"]) == 64
-    assert {key: value for key, value in root_context.json()["configuration"].items() if key != "branding_revision"} == {"display_name": "University of Gondar", "theme": "institutional", "logo_url": None}
+    assert {key: value for key, value in root_context.json()["configuration"].items() if key not in {"branding_revision","footer"}} == {"display_name": "University of Gondar", "theme": "institutional", "logo_url": None}
     assert college_context.status_code == 200
     assert college_context.json()["site"]["code"] == "INFORMATICS"
     assert college_context.json()["domain"] == "informatics.uog.edu.et"

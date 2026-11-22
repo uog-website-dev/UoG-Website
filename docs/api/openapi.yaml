@@ -4057,9 +4057,11 @@ paths:
         URL Site. Page transitions require PAGES; Post transitions require POSTS enabled
         for that Site. Authorization uses the action's Site CMS role assignment or
         an active database platform-administrator assignment. Keycloak realm roles
-        and body-supplied roles do not grant access. An author cannot review their
-        own content. Publishing records an immutable snapshot, audit event and cache
-        generation change. A repeated publish is idempotent.
+        and body-supplied roles do not grant access. Live Site administrators may
+        publish drafts, in-review and unpublished content directly; internal submission
+        and administrative approval are audited atomically. Other authors cannot review
+        their own content. Publishing records an immutable snapshot, audit event and
+        cache generation change. A repeated publish is idempotent.
       parameters:
       - in: header
         name: If-Match
@@ -8491,6 +8493,120 @@ paths:
               schema:
                 type: string
                 format: uuid
+  /api/v1/site-context/search/:
+    get:
+      operationId: v1_site_context_search_retrieve
+      description: Search latest eligible Page/Post publication titles and article
+        excerpts under the trusted hostname. No Site override. Bounded deterministic
+        pagination; disabled modules and drafts are excluded.
+      parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+          maximum: 10000
+          minimum: 1
+          default: 1
+      - in: query
+        name: page_size
+        schema:
+          type: integer
+          maximum: 20
+          minimum: 1
+          default: 10
+      - in: query
+        name: q
+        schema:
+          type: string
+          minLength: 2
+          maxLength: 100
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Public search
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchOutput'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
   /api/v1/site-context/widgets/:
     get:
       operationId: v1_site_context_widgets_retrieve
@@ -8537,6 +8653,11 @@ paths:
           * `primary` - primary
           * `secondary` - secondary
       - in: query
+        name: page_id
+        schema:
+          type: string
+          format: uuid
+      - in: query
         name: source
         schema:
           enum:
@@ -8545,6 +8666,7 @@ paths:
           - pages
           - taxonomy
           - menu
+          - breadcrumbs
           type: string
           minLength: 1
         description: |-
@@ -8553,6 +8675,7 @@ paths:
           * `pages` - pages
           * `taxonomy` - taxonomy
           * `menu` - menu
+          * `breadcrumbs` - breadcrumbs
         required: true
       - in: query
         name: tag
@@ -11230,6 +11353,330 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Site'
+          description: ''
+          headers:
+            ETag:
+              description: Strong representation validator. Echo exactly in If-Match
+                for mutations.
+              schema:
+                type: string
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          description: Invalid body, malformed input, or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    title:
+                    - This field is required.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '409':
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '412':
+          description: If-Match does not match the current strong ETag. Retrieve and
+            reconcile changes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '415':
+          description: Unsupported request content type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '428':
+          description: If-Match header is required for this mutation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '503':
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/sites/{id}/footer/:
+    get:
+      operationId: v1_sites_footer_retrieve
+      description: Read Site-owned footer settings and the currently published Footer
+        menu. Requires sites.update; no row is created by a read.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this site.
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Sites
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FooterEnvelope'
+          description: ''
+          headers:
+            ETag:
+              description: Strong representation validator. Echo exactly in If-Match
+                for mutations.
+              schema:
+                type: string
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+    patch:
+      operationId: v1_sites_footer_partial_update
+      description: Save only this Site's footer settings using its strong footer ETag.
+        Publishes settings immediately; menu snapshots and assignments follow their
+        existing workflow. Unknown ownership/version fields are rejected.
+      parameters:
+      - in: header
+        name: If-Match
+        schema:
+          type: string
+        description: Exact strong ETag from GET detail.
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this site.
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Sites
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedFooterSettingsRequest'
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FooterEnvelope'
           description: ''
           headers:
             ETag:
@@ -19432,7 +19879,8 @@ paths:
       operationId: v1_sites_menus_locations_draft_create
       description: menu.write. Save a Site-local assignment draft. version is required;
         occupied-slot changes require replace=true. menu=null saves an explicit unassignment
-        draft.
+        draft. Footer alternatively accepts ordered menus (0-4 distinct same-Site
+        IDs), one equal-width column per menu.
       parameters:
       - in: path
         name: location
@@ -22668,6 +23116,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -22822,6 +23275,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -22976,6 +23434,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -23195,6 +23658,11 @@ paths:
                                                                 - start
                                                                 - center
                                                                 - end
+                                                              content_width:
+                                                                enum:
+                                                                - full
+                                                                - wide
+                                                                - reading
                                                               tone:
                                                                 enum:
                                                                 - default
@@ -23310,6 +23778,11 @@ paths:
                                                                 - start
                                                                 - center
                                                                 - end
+                                                              content_width:
+                                                                enum:
+                                                                - full
+                                                                - wide
+                                                                - reading
                                                               tone:
                                                                 enum:
                                                                 - default
@@ -23419,6 +23892,11 @@ paths:
                                                                 - start
                                                                 - center
                                                                 - end
+                                                              content_width:
+                                                                enum:
+                                                                - full
+                                                                - wide
+                                                                - reading
                                                               tone:
                                                                 enum:
                                                                 - default
@@ -23535,6 +24013,11 @@ paths:
                                                                 - start
                                                                 - center
                                                                 - end
+                                                              content_width:
+                                                                enum:
+                                                                - full
+                                                                - wide
+                                                                - reading
                                                               tone:
                                                                 enum:
                                                                 - default
@@ -23654,6 +24137,11 @@ paths:
                                                                 - start
                                                                 - center
                                                                 - end
+                                                              content_width:
+                                                                enum:
+                                                                - full
+                                                                - wide
+                                                                - reading
                                                               tone:
                                                                 enum:
                                                                 - default
@@ -23749,6 +24237,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -23968,6 +24461,11 @@ paths:
                                                                 - start
                                                                 - center
                                                                 - end
+                                                              content_width:
+                                                                enum:
+                                                                - full
+                                                                - wide
+                                                                - reading
                                                               tone:
                                                                 enum:
                                                                 - default
@@ -24083,6 +24581,11 @@ paths:
                                                                 - start
                                                                 - center
                                                                 - end
+                                                              content_width:
+                                                                enum:
+                                                                - full
+                                                                - wide
+                                                                - reading
                                                               tone:
                                                                 enum:
                                                                 - default
@@ -24192,6 +24695,11 @@ paths:
                                                                 - start
                                                                 - center
                                                                 - end
+                                                              content_width:
+                                                                enum:
+                                                                - full
+                                                                - wide
+                                                                - reading
                                                               tone:
                                                                 enum:
                                                                 - default
@@ -24308,6 +24816,11 @@ paths:
                                                                 - start
                                                                 - center
                                                                 - end
+                                                              content_width:
+                                                                enum:
+                                                                - full
+                                                                - wide
+                                                                - reading
                                                               tone:
                                                                 enum:
                                                                 - default
@@ -24427,6 +24940,11 @@ paths:
                                                                 - start
                                                                 - center
                                                                 - end
+                                                              content_width:
+                                                                enum:
+                                                                - full
+                                                                - wide
+                                                                - reading
                                                               tone:
                                                                 enum:
                                                                 - default
@@ -24522,6 +25040,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -24741,6 +25264,11 @@ paths:
                                                                 - start
                                                                 - center
                                                                 - end
+                                                              content_width:
+                                                                enum:
+                                                                - full
+                                                                - wide
+                                                                - reading
                                                               tone:
                                                                 enum:
                                                                 - default
@@ -24856,6 +25384,11 @@ paths:
                                                                 - start
                                                                 - center
                                                                 - end
+                                                              content_width:
+                                                                enum:
+                                                                - full
+                                                                - wide
+                                                                - reading
                                                               tone:
                                                                 enum:
                                                                 - default
@@ -24965,6 +25498,11 @@ paths:
                                                                 - start
                                                                 - center
                                                                 - end
+                                                              content_width:
+                                                                enum:
+                                                                - full
+                                                                - wide
+                                                                - reading
                                                               tone:
                                                                 enum:
                                                                 - default
@@ -25081,6 +25619,11 @@ paths:
                                                                 - start
                                                                 - center
                                                                 - end
+                                                              content_width:
+                                                                enum:
+                                                                - full
+                                                                - wide
+                                                                - reading
                                                               tone:
                                                                 enum:
                                                                 - default
@@ -25200,6 +25743,11 @@ paths:
                                                                 - start
                                                                 - center
                                                                 - end
+                                                              content_width:
+                                                                enum:
+                                                                - full
+                                                                - wide
+                                                                - reading
                                                               tone:
                                                                 enum:
                                                                 - default
@@ -25295,6 +25843,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -25430,6 +25983,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -25572,6 +26130,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -25712,6 +26275,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -25855,6 +26423,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -26006,6 +26579,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -26143,6 +26721,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -26294,6 +26877,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -26445,6 +27033,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -26591,6 +27184,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -26730,6 +27328,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -26863,6 +27466,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -26992,6 +27600,11 @@ paths:
                                             category:
                                               type: string
                                               pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$
+                                            presentation:
+                                              enum:
+                                              - grid
+                                              - list
+                                              - featured
                                           required:
                                           - source
                                           - limit
@@ -27004,6 +27617,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -27133,6 +27751,11 @@ paths:
                                             category:
                                               type: string
                                               pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$
+                                            presentation:
+                                              enum:
+                                              - grid
+                                              - list
+                                              - featured
                                           required:
                                           - source
                                           - limit
@@ -27145,6 +27768,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -27274,6 +27902,11 @@ paths:
                                             category:
                                               type: string
                                               pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$
+                                            presentation:
+                                              enum:
+                                              - grid
+                                              - list
+                                              - featured
                                           required:
                                           - source
                                           - limit
@@ -27286,6 +27919,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -27424,6 +28062,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -27570,6 +28213,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -27721,6 +28369,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -27858,6 +28511,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -28002,6 +28660,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -28167,6 +28830,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -28315,6 +28983,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -28466,6 +29139,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -28593,6 +29271,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -28720,6 +29403,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -28847,6 +29535,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -28979,6 +29672,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -29106,6 +29804,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -29235,6 +29938,11 @@ paths:
                                             category:
                                               type: string
                                               pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$
+                                            presentation:
+                                              enum:
+                                              - grid
+                                              - list
+                                              - featured
                                           required:
                                           - source
                                           - limit
@@ -29247,6 +29955,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -29376,6 +30089,11 @@ paths:
                                             category:
                                               type: string
                                               pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$
+                                            presentation:
+                                              enum:
+                                              - grid
+                                              - list
+                                              - featured
                                           required:
                                           - source
                                           - limit
@@ -29388,6 +30106,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -29525,6 +30248,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -29652,6 +30380,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -29779,6 +30512,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -29906,6 +30644,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -30046,6 +30789,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -30185,6 +30933,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -30317,6 +31070,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -30454,6 +31212,11 @@ paths:
                                               - start
                                               - center
                                               - end
+                                            content_width:
+                                              enum:
+                                              - full
+                                              - wide
+                                              - reading
                                             tone:
                                               enum:
                                               - default
@@ -30572,6 +31335,11 @@ paths:
                                 - start
                                 - center
                                 - end
+                              content_width:
+                                enum:
+                                - full
+                                - wide
+                                - reading
                               tone:
                                 enum:
                                 - default
@@ -31321,6 +32089,11 @@ paths:
           * `sidebar` - sidebar
           * `primary` - primary
           * `secondary` - secondary
+      - in: query
+        name: page_id
+        schema:
+          type: string
+          format: uuid
       - in: path
         name: site_pk
         schema:
@@ -31336,6 +32109,7 @@ paths:
           - pages
           - taxonomy
           - menu
+          - breadcrumbs
           type: string
           minLength: 1
         description: |-
@@ -31344,6 +32118,7 @@ paths:
           * `pages` - pages
           * `taxonomy` - taxonomy
           * `menu` - menu
+          * `breadcrumbs` - breadcrumbs
         required: true
       - in: query
         name: tag
@@ -36350,7 +37125,7 @@ components:
           type: string
           format: uuid
         kind:
-          $ref: '#/components/schemas/KindEnum'
+          $ref: '#/components/schemas/ActivityItemKindEnum'
         title:
           type: string
         status:
@@ -36364,6 +37139,14 @@ components:
       - status
       - title
       - updated_at
+    ActivityItemKindEnum:
+      enum:
+      - pages
+      - posts
+      type: string
+      description: |-
+        * `pages` - pages
+        * `posts` - posts
     ActivityResponse:
       type: object
       properties:
@@ -36402,6 +37185,10 @@ components:
     ApplyInputRequest:
       type: object
       properties:
+        assets:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/TemplateAssetInputRequest'
         template_id:
           type: string
           minLength: 1
@@ -37069,9 +37856,104 @@ components:
       - permissions
       - site
       - user
+    FooterBranding:
+      type: object
+      properties:
+        name:
+          type: string
+        theme:
+          $ref: '#/components/schemas/ThemeEnum'
+        logo_asset_id:
+          type: string
+          format: uuid
+          nullable: true
+      required:
+      - logo_asset_id
+      - name
+      - theme
+    FooterEnvelope:
+      type: object
+      properties:
+        site:
+          type: integer
+        version:
+          type: integer
+        settings:
+          $ref: '#/components/schemas/FooterSettings'
+        menu_items:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        site_origin:
+          type: string
+          nullable: true
+        branding:
+          $ref: '#/components/schemas/FooterBranding'
+      required:
+      - branding
+      - menu_items
+      - settings
+      - site
+      - site_origin
+      - version
+    FooterSettings:
+      type: object
+      properties:
+        newsletter_label:
+          type: string
+          maxLength: 120
+        newsletter_url:
+          type: string
+          maxLength: 2048
+        support_label:
+          type: string
+          maxLength: 120
+        support_url:
+          type: string
+          maxLength: 2048
+        description:
+          type: string
+          maxLength: 600
+        address:
+          type: string
+          maxLength: 300
+        email:
+          oneOf:
+          - type: string
+            format: email
+          - type: string
+            maxLength: 0
+        phone:
+          oneOf:
+          - type: string
+            maxLength: 48
+            pattern: ^\+?[0-9][0-9(). -]{3,47}$
+          - type: string
+            maxLength: 0
+        links_heading:
+          type: string
+          maxLength: 80
+        highlight_label:
+          type: string
+          maxLength: 80
+        highlight_url:
+          type: string
+          maxLength: 2048
+        copyright_text:
+          type: string
+          maxLength: 300
+        social_links:
+          type: array
+          items:
+            $ref: '#/components/schemas/SocialLink'
     HomepageTemplateOutput:
       type: object
       properties:
+        media_slots:
+          type: array
+          items:
+            $ref: '#/components/schemas/TemplateMediaSlot'
         manifest_version:
           type: integer
         id:
@@ -37232,6 +38114,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -37386,6 +38273,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -37540,6 +38432,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -37759,6 +38656,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -37874,6 +38776,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -37983,6 +38890,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -38099,6 +39011,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -38218,6 +39135,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -38313,6 +39235,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -38532,6 +39459,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -38647,6 +39579,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -38756,6 +39693,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -38872,6 +39814,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -38991,6 +39938,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -39086,6 +40038,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -39305,6 +40262,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -39420,6 +40382,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -39529,6 +40496,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -39645,6 +40617,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -39764,6 +40741,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -39859,6 +40841,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -39994,6 +40981,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -40136,6 +41128,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -40276,6 +41273,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -40419,6 +41421,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -40570,6 +41577,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -40707,6 +41719,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -40858,6 +41875,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -41009,6 +42031,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -41155,6 +42182,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -41294,6 +42326,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -41427,6 +42464,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -41556,6 +42598,11 @@ components:
                                     category:
                                       type: string
                                       pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$
+                                    presentation:
+                                      enum:
+                                      - grid
+                                      - list
+                                      - featured
                                   required:
                                   - source
                                   - limit
@@ -41568,6 +42615,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -41697,6 +42749,11 @@ components:
                                     category:
                                       type: string
                                       pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$
+                                    presentation:
+                                      enum:
+                                      - grid
+                                      - list
+                                      - featured
                                   required:
                                   - source
                                   - limit
@@ -41709,6 +42766,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -41838,6 +42900,11 @@ components:
                                     category:
                                       type: string
                                       pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$
+                                    presentation:
+                                      enum:
+                                      - grid
+                                      - list
+                                      - featured
                                   required:
                                   - source
                                   - limit
@@ -41850,6 +42917,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -41988,6 +43060,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -42134,6 +43211,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -42285,6 +43367,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -42422,6 +43509,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -42566,6 +43658,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -42731,6 +43828,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -42879,6 +43981,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -43030,6 +44137,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -43157,6 +44269,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -43284,6 +44401,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -43411,6 +44533,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -43543,6 +44670,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -43670,6 +44802,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -43799,6 +44936,11 @@ components:
                                     category:
                                       type: string
                                       pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$
+                                    presentation:
+                                      enum:
+                                      - grid
+                                      - list
+                                      - featured
                                   required:
                                   - source
                                   - limit
@@ -43811,6 +44953,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -43940,6 +45087,11 @@ components:
                                     category:
                                       type: string
                                       pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$
+                                    presentation:
+                                      enum:
+                                      - grid
+                                      - list
+                                      - featured
                                   required:
                                   - source
                                   - limit
@@ -43952,6 +45104,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -44089,6 +45246,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -44216,6 +45378,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -44343,6 +45510,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -44470,6 +45642,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -44610,6 +45787,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -44749,6 +45931,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -44881,6 +46068,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -45018,6 +46210,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -45136,6 +46333,11 @@ components:
                         - start
                         - center
                         - end
+                      content_width:
+                        enum:
+                        - full
+                        - wide
+                        - reading
                       tone:
                         enum:
                         - default
@@ -45711,14 +46913,6 @@ components:
         * `custom` - Custom
         * `news` - News listing
         * `category` - News category
-    KindEnum:
-      enum:
-      - pages
-      - posts
-      type: string
-      description: |-
-        * `pages` - pages
-        * `posts` - posts
     LayoutEnum:
       enum:
       - FULL_WIDTH
@@ -45758,11 +46952,16 @@ components:
           type: string
           format: uuid
           nullable: true
+        menus:
+          type: array
+          items:
+            type: string
+            format: uuid
+          maxItems: 4
         replace:
           type: boolean
           default: false
       required:
-      - menu
       - version
     LocationOutput:
       type: object
@@ -45781,17 +46980,29 @@ components:
           type: string
           format: uuid
           nullable: true
+        draft_menus:
+          type: array
+          items:
+            type: string
+            format: uuid
+        published_menus:
+          type: array
+          items:
+            type: string
+            format: uuid
         is_published:
           type: boolean
         has_changes:
           type: boolean
       required:
       - draft_menu
+      - draft_menus
       - has_changes
       - is_published
       - label
       - location
       - published_menu
+      - published_menus
       - version
     LocationPublishInputRequest:
       type: object
@@ -47220,6 +48431,58 @@ components:
         * `CHANGE` - CHANGE
         * `UNCHANGED` - UNCHANGED
         * `BLOCKED` - BLOCKED
+    PatchedFooterSettingsRequest:
+      type: object
+      properties:
+        newsletter_label:
+          type: string
+          maxLength: 120
+        newsletter_url:
+          type: string
+          maxLength: 2048
+        support_label:
+          type: string
+          maxLength: 120
+        support_url:
+          type: string
+          maxLength: 2048
+        description:
+          type: string
+          maxLength: 600
+        address:
+          type: string
+          maxLength: 300
+        email:
+          oneOf:
+          - type: string
+            format: email
+          - type: string
+            maxLength: 0
+        phone:
+          oneOf:
+          - type: string
+            maxLength: 48
+            pattern: ^\+?[0-9][0-9(). -]{3,47}$
+          - type: string
+            maxLength: 0
+        links_heading:
+          type: string
+          minLength: 1
+          maxLength: 80
+        highlight_label:
+          type: string
+          maxLength: 80
+        highlight_url:
+          type: string
+          maxLength: 2048
+        copyright_text:
+          type: string
+          minLength: 1
+          maxLength: 300
+        social_links:
+          type: array
+          items:
+            $ref: '#/components/schemas/SocialLinkRequest'
     PatchedItemPatchRequest:
       type: object
       properties:
@@ -47854,6 +49117,24 @@ components:
       - resource_type
       - risk
       - updated_at
+    PlatformEnum:
+      enum:
+      - x
+      - youtube
+      - facebook
+      - linkedin
+      - telegram
+      - tiktok
+      - instagram
+      type: string
+      description: |-
+        * `x` - x
+        * `youtube` - youtube
+        * `facebook` - facebook
+        * `linkedin` - linkedin
+        * `telegram` - telegram
+        * `tiktok` - tiktok
+        * `instagram` - instagram
     Post:
       type: object
       description: |-
@@ -48409,6 +49690,10 @@ components:
     PrepareInputRequest:
       type: object
       properties:
+        assets:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/TemplateAssetInputRequest'
         template_id:
           type: string
           minLength: 1
@@ -48573,6 +49858,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -48727,6 +50017,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -48881,6 +50176,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -49100,6 +50400,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -49215,6 +50520,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -49324,6 +50634,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -49440,6 +50755,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -49559,6 +50879,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -49654,6 +50979,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -49873,6 +51203,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -49988,6 +51323,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -50097,6 +51437,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -50213,6 +51558,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -50332,6 +51682,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -50427,6 +51782,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -50646,6 +52006,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -50761,6 +52126,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -50870,6 +52240,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -50986,6 +52361,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -51105,6 +52485,11 @@ components:
                                                         - start
                                                         - center
                                                         - end
+                                                      content_width:
+                                                        enum:
+                                                        - full
+                                                        - wide
+                                                        - reading
                                                       tone:
                                                         enum:
                                                         - default
@@ -51200,6 +52585,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -51335,6 +52725,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -51477,6 +52872,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -51617,6 +53017,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -51760,6 +53165,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -51911,6 +53321,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -52048,6 +53463,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -52199,6 +53619,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -52350,6 +53775,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -52496,6 +53926,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -52635,6 +54070,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -52768,6 +54208,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -52897,6 +54342,11 @@ components:
                                     category:
                                       type: string
                                       pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$
+                                    presentation:
+                                      enum:
+                                      - grid
+                                      - list
+                                      - featured
                                   required:
                                   - source
                                   - limit
@@ -52909,6 +54359,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -53038,6 +54493,11 @@ components:
                                     category:
                                       type: string
                                       pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$
+                                    presentation:
+                                      enum:
+                                      - grid
+                                      - list
+                                      - featured
                                   required:
                                   - source
                                   - limit
@@ -53050,6 +54510,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -53179,6 +54644,11 @@ components:
                                     category:
                                       type: string
                                       pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$
+                                    presentation:
+                                      enum:
+                                      - grid
+                                      - list
+                                      - featured
                                   required:
                                   - source
                                   - limit
@@ -53191,6 +54661,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -53329,6 +54804,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -53475,6 +54955,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -53626,6 +55111,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -53763,6 +55253,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -53907,6 +55402,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -54072,6 +55572,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -54220,6 +55725,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -54371,6 +55881,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -54498,6 +56013,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -54625,6 +56145,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -54752,6 +56277,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -54884,6 +56414,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -55011,6 +56546,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -55140,6 +56680,11 @@ components:
                                     category:
                                       type: string
                                       pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$
+                                    presentation:
+                                      enum:
+                                      - grid
+                                      - list
+                                      - featured
                                   required:
                                   - source
                                   - limit
@@ -55152,6 +56697,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -55281,6 +56831,11 @@ components:
                                     category:
                                       type: string
                                       pattern: ^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$
+                                    presentation:
+                                      enum:
+                                      - grid
+                                      - list
+                                      - featured
                                   required:
                                   - source
                                   - limit
@@ -55293,6 +56848,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -55430,6 +56990,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -55557,6 +57122,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -55684,6 +57254,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -55811,6 +57386,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -55951,6 +57531,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -56090,6 +57675,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -56222,6 +57812,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -56359,6 +57954,11 @@ components:
                                       - start
                                       - center
                                       - end
+                                    content_width:
+                                      enum:
+                                      - full
+                                      - wide
+                                      - reading
                                     tone:
                                       enum:
                                       - default
@@ -56477,6 +58077,11 @@ components:
                         - start
                         - center
                         - end
+                      content_width:
+                        enum:
+                        - full
+                        - wide
+                        - reading
                       tone:
                         enum:
                         - default
@@ -56914,9 +58519,12 @@ components:
           nullable: true
         branding_revision:
           type: string
+        footer:
+          $ref: '#/components/schemas/FooterSettings'
       required:
       - branding_revision
       - display_name
+      - footer
       - logo_url
       - theme
     PublicMenuNode:
@@ -57430,6 +59038,48 @@ components:
           $ref: '#/components/schemas/ScopeFilterRequest'
       required:
       - type
+    SearchOutput:
+      type: object
+      properties:
+        site:
+          type: integer
+        count:
+          type: integer
+        page:
+          type: integer
+        page_size:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchResult'
+      required:
+      - count
+      - page
+      - page_size
+      - results
+      - site
+    SearchResult:
+      type: object
+      properties:
+        title:
+          type: string
+        href:
+          type: string
+        kind:
+          $ref: '#/components/schemas/SearchResultKindEnum'
+      required:
+      - href
+      - kind
+      - title
+    SearchResultKindEnum:
+      enum:
+      - page
+      - post
+      type: string
+      description: |-
+        * `page` - page
+        * `post` - post
     SectionSummary:
       type: object
       properties:
@@ -58874,6 +60524,29 @@ components:
       - role
       - site
       - username
+    SocialLink:
+      type: object
+      properties:
+        platform:
+          $ref: '#/components/schemas/PlatformEnum'
+        url:
+          type: string
+          maxLength: 2048
+      required:
+      - platform
+      - url
+    SocialLinkRequest:
+      type: object
+      properties:
+        platform:
+          $ref: '#/components/schemas/PlatformEnum'
+        url:
+          type: string
+          minLength: 1
+          maxLength: 2048
+      required:
+      - platform
+      - url
     SourceEnum:
       enum:
       - global
@@ -58946,6 +60619,34 @@ components:
       - page
       - page_size
       - results
+    TemplateAssetInputRequest:
+      type: object
+      properties:
+        asset_id:
+          type: string
+          format: uuid
+        alt:
+          type: string
+          minLength: 1
+          maxLength: 255
+      required:
+      - alt
+      - asset_id
+    TemplateMediaSlot:
+      type: object
+      properties:
+        code:
+          type: string
+        label:
+          type: string
+        node_ids:
+          type: array
+          items:
+            type: string
+      required:
+      - code
+      - label
+      - node_ids
     ThemeEnum:
       enum:
       - institutional

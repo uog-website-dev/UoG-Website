@@ -13,7 +13,7 @@ import Link from "@mui/material/Link";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 
-export interface PublicMenuNode {label:string;href:string;children?:PublicMenuNode[];unavailable?:boolean;}
+export interface PublicMenuNode {label:string;href:string;children?:PublicMenuNode[];unavailable?:boolean;column?:boolean;}
 const SAFE_PATH=/^\/(?!\/)(?!\\)[A-Za-z0-9\-._~%!$&'()*+,;=:@/?#]*$/;
 
 export function safeMenuHref(value:string):string|null {
@@ -37,9 +37,9 @@ function normalizeNodes(value:unknown,depth=1,budget={remaining:1000}):PublicMen
  for(const entry of value){
   if(budget.remaining--<=0)break;
   if(!entry||typeof entry!=="object")continue;
-  const row=entry as {label?:unknown;href?:unknown;children?:unknown;destination_status?:unknown};
+  const row=entry as {label?:unknown;href?:unknown;children?:unknown;destination_status?:unknown;column?:unknown};
   if(typeof row.label!=="string"||!row.label.trim())continue;
-  nodes.push({label:row.label.trim(),href:typeof row.href==="string"?safeMenuHref(row.href)??"":"",children:normalizeNodes(row.children,depth+1,budget),...(row.destination_status==="unavailable"?{unavailable:true}:{})});
+  nodes.push({label:row.label.trim(),href:typeof row.href==="string"?safeMenuHref(row.href)??"":"",children:normalizeNodes(row.children,depth+(row.column===true&&depth===1?0:1),budget),...(row.column===true&&depth===1?{column:true}:{}),...(row.destination_status==="unavailable"?{unavailable:true}:{})});
  }
  return nodes;
 }

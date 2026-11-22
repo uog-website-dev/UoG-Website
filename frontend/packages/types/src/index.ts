@@ -510,3 +510,5 @@ export interface HealthReport {
 export type { MediaAsset, MediaStatus, MediaListQuery, MediaMetadataPatch, MediaReferenceInventory, MediaDeletion } from "./media";
 
 export * from "./layout";
+
+export * from "./footer";

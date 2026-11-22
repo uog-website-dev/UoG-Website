@@ -28,6 +28,8 @@ def compose_location(site_id, location):
     site=Site.objects.select_related('template').get(pk=site_id)
     if location in MENU_SLOTS and location not in locations_for_site(site):return []
     assigned=MenuLocationAssignment.objects.filter(site_id=site_id,location=location,is_published=True).select_related('published_menu').first()
+    if assigned and location=='footer' and assigned.published_menus:
+        return footer_columns(site_id,assigned.published_menus) if _site_serves(site_id) else []
     if assigned:
         return _project(assigned.published_menu,'local') if assigned.published_menu and not assigned.published_menu.is_global and assigned.published_menu.is_active and _site_serves(site_id) else []
     policy = MenuInheritance.objects.filter(site_id=site_id, location=location).first()
@@ -91,3 +93,16 @@ def _project(menu, source, *, draft=False):
         return rendered
 
     return branch(None)
+
+
+def footer_columns(site_id, ids, *, draft=False):
+    """Keep each configured menu as one ordered footer column."""
+    menus={str(m.pk):m for m in Menu.objects.filter(site_id=site_id,pk__in=ids,is_global=False)}
+    result=[]
+    for identifier in ids:
+        menu=menus.get(identifier)
+        if menu is None or (not draft and not menu.is_active):
+            continue
+        result.append({'label':menu.name,'href':'','source':'local',
+                       'column':True,'children':_project(menu,'local',draft=draft)})
+    return result

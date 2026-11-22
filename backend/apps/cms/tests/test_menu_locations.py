@@ -169,3 +169,59 @@ def test_main_site_uses_the_same_scoped_assignment_and_public_delivery(api):
     assert call(context,'header',{'version':saved.json()['version']},'publish').status_code==200
     assert public(context,host)[0]['label']=='Mainnav'
     assert not MenuLocationAssignment.objects.filter(site=api.site).exists()
+
+
+def test_footer_columns_are_ordered_private_scoped_and_revalidated(api):
+    first=create(api,'Resources');second=create(api,'University');host=_host(api.site)
+    saved=call(api,'footer',{'version':0,'menus':[first,second]})
+    assert saved.status_code==200,saved.content
+    assert saved.json()['draft_menus']==[first,second]
+    assert public(api,host,'footer')==[]
+    preview=api.client.get(api.base+'preview-navigation/',**api.header)
+    assert [n['label'] for n in preview.json()['locations']['footer']]==['Resources','University']
+    result=call(api,'footer',{'version':saved.json()['version']},'publish')
+    assert result.status_code==200,result.content
+    columns=public(api,host,'footer')
+    assert [n['label'] for n in columns]==['Resources','University']
+    assert columns[1]['children'][0]['label']=='University'
+    assert all(n['column'] for n in columns)
+    assert call(api,'footer',{'version':0,'menus':[]}).status_code==409
+    version=result.json()['version']
+    for ids in [[first,first],[first]*5,[str(Menu.objects.create(site=api.other,name='Foreign column',location='').pk)]]:
+        assert call(api,'footer',{'version':version,'menus':ids}).status_code==400
+    assert call(api,'header',{'version':0,'menus':[first,second]}).status_code==400
+    draft=call(api,'footer',{'version':version,'menus':[second,first],'replace':True})
+    assert draft.status_code==200,draft.content
+    assert [n['label'] for n in public(api,host,'footer')]==['Resources','University']
+    assert call(api,'footer',{'version':draft.json()['version']},'publish').status_code==200
+    assert [n['label'] for n in public(api,host,'footer')]==['University','Resources']
+    row=MenuLocationAssignment.objects.get(site=api.site,location='footer')
+    clear=call(api,'footer',{'version':row.version,'menus':[]})
+    assert call(api,'footer',{'version':clear.json()['version']},'publish').status_code==200
+    assert public(api,host,'footer')==[]
+    assert Menu.objects.filter(pk__in=[first,second]).count()==2
+
+
+def test_footer_columns_db_guard_and_inactive_publish(api):
+    first=create(api,'Primary');second=Menu.objects.create(site=api.site,name='Draft column',location='',is_active=False)
+    foreign=Menu.objects.create(site=api.other,name='Foreign',location='')
+    for values in [[first,str(foreign.pk)],[first,first]]:
+        with pytest.raises(IntegrityError),transaction.atomic():
+            MenuLocationAssignment.objects.bulk_create([MenuLocationAssignment(site=api.site,location='footer',draft_menu_id=first,draft_menus=values)])
+    saved=call(api,'footer',{'version':0,'menus':[first,str(second.pk)]})
+    assert saved.status_code==200,saved.content
+    assert call(api,'footer',{'version':saved.json()['version']},'publish').status_code==400
+    with pytest.raises(IntegrityError),transaction.atomic():
+        Menu.objects.filter(pk=second.pk).delete()
+    assert not MenuLocationAssignment.objects.get(site=api.site,location='footer').is_published
+
+
+
+def test_extra_footer_menu_mutation_invalidates_the_assigned_slot(api):
+    first=create(api,'Firstcolumn');second=create(api,'Extracolumn');host=_host(api.site)
+    saved=call(api,'footer',{'version':0,'menus':[first,second]})
+    assert call(api,'footer',{'version':saved.json()['version']},'publish').status_code==200
+    assert public(api,host,'footer')[1]['label']=='Extracolumn'
+    menu=Menu.objects.get(pk=second)
+    menu.name='Updated resources';menu.save()
+    assert public(api,host,'footer')[1]['label']=='Updated resources'
