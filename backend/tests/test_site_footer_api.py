@@ -48,7 +48,10 @@ def test_public_footer_is_hostname_scoped(client, settings):
     for site, host in ((a,'footer-a.uog.edu.et'),(b,'footer-b.uog.edu.et')):
         activate_site(site.pk)
         SiteDomain.objects.create(site=site,hostname=host,is_primary=True,status='ACTIVE')
-    SiteFooter.objects.create(site=a, description='Only A footer')
+    from apps.sites.footer import footer_values
+    row = SiteFooter.objects.create(site=a, description='Only A footer')
+    row.published_settings = footer_values(row)
+    row.save(update_fields=['published_settings'])
     settings.ALLOWED_HOSTS = ['*']
     first = client.get('/api/v1/site-context/', HTTP_HOST='footer-a.uog.edu.et')
     second = client.get('/api/v1/site-context/', HTTP_HOST='footer-b.uog.edu.et')

@@ -21,6 +21,14 @@ class SiteHeader(models.Model):
     cta_label = models.CharField(max_length=120, blank=True, default="")
     cta_url = models.CharField(max_length=2048, blank=True, default="")
     language_switcher = models.BooleanField(default=False)
+    # Draft values above publish separately; visitors read this snapshot only.
+    published_settings = models.JSONField(null=True, blank=True)
+    previous_published_settings = models.JSONField(null=True, blank=True)
+    published_at = models.DateTimeField(null=True, blank=True)
+    published_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="+", editable=False,
+    )
     version = models.PositiveIntegerField(default=1, editable=False)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,

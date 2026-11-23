@@ -96,13 +96,22 @@ def _project(menu, source, *, draft=False):
 
 
 def footer_columns(site_id, ids, *, draft=False):
-    """Keep each configured menu as one ordered footer column."""
+    """Keep each configured menu as one ordered footer column.
+
+    Public output uses the footer settings' published headings, descriptions
+    and order, so renaming the internal menu never changes visitor-facing copy.
+    """
     menus={str(m.pk):m for m in Menu.objects.filter(site_id=site_id,pk__in=ids,is_global=False)}
     result=[]
     for identifier in ids:
         menu=menus.get(identifier)
         if menu is None or (not draft and not menu.is_active):
             continue
-        result.append({'label':menu.name,'href':'','source':'local',
+        result.append({'menu':str(menu.pk),'label':menu.name,'href':'','source':'local',
                        'column':True,'children':_project(menu,'local',draft=draft)})
+    if not draft:
+        from apps.sites.footer import apply_footer_column_copy,published_footer_values
+        from apps.sites.models import SiteFooter
+        row=SiteFooter.objects.filter(site_id=site_id).first()
+        result=apply_footer_column_copy(result,published_footer_values(row)['columns'])
     return result
