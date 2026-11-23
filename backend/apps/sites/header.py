@@ -1,17 +1,21 @@
-"""Typed header settings, safe destinations and Site-scoped maintenance.
+"""Typed header settings with a draft/publication split.
 
 Navigation is deliberately absent: header and utility menus come from the
 Site's existing published menu locations, so this module only owns typed
-presentation settings.
+presentation settings. Draft values publish separately and visitors only ever
+read the published snapshot.
 """
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.utils import timezone
 
+from apps.audit.context import audit_context, current_audit_context
+from apps.audit.writer import record_event
 from apps.authorization.access import effective_scope_for_site
 from apps.authorization.services import permission_granted
-from apps.audit.context import audit_context, current_audit_context
 from apps.cms.menu_models import CUSTOM_PATH, validate_external_url
 from apps.organizations.hierarchy_lock import hierarchy_write
 
+from .chrome_lint import enforce, lint_header
 from .models import Site
 from .models.header import HEADER_FIELDS, SiteHeader
 
@@ -87,6 +91,16 @@ def header_values(row):
     return {field: getattr(row, field) for field in HEADER_FIELDS} if row else defaults()
 
 
+def published_header_values(row):
+    if row and isinstance(row.published_settings, dict):
+        return {**defaults(), **{field: row.published_settings.get(field, defaults()[field]) for field in HEADER_FIELDS}}
+    return defaults()
+
+
+def header_has_unpublished_changes(row):
+    return header_values(row) != (row.published_settings if row and isinstance(row.published_settings, dict) else defaults())
+
+
 def header_etag(site_id, row):
     return f'"site-header-{site_id}-v{row.version if row else 0}"'
 
@@ -99,19 +113,23 @@ class HeaderConflict(Exception):
     pass
 
 
+def _require(actor, site):
+    if (
+        not actor or not actor.is_authenticated or not actor.is_active
+        or not permission_granted(
+            actor, "sites.update", site_id=site.pk,
+            organization_id=effective_scope_for_site(site.pk), audit=False,
+        )
+    ):
+        raise PermissionDenied("Site settings permission is required.")
+
+
 def save_header(site_id, changes, *, actor, expected):
     if set(changes) - set(HEADER_FIELDS):
         raise ValidationError({"fields": "Unsupported header fields."})
     with hierarchy_write():
         site = Site.objects.select_for_update().get(pk=site_id)
-        if (
-            not actor or not actor.is_authenticated or not actor.is_active
-            or not permission_granted(
-                actor, "sites.update", site_id=site.pk,
-                organization_id=effective_scope_for_site(site.pk), audit=False,
-            )
-        ):
-            raise PermissionDenied("Site settings permission is required.")
+        _require(actor, site)
         row = SiteHeader.objects.select_for_update().filter(site=site).first()
         if not expected:
             raise HeaderPreconditionRequired()
@@ -129,4 +147,63 @@ def save_header(site_id, changes, *, actor, expected):
                 setattr(row, field, value)
             row.updated_by = actor
             row.save()
+        return row
+
+
+def publish_header(site_id, *, actor, expected):
+    with hierarchy_write():
+        site = Site.objects.select_for_update().get(pk=site_id)
+        _require(actor, site)
+        row = SiteHeader.objects.select_for_update().filter(site=site).first()
+        if not expected:
+            raise HeaderPreconditionRequired()
+        if expected != header_etag(site.pk, row):
+            raise HeaderConflict()
+        if row is None:
+            raise ValidationError({"detail": "Save header settings before publishing."})
+        values = header_values(row)
+        validate_header(values)
+        errors, warnings = lint_header(values)
+        enforce(errors)
+        context = current_audit_context()
+        with audit_context(actor_kind="USER", actor_id=str(actor.pk), request_id=context.request_id):
+            previous = row.published_settings
+            row.previous_published_settings = previous
+            row.published_settings = values
+            row.published_at = timezone.now()
+            row.published_by = actor
+            row.updated_by = actor
+            row.save()
+            record_event(
+                action="SITE_HEADER_PUBLISHED", entity_type="sites.header", entity_id=row.pk,
+                before=previous, after=values, changed_fields=sorted(values),
+            )
+        return row, warnings
+
+
+def restore_previous_header(site_id, *, actor, expected):
+    with hierarchy_write():
+        site = Site.objects.select_for_update().get(pk=site_id)
+        _require(actor, site)
+        row = SiteHeader.objects.select_for_update().filter(site=site).first()
+        if not expected:
+            raise HeaderPreconditionRequired()
+        if expected != header_etag(site.pk, row):
+            raise HeaderConflict()
+        previous = row.previous_published_settings if row else None
+        if not row or not isinstance(previous, dict):
+            raise ValidationError({"detail": "There is no previous published header to restore."})
+        values = {**defaults(), **{field: previous.get(field, defaults()[field]) for field in HEADER_FIELDS}}
+        validate_header(values)
+        before = header_values(row)
+        context = current_audit_context()
+        with audit_context(actor_kind="USER", actor_id=str(actor.pk), request_id=context.request_id):
+            for field in HEADER_FIELDS:
+                setattr(row, field, values[field])
+            row.updated_by = actor
+            row.save()
+            record_event(
+                action="SITE_HEADER_RESTORED", entity_type="sites.header", entity_id=row.pk,
+                before=before, after=values, changed_fields=sorted(values),
+            )
         return row

@@ -20,6 +20,14 @@ class SiteFooter(models.Model):
     support_url=models.URLField(max_length=2048,blank=True,default="")
     copyright_text=models.CharField(max_length=300,default=COPYRIGHT_DEFAULT)
     social_links=models.JSONField(default=list,blank=True)
+    # Ordered public column copy. Each menu id references the Site's own menu;
+    # the public heading never falls back to that internal menu name once set.
+    columns=models.JSONField(default=list,blank=True)
+    # The last published document. Draft columns above never reach visitors.
+    published_settings=models.JSONField(null=True,blank=True)
+    previous_published_settings=models.JSONField(null=True,blank=True)
+    published_at=models.DateTimeField(null=True,blank=True)
+    published_by=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.SET_NULL,null=True,blank=True,related_name="+",editable=False)
     version=models.PositiveIntegerField(default=1,editable=False)
     created_by=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.SET_NULL,null=True,related_name="+",editable=False)
     updated_by=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.SET_NULL,null=True,related_name="+",editable=False)
@@ -47,4 +55,4 @@ class SiteFooter(models.Model):
             super().save(*args,**kwargs)
             self.refresh_from_db(fields=["version"])
 
-FOOTER_FIELDS=("newsletter_label","newsletter_url","support_label","support_url","description","address","email","phone","links_heading","highlight_label","highlight_url","copyright_text","social_links")
+FOOTER_FIELDS=("newsletter_label","newsletter_url","support_label","support_url","description","address","email","phone","links_heading","highlight_label","highlight_url","copyright_text","social_links","columns")

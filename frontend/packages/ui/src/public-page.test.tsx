@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 
 import { pageFromResponse, paragraphParts, PublicPageView } from "./public-page";
+import { VisualLayoutView } from "./visual-layout";
 
 const published = {
   status: "PUBLISHED",
@@ -24,7 +25,7 @@ const published = {
 const image = "00000000-0000-4000-8000-000000000001";
 
 /** A visual Page whose only layout widget is one hero. */
-function visualPage(settings?: { show_title?: boolean }, headingLevel?: 1 | 2) {
+function visualPage(settings?: { show_title?: boolean; chrome?: "global" | "none" }, headingLevel?: 1 | 2) {
   return pageFromResponse(200, {
     ...published,
     blocks: [],
@@ -86,6 +87,34 @@ describe("paragraphParts", () => {
 });
 
 describe("PublicPageView", () => {
+  it("keeps the global chrome unless the Page explicitly opts out", () => {
+    const { container } = render(<PublicPageView page={visualPage()} />);
+    expect(container.querySelector("[data-page-chrome]")).toBeNull();
+    expect(screen.queryByRole("navigation", { name: "Page navigation" })).toBeNull();
+  });
+  it("renders a chrome-free Page with its own navigation affordance", () => {
+    const { container } = render(<PublicPageView page={visualPage({ chrome: "none" })} />);
+    expect(container.querySelector('[data-page-chrome="none"]')).toBeTruthy();
+    expect(screen.getByRole("navigation", { name: "Page navigation" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: /Site home/ }).getAttribute("href")).toBe("/");
+    expect(screen.getByRole("heading", { level: 1 })).toBeTruthy();
+  });
+  it("still renders legacy Site chrome widgets inside a published layout", () => {
+    const layout = {
+      schema_version: 1 as const,
+      rows: [{
+        id: "row", type: "section" as const, ratios: [100] as [100],
+        columns: [{ id: "column", type: "column" as const, children: [
+          { id: "legacy-logo", type: "site_logo" as const, props: {} },
+          { id: "legacy-title", type: "site_title" as const, props: {} },
+          { id: "legacy-menu", type: "menu" as const, props: { menu_code: "header" } },
+        ] }],
+      }],
+    };
+    const { container } = render(<VisualLayoutView layout={layout} siteId={null} pageTitle="Admissions" />);
+    expect(container.querySelectorAll("[data-widget-type]").length).toBe(3);
+    expect(container.querySelector('[data-widget-type="site_title"]')?.textContent).toContain("placeholder");
+  });
   it("renders the published page and does not mount unsafe markup", () => {
     const { container } = render(<PublicPageView page={pageFromResponse(200, published)} />);
     expect(screen.getByRole("heading", { level: 1, name: "Admissions" })).toBeTruthy();

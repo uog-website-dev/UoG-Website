@@ -1,6 +1,6 @@
 # Visual layout contract v1
 
-The product-provided 43-widget palette is defined in the [registry schema](../../backend/apps/cms/schemas/layout/layout-v1.schema.json).
+The product-provided 43-widget registry is defined in the [registry schema](../../backend/apps/cms/schemas/layout/layout-v1.schema.json). The authoring palette offers 40 of them: `site_logo`, `site_title` and `menu` are legacy chrome nodes that remain valid and renderable in published layouts, but are never offered for new page content — branding and navigation belong to the global header. See [page chrome](../page-chrome.md).
 [Shared examples](../../backend/apps/cms/schemas/layout/fixtures.json) contain a
 valid configuration for every widget, a three-column Image Slider layout and
 rejected documents. `scripts/generate_layout_contract.py` is the source for
@@ -28,6 +28,8 @@ Pages may opt in using `metadata.visual_layout`:
   }]
 }
 ```
+
+`settings` optionally carries presentation choices: `show_title`, `content_width` (`full` legacy, `wide`, `reading`), `bleed`, and `chrome` (`global` default, or `none` for an explicit chrome-free Page). A missing `chrome` key keeps the global header and footer, so existing documents need no migration.
 
 The existing Page `layout` template hint and `blocks_version` remain separate.
 The visual envelope is stored in the existing metadata JSON, so working drafts,

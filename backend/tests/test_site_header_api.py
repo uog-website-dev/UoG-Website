@@ -126,7 +126,10 @@ def test_public_header_is_hostname_scoped(client, owner, settings):
     for site, host in ((a, "header-a.uog.edu.et"), (b, "header-b.uog.edu.et")):
         activate_site(site.pk)
         SiteDomain.objects.create(site=site, hostname=host, is_primary=True, status="ACTIVE")
-    SiteHeader.objects.create(site=a, sticky=True, cta_label="Apply now", cta_url="https://example.org/apply")
+    from apps.sites.header import header_values
+    row = SiteHeader.objects.create(site=a, sticky=True, cta_label="Apply now", cta_url="https://example.org/apply")
+    row.published_settings = header_values(row)
+    row.save(update_fields=["published_settings"])
     settings.ALLOWED_HOSTS = ["*"]
     first = client.get("/api/v1/site-context/", HTTP_HOST="header-a.uog.edu.et")
     second = client.get("/api/v1/site-context/", HTTP_HOST="header-b.uog.edu.et")

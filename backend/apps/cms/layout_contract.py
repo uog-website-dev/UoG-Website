@@ -25,13 +25,39 @@ def validate_layout(value, *, prefix="metadata.visual_layout"):
     except (ValueError, TypeError, RecursionError) as error:
         raise ValidationError({prefix: "Use a bounded JSON document."}) from error
 
+    def conforms(data, schema):
+        """Bool-only validation for scalar alternatives such as token-or-colour."""
+        if "oneOf" in schema:
+            return any(conforms(data, item) for item in schema["oneOf"])
+        if "const" in schema:
+            return type(data) is type(schema["const"]) and data == schema["const"]
+        if "enum" in schema:
+            return any(type(data) is type(item) and data == item for item in schema["enum"])
+        kind = schema.get("type")
+        if kind == "string":
+            if not isinstance(data, str): return False
+            return "pattern" not in schema or re.fullmatch(schema["pattern"], data) is not None
+        if kind == "boolean": return type(data) is bool
+        if kind == "integer": return type(data) is int
+        if kind == "number": return type(data) is int or (type(data) is float and math.isfinite(data))
+        if kind == "object": return isinstance(data, dict)
+        if kind == "array": return isinstance(data, list)
+        return True
+
     def check(data, schema, path):
         if "oneOf" in schema:
-            candidate = next((item for item in schema["oneOf"] if isinstance(data, dict) and item["properties"]["type"]["const"] == data.get("type")), None)
-            if candidate is None:
-                reject(path + ".type", "Unknown widget or nested Section. Use a registered leaf widget.")
-            else:
-                check(data, candidate, path)
+            node_schemas = [item for item in schema["oneOf"]
+                            if isinstance(item.get("properties"), dict)
+                            and isinstance(item["properties"].get("type"), dict)
+                            and "const" in item["properties"]["type"]]
+            if len(node_schemas) == len(schema["oneOf"]):
+                candidate = next((item for item in node_schemas if isinstance(data, dict) and item["properties"]["type"]["const"] == data.get("type")), None)
+                if candidate is None:
+                    reject(path + ".type", "Unknown widget or nested Section. Use a registered leaf widget.")
+                else:
+                    check(data, candidate, path)
+            elif not any(conforms(data, item) for item in schema["oneOf"]):
+                reject(path, "Use an approved token or value.")
             return
         if "const" in schema and (type(data) is not type(schema["const"]) or data != schema["const"]):
             reject(path, "Unsupported value or schema version.")

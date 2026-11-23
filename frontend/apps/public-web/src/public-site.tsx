@@ -10,6 +10,7 @@
  */
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
+import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import { PublicSiteBrandingProvider, UogThemeProvider, EMPTY_SITE, publicFetchInit, siteFromContext } from "@uog/ui";
 import type { PublicSiteContext } from "@uog/ui";
@@ -65,9 +66,20 @@ export function PublicSiteChrome({ children, initialSite = EMPTY_SITE }: { child
   return (
     <UogThemeProvider theme={site.theme}>
       <PublicSiteBrandingProvider site={site}>
-        <div data-public-site="true" data-theme={site.theme} data-site-code={site.code ?? ""} data-site-name={site.displayName}>
+        <Box
+          data-public-site="true"
+          data-theme={site.theme}
+          data-site-code={site.code ?? ""}
+          data-site-name={site.displayName}
+          sx={{
+            // A Page that opts out of global chrome carries its own navigation
+            // bar, so the shell header and footer leave layout and the
+            // accessibility tree together.
+            "&:has([data-page-chrome='none'])": {"& header[data-site-header], & footer": {display: "none"}},
+          }}
+        >
           <PublicMenus>{body}</PublicMenus>
-        </div>
+        </Box>
       </PublicSiteBrandingProvider>
     </UogThemeProvider>
   );

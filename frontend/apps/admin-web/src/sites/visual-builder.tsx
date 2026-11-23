@@ -73,8 +73,8 @@ import type { MediaPickerResult } from "@/sites/media-picker";
 import { ContentWorkflowButtons, ContentWorkflowDialog } from "@/sites/content-workflow";
 import type { WorkflowAction } from "@/sites/content-workflow";
 import {
-  categories, duplicateSection, duplicateWidget, emptyLayout, insertWidget, labelFor,
-  moveRow, moveWidget, nestedItems, newRow, newWidget, outline, registry,
+  categories, chromeWidgetsIn, duplicateSection, duplicateWidget, emptyLayout, insertWidget, labelFor, paletteRegistry,
+  moveRow, moveWidget, nestedItems, newRow, newWidget, outline,
   removeNode, reorderRowsByIds, resizeColumns, schemaFor, shiftWidget, starterLayout,
   widgetPropsPath, presentationSchema,
 } from "./visual-builder-model";
@@ -145,7 +145,7 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
   function dropWidget(source: VisualDragPayload | null, columnId: string, index: number) {
     if (isPalettePayload(source)) {
       const type = paletteTypeFromPayload(source);
-      if (!type || !registry.some(entry => entry.type === type)) {
+      if (!type || !paletteRegistry.some(entry => entry.type === type)) {
         setError("That widget is not available in the palette.");
         return;
       }
@@ -198,7 +198,7 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
     const context = resolveCanvasDropContext(event.clientX, event.clientY);
     if (isPalettePayload(source)) {
       const type = paletteTypeFromPayload(source);
-      if (!type || !registry.some(entry => entry.type === type)) {
+      if (!type || !paletteRegistry.some(entry => entry.type === type)) {
         setError("That widget is not available in the palette.");
         return;
       }
@@ -229,6 +229,7 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
   const [templatesLoading,setTemplatesLoading]=useState(false);
   const [templateName,setTemplateName]=useState("");
   const [templateDialog,setTemplateDialog]=useState(false);
+  const [chromeDialog,setChromeDialog]=useState(false);
   const [picker,setPicker]=useState<InsertionContext|null>(null);
   const [media,setMedia]=useState<{type?:WidgetType;apply?:(result:MediaPickerResult)=>void}|null>(null);
   const [undo,setUndo]=useState<VisualHistoryEntry[]>([]);
@@ -621,7 +622,10 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
   }
   const contextLabel=picker ? (()=>{const value=entries.find(item=>item.id===picker.columnId);const row=layout.rows.find(item=>item.columns.some(column=>column.id===picker.columnId));return `${entries.find(item=>item.id===row?.id)?.label??"Row"} / ${value?.label??"Column"}${picker.itemId?" / Layout item":""}`;})():"";
   const preview=page && pageFromResponse(200,{id:page.id,title:page.title,path:page.path,site:page.site,layout:page.layout,sidebar_id:page.sidebar,sidebar_snapshot:page.sidebar_snapshot,seo:page.seo??{},blocks:[],metadata:{...page.metadata,visual_layout:layout}});
-  const matchingWidgets=registry.filter(value=>`${value.label} ${value.type}`.toLowerCase().includes(widgetQuery.toLowerCase().trim()));
+  const chromeWidgets=chromeWidgetsIn(layout);
+  // Site branding and menus are part of the global header; legacy stored
+  // widgets stay renderable but are never offered for new content.
+  const matchingWidgets=paletteRegistry.filter(value=>`${value.label} ${value.type}`.toLowerCase().includes(widgetQuery.toLowerCase().trim()));
   const canvasWidth=PREVIEW_VIEWPORTS[previewViewport].width;
   const canMoveSelected=!!entry && entry.kind!=="column";
   const canDuplicateSelected=!!entry && (entry.kind==="row" || entry.kind==="widget");
@@ -669,6 +673,7 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
     </Box>:undefined}>{error}</Alert>:null}
     {message?<Alert severity="success" role="status" sx={{py:0}}>{message}</Alert>:null}
     {editable && !headingPlan.ok?<Alert severity="warning" role="alert">{headingPlan.message}</Alert>:null}
+    {chromeWidgets.length?<Alert severity="warning" role="alert">Legacy Site chrome was found in this Page: {chromeWidgets.map(widget=>widget.label).join(", ")}. It still renders and nothing was removed or rewritten. The Site header already supplies branding and navigation, so remove these widgets from the Page when you can to avoid repeating them.</Alert>:null}
     <Typography component="div" aria-live="polite" sx={{position:"absolute",width:1,height:1,overflow:"hidden",clip:"rect(0 0 0 0)"}}>{announcement}</Typography>
     {!editable?<Alert severity="info" action={page.status==="PUBLISHED"?<Button disabled={saving} onClick={()=>void editPublished()}>Open working draft</Button>:undefined}>
       {page.status==="PUBLISHED"?"This is the published Page. Open its private working draft to use the Visual Builder.":"This Page is locked for review. Return to Pages to follow its CMS workflow."}
@@ -821,7 +826,7 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
               setDropHoverColumn(null);
               if(isPalettePayload(source)){
                 const type=paletteTypeFromPayload(source);
-                if(!type || !registry.some(entry=>entry.type===type)){setError("That widget is not available in the palette.");return;}
+                if(!type || !paletteRegistry.some(entry=>entry.type===type)){setError("That widget is not available in the palette.");return;}
                 insertFromPalette(type as WidgetType, null);
               }
             }}
@@ -1113,11 +1118,25 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
               label={<Box><Typography variant="body2">Edge-to-edge bleed</Typography><Typography id="page-bleed-help" variant="caption" color="text.secondary" component="p">Off by default. Turning it on lets this Page reach the viewport edge instead of keeping its safe gutter.</Typography></Box>}/>
             {widthPlan.bleed?<Alert severity="warning" role="alert" sx={{mt:1}}>{widthPlan.warning}</Alert>:null}
             {widthPlan.legacyFullWidth?<Alert severity="info" sx={{mt:1}}>This Page uses the legacy Full width setting. Choose Wide or Reading, or turn on bleed deliberately.</Alert>:null}
+            <FormControlLabel sx={{mt:2,alignItems:"flex-start",ml:0,gap:1}} control={<Switch size="small" checked={layout.settings?.chrome==="none"} disabled={saving} inputProps={{"aria-describedby":"page-chrome-help"}} onChange={event=>{if(event.target.checked)setChromeDialog(true);else change({...layout,settings:{...layout.settings,chrome:"global"}});}}/>}
+              label={<Box><Typography variant="body2">Hide the global header and footer</Typography><Typography id="page-chrome-help" variant="caption" color="text.secondary" component="p">Off by default. Turning it on removes the Site header and footer from this Page and adds a small “Site home” navigation bar above the content. Homepage templates never use this mode.</Typography></Box>}/>
+            {layout.settings?.chrome==="none"?<Alert severity="warning" role="alert" sx={{mt:1}}>Global header and footer are hidden on this Page. Preview shows the in-page navigation bar. Nothing else on the Site changes.</Alert>:null}
           </Box>}
           {Object.keys(errors).length?<Box role="alert" sx={{mt:2}}><Typography color="error">Check these fields before saving:</Typography>{Object.entries(errors).slice(0,12).map(([path,messages])=><Typography key={path} variant="caption" component="p" sx={{overflowWrap:"anywhere"}}>{path}: {messages.join(" ")}</Typography>)}</Box>:null}
         </Paper>:null}
       </Box>
     </>}
+    <Dialog open={chromeDialog} onClose={()=>setChromeDialog(false)} fullWidth maxWidth="xs">
+      <DialogTitle>Hide the global header and footer?</DialogTitle>
+      <DialogContent>
+        <Typography variant="body2" sx={{mb:2}}>This Page will publish without the Site header, header menus and footer. A small “Site home” link above the content keeps an exit route.</Typography>
+        <Alert severity="warning">Only do this for a self-contained Page such as a campaign landing page. Visitors lose the Site menu on this Page.</Alert>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={()=>setChromeDialog(false)}>Keep header and footer</Button>
+        <Button variant="contained" onClick={()=>{setChromeDialog(false);change({...layout,settings:{...layout.settings,chrome:"none"}});}}>Hide header and footer</Button>
+      </DialogActions>
+    </Dialog>
     <Dialog open={templateDialog} onClose={()=>{if(!saving)setTemplateDialog(false);}} fullWidth maxWidth="xs">
       <DialogTitle>Save section as template</DialogTitle>
       <DialogContent>
@@ -1158,7 +1177,7 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
 function WidgetPicker({open,context,nested,onChoose,onClose,returnFocus}:{open:boolean;context:string;nested:boolean;onChoose:(type:WidgetType)=>void;onClose:()=>void;returnFocus:()=>void}) {
   const [query,setQuery]=useState("");const [category,setCategory]=useState("All");
   useEffect(()=>{if(open){setQuery("");setCategory("All");}},[open]);
-  const matching=registry.filter(value=>(!nested || ["hero_image","headline","editor","image","button"].includes(value.type)) && `${value.label} ${value.type}`.toLowerCase().includes(query.toLowerCase().trim()));
+  const matching=paletteRegistry.filter(value=>(!nested || ["hero_image","headline","editor","image","button"].includes(value.type)) && `${value.label} ${value.type}`.toLowerCase().includes(query.toLowerCase().trim()));
   const visible=matching.filter(value=>category==="All" || categories.find(item=>item.label===category)?.types.includes(value.type));
   function arrow(event:KeyboardEvent<HTMLDivElement>) {
     if(!(event.target as HTMLElement).hasAttribute("data-widget-card"))return;
@@ -1170,7 +1189,7 @@ function WidgetPicker({open,context,nested,onChoose,onClose,returnFocus}:{open:b
     event.preventDefault();buttons[next]?.focus();
   }
   return <Dialog open={open} onClose={onClose} fullWidth maxWidth="md" TransitionProps={{onExited:returnFocus}}>
-    <DialogTitle>Choose a widget<Typography variant="body2" color="text.secondary">Insert into {context}. {nested?"This layout item accepts Hero Image, Headline, Editor, Image and Button.":"Choose from the approved 43-widget catalog."}</Typography></DialogTitle>
+    <DialogTitle>Choose a widget<Typography variant="body2" color="text.secondary">Insert into {context}. {nested?"This layout item accepts Hero Image, Headline, Editor, Image and Button.":"Choose from the approved widget catalog. Site logo, Site title and menus live in the Site header, not in page content."}</Typography></DialogTitle>
     <DialogContent>
       <TextField autoFocus fullWidth label="Search widgets" placeholder="Try Slider, Image or Button" value={query} onChange={event=>setQuery(event.target.value)} sx={{mt:1,mb:2}}/>
       <Box aria-label="Widget categories" sx={{display:"flex",gap:1,flexWrap:"wrap",mb:2}}>

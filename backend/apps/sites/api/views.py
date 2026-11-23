@@ -22,9 +22,9 @@ from ..services.modules import disable_module_for_site, enable_module_for_site
 from ..services.registry import registry_write
 from .access import PreconditionFailed,PreconditionRequired,AdministrationViewSet, Conflict, reject_idempotency, translate_domain_errors
 from .footer import FooterSettingsSerializer,FooterEnvelopeSerializer,footer_envelope
-from ..footer import save_footer,footer_etag,FooterConflict,FooterPreconditionRequired
+from ..footer import save_footer,publish_footer,restore_previous_footer,footer_etag,FooterConflict,FooterPreconditionRequired
 from .header import HeaderSettingsSerializer,HeaderEnvelopeSerializer,header_envelope
-from ..header import save_header,header_etag,HeaderConflict,HeaderPreconditionRequired
+from ..header import save_header,publish_header,restore_previous_header,header_etag,HeaderConflict,HeaderPreconditionRequired
 from ..models import SiteFooter, SiteHeader
 from .module_management import ActivationSummarySerializer
 from .query import (
@@ -59,7 +59,12 @@ def _list(view, serializer, specs, default):
     partial_update=extend_schema(parameters=[IF_MATCH], description="Requires sites.update in this Site scope and the existing development-only write gate."),
 )
 class SiteViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, AdministrationViewSet):
-    permission_by_action={**AdministrationViewSet.permission_by_action,"footer":"sites.update","header":"sites.update"}
+    permission_by_action={
+        **AdministrationViewSet.permission_by_action,
+        "footer":"sites.update","header":"sites.update",
+        "footer_publish":"sites.update","footer_restore_previous":"sites.update",
+        "header_publish":"sites.update","header_restore_previous":"sites.update",
+    }
     queryset = Site.objects.select_related("organization_unit", "template").prefetch_related(
         Prefetch("domains", queryset=SiteDomain.objects.filter(is_primary=True), to_attr="primary_domain_rows"),
     ).order_by("code")
@@ -137,7 +142,7 @@ class SiteViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Administrati
             return self.respond(site, serializer_class=SiteSerializer)
 
     @extend_schema(methods=["GET"],responses=FooterEnvelopeSerializer,description="Read Site-owned footer settings and the currently published Footer menu. Requires sites.update; no row is created by a read.")
-    @extend_schema(methods=["PATCH"],parameters=[IF_MATCH],request=FooterSettingsSerializer,responses=FooterEnvelopeSerializer,description="Save only this Site's footer settings using its strong footer ETag. Publishes settings immediately; menu snapshots and assignments follow their existing workflow. Unknown ownership/version fields are rejected.")
+    @extend_schema(methods=["PATCH"],parameters=[IF_MATCH],request=FooterSettingsSerializer,responses=FooterEnvelopeSerializer,description="Save only this Site's footer draft using its strong footer ETag. Nothing becomes public until the publish action; menu snapshots and assignments follow their existing workflow. Unknown ownership/version fields are rejected.")
     @action(detail=True,methods=["get","patch"],url_path="footer")
     def footer(self,request,pk=None):
         site=self.get_object()
@@ -150,8 +155,28 @@ class SiteViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Administrati
             else:row=SiteFooter.objects.filter(site=site).first()
             return Response(footer_envelope(site,row),headers={"ETag":footer_etag(site.pk,row),"Cache-Control":"private, no-store"})
 
+    @extend_schema(parameters=[IF_MATCH],request=EMPTY,responses=FooterEnvelopeSerializer,description="Publish the saved footer draft after validation and the pre-publish copy lint. Placeholder, QA/review and design-reference wording blocks publication; duplicate column headings are returned as warnings. The previous publication is retained for restore.")
+    @action(detail=True,methods=["post"],url_path="footer/publish")
+    def footer_publish(self,request,pk=None):
+        site=self.get_object()
+        with translate_domain_errors():
+            try:row,warnings=publish_footer(site.pk,actor=request.user,expected=request.headers.get("If-Match"))
+            except FooterPreconditionRequired:raise PreconditionRequired()
+            except FooterConflict:raise PreconditionFailed()
+            return Response(footer_envelope(site,row,lint_warnings=warnings),headers={"ETag":footer_etag(site.pk,row),"Cache-Control":"private, no-store"})
+
+    @extend_schema(parameters=[IF_MATCH],request=EMPTY,responses=FooterEnvelopeSerializer,description="Copy the previous published footer back into the draft for review. Publication is unchanged until the publish action. Requires a saved previous publication.")
+    @action(detail=True,methods=["post"],url_path="footer/restore-previous")
+    def footer_restore_previous(self,request,pk=None):
+        site=self.get_object()
+        with translate_domain_errors():
+            try:row=restore_previous_footer(site.pk,actor=request.user,expected=request.headers.get("If-Match"))
+            except FooterPreconditionRequired:raise PreconditionRequired()
+            except FooterConflict:raise PreconditionFailed()
+            return Response(footer_envelope(site,row),headers={"ETag":footer_etag(site.pk,row),"Cache-Control":"private, no-store"})
+
     @extend_schema(methods=["GET"],responses=HeaderEnvelopeSerializer,description="Read Site-owned header settings with the currently published header and utility menus. Requires sites.update and the MENUS or PAGES module; no row is created by a read.")
-    @extend_schema(methods=["PATCH"],parameters=[IF_MATCH],request=HeaderSettingsSerializer,responses=HeaderEnvelopeSerializer,description="Save only this Site's header settings using its strong header ETag. Publishes settings immediately; header and utility navigation stay on the menu draft/publish workflow. Unknown ownership/version fields are rejected.")
+    @extend_schema(methods=["PATCH"],parameters=[IF_MATCH],request=HeaderSettingsSerializer,responses=HeaderEnvelopeSerializer,description="Save only this Site's header draft using its strong header ETag. Nothing becomes public until the publish action; header and utility navigation stay on the menu draft/publish workflow. Unknown ownership/version fields are rejected.")
     @action(detail=True,methods=["get","patch"],url_path="header")
     def header(self,request,pk=None):
         site=self.get_object()
@@ -165,6 +190,32 @@ class SiteViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Administrati
                 except HeaderPreconditionRequired:raise PreconditionRequired()
                 except HeaderConflict:raise PreconditionFailed()
             else:row=SiteHeader.objects.filter(site=site).first()
+            return Response(header_envelope(site,row),headers={"ETag":header_etag(site.pk,row),"Cache-Control":"private, no-store"})
+
+    @extend_schema(parameters=[IF_MATCH],request=EMPTY,responses=HeaderEnvelopeSerializer,description="Publish the saved header draft after validation and the pre-publish copy lint. The previous publication is retained for restore.")
+    @action(detail=True,methods=["post"],url_path="header/publish")
+    def header_publish(self,request,pk=None):
+        site=self.get_object()
+        from ..selectors.modules import module_is_available
+        if not (module_is_available(site.pk,"MENUS") or module_is_available(site.pk,"PAGES")):
+            raise PermissionDenied("Header settings require the MENUS or PAGES module.")
+        with translate_domain_errors():
+            try:row,warnings=publish_header(site.pk,actor=request.user,expected=request.headers.get("If-Match"))
+            except HeaderPreconditionRequired:raise PreconditionRequired()
+            except HeaderConflict:raise PreconditionFailed()
+            return Response(header_envelope(site,row,lint_warnings=warnings),headers={"ETag":header_etag(site.pk,row),"Cache-Control":"private, no-store"})
+
+    @extend_schema(parameters=[IF_MATCH],request=EMPTY,responses=HeaderEnvelopeSerializer,description="Copy the previous published header back into the draft for review. Publication is unchanged until the publish action.")
+    @action(detail=True,methods=["post"],url_path="header/restore-previous")
+    def header_restore_previous(self,request,pk=None):
+        site=self.get_object()
+        from ..selectors.modules import module_is_available
+        if not (module_is_available(site.pk,"MENUS") or module_is_available(site.pk,"PAGES")):
+            raise PermissionDenied("Header settings require the MENUS or PAGES module.")
+        with translate_domain_errors():
+            try:row=restore_previous_header(site.pk,actor=request.user,expected=request.headers.get("If-Match"))
+            except HeaderPreconditionRequired:raise PreconditionRequired()
+            except HeaderConflict:raise PreconditionFailed()
             return Response(header_envelope(site,row),headers={"ETag":header_etag(site.pk,row),"Cache-Control":"private, no-store"})
 
 

@@ -1,8 +1,9 @@
 """Header settings share Site RBAC and the existing published menu resolver."""
 from rest_framework import serializers
 
-from ..header import defaults, header_values
+from ..header import header_has_unpublished_changes, header_values, published_header_values
 from ..models import SiteHeader
+from .footer import LintWarningSerializer
 from .serializers import StrictFields
 
 
@@ -42,11 +43,16 @@ class HeaderEnvelopeSerializer(serializers.Serializer):
     site = serializers.IntegerField()
     version = serializers.IntegerField()
     settings = HeaderSettingsSerializer()
+    published_settings = HeaderSettingsSerializer()
+    has_unpublished_changes = serializers.BooleanField()
+    published_at = serializers.DateTimeField(allow_null=True)
+    previous_available = serializers.BooleanField()
     menus = HeaderMenusSerializer()
     menu_state = HeaderMenuStateSerializer()
     site_origin = serializers.CharField(allow_null=True)
     modules = serializers.ListField(child=serializers.CharField())
     branding = HeaderBrandingSerializer()
+    lint_warnings = LintWarningSerializer(many=True, required=False)
 
 def _menu_state(site_id):
     """Read-only view of the existing menu assignment drafts; never a writer."""
@@ -73,12 +79,12 @@ def _menu_state(site_id):
 
 
 def public_header(site):
-    # No row is created by a read; Sites keep the safe default header.
+    # No row is created by a read; only the published snapshot is public.
     row = SiteHeader.objects.filter(site_id=site.pk).first()
-    return header_values(row)
+    return published_header_values(row)
 
 
-def header_envelope(site, row):
+def header_envelope(site, row, *, lint_warnings=()):
     from apps.cms.menu_destinations import menu_origin
     from apps.cms.selectors.menu_delivery import compose_location
     from apps.cms.api.widget_runtime import logo_asset
@@ -97,6 +103,10 @@ def header_envelope(site, row):
         "site": site.pk,
         "version": row.version if row else 0,
         "settings": header_values(row),
+        "published_settings": published_header_values(row),
+        "has_unpublished_changes": header_has_unpublished_changes(row),
+        "published_at": row.published_at if row else None,
+        "previous_available": bool(row and isinstance(row.previous_published_settings, dict)),
         # Published menus only: previewing a draft menu is the Menus screen's job.
         "menus": {
             "header": compose_location(site.pk, "header") if menus_enabled else [],
@@ -105,4 +115,5 @@ def header_envelope(site, row):
         "menu_state": _menu_state(site.pk),
         "site_origin": menu_origin(site.pk),
         "modules": sorted(available_module_codes(site.pk)),
+        "lint_warnings": list(lint_warnings),
     }

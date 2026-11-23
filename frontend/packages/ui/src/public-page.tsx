@@ -25,6 +25,7 @@ import { publicFetchInit } from "./public-site";
 import type {PublicMenuNode} from "./site-navigation";
 import { menusFromResponse, SiteNavigation, safeMenuHref } from "./site-navigation";
 const PrivateMediaBase = createContext<string | null>(null);
+const focusRing = {"&:focus-visible":{outline:"3px solid",outlineColor:"primary.main",outlineOffset:2}} as const;
 
 export interface PublicBlock {
   type: string;
@@ -428,6 +429,8 @@ export function PublicPageView({ page, privateMediaBase, viewportWidth }: { page
   const titleHidden = heading ? !heading.titleVisible : false;
   // One resolver drives the builder canvas and the public Page alike.
   const pageWidth = page.visual_layout ? resolvePageWidth(page.visual_layout.settings) : null;
+  // Explicit opt-out only: a stored "global" or absent value keeps the shell.
+  const chromeFree = page.visual_layout?.settings?.chrome === "none";
   // Device preview uses its explicit canvas width rather than the surrounding browser.
   const stacked = viewportWidth !== undefined && viewportWidth < 900;
   const columns = shell === "FULL_WIDTH" || stacked ? "minmax(0,1fr)" : {
@@ -447,6 +450,7 @@ export function PublicPageView({ page, privateMediaBase, viewportWidth }: { page
         data-page-width={pageWidth?.width}
         data-page-bleed={pageWidth?.bleed ? "true" : undefined}
         data-page-gutter={pageWidth ? `${pageWidth.gutter}px` : undefined}
+        data-page-chrome={chromeFree ? "none" : undefined}
         data-site-code={site.code ?? ""}
         sx={{
           display: "grid", width: "100%", minWidth: 0, gap: { xs: 3, md: 4 },
@@ -459,6 +463,11 @@ export function PublicPageView({ page, privateMediaBase, viewportWidth }: { page
           aria-labelledby="public-page-title"
           sx={{ gridArea: "content", display: "flex", flexDirection: "column", gap: 2, minWidth: 0, width: "100%", maxWidth: pageWidth?.maxWidth, mx: "auto", overflowWrap: "anywhere" }}
         >
+          {chromeFree ? (
+            <Box component="nav" aria-label="Page navigation" sx={{ borderBottom: 1, borderColor: "divider", pb: 1 }}>
+              <Link href="/" sx={{ fontWeight: 700, minHeight: 44, display: "inline-flex", alignItems: "center", ...focusRing }}>← Site home</Link>
+            </Box>
+          ) : null}
           <Typography id="public-page-title" variant="h3" component={titleHidden ? "span" : "h1"} sx={titleHidden ? {position:"absolute",left:0,top:0,width:1,height:1,p:0,m:-1,overflow:"hidden",clipPath:"inset(50%)",whiteSpace:"nowrap"} : { overflowWrap: "anywhere" }}>
           {page.title}
         </Typography>

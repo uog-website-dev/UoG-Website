@@ -83,14 +83,14 @@ describe("Visual Builder workspace",()=>{
     expect(screen.getByText("Informatics · Revision 1 · DRAFT")).toBeTruthy();
     expect((screen.getByRole("button",{name:"Save draft"}) as HTMLButtonElement).disabled).toBe(true);
   });
-  it("searches the 43-card picker, supports arrow/Enter selection and restores invoking focus",async()=>{
+  it("searches the approved picker, supports arrow/Enter selection and restores invoking focus",async()=>{
     const user=userEvent.setup();render(<VisualBuilder {...props}/>);
     await user.click(await screen.findByRole("button",{name:"Add your first row"}));
     await user.click(screen.getByText("Row layout controls"));
     const trigger=screen.getByRole("button",{name:"Add widget to row 1 column 1"});
     await user.click(trigger);
     const dialog=await screen.findByRole("dialog",{name:/Choose a widget/});
-    expect(within(dialog).getByRole("button",{name:"All (43)"})).toBeTruthy();
+    expect(within(dialog).getByRole("button",{name:"All (40)"})).toBeTruthy();
     await user.type(within(dialog).getByRole("textbox",{name:"Search widgets"}),"Slider");
     expect(within(dialog).getByRole("button",{name:"Media & sliders (2)"})).toBeTruthy();
     const image=within(dialog).getByRole("button",{name:/Image Slider Media & sliders/});
@@ -391,6 +391,27 @@ describe("Visual Builder workspace",()=>{
     await user.click(bleed);
     expect(await screen.findByText(/Bleed removes the 24 px safe gutter/)).toBeTruthy();
     expect((screen.getByRole("region",{name:"Live Page canvas"}).querySelector('[data-page-bleed="true"]'))).toBeTruthy();
+  });
+  it("requires explicit confirmation before hiding the global header and footer",async()=>{
+    const user=userEvent.setup();
+    load.mockResolvedValue({ok:true,data:record({metadata:{visual_layout:starterLayout()}})});
+    render(<VisualBuilder {...props}/>);
+    await screen.findByRole("region",{name:"Live Page canvas"});
+    await user.click(screen.getByRole("button",{name:"Page settings"}));
+    const toggle=()=>screen.getByRole("checkbox",{name:/Hide the global header and footer/}) as HTMLInputElement;
+    expect(toggle().checked).toBe(false);
+    await user.click(toggle());
+    const dialog=await screen.findByRole("dialog",{name:"Hide the global header and footer?"});
+    await user.click(within(dialog).getByRole("button",{name:"Keep header and footer"}));
+    await waitFor(()=>expect(screen.queryByRole("dialog",{name:"Hide the global header and footer?"})).toBeNull());
+    expect(toggle().checked).toBe(false);
+    await user.click(toggle());
+    await user.click(within(await screen.findByRole("dialog",{name:"Hide the global header and footer?"})).getByRole("button",{name:"Hide header and footer"}));
+    await waitFor(()=>expect(toggle().checked).toBe(true));
+    expect(screen.getByText(/Global header and footer are hidden on this Page/)).toBeTruthy();
+    const canvas=screen.getByRole("region",{name:"Live Page canvas"});
+    expect(canvas.querySelector('[data-page-chrome="none"]')).toBeTruthy();
+    expect(within(canvas).getByRole("link",{name:/Site home/})).toBeTruthy();
   });
   it("accepts a palette drop on the empty canvas to create the first section",async()=>{
     render(<VisualBuilder {...props}/>);

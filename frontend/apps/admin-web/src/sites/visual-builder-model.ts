@@ -15,11 +15,25 @@ export const categories: {label:string; shortLabel:string; types:WidgetType[]}[]
   {label:"Interactive",shortLabel:"INTERACTIVE",types:["button","button_grid","contact_form","tabs","accordion","call_to_action"]},
   {label:"Content",shortLabel:"CONTENT",types:["headline","editor","blog","recent_posts","post_carousel","testimonials","author_box","features"]},
   {label:"Information",shortLabel:"INFORMATION",types:["taxonomy","icon","price_table","google_maps","social_media_buttons"]},
-  {label:"Site & navigation",shortLabel:"SITE",types:["site_logo","site_title","page_title","menu","breadcrumbs"]},
+  {label:"Page & navigation",shortLabel:"PAGE NAV",types:["page_title","breadcrumbs"]},
   {label:"Dynamic content",shortLabel:"DYNAMIC",types:["loop_grid","loop_carousel","taxonomy_filter","post_title","post_excerpt","featured_image"]},
   {label:"Page utilities",shortLabel:"PAGE",types:["alert","table_of_contents","menu_anchor","countdown"]},
 ];
 export const uid = () => crypto.randomUUID();
+/**
+ * Site branding and menus belong to the global header, never to page content.
+ * The renderer keeps supporting these nodes so published legacy layouts do not
+ * lose content, but the palette no longer offers them.
+ */
+export const LEGACY_CHROME_TYPES = ["site_logo","site_title","menu"] as const;
+const isLegacyChromeType = (type:string) => (LEGACY_CHROME_TYPES as readonly string[]).includes(type);
+/** The only registry both palette surfaces may offer; legacy chrome stays renderable. */
+export const paletteRegistry = registry.filter(entry=>!isLegacyChromeType(entry.type));
+/** Chrome widgets already stored in a layout; the builder warns instead of rewriting. */
+export function chromeWidgetsIn(layout:VisualLayout):{id:string;type:string;label:string}[] {
+  return outline(layout).filter(entry=>entry.kind==="widget" && isLegacyChromeType((entry.node as WidgetNode).type))
+    .map(entry=>({id:entry.id,type:(entry.node as WidgetNode).type,label:entry.label}));
+}
 export const labelFor = (type:string) => registry.find(entry=>entry.type===type)?.label ?? type;
 export const schemaFor = (type:WidgetType) => {
   const schema=leaves.find(schema=>schema.properties?.type?.const===type)!.properties!.props!;

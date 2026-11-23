@@ -6,8 +6,8 @@ import {ThemeProvider} from "@mui/material/styles";
 import {defaultSiteHeader,headerSettingsFrom} from "@uog/types";
 import type {SiteHeaderSettings} from "@uog/types";
 import {EMPTY_SITE,PublicSiteHeader,FormErrorSummary,fieldErrorsFrom,uogTheme,highContrastTheme} from "@uog/ui";
-import {getSiteHeader,updateSiteHeader} from "@/app/sites/header-actions";
-import type {SiteHeaderEnvelope} from "@/app/sites/header-actions";
+import {getSiteHeader,publishSiteHeader,restorePreviousSiteHeader,updateSiteHeader} from "@/app/sites/header-actions";
+import type {LintWarning,SiteHeaderEnvelope} from "@/app/sites/header-actions";
 import {deserializeApiError,unwrap} from "@/organizations/contract";
 import {APP_BASE_PATH} from "@/base-path";
 import {useSiteAdmin} from "./site-admin-frame";
@@ -25,6 +25,7 @@ function HeaderEditor({siteId}:{siteId:number}) {
  const [loaded,setLoaded]=useState<SiteHeaderEnvelope|null>(null),[etag,setEtag]=useState<string|null>(null);
  const [values,setValues]=useState<SiteHeaderSettings>(defaultSiteHeader),[saved,setSaved]=useState<SiteHeaderSettings|null>(null);
  const [loading,setLoading]=useState(true),[saving,setSaving]=useState(false),[attempt,setAttempt]=useState(0);
+ const [publishing,setPublishing]=useState(false),[restoring,setRestoring]=useState(false),[warnings,setWarnings]=useState<LintWarning[]>([]);
  const [error,setError]=useState(""),[notice,setNotice]=useState(""),[errors,setErrors]=useState<Record<string,string>>({});
  const [viewport,setViewport]=useState<PreviewViewport>("desktop");
  const dirty=saved!==null&&JSON.stringify(values)!==JSON.stringify(saved);
@@ -42,9 +43,28 @@ function HeaderEditor({siteId}:{siteId:number}) {
    const result=await updateSiteHeader(siteId,etag,values);
    if(!result.ok){setErrors(fieldErrorsFrom(deserializeApiError(result.error)));throw new Error([409,412,428].includes(result.error.status)?"Header settings changed in another session. Your edits are preserved. Reload current settings before saving again.":result.error.message);}
    if(result.data.data.site!==siteId)throw new Error("Unexpected Site response.");
-   const next=headerSettingsFrom(result.data.data.settings);setValues(next);setSaved(next);setEtag(result.data.etag);setLoaded(result.data.data);
-   setNotice("Header saved for this Site. Published pages update on reload or when their tab returns to the foreground.");
+   const next=headerSettingsFrom(result.data.data.settings);setValues(next);setSaved(next);setEtag(result.data.etag);setLoaded(result.data.data);setWarnings([]);
+   setNotice("Header draft saved. Nothing is public until you publish it.");
   }catch(cause){setError(cause instanceof Error?cause.message:"Save failed. Your edits are preserved.");}finally{setSaving(false);}
+ }
+ function applyResponse(data:SiteHeaderEnvelope,etag:string|null,message:string){const next=headerSettingsFrom(data.settings);setValues(next);setSaved(next);setEtag(etag);setLoaded(data);setNotice(message);}
+ async function publish(){
+  if(!etag||publishing||saving||dirty)return;setPublishing(true);setError("");setErrors({});setNotice("");setWarnings([]);
+  try{
+   const result=await publishSiteHeader(siteId,etag);
+   if(!result.ok){setErrors(fieldErrorsFrom(deserializeApiError(result.error)));throw new Error([409,412,428].includes(result.error.status)?"Header changed in another session. Your edits are preserved. Reload before publishing again.":result.error.message);}
+   applyResponse(result.data.data,result.data.etag,"Header published. Visitors now see these values.");setWarnings(result.data.data.lint_warnings??[]);
+  }catch(cause){setError(cause instanceof Error?cause.message:"Publish failed. Your draft is unchanged.");}finally{setPublishing(false);}
+ }
+ async function restore(){
+  if(!etag||restoring||saving||!loaded?.previous_available)return;
+  if(!window.confirm("Copy the previous published header into this draft? Visitors keep seeing the current publication until you publish again."))return;
+  setRestoring(true);setError("");setErrors({});setNotice("");
+  try{
+   const result=await restorePreviousSiteHeader(siteId,etag);
+   if(!result.ok){setErrors(fieldErrorsFrom(deserializeApiError(result.error)));throw new Error([409,412,428].includes(result.error.status)?"Header changed in another session. Reload before restoring.":result.error.message);}
+   applyResponse(result.data.data,result.data.etag,"Previous published header restored into the draft. Publish to make it public again.");
+  }catch(cause){setError(cause instanceof Error?cause.message:"Restore failed. Your draft is unchanged.");}finally{setRestoring(false);}
  }
  const set=<K extends keyof SiteHeaderSettings>(key:K,value:SiteHeaderSettings[K])=>setValues(previous=>({...previous,[key]:value}));
  if(loading)return <Box role="status" sx={{display:"flex",alignItems:"center",gap:2}}><CircularProgress size={24}/>Loading header…</Box>;
@@ -88,11 +108,16 @@ function HeaderEditor({siteId}:{siteId:number}) {
     <Typography variant="body2" color="text.secondary">Header and utility menus use the existing Menus draft/publish workflow. This preview shows published menus only.</Typography>
     {admin.enabledModuleCodes.includes("MENUS")?<Box sx={{display:"flex",gap:1,flexWrap:"wrap"}}><Button component={Link} href={siteAdminHref(siteId,"menus")}>Manage header and utility menus</Button></Box>:null}
    </Box>
-   <Alert severity="info">Header settings save immediately for this Site. Unsaved changes appear in the preview below; published pages change only after Save.</Alert>
+   <Alert severity="info">Header settings save as a private draft. Publish header to make them public; header and utility menus follow the existing Menus publish workflow.</Alert>
+   {loaded.published_at?<Typography variant="body2" color="text.secondary">Published {new Date(loaded.published_at).toLocaleString()}{loaded.has_unpublished_changes?" · a newer draft has not been published":""}</Typography>:<Typography variant="body2" color="text.secondary">This header has not been published yet. Visitors see the default header.</Typography>}
+   {warnings.length?<Alert severity="warning" role="status"><Typography variant="subtitle2">Published with warnings</Typography>{warnings.map(warning=><Typography key={warning.path} variant="body2">{warning.path}: {warning.message}</Typography>)}</Alert>:null}
    <Box sx={{display:"flex",gap:2,flexWrap:"wrap"}}>
-    <Button type="submit" variant="contained" disabled={saving||!dirty||!etag}>{saving?"Saving…":"Save header"}</Button>
-    <Button disabled={saving} onClick={()=>{if(!dirty||window.confirm("Discard unsaved header settings and reload?"))setAttempt(value=>value+1);}}>Reload current settings</Button>
+    <Button type="submit" variant="contained" disabled={saving||publishing||!dirty||!etag}>{saving?"Saving…":"Save draft"}</Button>
+    <Button variant="contained" color="secondary" disabled={saving||publishing||restoring||dirty||!etag} onClick={()=>void publish()}>{publishing?"Publishing…":"Publish header"}</Button>
+    <Button disabled={saving||publishing||restoring||!etag||!loaded.previous_available} onClick={()=>void restore()}>{restoring?"Restoring…":"Restore previous published header"}</Button>
+    <Button disabled={saving||publishing||restoring} onClick={()=>{if(!dirty||window.confirm("Discard unsaved header settings and reload?"))setAttempt(value=>value+1);}}>Reload current settings</Button>
    </Box>
+   {dirty?<Typography variant="caption" color="text.secondary">Save the draft before publishing. Publish is disabled while unsaved edits exist.</Typography>:null}
   </Paper>
   <Box component="section" aria-label="Header preview" sx={{minWidth:0}}>
    <Box sx={{display:"flex",alignItems:"center",gap:1,flexWrap:"wrap",mb:1}}>
@@ -102,7 +127,7 @@ function HeaderEditor({siteId}:{siteId:number}) {
      <Button size="small" variant={viewport==="mobile"?"contained":"outlined"} aria-pressed={viewport==="mobile"} onClick={()=>setViewport("mobile")}>Mobile</Button>
     </Box>
    </Box>
-   <Typography variant="body2" color="text.secondary">The real public header with this Site’s published menus. Preview links open in a new tab.</Typography>
+   <Typography variant="body2" color="text.secondary">Your draft values with this Site’s published menus. Visitors see the published header, not this preview. Preview links open in a new tab.</Typography>
    <ThemeProvider theme={loaded.branding.theme==="high-contrast"?highContrastTheme:uogTheme}>
     <Box sx={{mt:2,border:1,borderColor:"divider",borderRadius:2,overflow:"hidden",width:VIEWPORT_WIDTH[viewport],maxWidth:"100%",mx:viewport==="mobile"?"auto":0,bgcolor:"background.default"}}>
      <PublicSiteHeader site={previewSite} headerItems={loaded.menus.header} utilityItems={loaded.menus.utility} settings={values} preview siteOrigin={loaded.site_origin??undefined} previewLogo={asset?{assetId:asset,mediaBase:`${APP_BASE_PATH}/sites/${siteId}/media`}:null}/>

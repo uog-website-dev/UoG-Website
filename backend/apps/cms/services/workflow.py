@@ -275,12 +275,13 @@ def _publish_working_draft(draft, *, actor, comment, using, approval=None):
     bump_publication_version(
         target.site_id, target.locale, path=target.path, using=using,
     )
+    from apps.sites.chrome_lint import lint_page
     record_event(
         action="CONTENT_PUBLISHED",
         entity_type="cms.sitecontent",
         entity_id=str(target.pk),
         before={"title": previous_title},
-        after={"title": target.title, "working_draft_id": str(draft.pk)},
+        after={"title": target.title, "working_draft_id": str(draft.pk), "lint_warnings": lint_page(draft.layout)},
         changed_fields=[
             "title", "blocks", "blocks_version", "metadata",
             "seo", "layout", "visibility",

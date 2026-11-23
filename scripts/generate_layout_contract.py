@@ -151,7 +151,7 @@ def build_schema():
               ["id", "type", "ratios", "columns"])
     return {"$schema": "https://json-schema.org/draft/2020-12/schema", "title": "UoG visual layout v1",
             **obj({"schema_version": {"const": 1}, "rows": {"type": "array", "maxItems": 50, "items": row},
-                   "settings":obj({"show_title":{"type":"boolean"},"content_width":{"enum":["full","wide","reading"]},"bleed":{"type":"boolean"}},[])},["schema_version","rows"]),
+                   "settings":obj({"show_title":{"type":"boolean"},"content_width":{"enum":["full","wide","reading"]},"bleed":{"type":"boolean"},"chrome":{"enum":["global","none"]}},[])},["schema_version","rows"]),
             "x-limits": {"max_nodes": 200, "max_depth": 4, "max_bytes": 262144},
             "x-breakpoints": {
                 "tokens": ["desktop", "tablet", "mobile"],
@@ -246,6 +246,13 @@ def main():
     spaced["rows"][0]["columns"][0]["children"][0]["style"] = {"gap": "sm"}
     spaced["rows"][0]["columns"][0]["children"][0]["responsive"] = {"mobile": {"gap": "none"}}
     cases.append({"name": "responsive-spacing-stack", "valid": True, "layout": spaced})
+    # A Page may deliberately opt out of the global header and footer.
+    chrome_free = copy.deepcopy(valid)
+    chrome_free["settings"] = {"chrome": "none", "content_width": "wide"}
+    cases.append({"name": "page-chrome-none", "valid": True, "layout": chrome_free})
+    unknown_chrome = copy.deepcopy(valid)
+    unknown_chrome["settings"] = {"chrome": "page"}
+    cases.append({"name": "unknown-chrome-setting", "valid": False, "layout": unknown_chrome})
     for widget_type, profile in CATALOG.items():
         doc={"schema_version":1,"rows":[{"id":"row-1","type":"section","ratios":[100],"columns":[{"id":"column-1","type":"column","children":[{"id":"widget-1","type":widget_type,"props":example(PROFILES[profile])}]}]}]}
         cases.append({"name":"catalog-"+widget_type,"valid":True,"layout":doc})
@@ -260,7 +267,7 @@ def main():
                 path.write_text(content, encoding="utf-8")
 
     if args.check:
-        frozen = ROOT / "backend/apps/cms/migrations/0035_layout_schema.json"
+        frozen = ROOT / "backend/apps/cms/migrations/0036_layout_schema.json"
         if json.loads(frozen.read_text(encoding="utf-8")) != build_schema(): raise SystemExit("Frozen migration schema drift")
     types_path=ROOT / "frontend/packages/types/src/layout/generated.ts"
     content=types_source()

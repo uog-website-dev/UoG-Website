@@ -47,9 +47,9 @@ export function PublicSiteFooter({site,items=[],settings=site.footer,siteOrigin,
   ? `${previewLogo.mediaBase}/${previewLogo.assetId}/image?variant=thumbnail`:null;
  const [logoFailed,setLogoFailed]=useState(false);useEffect(()=>setLogoFailed(false),[privateLogo]);
  const links=useMemo(()=>menusFromResponse(200,{locations:{footer:items}}).footer,[items]);
- const groups:{title:string;href:string;items:PublicMenuNode[];flat?:boolean}[]=[];
+ const groups:{title:string;description?:string;href:string;items:PublicMenuNode[];flat?:boolean}[]=[];
  if(!links.some(item=>item.column||item.children?.length))groups.push({title:config.links_heading,href:"",items:links,flat:true});
- else for(const item of links){if(item.column||item.children?.length)groups.push({title:item.label,href:item.href,items:item.children??[]});else{const last=groups[groups.length-1];if(last?.flat)last.items.push(item);else groups.push({title:config.links_heading,href:"",items:[item],flat:true});}}
+ else for(const item of links){if(item.column||item.children?.length)groups.push({title:item.label,description:item.description,href:item.href,items:item.children??[]});else{const last=groups[groups.length-1];if(last?.flat)last.items.push(item);else groups.push({title:config.links_heading,href:"",items:[item],flat:true});}}
  const copyright=config.copyright_text.replaceAll("{year}",String(new Date().getFullYear())).replaceAll("{site}",site.displayName);
  return <Box component="footer" data-site-footer={site.id??"unresolved"} sx={{mt:6,bgcolor:"primary.dark",color:"primary.contrastText",borderTop:1,borderColor:"rgba(255,255,255,.12)",overflowWrap:"anywhere"}}>
   {config.newsletter_url&&config.newsletter_label?<Box sx={{bgcolor:'background.paper',color:'text.primary',borderBottom:1,borderColor:'divider'}}><Container maxWidth="lg" sx={{py:4,display:'flex',justifyContent:'space-between',alignItems:'center',gap:3,flexWrap:'wrap'}}><Typography component="h2" variant="h6">Stay connected with {site.displayName}</Typography><Link href={config.newsletter_url} target="_blank" rel="noopener noreferrer" aria-label={`${config.newsletter_label} (opens in a new tab)`} sx={{bgcolor:'primary.main',color:'primary.contrastText',px:3,py:1.5,borderRadius:1,fontWeight:700,...focus}}>{config.newsletter_label}</Link></Container></Box>:null}
@@ -70,7 +70,8 @@ export function PublicSiteFooter({site,items=[],settings=site.footer,siteOrigin,
     </Box>
     {links.length?<Box component="nav" aria-label="Footer navigation" sx={{display:"grid",gridTemplateColumns:{xs:"minmax(0,1fr)",sm:`repeat(${Math.min(groups.length,2)},minmax(0,1fr))`,lg:`repeat(${Math.min(groups.length,4)},minmax(0,1fr))`},gap:{xs:3,md:4},alignContent:"start"}}>
      {groups.map((group,index)=>{const href=linkUrl(group.href,siteOrigin,preview);return <Box component="section" key={`${index}-${group.title}`} sx={{minWidth:0}}>
-      <Typography component="h2" variant="subtitle1" sx={{fontWeight:750,mb:1.5,lineHeight:1.45}}>{href?<Link href={href} color="inherit" underline="hover" target={preview?"_blank":undefined} rel={preview?"noopener noreferrer":undefined} sx={focus}>{group.title}</Link>:group.title}</Typography>
+      <Typography component="h2" variant="subtitle1" sx={{fontWeight:750,mb:group.description?0.5:1.5,lineHeight:1.45}}>{href?<Link href={href} color="inherit" underline="hover" target={preview?"_blank":undefined} rel={preview?"noopener noreferrer":undefined} sx={focus}>{group.title}</Link>:group.title}</Typography>
+      {group.description?<Typography variant="body2" sx={{mb:1.5,opacity:.85,lineHeight:1.6}}>{group.description}</Typography>:null}
       <Box sx={{opacity:.85}}><FooterLinks items={group.items} origin={siteOrigin} preview={preview}/></Box>
      </Box>;})}
     </Box>:null}
