@@ -64,3 +64,13 @@ it('fetches a fresh revision tag before replacing an existing draft',async()=>{
  await waitFor(()=>expect(apply).toHaveBeenCalledWith(11,{template_id:'college-department',version:1,mode:'replace',page_id:'draft-1'},expect.any(String),'"cms-content-draft-1-r2"'));
  expect(opened).toHaveBeenCalledWith({id:'draft-1'});
 });
+
+it('requires Site media binding before applying an illustrated starter',async()=>{
+ load.mockResolvedValue({ok:true,data:[{...entries[0],media_slots:[{code:'hero',label:'Hero photograph',node_ids:['hero']}]}]});
+ render(<HomepageTemplateCatalogue siteId={11} canEdit onApplied={vi.fn()}/>);
+ fireEvent.click(await screen.findByRole('button',{name:'Preview University Main'}));
+ expect(screen.getByRole('button',{name:'Choose Hero photograph'})).toBeTruthy();
+ fireEvent.click(screen.getByRole('button',{name:'Apply University Main as draft'}));
+ expect(screen.getByRole('button',{name:'Confirm and open draft'}).hasAttribute('disabled')).toBe(true);
+ expect(apply).not.toHaveBeenCalled();
+});

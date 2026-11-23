@@ -32,7 +32,7 @@ describe("Configured widget runtime",()=>{
     expect(screen.getByRole("img",{name:"Site logo placeholder"})).toBeTruthy();
     expect(screen.getByText("Site title placeholder")).toBeTruthy();
     expect(screen.getByText(/Site navigation placeholder/)).toBeTruthy();
-    expect(screen.getByText(/Site news placeholder/)).toBeTruthy();
+    expect(screen.getByText(/Site news preview/)).toBeTruthy();
     expect(fetchMock).not.toHaveBeenCalled();
   });
   it("ignores stale identity responses when the active Site changes",async()=>{

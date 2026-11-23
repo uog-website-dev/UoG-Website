@@ -1,0 +1,225 @@
+{
+  "date": "2026-11-22",
+  "reference": "https://aau.edu.et/",
+  "commit": "cc7d4db",
+  "scope": "current working tree including uncommitted footer implementation",
+  "registered_widgets": 43,
+  "explicit_handlers": 35,
+  "widgets": [
+    {
+      "widget": "hero_image",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "image_slider",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "image_grid",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "layout_slider",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "simple_masonry",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "anything_carousel",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "lottie_player",
+      "renderer": "fallback",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "video_player",
+      "renderer": "partial",
+      "note": "Safe provider link; no embedded player."
+    },
+    {
+      "widget": "image",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "button",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "button_grid",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "contact_form",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "tabs",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "accordion",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "call_to_action",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "headline",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "editor",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "blog",
+      "renderer": "fallback",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "recent_posts",
+      "renderer": "fallback",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "post_carousel",
+      "renderer": "fallback",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "testimonials",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "author_box",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "features",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "taxonomy",
+      "renderer": "fallback",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "icon",
+      "renderer": "partial",
+      "note": "Text label; configured icon glyph is not rendered."
+    },
+    {
+      "widget": "price_table",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "google_maps",
+      "renderer": "partial",
+      "note": "Safe maps link; no embedded map."
+    },
+    {
+      "widget": "social_media_buttons",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "site_logo",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "site_title",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "page_title",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "menu",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "breadcrumbs",
+      "renderer": "fallback",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "loop_grid",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "loop_carousel",
+      "renderer": "fallback",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "taxonomy_filter",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "post_title",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "post_excerpt",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "featured_image",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "alert",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "table_of_contents",
+      "renderer": "fallback",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "menu_anchor",
+      "renderer": "handler_present",
+      "note": "Handler presence is not proof of complete product behavior."
+    },
+    {
+      "widget": "countdown",
+      "renderer": "partial",
+      "note": "Static date/label; no live remaining-time calculation."
+    }
+  ]
+}

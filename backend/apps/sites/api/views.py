@@ -20,7 +20,10 @@ from ..services.lifecycle import transition_site
 from ..services.module_bulk import activation_summary
 from ..services.modules import disable_module_for_site, enable_module_for_site
 from ..services.registry import registry_write
-from .access import AdministrationViewSet, Conflict, reject_idempotency, translate_domain_errors
+from .access import PreconditionFailed,PreconditionRequired,AdministrationViewSet, Conflict, reject_idempotency, translate_domain_errors
+from .footer import FooterSettingsSerializer,FooterEnvelopeSerializer,footer_envelope
+from ..footer import save_footer,footer_etag,FooterConflict,FooterPreconditionRequired
+from ..models import SiteFooter
 from .module_management import ActivationSummarySerializer
 from .query import (
     LIST_PARAMETERS, DomainQuerySerializer, ModuleQuerySerializer, SiteModuleQuerySerializer,
@@ -54,6 +57,7 @@ def _list(view, serializer, specs, default):
     partial_update=extend_schema(parameters=[IF_MATCH], description="Requires sites.update in this Site scope and the existing development-only write gate."),
 )
 class SiteViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, AdministrationViewSet):
+    permission_by_action={**AdministrationViewSet.permission_by_action,"footer":"sites.update"}
     queryset = Site.objects.select_related("organization_unit", "template").prefetch_related(
         Prefetch("domains", queryset=SiteDomain.objects.filter(is_primary=True), to_attr="primary_domain_rows"),
     ).order_by("code")
@@ -129,6 +133,20 @@ class SiteViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Administrati
             site = self.lock(request, self.get_queryset(), SiteSerializer)
             site = apply_site_configuration(site.pk, request.data)
             return self.respond(site, serializer_class=SiteSerializer)
+
+    @extend_schema(methods=["GET"],responses=FooterEnvelopeSerializer,description="Read Site-owned footer settings and the currently published Footer menu. Requires sites.update; no row is created by a read.")
+    @extend_schema(methods=["PATCH"],parameters=[IF_MATCH],request=FooterSettingsSerializer,responses=FooterEnvelopeSerializer,description="Save only this Site's footer settings using its strong footer ETag. Publishes settings immediately; menu snapshots and assignments follow their existing workflow. Unknown ownership/version fields are rejected.")
+    @action(detail=True,methods=["get","patch"],url_path="footer")
+    def footer(self,request,pk=None):
+        site=self.get_object()
+        with translate_domain_errors():
+            if request.method=="PATCH":
+                serializer=FooterSettingsSerializer(data=request.data);serializer.is_valid(raise_exception=True)
+                try:row=save_footer(site.pk,serializer.validated_data,actor=request.user,expected=request.headers.get("If-Match"))
+                except FooterPreconditionRequired:raise PreconditionRequired()
+                except FooterConflict:raise PreconditionFailed()
+            else:row=SiteFooter.objects.filter(site=site).first()
+            return Response(footer_envelope(site,row),headers={"ETag":footer_etag(site.pk,row),"Cache-Control":"private, no-store"})
 
 
 @extend_schema(tags=["Domains"])

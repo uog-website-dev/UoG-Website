@@ -33,7 +33,7 @@ import type {
 } from "@/app/sites/menu-actions";
 import type { ActionResult } from "@/organizations/contract";
 
-const MAX_MENU_DEPTH = 4;
+import { MAX_MENU_DEPTH } from "@uog/types";
 
 const PATH = /^\/(?:[a-z0-9][a-z0-9-]{0,63}(?:\/[a-z0-9][a-z0-9-]{0,63})*)?$/;
 
@@ -218,7 +218,7 @@ export function MenuItemTree({
     const parent = index > 0 ? group[index - 1] : undefined;
     if (!parent) return;
     if (!canPlace(items, item.id, parent.id)) {
-      setNotice("Menu items cannot be nested deeper than 4 levels.");
+      setNotice("Menus support one top-level destination and five submenu levels.");
       return;
     }
     void move(item.id, parent.id, siblings(items, parent.id).length);
@@ -252,7 +252,7 @@ export function MenuItemTree({
       return;
     }
     if (!canPlace(items, source.id, target.id)) {
-      setNotice("Menu items cannot be nested deeper than 4 levels.");
+      setNotice("Menus support one top-level destination and five submenu levels.");
       return;
     }
     void move(source.id, target.id, siblings(items, target.id).length);
@@ -286,7 +286,7 @@ export function MenuItemTree({
                 event.preventDefault();
                 dropOn(item);
               }}
-              sx={{ display: "flex", flexDirection: "column", gap: 0.5, pl: depth * 2 }}
+              sx={{ display: "flex", flexDirection: "column", gap: 0.5, pl: depth ? { xs: 1, md: 2 } : 0 }}
             >
               <Box
                 sx={{
@@ -296,11 +296,14 @@ export function MenuItemTree({
                   p: 1.5,
                   border: 1,
                   borderColor: "divider",
-                  borderRadius: 1,
+                  borderRadius: 2,
+                  borderLeft: "3px solid",
+                  borderLeftColor: depth ? "primary.light" : "divider",
                   bgcolor: "background.paper",
                 }}
               >
                 <Box sx={{ minWidth: 0 }}>
+                  <Typography variant="caption" color="text.secondary">{depth===0?"Top-level item":`Submenu level ${depth} of 5`}</Typography>
                   <Typography sx={{ fontWeight: 600, overflowWrap: "anywhere" }}>{item.label}</Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ overflowWrap: "anywhere" }}>
                     {targetText(item, targets)}
@@ -431,7 +434,7 @@ function ItemForm({
       return;
     }
     if (initial && parent !== (initial.parent ?? "") && !canPlace(items, initial.id, parent || null)) {
-      setWarning("Menu items cannot be nested deeper than 4 levels.");
+      setWarning("Menus support one top-level destination and five submenu levels.");
       return;
     }
     setWarning(null);

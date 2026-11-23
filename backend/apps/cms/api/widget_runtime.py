@@ -32,7 +32,8 @@ from ..selectors.pages import public_pages
 
 
 class WidgetQuery(StrictFields, serializers.Serializer):
-    source = serializers.ChoiceField(choices=("identity", "posts", "pages", "taxonomy", "menu"))
+    source = serializers.ChoiceField(choices=("identity", "posts", "pages", "taxonomy", "menu", "breadcrumbs"))
+    page_id = serializers.UUIDField(required=False)
     menu_code = serializers.ChoiceField(choices=("header","footer","sidebar","primary","secondary"),default="header")
     limit = serializers.IntegerField(default=12, min_value=1, max_value=50)
     locale = serializers.CharField(required=False, max_length=35)
@@ -81,6 +82,20 @@ def widget_data(site, parameters):
             "logo_url": "/api/v1/site-context/identity/logo/" if asset else None,
         }]}
     locale = _locale(site, parameters.get("locale"))
+    if source == "breadcrumbs":
+        if not module_is_available(site.pk,"PAGES") or not parameters.get("page_id"):
+            raise NotFound()
+        current=parameters["page_id"];seen=set();crumbs=[]
+        while current and current not in seen and len(crumbs)<16:
+            seen.add(current)
+            page=public_pages(site.pk,locale).filter(pk=current).first()
+            if page is None:break
+            snapshot=PublishedContentSnapshot.objects.filter(content_id=page.pk).order_by("-version").first()
+            if snapshot is None:break
+            payload=snapshot.payload
+            crumbs.append({"site":site.pk,"title":payload["title"],"path":payload["path"]})
+            current=payload.get("parent_id")
+        return {"site":site.pk,"source":source,"results":list(reversed(crumbs))}
     if source == "pages":
         if not module_is_available(site.pk, "PAGES"):
             raise NotFound()

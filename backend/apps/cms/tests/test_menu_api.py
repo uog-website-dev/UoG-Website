@@ -195,7 +195,7 @@ def test_invalid_cycle_and_descendant_depth_roll_back_positions_versions_and_aud
     url = _menu(api)
     root = _item(api, url, "Root")
     cursor = root
-    for label in ("Level 2", "Level 3", "Level 4"):
+    for label in ("Level 2", "Level 3", "Level 4", "Level 5", "Level 6"):
         cursor = _item(api, url, label, parent=api.client.get(cursor, **api.header).json()["id"])
     other = _item(api, url, "Other")
     deep_id = api.client.get(cursor, **api.header).json()["id"]
@@ -504,3 +504,28 @@ def test_local_location_edit_cross_site_block_and_central_menu_authority(api, se
     assert blocked.status_code == 400
     assert blocked.json()["error"]["details"]["reason"] == "module_disabled"
     assert Menu.objects.get(pk=moved.json()["id"]).name == "Campus footer"
+
+
+
+def test_five_submenu_levels_round_trip_preview_publication_and_public_delivery(api):
+    from .test_public_posts import _host
+    url=_menu(api);parent=None
+    for level in range(6):
+        item=_item(api,url,f'Level {level}',parent=parent)
+        parent=api.client.get(item,**api.header).json()['id']
+    tag=_tag(api,url)
+    invalid=_post(api,url+'items/',{'label':'Too deep','item_type':'custom','target':'/about','parent':parent},tag)
+    assert invalid.status_code==400,invalid.content
+    assert _tag(api,url)==tag
+    def labels(nodes):
+        result=[]
+        while nodes:
+            assert len(nodes)==1
+            result.append(nodes[0]['label']);nodes=nodes[0]['children']
+        return result
+    preview=api.client.get(api.base+'preview-navigation/',**api.header)
+    assert labels(preview.json()['locations']['header'])==[f'Level {i}' for i in range(6)]
+    assert _post(api,url+'activate/',{},tag).status_code==200
+    public=api.client.get('/api/v1/site-context/menus/?location=header',HTTP_HOST=_host(api.site))
+    assert public.status_code==200,public.content
+    assert labels(public.json()['locations']['header'])==[f'Level {i}' for i in range(6)]

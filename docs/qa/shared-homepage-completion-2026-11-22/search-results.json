@@ -1,0 +1,18 @@
+[
+  {
+    "host": "www.uog.local",
+    "site": 17,
+    "matchingPublishedTitle": true,
+    "foreignOverrideRejected": true,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "host": "coi.uog.local",
+    "site": 16,
+    "matchingPublishedTitle": true,
+    "foreignOverrideRejected": true,
+    "overflow": false,
+    "violations": []
+  }
+]

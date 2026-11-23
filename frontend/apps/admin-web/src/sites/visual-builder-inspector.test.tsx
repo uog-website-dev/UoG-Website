@@ -157,3 +157,11 @@ describe("Visual Builder inspector", () => {
     expect(isSafeLink((button.props as { href: string }).href)).toBe(false);
   });
 });
+
+it("selects theme colours using labelled swatches and restores the default",()=>{
+ const onChange=vi.fn();const schema={type:"object",properties:{panel_tone:{enum:["light","brand","gold"]}}};
+ const view=render(<InspectorFields schema={schema} value={{panel_tone:"brand"}} onChange={onChange}/>);
+ expect(view.getByRole("button",{name:"Panel tone: Brand"}).getAttribute("aria-pressed")).toBe("true");
+ fireEvent.click(view.getByRole("button",{name:"Panel tone: Gold"}));expect(onChange).toHaveBeenLastCalledWith({panel_tone:"gold"});
+ fireEvent.click(view.getByRole("button",{name:"Panel tone: Default"}));expect(onChange).toHaveBeenLastCalledWith({});view.unmount();
+});

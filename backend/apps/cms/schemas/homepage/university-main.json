@@ -1,173 +1,111 @@
 {
   "manifest_version": 1,
   "id": "university-main",
-  "version": 3,
+  "version": 4,
   "name": "University Main",
-  "description": "A branded university homepage with an editable welcome, key links and published Site news.",
+  "description": "A responsive university homepage with split-image carousels, highlights, campus panels, published news, partnerships and enquiries. Select this Site's images before applying.",
   "required_modules": [
     "PAGES",
     "VISUAL_BUILDER"
+  ],
+  "media_slots": [
+    {
+      "code": "hero",
+      "label": "Hero photograph",
+      "node_ids": [
+        "university-hero-learn",
+        "university-hero-research"
+      ]
+    },
+    {
+      "code": "campus",
+      "label": "Campus photograph",
+      "node_ids": [
+        "university-campus-life",
+        "university-campus-research"
+      ]
+    }
   ],
   "layout": {
     "schema_version": 1,
     "settings": {
       "show_title": false,
-      "content_width": "wide"
+      "content_width": "full"
     },
     "rows": [
       {
-        "id": "um-brand",
-        "type": "section",
-        "ratios": [
-          25,
-          75
-        ],
-        "columns": [
-          {
-            "id": "um-brand-logo",
-            "type": "column",
-            "children": [
-              {
-                "id": "um-logo",
-                "type": "site_logo",
-                "props": {}
-              }
-            ]
-          },
-          {
-            "id": "um-brand-title",
-            "type": "column",
-            "children": [
-              {
-                "id": "um-title",
-                "type": "site_title",
-                "props": {}
-              }
-            ]
-          }
-        ],
-        "style": {
-          "padding": "md",
-          "background": "paper",
-          "text_color": "default",
-          "gap": "md",
-          "radius": "md"
-        },
-        "responsive": {
-          "mobile": {
-            "stack": true
-          }
-        }
-      },
-      {
-        "id": "um-nav",
+        "id": "university-hero",
         "type": "section",
         "ratios": [
           100
         ],
         "columns": [
           {
-            "id": "um-nav-col",
+            "id": "university-hero-column-0",
             "type": "column",
             "children": [
               {
-                "id": "um-menu",
-                "type": "menu",
-                "props": {
-                  "menu_code": "header"
-                }
-              }
-            ]
-          }
-        ],
-        "style": {
-          "padding": "sm",
-          "background": "mist",
-          "text_color": "default",
-          "gap": "sm"
-        }
-      },
-      {
-        "id": "um-hero",
-        "type": "section",
-        "ratios": [
-          100
-        ],
-        "columns": [
-          {
-            "id": "um-hero-col",
-            "type": "column",
-            "children": [
-              {
-                "id": "um-hero-title",
-                "type": "headline",
-                "props": {
-                  "text": "Welcome to our university",
-                  "level": 2
-                }
-              },
-              {
-                "id": "um-hero-copy",
-                "type": "editor",
-                "props": {
-                  "html": "<p>Replace this introduction with an approved welcome for your Site. Add locally approved imagery through the builder when available.</p>"
-                }
-              }
-            ]
-          }
-        ],
-        "style": {
-          "padding": "xl",
-          "background": "navy_gradient",
-          "text_color": "inverse",
-          "radius": "lg",
-          "gap": "lg",
-          "text_size": "xl"
-        },
-        "responsive": {
-          "mobile": {
-            "gap": "md"
-          }
-        }
-      },
-      {
-        "id": "um-links",
-        "type": "section",
-        "ratios": [
-          100
-        ],
-        "columns": [
-          {
-            "id": "um-links-col",
-            "type": "column",
-            "children": [
-              {
-                "id": "um-links-title",
-                "type": "headline",
-                "props": {
-                  "text": "Explore our university",
-                  "level": 3
-                }
-              },
-              {
-                "id": "um-hero-links",
-                "type": "button_grid",
+                "id": "university-hero-carousel",
+                "type": "layout_slider",
                 "props": {
                   "items": [
                     {
-                      "id": "um-apply",
-                      "label": "Apply to study",
-                      "href": "/admissions"
+                      "id": "university-hero-learn-slide",
+                      "children": [
+                        {
+                          "id": "university-hero-learn",
+                          "type": "hero_image",
+                          "props": {
+                            "asset_id": "00000000-0000-0000-0000-000000000000",
+                            "alt": "Choose an approved Site photograph",
+                            "title": "Ideas that shape a better future",
+                            "text": "Discover learning, research and a community committed to public service.",
+                            "layout": "split",
+                            "height": "medium",
+                            "mask": "curve",
+                            "actions": [
+                              {
+                                "id": "university-hero-learn-action",
+                                "label": "Explore opportunities",
+                                "href": "#opportunities"
+                              }
+                            ]
+                          },
+                          "style": {
+                            "background": "navy",
+                            "text_color": "inverse"
+                          }
+                        }
+                      ]
                     },
                     {
-                      "id": "um-programmes",
-                      "label": "Explore programmes",
-                      "href": "/academics"
-                    },
-                    {
-                      "id": "um-research",
-                      "label": "Research",
-                      "href": "/research"
+                      "id": "university-hero-research-slide",
+                      "children": [
+                        {
+                          "id": "university-hero-research",
+                          "type": "hero_image",
+                          "props": {
+                            "asset_id": "00000000-0000-0000-0000-000000000000",
+                            "alt": "Choose an approved Site photograph",
+                            "title": "Discover. Collaborate. Make an impact.",
+                            "text": "Connect with our academic community and explore our work.",
+                            "layout": "split",
+                            "height": "medium",
+                            "mask": "curve",
+                            "actions": [
+                              {
+                                "id": "university-hero-research-action",
+                                "label": "Explore opportunities",
+                                "href": "#research"
+                              }
+                            ]
+                          },
+                          "style": {
+                            "background": "navy",
+                            "text_color": "inverse"
+                          }
+                        }
+                      ]
                     }
                   ]
                 }
@@ -176,49 +114,632 @@
           }
         ],
         "style": {
-          "padding": "lg",
-          "background": "paper",
-          "text_color": "default",
-          "radius": "md",
-          "gap": "md"
+          "content_width": "full",
+          "padding": "none",
+          "gap": "lg"
+        },
+        "responsive": {
+          "mobile": {
+            "stack": true,
+            "gap": "md"
+          }
         }
       },
       {
-        "id": "um-news",
+        "id": "university-impact-title",
         "type": "section",
         "ratios": [
           100
         ],
         "columns": [
           {
-            "id": "um-news-col",
+            "id": "university-impact-title-column-0",
             "type": "column",
             "children": [
               {
-                "id": "um-news-title",
+                "id": "university-impact-heading",
                 "type": "headline",
                 "props": {
-                  "text": "University news",
-                  "level": 3
+                  "text": "Learning with purpose",
+                  "level": 2
                 }
               },
               {
-                "id": "um-news-grid",
-                "type": "loop_grid",
+                "id": "university-impact-intro",
+                "type": "editor",
                 "props": {
-                  "source": "posts",
-                  "limit": 3
+                  "html": "<p>Education, discovery and service connect our community.</p>"
                 }
               }
             ]
           }
         ],
         "style": {
+          "content_width": "wide",
           "padding": "lg",
-          "background": "paper",
-          "text_color": "default",
-          "radius": "md",
-          "gap": "md"
+          "gap": "lg"
+        },
+        "responsive": {
+          "mobile": {
+            "stack": true,
+            "gap": "md"
+          }
+        }
+      },
+      {
+        "id": "university-impact",
+        "type": "section",
+        "ratios": [
+          1,
+          1,
+          1
+        ],
+        "columns": [
+          {
+            "id": "university-impact-column-0",
+            "type": "column",
+            "children": [
+              {
+                "id": "university-learn-icon",
+                "type": "icon",
+                "props": {
+                  "icon": "school",
+                  "label": "Education"
+                }
+              },
+              {
+                "id": "university-learn-title",
+                "type": "headline",
+                "props": {
+                  "text": "Learn",
+                  "level": 2
+                }
+              },
+              {
+                "id": "university-learn-text",
+                "type": "editor",
+                "props": {
+                  "html": "<p>Explore academic pathways and develop practical knowledge.</p>"
+                }
+              }
+            ]
+          },
+          {
+            "id": "university-impact-column-1",
+            "type": "column",
+            "children": [
+              {
+                "id": "university-research-icon",
+                "type": "icon",
+                "props": {
+                  "icon": "book",
+                  "label": "Research"
+                }
+              },
+              {
+                "id": "university-research-title",
+                "type": "headline",
+                "props": {
+                  "text": "Discover",
+                  "level": 2
+                }
+              },
+              {
+                "id": "university-research-text",
+                "type": "editor",
+                "props": {
+                  "html": "<p>Connect ideas and collaborate on meaningful research.</p>"
+                }
+              }
+            ]
+          },
+          {
+            "id": "university-impact-column-2",
+            "type": "column",
+            "children": [
+              {
+                "id": "university-community-icon",
+                "type": "icon",
+                "props": {
+                  "icon": "location",
+                  "label": "Community"
+                }
+              },
+              {
+                "id": "university-community-title",
+                "type": "headline",
+                "props": {
+                  "text": "Connect",
+                  "level": 2
+                }
+              },
+              {
+                "id": "university-community-text",
+                "type": "editor",
+                "props": {
+                  "html": "<p>Work together to serve our university and wider community.</p>"
+                }
+              }
+            ]
+          }
+        ],
+        "style": {
+          "content_width": "wide",
+          "padding": "lg",
+          "gap": "lg",
+          "background": "mist",
+          "radius": "lg"
+        },
+        "responsive": {
+          "mobile": {
+            "stack": true,
+            "gap": "md"
+          }
+        }
+      },
+      {
+        "id": "university-quick",
+        "type": "section",
+        "ratios": [
+          100
+        ],
+        "columns": [
+          {
+            "id": "university-quick-column-0",
+            "type": "column",
+            "children": [
+              {
+                "id": "university-quick-anchor",
+                "type": "menu_anchor",
+                "props": {
+                  "anchor": "opportunities"
+                }
+              },
+              {
+                "id": "university-quick-title",
+                "type": "headline",
+                "props": {
+                  "text": "Explore your opportunities",
+                  "level": 2
+                }
+              },
+              {
+                "id": "university-quick-links",
+                "type": "button_grid",
+                "props": {
+                  "items": [
+                    {
+                      "id": "university-quick-news",
+                      "label": "Latest news",
+                      "href": "/posts"
+                    },
+                    {
+                      "id": "university-quick-life",
+                      "label": "Campus life",
+                      "href": "#campus-life"
+                    },
+                    {
+                      "id": "university-quick-research",
+                      "label": "Research",
+                      "href": "#research"
+                    },
+                    {
+                      "id": "university-quick-contact",
+                      "label": "Contact",
+                      "href": "#contact"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "style": {
+          "content_width": "wide",
+          "padding": "lg",
+          "gap": "lg"
+        },
+        "responsive": {
+          "mobile": {
+            "stack": true,
+            "gap": "md"
+          }
+        }
+      },
+      {
+        "id": "university-campus",
+        "type": "section",
+        "ratios": [
+          100
+        ],
+        "columns": [
+          {
+            "id": "university-campus-column-0",
+            "type": "column",
+            "children": [
+              {
+                "id": "university-campus-anchor",
+                "type": "menu_anchor",
+                "props": {
+                  "anchor": "campus-life"
+                }
+              },
+              {
+                "id": "university-campus-carousel",
+                "type": "layout_slider",
+                "props": {
+                  "items": [
+                    {
+                      "id": "university-campus-life-slide",
+                      "children": [
+                        {
+                          "id": "university-campus-life",
+                          "type": "hero_image",
+                          "props": {
+                            "asset_id": "00000000-0000-0000-0000-000000000000",
+                            "alt": "Choose an approved Site photograph",
+                            "title": "A place to belong",
+                            "text": "Explore student life, academic facilities and opportunities to connect.",
+                            "layout": "split",
+                            "height": "medium",
+                            "mask": "curve",
+                            "actions": [
+                              {
+                                "id": "university-campus-life-action",
+                                "label": "Explore opportunities",
+                                "href": "#contact"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "id": "university-campus-research-slide",
+                      "children": [
+                        {
+                          "id": "university-campus-research",
+                          "type": "hero_image",
+                          "props": {
+                            "asset_id": "00000000-0000-0000-0000-000000000000",
+                            "alt": "Choose an approved Site photograph",
+                            "title": "Knowledge in action",
+                            "text": "Meet the people and projects shaping our community.",
+                            "layout": "split_reverse",
+                            "height": "medium",
+                            "mask": "curve",
+                            "actions": [
+                              {
+                                "id": "university-campus-research-action",
+                                "label": "Explore opportunities",
+                                "href": "#research"
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "style": {
+          "content_width": "full",
+          "padding": "none",
+          "gap": "lg",
+          "background": "mist"
+        },
+        "responsive": {
+          "mobile": {
+            "stack": true,
+            "gap": "md"
+          }
+        }
+      },
+      {
+        "id": "university-news",
+        "type": "section",
+        "ratios": [
+          100
+        ],
+        "columns": [
+          {
+            "id": "university-news-column-0",
+            "type": "column",
+            "children": [
+              {
+                "id": "university-news-title",
+                "type": "headline",
+                "props": {
+                  "text": "Latest news",
+                  "level": 2
+                }
+              },
+              {
+                "id": "university-news-intro",
+                "type": "editor",
+                "props": {
+                  "html": "<p>Updates from this Site, published by our editorial team.</p>"
+                }
+              },
+              {
+                "id": "university-news-grid",
+                "type": "loop_grid",
+                "props": {
+                  "source": "posts",
+                  "limit": 4,
+                  "presentation": "featured"
+                }
+              },
+              {
+                "id": "university-news-more",
+                "type": "button",
+                "props": {
+                  "label": "View all news",
+                  "href": "/posts",
+                  "variant": "outline"
+                }
+              }
+            ]
+          }
+        ],
+        "style": {
+          "content_width": "wide",
+          "padding": "lg",
+          "gap": "lg"
+        },
+        "responsive": {
+          "mobile": {
+            "stack": true,
+            "gap": "md"
+          }
+        }
+      },
+      {
+        "id": "university-research",
+        "type": "section",
+        "ratios": [
+          60,
+          40
+        ],
+        "columns": [
+          {
+            "id": "university-research-column-0",
+            "type": "column",
+            "children": [
+              {
+                "id": "university-research-anchor",
+                "type": "menu_anchor",
+                "props": {
+                  "anchor": "research"
+                }
+              },
+              {
+                "id": "university-research-heading",
+                "type": "headline",
+                "props": {
+                  "text": "Research and collaboration",
+                  "level": 2
+                }
+              },
+              {
+                "id": "university-research-intro",
+                "type": "editor",
+                "props": {
+                  "html": "<p>Explore our research priorities and find opportunities to work together.</p>"
+                }
+              }
+            ]
+          },
+          {
+            "id": "university-research-column-1",
+            "type": "column",
+            "children": [
+              {
+                "id": "university-facilities",
+                "type": "tabs",
+                "props": {
+                  "items": [
+                    {
+                      "id": "university-tab-programs",
+                      "title": "Academic programs",
+                      "text": "Use this space to describe approved academic pathways and entry information."
+                    },
+                    {
+                      "id": "university-tab-facilities",
+                      "title": "Facilities",
+                      "text": "Describe your Site facilities, libraries and learning spaces."
+                    },
+                    {
+                      "id": "university-tab-support",
+                      "title": "Student support",
+                      "text": "Describe the support available to students and the community."
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "style": {
+          "content_width": "wide",
+          "padding": "lg",
+          "gap": "lg",
+          "background": "mist",
+          "radius": "lg"
+        },
+        "responsive": {
+          "mobile": {
+            "stack": true,
+            "gap": "md"
+          }
+        }
+      },
+      {
+        "id": "university-partners",
+        "type": "section",
+        "ratios": [
+          100
+        ],
+        "columns": [
+          {
+            "id": "university-partners-column-0",
+            "type": "column",
+            "children": [
+              {
+                "id": "university-partners-title",
+                "type": "headline",
+                "props": {
+                  "text": "Partnership and collaboration",
+                  "level": 2
+                }
+              },
+              {
+                "id": "university-partners-carousel",
+                "type": "anything_carousel",
+                "props": {
+                  "items": [
+                    {
+                      "id": "university-partner-academic",
+                      "children": [
+                        {
+                          "id": "university-partner-academic-title",
+                          "type": "headline",
+                          "props": {
+                            "text": "Academic collaboration",
+                            "level": 2
+                          }
+                        },
+                        {
+                          "id": "university-partner-academic-text",
+                          "type": "editor",
+                          "props": {
+                            "html": "<p>Replace this introduction with approved partner information and links.</p>"
+                          }
+                        },
+                        {
+                          "id": "university-partner-academic-link",
+                          "type": "button",
+                          "props": {
+                            "label": "Discuss a partnership",
+                            "href": "#contact",
+                            "variant": "outline"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "id": "university-partner-community",
+                      "children": [
+                        {
+                          "id": "university-partner-community-title",
+                          "type": "headline",
+                          "props": {
+                            "text": "Community partnerships",
+                            "level": 2
+                          }
+                        },
+                        {
+                          "id": "university-partner-community-text",
+                          "type": "editor",
+                          "props": {
+                            "html": "<p>Share the work your Site undertakes with its community.</p>"
+                          }
+                        },
+                        {
+                          "id": "university-partner-community-link",
+                          "type": "button",
+                          "props": {
+                            "label": "Contact our team",
+                            "href": "#contact",
+                            "variant": "outline"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "style": {
+          "content_width": "wide",
+          "padding": "lg",
+          "gap": "lg",
+          "background": "mist",
+          "radius": "lg"
+        },
+        "responsive": {
+          "mobile": {
+            "stack": true,
+            "gap": "md"
+          }
+        }
+      },
+      {
+        "id": "university-contact",
+        "type": "section",
+        "ratios": [
+          40,
+          60
+        ],
+        "columns": [
+          {
+            "id": "university-contact-column-0",
+            "type": "column",
+            "children": [
+              {
+                "id": "university-contact-anchor",
+                "type": "menu_anchor",
+                "props": {
+                  "anchor": "contact"
+                }
+              },
+              {
+                "id": "university-contact-heading",
+                "type": "headline",
+                "props": {
+                  "text": "Start a conversation",
+                  "level": 2
+                }
+              },
+              {
+                "id": "university-contact-copy",
+                "type": "editor",
+                "props": {
+                  "html": "<p>Send an enquiry to our Site team.</p>"
+                }
+              }
+            ]
+          },
+          {
+            "id": "university-contact-column-1",
+            "type": "column",
+            "children": [
+              {
+                "id": "university-contact-form",
+                "type": "contact_form",
+                "props": {
+                  "form_code": "homepage-enquiries",
+                  "submit_label": "Send enquiry"
+                }
+              }
+            ]
+          }
+        ],
+        "style": {
+          "content_width": "wide",
+          "padding": "lg",
+          "gap": "lg"
+        },
+        "responsive": {
+          "mobile": {
+            "stack": true,
+            "gap": "md"
+          }
         }
       }
     ]

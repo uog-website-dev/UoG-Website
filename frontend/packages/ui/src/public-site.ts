@@ -1,3 +1,5 @@
+import {footerSettingsFrom} from "@uog/types";
+import type {SiteFooterSettings} from "@uog/types";
 /**
  * Host-resolved public Site decisions.
  *
@@ -31,6 +33,7 @@ export interface PublicSiteContext {
   canonicalDomain: string | null;
   logoUrl: string | null;
   brandingRevision?: string;
+  footer?:SiteFooterSettings;
   theme: "institutional" | "high-contrast";
   modules: { pages: boolean; posts: boolean; menus: boolean };
 }
@@ -55,7 +58,7 @@ export function siteFromContext(status: number, body: unknown): PublicSiteContex
     site?: { id?: unknown; code?: unknown; name?: unknown } | null;
     domain?: unknown;
     canonical_domain?: unknown;
-    configuration?: { display_name?: unknown; theme?: unknown; logo_url?: unknown; branding_revision?: unknown } | null;
+    configuration?: { display_name?: unknown; theme?: unknown; logo_url?: unknown; branding_revision?: unknown; footer?:unknown } | null;
     modules?: unknown;
   };
   const site = row.site;
@@ -77,6 +80,7 @@ export function siteFromContext(status: number, body: unknown): PublicSiteContex
     canonicalDomain: typeof row.canonical_domain === "string" && /^[a-z0-9.-]+$/i.test(row.canonical_domain) ? row.canonical_domain.toLowerCase() : null,
     logoUrl: row.configuration?.logo_url === "/api/v1/site-context/identity/logo/" ? row.configuration.logo_url : null,
     brandingRevision: typeof row.configuration?.branding_revision === "string" && /^[a-f0-9]{64}$/.test(row.configuration.branding_revision) ? row.configuration.branding_revision : undefined,
+    footer:footerSettingsFrom(row.configuration?.footer),
     theme,
     modules: {
       pages: modules.includes("PAGES"),

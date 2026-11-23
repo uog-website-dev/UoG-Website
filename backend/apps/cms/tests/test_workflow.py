@@ -381,3 +381,78 @@ def test_concurrent_post_publish_retries_create_one_snapshot_and_audit(sites):
     assert AuditEvent.objects.filter(
         entity_id=str(post.pk), action="CONTENT_PUBLISHED",
     ).count() == 1
+
+
+@pytest.mark.parametrize("kind", ["page", "post"])
+def test_site_administrator_direct_publish_and_republish(sites, kind):
+    from types import SimpleNamespace
+    from apps.authorization.models import Role, UserRoleAssignment
+    from apps.cms.workflow_actions import available_workflow_actions
+    site, other = sites
+    from django.core.management import call_command
+    call_command("seed_rbac", verbosity=0)
+    actor = _user("direct-admin-" + kind)
+    UserRoleAssignment.objects.create(user=actor, role=Role.objects.get(code="site-administrator"),
+                                     scope="SITE", site=site, organization=site.organization_unit)
+    content = (_page(site, actor) if kind == "page" else
+               Post.objects.create(site=site, title="Direct news", slug="direct-news",
+                                   content="<p>News</p>", created_by=actor, updated_by=actor))
+    assert "publish" in available_workflow_actions(content, SimpleNamespace(user=actor))
+    published = _transition(content, "publish", actor)
+    assert published.status == ContentStatus.PUBLISHED
+    assert PublishedContentSnapshot.objects.filter(content=content).count() == 1
+    _transition(content, "unpublish", actor)
+    content.refresh_from_db()
+    assert "publish" in available_workflow_actions(content, SimpleNamespace(user=actor))
+    assert _transition(content, "publish", actor).status == ContentStatus.PUBLISHED
+    assert PublishedContentSnapshot.objects.filter(content=content).count() == 2
+    foreign = create_page(site=other, title="Foreign", slug="foreign", blocks=[], actor=actor)
+    with pytest.raises(PermissionDenied):
+        _transition(foreign, "publish", actor)
+    foreign.refresh_from_db()
+    assert foreign.status == ContentStatus.DRAFT
+
+
+def test_combined_content_roles_do_not_grant_direct_publication(sites):
+    site, _ = sites
+    actor = _user("combined-not-admin")
+    _grant(site, actor, *ContentRole.values)
+    page = _page(site, actor)
+    with pytest.raises(ValidationError):
+        _transition(page, "publish", actor)
+    page.refresh_from_db()
+    assert page.status == ContentStatus.DRAFT
+    assert not ContentWorkflowTransition.objects.filter(content=page).exists()
+
+
+@pytest.mark.parametrize("visual", [False, True])
+def test_admin_publish_validates_and_rolls_back_intermediate_history(sites, monkeypatch, visual):
+    from django.core.management import call_command
+    from apps.authorization.models import Role, UserRoleAssignment
+    from apps.cms.models import ContentEditConflict
+    call_command("seed_rbac", verbosity=0)
+    site, _ = sites
+    actor = _user("atomic-admin")
+    UserRoleAssignment.objects.create(user=actor, role=Role.objects.get(code="site-administrator"),
+                                     scope="SITE", site=site, organization=site.organization_unit)
+    page = _page(site, actor)
+    if visual:
+        from .test_realm_role_authorization import _enable
+        _enable("PAGES", site)
+        page.metadata = {"visual_layout":{"schema_version":1,"rows":[]}}
+        page.save()
+    original_revision = page.revision_number
+    with pytest.raises(ContentEditConflict):
+        transition_content(page.pk, action="publish", actor=actor, expected_revision=original_revision - 1)
+    def unavailable(*args, **kwargs):
+        raise ValidationError({"media":"Unavailable asset"})
+    with monkeypatch.context() as patch:
+        patch.setattr("apps.cms.services.visual_publication.validate_publication", unavailable)
+        with pytest.raises(ValidationError):
+            transition_content(page.pk, action="publish", actor=actor, expected_revision=original_revision)
+    page.refresh_from_db()
+    assert page.status == ContentStatus.DRAFT
+    assert page.revision_number == original_revision
+    assert not ContentWorkflowTransition.objects.filter(content=page).exists()
+    assert not PublishedContentSnapshot.objects.filter(content=page).exists()
+    assert transition_content(page.pk, action="publish", actor=actor, expected_revision=original_revision).status == ContentStatus.PUBLISHED

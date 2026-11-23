@@ -195,3 +195,14 @@ it("adds typed news and same-Site category destinations", async () => {
 });
 
 vi.mock("@/data/read-client",async()=>{const menus=await import("@/app/sites/menu-actions");return {loadSiteNavigation:(...args:unknown[])=>(menus.loadSiteNavigation as (...values:unknown[])=>unknown)(...args.slice(0,2))};});
+
+
+it('allows a fifth submenu in the parent picker and excludes sixth-submenu parents',async()=>{
+ const current=state();current.items=Array.from({length:6},(_,i)=>({id:`level-${i}`,label:`Level ${i}`,parent:i?`level-${i-1}`:null,sort_order:0,target:'/about',item_type:'custom' as const,is_active:true}));
+ renderTree(current);
+ const form=await screen.findByRole('form',{name:'Add to Header'});
+ const select=within(form).getByRole('combobox',{name:'Place under'});
+ expect(within(select).getByRole('option',{name:'Level 4'})).toBeTruthy();
+ expect(within(select).queryByRole('option',{name:'Level 5'})).toBeNull();
+ expect(screen.getByText('Submenu level 5 of 5')).toBeTruthy();
+});

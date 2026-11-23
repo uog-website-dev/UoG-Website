@@ -81,3 +81,36 @@ def test_membership_only_editor_reviewer_publisher_handoff(client,oidc,sites):
         response=client.post(workflow,{"action":action,"comment":"Reviewed membership regression"},content_type="application/json",**headers[code])
         assert response.status_code==200,response.content
     assert UserRoleAssignment.objects.filter(site=site,user__username__startswith="handoff-").count()==3
+
+
+@pytest.mark.parametrize("resource", [PAGES, POSTS])
+def test_administrator_api_direct_publish_unpublish_and_scope(client, oidc, sites, resource):
+    call_command("seed_rbac", verbosity=0)
+    site, other = sites
+    _enable("PAGES", site, other); _enable("POSTS", site, other)
+    header = _identity(oidc, "direct-api-admin", roles=[])
+    assert client.get("/api/me/", **header).status_code == 200
+    user = get_user_model().objects.get(username="direct-api-admin")
+    assignment = UserRoleAssignment.objects.create(user=user, role=Role.objects.get(code="site-administrator"),
+        scope="SITE", site=site, organization=site.organization_unit)
+    data = {"title":"Administrator article", "slug":"administrator-article"}
+    if resource == POSTS: data["content"] = "<p>Direct publication</p>"
+    else: data["blocks"] = []
+    created = client.post(resource.format(site=site.pk), data, content_type="application/json", **header)
+    assert created.status_code == 201, created.content
+    assert "publish" in created.json()["available_actions"]
+    workflow = WORKFLOW.format(site=site.pk, content=created.json()["id"])
+    for action in ["publish", "unpublish", "publish"]:
+        response = client.post(workflow, {"action":action}, content_type="application/json", **header)
+        assert response.status_code == 200, response.content
+    forged = client.post(WORKFLOW.format(site=other.pk, content=created.json()["id"]),
+        {"action":"unpublish"}, content_type="application/json", **header)
+    assert forged.status_code == 404
+    from apps.sites.models import SiteModule
+    SiteModule.objects.filter(site=site, module__code="POSTS" if resource == POSTS else "PAGES").update(is_enabled=False)
+    denied = client.post(workflow, {"action":"unpublish"}, content_type="application/json", **header)
+    assert denied.status_code == 400, denied.content
+    assert "module" in denied.json()["error"]["details"]
+    SiteModule.objects.filter(site=site).update(is_enabled=True)
+    assignment.revoked_at = timezone.now(); assignment.save()
+    assert client.post(workflow, {"action":"unpublish"}, content_type="application/json", **header).status_code == 403

@@ -63,3 +63,16 @@ def require_cms_grant(
     raise PermissionDenied(
         message or "A CMS role assigned to this Site is required."
     )
+
+
+def cms_administrator_allows(actor, site_id, *, using=None):
+    """Direct publication is reserved for live Site/platform administrators."""
+    if not getattr(actor, "is_authenticated", False) or not getattr(actor, "is_active", False):
+        return False
+    if is_platform_administrator(actor):
+        return True
+    assignments = live_assignments(actor)
+    if using is not None:
+        assignments = assignments.using(using)
+    return assignments.filter(scope="SITE", site_id=site_id, role__is_system=True,
+                              role__code="site-administrator").exists()

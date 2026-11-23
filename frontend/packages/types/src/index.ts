@@ -510,3 +510,7 @@ export interface HealthReport {
 export type { MediaAsset, MediaStatus, MediaListQuery, MediaMetadataPatch, MediaReferenceInventory, MediaDeletion } from "./media";
 
 export * from "./layout";
+
+export * from "./footer";
+
+export { MAX_MENU_DEPTH } from "./navigation";

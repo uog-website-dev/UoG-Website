@@ -1,0 +1,92 @@
+[
+  {
+    "host": "coi.uog.local",
+    "width": 390,
+    "site": "College of Informatics",
+    "overflow": false,
+    "headers": 1,
+    "footers": 1,
+    "h1": 1,
+    "violations": []
+  },
+  {
+    "host": "coi.uog.local",
+    "width": 768,
+    "site": "College of Informatics",
+    "overflow": false,
+    "headers": 1,
+    "footers": 1,
+    "h1": 1,
+    "violations": []
+  },
+  {
+    "host": "coi.uog.local",
+    "width": 1440,
+    "site": "College of Informatics",
+    "overflow": false,
+    "headers": 1,
+    "footers": 1,
+    "h1": 1,
+    "violations": []
+  },
+  {
+    "host": "www.uog.local",
+    "width": 390,
+    "site": "University of Gondar",
+    "overflow": false,
+    "headers": 1,
+    "footers": 1,
+    "h1": 1,
+    "violations": []
+  },
+  {
+    "host": "www.uog.local",
+    "width": 768,
+    "site": "University of Gondar",
+    "overflow": false,
+    "headers": 1,
+    "footers": 1,
+    "h1": 1,
+    "violations": []
+  },
+  {
+    "host": "www.uog.local",
+    "width": 1440,
+    "site": "University of Gondar",
+    "overflow": false,
+    "headers": 1,
+    "footers": 1,
+    "h1": 1,
+    "violations": []
+  },
+  {
+    "host": "caes.uog.local",
+    "width": 390,
+    "site": "College of Agriculture and Environmental Sciences",
+    "overflow": false,
+    "headers": 1,
+    "footers": 1,
+    "h1": 1,
+    "violations": []
+  },
+  {
+    "host": "caes.uog.local",
+    "width": 768,
+    "site": "College of Agriculture and Environmental Sciences",
+    "overflow": false,
+    "headers": 1,
+    "footers": 1,
+    "h1": 1,
+    "violations": []
+  },
+  {
+    "host": "caes.uog.local",
+    "width": 1440,
+    "site": "College of Agriculture and Environmental Sciences",
+    "overflow": false,
+    "headers": 1,
+    "footers": 1,
+    "h1": 1,
+    "violations": []
+  }
+]

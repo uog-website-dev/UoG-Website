@@ -42,6 +42,8 @@ def test_subtree_move_validates_descendant_depth(ready):
     leaf = _item(menu, "leaf", parent=child)
     other = _item(menu, "other", sort_order=1)
     deep = _item(menu, "deep", parent=other)
+    deep = _item(menu, "deep-2", parent=deep)
+    deep = _item(menu, "deep-3", parent=deep)
     root.parent = deep
     with pytest.raises(ValidationError, match="deeper"):
         root.save()

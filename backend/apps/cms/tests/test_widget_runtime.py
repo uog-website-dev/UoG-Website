@@ -205,3 +205,33 @@ def test_public_branding_revision_tracks_logo_and_title_without_changing_other_s
     apply_site_configuration(a.pk,{"identity":{"display_name":"Updated title"}})
     assert context(ha)["branding_revision"] not in revisions
     assert context(hb)==peer
+
+
+def test_public_search_uses_latest_published_site_snapshots(world,client):
+    a,b,ha,hb,page=world
+    url='/api/v1/site-context/search/'
+    result=client.get(url,{'q':'Published'},HTTP_HOST=ha)
+    assert result.status_code==200,result.content
+    assert result.json()['site']==a.pk
+    assert result.json()['results']==[{'title':'Published A','href':'/posts/post-a','kind':'post'}]
+    assert client.get(url,{'q':'secret'},HTTP_HOST=ha).json()['results']==[]
+    assert client.get(url,{'q':'Foreign'},HTTP_HOST=hb).json()['results'][0]['title']=='Foreign secret'
+    assert client.get(url,{'q':'Contact'},HTTP_HOST=ha).json()['results'][0]['href']=='/contact'
+    assert 'no-store' in result['Cache-Control']
+    for invalid in ({'q':'a'},{'q':'x'*101},{'q':'Published','site':b.pk},{'q':'Published','page':0},{'q':'Published','page_size':1000}):
+        assert client.get(url,invalid,HTTP_HOST=ha).status_code==400
+    assert client.get(url+'?q=Published&q=Foreign',HTTP_HOST=ha).status_code==400
+    assert client.get(url,{'q':'Published'},HTTP_HOST='unknown.uog.test').status_code==404
+    disable_module_for_site(a.pk,Module.objects.get(code='POSTS').pk)
+    assert client.get(url,{'q':'Published'},HTTP_HOST=ha).json()['results']==[]
+
+
+def test_breadcrumbs_follow_only_published_same_site_ancestors(world,client):
+    a,b,ha,hb,parent=world
+    child=_publish(Page.objects.create(site=a,parent=parent,title='Child',slug='child'))
+    result=client.get('/api/v1/site-context/widgets/',{'source':'breadcrumbs','page_id':str(child.pk)},HTTP_HOST=ha)
+    assert result.status_code==200,result.content
+    assert [row['title'] for row in result.json()['results']]==['Contact','Child']
+    foreign=client.get('/api/v1/site-context/widgets/',{'source':'breadcrumbs','page_id':str(child.pk)},HTTP_HOST=hb)
+    assert foreign.status_code==200 and foreign.json()['results']==[]
+    assert client.get('/api/v1/site-context/widgets/',{'source':'breadcrumbs'},HTTP_HOST=ha).status_code==404

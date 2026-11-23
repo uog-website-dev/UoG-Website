@@ -21,6 +21,10 @@ def preview_navigation(site,*,actor,menu=None):
         rows={r.location:r for r in MenuLocationAssignment.objects.filter(site=site).select_related('draft_menu')}
         for location in locations_for_site(site):
             if location in rows:
+                if location=='footer' and rows[location].draft_menus:
+                    from ..selectors.menu_delivery import footer_columns
+                    locations[location]=footer_columns(site.pk,rows[location].draft_menus,draft=True)
+                    continue
                 chosen=rows[location].draft_menu
                 if chosen and (chosen.site_id!=site.pk or chosen.is_global):raise ValidationError({'menu':'Choose a local menu owned by this Site.'})
                 locations[location]=_project(chosen,'local',draft=True)

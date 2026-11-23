@@ -18,7 +18,7 @@ from apps.authorization.access import effective_scope_for_site
 from apps.authorization.services import permission_granted
 from apps.organizations.hierarchy_lock import hierarchy_write
 
-from ..menu_models import Menu, MenuItem, require_menus_module
+from ..menu_models import Menu, MenuItem, require_menus_module, MAX_MENU_DEPTH
 
 
 MENU_FIELDS = frozenset({"code", "location", "name", "is_active", "is_global"})
@@ -297,8 +297,8 @@ def move_menu_item(item_id, *, actor, expected, parent_id, position):
                 raise ValidationError({"tree": "A menu move cannot create a cycle."})
             depth += 1
             ancestor_id = parents.get(ancestor_id)
-        if depth + subtree_height(item.pk, set()) > 4:
-            raise ValidationError({"tree": "Menu items cannot be nested deeper than 4 levels."})
+        if depth + subtree_height(item.pk, set()) > MAX_MENU_DEPTH:
+            raise ValidationError({"tree": f"Menu items cannot be nested deeper than {MAX_MENU_DEPTH} levels (five submenu levels)."})
         groups = [item.parent_id] if item.parent_id == parent_id else [item.parent_id, parent_id]
         affected = []
         for group in groups:

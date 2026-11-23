@@ -9,7 +9,7 @@
  * and javascript: targets never become markup.
  */
 import { createContext, useContext, useEffect, useState } from "react";
-import { validateVisualLayout } from "@uog/types";
+import { validateVisualLayout, MAX_MENU_DEPTH } from "@uog/types";
 import type { VisualLayout } from "@uog/types";
 import { VisualLayoutView } from "./visual-layout";
 import type { ReactNode } from "react";
@@ -58,7 +58,7 @@ export function sidebarFromResponse(value: unknown, site: number | null, id: str
       || !Number.isInteger(row.version) || row.version < 1 || !Array.isArray(row.components) || row.components.length > 12) return undefined;
   let count = 0;
   function validLinks(links: SidebarLink[], depth: number): boolean {
-    return depth <= 4 && Array.isArray(links) && links.every(link => {
+    return depth <= MAX_MENU_DEPTH && Array.isArray(links) && links.every(link => {
       if (++count > 2000 || !link || typeof link.label !== "string" || link.label.length > 255
           || typeof link.href !== "string" || link.href.length > 2048 || !safeMenuHref(link.href)) return false;
       return link.children?.length ? validLinks(link.children, depth + 1) : Array.isArray(link.children);
@@ -435,7 +435,7 @@ export function PublicPageView({ page, privateMediaBase, viewportWidth, hideTitl
   };
   return (
     <PrivateMediaBase.Provider value={privateMediaBase ?? null}>
-      <Box data-page-layout={shell} data-site-code={site.code ?? ""} sx={{
+      <Box data-page-layout={shell} data-page-bleed={shell==="FULL_WIDTH"&&page.visual_layout?.settings?.content_width==="full"?"true":undefined} data-site-code={site.code ?? ""} sx={{
         display: "grid", width: "100%", minWidth: 0, gap: { xs: 3, md: 4 },
         gridTemplateColumns: columns, gridTemplateAreas: areas,
       }}>

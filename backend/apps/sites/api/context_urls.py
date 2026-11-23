@@ -11,12 +11,14 @@ from apps.cms.api.public import (
     PublicCategoryArchiveView,
 )
 
+from apps.cms.api.public_search import PublicSearch
 from .context import SiteContextView
 from apps.media.delivery import PublicMediaImage
 from apps.cms.api.widget_runtime import PublicWidgetData, PublicSiteLogo, PublicContact
 
 app_name = "site_context"
 urlpatterns = [
+    path("search/", PublicSearch.as_view(), name="public-search"),
     path("widgets/", PublicWidgetData.as_view(), name="public-widget-data"),
     path("identity/logo/", PublicSiteLogo.as_view(), name="public-site-logo"),
     path("contact/<uuid:page_id>/<str:form_code>/", PublicContact.as_view(), name="public-contact"),

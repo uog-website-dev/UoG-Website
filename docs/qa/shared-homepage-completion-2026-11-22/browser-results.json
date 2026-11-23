@@ -1,0 +1,50 @@
+[
+  {
+    "site": 17,
+    "template": "University Main",
+    "draft": "877a8934-0e20-4241-9424-de7a0bef7d73",
+    "builder": "http://localhost/admin/sites/17/admin/pages/877a8934-0e20-4241-9424-de7a0bef7d73/builder",
+    "preview": "http://localhost/admin/sites/17/admin/pages/877a8934-0e20-4241-9424-de7a0bef7d73/preview?revision=1",
+    "widths": [
+      {
+        "width": 390,
+        "overflow": false
+      },
+      {
+        "width": 768,
+        "overflow": false
+      },
+      {
+        "width": 1440,
+        "overflow": false
+      }
+    ],
+    "keyboardSlideSelection": true,
+    "publicUnchanged": true,
+    "violations": []
+  },
+  {
+    "site": 16,
+    "template": "College/Department",
+    "draft": "0c8e5301-b5e3-443a-8523-d5135fffec20",
+    "builder": "http://localhost/admin/sites/16/admin/pages/0c8e5301-b5e3-443a-8523-d5135fffec20/builder",
+    "preview": "http://localhost/admin/sites/16/admin/pages/0c8e5301-b5e3-443a-8523-d5135fffec20/preview?revision=1",
+    "widths": [
+      {
+        "width": 390,
+        "overflow": false
+      },
+      {
+        "width": 768,
+        "overflow": false
+      },
+      {
+        "width": 1440,
+        "overflow": false
+      }
+    ],
+    "keyboardSlideSelection": true,
+    "publicUnchanged": true,
+    "violations": []
+  }
+]

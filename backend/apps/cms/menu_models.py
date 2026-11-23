@@ -19,7 +19,7 @@ from apps.organizations.hierarchy_lock import hierarchy_write
 
 LOCATION_FORMAT = r"\A[a-z][a-z0-9-]{0,31}\Z"
 CUSTOM_PATH = re.compile(r"\A/(?:[a-z0-9][a-z0-9-]{0,63}(?:/[a-z0-9][a-z0-9-]{0,63})*)?\Z")
-MAX_MENU_DEPTH = 4
+MAX_MENU_DEPTH = 6  # Top-level destination plus five submenu levels.
 EXTERNAL_SCHEMES = frozenset({"http", "https"})
 REJECTED_SCHEMES = frozenset({"javascript", "data", "vbscript", "file"})
 MENU_LOCATIONS = ("header", "footer", "sidebar", "primary", "secondary")

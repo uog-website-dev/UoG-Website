@@ -2,6 +2,7 @@ import { layoutSchema, widgetRegistry, validateVisualLayout } from "@uog/types";
 import type { VisualLayout, WidgetNode, WidgetType, LayoutSection, LayoutColumn } from "@uog/types";
 
 export interface PropertySchema {
+  description?:string; enumLabels?:Record<string,string>;
   type?: string; const?: unknown; enum?: unknown[]; properties?: Record<string, PropertySchema>;
   required?: string[]; items?: PropertySchema; oneOf?: PropertySchema[];
   minimum?: number; maximum?: number; minLength?: number; maxLength?: number;
@@ -20,7 +21,14 @@ export const categories: {label:string; shortLabel:string; types:WidgetType[]}[]
 ];
 export const uid = () => crypto.randomUUID();
 export const labelFor = (type:string) => registry.find(entry=>entry.type===type)?.label ?? type;
-export const schemaFor = (type:WidgetType) => leaves.find(schema=>schema.properties?.type?.const===type)!.properties!.props!;
+export const schemaFor = (type:WidgetType) => {
+  const schema=leaves.find(schema=>schema.properties?.type?.const===type)!.properties!.props!;
+  // Restrict authoring choices without invalidating legacy stored animation codes.
+  if(type==="simple_masonry")return {...schema,properties:{items:schema.properties!.items!}};
+  const descriptions:Record<string,string>={cards_label:"Optional section label above information cards. Add up to two cards in Items; cards use an image-overlay hero and stack on mobile.",height:"One consistent slide height for every image. Images crop to fill; long text remains scrollable.",navigation:"Choose clean arrows and dots, overlaid controls, or image thumbnails.",autoplay_seconds:"Automatic rotation pauses on hover, keyboard focus and hidden tabs; reduced motion turns it off. A pause control is available on keyboard focus.",curve_border:"Curved image edge accent. Applies to split heroes with a curve mask.",curve_border_width:"Accent width in pixels.",heading_level:"Semantic heading H1?H4; use one H1 per Page.",heading_size:"Visual size independent of semantic heading level.",heading_color:"Approved heading colour; check contrast against your panel tone.",heading_weight:"Heading emphasis.",heading_case:"Normal or uppercase heading.",text_align:"Alignment of heading, body and actions.",body_size:"Paragraph text size.",pattern:"Approved decorative pattern behind the hero text; no uploaded CSS or scripts.",panel_tone:"Background and accessible text colors for the text/action panel.",media_ratio:"Image share of the split hero width. Mobile always stacks image and text.",display:"Grid keeps a static list. Slider adds a horizontal, swipeable card track.",columns:"Visible cards across on desktop. Narrow screens reduce the column count.",image_hover:"Zoom stays inside the image frame and respects reduced-motion preferences."};
+  if(["hero_image","layout_slider","anything_carousel","loop_grid","blog","recent_posts"].includes(type))return {...schema,properties:Object.fromEntries(Object.entries(schema.properties??{}).map(([key,value])=>[key,{...value,description:descriptions[key],...(key==="autoplay_seconds"?{enumLabels:{0:"Off",5:"Every 5 seconds",8:"Every 8 seconds",10:"Every 10 seconds"}}:{}),...(key==="media_ratio"?{enumLabels:{40:"40% image / 60% text",50:"Equal image and text",60:"60% image / 40% text"}}:{})}]))};
+  return type==="lottie_player"?{...schema,properties:{...schema.properties,animation_code:{...schema.properties!.animation_code,enum:["campus","research","community","item-example","example"]}}}:schema;
+};
 export const presentationSchema = layoutSchema.properties.rows.items.properties.style as PropertySchema;
 export const emptyLayout = ():VisualLayout => ({schema_version:1,rows:[]});
 

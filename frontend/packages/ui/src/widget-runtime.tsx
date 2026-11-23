@@ -9,6 +9,8 @@ import TextField from "@mui/material/TextField";
 import Alert from "@mui/material/Alert";
 import Link from "@mui/material/Link";
 import {usePublicSiteBranding, publicLogoSource} from "./site-branding";
+import {HorizontalCards,containedImageHover,newsCardHover} from "./horizontal-cards";
+import {ContentCarousel} from "./visual-presentation";
 import { menusFromResponse, SiteNavigation } from "./site-navigation";
 
 export interface WidgetPost {
@@ -19,6 +21,7 @@ export interface WidgetPost {
   excerpt:string;
   featured_media:string;
   featured_alt?:string;
+  published_at?:string;
 }
 interface WidgetEnvelope {site:number; results:Record<string,unknown>[]}
 interface WidgetScope {
@@ -81,19 +84,19 @@ function WidgetScopeProvider({siteId,pageId,preview=false,mediaBase,children}:{s
   </ScopeContext.Provider>;
 }
 
-function useWidgetData(query:Record<string,string>) {
+function useWidgetData(query:Record<string,string>,enabled=true) {
   const scope=useContext(ScopeContext);
   const key=JSON.stringify(query);
   const [attempt,setAttempt]=useState(0);
   const [state,setState]=useState<{key:string;data:WidgetEnvelope|null;error:string|null}>({key:"",data:null,error:null});
   useEffect(()=>{
     let active=true;
-    if(!scope)return;
+    if(!scope||!enabled)return;
     setState({key,data:null,error:null});
     void scope.load(JSON.parse(key)).then(data=>{if(active)setState({key,data,error:null});})
       .catch(error=>{if(active)setState({key,data:null,error:error instanceof Error?error.message:"Content is unavailable."});});
     return ()=>{active=false;};
-  },[key,scope?.load,attempt]);
+  },[key,scope?.load,attempt,enabled]);
   return {data:state.key===key?state.data:null,error:state.key===key?state.error:null,retry:()=>setAttempt(value=>value+1)};
 }
 
@@ -199,31 +202,46 @@ export function FeaturedImageWidget({compact=false,variant="inline"}:{compact?:b
 function asPost(row:Record<string,unknown>,siteId:number|null):WidgetPost|null {
   if(row.site!==siteId || typeof row.id!=="string" || typeof row.title!=="string" || typeof row.slug!=="string" || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(row.slug))return null;
   return {id:row.id,site:row.site as number,title:row.title,slug:row.slug,
-    featured_alt:typeof row.featured_alt==="string"?row.featured_alt:"",excerpt:typeof row.excerpt==="string"?row.excerpt:"",featured_media:typeof row.featured_media==="string"?row.featured_media:""};
+    published_at:typeof row.published_at==="string"&&!Number.isNaN(Date.parse(row.published_at))?row.published_at:undefined,featured_alt:typeof row.featured_alt==="string"?row.featured_alt:"",excerpt:typeof row.excerpt==="string"?row.excerpt:"",featured_media:typeof row.featured_media==="string"?row.featured_media:""};
 }
 
-export function LoopGridWidget({source,limit,category}:{source:"posts"|"pages";limit:number;category?:string}) {
+export function LoopGridWidget({source,limit,category,presentation="grid",carousel=false,display="grid",columns,image_hover="zoom"}:{source:"posts"|"pages";limit:number;category?:string;presentation?:"grid"|"list"|"featured";carousel?:boolean;display?:"grid"|"slider";columns?:number;image_hover?:"none"|"zoom"}) {
   const scope=useContext(ScopeContext);
   const query:Record<string,string>={source,limit:String(limit)};
   if(category || scope?.filters.category)query.category=category || scope!.filters.category;
   if(scope?.filters.tag)query.tag=scope.filters.tag;
   const state=useWidgetData(query);
-  if(scope?.siteId===null)return <Typography role="status" color="text.secondary">{source === "posts" ? "Site news placeholder · shows published news for this Site" : "Site pages placeholder · shows published pages for this Site"}</Typography>;
+  if(scope?.siteId===null)return <Typography role="status" color="text.secondary">{source === "posts" ? "Site news preview: published articles will appear here." : "Site pages preview: published Pages will appear here."}</Typography>;
   if(!state.data)return <DataState {...state}/>;
   if(!state.data.results.length)return <Typography role="status">No published {source} match these filters.</Typography>;
-  return <Box aria-label="Published content grid" sx={{display:"grid",gridTemplateColumns:"1fr","@container visual-layout (min-width: 600px)":{gridTemplateColumns:"repeat(2,minmax(0,1fr))"},gap:2}}>
-    {state.data.results.map(row=>{
-      if(source==="pages"){
-        if(row.site!==scope?.siteId || typeof row.path!=="string" || !/^\/(?:[a-z0-9]+(?:-[a-z0-9]+)*\/?)*$/.test(row.path))return null;
-        return <Box component="article" key={String(row.id)}><Link href={row.path}>{String(row.title)}</Link></Box>;
-      }
-      const post=asPost(row,scope?.siteId??null);
-      if(!post)return null;
-      return <VisualPostProvider key={post.id} post={post} siteId={scope?.siteId??null}>
-        <Box component="article"><FeaturedImageWidget compact/><Link href={`/posts/${post.slug}`}><PostTitleWidget/></Link><PostExcerptWidget/></Box>
-      </VisualPostProvider>;
-    })}
-  </Box>;
+  const cards=state.data.results.flatMap((row,index)=>{
+    if(source==="pages"){
+      if(row.site!==scope?.siteId || typeof row.path!=="string" || !/^\/(?:[a-z0-9]+(?:-[a-z0-9]+)*\/?)*$/.test(row.path))return [];
+      return [{id:String(row.id),content:<Box component="article" sx={{p:3,border:1,borderColor:'divider',borderRadius:2}}><Link href={row.path} sx={{fontWeight:700}}>{String(row.title)}</Link></Box>}];
+    }
+    const post=asPost(row,scope?.siteId??null);if(!post)return [];
+    const compact=display!=='slider'&&(presentation==='list'||(presentation==='featured'&&index>0));
+    return [{id:post.id,content:<VisualPostProvider post={post} siteId={scope?.siteId??null}>
+      <Box component="article" sx={{...newsCardHover,display:'grid',gridTemplateColumns:compact?{xs:'minmax(0,1fr)',sm:'minmax(100px,30%) minmax(0,1fr)'}:'minmax(0,1fr)',gap:2,pb:3,borderBottom:1,borderColor:'divider',height:'100%',minWidth:0,'&:not(:has(img))':{gridTemplateColumns:'minmax(0,1fr)'},'& img':{width:'100%',height:compact?140:260,objectFit:'cover',borderRadius:2}}}>
+        <Box data-image-hover={image_hover} sx={image_hover==='zoom'?containedImageHover:{overflow:'hidden',borderRadius:2}}><Link href={`/posts/${post.slug}`} aria-label={`Read ${post.title}`} sx={{display:'block'}}><FeaturedImageWidget compact/></Link></Box>
+        <Box sx={{display:'grid',alignContent:'start',gap:1,minWidth:0}}><Typography component="h3" variant={compact?'h6':'h5'} sx={{lineHeight:1.4,fontWeight:750}}><Link href={`/posts/${post.slug}`} color="inherit" underline="hover">{post.title}</Link></Typography>
+          {post.published_at?<Typography component="time" dateTime={post.published_at} variant="body2" color="text.secondary">{new Date(post.published_at).toLocaleDateString('en',{year:'numeric',month:'short',day:'numeric',timeZone:'UTC'})}</Typography>:null}
+          {!compact?<PostExcerptWidget/>:null}
+        </Box>
+      </Box>
+    </VisualPostProvider>}];
+  });
+  if(display==='slider')return <HorizontalCards items={cards} columns={columns??3} label={source==='posts'?'News slider':'Pages slider'}/>;
+  if(carousel)return <ContentCarousel items={cards} label={source==='posts'?'News carousel':'Pages carousel'}/>;
+  return <Box aria-label="Published content grid" data-news-presentation={presentation} sx={{display:'grid',gridTemplateColumns:presentation==='list'?'minmax(0,1fr)':{xs:'minmax(0,1fr)',md:`repeat(${presentation==='featured'?2:columns??2},minmax(0,1fr))`},gap:3}}>{cards.map((card,index)=><Box key={card.id} sx={{minWidth:0,...(presentation==='featured'&&index===0?{gridRow:{md:`span ${Math.max(1,cards.length-1)}`}}:{})}}>{card.content}</Box>)}</Box>;
+}
+
+export function TaxonomyWidget({taxonomy_code,limit}:{taxonomy_code:string;limit:number}) {
+ const scope=useContext(ScopeContext),state=useWidgetData({source:'taxonomy',taxonomy_code,limit:String(limit)});
+ if(scope?.siteId===null)return <Typography>Categories from this Site appear here.</Typography>;
+ if(!state.data)return <DataState {...state}/>;
+ const terms=state.data.results.filter(row=>typeof row.slug==='string'&&/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(row.slug));
+ return <Box component="nav" aria-label={taxonomy_code==='tags'?'Tags':'Categories'} sx={{display:'flex',gap:1,flexWrap:'wrap'}}>{terms.length?terms.map(term=><Link key={String(term.id)} href={taxonomy_code==='tags'||taxonomy_code==='tag'?`/posts?tag=${term.slug}`:`/posts/categories/${term.slug}`} sx={{py:1,px:2,minHeight:44,border:1,borderColor:'divider',borderRadius:2}}>{String(term.name)}</Link>):<Typography>No published categories are available.</Typography>}</Box>;
 }
 
 export function TaxonomyFilterWidget({taxonomy_code,limit}:{taxonomy_code:string;limit:number}) {
@@ -297,4 +315,12 @@ export function ContactFormWidget({form_code,submit_label}:{form_code:string;sub
     <Button type="submit" variant="contained" disabled={disabled}>{sending?"Sending…":submit_label}</Button>
     {scope?.preview?<Typography variant="caption">Messages are accepted from the published Page.</Typography>:null}
   </Box>;
+}
+
+export function BreadcrumbsWidget({pageTitle}:{pageTitle:string}) {
+ const scope=useContext(ScopeContext),enabled=!!scope?.pageId&&uuid.test(scope.pageId)&&!scope.preview&&scope.siteId!==null;
+ const state=useWidgetData({source:'breadcrumbs',...(scope?.pageId?{page_id:scope.pageId}:{})},enabled);
+ const rows=state.data?.results.filter(row=>row.site===scope?.siteId&&typeof row.title==='string'&&typeof row.path==='string'&&/^\/(?:[a-z0-9]+(?:-[a-z0-9]+)*\/?)*$/.test(row.path))??[];
+ const ancestors=rows.slice(0,-1).filter(row=>row.path!=='/');
+ return <Box component="nav" aria-label="Breadcrumbs" sx={{display:'flex',alignItems:'center',gap:1,flexWrap:'wrap'}}><Link href="/" sx={{minHeight:44,display:'inline-flex',alignItems:'center'}}>Home</Link>{ancestors.map(row=><Box key={String(row.path)} sx={{display:'flex',gap:1,alignItems:'center'}}><span aria-hidden>/</span><Link href={String(row.path)} sx={{minHeight:44,display:'inline-flex',alignItems:'center'}}>{String(row.title)}</Link></Box>)}<span aria-hidden>/</span><Typography aria-current="page">{pageTitle}</Typography></Box>;
 }

@@ -1,0 +1,56 @@
+[
+  {
+    "width": 390,
+    "heights": [
+      720,
+      720,
+      720,
+      720,
+      720
+    ],
+    "pattern": true,
+    "counterVisuallyHidden": true,
+    "horizontalFixture": true,
+    "horizontalScrolled": true,
+    "containedZoom": true,
+    "reducedMotion": true,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "width": 768,
+    "heights": [
+      640,
+      640,
+      640,
+      640,
+      640
+    ],
+    "pattern": true,
+    "counterVisuallyHidden": true,
+    "horizontalFixture": true,
+    "horizontalScrolled": true,
+    "containedZoom": true,
+    "reducedMotion": true,
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "width": 1440,
+    "heights": [
+      640,
+      640,
+      640,
+      640,
+      640
+    ],
+    "pattern": true,
+    "counterVisuallyHidden": true,
+    "horizontalFixture": true,
+    "horizontalScrolled": true,
+    "containedZoom": true,
+    "reducedMotion": true,
+    "overflow": false,
+    "violations": []
+  }
+]
