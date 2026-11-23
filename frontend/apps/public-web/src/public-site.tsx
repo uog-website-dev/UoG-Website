@@ -13,13 +13,13 @@ import type { ReactNode } from "react";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import { PublicSiteBrandingProvider, UogThemeProvider, EMPTY_SITE, publicFetchInit, siteFromContext } from "@uog/ui";
-import type { PublicSiteContext } from "@uog/ui";
+import type { PublicMenusPayload, PublicSiteContext } from "@uog/ui/public-site";
 
 import { PublicMenus } from "@/public-menus";
 
 const CONTEXT_PATH = "/api/v1/site-context/";
 
-export function PublicSiteChrome({ children, initialSite = EMPTY_SITE }: { children: ReactNode; initialSite?: PublicSiteContext }) {
+export function PublicSiteChrome({ children, initialSite = EMPTY_SITE, initialMenus = null }: { children: ReactNode; initialSite?: PublicSiteContext; initialMenus?: PublicMenusPayload | null }) {
   const [site, setSite] = useState<PublicSiteContext>(initialSite);
 
   const pending = useRef<AbortController | null>(null);
@@ -78,7 +78,7 @@ export function PublicSiteChrome({ children, initialSite = EMPTY_SITE }: { child
             "&:has([data-page-chrome='none'])": {"& header[data-site-header], & footer": {display: "none"}},
           }}
         >
-          <PublicMenus>{body}</PublicMenus>
+          <PublicMenus initialMenus={initialMenus}>{body}</PublicMenus>
         </Box>
       </PublicSiteBrandingProvider>
     </UogThemeProvider>

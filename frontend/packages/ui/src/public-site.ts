@@ -97,6 +97,25 @@ export function siteFromContext(status: number, body: unknown): PublicSiteContex
   };
 }
 
+export interface PublicMenusPayload {
+  site: number;
+  locations: Record<string, unknown>;
+  configured_locations?: string[];
+}
+
+/**
+ * Accept a menu payload only when it belongs to the Site resolved for this
+ * request. A Host header can resolve one Site; another Site's cached payload
+ * must never be rendered for it.
+ */
+export function menuPayloadForSite(payload: unknown, siteId: number | null): PublicMenusPayload | null {
+  if (!siteId || payload == null || typeof payload !== "object" || Array.isArray(payload)) return null;
+  const row = payload as { site?: unknown; locations?: unknown };
+  if (row.site !== siteId) return null;
+  if (row.locations == null || typeof row.locations !== "object" || Array.isArray(row.locations)) return null;
+  return payload as PublicMenusPayload;
+}
+
 /** A public document may be shown only when it belongs to the resolved Site. */
 export function sameSite(documentSite: number | null, siteId: number | null): boolean {
   if (siteId == null || documentSite == null) return false;

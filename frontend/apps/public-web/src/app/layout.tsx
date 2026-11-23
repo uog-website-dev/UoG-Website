@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 
 import { PublicSiteChrome } from "@/public-site";
-import { publicSiteForHost } from "@/public-metadata";
+import { publicMenusForHost, publicSiteForHost } from "@/public-metadata";
 
 import "./globals.css";
 
@@ -13,11 +13,15 @@ export const metadata: Metadata = {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const site = await publicSiteForHost((await headers()).get("host"));
+  const host = (await headers()).get("host");
+  const site = await publicSiteForHost(host);
+  // Menus join the first HTML response so primary navigation does not pop in
+  // after hydration. The backend's delivery cache is versioned on publish.
+  const menus = site.modules.menus ? await publicMenusForHost(host, site.id) : null;
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <PublicSiteChrome initialSite={site}>{children}</PublicSiteChrome>
+        <PublicSiteChrome initialSite={site} initialMenus={menus}>{children}</PublicSiteChrome>
       </body>
     </html>
   );
