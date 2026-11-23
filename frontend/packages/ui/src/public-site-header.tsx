@@ -86,34 +86,38 @@ export function PublicSiteHeader({
         borderBottom: "3px solid",
         borderColor: "secondary.main",
         overflowWrap: "anywhere",
+        pt: "env(safe-area-inset-top)",
       }}
     >
       {utilityItems.length ? (
-        <Container maxWidth="lg" sx={{ display: "flex", justifyContent: "flex-end", borderBottom: "1px solid", borderColor: "rgba(255,255,255,.18)", "& nav": { px: 0 }, "& ul": { columnGap: 2 }, "& a": { fontSize: ".875rem", minHeight: 44 } }}>
+        <Container maxWidth="lg" sx={{ display: { xs: "none", lg: "flex" }, justifyContent: "flex-end", borderBottom: "1px solid", borderColor: "rgba(255,255,255,.18)", "& nav": { px: 0 }, "& ul": { columnGap: 2 }, "& a": { fontSize: ".875rem", minHeight: 44 } }}>
           <SiteNavigation items={utilityItems} label="Site utility" />
         </Container>
       ) : null}
-      <Container maxWidth="lg" sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2, "& [data-site-branding] > span": { fontSize: { xs: ".95rem", md: "1.2rem" }, letterSpacing: "-.015em" }, minHeight: { xs: 80, md: 104 }, py: 2 }}>
+      <Container maxWidth="lg" data-mobile-header-row sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: { xs: 1, md: 2 }, "& [data-site-branding] > span": { fontSize: { xs: ".875rem", md: "1.2rem" }, letterSpacing: "-.015em", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: { xs: 200, sm: "none" } }, "& [data-site-branding-mark]": { width: { xs: 40, md: 100 }, height: { xs: 40, md: 75 }, fontSize: { xs: ".7rem", md: "1rem" }, flexShrink: 0 }, minHeight: { xs: 64, md: 104 }, py: { xs: 0.5, md: 1.5 }, boxSizing: "border-box" }}>
         <Link
           href={brand ?? "/"}
           color="inherit"
           underline="none"
           target={preview ? "_blank" : undefined}
           rel={preview ? "noopener noreferrer" : undefined}
-          sx={{ minWidth: 0, display: "inline-flex", alignItems: "center", gap: 1.5, ...focus }}
+          sx={{ minWidth: 0, minHeight: 44, flex: "1 1 auto", display: "inline-flex", alignItems: "center", gap: 1.25, ...focus }}
         >
-          {privateLogo ? <Box component="img" src={privateLogo} alt={`${site.displayName} logo`} sx={{ width: 100, height: 75, objectFit: "contain", flex: "0 0 auto" }} /> : <SiteBrandingLockup site={site} inverse />}
+          {privateLogo ? <Box component="img" src={privateLogo} alt={`${site.displayName} logo`} sx={{ width: { xs: 40, md: 100 }, height: { xs: 40, md: 75 }, objectFit: "contain", flex: "0 0 auto" }} /> : <SiteBrandingLockup site={site} inverse />}
           {privateLogo ? <Box component="span" sx={{ fontWeight: 700 }}>{site.displayName}</Box> : null}
         </Link>
-        <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 0.5, md: 1 } }}>
-          <SiteNavigation items={headerItems} label="Site header" mobile />
+        <Box sx={{ display: "flex", alignItems: "center", flexShrink: 0, gap: { xs: 0.5, md: 1 } }}>
+          <SiteNavigation items={headerItems} label="Site header" mobile drawerSections={[
+            ...(utilityItems.length ? [{ label: "Site utility", items: utilityItems }] : []),
+            ...(cta ? [{ label: "Quick links", items: [], action: { label: config.cta_label, href: cta } }] : []),
+          ]} />
           {cta ? (
             <Button
               component="a"
               href={cta}
               target={preview ? "_blank" : undefined}
               rel={preview ? "noopener noreferrer" : undefined}
-              sx={{ bgcolor: "secondary.main", color: "secondary.contrastText", fontWeight: 700, whiteSpace: "nowrap", "&:hover": { bgcolor: "secondary.dark" }, ...focus }}
+              sx={{ display: { xs: "none", md: "inline-flex" }, bgcolor: "secondary.main", color: "secondary.contrastText", fontWeight: 700, whiteSpace: "nowrap", "&:hover": { bgcolor: "secondary.dark" }, ...focus }}
             >
               {config.cta_label}
             </Button>

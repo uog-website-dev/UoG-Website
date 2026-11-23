@@ -203,11 +203,23 @@ it('preserves five submenu levels and opens deep desktop branches by keyboard',a
  leaf.focus();await user.keyboard('{Escape}');
  expect(document.activeElement).toBe(screen.getByRole('button',{name:'Show Level 4 submenu'}));
 });
+it('collapses utility links and a quick action into the mobile drawer',async()=>{
+ const user=userEvent.setup();
+ render(<SiteNavigation label="Compact header" items={[{label:'Primary',href:'/primary'}]} mobile drawerSections={[{label:'Site utility',items:[{label:'Jobs',href:'/jobs'}]},{label:'Quick links',items:[],action:{label:'Apply now',href:'/apply'}}]}/>);
+ const open=screen.getByRole('button',{name:'Open compact header'});
+ expect(open.getAttribute('aria-expanded')).toBe('false');
+ await user.click(open);
+ const drawer=within(document.querySelector('.MuiDrawer-paper') as HTMLElement);
+ expect(drawer.getByRole('navigation',{name:'Site utility'}).textContent).toContain('Jobs');
+ expect(drawer.getByRole('link',{name:'Apply now'}).getAttribute('href')).toBe('/apply');
+ expect(drawer.getByRole('heading',{name:'Site utility'})).toBeTruthy();
+});
+
 it('allows all five submenu levels in the mobile drawer without unsafe links',async()=>{
  const user=userEvent.setup();render(<SiteNavigation label="Deep mobile" mobile items={fiveSubmenus()}/>);
  await user.click(screen.getByRole('button',{name:'Open deep mobile'}));
  const drawer=within(document.querySelector('.MuiDrawer-paper') as HTMLElement);
- for(const label of ['Academics','Level 1','Level 2','Level 3','Level 4'])await user.click(drawer.getByRole('button',{name:label,exact:true}));
+ for(const label of ['Academics','Level 1','Level 2','Level 3','Level 4'])await user.click(drawer.getByRole('button',{name:label}));
  expect(drawer.getByRole('link',{name:'Level 5'}).getAttribute('href')).toBe('/level-5');
  await user.keyboard('{Escape}');expect(drawer.getByRole('button',{name:'Level 4'}).getAttribute('aria-expanded')).toBe('false');
 });

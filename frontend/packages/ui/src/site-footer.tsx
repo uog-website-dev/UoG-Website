@@ -1,7 +1,8 @@
 "use client";
 import {MAX_MENU_DEPTH} from "@uog/types";
-import {useEffect,useMemo,useState} from "react";
-import {Box,Container,IconButton,Link,Typography} from "@mui/material";
+import {useEffect,useId,useMemo,useState} from "react";
+import {Box,ButtonBase,Container,IconButton,Link,Typography} from "@mui/material";
+import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
 import ChatBubbleOutlineRounded from "@mui/icons-material/ChatBubbleOutlineRounded";
 import XIcon from "@mui/icons-material/X";
 import YouTubeIcon from "@mui/icons-material/YouTube";
@@ -31,13 +32,42 @@ function linkUrl(value:string,origin?:string,preview=false):string|null {
  if(href.startsWith("/")&&origin){const base=safeMenuHref(origin);if(!base)return null;try{return new URL(href,base).toString();}catch{return null;}}
  return href;
 }
-function FooterLinks({items,origin,preview,depth=0}:{items:PublicMenuNode[];origin?:string;preview:boolean;depth?:number}) {
- if(depth>=MAX_MENU_DEPTH)return null;
+function FooterItems({items,origin,preview,depth}:{items:PublicMenuNode[];origin?:string;preview:boolean;depth:number}) {
  return <Box component="ul" sx={{listStyle:"none",p:0,m:0,pl:depth?1.5:0}}>
   {items.map((item,index)=>{const href=linkUrl(item.href,origin,preview);return <Box component="li" key={`${index}-${item.label}`} sx={{minWidth:0}}>
    {href?<Link href={href} target={preview?"_blank":undefined} rel={preview?"noopener noreferrer":undefined} color="inherit" underline="hover" sx={{display:"inline-flex",alignItems:"center",minHeight:44,lineHeight:1.55,fontSize:".9rem",maxWidth:"100%",overflowWrap:"anywhere",...focus}}>{item.label}</Link>:<Typography variant="body2" sx={{py:1}}>{item.label}</Typography>}
-   {item.children?.length?<FooterLinks items={item.children} origin={origin} preview={preview} depth={depth+1}/>:null}
+   {item.children?.length?<FooterLinks items={item.children} origin={origin} preview={preview} depth={depth+1} label={item.label}/>:null}
   </Box>;})}
+ </Box>;
+}
+const FOOTER_LINK_LIMIT=6;
+function FooterLinks({items,origin,preview,depth=0,label="footer"}:{items:PublicMenuNode[];origin?:string;preview:boolean;depth?:number;label?:string}) {
+ const [all,setAll]=useState(false);const id=useId();
+ if(depth>=MAX_MENU_DEPTH)return null;
+ if(items.length<=FOOTER_LINK_LIMIT)return <FooterItems items={items} origin={origin} preview={preview} depth={depth}/>;
+ return <>
+  <FooterItems items={items.slice(0,FOOTER_LINK_LIMIT)} origin={origin} preview={preview} depth={depth}/>
+  <Box id={id} sx={{display:all?"block":"none"}}><FooterItems items={items.slice(FOOTER_LINK_LIMIT)} origin={origin} preview={preview} depth={depth}/></Box>
+  <ButtonBase aria-expanded={all} aria-controls={id} onClick={()=>setAll(value=>!value)} aria-label={`${all?"Show fewer":"More"} ${label} links`} sx={{minHeight:44,display:"inline-flex",alignItems:"center",gap:.5,fontSize:".9rem",fontWeight:700,textDecoration:"underline",textUnderlineOffset:"4px",borderRadius:.5,...focus}}>
+   {all?"Show fewer":"More"}<ExpandMoreRoundedIcon aria-hidden sx={{fontSize:18,transform:all?"rotate(180deg)":"none",transition:"transform 150ms ease","@media (prefers-reduced-motion: reduce)":{transition:"none"}}}/>
+  </ButtonBase>
+ </>;
+}
+function FooterGroup({group,preview,siteOrigin}:{group:{title:string;description?:string;href:string;items:PublicMenuNode[]};preview:boolean;siteOrigin?:string}) {
+ const [open,setOpen]=useState(false);const id=useId();const href=linkUrl(group.href,siteOrigin,preview);
+ return <Box component="section" data-footer-group sx={{minWidth:0,borderBottom:{xs:1,md:0},borderColor:"rgba(255,255,255,.18)"}}>
+  <Typography component="h2" variant="subtitle1" sx={{m:0,fontWeight:750,lineHeight:1.45}}>
+   <ButtonBase aria-expanded={open} aria-controls={`${id}-panel`} onClick={()=>setOpen(value=>!value)} onKeyDown={event=>{if(event.key==="Escape"){event.stopPropagation();setOpen(false);}}}
+    sx={{display:{xs:"flex",md:"none"},alignItems:"center",justifyContent:"space-between",gap:1,width:"100%",minHeight:48,py:1,textAlign:"start",font:"inherit",fontWeight:750,borderRadius:1,"&:focus-visible":{outline:"3px solid",outlineColor:"secondary.main",outlineOffset:-3}}}>
+    <Box component="span" sx={{minWidth:0,overflowWrap:"anywhere"}}>{group.title}</Box>
+    <ExpandMoreRoundedIcon aria-hidden sx={{flexShrink:0,transform:open?"rotate(180deg)":"none",transition:"transform 150ms ease","@media (prefers-reduced-motion: reduce)":{transition:"none"}}}/>
+   </ButtonBase>
+   <Box component="span" sx={{display:{xs:"none",md:"inline"}}}>{href?<Link href={href} color="inherit" underline="hover" target={preview?"_blank":undefined} rel={preview?"noopener noreferrer":undefined} sx={focus}>{group.title}</Link>:group.title}</Box>
+  </Typography>
+  <Box id={`${id}-panel`} sx={{display:{xs:open?"block":"none",md:"block"},pt:{xs:1,md:0}}}>
+   {group.description?<Typography variant="body2" sx={{mb:1.5,opacity:.85,lineHeight:1.6}}>{group.description}</Typography>:null}
+   <Box sx={{opacity:.85}}><FooterLinks items={group.items} origin={siteOrigin} preview={preview} label={group.title}/></Box>
+  </Box>
  </Box>;
 }
 /** One public/preview renderer for Main and child Sites. No HTML, storage keys or arbitrary icons. */
@@ -51,13 +81,13 @@ export function PublicSiteFooter({site,items=[],settings=site.footer,siteOrigin,
  if(!links.some(item=>item.column||item.children?.length))groups.push({title:config.links_heading,href:"",items:links,flat:true});
  else for(const item of links){if(item.column||item.children?.length)groups.push({title:item.label,description:item.description,href:item.href,items:item.children??[]});else{const last=groups[groups.length-1];if(last?.flat)last.items.push(item);else groups.push({title:config.links_heading,href:"",items:[item],flat:true});}}
  const copyright=config.copyright_text.replaceAll("{year}",String(new Date().getFullYear())).replaceAll("{site}",site.displayName);
- return <Box component="footer" data-site-footer={site.id??"unresolved"} sx={{mt:6,bgcolor:"primary.dark",color:"primary.contrastText",borderTop:1,borderColor:"rgba(255,255,255,.12)",overflowWrap:"anywhere"}}>
+ return <Box component="footer" data-site-footer={site.id??"unresolved"} sx={{mt:{xs:4,md:6},bgcolor:"primary.dark",color:"primary.contrastText",borderTop:1,borderColor:"rgba(255,255,255,.12)",overflowWrap:"anywhere",pb:"env(safe-area-inset-bottom)"}}>
   {config.newsletter_url&&config.newsletter_label?<Box sx={{bgcolor:'background.paper',color:'text.primary',borderBottom:1,borderColor:'divider'}}><Container maxWidth="lg" sx={{py:4,display:'flex',justifyContent:'space-between',alignItems:'center',gap:3,flexWrap:'wrap'}}><Typography component="h2" variant="h6">Stay connected with {site.displayName}</Typography><Link href={config.newsletter_url} target="_blank" rel="noopener noreferrer" aria-label={`${config.newsletter_label} (opens in a new tab)`} sx={{bgcolor:'primary.main',color:'primary.contrastText',px:3,py:1.5,borderRadius:1,fontWeight:700,...focus}}>{config.newsletter_label}</Link></Container></Box>:null}
-  {config.support_url&&config.support_label?<Link href={config.support_url} target="_blank" rel="noopener noreferrer" aria-label={`${config.support_label} (opens in a new tab)`} sx={{position:preview?'static':'fixed',bottom:24,right:24,zIndex:1100,display:'inline-flex',alignItems:'center',gap:1,p:2,borderRadius:8,boxShadow:3,bgcolor:'primary.main',color:'primary.contrastText',fontWeight:700,...focus}}><ChatBubbleOutlineRounded/>{config.support_label}</Link>:null}
-  <Container maxWidth="lg" sx={{py:{xs:5,md:7}}}>
-   <Box sx={{display:"grid",gridTemplateColumns:{xs:"minmax(0,1fr)",md:"minmax(200px,260px) minmax(0,1fr)"},gap:{xs:4,md:6}}}>
+  {config.support_url&&config.support_label?<Link href={config.support_url} target="_blank" rel="noopener noreferrer" aria-label={`${config.support_label} (opens in a new tab)`} sx={{position:preview?'static':'fixed',bottom:'calc(24px + env(safe-area-inset-bottom))',right:'calc(16px + env(safe-area-inset-right))',zIndex:1100,display:'inline-flex',alignItems:'center',gap:1,minHeight:44,p:2,borderRadius:8,boxShadow:3,bgcolor:'primary.main',color:'primary.contrastText',fontWeight:700,...focus}}><ChatBubbleOutlineRounded/>{config.support_label}</Link>:null}
+  <Container maxWidth="lg" sx={{py:{xs:3,md:7}}}>
+   <Box sx={{display:"grid",gridTemplateColumns:{xs:"minmax(0,1fr)",md:"minmax(200px,260px) minmax(0,1fr)"},gap:{xs:3,md:6}}}>
     <Box sx={{minWidth:0}}>
-     <Link href={preview?(siteOrigin??undefined):"/"} target={preview?"_blank":undefined} rel={preview?"noopener noreferrer":undefined} color="inherit" underline="none" sx={{display:"inline-flex",flexDirection:"column",alignItems:"flex-start",gap:2,maxWidth:"100%",...focus}}>
+     <Link href={preview?(siteOrigin??undefined):"/"} target={preview?"_blank":undefined} rel={preview?"noopener noreferrer":undefined} color="inherit" underline="none" sx={{display:"inline-flex",flexDirection:"column",alignItems:"flex-start",gap:2,maxWidth:"100%","& img, & [role=img]":{width:{xs:96,md:180},height:{xs:96,md:180}},...focus}}>
       {preview?(privateLogo&&!logoFailed?<Box component="img" src={privateLogo} alt={`${site.displayName} logo`} onError={()=>setLogoFailed(true)} sx={{width:180,height:180,objectFit:"contain"}}/>:<SiteBrandingMark site={{...site,logoUrl:null}} size={180}/>):<SiteBrandingMark site={site} size={180}/>}<Typography component="span" variant="h6" sx={{fontWeight:750,lineHeight:1.35}}>{site.displayName}</Typography>
      </Link>
      {config.description?<Typography sx={{mt:2,fontSize:".9rem",lineHeight:1.8,opacity:.85,whiteSpace:"pre-line"}}>{config.description}</Typography>:null}
@@ -68,12 +98,8 @@ export function PublicSiteFooter({site,items=[],settings=site.footer,siteOrigin,
      </Box>:null}
      {config.highlight_label?<Box sx={{mt:2,display:"flex",gap:1.5,alignItems:"center",minHeight:44}}><RadioOutlinedIcon aria-hidden/>{config.highlight_url?<Link href={config.highlight_url} color="inherit" underline="hover" sx={{minHeight:44,display:"inline-flex",alignItems:"center",...focus}}>{config.highlight_label}</Link>:<Typography>{config.highlight_label}</Typography>}</Box>:null}
     </Box>
-    {links.length?<Box component="nav" aria-label="Footer navigation" sx={{display:"grid",gridTemplateColumns:{xs:"minmax(0,1fr)",sm:`repeat(${Math.min(groups.length,2)},minmax(0,1fr))`,lg:`repeat(${Math.min(groups.length,4)},minmax(0,1fr))`},gap:{xs:3,md:4},alignContent:"start"}}>
-     {groups.map((group,index)=>{const href=linkUrl(group.href,siteOrigin,preview);return <Box component="section" key={`${index}-${group.title}`} sx={{minWidth:0}}>
-      <Typography component="h2" variant="subtitle1" sx={{fontWeight:750,mb:group.description?0.5:1.5,lineHeight:1.45}}>{href?<Link href={href} color="inherit" underline="hover" target={preview?"_blank":undefined} rel={preview?"noopener noreferrer":undefined} sx={focus}>{group.title}</Link>:group.title}</Typography>
-      {group.description?<Typography variant="body2" sx={{mb:1.5,opacity:.85,lineHeight:1.6}}>{group.description}</Typography>:null}
-      <Box sx={{opacity:.85}}><FooterLinks items={group.items} origin={siteOrigin} preview={preview}/></Box>
-     </Box>;})}
+    {links.length?<Box component="nav" aria-label="Footer navigation" sx={{display:"grid",gridTemplateColumns:{xs:"minmax(0,1fr)",sm:"repeat(2,minmax(0,1fr))",md:`repeat(${Math.min(Math.max(groups.length,1),4)},minmax(0,1fr))`},gap:{xs:0,sm:2,md:4},columnGap:{xs:0,sm:3},alignContent:"start"}}>
+     {groups.map((group,index)=><FooterGroup key={`${index}-${group.title}`} group={group} preview={preview} siteOrigin={siteOrigin}/>)}
     </Box>:null}
    </Box>
    <Box sx={{mt:{xs:4,md:6},pt:3,borderTop:1,borderColor:"rgba(255,255,255,.2)",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:2}}>

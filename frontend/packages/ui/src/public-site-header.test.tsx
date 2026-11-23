@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { EMPTY_SITE } from "./public-site";
 import { PublicSiteHeader } from "./public-site-header";
@@ -12,9 +12,26 @@ describe("PublicSiteHeader", () => {
     const header = document.querySelector('[data-site-header="11"]') as HTMLElement;
     expect(header).toBeTruthy();
     expect(header.querySelector('a[href="/"]')).toBeTruthy();
+    expect(header.querySelectorAll('[data-site-branding-mark]')).toHaveLength(1);
+    expect(screen.getByText("Informatics")).toBeTruthy();
     expect(screen.getByRole("link", { name: "About" })).toBeTruthy();
     expect(screen.getByRole("link", { name: "Study" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Search this Site" })).toBeTruthy();
+  });
+
+  it("keeps one compact mobile row and moves utility links and the CTA into the drawer", () => {
+    render(<PublicSiteHeader
+      site={{ ...base, modules: { pages: true, posts: false, menus: true } }}
+      headerItems={[{ label: "About", href: "/about" }]}
+      utilityItems={[{ label: "Jobs", href: "/jobs" }]}
+      settings={{ brand_href: "/", search_enabled: true, sticky: false, cta_label: "Apply now", cta_url: "/apply", language_switcher: false }}
+    />);
+    expect(document.querySelector("[data-mobile-header-row]")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Open site header" }));
+    const drawer = within(document.querySelector(".MuiDrawer-paper") as HTMLElement);
+    expect(drawer.getByRole("link", { name: "Jobs" }).getAttribute("href")).toBe("/jobs");
+    expect(drawer.getByRole("link", { name: "Apply now" }).getAttribute("href")).toBe("/apply");
+    expect(drawer.getByRole("navigation", { name: "Site utility" })).toBeTruthy();
   });
 
   it("hides search when neither PAGES nor POSTS is enabled", () => {
