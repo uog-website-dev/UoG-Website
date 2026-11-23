@@ -17,10 +17,12 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Divider from "@mui/material/Divider";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import IconButton from "@mui/material/IconButton";
 import MenuItem from "@mui/material/MenuItem";
 import Paper from "@mui/material/Paper";
 import Skeleton from "@mui/material/Skeleton";
+import Switch from "@mui/material/Switch";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import TextField from "@mui/material/TextField";
@@ -57,7 +59,7 @@ import type {
   WidgetResponsive,
   WidgetType,
 } from "@uog/types";
-import { PublicPageView, pageFromResponse } from "@uog/ui";
+import { PublicPageView, pageFromResponse, resolvePageHeading, PAGE_HEADING_ERROR_PATH, resolvePageWidth } from "@uog/ui";
 import {
   getSiteVisualDraft, saveSiteVisualDraft, openWorkingDraft,
   getSitePagePreview, transitionSitePage,
@@ -361,7 +363,9 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
   const entries=outline(layout);
   const entry=entries.find(value=>value.id===selected);
   const checked=validateVisualLayout(layout);
-  const errors={...(!checked.ok?checked.errors:{}),...serverFields};
+  const headingPlan=resolvePageHeading(layout);
+  const widthPlan=resolvePageWidth(layout.settings);
+  const errors={...(!checked.ok?checked.errors:{}),...(!headingPlan.ok?{[PAGE_HEADING_ERROR_PATH]:[headingPlan.message]}:{}),...serverFields};
   const editable=page && ["DRAFT","UNPUBLISHED"].includes(page.status);
 
   useLayoutEffect(()=>{
@@ -501,7 +505,7 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
     finally{if(alive.current)setSaving(false);}
   }
   async function save() {
-    if(!page?.etag || !checked.ok || saving)return;
+    if(!page?.etag || !checked.ok || !headingPlan.ok || saving)return;
     setSaving(true);setError(null);setMessage("");setConflict(false);
     try {
       const result=await saveSiteVisualDraft(siteId,pageId,page.etag,checked.value);
@@ -525,7 +529,7 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
     finally{if(alive.current)setSaving(false);}
   }
   async function openPreview() {
-    if(!page || saving || workflowBusy || !checked.ok)return;
+    if(!page || saving || workflowBusy || !checked.ok || !headingPlan.ok)return;
     const target=window.open("about:blank","_blank");
     if(!target){setError("Allow pop-ups for this Site to open the Page preview.");return;}
     target.opener=null;
@@ -573,6 +577,7 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
   }
   async function queueWorkflow(action:WorkflowAction) {
     if(!page?.etag)return;
+    if(!headingPlan.ok){setError(headingPlan.message);return;}
     if(dirty){setError("Save your draft before using CMS workflow actions.");return;}
     const sequence=++workflowSequence.current;
     setWorkflowComment("");setWorkflowError("");setWorkflowPreview(null);
@@ -648,13 +653,13 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
       </Box>
       <Chip size="small" label={page.status==="PUBLISHED"?"Published revision":editable?(dirty?"Unsaved changes":"Saved draft"):"Review revision"} color={dirty?"warning":"default"}/>
       <Button onClick={leaveBuilder} disabled={saving || workflowBusy}>Back to Pages</Button>
-      <Button size="small" disabled={!checked.ok || saving || workflowBusy} onClick={()=>void openPreview()}>Preview in new tab</Button>
+      <Button size="small" disabled={!checked.ok || !headingPlan.ok || saving || workflowBusy} onClick={()=>void openPreview()}>Preview in new tab</Button>
       <Button size="small" onClick={()=>setSelected(null)}>Page settings</Button>
-      <ContentWorkflowButtons title={page.title} available={page.available_actions??[]} disabled={saving || workflowBusy || dirty || !page.etag} onAction={(action)=>void queueWorkflow(action)}/>
+      <ContentWorkflowButtons title={page.title} available={page.available_actions??[]} disabled={saving || workflowBusy || dirty || !page.etag || !headingPlan.ok} onAction={(action)=>void queueWorkflow(action)}/>
       {editable?<>
         <Button aria-expanded={showHomepageTemplates} disabled={saving || workflowBusy} onClick={()=>setShowHomepageTemplates(value=>!value)}>Homepage templates</Button>
         <Button ref={focusButton} startIcon={focusMode?<FullscreenExit/>:<Fullscreen/>} aria-pressed={focusMode} onClick={()=>setFocusMode(value=>!value)}>{focusMode?"Exit focus mode":"Focus mode"}</Button>
-        <Button variant="contained" startIcon={saving?<CircularProgress size={16} color="inherit"/>:<SaveOutlined/>} disabled={!dirty || saving || !checked.ok} onClick={()=>void save()}>{saving?"Saving…":"Save draft"}</Button>
+        <Button variant="contained" startIcon={saving?<CircularProgress size={16} color="inherit"/>:<SaveOutlined/>} disabled={!dirty || saving || !checked.ok || !headingPlan.ok} onClick={()=>void save()}>{saving?"Saving…":"Save draft"}</Button>
       </>:null}
     </Paper>
     {editable && showHomepageTemplates?<Box sx={{p:2,overflow:"auto",maxHeight:"70vh",flexShrink:0}}><HomepageTemplateCatalogue siteId={siteId} canEdit onChoose={(value,name)=>{change(value,{selection:null});setShowHomepageTemplates(false);setMessage(`${name} loaded into the unsaved draft. Save to retain it; publication is unchanged.`);}}/></Box>:null}
@@ -663,6 +668,7 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
       <Button color="inherit" size="small" disabled={saving} onClick={()=>void adoptServerDraft()}>Adopt server draft</Button>
     </Box>:undefined}>{error}</Alert>:null}
     {message?<Alert severity="success" role="status" sx={{py:0}}>{message}</Alert>:null}
+    {editable && !headingPlan.ok?<Alert severity="warning" role="alert">{headingPlan.message}</Alert>:null}
     <Typography component="div" aria-live="polite" sx={{position:"absolute",width:1,height:1,overflow:"hidden",clip:"rect(0 0 0 0)"}}>{announcement}</Typography>
     {!editable?<Alert severity="info" action={page.status==="PUBLISHED"?<Button disabled={saving} onClick={()=>void editPublished()}>Open working draft</Button>:undefined}>
       {page.status==="PUBLISHED"?"This is the published Page. Open its private working draft to use the Visual Builder.":"This Page is locked for review. Return to Pages to follow its CMS workflow."}
@@ -969,7 +975,7 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
                   ...(selected?{[`& [data-node-id="${selected}"]`]:{outline:"2px solid #2273b9",outlineOffset:2,borderRadius:1}}:{})
                 }}
               >
-                {checked.ok && preview?<PublicPageView page={preview} privateMediaBase={`${APP_BASE_PATH}/sites/${siteId}/media`} viewportWidth={canvasWidth} hideTitle={layout.settings?.show_title===undefined}/>:<Alert severity="warning">Complete the highlighted inspector fields to preview this layout.</Alert>}
+                {checked.ok && preview?<PublicPageView page={preview} privateMediaBase={`${APP_BASE_PATH}/sites/${siteId}/media`} viewportWidth={canvasWidth}/>:<Alert severity="warning">Complete the highlighted inspector fields to preview this layout.</Alert>}
                 {selectionBox && entry && entry.kind!=="column"?<Box
                   data-testid="canvas-selection-chrome"
                   sx={{
@@ -1091,13 +1097,22 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
             <Divider sx={{my:3}}/>
             <Typography variant="subtitle2" sx={{mb:2}}>Page settings</Typography>
             <TextField select fullWidth size="small" label="Page title" value={layout.settings?.show_title===false?"hidden":"visible"} disabled={saving}
+              error={!headingPlan.ok}
+              helperText={headingPlan.ok?"The Page title is the main H1 unless a hero is set to H1.":headingPlan.message}
+              FormHelperTextProps={{role:headingPlan.ok?undefined:"alert"}}
               onChange={event=>change({...layout,settings:{...layout.settings,show_title:event.target.value==="visible"}})}>
               <MenuItem value="visible">Show title</MenuItem><MenuItem value="hidden">Hide title visually</MenuItem>
             </TextField>
-            <TextField select fullWidth size="small" sx={{mt:2}} label="Content width" value={layout.settings?.content_width??"full"} disabled={saving}
+            <TextField select fullWidth size="small" sx={{mt:2}} label="Content width" value={widthPlan.width} disabled={saving}
+              helperText="Content keeps a 24 px safe gutter on every screen size."
               onChange={event=>change({...layout,settings:{...layout.settings,content_width:event.target.value as "full"|"wide"|"reading"}})}>
-              <MenuItem value="full">Full width</MenuItem><MenuItem value="wide">Wide · 1280px</MenuItem><MenuItem value="reading">Reading · 880px</MenuItem>
+              <MenuItem value="wide">Wide · 1280px</MenuItem><MenuItem value="reading">Reading · 880px</MenuItem>
+              {widthPlan.legacyFullWidth?<MenuItem value="full">Full width · legacy</MenuItem>:null}
             </TextField>
+            <FormControlLabel sx={{mt:2,alignItems:"flex-start",ml:0,gap:1}} control={<Switch size="small" checked={widthPlan.bleed} disabled={saving} inputProps={{"aria-describedby":"page-bleed-help"}} onChange={event=>change({...layout,settings:{...layout.settings,bleed:event.target.checked}})}/>}
+              label={<Box><Typography variant="body2">Edge-to-edge bleed</Typography><Typography id="page-bleed-help" variant="caption" color="text.secondary" component="p">Off by default. Turning it on lets this Page reach the viewport edge instead of keeping its safe gutter.</Typography></Box>}/>
+            {widthPlan.bleed?<Alert severity="warning" role="alert" sx={{mt:1}}>{widthPlan.warning}</Alert>:null}
+            {widthPlan.legacyFullWidth?<Alert severity="info" sx={{mt:1}}>This Page uses the legacy Full width setting. Choose Wide or Reading, or turn on bleed deliberately.</Alert>:null}
           </Box>}
           {Object.keys(errors).length?<Box role="alert" sx={{mt:2}}><Typography color="error">Check these fields before saving:</Typography>{Object.entries(errors).slice(0,12).map(([path,messages])=><Typography key={path} variant="caption" component="p" sx={{overflowWrap:"anywhere"}}>{path}: {messages.join(" ")}</Typography>)}</Box>:null}
         </Paper>:null}

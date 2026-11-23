@@ -50,6 +50,12 @@ export function PublicSiteChrome({ children, initialSite = EMPTY_SITE }: { child
     <Container maxWidth="lg" sx={{
       py: { xs: 3, md: 5 }, display: "flex", flexDirection: "column", minHeight: "65vh",
       "& [data-layout-version] p": { lineHeight: 1.75 },
+      // A visual Page owns its own safe gutter (see @uog/ui resolvePageWidth),
+      // so the shell must not add a second inset.
+      "&:has([data-page-width])": { px: 0 },
+      // Wide/Reading caps must apply to the whole viewport, not a 1200 px shell.
+      "&:has([data-page-layout='FULL_WIDTH'][data-page-width])": { maxWidth: "none" },
+      // Only an explicit Page bleed releases the surrounding shell.
       "&:has([data-page-bleed='true'])": {maxWidth:"none",px:0,py:0},
     }}>
       {children}

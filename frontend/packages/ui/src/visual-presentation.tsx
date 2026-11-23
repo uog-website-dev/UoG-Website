@@ -51,7 +51,7 @@ export function PresentationLink({href,label,variant="text",inverse=false,showAr
     sx={{...(inverse?{bgcolor:variant==="solid"?"white":"transparent",color:variant==="solid"?"primary.main":"white",borderColor:"white","&:hover":{bgcolor:variant==="solid"?"grey.100":"rgba(255,255,255,.12)",borderColor:"white"}}:{}),minHeight:44,maxWidth:"100%",overflowWrap:"anywhere",textAlign:"inherit","&:focus-visible":{outline:"3px solid currentColor",outlineOffset:3}}}>{label}</Button>;
 }
 
-export function HeroView({props,siteId,width}:{props:WidgetPropsMap["hero_image"];siteId:number|null;width:number}) {
+export function HeroView({props,siteId,width,demoteH1=false}:{props:WidgetPropsMap["hero_image"];siteId:number|null;width:number;demoteH1?:boolean}) {
   const [closedCards,setClosedCards]=useState<Set<string>>(()=>new Set());
   const cardScope=useId();
   const root=useRef<HTMLDivElement>(null);
@@ -77,6 +77,9 @@ export function HeroView({props,siteId,width}:{props:WidgetPropsMap["hero_image"
     {props.text?<Typography>{props.text}</Typography>:null}
   </>;
   const ratio=props.media_ratio??50;
+  // The Page title owns the H1 when it is visible, so a hero that requests H1
+  // is demoted to H2 instead of publishing a second main heading.
+  const headingComponent=props.heading_level===3?"h3":props.heading_level===4?"h4":props.heading_level===1&&!demoteH1?"h1":"h2";
   const contentHeight=props.height==="compact"?320:props.height==="tall"?440:360;
   const pattern=props.pattern??(split?"heritage":"none");
   const tone=props.panel_tone??"inherit";
@@ -113,7 +116,7 @@ export function HeroView({props,siteId,width}:{props:WidgetPropsMap["hero_image"
       <Box sx={hasCards?{display:"grid",gridTemplateColumns:wide?"minmax(0,1fr) minmax(0,1.3fr) minmax(0,1fr)":"minmax(0,1fr)",gap:3,alignItems:"center",width:"100%"}:undefined}>
       {hasCards&&wide?card(props.items![0]!):null}
       <Box sx={{display:"grid",gap:3,minWidth:0,textAlign:hasCards?"center":props.text_align}}>
-      <Typography component={props.heading_level===1?"h1":props.heading_level===3?"h3":props.heading_level===4?"h4":"h2"} sx={{fontSize:props.heading_size?sizes[props.heading_size]:"clamp(1.75rem,4cqi,3.5rem)",fontWeight:{regular:400,medium:500,bold:700,heavy:800}[props.heading_weight??"bold"],color:props.heading_color==="white"?"white":props.heading_color==="gold"?"#d8ad45":props.heading_color==="brand"?"primary.main":props.heading_color==="dark"?"#172536":"inherit",textTransform:props.heading_case==="uppercase"?"uppercase":"none",lineHeight:1.12,m:0,overflowWrap:"anywhere"}}>{props.title}</Typography>
+      <Typography component={headingComponent} sx={{fontSize:props.heading_size?sizes[props.heading_size]:"clamp(1.75rem,4cqi,3.5rem)",fontWeight:{regular:400,medium:500,bold:700,heavy:800}[props.heading_weight??"bold"],color:props.heading_color==="white"?"white":props.heading_color==="gold"?"#d8ad45":props.heading_color==="brand"?"primary.main":props.heading_color==="dark"?"#172536":"inherit",textTransform:props.heading_case==="uppercase"?"uppercase":"none",lineHeight:1.12,m:0,overflowWrap:"anywhere"}}>{props.title}</Typography>
       {props.text?<Typography sx={{maxWidth:"60ch",fontSize:{sm:".95rem",md:"1.1rem",lg:"1.3rem"}[props.body_size??"md"],lineHeight:1.7}}>{props.text}</Typography>:null}
       {props.actions?.length?<Box sx={{display:"flex",gap:1.5,flexWrap:"wrap"}}>{props.actions.map((action,index)=><PresentationLink key={action.id} {...action} inverse={inverse} showArrow variant={index===0?"solid":"outline"}/>)}</Box>:null}
       </Box>

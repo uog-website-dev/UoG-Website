@@ -21,6 +21,47 @@ const published = {
   otherSite: { title: "Hospital" },
 };
 
+const image = "00000000-0000-4000-8000-000000000001";
+
+/** A visual Page whose only layout widget is one hero. */
+function visualPage(settings?: { show_title?: boolean }, headingLevel?: 1 | 2) {
+  return pageFromResponse(200, {
+    ...published,
+    blocks: [],
+    metadata: {
+      visual_layout: {
+        schema_version: 1,
+        ...(settings === undefined ? {} : { settings }),
+        rows: [
+          {
+            id: "row",
+            type: "section",
+            ratios: [100],
+            columns: [
+              {
+                id: "column",
+                type: "column",
+                children: [
+                  {
+                    id: "hero",
+                    type: "hero_image",
+                    props: {
+                      asset_id: image,
+                      alt: "Campus",
+                      title: "Welcome",
+                      ...(headingLevel === undefined ? {} : { heading_level: headingLevel }),
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    },
+  });
+}
+
 describe("pageFromResponse", () => {
   it("reads one published page and ignores a disabled module", () => {
     const page = pageFromResponse(200, published);
@@ -71,10 +112,38 @@ describe("PublicPageView", () => {
     expect(screen.getByRole("status").textContent).toMatch(/no published page/i);
   });
 
-  it("can hide the automatic page title for builder canvas composition", () => {
-    render(<PublicPageView page={pageFromResponse(200, published)} hideTitle />);
-      expect(getComputedStyle(screen.getByRole("heading", { level: 1, name: "Admissions" })).position).toBe("absolute");
+  it("shows the automatic page title as the only H1 when no hero supplies one", () => {
+    const { container } = render(<PublicPageView page={visualPage(undefined)} />);
+    expect(screen.getByRole("heading", { level: 1, name: "Admissions" })).toBeTruthy();
+    expect(getComputedStyle(screen.getByRole("heading", { level: 1, name: "Admissions" })).position).not.toBe("absolute");
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    expect(screen.getByRole("heading", { level: 2, name: "Welcome" })).toBeTruthy();
     expect(screen.getByRole("article", { name: "Admissions" })).toBeTruthy();
+    expect(container.querySelectorAll("h1")).toHaveLength(1);
+  });
+
+  it("clips the page title only when one hero supplies the visible H1", () => {
+    render(<PublicPageView page={visualPage({ show_title: false }, 1)} />);
+    const title = document.getElementById("public-page-title");
+    expect(title?.tagName).toBe("SPAN");
+    expect(title?.textContent).toBe("Admissions");
+    expect(getComputedStyle(title!).position).toBe("absolute");
+    expect(screen.getByRole("heading", { level: 1, name: "Welcome" })).toBeTruthy();
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    expect(screen.getByRole("article", { name: "Admissions" })).toBeTruthy();
+  });
+
+  it("demotes a hero H1 when the page title is also visible", () => {
+    render(<PublicPageView page={visualPage({ show_title: true }, 1)} />);
+    expect(getComputedStyle(screen.getByRole("heading", { level: 1, name: "Admissions" })).position).not.toBe("absolute");
+    expect(screen.getByRole("heading", { level: 2, name: "Welcome" })).toBeTruthy();
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+  });
+
+  it("restores a visible page title when a hidden title has no H1", () => {
+    render(<PublicPageView page={visualPage({ show_title: false })} />);
+    expect(getComputedStyle(screen.getByRole("heading", { level: 1, name: "Admissions" })).position).not.toBe("absolute");
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
   });
 });
 

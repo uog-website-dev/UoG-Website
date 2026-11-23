@@ -6,6 +6,18 @@ export { SiteNavigation, PublicMenuFrame, safeMenuHref, menusFromResponse } from
 export type { PublicMenuNode } from "./site-navigation";
 export { PublicPageView, pageFromResponse, paragraphParts } from "./public-page";
 export { VisualLayoutView } from "./visual-layout";
+export { countLayoutH1, resolvePageHeading, PAGE_HEADING_ERROR_PATH } from "./page-heading";
+export type { PageHeadingResolution } from "./page-heading";
+export {
+  DEFAULT_PAGE_WIDTH,
+  PAGE_BLEED_ERROR_PATH,
+  PAGE_CONTENT_WIDTHS,
+  PAGE_SAFE_GUTTER_PX,
+  PAGE_WIDTH_ERROR_PATH,
+  isLegacyFullWidth,
+  resolvePageWidth,
+} from "./page-width";
+export type { PageWidthResolution, PageWidthToken } from "./page-width";
 export { PublicSiteFrame } from "./public-site-frame";
 export {
   EMPTY_SITE,
@@ -71,6 +83,9 @@ export type { ToastApi, ToastOptions } from "./toast";
 
 export { WidgetRuntimeProvider } from "./widget-runtime";
 
-export {PublicSiteFooter} from "./site-footer";
+export { PublicSiteFooter} from "./site-footer";
+
+export { PublicSiteHeader } from "./public-site-header";
+export type { PublicSiteHeaderProps } from "./public-site-header";
 
 export {PublicSiteSearch} from "./public-site-search";

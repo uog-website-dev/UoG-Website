@@ -123,6 +123,16 @@ describe("site administration matrix", () => {
 });
 
 
+it("exposes Header to Site settings editors when MENUS or PAGES is enabled",()=>{
+  const section=sectionByKey("header");
+  expect(sectionDecision(section,{enabledModuleCodes:["MENUS"],permissions:["sites.update"]})).toBe("visible");
+  expect(sectionDecision(section,{enabledModuleCodes:["PAGES"],permissions:["sites.update"]})).toBe("visible");
+  expect(sectionDecision(section,{enabledModuleCodes:[],permissions:["sites.update"]})).toBe("module_disabled");
+  expect(sectionDecision(section,{enabledModuleCodes:["MENUS"],permissions:[]})).toBe("permission_denied");
+  expect(isSiteSectionActive(section,11,"/sites/11/admin/header")).toBe(true);
+  expect(isSiteSectionActive(section,22,"/sites/11/admin/header")).toBe(false);
+});
+
 it("exposes Appearance to Site settings editors without requiring a CMS module",()=>{
   const section=sectionByKey("appearance");
   expect(sectionDecision(section,{enabledModuleCodes:[],permissions:["sites.update"]})).toBe("visible");

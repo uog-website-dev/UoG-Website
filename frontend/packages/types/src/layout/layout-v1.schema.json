@@ -13518,6 +13518,9 @@
             "wide",
             "reading"
           ]
+        },
+        "bleed": {
+          "type": "boolean"
         }
       },
       "required": []

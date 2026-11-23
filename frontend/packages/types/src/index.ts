@@ -513,4 +513,6 @@ export * from "./layout";
 
 export * from "./footer";
 
+export * from "./header";
+
 export { MAX_MENU_DEPTH } from "./navigation";

@@ -78,6 +78,33 @@ def test_responsive_overrides_accept_approved_tokens_and_reject_unknown():
     assert validate_layout(legacy) == legacy
 
 
+def test_page_width_and_explicit_bleed_settings():
+    for settings in ({}, {"show_title": False, "content_width": "wide"},
+                     {"content_width": "full"}, {"content_width": "reading", "bleed": False}):
+        layout = copy.deepcopy(FIXTURES[0]["layout"])
+        layout["settings"] = settings
+        assert validate_layout(layout) == layout
+    bleeding = copy.deepcopy(FIXTURES[0]["layout"])
+    bleeding["settings"] = {"content_width": "wide", "bleed": True}
+    assert validate_layout(bleeding) == bleeding
+    for settings in ({"bleed": "yes"}, {"bleed": 1}, {"content_width": "huge"}, {"full_bleed": True}):
+        bad = copy.deepcopy(FIXTURES[0]["layout"])
+        bad["settings"] = settings
+        with pytest.raises(ValidationError) as caught:
+            validate_layout(bad)
+        assert all(path.startswith("metadata.visual_layout.settings") for path in caught.value.message_dict)
+
+
+@pytest.mark.django_db
+def test_database_guard_accepts_explicit_bleed(sites):
+    layout = {"schema_version": 1, "rows": [],
+              "settings": {"content_width": "wide", "bleed": True}}
+    page = Page.objects.create(site=sites[0], title="Bleed", slug="bleed-contract",
+                               metadata={"visual_layout": layout})
+    page.refresh_from_db()
+    assert page.metadata["visual_layout"]["settings"]["bleed"] is True
+
+
 @pytest.mark.django_db(transaction=True)
 def test_upgrade_from_pre_visual_contract_preserves_legacy_page():
     from django.db.migrations.executor import MigrationExecutor

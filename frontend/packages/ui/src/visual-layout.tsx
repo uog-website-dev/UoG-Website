@@ -50,7 +50,7 @@ function useLayoutViewportWidth(forced?: number) {
   return { rootRef, width };
 }
 
-function SectionRow({row,siteId,pageTitle,width}:{row:LayoutSection;siteId:number|null;pageTitle:string;width:number}) {
+function SectionRow({row,siteId,pageTitle,width,demoteH1}:{row:LayoutSection;siteId:number|null;pageTitle:string;width:number;demoteH1:boolean}) {
   const resolved = resolveSectionPresentation(row.style, row.responsive, width);
   const columns = resolved.stack
     ? "minmax(0,1fr)"
@@ -66,7 +66,7 @@ function SectionRow({row,siteId,pageTitle,width}:{row:LayoutSection;siteId:numbe
     {row.columns.map((column) => (
       <Box key={column.id} data-node-id={column.id} sx={{minWidth:0,display:"flex",flexDirection:"column",gap:2}}>
         {column.children.map((widget) => (
-          <VisualWidget key={widget.id} widget={widget} siteId={siteId} pageTitle={pageTitle} viewportWidth={width}/>
+          <VisualWidget key={widget.id} widget={widget} siteId={siteId} pageTitle={pageTitle} viewportWidth={width} demoteH1={demoteH1}/>
         ))}
       </Box>
     ))}
@@ -74,7 +74,7 @@ function SectionRow({row,siteId,pageTitle,width}:{row:LayoutSection;siteId:numbe
 }
 
 /** Shared Admin/portal rendering. Unvalidated or unsupported trees fail closed. */
-export function VisualLayoutView({layout,siteId,pageTitle,pageId,preview=false,mediaBase,viewportWidth}:{layout:VisualLayout;siteId:number|null;pageTitle:string;pageId?:string;preview?:boolean;mediaBase?:string;viewportWidth?:number}) {
+export function VisualLayoutView({layout,siteId,pageTitle,pageId,preview=false,mediaBase,viewportWidth,demoteH1=false}:{layout:VisualLayout;siteId:number|null;pageTitle:string;pageId?:string;preview?:boolean;mediaBase?:string;viewportWidth?:number;demoteH1?:boolean}) {
   const checked=validateVisualLayout(layout);
   const { rootRef, width } = useLayoutViewportWidth(viewportWidth);
   if(!checked.ok)return <Typography role="status">This page content is currently unavailable.</Typography>;
@@ -84,7 +84,7 @@ export function VisualLayoutView({layout,siteId,pageTitle,pageId,preview=false,m
     {preview && postBindings?<PostPreviewSelector/>:null}
     <Box ref={rootRef} data-layout-version="1" data-viewport-width={width} sx={{display:"grid",gap:{xs:4,md:6},minWidth:0,overflowWrap:"anywhere",containerType:"inline-size",containerName:"visual-layout"}}>
       {checked.value.rows.map((row) => (
-        <SectionRow key={row.id} row={row} siteId={siteId} pageTitle={pageTitle} width={width}/>
+        <SectionRow key={row.id} row={row} siteId={siteId} pageTitle={pageTitle} width={width} demoteH1={demoteH1}/>
       ))}
     </Box>
   </WidgetRuntimeProvider>;
@@ -172,7 +172,7 @@ function AccordionWidget({items}:{items:Array<{id:string;title:string;text:strin
   </Box>;
 }
 
-function VisualWidget({widget,siteId,pageTitle,viewportWidth}:{widget:WidgetNode;siteId:number|null;pageTitle:string;viewportWidth:number}):ReactNode {
+function VisualWidget({widget,siteId,pageTitle,viewportWidth,demoteH1}:{widget:WidgetNode;siteId:number|null;pageTitle:string;viewportWidth:number;demoteH1:boolean}):ReactNode {
   const resolved = resolveWidgetPresentation(widget.style, widget.responsive, viewportWidth);
   let body:ReactNode;
   switch(widget.type) {
@@ -193,14 +193,14 @@ function VisualWidget({widget,siteId,pageTitle,viewportWidth}:{widget:WidgetNode
     case "contact_form":body=<ContactFormWidget {...widget.props}/>;break;
     case "headline":body=<BlockView block={{type:"heading",...widget.props}} siteId={siteId}/>;break;
     case "editor":body=<BlockView block={{type:"paragraph",html:widget.props.html}} siteId={siteId}/>;break;
-    case "hero_image":body=<HeroView props={widget.props} siteId={siteId} width={viewportWidth}/>;break;
+    case "hero_image":body=<HeroView props={widget.props} siteId={siteId} width={viewportWidth} demoteH1={demoteH1}/>;break;
     case "image":body=<BlockView block={{type:"image",ref:`sites/${siteId}/assets/${widget.props.asset_id}`,alt:widget.props.alt}} siteId={siteId}/>;break;
     case "image_slider":body=<ContentCarousel label="Image slider" items={widget.props.items.map(item=>({id:item.id,content:<Box component="figure" sx={{m:0,"& img":{width:"100%",maxHeight:560,objectFit:"cover",borderRadius:2}}}><BlockView block={{type:"image",ref:`sites/${siteId}/assets/${item.asset_id}`,alt:item.alt}} siteId={siteId}/>{item.caption?<Typography component="figcaption" sx={{mt:1,color:"text.secondary"}}>{item.caption}</Typography>:null}</Box>}))}/>;break;
     case "image_grid":body=<BlockView block={{type:"gallery",images:widget.props.items}} siteId={siteId}/>;break;
     case "button":body=<PresentationLink {...widget.props}/>;break;
     case "button_grid":case "social_media_buttons":body=<Box sx={{display:"flex",gap:2,flexWrap:"wrap"}}>{widget.props.items.map(item=><PresentationLink key={item.id} label={item.label} href={item.href} variant={widget.type==="button_grid"?"solid":"text"}/>)}</Box>;break;
-    case "layout_slider":case "anything_carousel":body=<ContentCarousel frameHeight={widget.type==="layout_slider"?widget.props.height??widget.props.items.flatMap(slide=>slide.children).find(node=>node.type==="hero_image")?.props.height??"medium":undefined} frameStacked={widget.type==="layout_slider"} navigation={widget.props.navigation} autoplaySeconds={widget.props.autoplay_seconds} items={widget.props.items.map(item=>({id:item.id,thumbnail:(()=>{const image=item.children.find(child=>child.type==="image"||child.type==="hero_image");return image&&(image.type==="image"||image.type==="hero_image")?<BlockView block={{type:"image",ref:`sites/${siteId}/assets/${image.props.asset_id}`,alt:""}} siteId={siteId}/>:undefined;})(),content:<Box sx={{display:"grid",gap:2,alignContent:"center"}}>{item.children.map(child=><VisualWidget key={child.id} widget={child.type==="hero_image"?{...child,props:{...child.props,height:widget.props.height??widget.props.items.flatMap(slide=>slide.children).find(node=>node.type==="hero_image")?.props.height??"medium"}}:child} siteId={siteId} pageTitle={pageTitle} viewportWidth={viewportWidth}/>)}</Box>}))}/>;break;
-    case "simple_masonry":body=<Box data-widget="simple_masonry" sx={{columns:viewportWidth>=900?3:viewportWidth>=600?2:1,columnGap:2}}>{widget.props.items.map(item=><Box key={item.id} sx={{breakInside:"avoid",mb:2,display:"grid",gap:2}}>{item.children.map(child=><VisualWidget key={child.id} widget={child} siteId={siteId} pageTitle={pageTitle} viewportWidth={viewportWidth}/>)}</Box>)}</Box>;break;
+    case "layout_slider":case "anything_carousel":body=<ContentCarousel frameHeight={widget.type==="layout_slider"?widget.props.height??widget.props.items.flatMap(slide=>slide.children).find(node=>node.type==="hero_image")?.props.height??"medium":undefined} frameStacked={widget.type==="layout_slider"} navigation={widget.props.navigation} autoplaySeconds={widget.props.autoplay_seconds} items={widget.props.items.map(item=>({id:item.id,thumbnail:(()=>{const image=item.children.find(child=>child.type==="image"||child.type==="hero_image");return image&&(image.type==="image"||image.type==="hero_image")?<BlockView block={{type:"image",ref:`sites/${siteId}/assets/${image.props.asset_id}`,alt:""}} siteId={siteId}/>:undefined;})(),content:<Box sx={{display:"grid",gap:2,alignContent:"center"}}>{item.children.map(child=><VisualWidget key={child.id} widget={child.type==="hero_image"?{...child,props:{...child.props,height:widget.props.height??widget.props.items.flatMap(slide=>slide.children).find(node=>node.type==="hero_image")?.props.height??"medium"}}:child} siteId={siteId} pageTitle={pageTitle} viewportWidth={viewportWidth} demoteH1={demoteH1}/>)}</Box>}))}/>;break;
+    case "simple_masonry":body=<Box data-widget="simple_masonry" sx={{columns:viewportWidth>=900?3:viewportWidth>=600?2:1,columnGap:2}}>{widget.props.items.map(item=><Box key={item.id} sx={{breakInside:"avoid",mb:2,display:"grid",gap:2}}>{item.children.map(child=><VisualWidget key={child.id} widget={child} siteId={siteId} pageTitle={pageTitle} viewportWidth={viewportWidth} demoteH1={demoteH1}/>)}</Box>)}</Box>;break;
     case "tabs":body=<TabsWidget items={widget.props.items}/>;break;
     case "accordion":body=<AccordionWidget items={widget.props.items}/>;break;
     case "call_to_action":case "author_box":body=<Box><Typography variant="h3">{widget.props.title}</Typography><Typography>{widget.props.text}</Typography>{widget.props.href && widget.props.label?<BlockView block={{type:"button",href:widget.props.href,label:widget.props.label}}/>:null}</Box>;break;

@@ -5,7 +5,7 @@ from django.db.models import Prefetch, Q
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import mixins
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -23,7 +23,9 @@ from ..services.registry import registry_write
 from .access import PreconditionFailed,PreconditionRequired,AdministrationViewSet, Conflict, reject_idempotency, translate_domain_errors
 from .footer import FooterSettingsSerializer,FooterEnvelopeSerializer,footer_envelope
 from ..footer import save_footer,footer_etag,FooterConflict,FooterPreconditionRequired
-from ..models import SiteFooter
+from .header import HeaderSettingsSerializer,HeaderEnvelopeSerializer,header_envelope
+from ..header import save_header,header_etag,HeaderConflict,HeaderPreconditionRequired
+from ..models import SiteFooter, SiteHeader
 from .module_management import ActivationSummarySerializer
 from .query import (
     LIST_PARAMETERS, DomainQuerySerializer, ModuleQuerySerializer, SiteModuleQuerySerializer,
@@ -57,7 +59,7 @@ def _list(view, serializer, specs, default):
     partial_update=extend_schema(parameters=[IF_MATCH], description="Requires sites.update in this Site scope and the existing development-only write gate."),
 )
 class SiteViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, AdministrationViewSet):
-    permission_by_action={**AdministrationViewSet.permission_by_action,"footer":"sites.update"}
+    permission_by_action={**AdministrationViewSet.permission_by_action,"footer":"sites.update","header":"sites.update"}
     queryset = Site.objects.select_related("organization_unit", "template").prefetch_related(
         Prefetch("domains", queryset=SiteDomain.objects.filter(is_primary=True), to_attr="primary_domain_rows"),
     ).order_by("code")
@@ -147,6 +149,23 @@ class SiteViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Administrati
                 except FooterConflict:raise PreconditionFailed()
             else:row=SiteFooter.objects.filter(site=site).first()
             return Response(footer_envelope(site,row),headers={"ETag":footer_etag(site.pk,row),"Cache-Control":"private, no-store"})
+
+    @extend_schema(methods=["GET"],responses=HeaderEnvelopeSerializer,description="Read Site-owned header settings with the currently published header and utility menus. Requires sites.update and the MENUS or PAGES module; no row is created by a read.")
+    @extend_schema(methods=["PATCH"],parameters=[IF_MATCH],request=HeaderSettingsSerializer,responses=HeaderEnvelopeSerializer,description="Save only this Site's header settings using its strong header ETag. Publishes settings immediately; header and utility navigation stay on the menu draft/publish workflow. Unknown ownership/version fields are rejected.")
+    @action(detail=True,methods=["get","patch"],url_path="header")
+    def header(self,request,pk=None):
+        site=self.get_object()
+        from ..selectors.modules import module_is_available
+        if not (module_is_available(site.pk,"MENUS") or module_is_available(site.pk,"PAGES")):
+            raise PermissionDenied("Header settings require the MENUS or PAGES module.")
+        with translate_domain_errors():
+            if request.method=="PATCH":
+                serializer=HeaderSettingsSerializer(data=request.data);serializer.is_valid(raise_exception=True)
+                try:row=save_header(site.pk,serializer.validated_data,actor=request.user,expected=request.headers.get("If-Match"))
+                except HeaderPreconditionRequired:raise PreconditionRequired()
+                except HeaderConflict:raise PreconditionFailed()
+            else:row=SiteHeader.objects.filter(site=site).first()
+            return Response(header_envelope(site,row),headers={"ETag":header_etag(site.pk,row),"Cache-Control":"private, no-store"})
 
 
 @extend_schema(tags=["Domains"])

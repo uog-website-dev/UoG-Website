@@ -151,7 +151,7 @@ def build_schema():
               ["id", "type", "ratios", "columns"])
     return {"$schema": "https://json-schema.org/draft/2020-12/schema", "title": "UoG visual layout v1",
             **obj({"schema_version": {"const": 1}, "rows": {"type": "array", "maxItems": 50, "items": row},
-                   "settings":obj({"show_title":{"type":"boolean"},"content_width":{"enum":["full","wide","reading"]}},[])},["schema_version","rows"]),
+                   "settings":obj({"show_title":{"type":"boolean"},"content_width":{"enum":["full","wide","reading"]},"bleed":{"type":"boolean"}},[])},["schema_version","rows"]),
             "x-limits": {"max_nodes": 200, "max_depth": 4, "max_bytes": 262144},
             "x-breakpoints": {
                 "tokens": ["desktop", "tablet", "mobile"],

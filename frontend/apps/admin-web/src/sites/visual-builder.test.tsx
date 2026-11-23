@@ -26,6 +26,9 @@ function record(values:Partial<SitePageRecord>={}):SitePageRecord{return {
   updated_at:"2026-11-12T00:00:00Z",blocks:[],seo:{},metadata:{visual_layout:{schema_version:1,rows:[]}},etag:'"revision-1"',revision_number:1,available_actions:["submit"],...values,
 };}
 const fail=(status:number)=>({ok:false,error:{status,code:"api_error",message:"Request failed.",details:null,requestId:null}});
+function heroLayout(showTitle:boolean, level:1|2){
+  return {schema_version:1,settings:{show_title:showTitle},rows:[{id:"row",type:"section",ratios:[100],columns:[{id:"column",type:"column",children:[{id:"hero",type:"hero_image",props:{asset_id:"00000000-0000-4000-8000-000000000001",alt:"Campus",title:"Welcome",layout:"split",heading_level:level}}]}]}]};
+}
 beforeEach(()=>{vi.clearAllMocks();load.mockResolvedValue({ok:true,data:record()});save.mockResolvedValue({ok:true,data:record({etag:'"revision-2"',revision_number:2})});preview.mockResolvedValue({ok:true,data:{revision_id:1,revision_number:1,content_hash:"abc",status:"DRAFT",approval_id:null,reviewed_revision_id:null,approved_revision_id:null,page:{title:"Admissions",path:"/admissions",site:11,blocks:[],metadata:{},seo:{}},etag:'"preview-1"'}});transition.mockResolvedValue({ok:true,data:record({status:"IN_REVIEW",etag:'"revision-3"',revision_number:3,available_actions:["approve","reject"]})});listTemplates.mockResolvedValue({ok:true,data:[]});createTemplate.mockResolvedValue({ok:true,data:{id:"tmpl-1",site:11,name:"Band",status:"ACTIVE",schema_version:1,version:1,section:{id:"row",type:"section",ratios:[100],columns:[]},created_at:"2026-11-12T00:00:00Z",updated_at:"2026-11-12T00:00:00Z"}});insertTemplate.mockResolvedValue({ok:true,data:record({etag:'"revision-2"',revision_number:2})});});
 
 describe("Visual Builder workspace",()=>{
@@ -337,12 +340,13 @@ describe("Visual Builder workspace",()=>{
     expect(screen.getAllByRole("button",{name:/Drag Headline/}).length).toBeGreaterThan(1);
     expect(screen.getByText(/Drag the handle to reorder|Drop palette widgets/)).toBeTruthy();
   });
-  it("makes palette widgets draggable onto the canvas drop targets and hides the automatic page title",async()=>{
+  it("makes palette widgets draggable onto the canvas drop targets and shows the automatic page title",async()=>{
     load.mockResolvedValue({ok:true,data:record({metadata:{visual_layout:starterLayout()}})});
     render(<VisualBuilder {...props}/>);
     const canvas=await screen.findByRole("region",{name:"Live Page canvas"});
     expect(screen.getByTestId("live-canvas-drop-frame")).toBeTruthy();
-    expect(getComputedStyle(screen.getByRole("heading",{level:1,name:"Admissions"})).position).toBe("absolute");
+    expect(getComputedStyle(screen.getByRole("heading",{level:1,name:"Admissions"})).position).not.toBe("absolute");
+    expect(screen.getAllByRole("heading",{level:1})).toHaveLength(1);
     const paletteCard=await screen.findByRole("button",{name:/Add Headline\. Drag onto the canvas/});
     expect(paletteCard.getAttribute("draggable")).toBe("true");
     expect(screen.getByText(/Drag onto the live canvas/)).toBeTruthy();
@@ -351,6 +355,42 @@ describe("Visual Builder workspace",()=>{
     fireEvent.dragOver(canvas,{dataTransfer:transfer});
     fireEvent.drop(canvas,{clientX:12,clientY:12,dataTransfer:transfer});
     await waitFor(()=>expect(screen.getByText(/Button added/i)).toBeTruthy());
+  });
+  it("blocks save and preview until the Page has exactly one visible H1",async()=>{
+    const user=userEvent.setup();
+    load.mockResolvedValue({ok:true,data:record({metadata:{visual_layout:heroLayout(true,1)}})});
+    render(<VisualBuilder {...props}/>);
+    await screen.findByRole("region",{name:"Live Page canvas"});
+    await user.click(screen.getByRole("button",{name:"Page settings"}));
+    expect(screen.getAllByText(/Page title is shown/i).length).toBeGreaterThan(0);
+    expect((screen.getByRole("button",{name:"Save draft"}) as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByRole("button",{name:"Preview in new tab"}) as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByRole("button",{name:/Submit Admissions for review/}) as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.mouseDown(screen.getByRole("combobox",{name:"Content width"}));
+    fireEvent.click(await screen.findByRole("option",{name:"Wide · 1280px"}));
+    expect((screen.getByRole("button",{name:"Save draft"}) as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.mouseDown(screen.getByRole("combobox",{name:"Page title"}));
+    fireEvent.click(await screen.findByRole("option",{name:"Hide title visually"}));
+    await waitFor(()=>expect((screen.getByRole("button",{name:"Save draft"}) as HTMLButtonElement).disabled).toBe(false));
+    expect((screen.getByRole("button",{name:"Preview in new tab"}) as HTMLButtonElement).disabled).toBe(false);
+    expect(screen.queryByText(/Page title is shown/i)).toBeNull();
+    expect(screen.getAllByRole("heading",{level:1})).toHaveLength(1);
+  });
+  it("defaults page width to Wide and warns only when bleed is enabled",async()=>{
+    const user=userEvent.setup();
+    load.mockResolvedValue({ok:true,data:record({metadata:{visual_layout:starterLayout()}})});
+    render(<VisualBuilder {...props}/>);
+    await screen.findByRole("region",{name:"Live Page canvas"});
+    await user.click(screen.getByRole("button",{name:"Page settings"}));
+    const width=screen.getByRole("combobox",{name:"Content width"});
+    expect(width.textContent).toContain("Wide · 1280px");
+    expect(screen.getByText(/24 px safe gutter/)).toBeTruthy();
+    const bleed=screen.getByRole("checkbox",{name:/Edge-to-edge bleed/}) as HTMLInputElement;
+    expect(bleed.checked).toBe(false);
+    expect(screen.queryByText(/Bleed removes the 24 px safe gutter/)).toBeNull();
+    await user.click(bleed);
+    expect(await screen.findByText(/Bleed removes the 24 px safe gutter/)).toBeTruthy();
+    expect((screen.getByRole("region",{name:"Live Page canvas"}).querySelector('[data-page-bleed="true"]'))).toBeTruthy();
   });
   it("accepts a palette drop on the empty canvas to create the first section",async()=>{
     render(<VisualBuilder {...props}/>);

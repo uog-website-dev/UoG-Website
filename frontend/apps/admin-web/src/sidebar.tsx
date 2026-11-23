@@ -12,6 +12,7 @@
  * (`/admin`) is applied — plain `<a>` tags would escape the console.
  */
 import VerticalAlignBottomOutlinedIcon from "@mui/icons-material/VerticalAlignBottomOutlined";
+import VerticalAlignTopOutlinedIcon from "@mui/icons-material/VerticalAlignTopOutlined";
 import PaletteOutlinedIcon from "@mui/icons-material/PaletteOutlined";
 import CloseIcon from "@mui/icons-material/Close";
 import AccountBalanceRoundedIcon from "@mui/icons-material/AccountBalanceRounded";
@@ -60,6 +61,7 @@ const SITE_SECTION_ICONS: Record<SiteSection["key"], SvgIconComponent> = {
   builder: ViewQuiltIcon,
   homepage: HomeOutlinedIcon,
   appearance: PaletteOutlinedIcon,
+  header: VerticalAlignTopOutlinedIcon,
   footer: VerticalAlignBottomOutlinedIcon,
   posts: ArticleIcon,
   menus: AccountTreeIcon,
@@ -74,6 +76,7 @@ const SITE_SECTION_DESCRIPTIONS: Record<SiteSection["key"], string> = {
   builder: "Compose a visual Page layout",
   homepage: "Assign the published Site root",
   appearance: "Site logo, public title and theme",
+  header: "Header branding, navigation, search and call to action",
   footer: "Footer content, contact and social links",
   posts: "News and announcements",
   menus: "Header and footer navigation",
