@@ -10,10 +10,12 @@
 export const CENTRAL_MODULE_PERMISSION = "platform.sites.manage_registry";
 
 export interface SiteSection {
-  key: "footer" | "appearance" | "dashboard" | "sidebars" | "pages" | "builder" | "homepage" | "posts" | "menus" | "media" | "users";
+  key: "header" | "footer" | "appearance" | "dashboard" | "sidebars" | "pages" | "builder" | "homepage" | "posts" | "menus" | "media" | "users";
   label: string;
-  segment: "footer" | "appearance" | "" | "sidebars" | "pages" | "builder" | "homepage" | "posts" | "menus" | "media" | "users";
+  segment: "header" | "footer" | "appearance" | "" | "sidebars" | "pages" | "builder" | "homepage" | "posts" | "menus" | "media" | "users";
   module: "PAGES" | "POSTS" | "MENUS" | "MEDIA" | "VISUAL_BUILDER" | null;
+  /** Any one enabled module satisfies the gate; used when two modules qualify. */
+  modules?: readonly ("PAGES" | "POSTS" | "MENUS" | "MEDIA" | "VISUAL_BUILDER")[];
   permissions: readonly string[];
 }
 
@@ -52,6 +54,7 @@ export const SITE_SECTIONS: readonly SiteSection[] = [
     module: "PAGES",
     permissions: ["sites.update"],
   },
+  {key:"header",label:"Header",segment:"header",module:null,modules:["MENUS","PAGES"],permissions:["sites.update"]},
   {key:"footer",label:"Footer",segment:"footer",module:null,permissions:["sites.update"]},
   {key: "appearance", label: "Appearance", segment: "appearance", module: null, permissions: ["sites.update"]},
   {
@@ -103,14 +106,13 @@ export function sectionByKey(key: SiteSection["key"] | string): SiteSection {
 /** Pages, Posts and Menus need both an enabled Site module and a permission. */
 export function sectionDecision(section: SiteSection, access: SiteAccessInput): SectionDecision {
   if (section.key === "dashboard") return "visible";
-  if (section.module == null) {
-    return section.permissions.some((code) => access.permissions.includes(code)) ? "visible" : "permission_denied";
+  const requiredModules = section.modules ?? (section.module ? [section.module] : []);
+  if (requiredModules.length > 0 && !requiredModules.some((code) => access.enabledModuleCodes.includes(code))) {
+    return "module_disabled";
   }
-  if (!access.enabledModuleCodes.includes(section.module)) return "module_disabled";
-  if (!section.permissions.some((code) => access.permissions.includes(code))) {
-    return "permission_denied";
-  }
-  return "visible";
+  return section.permissions.some((code) => access.permissions.includes(code))
+    ? "visible"
+    : "permission_denied";
 }
 
 export function visibleSiteSections(access: SiteAccessInput): SiteSection[] {

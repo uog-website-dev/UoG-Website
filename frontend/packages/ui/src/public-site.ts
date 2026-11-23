@@ -1,5 +1,5 @@
-import {footerSettingsFrom} from "@uog/types";
-import type {SiteFooterSettings} from "@uog/types";
+import {footerSettingsFrom,headerSettingsFrom} from "@uog/types";
+import type {SiteFooterSettings,SiteHeaderSettings} from "@uog/types";
 /**
  * Host-resolved public Site decisions.
  *
@@ -34,6 +34,9 @@ export interface PublicSiteContext {
   logoUrl: string | null;
   brandingRevision?: string;
   footer?:SiteFooterSettings;
+  header?:SiteHeaderSettings;
+  /** Enabled public languages; locale-prefixed routes are not implemented yet. */
+  languages?: string[];
   theme: "institutional" | "high-contrast";
   modules: { pages: boolean; posts: boolean; menus: boolean };
 }
@@ -58,7 +61,7 @@ export function siteFromContext(status: number, body: unknown): PublicSiteContex
     site?: { id?: unknown; code?: unknown; name?: unknown } | null;
     domain?: unknown;
     canonical_domain?: unknown;
-    configuration?: { display_name?: unknown; theme?: unknown; logo_url?: unknown; branding_revision?: unknown; footer?:unknown } | null;
+    configuration?: { display_name?: unknown; theme?: unknown; logo_url?: unknown; branding_revision?: unknown; footer?:unknown; header?:unknown; languages?:unknown } | null;
     modules?: unknown;
   };
   const site = row.site;
@@ -81,6 +84,10 @@ export function siteFromContext(status: number, body: unknown): PublicSiteContex
     logoUrl: row.configuration?.logo_url === "/api/v1/site-context/identity/logo/" ? row.configuration.logo_url : null,
     brandingRevision: typeof row.configuration?.branding_revision === "string" && /^[a-f0-9]{64}$/.test(row.configuration.branding_revision) ? row.configuration.branding_revision : undefined,
     footer:footerSettingsFrom(row.configuration?.footer),
+    header:headerSettingsFrom(row.configuration?.header),
+    languages:Array.isArray(row.configuration?.languages)
+      ? row.configuration.languages.filter((code):code is string=>typeof code==="string"&&/^[a-z]{2,3}(?:-[a-z0-9]{2,8})*$/.test(code))
+      : undefined,
     theme,
     modules: {
       pages: modules.includes("PAGES"),

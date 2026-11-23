@@ -57,4 +57,4 @@ export type WidgetNode = { [K in WidgetType]: { id: string; type: K; props: Widg
 export interface LayoutColumn { id: string; type: "column"; children: WidgetNode[] }
 export type ColumnRatios = [100] | [50, 50] | [60, 40] | [40, 60] | [70, 30] | [30, 70] | [75, 25] | [25, 75] | [1, 1, 1];
 export interface LayoutSection { id: string; type: "section"; ratios: ColumnRatios; columns: LayoutColumn[]; style?: LayoutStyle; responsive?: SectionResponsive }
-export interface VisualLayout { schema_version: 1; rows: LayoutSection[]; settings?: { show_title?: boolean; content_width?: "full" | "wide" | "reading" } }
+export interface VisualLayout { schema_version: 1; rows: LayoutSection[]; settings?: { show_title?: boolean; content_width?: "full" | "wide" | "reading"; bleed?: boolean } }

@@ -9,7 +9,7 @@ import {PublicPageView,pageFromResponse} from "./public-page";
 const image="00000000-0000-4000-8000-000000000001";
 function scene():VisualLayout {
   return {schema_version:1,settings:{show_title:false,content_width:"wide"},rows:[{
-    id:"row",type:"section",ratios:[100],style:{padding:"md",background:"mist",radius:"lg"},columns:[{
+    id:"row",type:"section",ratios:[100],style:{padding:"md",radius:"lg"},columns:[{
       id:"column",type:"column",children:[{id:"carousel",type:"layout_slider",props:{items:[
         {id:"slide-a",children:[{id:"hero-a",type:"hero_image",props:{asset_id:image,alt:"Research",title:"Discover research",layout:"split",mask:"curve",height:"compact",actions:[{id:"action-a",label:"Explore",href:"#research"}]}}]},
         {id:"slide-b",children:[{id:"hero-b",type:"hero_image",props:{asset_id:image,alt:"Campus",title:"Campus life",layout:"overlay",height:"medium"}}]},
@@ -23,7 +23,8 @@ describe("Professional visual presentation",()=>{
     expect(validateVisualLayout(layout).ok).toBe(true);
     const user=userEvent.setup();
     const view=render(<PublicPageView page={pageFromResponse(200,{title:"Home",site:11,blocks:[],metadata:{visual_layout:layout}})} privateMediaBase={surface==="preview"?"/admin/sites/11/media":undefined} viewportWidth={1280}/>);
-    expect(getComputedStyle(screen.getByRole("heading",{name:"Home",level:1})).position).toBe("absolute");
+    expect(getComputedStyle(screen.getByRole("heading",{name:"Home",level:1})).position).not.toBe("absolute");
+    expect(screen.getAllByRole("heading",{level:1})).toHaveLength(1);
     expect(screen.getByRole("heading",{name:"Discover research"})).toBeTruthy();
     expect(screen.getByRole("link",{name:"Explore"}).getAttribute("href")).toBe("#research");
     expect(screen.queryByRole("heading",{name:"Campus life"})).toBeNull();
@@ -56,6 +57,7 @@ describe("Professional visual presentation",()=>{
  if(hero.type!=="layout_slider")throw Error("fixture");const node=hero.props.items[0].children[0];
  if(node.type!=="hero_image")throw Error("fixture");
  Object.assign(node.props,{pattern:"diamonds",panel_tone:"brand_gradient",curve_border:"gold",curve_border_width:8,heading_level:3,heading_size:"xl",heading_weight:"heavy",heading_case:"uppercase",text_align:"center",body_size:"lg"});
+ console.log("HERO_VALIDATION", JSON.stringify(validateVisualLayout(layout)));
  expect(validateVisualLayout(layout).ok).toBe(true);
  const view=render(<PublicPageView page={pageFromResponse(200,{title:"Home",site:11,blocks:[],metadata:{visual_layout:layout}})} viewportWidth={1280}/>);
  expect(view.getByRole("heading",{name:"Discover research",level:3})).toBeTruthy();

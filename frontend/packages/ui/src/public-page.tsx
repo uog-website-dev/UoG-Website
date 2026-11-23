@@ -12,6 +12,8 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { validateVisualLayout, MAX_MENU_DEPTH } from "@uog/types";
 import type { VisualLayout } from "@uog/types";
 import { VisualLayoutView } from "./visual-layout";
+import { resolvePageHeading } from "./page-heading";
+import { resolvePageWidth, withSafePageWidth } from "./page-width";
 import type { ReactNode } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -120,7 +122,7 @@ export function pageFromResponse(status: number, body: unknown): PublicPageDocum
   const path = typeof row.path === "string" && row.path.startsWith("/") ? row.path : "/";
   const seo = row.seo != null && typeof row.seo === "object" ? row.seo as { meta_title?: unknown; meta_description?: unknown } : {};
   const metadata = row.metadata && typeof row.metadata === "object" ? row.metadata as Record<string,unknown> : {};
-  const visual = Object.hasOwn(metadata,"visual_layout") ? validateVisualLayout(metadata.visual_layout) : null;
+  const visual = Object.hasOwn(metadata,"visual_layout") ? validateVisualLayout(withSafePageWidth(metadata.visual_layout)) : null;
   return {
     ...(typeof (body as {id?:unknown}).id==="string" ? {id:(body as {id:string}).id}:{}),
     ...(visual ? visual.ok ? {visual_layout:visual.value} : {layout_unavailable:true} : {}),
@@ -408,7 +410,7 @@ function PageSidebar({ page, preview }: { page: PublicPageDocument; preview: boo
   );
 }
 
-export function PublicPageView({ page, privateMediaBase, viewportWidth, hideTitle = false }: { page: PublicPageDocument | null; privateMediaBase?: string; viewportWidth?: number; hideTitle?: boolean }): ReactNode {
+export function PublicPageView({ page, privateMediaBase, viewportWidth }: { page: PublicPageDocument | null; privateMediaBase?: string; viewportWidth?: number }): ReactNode {
   const site = usePublicSiteBranding();
   if (!page) {
     return (
@@ -419,8 +421,13 @@ export function PublicPageView({ page, privateMediaBase, viewportWidth, hideTitl
   }
   const shell = page.layout === "LEFT_SIDEBAR" || page.layout === "RIGHT_SIDEBAR"
     ? page.layout : "FULL_WIDTH";
-  const titleHidden = hideTitle || page.visual_layout?.settings?.show_title === false;
-  const contentWidth = { full: "100%", wide: 1280, reading: 880 }[page.visual_layout?.settings?.content_width ?? "full"];
+  // The Page title owns the H1 unless exactly one layout hero supplies it.
+  // Invalid or legacy settings fall back to a visible title rather than
+  // publishing a Page with no main heading.
+  const heading = page.visual_layout ? resolvePageHeading(page.visual_layout) : null;
+  const titleHidden = heading ? !heading.titleVisible : false;
+  // One resolver drives the builder canvas and the public Page alike.
+  const pageWidth = page.visual_layout ? resolvePageWidth(page.visual_layout.settings) : null;
   // Device preview uses its explicit canvas width rather than the surrounding browser.
   const stacked = viewportWidth !== undefined && viewportWidth < 900;
   const columns = shell === "FULL_WIDTH" || stacked ? "minmax(0,1fr)" : {
@@ -435,19 +442,27 @@ export function PublicPageView({ page, privateMediaBase, viewportWidth, hideTitl
   };
   return (
     <PrivateMediaBase.Provider value={privateMediaBase ?? null}>
-      <Box data-page-layout={shell} data-page-bleed={shell==="FULL_WIDTH"&&page.visual_layout?.settings?.content_width==="full"?"true":undefined} data-site-code={site.code ?? ""} sx={{
-        display: "grid", width: "100%", minWidth: 0, gap: { xs: 3, md: 4 },
-        gridTemplateColumns: columns, gridTemplateAreas: areas,
-      }}>
+      <Box
+        data-page-layout={shell}
+        data-page-width={pageWidth?.width}
+        data-page-bleed={pageWidth?.bleed ? "true" : undefined}
+        data-page-gutter={pageWidth ? `${pageWidth.gutter}px` : undefined}
+        data-site-code={site.code ?? ""}
+        sx={{
+          display: "grid", width: "100%", minWidth: 0, gap: { xs: 3, md: 4 },
+          gridTemplateColumns: columns, gridTemplateAreas: areas,
+          ...(pageWidth ? { px: `${pageWidth.gutter}px` } : {}),
+        }}
+      >
         <Box
           component="article"
           aria-labelledby="public-page-title"
-          sx={{ gridArea: "content", display: "flex", flexDirection: "column", gap: 2, minWidth: 0, width: "100%", maxWidth: contentWidth, mx: "auto", overflowWrap: "anywhere" }}
+          sx={{ gridArea: "content", display: "flex", flexDirection: "column", gap: 2, minWidth: 0, width: "100%", maxWidth: pageWidth?.maxWidth, mx: "auto", overflowWrap: "anywhere" }}
         >
-          <Typography id="public-page-title" variant="h3" component="h1" sx={titleHidden ? {position:"absolute",left:0,top:0,width:1,height:1,p:0,m:-1,overflow:"hidden",clipPath:"inset(50%)",whiteSpace:"nowrap"} : { overflowWrap: "anywhere" }}>
+          <Typography id="public-page-title" variant="h3" component={titleHidden ? "span" : "h1"} sx={titleHidden ? {position:"absolute",left:0,top:0,width:1,height:1,p:0,m:-1,overflow:"hidden",clipPath:"inset(50%)",whiteSpace:"nowrap"} : { overflowWrap: "anywhere" }}>
           {page.title}
         </Typography>
-      {page.layout_unavailable ? <Typography role="status">This page content is currently unavailable.</Typography> : page.visual_layout ? <VisualLayoutView layout={page.visual_layout} siteId={page.site} pageTitle={page.title} pageId={page.id} preview={Boolean(privateMediaBase)} mediaBase={privateMediaBase} viewportWidth={viewportWidth} /> : <BlockList blocks={page.blocks} siteId={page.site} />}
+      {page.layout_unavailable ? <Typography role="status">This page content is currently unavailable.</Typography> : page.visual_layout ? <VisualLayoutView layout={page.visual_layout} siteId={page.site} pageTitle={page.title} pageId={page.id} preview={Boolean(privateMediaBase)} mediaBase={privateMediaBase} viewportWidth={viewportWidth} demoteH1={heading?.demoteLayoutH1 ?? false} /> : <BlockList blocks={page.blocks} siteId={page.site} />}
         </Box>
         {shell !== "FULL_WIDTH" ? <PageSidebar key={`${page.site}:${page.path}`} page={page} preview={Boolean(privateMediaBase)} /> : null}
       </Box>
