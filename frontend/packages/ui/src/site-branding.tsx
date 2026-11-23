@@ -26,7 +26,7 @@ export function publicLogoSource(site: PublicSiteContext): string | null {
 }
 
 /** Responsive, Site-bound logo with a branded text fallback and no broken-image state. */
-export function SiteBrandingMark({ site, size = 56 }: { site: PublicSiteContext; size?: number }) {
+export function SiteBrandingMark({ site, size = 56, width = size }: { site: PublicSiteContext; size?: number; width?: number }) {
   const source = publicLogoSource(site);
   const [failed, setFailed] = useState(false);
   useEffect(() => setFailed(false), [site]);
@@ -38,7 +38,7 @@ export function SiteBrandingMark({ site, size = 56 }: { site: PublicSiteContext;
         role="img"
         aria-label={`${site.displayName || "University of Gondar"} logo fallback`}
         sx={{
-          width: dimensions,
+          width,
           height: dimensions,
           flex: "0 0 auto",
           display: "grid",
@@ -65,7 +65,7 @@ export function SiteBrandingMark({ site, size = 56 }: { site: PublicSiteContext;
       referrerPolicy="no-referrer"
       onError={() => setFailed(true)}
       sx={{
-        width: dimensions,
+        width,
         height: dimensions,
         flex: "0 0 auto",
         objectFit: "contain",
@@ -95,7 +95,7 @@ export function SiteBrandingLockup({
       data-site-branding={site.code ?? "university"}
       sx={{ display: "inline-flex", alignItems: "center", gap: compact ? 1 : 1.5, minWidth: 0 }}
     >
-      <SiteBrandingMark site={site} size={compact ? 44 : 75} />
+      <SiteBrandingMark site={site} size={compact ? 44 : 75} width={compact ? 44 : 100} />
       <Typography
         component="span"
         variant={compact ? "subtitle2" : "subtitle1"}

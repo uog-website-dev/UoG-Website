@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+HEX_COLOUR={"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"}
 ID = {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"}
 TEXT = {"type": "string", "minLength": 1, "maxLength": 400}
 LONG = {"type": "string", "minLength": 1, "maxLength": 20000}
@@ -69,8 +70,23 @@ PROFILES["hero"]["properties"].update({
  "mask":{"enum":["none","curve","rounded"]},
  "image_position":{"enum":["center","top","bottom","left","right"]},
  "actions":items({"label":TEXT,"href":HREF}),
+ "items":{"type":"array","maxItems":2,"items":obj({"id":ID,"asset_id":ASSET,"alt":{"type":"string","maxLength":255},"eyebrow":TEXT,"title":TEXT,"text":{"type":"string","maxLength":1200},"label":TEXT,"href":HREF},["id","asset_id","alt","title","text","label","href"])},
+ "cards_label":TEXT,
+ "pattern":{"enum":["none","heritage","grid","dots","diagonal","waves","diamonds"]},
+ "panel_tone":{"enum":["inherit","light","brand","dark","mist","gold","brand_gradient","dark_gradient"]},
+ "media_ratio":{"enum":[40,50,60]},
+ "curve_border":{"enum":["none","white","gold","brand"]},
+ "curve_border_width":{"enum":[4,8,12]},
+ "heading_level":{"enum":[1,2,3,4]},
+ "heading_size":{"enum":["sm","md","lg","xl","display"]},
+ "heading_color":{"enum":["auto","brand","white","gold","dark"]},
+ "heading_weight":{"enum":["regular","medium","bold","heavy"]},
+ "heading_case":{"enum":["normal","uppercase"]},
+ "text_align":{"enum":["left","center","right"]},
+ "body_size":{"enum":["sm","md","lg"]},
 })
 PROFILES["link"]["properties"].update({"variant":{"enum":["text","solid","outline"]}})
+PROFILES["source"]["properties"].update({"display":{"enum":["grid","slider"]},"columns":{"enum":[1,2,3,4]},"image_hover":{"enum":["none","zoom"]}})
 PROFILES["source"]["properties"]["presentation"] = {"enum": ["grid", "list", "featured"]}
 CATALOG = {
  "hero_image":"hero", "image_slider":"media_items", "image_grid":"media_items",
@@ -94,8 +110,8 @@ def presentation_schema():
                  "gap": { "enum": ["none","sm","md","lg"] },
                  "padding":{"enum":["none","sm","md","lg","xl"]},
                  "text_size":{"enum":["sm","md","lg","xl","display"]},
-                 "text_color":{"enum":["default","brand","inverse","muted"]},
-                 "background":{"enum":["none","paper","mist","navy","blue","gold","blue_gradient","navy_gradient"]},
+                 "text_color":{"oneOf":[{"enum":["default","brand","inverse","muted"]},HEX_COLOUR]},
+                 "background":{"oneOf":[{"enum":["none","paper","mist","navy","blue","gold","blue_gradient","navy_gradient"]},HEX_COLOUR]},
                  "radius":{"enum":["none","sm","md","lg","pill"]},
                  "border":{"enum":["none","subtle","brand"]},
                  "shadow":{"enum":["none","sm","md","lg"]},
@@ -106,6 +122,12 @@ def presentation_schema():
 
 # Content slides contain a bounded leaf-only sublayout, never another Section.
 PROFILES["layout_items"] = obj({"items":items({"children":{"type":"array","maxItems":20,"items":{"oneOf":[obj({"id":ID,"type":{"const":name},"props":PROFILES[CATALOG[name]],"style":presentation_schema()},["id","type","props"]) for name in ["hero_image","headline","editor","image","button"]]}}})})
+PROFILES["layout_items"]["properties"].update({
+    "navigation":{"enum":["standard","overlay","thumbnails"]},
+    "height":{"enum":["compact","medium","tall","screen"]},
+    "autoplay_seconds":{"enum":[0,5,8,10]},
+})
+PROFILES["cards"]["properties"].update({"columns":{"enum":[1,2,3,4]},"presentation":{"enum":["plain","statistics"]}})
 RATIOS = [[100], [50, 50], [60, 40], [40, 60], [70, 30], [30, 70], [75, 25], [25, 75], [1, 1, 1]]
 
 
@@ -150,6 +172,10 @@ def fixture():
         {"id": "column-3", "type": "column", "children": [{"id": "text-1", "type": "editor", "props": {"html": "<p>Study and research</p>"}}]},
     ]}]}
 
+
+# Preserve existing token documents while allowing arbitrary safe RGB colours.
+for field in ("panel_tone","heading_color","curve_border"):
+    PROFILES["hero"]["properties"][field]={"oneOf":[PROFILES["hero"]["properties"][field],HEX_COLOUR]}
 
 def ts_type(schema):
     if "oneOf" in schema: return " | ".join(ts_type(item) for item in schema["oneOf"])
@@ -234,7 +260,7 @@ def main():
                 path.write_text(content, encoding="utf-8")
 
     if args.check:
-        frozen = ROOT / "backend/apps/cms/migrations/0028_layout_schema.json"
+        frozen = ROOT / "backend/apps/cms/migrations/0035_layout_schema.json"
         if json.loads(frozen.read_text(encoding="utf-8")) != build_schema(): raise SystemExit("Frozen migration schema drift")
     types_path=ROOT / "frontend/packages/types/src/layout/generated.ts"
     content=types_source()

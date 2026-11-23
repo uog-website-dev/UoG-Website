@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import {describe,it,expect} from "vitest";
 import {validateVisualLayout} from "@uog/types";
 import type {VisualLayout} from "@uog/types";
+import {HeroView} from "./visual-presentation";
 import {PublicPageView,pageFromResponse} from "./public-page";
 
 const image="00000000-0000-4000-8000-000000000001";
@@ -48,4 +49,48 @@ describe("Professional visual presentation",()=>{
     (layout.rows[0]!.style as Record<string,unknown>).background="url(javascript:alert(1))";
     expect(validateVisualLayout(layout).ok).toBe(false);
   });
+});
+
+ it("renders approved hero heading semantics and rejects active style values",()=>{
+ const layout=scene();const hero=layout.rows[0].columns[0].children[0];
+ if(hero.type!=="layout_slider")throw Error("fixture");const node=hero.props.items[0].children[0];
+ if(node.type!=="hero_image")throw Error("fixture");
+ Object.assign(node.props,{pattern:"diamonds",panel_tone:"brand_gradient",curve_border:"gold",curve_border_width:8,heading_level:3,heading_size:"xl",heading_weight:"heavy",heading_case:"uppercase",text_align:"center",body_size:"lg"});
+ expect(validateVisualLayout(layout).ok).toBe(true);
+ const view=render(<PublicPageView page={pageFromResponse(200,{title:"Home",site:11,blocks:[],metadata:{visual_layout:layout}})} viewportWidth={1280}/>);
+ expect(view.getByRole("heading",{name:"Discover research",level:3})).toBeTruthy();
+ Object.assign(node.props,{heading_color:"url(javascript:alert(1))"});expect(validateVisualLayout(layout).ok).toBe(false);view.unmount();
+ });
+
+it("keeps untouched legacy rendering and applies explicitly chosen formatting",()=>{
+ const props={asset_id:image,alt:"Campus",title:"Legacy hero"};
+ const view=render(<HeroView props={props} siteId={null} width={1280}/>);
+ expect(view.container.querySelector("[data-hero-frame]")).toBeNull();
+ view.rerender(<HeroView props={{...props,heading_level:3,heading_case:"uppercase",panel_tone:"dark"}} siteId={null} width={1280}/>);
+ expect(view.getByRole("heading",{name:"Legacy hero",level:3})).toBeTruthy();
+ expect(view.container.querySelector("[data-hero-frame]")).toBeTruthy();view.unmount();
+});
+for(const layout of ["split","split_reverse"] as const)it(`paints tone behind the curved image in ${layout}`,()=>{
+ const view=render(<HeroView props={{asset_id:image,alt:"Campus",title:"Curve",layout,mask:"curve",panel_tone:"dark_gradient",curve_border:"gold"}} siteId={null} width={1280}/>);
+ const frame=view.container.querySelector("[data-hero-frame]")!;
+ expect(getComputedStyle(frame).backgroundImage).toContain("linear-gradient");
+ expect(getComputedStyle(view.getByRole("region",{name:"Slide text and actions"})).backgroundImage).not.toContain("linear-gradient");view.unmount();
+});
+
+it("renders two linked information cards over a hero without mutating their IDs",()=>{
+ const items=[{id:"events",asset_id:image,alt:"Students",eyebrow:"Every campus",title:"Events and activities",text:"Join our community.",label:"View gallery",href:"/gallery"},{id:"sports",asset_id:image,alt:"Sport",title:"Sports festival",text:"Discover campus sport.",label:"Explore sport",href:"/sport"}];
+ const view=render(<HeroView props={{asset_id:image,alt:"Campus",title:"Campus life",items,cards_label:"Explore campus",height:"tall"}} siteId={null} width={1280}/>);
+ expect(view.getAllByRole("article")).toHaveLength(2);
+ expect(view.getByRole("link",{name:"View gallery"}).getAttribute("href")).toBe("/gallery");
+ expect(view.container.querySelector('[data-hero-info-card="sports"]')).toBeTruthy();
+ expect(view.getByText("Explore campus")).toBeTruthy();view.unmount();
+});
+
+it("closes and reopens one hero card by keyboard while preserving focus and the other card",async()=>{
+ const items=[{id:"events",asset_id:image,alt:"Students",title:"Events",text:"Community",label:"Gallery",href:"/gallery"},{id:"sport",asset_id:image,alt:"Sport",title:"Sport",text:"Campus",label:"Sport",href:"/sport"}];
+ const view=render(<HeroView props={{asset_id:image,alt:"Campus",title:"Life",items}} siteId={null} width={1280}/>);
+ const user=userEvent.setup();const close=view.getByRole("button",{name:"Hide Events"});close.focus();await user.keyboard("{Enter}");
+ expect(view.queryByRole("link",{name:"Gallery"})).toBeNull();expect(view.getByRole("link",{name:"Sport"})).toBeTruthy();
+ const reopen=view.getByRole("button",{name:"Show Events"});expect(document.activeElement).toBe(reopen);expect(reopen.getAttribute("aria-expanded")).toBe("false");
+ await user.keyboard(" ");expect(view.getByRole("link",{name:"Gallery"})).toBeTruthy();expect(view.getByRole("button",{name:"Hide Events"}).getAttribute("aria-expanded")).toBe("true");view.unmount();
 });

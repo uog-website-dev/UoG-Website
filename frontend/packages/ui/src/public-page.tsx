@@ -9,7 +9,7 @@
  * and javascript: targets never become markup.
  */
 import { createContext, useContext, useEffect, useState } from "react";
-import { validateVisualLayout } from "@uog/types";
+import { validateVisualLayout, MAX_MENU_DEPTH } from "@uog/types";
 import type { VisualLayout } from "@uog/types";
 import { VisualLayoutView } from "./visual-layout";
 import type { ReactNode } from "react";
@@ -58,7 +58,7 @@ export function sidebarFromResponse(value: unknown, site: number | null, id: str
       || !Number.isInteger(row.version) || row.version < 1 || !Array.isArray(row.components) || row.components.length > 12) return undefined;
   let count = 0;
   function validLinks(links: SidebarLink[], depth: number): boolean {
-    return depth <= 4 && Array.isArray(links) && links.every(link => {
+    return depth <= MAX_MENU_DEPTH && Array.isArray(links) && links.every(link => {
       if (++count > 2000 || !link || typeof link.label !== "string" || link.label.length > 255
           || typeof link.href !== "string" || link.href.length > 2048 || !safeMenuHref(link.href)) return false;
       return link.children?.length ? validLinks(link.children, depth + 1) : Array.isArray(link.children);

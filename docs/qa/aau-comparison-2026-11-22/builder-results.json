@@ -1,0 +1,12 @@
+{
+  "site": 102,
+  "page": "180d0b82-420d-4d86-838d-d6fb33423029",
+  "draft": "2180569c-4d19-4c15-b39e-291ac00a65e3",
+  "builder": "http://localhost/admin/sites/102/admin/pages/2180569c-4d19-4c15-b39e-291ac00a65e3/builder",
+  "preview": "http://localhost/admin/sites/102/admin/pages/2180569c-4d19-4c15-b39e-291ac00a65e3/preview?revision=2",
+  "newInspectorControls": true,
+  "saveReload": true,
+  "privateNewTabPreview": true,
+  "publicUnchanged": true,
+  "originalTitleRestored": true
+}

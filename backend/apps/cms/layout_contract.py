@@ -112,6 +112,8 @@ def validate_layout_media(layout, *, site_id):
         references = []
         if node["type"] in {"image", "hero_image"}:
             references = [(props["asset_id"], node_path + ".props.asset_id")]
+            if node["type"] == "hero_image":
+                references += [(item["asset_id"], f"{node_path}.props.items[{i}].asset_id") for i,item in enumerate(props.get("items", []))]
         elif node["type"] in {"image_slider", "image_grid"}:
             references = [(item["asset_id"], f"{node_path}.props.items[{i}].asset_id") for i, item in enumerate(props["items"])]
         for asset_id, field_path in references:

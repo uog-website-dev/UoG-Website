@@ -21,10 +21,10 @@ import {WidgetRuntimeProvider, SiteTitleWidget, SiteLogoWidget, LoopGridWidget, 
 const tokenGap = {none:0,sm:1,md:2,lg:4} as const;
 const focusRing = {"&:focus-visible":{outline:"3px solid",outlineColor:"primary.main",outlineOffset:2}} as const;
 
-function presentationStyle(resolved:{align:string;tone:string;gap:"none"|"sm"|"md"|"lg"}) {
+function presentationStyle(resolved:{align:string;tone:string;gap:"none"|"sm"|"md"|"lg"},inheritAlign=false) {
   const branded = resolved.tone === "brand";
   return {
-    textAlign:resolved.align === "center" ? "center" as const : resolved.align === "end" ? "end" as const : "start" as const,
+    textAlign:inheritAlign?"inherit" as const:resolved.align === "center" ? "center" as const : resolved.align === "end" ? "end" as const : "start" as const,
     gap:tokenGap[resolved.gap],
     bgcolor:resolved.tone === "muted" ? "background.paper" : branded ? "primary.main" : "transparent",
     color:branded ? "primary.contrastText" : "inherit",
@@ -198,13 +198,13 @@ function VisualWidget({widget,siteId,pageTitle,viewportWidth}:{widget:WidgetNode
     case "image_slider":body=<ContentCarousel label="Image slider" items={widget.props.items.map(item=>({id:item.id,content:<Box component="figure" sx={{m:0,"& img":{width:"100%",maxHeight:560,objectFit:"cover",borderRadius:2}}}><BlockView block={{type:"image",ref:`sites/${siteId}/assets/${item.asset_id}`,alt:item.alt}} siteId={siteId}/>{item.caption?<Typography component="figcaption" sx={{mt:1,color:"text.secondary"}}>{item.caption}</Typography>:null}</Box>}))}/>;break;
     case "image_grid":body=<BlockView block={{type:"gallery",images:widget.props.items}} siteId={siteId}/>;break;
     case "button":body=<PresentationLink {...widget.props}/>;break;
-    case "button_grid":case "social_media_buttons":body=<Box sx={{display:"flex",gap:2,flexWrap:"wrap"}}>{widget.props.items.map(item=><BlockView key={item.id} block={{type:"button",label:item.label,href:item.href}} siteId={siteId}/>)}</Box>;break;
-    case "layout_slider":case "anything_carousel":body=<ContentCarousel items={widget.props.items.map(item=>({id:item.id,content:<Box sx={{display:"grid",gap:2}}>{item.children.map(child=><VisualWidget key={child.id} widget={child} siteId={siteId} pageTitle={pageTitle} viewportWidth={viewportWidth}/>)}</Box>}))}/>;break;
+    case "button_grid":case "social_media_buttons":body=<Box sx={{display:"flex",gap:2,flexWrap:"wrap"}}>{widget.props.items.map(item=><PresentationLink key={item.id} label={item.label} href={item.href} variant={widget.type==="button_grid"?"solid":"text"}/>)}</Box>;break;
+    case "layout_slider":case "anything_carousel":body=<ContentCarousel frameHeight={widget.type==="layout_slider"?widget.props.height??widget.props.items.flatMap(slide=>slide.children).find(node=>node.type==="hero_image")?.props.height??"medium":undefined} frameStacked={widget.type==="layout_slider"} navigation={widget.props.navigation} autoplaySeconds={widget.props.autoplay_seconds} items={widget.props.items.map(item=>({id:item.id,thumbnail:(()=>{const image=item.children.find(child=>child.type==="image"||child.type==="hero_image");return image&&(image.type==="image"||image.type==="hero_image")?<BlockView block={{type:"image",ref:`sites/${siteId}/assets/${image.props.asset_id}`,alt:""}} siteId={siteId}/>:undefined;})(),content:<Box sx={{display:"grid",gap:2,alignContent:"center"}}>{item.children.map(child=><VisualWidget key={child.id} widget={child.type==="hero_image"?{...child,props:{...child.props,height:widget.props.height??widget.props.items.flatMap(slide=>slide.children).find(node=>node.type==="hero_image")?.props.height??"medium"}}:child} siteId={siteId} pageTitle={pageTitle} viewportWidth={viewportWidth}/>)}</Box>}))}/>;break;
     case "simple_masonry":body=<Box data-widget="simple_masonry" sx={{columns:viewportWidth>=900?3:viewportWidth>=600?2:1,columnGap:2}}>{widget.props.items.map(item=><Box key={item.id} sx={{breakInside:"avoid",mb:2,display:"grid",gap:2}}>{item.children.map(child=><VisualWidget key={child.id} widget={child} siteId={siteId} pageTitle={pageTitle} viewportWidth={viewportWidth}/>)}</Box>)}</Box>;break;
     case "tabs":body=<TabsWidget items={widget.props.items}/>;break;
     case "accordion":body=<AccordionWidget items={widget.props.items}/>;break;
     case "call_to_action":case "author_box":body=<Box><Typography variant="h3">{widget.props.title}</Typography><Typography>{widget.props.text}</Typography>{widget.props.href && widget.props.label?<BlockView block={{type:"button",href:widget.props.href,label:widget.props.label}}/>:null}</Box>;break;
-    case "features":body=<Box sx={{display:"grid",gap:2}}>{widget.props.items.map(item=><Box key={item.id} data-item-id={item.id}><Typography variant="h3">{item.title}</Typography><Typography>{item.text}</Typography></Box>)}</Box>;break;
+    case "features":body=<Box sx={{display:"grid",gridTemplateColumns:{xs:"minmax(0,1fr)",sm:`repeat(${Math.min(widget.props.columns??1,2)},minmax(0,1fr))`,md:`repeat(${widget.props.columns??1},minmax(0,1fr))`},gap:widget.props.presentation==="statistics"?0:2}}>{widget.props.items.map((item,index)=><Box key={item.id} data-item-id={item.id} sx={widget.props.presentation==="statistics"?{p:3,textAlign:"center",display:"grid",alignContent:"center",gap:2,minHeight:220,border:1,borderColor:"divider",bgcolor:index===0?"primary.main":"background.paper",color:index===0?"primary.contrastText":"text.primary"}:undefined}><Typography variant="h3" sx={widget.props.presentation==="statistics"?{fontSize:"clamp(1.75rem,3cqi,3rem)",fontWeight:750}:undefined}>{item.title}</Typography><Typography sx={{whiteSpace:"pre-line"}}>{item.text}</Typography></Box>)}</Box>;break;
     case "testimonials":body=<Box component="blockquote"><Typography>{widget.props.text}</Typography><Typography component="cite">{widget.props.attribution}</Typography></Box>;break;
     case "page_title":body=<Typography variant="h2">{pageTitle}</Typography>;break;
     case "alert":body=<Typography role="note">{widget.props.text}</Typography>;break;
@@ -221,6 +221,6 @@ function VisualWidget({widget,siteId,pageTitle,viewportWidth}:{widget:WidgetNode
     data-widget-type={widget.type}
     data-resolved-breakpoint={resolved.breakpoint}
     data-resolved-gap={resolved.gap}
-    sx={{minWidth:0,...presentationStyle(resolved),...decorativeStyle(widget.style)}}
+    sx={{minWidth:0,...presentationStyle(resolved,!widget.style?.align),...decorativeStyle(widget.style)}}
   >{body}</Box>;
 }

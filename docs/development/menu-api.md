@@ -134,7 +134,7 @@ Move an item under another item, at the zero-based destination sibling index:
 
 Source and destination sibling positions change in one final-state UPDATE.
 Sibling uniqueness is deferred only within the operation and rechecked before
-returning. Cycles, foreign parents, and subtree depth above four are rejected;
+returning. Cycles, foreign parents, and subtree depth above six total levels (five submenu levels) are rejected;
 failure rolls back all positions, versions and audit events. A root is level one.
 
 Internal `page` UUID / `post` integer targets must exist in the Menu's Site.

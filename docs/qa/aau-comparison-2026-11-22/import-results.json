@@ -1,0 +1,311 @@
+{
+  "draft": "2180569c-4d19-4c15-b39e-291ac00a65e3",
+  "site": 102,
+  "page": "180d0b82-420d-4d86-838d-d6fb33423029",
+  "host": "aau-review.uog.local",
+  "assets": [
+    {
+      "key": "gate-min",
+      "asset_id": "8e8f4e4a-7ec6-46c8-8065-28959518f0c2",
+      "states": [
+        "READY"
+      ],
+      "checksum": "0285c74938008dc7d2eaa2d99c6347d8850192d59c7d7f53ded8939dbb62f65a",
+      "source": "https://aau.edu.et/images/gate-min.jpg"
+    },
+    {
+      "key": "research",
+      "asset_id": "74ed39a4-4023-4efb-ac64-fbf8d4d6b2a4",
+      "states": [
+        "READY"
+      ],
+      "checksum": "3be07dd6a76aab98ab65b22f1c365a19cd3b48b417408174357077bf6a67eb25",
+      "source": "https://aau.edu.et/images/research.jpg"
+    },
+    {
+      "key": "gerdLanding",
+      "asset_id": "50313a2f-e2d3-448a-a18e-dd98cc630933",
+      "states": [
+        "READY"
+      ],
+      "checksum": "c0936e4698258e720a4bc2f9a730b2d27cb92b4d79c9ae5e0d03f8e5825d5eb9",
+      "source": "https://aau.edu.et/images/gerdLanding.jpg"
+    },
+    {
+      "key": "tashLight1",
+      "asset_id": "4b603d98-34bc-4079-bd51-dee66d486ff1",
+      "states": [
+        "READY"
+      ],
+      "checksum": "fa58846050962759f797f32f2cb8f96ac488756ccb08c8ce16ce31a853f42a83",
+      "source": "https://aau.edu.et/images/tashLight1.webp"
+    },
+    {
+      "key": "forumbuilding",
+      "asset_id": "68dd64ac-d22b-40ab-a84b-0536ad7f66c0",
+      "states": [
+        "READY"
+      ],
+      "checksum": "7c05b02e34b8cd6da85f637ac360514775bd125bea1974f1af3348397bbfee2e",
+      "source": "https://aau.edu.et/_next/image?url=%2Fimages%2Fforumbuilding.jpg&w=1920&q=75"
+    },
+    {
+      "key": "freshers",
+      "asset_id": "935dc9b3-f369-4e7a-a35b-a3acae6d93e1",
+      "states": [
+        "READY"
+      ],
+      "checksum": "bba78ff2614339a01efe1284ee984879a6d5e5c2370e0e3660d2a492257db94d",
+      "source": "https://aau.edu.et/images/freshers.jpg"
+    },
+    {
+      "key": "recreationAndsports",
+      "asset_id": "795e33e3-d75a-4f1c-932d-481f87c742d5",
+      "states": [
+        "READY"
+      ],
+      "checksum": "0a5b7cd827d109258c8b2830ea0c2b49735c46d705dde2a6dfa912a0b96b75b0",
+      "source": "https://aau.edu.et/images/recreationAndsports.jpg"
+    },
+    {
+      "key": "kennedy1-min",
+      "asset_id": "65875eb1-6a76-4ce4-b741-a5a0cdc980bc",
+      "states": [
+        "READY"
+      ],
+      "checksum": "bcbf1dc9d7a71b7149ef7cd5d39784f0d071be99eae74c6c548d24150ea173db",
+      "source": "https://aau.edu.et/_next/image?url=%2Fimages%2Fkennedy1-min.jpg&w=1920&q=75"
+    },
+    {
+      "key": "alamoudi",
+      "asset_id": "8c44ab03-60e3-4812-92e0-cca4cbb6b296",
+      "states": [
+        "READY"
+      ],
+      "checksum": "9657f228672f41e4451174d46c97bba6d2c5f4d1d848f9a42b889a13f0f9ff1d",
+      "source": "https://aau.edu.et/_next/image?url=%2Fimages%2Falamoudi.jpg&w=1920&q=75"
+    },
+    {
+      "key": "logo",
+      "asset_id": "9f54f3c4-6fc7-49a2-ac7f-b8f20e93f587",
+      "states": [
+        "READY"
+      ],
+      "checksum": "0295c4df783f0ada3271e1d0d8e2f5d5b597206303a6cb3338827d8760726e5c",
+      "source": "https://aau.edu.et/images/aauLogo.png"
+    },
+    {
+      "key": "news-0",
+      "asset_id": "b7af58f7-e982-4c39-9815-300af59db983",
+      "states": [
+        "READY"
+      ],
+      "checksum": "e103d66e63e5acc125771f4628a643d01083c341c56dbd3a0cdb8ae75099328b",
+      "source": "https://volume.aau.edu.et/4,3d9ee547fdddec.jpg?width=1200&height=auto"
+    },
+    {
+      "key": "news-1",
+      "asset_id": "21d0b91b-ca79-481f-84eb-3cdf96b96691",
+      "states": [
+        "READY"
+      ],
+      "checksum": "be403cb71feee9738b5eeda664b37a81196b02c927113170c95c43f9d1e391e2",
+      "source": "https://volume.aau.edu.et/4,3d9ed9af9a16e7.jpg?width=1200&height=auto"
+    },
+    {
+      "key": "news-2",
+      "asset_id": "fd93baec-d1e4-4a3a-b36d-7985c05f99fd",
+      "states": [
+        "READY"
+      ],
+      "checksum": "a0fbe625fe86cdb6bd65892bc26b8767e4c8d41e83407eeb669d23b3635054e3",
+      "source": "https://volume.aau.edu.et/4,3d9ecfa24150c1.jpg?width=1200&height=auto"
+    },
+    {
+      "key": "news-3",
+      "asset_id": "69f5802b-788c-4141-82d1-ae29584d6a13",
+      "states": [
+        "READY"
+      ],
+      "checksum": "995d74f45e5b08cddb7eb1edd4b73321f0d3b53a28b51e97d882a5859f82c2d0",
+      "source": "https://volume.aau.edu.et/7,3d9eb91099d67e.jpg?width=1200&height=auto"
+    },
+    {
+      "key": "news-4",
+      "asset_id": "406f0e7c-638d-42b2-b33b-a0e1bf700cce",
+      "states": [
+        "READY"
+      ],
+      "checksum": "3a6566f8210e40d716a5aac1dfb94d67799591c66b99f7abd6974f9a5ec64b30",
+      "source": "https://volume.aau.edu.et/5,3d9eb1d8fa87e8.jpg?width=1200&height=auto"
+    },
+    {
+      "key": "campus-0",
+      "asset_id": "d75d2e94-bbb2-45e5-b55e-a6ef2e289005",
+      "states": [
+        "READY"
+      ],
+      "checksum": "a2da2ff8c848c312bf8107951c9a876be0353f1cb34fb1ef811a1e259232fb6a",
+      "source": "https://volume.aau.edu.et/4,0a6be30b96c5.jpg?width=1200&height=auto"
+    },
+    {
+      "key": "campus-1",
+      "asset_id": "c85c6397-5079-4102-9b49-7c58c8ca5cd5",
+      "states": [
+        "READY"
+      ],
+      "checksum": "147dd867e8b409a80f175729366fe7ba1c4b6f698e46e216f15d66beb656a1a1",
+      "source": "https://volume.aau.edu.et/3,0a6a104c3cf0.jpg?width=1200&height=auto"
+    },
+    {
+      "key": "campus-2",
+      "asset_id": "991efd87-a170-4109-be94-8bad232012f3",
+      "states": [
+        "READY"
+      ],
+      "checksum": "8cb3eed9d83df6c6090cf0161b786fe86e95864d348d16eb48a63d019f753eb0",
+      "source": "https://volume.aau.edu.et/5,0a69352477eb.jpg?width=1200&height=auto"
+    },
+    {
+      "key": "campus-3",
+      "asset_id": "a041f830-813b-4101-a35c-257c9f1b790b",
+      "states": [
+        "READY"
+      ],
+      "checksum": "24c6254f2c8c45ddc215878e23f3acecb0662276a100169d15e27371d5ea3851",
+      "source": "https://volume.aau.edu.et/2,0a68cb1e3e82.jpg?width=1200&height=auto"
+    },
+    {
+      "key": "campus-4",
+      "asset_id": "b6ab57bb-94bc-4a85-871f-1c326b6f9666",
+      "states": [
+        "READY"
+      ],
+      "checksum": "46da5d244eb243d827dfca905dc1666040c3680bf7f801437d9e0932022ebb6f",
+      "source": "https://volume.aau.edu.et/3,0a67526e2274.jpg?width=1200&height=auto"
+    },
+    {
+      "key": "campus-5",
+      "asset_id": "eaa0bd8d-1fe2-4362-8804-553053424a93",
+      "states": [
+        "READY"
+      ],
+      "checksum": "e557c015ca33e71fba4e1cdfa5a10aeb87ae998a5312cfd8041085d48eab140c",
+      "source": "https://volume.aau.edu.et/5,0a66aa7e919a.jpg?width=1200&height=auto"
+    },
+    {
+      "key": "campus-6",
+      "asset_id": "54aea9d0-51e8-42a0-bde1-857d8e27e17e",
+      "states": [
+        "READY"
+      ],
+      "checksum": "1705d7e1066637b322ae7579a2976657da2efbe7bd5e2377e297449e53742934",
+      "source": "https://volume.aau.edu.et/1,0a6552623734.jpg?width=1200&height=auto"
+    },
+    {
+      "key": "campus-7",
+      "asset_id": "d7d9af59-83b3-4907-9470-3a71c16a6e78",
+      "states": [
+        "READY"
+      ],
+      "checksum": "8373761d219101fe1af8872a9b80d232167229d1e74d9bdc71b99be9cf17971b",
+      "source": "https://volume.aau.edu.et/7,0a64ef6f7eb3.jpg?width=1200&height=auto"
+    },
+    {
+      "key": "campus-8",
+      "asset_id": "6aed1625-d92e-4061-a761-6f8b285e48da",
+      "states": [
+        "READY"
+      ],
+      "checksum": "5736c89e29aabc46d80f69a0d37e353bb69b911153df9f135b552f39df6aaec5",
+      "source": "https://volume.aau.edu.et/3,0a63cd3aac19.jpg?width=1200&height=auto"
+    },
+    {
+      "key": "campus-9",
+      "asset_id": "2be47970-546f-4738-8732-8facc1b3c132",
+      "states": [
+        "READY"
+      ],
+      "checksum": "e7fddd3119ae66764f5c451586171a607510063579944fa34d12b29b2bc9d877",
+      "source": "https://volume.aau.edu.et/4,0a3c956f5c51.jpg?width=1200&height=auto"
+    },
+    {
+      "key": "campus-10",
+      "asset_id": "550ebcbc-47fd-48b7-b76b-1a0faa180212",
+      "states": [
+        "READY"
+      ],
+      "checksum": "9453d5de76ceabdeac0657586a30658597592e1ae826faa1fa2c1c036f7b79c6",
+      "source": "https://volume.aau.edu.et/1,0a3871120585.jpg?width=1200&height=auto"
+    },
+    {
+      "key": "campus-11",
+      "asset_id": "e1e0ac23-5265-4e7f-a489-4ab8887acd29",
+      "states": [
+        "READY"
+      ],
+      "checksum": "5393cb62fe68a4396c2dc83a404a05195ebf499c1840881cc82eeb7bfcae47f1",
+      "source": "https://volume.aau.edu.et/3,0a37585a804d.jpg?width=1200&height=auto"
+    },
+    {
+      "key": "partner-0",
+      "asset_id": "cb69f127-6129-4ac7-bfb2-b1ea52845f40",
+      "states": [
+        "READY"
+      ],
+      "checksum": "7eca51220c68c68da2c664c90c3523529d7fdcb283f0406c3ffaf3e14b06f488",
+      "source": "https://volume.aau.edu.et/1,3d9c42a53b1c2e.jpg?width=600&height=auto"
+    },
+    {
+      "key": "partner-1",
+      "asset_id": "872d45fc-e273-45f0-be79-82fa0a4bb885",
+      "states": [
+        "READY"
+      ],
+      "checksum": "9b001eebe3e2b2d902a9b933469ff28fe842a937f08a901ee3325e0abe319384",
+      "source": "https://volume.aau.edu.et/4,3d9c4353addd14.jpg?width=600&height=auto"
+    },
+    {
+      "key": "partner-2",
+      "asset_id": "2ddcdf15-c8c4-4d1c-9339-b1d9bc6034c3",
+      "states": [
+        "READY"
+      ],
+      "checksum": "073e498ec0481993dc7b9f9962248c386dfce54154de9f7a73a71c9c932c2001",
+      "source": "https://volume.aau.edu.et/2,3d9e71196b50ca.jpg?width=600&height=auto"
+    },
+    {
+      "key": "partner-3",
+      "asset_id": "b25979b8-9315-40aa-bd36-50e11238d750",
+      "states": [
+        "READY"
+      ],
+      "checksum": "4c5b9c78263143a492de3aad6785aa29202316a3c42514f736993252b9d6032d",
+      "source": "https://volume.aau.edu.et/3,0b6635b67178.jpg?width=600&height=auto"
+    },
+    {
+      "key": "partner-4",
+      "asset_id": "b5baa8a3-5d86-4f5d-bd28-4c6f19b2918b",
+      "states": [
+        "READY"
+      ],
+      "checksum": "981c00e4148c88c4cb77ec7f05e90a57ba2afdf691155d6c5b5a302a2904b5af",
+      "source": "https://volume.aau.edu.et/5,0a6d1aa91ef7.jpg?width=600&height=auto"
+    }
+  ],
+  "posts": [
+    "c6c629d9-3038-4479-85fa-88f67106e73f",
+    "bcf613ca-52a8-4bb0-b8fc-47b62704cd46",
+    "b7005f58-b1fd-4489-9d6a-b5d482c2af40",
+    "827bda64-3735-419f-97b1-b406915c3f84",
+    "ca1dd84e-a49e-4406-9030-860ff7c0fe72",
+    "435aa5f3-876c-4330-994e-f9db95de3825",
+    "9467f7f9-9568-4f45-afbf-9414de0b3fb2",
+    "59c75107-5799-4087-b3b8-23121b35dc66",
+    "9c4b6023-b573-4e2c-acd8-4af93ec7980d",
+    "148fc8c0-9754-40eb-85a0-7d320f608612"
+  ],
+  "rows": 11,
+  "other_sites_unchanged": true,
+  "local_url": "http://aau-review.localhost/"
+}

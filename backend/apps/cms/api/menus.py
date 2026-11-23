@@ -505,7 +505,7 @@ class MenuItemViewSet(MenuAPIBase):
             domain.delete_menu_record(item.pk, actor=request.user, expected=self._expected(), item=True)
             return self._response(None, menu, status=204)
 
-    @extend_schema(parameters=[IF_MATCH], request=MoveInput, responses=ItemOutput, description="menu.write (plus menu.publish for active menus). Atomic subtree move; position is the zero-based destination sibling index. Cycles and excessive descendant depth return invalid_tree and roll back every changed position.")
+    @extend_schema(parameters=[IF_MATCH], request=MoveInput, responses=ItemOutput, description="menu.write (plus menu.publish for active menus). Atomic subtree move; position is the zero-based destination sibling index. One top-level item plus five submenu levels are supported. Cycles and excessive descendant depth return invalid_tree and roll back every changed position.")
     @action(detail=True, methods=["post"])
     def move(self, request, *args, **kwargs):
         with menu_errors(), hierarchy_write():

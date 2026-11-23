@@ -18163,8 +18163,9 @@ paths:
     post:
       operationId: v1_sites_menus_items_move_create
       description: menu.write (plus menu.publish for active menus). Atomic subtree
-        move; position is the zero-based destination sibling index. Cycles and excessive
-        descendant depth return invalid_tree and roll back every changed position.
+        move; position is the zero-based destination sibling index. One top-level
+        item plus five submenu levels are supported. Cycles and excessive descendant
+        depth return invalid_tree and roll back every changed position.
       parameters:
       - in: header
         name: If-Match
@@ -24226,6 +24227,17 @@ paths:
                                                 required:
                                                 - id
                                                 - children
+                                            navigation:
+                                              enum:
+                                              - standard
+                                              - overlay
+                                              - thumbnails
+                                            autoplay_seconds:
+                                              enum:
+                                              - 0
+                                              - 5
+                                              - 8
+                                              - 10
                                           required:
                                           - items
                                         style:
@@ -25029,6 +25041,17 @@ paths:
                                                 required:
                                                 - id
                                                 - children
+                                            navigation:
+                                              enum:
+                                              - standard
+                                              - overlay
+                                              - thumbnails
+                                            autoplay_seconds:
+                                              enum:
+                                              - 0
+                                              - 5
+                                              - 8
+                                              - 10
                                           required:
                                           - items
                                         style:
@@ -25832,6 +25855,17 @@ paths:
                                                 required:
                                                 - id
                                                 - children
+                                            navigation:
+                                              enum:
+                                              - standard
+                                              - overlay
+                                              - thumbnails
+                                            autoplay_seconds:
+                                              enum:
+                                              - 0
+                                              - 5
+                                              - 8
+                                              - 10
                                           required:
                                           - items
                                         style:
@@ -28358,6 +28392,16 @@ paths:
                                                 - id
                                                 - title
                                                 - text
+                                            columns:
+                                              enum:
+                                              - 1
+                                              - 2
+                                              - 3
+                                              - 4
+                                            presentation:
+                                              enum:
+                                              - plain
+                                              - statistics
                                           required:
                                           - items
                                         style:
@@ -39224,6 +39268,17 @@ components:
                                         required:
                                         - id
                                         - children
+                                    navigation:
+                                      enum:
+                                      - standard
+                                      - overlay
+                                      - thumbnails
+                                    autoplay_seconds:
+                                      enum:
+                                      - 0
+                                      - 5
+                                      - 8
+                                      - 10
                                   required:
                                   - items
                                 style:
@@ -40027,6 +40082,17 @@ components:
                                         required:
                                         - id
                                         - children
+                                    navigation:
+                                      enum:
+                                      - standard
+                                      - overlay
+                                      - thumbnails
+                                    autoplay_seconds:
+                                      enum:
+                                      - 0
+                                      - 5
+                                      - 8
+                                      - 10
                                   required:
                                   - items
                                 style:
@@ -40830,6 +40896,17 @@ components:
                                         required:
                                         - id
                                         - children
+                                    navigation:
+                                      enum:
+                                      - standard
+                                      - overlay
+                                      - thumbnails
+                                    autoplay_seconds:
+                                      enum:
+                                      - 0
+                                      - 5
+                                      - 8
+                                      - 10
                                   required:
                                   - items
                                 style:
@@ -43356,6 +43433,16 @@ components:
                                         - id
                                         - title
                                         - text
+                                    columns:
+                                      enum:
+                                      - 1
+                                      - 2
+                                      - 3
+                                      - 4
+                                    presentation:
+                                      enum:
+                                      - plain
+                                      - statistics
                                   required:
                                   - items
                                 style:
@@ -50968,6 +51055,17 @@ components:
                                         required:
                                         - id
                                         - children
+                                    navigation:
+                                      enum:
+                                      - standard
+                                      - overlay
+                                      - thumbnails
+                                    autoplay_seconds:
+                                      enum:
+                                      - 0
+                                      - 5
+                                      - 8
+                                      - 10
                                   required:
                                   - items
                                 style:
@@ -51771,6 +51869,17 @@ components:
                                         required:
                                         - id
                                         - children
+                                    navigation:
+                                      enum:
+                                      - standard
+                                      - overlay
+                                      - thumbnails
+                                    autoplay_seconds:
+                                      enum:
+                                      - 0
+                                      - 5
+                                      - 8
+                                      - 10
                                   required:
                                   - items
                                 style:
@@ -52574,6 +52683,17 @@ components:
                                         required:
                                         - id
                                         - children
+                                    navigation:
+                                      enum:
+                                      - standard
+                                      - overlay
+                                      - thumbnails
+                                    autoplay_seconds:
+                                      enum:
+                                      - 0
+                                      - 5
+                                      - 8
+                                      - 10
                                   required:
                                   - items
                                 style:
@@ -55100,6 +55220,16 @@ components:
                                         - id
                                         - title
                                         - text
+                                    columns:
+                                      enum:
+                                      - 1
+                                      - 2
+                                      - 3
+                                      - 4
+                                    presentation:
+                                      enum:
+                                      - plain
+                                      - statistics
                                   required:
                                   - items
                                 style:

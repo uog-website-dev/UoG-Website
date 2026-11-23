@@ -18,6 +18,9 @@ def references(layout):
         props=node.get("props",{})
         if node["type"] in {"image","hero_image"}:
             yield props["asset_id"],path+".props.asset_id"
+            if node["type"] == "hero_image":
+                for i,item in enumerate(props.get("items", [])):
+                    yield item["asset_id"],f"{path}.props.items[{i}].asset_id"
         elif node["type"] in {"image_slider","image_grid"}:
             for i,item in enumerate(props["items"]):
                 yield item["asset_id"],f"{path}.props.items[{i}].asset_id"

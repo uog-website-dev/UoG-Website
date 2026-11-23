@@ -1,4 +1,5 @@
 "use client";
+import {MAX_MENU_DEPTH} from "@uog/types";
 import {useEffect,useMemo,useState} from "react";
 import {Box,Container,IconButton,Link,Typography} from "@mui/material";
 import ChatBubbleOutlineRounded from "@mui/icons-material/ChatBubbleOutlineRounded";
@@ -31,7 +32,7 @@ function linkUrl(value:string,origin?:string,preview=false):string|null {
  return href;
 }
 function FooterLinks({items,origin,preview,depth=0}:{items:PublicMenuNode[];origin?:string;preview:boolean;depth?:number}) {
- if(depth>=4)return null;
+ if(depth>=MAX_MENU_DEPTH)return null;
  return <Box component="ul" sx={{listStyle:"none",p:0,m:0,pl:depth?1.5:0}}>
   {items.map((item,index)=>{const href=linkUrl(item.href,origin,preview);return <Box component="li" key={`${index}-${item.label}`} sx={{minWidth:0}}>
    {href?<Link href={href} target={preview?"_blank":undefined} rel={preview?"noopener noreferrer":undefined} color="inherit" underline="hover" sx={{display:"inline-flex",alignItems:"center",minHeight:44,lineHeight:1.55,fontSize:".9rem",maxWidth:"100%",overflowWrap:"anywhere",...focus}}>{item.label}</Link>:<Typography variant="body2" sx={{py:1}}>{item.label}</Typography>}
@@ -57,7 +58,7 @@ export function PublicSiteFooter({site,items=[],settings=site.footer,siteOrigin,
    <Box sx={{display:"grid",gridTemplateColumns:{xs:"minmax(0,1fr)",md:"minmax(200px,260px) minmax(0,1fr)"},gap:{xs:4,md:6}}}>
     <Box sx={{minWidth:0}}>
      <Link href={preview?(siteOrigin??undefined):"/"} target={preview?"_blank":undefined} rel={preview?"noopener noreferrer":undefined} color="inherit" underline="none" sx={{display:"inline-flex",flexDirection:"column",alignItems:"flex-start",gap:2,maxWidth:"100%",...focus}}>
-      {preview?(privateLogo&&!logoFailed?<Box component="img" src={privateLogo} alt={`${site.displayName} logo`} onError={()=>setLogoFailed(true)} sx={{width:130,height:130,objectFit:"contain"}}/>:<SiteBrandingMark site={{...site,logoUrl:null}} size={130}/>):<SiteBrandingMark site={site} size={130}/>}<Typography component="span" variant="h6" sx={{fontWeight:750,lineHeight:1.35}}>{site.displayName}</Typography>
+      {preview?(privateLogo&&!logoFailed?<Box component="img" src={privateLogo} alt={`${site.displayName} logo`} onError={()=>setLogoFailed(true)} sx={{width:180,height:180,objectFit:"contain"}}/>:<SiteBrandingMark site={{...site,logoUrl:null}} size={180}/>):<SiteBrandingMark site={site} size={180}/>}<Typography component="span" variant="h6" sx={{fontWeight:750,lineHeight:1.35}}>{site.displayName}</Typography>
      </Link>
      {config.description?<Typography sx={{mt:2,fontSize:".9rem",lineHeight:1.8,opacity:.85,whiteSpace:"pre-line"}}>{config.description}</Typography>:null}
      {(config.address||config.email||config.phone)?<Box component="address" sx={{fontStyle:"normal",mt:2,display:"grid",gap:.5,fontSize:".875rem",opacity:.9}}>

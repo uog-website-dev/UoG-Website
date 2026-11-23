@@ -1,0 +1,17 @@
+{
+  "before": {
+    "assets": 32,
+    "posts": 10,
+    "pages": 2,
+    "derivatives": 64,
+    "ready_processing": 32
+  },
+  "after": {
+    "assets": 32,
+    "posts": 10,
+    "pages": 2,
+    "derivatives": 64,
+    "ready_processing": 32
+  },
+  "idempotent": true
+}

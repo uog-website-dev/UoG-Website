@@ -123,7 +123,7 @@ it('closes the mobile menu after activating a nested link and restores the trigg
 it('bounds malformed trees and rejects encoded controls and error response trees', () => {
  const tree={label:'Root',href:'/root',children:[] as unknown[]};let cursor=tree;
  for(let i=0;i<100;i++){const child={label:'Nested',href:'/nested',children:[] as unknown[]};cursor.children.push(child);cursor=child;}
- const parsed=menusFromResponse(200,{locations:{header:[tree]}});expect(JSON.stringify(parsed).match(/Nested/g)?.length).toBe(3);
+ const parsed=menusFromResponse(200,{locations:{header:[tree]}});expect(JSON.stringify(parsed).match(/Nested/g)?.length).toBe(5);
  expect(menusFromResponse(500,{locations:{header}})).toEqual({header:[],footer:[]});
  for(const href of ['/bad%0aheader','https://example.com/%5cpath','/bad%ZZ'])expect(safeMenuHref(href)).toBeNull();
 });
@@ -182,4 +182,32 @@ it('skips unavailable root labels when moving between top-level controls',async(
  const user=userEvent.setup();render(<SiteNavigation label="Primary" dropdown items={[...header,{label:"News",href:"/posts"}]}/>);
  screen.getByRole('button',{name:'Department'}).focus();await user.keyboard('{ArrowRight}');
  expect(document.activeElement).toBe(screen.getByRole('link',{name:'News'}));
+});
+
+
+function fiveSubmenus() {
+ let node={label:'Level 5',href:'/level-5',children:[] as any[]};
+ for(let level=4;level>=0;level--)node={label:level===0?'Academics':`Level ${level}`,href:`/level-${level}`,children:[node]};
+ return [node];
+}
+it('preserves five submenu levels and opens deep desktop branches by keyboard',async()=>{
+ const user=userEvent.setup();
+ const nodes=menusFromResponse(200,{locations:{header:fiveSubmenus()}}).header;
+ render(<SiteNavigation label="Deep desktop" dropdown items={nodes}/>);
+ await user.click(screen.getByRole('button',{name:'Academics'}));
+ for(const level of [2,3,4]){
+  const toggle=screen.getByRole('button',{name:`Show Level ${level} submenu`});
+  toggle.focus();await user.keyboard('{Enter}');expect(toggle.getAttribute('aria-expanded')).toBe('true');
+ }
+ const leaf=screen.getByRole('link',{name:'Level 5'});expect(leaf.getAttribute('href')).toBe('/level-5');
+ leaf.focus();await user.keyboard('{Escape}');
+ expect(document.activeElement).toBe(screen.getByRole('button',{name:'Show Level 4 submenu'}));
+});
+it('allows all five submenu levels in the mobile drawer without unsafe links',async()=>{
+ const user=userEvent.setup();render(<SiteNavigation label="Deep mobile" mobile items={fiveSubmenus()}/>);
+ await user.click(screen.getByRole('button',{name:'Open deep mobile'}));
+ const drawer=within(document.querySelector('.MuiDrawer-paper') as HTMLElement);
+ for(const label of ['Academics','Level 1','Level 2','Level 3','Level 4'])await user.click(drawer.getByRole('button',{name:label,exact:true}));
+ expect(drawer.getByRole('link',{name:'Level 5'}).getAttribute('href')).toBe('/level-5');
+ await user.keyboard('{Escape}');expect(drawer.getByRole('button',{name:'Level 4'}).getAttribute('aria-expanded')).toBe('false');
 });

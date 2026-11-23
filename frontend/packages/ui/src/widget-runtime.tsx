@@ -9,6 +9,7 @@ import TextField from "@mui/material/TextField";
 import Alert from "@mui/material/Alert";
 import Link from "@mui/material/Link";
 import {usePublicSiteBranding, publicLogoSource} from "./site-branding";
+import {HorizontalCards,containedImageHover,newsCardHover} from "./horizontal-cards";
 import {ContentCarousel} from "./visual-presentation";
 import { menusFromResponse, SiteNavigation } from "./site-navigation";
 
@@ -204,7 +205,7 @@ function asPost(row:Record<string,unknown>,siteId:number|null):WidgetPost|null {
     published_at:typeof row.published_at==="string"&&!Number.isNaN(Date.parse(row.published_at))?row.published_at:undefined,featured_alt:typeof row.featured_alt==="string"?row.featured_alt:"",excerpt:typeof row.excerpt==="string"?row.excerpt:"",featured_media:typeof row.featured_media==="string"?row.featured_media:""};
 }
 
-export function LoopGridWidget({source,limit,category,presentation="grid",carousel=false}:{source:"posts"|"pages";limit:number;category?:string;presentation?:"grid"|"list"|"featured";carousel?:boolean}) {
+export function LoopGridWidget({source,limit,category,presentation="grid",carousel=false,display="grid",columns,image_hover="zoom"}:{source:"posts"|"pages";limit:number;category?:string;presentation?:"grid"|"list"|"featured";carousel?:boolean;display?:"grid"|"slider";columns?:number;image_hover?:"none"|"zoom"}) {
   const scope=useContext(ScopeContext);
   const query:Record<string,string>={source,limit:String(limit)};
   if(category || scope?.filters.category)query.category=category || scope!.filters.category;
@@ -219,10 +220,10 @@ export function LoopGridWidget({source,limit,category,presentation="grid",carous
       return [{id:String(row.id),content:<Box component="article" sx={{p:3,border:1,borderColor:'divider',borderRadius:2}}><Link href={row.path} sx={{fontWeight:700}}>{String(row.title)}</Link></Box>}];
     }
     const post=asPost(row,scope?.siteId??null);if(!post)return [];
-    const compact=presentation==='list'||(presentation==='featured'&&index>0);
+    const compact=display!=='slider'&&(presentation==='list'||(presentation==='featured'&&index>0));
     return [{id:post.id,content:<VisualPostProvider post={post} siteId={scope?.siteId??null}>
-      <Box component="article" sx={{display:'grid',gridTemplateColumns:compact?{xs:'minmax(0,1fr)',sm:'minmax(100px,30%) minmax(0,1fr)'}:'minmax(0,1fr)',gap:2,pb:3,borderBottom:1,borderColor:'divider',height:'100%',minWidth:0,'&:not(:has(img))':{gridTemplateColumns:'minmax(0,1fr)'},'& img':{width:'100%',height:compact?140:260,objectFit:'cover',borderRadius:2}}}>
-        <FeaturedImageWidget compact/>
+      <Box component="article" sx={{...newsCardHover,display:'grid',gridTemplateColumns:compact?{xs:'minmax(0,1fr)',sm:'minmax(100px,30%) minmax(0,1fr)'}:'minmax(0,1fr)',gap:2,pb:3,borderBottom:1,borderColor:'divider',height:'100%',minWidth:0,'&:not(:has(img))':{gridTemplateColumns:'minmax(0,1fr)'},'& img':{width:'100%',height:compact?140:260,objectFit:'cover',borderRadius:2}}}>
+        <Box data-image-hover={image_hover} sx={image_hover==='zoom'?containedImageHover:{overflow:'hidden',borderRadius:2}}><Link href={`/posts/${post.slug}`} aria-label={`Read ${post.title}`} sx={{display:'block'}}><FeaturedImageWidget compact/></Link></Box>
         <Box sx={{display:'grid',alignContent:'start',gap:1,minWidth:0}}><Typography component="h3" variant={compact?'h6':'h5'} sx={{lineHeight:1.4,fontWeight:750}}><Link href={`/posts/${post.slug}`} color="inherit" underline="hover">{post.title}</Link></Typography>
           {post.published_at?<Typography component="time" dateTime={post.published_at} variant="body2" color="text.secondary">{new Date(post.published_at).toLocaleDateString('en',{year:'numeric',month:'short',day:'numeric',timeZone:'UTC'})}</Typography>:null}
           {!compact?<PostExcerptWidget/>:null}
@@ -230,8 +231,9 @@ export function LoopGridWidget({source,limit,category,presentation="grid",carous
       </Box>
     </VisualPostProvider>}];
   });
+  if(display==='slider')return <HorizontalCards items={cards} columns={columns??3} label={source==='posts'?'News slider':'Pages slider'}/>;
   if(carousel)return <ContentCarousel items={cards} label={source==='posts'?'News carousel':'Pages carousel'}/>;
-  return <Box aria-label="Published content grid" data-news-presentation={presentation} sx={{display:'grid',gridTemplateColumns:presentation==='list'?'minmax(0,1fr)':{xs:'minmax(0,1fr)',md:'repeat(2,minmax(0,1fr))'},gap:3}}>{cards.map((card,index)=><Box key={card.id} sx={{minWidth:0,...(presentation==='featured'&&index===0?{gridRow:{md:`span ${Math.max(1,cards.length-1)}`}}:{})}}>{card.content}</Box>)}</Box>;
+  return <Box aria-label="Published content grid" data-news-presentation={presentation} sx={{display:'grid',gridTemplateColumns:presentation==='list'?'minmax(0,1fr)':{xs:'minmax(0,1fr)',md:`repeat(${presentation==='featured'?2:columns??2},minmax(0,1fr))`},gap:3}}>{cards.map((card,index)=><Box key={card.id} sx={{minWidth:0,...(presentation==='featured'&&index===0?{gridRow:{md:`span ${Math.max(1,cards.length-1)}`}}:{})}}>{card.content}</Box>)}</Box>;
 }
 
 export function TaxonomyWidget({taxonomy_code,limit}:{taxonomy_code:string;limit:number}) {

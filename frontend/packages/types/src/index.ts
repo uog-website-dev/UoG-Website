@@ -512,3 +512,5 @@ export type { MediaAsset, MediaStatus, MediaListQuery, MediaMetadataPatch, Media
 export * from "./layout";
 
 export * from "./footer";
+
+export { MAX_MENU_DEPTH } from "./navigation";

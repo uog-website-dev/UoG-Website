@@ -1,0 +1,1219 @@
+{
+  "schema_version": 1,
+  "settings": {
+    "show_title": false,
+    "content_width": "full"
+  },
+  "rows": [
+    {
+      "id": "aau-section-2",
+      "type": "section",
+      "ratios": [
+        100
+      ],
+      "style": {
+        "content_width": "wide",
+        "padding": "sm"
+      },
+      "columns": [
+        {
+          "id": "aau-column-3",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-alert-1",
+              "type": "alert",
+              "props": {
+                "text": "AAU comparison: public reference content imported for a local CMS capability review. Original articles remain on aau.edu.et.",
+                "severity": "info"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aau-section-17",
+      "type": "section",
+      "ratios": [
+        100
+      ],
+      "style": {
+        "content_width": "full",
+        "padding": "none"
+      },
+      "columns": [
+        {
+          "id": "aau-column-18",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-layout_slider-16",
+              "type": "layout_slider",
+              "props": {
+                "items": [
+                  {
+                    "id": "aau-slide-12",
+                    "children": [
+                      {
+                        "id": "aau-hero_image-5",
+                        "type": "hero_image",
+                        "props": {
+                          "asset_id": "00000000-0000-4000-8000-000000000001",
+                          "alt": "gate min at Addis Ababa University",
+                          "title": "Seek Wisdom, Elevate Your Intellect and Serve Humanity",
+                          "text": "Learning, discovery and public service at Addis Ababa University.",
+                          "layout": "split",
+                          "height": "medium",
+                          "mask": "curve",
+                          "actions": [
+                            {
+                              "id": "aau-action-4",
+                              "label": "Study at AAU",
+                              "href": "http://admission.aau.edu.et/"
+                            }
+                          ]
+                        },
+                        "style": {
+                          "background": "mist",
+                          "text_color": "default"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "aau-slide-13",
+                    "children": [
+                      {
+                        "id": "aau-hero_image-7",
+                        "type": "hero_image",
+                        "props": {
+                          "asset_id": "00000000-0000-4000-8000-000000000001",
+                          "alt": "research at Addis Ababa University",
+                          "title": "Research that makes a difference",
+                          "text": "Explore research and scholarship across disciplines.",
+                          "layout": "split",
+                          "height": "medium",
+                          "mask": "curve",
+                          "actions": [
+                            {
+                              "id": "aau-action-6",
+                              "label": "Explore research",
+                              "href": "https://aau.edu.et/research"
+                            }
+                          ]
+                        },
+                        "style": {
+                          "background": "mist",
+                          "text_color": "default"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "aau-slide-14",
+                    "children": [
+                      {
+                        "id": "aau-hero_image-9",
+                        "type": "hero_image",
+                        "props": {
+                          "asset_id": "00000000-0000-4000-8000-000000000001",
+                          "alt": "gerdLanding at Addis Ababa University",
+                          "title": "Connecting industry and innovation",
+                          "text": "Academic partnerships connect knowledge with practical challenges.",
+                          "layout": "split",
+                          "height": "medium",
+                          "mask": "curve",
+                          "actions": [
+                            {
+                              "id": "aau-action-8",
+                              "label": "Publications",
+                              "href": "https://aau.edu.et/publications"
+                            }
+                          ]
+                        },
+                        "style": {
+                          "background": "mist",
+                          "text_color": "default"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "aau-slide-15",
+                    "children": [
+                      {
+                        "id": "aau-hero_image-11",
+                        "type": "hero_image",
+                        "props": {
+                          "asset_id": "00000000-0000-4000-8000-000000000001",
+                          "alt": "tashLight1 at Addis Ababa University",
+                          "title": "Excellence in clinical care",
+                          "text": "Explore clinical services and health-science education.",
+                          "layout": "split",
+                          "height": "medium",
+                          "mask": "curve",
+                          "actions": [
+                            {
+                              "id": "aau-action-10",
+                              "label": "View services",
+                              "href": "https://aau.edu.et/services"
+                            }
+                          ]
+                        },
+                        "style": {
+                          "background": "mist",
+                          "text_color": "default"
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "navigation": "overlay",
+                "autoplay_seconds": 8
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aau-section-26",
+      "type": "section",
+      "ratios": [
+        100
+      ],
+      "style": {
+        "content_width": "wide",
+        "padding": "md",
+        "align": "center"
+      },
+      "columns": [
+        {
+          "id": "aau-column-27",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-headline-19",
+              "type": "headline",
+              "props": {
+                "text": "Our Impact in Numbers",
+                "level": 2
+              },
+              "style": {
+                "text_size": "md"
+              }
+            },
+            {
+              "id": "aau-features-24",
+              "type": "features",
+              "props": {
+                "columns": 4,
+                "presentation": "statistics",
+                "items": [
+                  {
+                    "id": "aau-stat-20",
+                    "title": "AAU Notable Alumni",
+                    "text": "Explore the original alumni directory at aau.edu.et."
+                  },
+                  {
+                    "id": "aau-stat-21",
+                    "title": "#1",
+                    "text": "East Africa university ranking\nSource: AAU statistics / QS"
+                  },
+                  {
+                    "id": "aau-stat-22",
+                    "title": "280 K+",
+                    "text": "All Time Graduates\nSource: AAU statistics"
+                  },
+                  {
+                    "id": "aau-stat-23",
+                    "title": "12 K+",
+                    "text": "Research outputs\nSource: AAU statistics"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "aau-button-25",
+              "type": "button",
+              "props": {
+                "label": "View source statistics",
+                "href": "https://aau.edu.et/statistics",
+                "variant": "solid"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aau-section-34",
+      "type": "section",
+      "ratios": [
+        100
+      ],
+      "style": {
+        "content_width": "wide",
+        "padding": "md",
+        "align": "center"
+      },
+      "columns": [
+        {
+          "id": "aau-column-35",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-button_grid-33",
+              "type": "button_grid",
+              "props": {
+                "items": [
+                  {
+                    "id": "aau-quick-28",
+                    "label": "Library",
+                    "href": "https://aau.edu.et/library"
+                  },
+                  {
+                    "id": "aau-quick-29",
+                    "label": "E-learning",
+                    "href": "https://courses.aau.edu.et/"
+                  },
+                  {
+                    "id": "aau-quick-30",
+                    "label": "Campus life",
+                    "href": "#campus-life"
+                  },
+                  {
+                    "id": "aau-quick-31",
+                    "label": "Alumni",
+                    "href": "https://alumni.aau.edu.et/"
+                  },
+                  {
+                    "id": "aau-quick-32",
+                    "label": "Meet our staff",
+                    "href": "https://aau.edu.et/staffs"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aau-section-44",
+      "type": "section",
+      "ratios": [
+        100
+      ],
+      "style": {
+        "content_width": "full",
+        "padding": "none"
+      },
+      "columns": [
+        {
+          "id": "aau-column-45",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-menu_anchor-36",
+              "type": "menu_anchor",
+              "props": {
+                "anchor": "campus-life"
+              }
+            },
+            {
+              "id": "aau-layout_slider-43",
+              "type": "layout_slider",
+              "props": {
+                "items": [
+                  {
+                    "id": "aau-slide-41",
+                    "children": [
+                      {
+                        "id": "aau-hero_image-38",
+                        "type": "hero_image",
+                        "props": {
+                          "asset_id": "00000000-0000-4000-8000-000000000001",
+                          "alt": "forumbuilding at Addis Ababa University",
+                          "title": "Campus life",
+                          "text": "Explore student activities, facilities and the university community.",
+                          "layout": "overlay",
+                          "height": "medium",
+                          "mask": "none",
+                          "actions": [
+                            {
+                              "id": "aau-action-37",
+                              "label": "Explore campus life",
+                              "href": "https://aau.edu.et/campus_life"
+                            }
+                          ]
+                        },
+                        "style": {
+                          "background": "navy",
+                          "text_color": "inverse"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "aau-slide-42",
+                    "children": [
+                      {
+                        "id": "aau-hero_image-40",
+                        "type": "hero_image",
+                        "props": {
+                          "asset_id": "00000000-0000-4000-8000-000000000001",
+                          "alt": "kennedy1 min at Addis Ababa University",
+                          "title": "Learning and discovery",
+                          "text": "Libraries, museums and spaces for teaching and collaboration.",
+                          "layout": "overlay",
+                          "height": "medium",
+                          "mask": "none",
+                          "actions": [
+                            {
+                              "id": "aau-action-39",
+                              "label": "Explore the library",
+                              "href": "https://aau.edu.et/library"
+                            }
+                          ]
+                        },
+                        "style": {
+                          "background": "navy",
+                          "text_color": "inverse"
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "navigation": "overlay",
+                "autoplay_seconds": 0
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aau-section-50",
+      "type": "section",
+      "ratios": [
+        100
+      ],
+      "style": {
+        "content_width": "wide",
+        "padding": "md"
+      },
+      "columns": [
+        {
+          "id": "aau-column-51",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-image_grid-49",
+              "type": "image_grid",
+              "props": {
+                "items": [
+                  {
+                    "id": "aau-life-image-46",
+                    "asset_id": "00000000-0000-4000-8000-000000000001",
+                    "alt": "freshers at Addis Ababa University",
+                    "caption": "Student events and activities"
+                  },
+                  {
+                    "id": "aau-life-image-47",
+                    "asset_id": "00000000-0000-4000-8000-000000000001",
+                    "alt": "recreationAndsports at Addis Ababa University",
+                    "caption": "Recreation and sport"
+                  },
+                  {
+                    "id": "aau-life-image-48",
+                    "asset_id": "00000000-0000-4000-8000-000000000001",
+                    "alt": "alamoudi at Addis Ababa University",
+                    "caption": "Learning facilities"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aau-section-55",
+      "type": "section",
+      "ratios": [
+        100
+      ],
+      "style": {
+        "content_width": "wide",
+        "padding": "md"
+      },
+      "columns": [
+        {
+          "id": "aau-column-56",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-headline-52",
+              "type": "headline",
+              "props": {
+                "text": "What's New",
+                "level": 2
+              },
+              "style": {
+                "text_size": "md"
+              }
+            },
+            {
+              "id": "aau-loop_grid-53",
+              "type": "loop_grid",
+              "props": {
+                "source": "posts",
+                "limit": 4,
+                "category": "news",
+                "presentation": "featured"
+              }
+            },
+            {
+              "id": "aau-button-54",
+              "type": "button",
+              "props": {
+                "label": "View more news",
+                "href": "/posts/categories/news",
+                "variant": "solid"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aau-section-95",
+      "type": "section",
+      "ratios": [
+        100
+      ],
+      "style": {
+        "content_width": "full",
+        "padding": "lg",
+        "background": "navy",
+        "text_color": "inverse"
+      },
+      "columns": [
+        {
+          "id": "aau-column-96",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-headline-57",
+              "type": "headline",
+              "props": {
+                "text": "Explore our Campuses",
+                "level": 2
+              },
+              "style": {
+                "text_size": "md"
+              }
+            },
+            {
+              "id": "aau-layout_slider-94",
+              "type": "layout_slider",
+              "props": {
+                "items": [
+                  {
+                    "id": "aau-slide-82",
+                    "children": [
+                      {
+                        "id": "aau-hero_image-59",
+                        "type": "hero_image",
+                        "props": {
+                          "asset_id": "00000000-0000-4000-8000-000000000001",
+                          "alt": "Sefere Selam Campus",
+                          "title": "Sefere Selam Campus",
+                          "text": "Explore this AAU campus and follow the source for current programme and contact details.",
+                          "layout": "split_reverse",
+                          "height": "medium",
+                          "mask": "none",
+                          "actions": [
+                            {
+                              "id": "aau-action-58",
+                              "label": "Explore this campus",
+                              "href": "https://aau.edu.et/campuses"
+                            }
+                          ]
+                        },
+                        "style": {
+                          "background": "navy",
+                          "text_color": "inverse"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "aau-slide-83",
+                    "children": [
+                      {
+                        "id": "aau-hero_image-61",
+                        "type": "hero_image",
+                        "props": {
+                          "asset_id": "00000000-0000-4000-8000-000000000001",
+                          "alt": "FBE Campus",
+                          "title": "FBE Campus",
+                          "text": "Explore this AAU campus and follow the source for current programme and contact details.",
+                          "layout": "split_reverse",
+                          "height": "medium",
+                          "mask": "none",
+                          "actions": [
+                            {
+                              "id": "aau-action-60",
+                              "label": "Explore this campus",
+                              "href": "https://aau.edu.et/campuses"
+                            }
+                          ]
+                        },
+                        "style": {
+                          "background": "navy",
+                          "text_color": "inverse"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "aau-slide-84",
+                    "children": [
+                      {
+                        "id": "aau-hero_image-63",
+                        "type": "hero_image",
+                        "props": {
+                          "asset_id": "00000000-0000-4000-8000-000000000001",
+                          "alt": "Lideta Campus",
+                          "title": "Lideta Campus",
+                          "text": "Explore this AAU campus and follow the source for current programme and contact details.",
+                          "layout": "split_reverse",
+                          "height": "medium",
+                          "mask": "none",
+                          "actions": [
+                            {
+                              "id": "aau-action-62",
+                              "label": "Explore this campus",
+                              "href": "https://aau.edu.et/campuses"
+                            }
+                          ]
+                        },
+                        "style": {
+                          "background": "navy",
+                          "text_color": "inverse"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "aau-slide-85",
+                    "children": [
+                      {
+                        "id": "aau-hero_image-65",
+                        "type": "hero_image",
+                        "props": {
+                          "asset_id": "00000000-0000-4000-8000-000000000001",
+                          "alt": "Tikur Anbessa Campus",
+                          "title": "Tikur Anbessa Campus",
+                          "text": "Explore this AAU campus and follow the source for current programme and contact details.",
+                          "layout": "split_reverse",
+                          "height": "medium",
+                          "mask": "none",
+                          "actions": [
+                            {
+                              "id": "aau-action-64",
+                              "label": "Explore this campus",
+                              "href": "https://aau.edu.et/campuses"
+                            }
+                          ]
+                        },
+                        "style": {
+                          "background": "navy",
+                          "text_color": "inverse"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "aau-slide-86",
+                    "children": [
+                      {
+                        "id": "aau-hero_image-67",
+                        "type": "hero_image",
+                        "props": {
+                          "asset_id": "00000000-0000-4000-8000-000000000001",
+                          "alt": "Alle Fine Arts Campus ",
+                          "title": "Alle Fine Arts Campus",
+                          "text": "Explore this AAU campus and follow the source for current programme and contact details.",
+                          "layout": "split_reverse",
+                          "height": "medium",
+                          "mask": "none",
+                          "actions": [
+                            {
+                              "id": "aau-action-66",
+                              "label": "Explore this campus",
+                              "href": "https://aau.edu.et/campuses"
+                            }
+                          ]
+                        },
+                        "style": {
+                          "background": "navy",
+                          "text_color": "inverse"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "aau-slide-87",
+                    "children": [
+                      {
+                        "id": "aau-hero_image-69",
+                        "type": "hero_image",
+                        "props": {
+                          "asset_id": "00000000-0000-4000-8000-000000000001",
+                          "alt": "Yared School of Music campus",
+                          "title": "Yared School of Music campus",
+                          "text": "Explore this AAU campus and follow the source for current programme and contact details.",
+                          "layout": "split_reverse",
+                          "height": "medium",
+                          "mask": "none",
+                          "actions": [
+                            {
+                              "id": "aau-action-68",
+                              "label": "Explore this campus",
+                              "href": "https://aau.edu.et/campuses"
+                            }
+                          ]
+                        },
+                        "style": {
+                          "background": "navy",
+                          "text_color": "inverse"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "aau-slide-88",
+                    "children": [
+                      {
+                        "id": "aau-hero_image-71",
+                        "type": "hero_image",
+                        "props": {
+                          "asset_id": "00000000-0000-4000-8000-000000000001",
+                          "alt": "Commerce Campus",
+                          "title": "Commerce Campus",
+                          "text": "Explore this AAU campus and follow the source for current programme and contact details.",
+                          "layout": "split_reverse",
+                          "height": "medium",
+                          "mask": "none",
+                          "actions": [
+                            {
+                              "id": "aau-action-70",
+                              "label": "Explore this campus",
+                              "href": "https://aau.edu.et/campuses"
+                            }
+                          ]
+                        },
+                        "style": {
+                          "background": "navy",
+                          "text_color": "inverse"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "aau-slide-89",
+                    "children": [
+                      {
+                        "id": "aau-hero_image-73",
+                        "type": "hero_image",
+                        "props": {
+                          "asset_id": "00000000-0000-4000-8000-000000000001",
+                          "alt": "Bishoftu Campus",
+                          "title": "Bishoftu Campus",
+                          "text": "Explore this AAU campus and follow the source for current programme and contact details.",
+                          "layout": "split_reverse",
+                          "height": "medium",
+                          "mask": "none",
+                          "actions": [
+                            {
+                              "id": "aau-action-72",
+                              "label": "Explore this campus",
+                              "href": "https://aau.edu.et/campuses"
+                            }
+                          ]
+                        },
+                        "style": {
+                          "background": "navy",
+                          "text_color": "inverse"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "aau-slide-90",
+                    "children": [
+                      {
+                        "id": "aau-hero_image-75",
+                        "type": "hero_image",
+                        "props": {
+                          "asset_id": "00000000-0000-4000-8000-000000000001",
+                          "alt": "Science Campus",
+                          "title": "Science Campus",
+                          "text": "Explore this AAU campus and follow the source for current programme and contact details.",
+                          "layout": "split_reverse",
+                          "height": "medium",
+                          "mask": "none",
+                          "actions": [
+                            {
+                              "id": "aau-action-74",
+                              "label": "Explore this campus",
+                              "href": "https://aau.edu.et/campuses"
+                            }
+                          ]
+                        },
+                        "style": {
+                          "background": "navy",
+                          "text_color": "inverse"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "aau-slide-91",
+                    "children": [
+                      {
+                        "id": "aau-hero_image-77",
+                        "type": "hero_image",
+                        "props": {
+                          "asset_id": "00000000-0000-4000-8000-000000000001",
+                          "alt": "Amist Kilo Campus",
+                          "title": "Amist Kilo Campus",
+                          "text": "Explore this AAU campus and follow the source for current programme and contact details.",
+                          "layout": "split_reverse",
+                          "height": "medium",
+                          "mask": "none",
+                          "actions": [
+                            {
+                              "id": "aau-action-76",
+                              "label": "Explore this campus",
+                              "href": "https://aau.edu.et/campuses"
+                            }
+                          ]
+                        },
+                        "style": {
+                          "background": "navy",
+                          "text_color": "inverse"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "aau-slide-92",
+                    "children": [
+                      {
+                        "id": "aau-hero_image-79",
+                        "type": "hero_image",
+                        "props": {
+                          "asset_id": "00000000-0000-4000-8000-000000000001",
+                          "alt": "Sidist Kilo Campus",
+                          "title": "Sidist Kilo Campus",
+                          "text": "Explore this AAU campus and follow the source for current programme and contact details.",
+                          "layout": "split_reverse",
+                          "height": "medium",
+                          "mask": "none",
+                          "actions": [
+                            {
+                              "id": "aau-action-78",
+                              "label": "Explore this campus",
+                              "href": "https://aau.edu.et/campuses"
+                            }
+                          ]
+                        },
+                        "style": {
+                          "background": "navy",
+                          "text_color": "inverse"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "aau-slide-93",
+                    "children": [
+                      {
+                        "id": "aau-hero_image-81",
+                        "type": "hero_image",
+                        "props": {
+                          "asset_id": "00000000-0000-4000-8000-000000000001",
+                          "alt": "Entoto Fine Arts Center",
+                          "title": "Entoto Fine Arts Center",
+                          "text": "Explore this AAU campus and follow the source for current programme and contact details.",
+                          "layout": "split_reverse",
+                          "height": "medium",
+                          "mask": "none",
+                          "actions": [
+                            {
+                              "id": "aau-action-80",
+                              "label": "Explore this campus",
+                              "href": "https://aau.edu.et/campuses"
+                            }
+                          ]
+                        },
+                        "style": {
+                          "background": "navy",
+                          "text_color": "inverse"
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "navigation": "overlay",
+                "autoplay_seconds": 0
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aau-section-124",
+      "type": "section",
+      "ratios": [
+        100
+      ],
+      "style": {
+        "content_width": "wide",
+        "padding": "md",
+        "background": "mist",
+        "align": "center"
+      },
+      "columns": [
+        {
+          "id": "aau-column-125",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-headline-122",
+              "type": "headline",
+              "props": {
+                "text": "Featured partners",
+                "level": 2
+              },
+              "style": {
+                "text_size": "md"
+              }
+            },
+            {
+              "id": "aau-anything_carousel-123",
+              "type": "anything_carousel",
+              "props": {
+                "items": [
+                  {
+                    "id": "aau-partner-97",
+                    "children": [
+                      {
+                        "id": "aau-image-98",
+                        "type": "image",
+                        "props": {
+                          "asset_id": "00000000-0000-4000-8000-000000000001",
+                          "alt": "the Belgian Development Cooperation logo"
+                        },
+                        "style": {
+                          "image_fit": "contain",
+                          "image_height": "compact"
+                        }
+                      },
+                      {
+                        "id": "aau-headline-99",
+                        "type": "headline",
+                        "props": {
+                          "text": "the Belgian Development Cooperation",
+                          "level": 2
+                        },
+                        "style": {
+                          "text_size": "md"
+                        }
+                      },
+                      {
+                        "id": "aau-editor-100",
+                        "type": "editor",
+                        "props": {
+                          "html": "<p>Featured in the AAU partner directory. Follow the original source for the current partnership description.</p>"
+                        }
+                      },
+                      {
+                        "id": "aau-button-101",
+                        "type": "button",
+                        "props": {
+                          "label": "View original partner directory",
+                          "href": "https://aau.edu.et/partners",
+                          "variant": "solid"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "aau-partner-102",
+                    "children": [
+                      {
+                        "id": "aau-image-103",
+                        "type": "image",
+                        "props": {
+                          "asset_id": "00000000-0000-4000-8000-000000000001",
+                          "alt": "VLIR-UOS logo"
+                        },
+                        "style": {
+                          "image_fit": "contain",
+                          "image_height": "compact"
+                        }
+                      },
+                      {
+                        "id": "aau-headline-104",
+                        "type": "headline",
+                        "props": {
+                          "text": "VLIR-UOS",
+                          "level": 2
+                        },
+                        "style": {
+                          "text_size": "md"
+                        }
+                      },
+                      {
+                        "id": "aau-editor-105",
+                        "type": "editor",
+                        "props": {
+                          "html": "<p>Featured in the AAU partner directory. Follow the original source for the current partnership description.</p>"
+                        }
+                      },
+                      {
+                        "id": "aau-button-106",
+                        "type": "button",
+                        "props": {
+                          "label": "View original partner directory",
+                          "href": "https://aau.edu.et/partners",
+                          "variant": "solid"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "aau-partner-107",
+                    "children": [
+                      {
+                        "id": "aau-image-108",
+                        "type": "image",
+                        "props": {
+                          "asset_id": "00000000-0000-4000-8000-000000000001",
+                          "alt": "Ethio-Telecom logo"
+                        },
+                        "style": {
+                          "image_fit": "contain",
+                          "image_height": "compact"
+                        }
+                      },
+                      {
+                        "id": "aau-headline-109",
+                        "type": "headline",
+                        "props": {
+                          "text": "Ethio-Telecom",
+                          "level": 2
+                        },
+                        "style": {
+                          "text_size": "md"
+                        }
+                      },
+                      {
+                        "id": "aau-editor-110",
+                        "type": "editor",
+                        "props": {
+                          "html": "<p>Featured in the AAU partner directory. Follow the original source for the current partnership description.</p>"
+                        }
+                      },
+                      {
+                        "id": "aau-button-111",
+                        "type": "button",
+                        "props": {
+                          "label": "View original partner directory",
+                          "href": "https://aau.edu.et/partners",
+                          "variant": "solid"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "aau-partner-112",
+                    "children": [
+                      {
+                        "id": "aau-image-113",
+                        "type": "image",
+                        "props": {
+                          "asset_id": "00000000-0000-4000-8000-000000000001",
+                          "alt": "Africa Special NEP (RSAS) logo"
+                        },
+                        "style": {
+                          "image_fit": "contain",
+                          "image_height": "compact"
+                        }
+                      },
+                      {
+                        "id": "aau-headline-114",
+                        "type": "headline",
+                        "props": {
+                          "text": "Africa Special NEP (RSAS)",
+                          "level": 2
+                        },
+                        "style": {
+                          "text_size": "md"
+                        }
+                      },
+                      {
+                        "id": "aau-editor-115",
+                        "type": "editor",
+                        "props": {
+                          "html": "<p>Featured in the AAU partner directory. Follow the original source for the current partnership description.</p>"
+                        }
+                      },
+                      {
+                        "id": "aau-button-116",
+                        "type": "button",
+                        "props": {
+                          "label": "View original partner directory",
+                          "href": "https://aau.edu.et/partners",
+                          "variant": "solid"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "aau-partner-117",
+                    "children": [
+                      {
+                        "id": "aau-image-118",
+                        "type": "image",
+                        "props": {
+                          "asset_id": "00000000-0000-4000-8000-000000000001",
+                          "alt": "Sida logo"
+                        },
+                        "style": {
+                          "image_fit": "contain",
+                          "image_height": "compact"
+                        }
+                      },
+                      {
+                        "id": "aau-headline-119",
+                        "type": "headline",
+                        "props": {
+                          "text": "Sida",
+                          "level": 2
+                        },
+                        "style": {
+                          "text_size": "md"
+                        }
+                      },
+                      {
+                        "id": "aau-editor-120",
+                        "type": "editor",
+                        "props": {
+                          "html": "<p>Featured in the AAU partner directory. Follow the original source for the current partnership description.</p>"
+                        }
+                      },
+                      {
+                        "id": "aau-button-121",
+                        "type": "button",
+                        "props": {
+                          "label": "View original partner directory",
+                          "href": "https://aau.edu.et/partners",
+                          "variant": "solid"
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "navigation": "thumbnails",
+                "autoplay_seconds": 0
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aau-section-129",
+      "type": "section",
+      "ratios": [
+        100
+      ],
+      "style": {
+        "content_width": "wide",
+        "padding": "md"
+      },
+      "columns": [
+        {
+          "id": "aau-column-130",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-headline-126",
+              "type": "headline",
+              "props": {
+                "text": "Announcements",
+                "level": 2
+              },
+              "style": {
+                "text_size": "md"
+              }
+            },
+            {
+              "id": "aau-loop_grid-127",
+              "type": "loop_grid",
+              "props": {
+                "source": "posts",
+                "limit": 5,
+                "category": "announcements",
+                "presentation": "list"
+              }
+            },
+            {
+              "id": "aau-button-128",
+              "type": "button",
+              "props": {
+                "label": "View all announcements",
+                "href": "/posts/categories/announcements",
+                "variant": "solid"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aau-section-132",
+      "type": "section",
+      "ratios": [
+        100
+      ],
+      "style": {
+        "content_width": "wide",
+        "padding": "md"
+      },
+      "columns": [
+        {
+          "id": "aau-column-133",
+          "type": "column",
+          "children": [
+            {
+              "id": "aau-editor-131",
+              "type": "editor",
+              "props": {
+                "html": "<p>Comparison source: https://aau.edu.et/ — captured 22 November 2026. Images retain their original AAU attribution; article summaries are shortened and link to their sources. Imported publication dates show the local CMS release time, while original dates are retained in each article.</p>"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

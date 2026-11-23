@@ -58,3 +58,12 @@ Preparation deep-clones the validated document and mints fresh node/item IDs. It
 Both require Keycloak authentication and a live canonical Site Author/Editor-equivalent grant (or existing Site/Platform Administrator authority). Viewer, Reviewer-only and Publisher-only memberships cannot prepare templates. Foreign Site scope is denied. Requests do not accept client-supplied manifests, Page targets, Site overrides or arbitrary layouts. Unknown fields, stale versions and unavailable capabilities return field-addressed 400 errors; anonymous callers receive 401 and unauthorized callers 403. Responses use private/no-store and noindex headers. Disabled modules may still be explained in the authorized catalogue, but preparation is blocked and the eventual Page-save endpoint independently rechecks permissions/modules.
 
 [Original catalogue verification evidence](qa/homepage-templates-2026-11-15/README.md) predates the dynamic Site widget additions. Refresh desktop/mobile design review and attach updated test results and the PR to Azure DevOps Issue P4-HOME-002 as part of release completion.
+
+
+### Carousel and feature presentation options
+
+Existing Layout Slider and Anything Carousel widgets accept optional navigation (`standard`, `overlay`, `thumbnails`) and autoplay_seconds (`0`, `5`, `8`, `10`). Rotation pauses for pointer hover, keyboard focus, explicit Pause and hidden documents; reduced motion disables it. Thumbnail selectors use an existing image/hero asset in the slide, without copying storage objects. Controls move below content at narrow widths.
+
+Features accepts optional columns (`1`-`4`) and presentation (`plain`, `statistics`). These are leaf-widget columns, not nested Sections or an expansion of the one-to-three-column row contract. Existing documents keep their defaults. Widget alignment inherits its parent row unless explicitly configured.
+
+The isolated [AAU comparison review](qa/aau-comparison-2026-11-22/README.md) records real imported media, articles, builder/private-preview roundtrip and public viewport results. Shared catalogue templates remain institution-neutral.

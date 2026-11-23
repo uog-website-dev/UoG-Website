@@ -1,0 +1,50 @@
+[
+  {
+    "host": "www.uog.local",
+    "width": 390,
+    "overflow": false,
+    "violations": [],
+    "fixture": true,
+    "fiveSubmenus": true
+  },
+  {
+    "host": "www.uog.local",
+    "width": 768,
+    "overflow": false,
+    "violations": [],
+    "fixture": true,
+    "fiveSubmenus": true
+  },
+  {
+    "host": "www.uog.local",
+    "width": 1440,
+    "overflow": false,
+    "violations": [],
+    "fixture": true,
+    "fiveSubmenus": true
+  },
+  {
+    "host": "coi.uog.local",
+    "width": 390,
+    "overflow": false,
+    "violations": [],
+    "fixture": true,
+    "fiveSubmenus": true
+  },
+  {
+    "host": "coi.uog.local",
+    "width": 768,
+    "overflow": false,
+    "violations": [],
+    "fixture": true,
+    "fiveSubmenus": true
+  },
+  {
+    "host": "coi.uog.local",
+    "width": 1440,
+    "overflow": false,
+    "violations": [],
+    "fixture": true,
+    "fiveSubmenus": true
+  }
+]

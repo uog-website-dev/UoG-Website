@@ -14,6 +14,7 @@ import Box from "@mui/material/Box";
 import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 
+import {containedImageHover,newsCardHover} from "./horizontal-cards";
 import { paragraphParts } from "./public-page";
 import { ArticleDocumentView } from "./article-document";
 import { VisualPostProvider, PostTitleWidget, PostExcerptWidget, FeaturedImageWidget } from "./widget-runtime";
@@ -173,7 +174,7 @@ function NewsThumbnail({post}:{post:PublicPostSummary}) {
   const [failed,setFailed] = useState(false);
   const match = /^sites\/([1-9][0-9]*)\/assets\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/.exec(post.featured_media ?? "");
   const available = match && Number(match[1]) === post.site && !failed;
-  return <Box sx={{aspectRatio:"16 / 9",bgcolor:"grey.100",display:"grid",placeItems:"center",overflow:"hidden"}}>
+  return <Box data-image-hover="zoom" sx={{...containedImageHover,aspectRatio:"16 / 9",bgcolor:"grey.100",display:"grid",placeItems:"center",overflow:"hidden"}}>
     {available ? <Box component="img" src={`/api/v1/site-context/media/${match[2]}/?variant=thumbnail`} alt={post.featured_alt || ""} loading="lazy" onError={() => setFailed(true)} sx={{width:"100%",height:"100%",objectFit:"cover"}} />
       : <Box role="img" aria-label="No image available" sx={{display:"grid",placeItems:"center",color:"text.secondary"}}><DescriptionOutlinedIcon aria-hidden sx={{fontSize:40}} /></Box>}
   </Box>;
@@ -183,7 +184,7 @@ export function PublicPostFeed({ posts }: { posts: PublicPostSummary[] | null })
   if (!posts || posts.length === 0) return <Typography role="status" color="text.secondary">This Site has no published posts to show.</Typography>;
   return <Box component="ul" data-testid="public-post-feed" aria-label="Published posts" sx={{listStyle:"none",p:0,m:0,display:"grid",gridTemplateColumns:{xs:"minmax(0,1fr)",sm:"repeat(2,minmax(0,1fr))",lg:"repeat(3,minmax(0,1fr))"},gap:3,width:"100%"}}>
     {posts.map(post => <Box component="li" key={`${post.id || post.slug}:${post.publication_version ?? 0}`} sx={{minWidth:0,display:"flex"}}>
-      <Box component="article" sx={{width:"100%",border:1,borderColor:"divider",borderRadius:2,overflow:"hidden",bgcolor:"background.paper",display:"flex",flexDirection:"column","&:focus-within":{outline:"3px solid",outlineColor:"primary.main",outlineOffset:3}}}>
+      <Box component="article" sx={{...newsCardHover,width:"100%",border:1,borderColor:"divider",borderRadius:2,overflow:"hidden",bgcolor:"background.paper",display:"flex",flexDirection:"column","&:focus-within":{outline:"3px solid",outlineColor:"primary.main",outlineOffset:3}}}>
         <NewsThumbnail post={post} />
         <Box sx={{p:2.5,display:"flex",flexDirection:"column",gap:1.5,flex:1}}>
           {post.categories[0] ? <Typography component="a" href={`/posts/categories/${encodeURIComponent(post.categories[0].slug)}`} variant="overline" color="primary.main" sx={{lineHeight:1.4,textDecoration:"none","&:hover":{textDecoration:"underline"}}}>{post.categories[0].name}</Typography> : null}

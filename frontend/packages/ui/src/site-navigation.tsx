@@ -1,10 +1,12 @@
 "use client";
+import {MAX_MENU_DEPTH} from "@uog/types";
 
 /** Shared host-scoped navigation for public output and authenticated previews. */
 import {useEffect,useId,useRef,useState} from "react";
 import type {ReactNode} from "react";
 import ButtonBase from "@mui/material/ButtonBase";
 import Typography from "@mui/material/Typography";
+import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
@@ -32,7 +34,7 @@ export function menusFromResponse(status:number,body:unknown):{header:PublicMenu
  return {...(Array.isArray(record.secondary)?{utility:normalizeNodes(record.secondary)}:{}),header:normalizeNodes(record.header),footer:normalizeNodes(record.footer)};
 }
 function normalizeNodes(value:unknown,depth=1,budget={remaining:1000}):PublicMenuNode[] {
- if(!Array.isArray(value)||depth>4)return [];
+ if(!Array.isArray(value)||depth>MAX_MENU_DEPTH)return [];
  const nodes:PublicMenuNode[]=[];
  for(const entry of value){
   if(budget.remaining--<=0)break;
@@ -65,13 +67,34 @@ function NavigationLink({item,context,children,rootTrigger=false,rootIndex}:{ite
  const active=current(href,context.currentPath,context.siteOrigin);
  return <Link data-nav-index={rootIndex} data-nav-trigger={rootTrigger||undefined} href={href} aria-current={active?"page":undefined} target={context.openLinksInNewTab?"_blank":undefined} rel={context.openLinksInNewTab?"noopener noreferrer":undefined} onClick={()=>context.onNavigate?.()} color="inherit" underline="none" sx={{display:"inline-flex",alignItems:"center",minHeight:44,maxWidth:"100%",overflowWrap:"anywhere",fontWeight:active?700:600,px:0.75,borderBottom:"2px solid",borderColor:active?"currentColor":"transparent","&:hover":{borderColor:"currentColor"},"&:focus-visible":{outline:"3px solid currentColor",outlineOffset:2,borderRadius:0.5}}}>{children??item.label}</Link>;
 }
-function MenuLinks({items,context,depth=0,horizontal=false}:{items:PublicMenuNode[];context:LinkContext;depth?:number;horizontal?:boolean}){
- if(depth>=4)return null;
- return <Box component="ul" sx={{listStyle:"none",m:0,p:0,pl:depth?2:0,minWidth:0,display:horizontal?"flex":"block",flexWrap:"wrap",alignItems:"center",columnGap:3}}>
-  {items.slice(0,1000).map((item,index)=><Box component="li" key={`${index}-${item.href}`} sx={{py:0.25,minWidth:0,overflowWrap:"anywhere"}}>
-   <NavigationLink item={item} context={context}/>
-   {item.children?.length?<MenuLinks items={item.children} context={context} depth={depth+1}/>:null}
-  </Box>)}
+function MenuBranch({item,context,depth,collapsible}:{item:PublicMenuNode;context:LinkContext;depth:number;collapsible:boolean}) {
+ const [expanded,setExpanded]=useState(false);
+ const id=useId();
+ const toggle=useRef<HTMLButtonElement|null>(null);
+ const subtree=useRef<HTMLElement|null>(null);
+ const children=Boolean(item.children?.length)&&depth<MAX_MENU_DEPTH-1;
+ return <Box component="li" sx={{minWidth:0,overflowWrap:"anywhere"}}
+  onKeyDown={event=>{if(!collapsible||!children)return;
+   if(event.key==="Escape"&&expanded){event.preventDefault();event.stopPropagation();setExpanded(false);toggle.current?.focus();}
+   if(event.key==="ArrowLeft"&&expanded){event.preventDefault();event.stopPropagation();setExpanded(false);toggle.current?.focus();}
+  }}>
+  <Box sx={{display:"flex",alignItems:"center",gap:.5,minWidth:0}}>
+   <Box sx={{flex:1,minWidth:0}}><NavigationLink item={item} context={context}/></Box>
+   {children&&collapsible?<IconButton ref={toggle} size="small" aria-label={`${expanded?"Hide":"Show"} ${item.label} submenu`} aria-expanded={expanded} aria-controls={expanded?id:undefined}
+    onClick={()=>setExpanded(!expanded)} onKeyDown={event=>{if(event.key==="ArrowRight"){event.preventDefault();event.stopPropagation();setExpanded(true);requestAnimationFrame(()=>subtree.current?.querySelector<HTMLElement>("a[href],button")?.focus());}}}
+    sx={{width:36,height:44,flexShrink:0,color:"primary.main",borderRadius:1,"&:focus-visible":{outline:"3px solid",outlineColor:"primary.main",outlineOffset:-3}}}>
+    <ChevronRightRoundedIcon sx={{fontSize:19,transform:expanded?"rotate(90deg)":"none",transition:"transform 150ms ease","@media (prefers-reduced-motion:reduce)":{transition:"none"}}}/>
+   </IconButton>:null}
+  </Box>
+  {children&&(!collapsible||expanded)?<Box ref={subtree} id={id} sx={collapsible?{ml:1.25,pl:1.5,mb:1,borderLeft:2,borderColor:"divider"}:undefined}>
+   <MenuLinks items={item.children??[]} context={context} depth={depth+1} collapsible={collapsible}/>
+  </Box>:null}
+ </Box>;
+}
+function MenuLinks({items,context,depth=0,horizontal=false,collapsible=false}:{items:PublicMenuNode[];context:LinkContext;depth?:number;horizontal?:boolean;collapsible?:boolean}){
+ if(depth>=MAX_MENU_DEPTH)return null;
+ return <Box component="ul" sx={{listStyle:"none",m:0,p:0,pl:depth&&!collapsible?1:0,minWidth:0,display:horizontal?"flex":"block",flexWrap:"wrap",alignItems:"center",columnGap:3}}>
+  {items.slice(0,1000).map((item,index)=><MenuBranch key={`${index}-${item.href}`} item={item} context={context} depth={depth} collapsible={collapsible}/>)}
  </Box>;
 }
 const OPEN_EVENT="uog:site-navigation-open";
@@ -88,7 +111,7 @@ function DropdownNavigation({items,label,context}:{items:PublicMenuNode[];label:
  function activate(index:number) {
   const bounds=root.current?.getBoundingClientRect(),trigger=triggerAt(index)?.getBoundingClientRect();
   const grouped=items[index]?.children?.some(child=>child.children?.length);
-  const panelWidth=Math.min(grouped?760:360,window.innerWidth-32);
+  const panelWidth=Math.min(grouped?920:360,window.innerWidth-32);
   setLeft(bounds&&trigger?Math.max(16-bounds.left,Math.min(trigger.left-bounds.left,Math.min(bounds.right,window.innerWidth-16)-bounds.left-panelWidth)):0);
   setHeight(Math.min(640,Math.max(160,window.innerHeight-(bounds?.bottom??0)-20)));
   document.dispatchEvent(new CustomEvent(OPEN_EVENT,{detail:id}));
@@ -129,7 +152,7 @@ function DropdownNavigation({items,label,context}:{items:PublicMenuNode[];label:
    {items.map((item,index)=>{
     const expanded=active===index;
     const grouped=Boolean(item.children?.some(child=>child.children?.length));
-    const width=grouped?760:360;
+    const width=grouped?920:360;
     return <Box component="li" key={`${index}-${item.label}`} sx={{minWidth:0,maxWidth:"100%"}}
      onPointerEnter={event=>{if(event.pointerType==="mouse"){if(item.children?.length){hoverOpened.current=true;activate(index);}else setActive(null);}}}>
      {item.children?.length?<>
@@ -140,7 +163,7 @@ function DropdownNavigation({items,label,context}:{items:PublicMenuNode[];label:
        {item.label}<ExpandMoreRoundedIcon aria-hidden sx={{fontSize:18,opacity:.8,transform:expanded?"rotate(180deg)":"none",transition:"transform 150ms ease","@media (prefers-reduced-motion: reduce)":{transition:"none"}}}/>
       </ButtonBase>
       {expanded?<Box id={`${id}-${index}`} data-nav-panel role="region" aria-label={`${item.label} links`}
-       sx={{position:"absolute",top:"100%",left,width,maxWidth:"calc(100vw - 32px)",maxHeight:height,overflowY:"auto",overscrollBehavior:"contain",zIndex:30,bgcolor:"background.paper",color:"text.primary",border:1,borderColor:"divider",borderTop:"3px solid",borderTopColor:"secondary.main",borderRadius:"0 0 12px 12px",boxShadow:6,p:{xs:2,md:3},boxSizing:"border-box","& a":{display:"flex",minHeight:40,width:"100%",boxSizing:"border-box",fontWeight:400,px:1,py:.75,borderBottom:0,borderRadius:1,"&:hover":{bgcolor:"action.hover",color:"primary.main"}},"& ul":{pl:0}}}>
+       sx={{position:"absolute",top:"100%",left,width,maxWidth:"calc(100vw - 32px)",maxHeight:height,overflowY:"auto",overscrollBehavior:"contain",zIndex:30,bgcolor:"background.paper",color:"text.primary",border:1,borderColor:"divider",borderTop:"3px solid",borderTopColor:"secondary.main",borderRadius:"0 0 12px 12px",boxShadow:"0 20px 48px rgba(0,25,50,.18),0 2px 8px rgba(0,25,50,.08)",p:{xs:2,md:3.5},boxSizing:"border-box","& a":{display:"flex",minHeight:44,width:"100%",boxSizing:"border-box",fontWeight:400,px:1,py:.75,borderBottom:0,borderRadius:1,"&:hover":{bgcolor:"action.hover",color:"primary.main"}},"& ul":{pl:0},"& section + section":{borderLeft:0}}}>
        <NavigationPanel item={item} context={panelContext}/>
       </Box>:null}
      </>:<Box onKeyDown={event=>topKey(event,index)} onFocus={()=>setActive(null)}><NavigationLink item={item} context={panelContext} rootTrigger rootIndex={index}/></Box>}
@@ -164,24 +187,24 @@ function NavigationPanel({item,context}:{item:PublicMenuNode;context:LinkContext
    <Typography component="p" variant="overline" sx={{fontWeight:800,letterSpacing:".09em",color:"primary.main"}}>{item.label}</Typography>
    {hasOverview?<Box sx={{flexShrink:0}}><NavigationLink item={item} context={context}>Overview</NavigationLink></Box>:null}
   </Box>
-  {groups.length?<Box sx={{display:"grid",gridTemplateColumns:{xs:"minmax(0,1fr)",md:`repeat(${Math.min(3,sections.length)},minmax(0,1fr))`},gap:3}}>
-   {sections.map(({group,leaves},index)=><Box key={`${index}-${group?.label??"general"}`} sx={{minWidth:0}}>
+  {groups.length?<Box sx={{display:"grid",gridTemplateColumns:{xs:"minmax(0,1fr)",md:`repeat(${Math.min(3,sections.length)},minmax(0,1fr))`},gap:{xs:2,md:4}}}>
+   {sections.map(({group,leaves},index)=><Box key={`${index}-${group?.label??"general"}`} component="section" sx={{minWidth:0}}>
     <Typography component="p" variant="overline" sx={{fontWeight:800,letterSpacing:".06em",mb:1,pb:1,borderBottom:1,borderColor:"divider"}}>{group?.label??"General"}</Typography>
-    <MenuLinks items={group?.children??leaves} context={context} depth={1}/>
+    <MenuLinks items={group?.children??leaves} context={context} depth={group?2:1} collapsible/>
     {group&&safeMenuHref(group.href)&&group.href!==item.href?<NavigationLink item={group} context={context}>View all {group.label.toLowerCase()}</NavigationLink>:null}
    </Box>)}
-  </Box>:<MenuLinks items={children} context={context} depth={1}/>}
+  </Box>:<MenuLinks items={children} context={context} depth={1} collapsible/>}
  </>;
 }
 
 function MobileMenuLinks({items,context,depth=0}:{items:PublicMenuNode[];context:LinkContext;depth?:number}) {
  const [active,setActive]=useState<number|null>(null);
  const id=useId();
- if(depth>=4)return null;
- return <Box component="ul" sx={{listStyle:"none",p:0,m:0,pl:depth?1.5:0,"& a":{width:"100%",boxSizing:"border-box",py:.75,borderBottom:0}}}>
+ if(depth>=MAX_MENU_DEPTH)return null;
+ return <Box component="ul" onKeyDown={event=>{if(event.key==="Escape"&&depth>0&&active!==null){event.preventDefault();event.stopPropagation();const button=event.currentTarget.querySelector<HTMLElement>(`[data-mobile-index="${active}"]`);setActive(null);button?.focus();}}} sx={{listStyle:"none",p:0,m:0,pl:depth?1.25:0,"& a":{width:"100%",boxSizing:"border-box",py:.75,borderBottom:0}}}>
   {items.map((item,index)=><Box component="li" key={`${index}-${item.label}`} sx={{borderBottom:depth?0:1,borderColor:"divider"}}>
    {item.children?.length?<>
-    <ButtonBase type="button" aria-expanded={active===index} aria-controls={active===index?`${id}-${index}`:undefined} onClick={()=>setActive(active===index?null:index)}
+    <ButtonBase data-mobile-index={index} type="button" aria-expanded={active===index} aria-controls={active===index?`${id}-${index}`:undefined} onClick={()=>setActive(active===index?null:index)}
      sx={{width:"100%",justifyContent:"space-between",textAlign:"start",gap:1,minHeight:48,px:1,font:"inherit",fontWeight:650,borderRadius:1,"&:focus-visible":{outline:"3px solid",outlineColor:"primary.main",outlineOffset:-3}}}>
      {item.label}<ExpandMoreRoundedIcon aria-hidden sx={{fontSize:20,transform:active===index?"rotate(180deg)":"none"}}/>
     </ButtonBase>
@@ -203,7 +226,7 @@ export function SiteNavigation({items,label,mobile=false,dropdown=false,currentP
   {mobile?<>
    <Box sx={{display:{xs:"none",lg:"block"}}}><SiteNavigation items={items} label={`${label} desktop`} dropdown currentPath={context.currentPath} siteOrigin={siteOrigin} openLinksInNewTab={openLinksInNewTab}/></Box>
    <IconButton aria-label={`Open ${label.toLowerCase()}`} aria-expanded={open} aria-controls={menuId} onClick={()=>setOpen(true)} sx={{color:"inherit",display:{xs:"inline-flex",lg:"none"},"&:focus-visible":{outline:"3px solid currentColor",outlineOffset:2}}}><MenuIcon/></IconButton>
-   <Drawer anchor="left" open={open} onClose={()=>setOpen(false)}><Box sx={{width:340,maxWidth:"100vw",boxSizing:"border-box",p:2}} id={menuId}>
+   <Drawer anchor="left" open={open} onClose={()=>setOpen(false)}><Box sx={{width:340,maxWidth:"calc(100vw - 16px)",boxSizing:"border-box",p:2}} id={menuId}>
     <Box sx={{display:"flex",alignItems:"center",justifyContent:"space-between",mb:2,pb:1,borderBottom:1,borderColor:"divider"}}><Typography fontWeight={800}>Navigation</Typography><IconButton aria-label={`Close ${label.toLowerCase()}`} onClick={()=>setOpen(false)} sx={{"&:focus-visible":{outline:"3px solid currentColor",outlineOffset:2}}}><CloseIcon/></IconButton></Box>
     <Box component="div" role="navigation" aria-label={label}><MobileMenuLinks items={items} context={{...context,onNavigate:()=>setOpen(false)}}/></Box>
    </Box></Drawer>

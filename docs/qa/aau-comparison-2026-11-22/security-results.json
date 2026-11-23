@@ -1,0 +1,37 @@
+[
+  {
+    "case": "own-page",
+    "status": 200,
+    "pass": true
+  },
+  {
+    "case": "foreign-page",
+    "status": 403,
+    "pass": true
+  },
+  {
+    "case": "own-asset",
+    "status": 200,
+    "pass": true
+  },
+  {
+    "case": "foreign-asset",
+    "status": 403,
+    "pass": true
+  },
+  {
+    "case": "foreign-public-image",
+    "status": 404,
+    "pass": true
+  },
+  {
+    "case": "anonymous-preview",
+    "status": 401,
+    "pass": true
+  },
+  {
+    "case": "anonymous-draft-route",
+    "status": 404,
+    "pass": true
+  }
+]

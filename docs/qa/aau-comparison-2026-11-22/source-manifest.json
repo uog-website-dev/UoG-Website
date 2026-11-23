@@ -1,0 +1,406 @@
+{
+  "source": "https://aau.edu.et/",
+  "captured": "2026-11-22",
+  "assets": {
+    "gate-min": {
+      "url": "https://aau.edu.et/images/gate-min.jpg",
+      "alt": "gate min at Addis Ababa University",
+      "file": "assets/gate-min.image",
+      "sha256": "0285c74938008dc7d2eaa2d99c6347d8850192d59c7d7f53ded8939dbb62f65a",
+      "bytes": 964249
+    },
+    "research": {
+      "url": "https://aau.edu.et/images/research.jpg",
+      "alt": "research at Addis Ababa University",
+      "file": "assets/research.image",
+      "sha256": "3be07dd6a76aab98ab65b22f1c365a19cd3b48b417408174357077bf6a67eb25",
+      "bytes": 537593
+    },
+    "gerdLanding": {
+      "url": "https://aau.edu.et/images/gerdLanding.jpg",
+      "alt": "gerdLanding at Addis Ababa University",
+      "file": "assets/gerdLanding.image",
+      "sha256": "c0936e4698258e720a4bc2f9a730b2d27cb92b4d79c9ae5e0d03f8e5825d5eb9",
+      "bytes": 187108
+    },
+    "tashLight1": {
+      "url": "https://aau.edu.et/images/tashLight1.webp",
+      "alt": "tashLight1 at Addis Ababa University",
+      "file": "assets/tashLight1.image",
+      "sha256": "fa58846050962759f797f32f2cb8f96ac488756ccb08c8ce16ce31a853f42a83",
+      "bytes": 146344
+    },
+    "forumbuilding": {
+      "url": "https://aau.edu.et/_next/image?url=%2Fimages%2Fforumbuilding.jpg&w=1920&q=75",
+      "alt": "forumbuilding at Addis Ababa University",
+      "file": "assets/forumbuilding.image",
+      "sha256": "7c05b02e34b8cd6da85f637ac360514775bd125bea1974f1af3348397bbfee2e",
+      "bytes": 516168,
+      "original_url": "https://aau.edu.et/images/forumbuilding.jpg"
+    },
+    "freshers": {
+      "url": "https://aau.edu.et/images/freshers.jpg",
+      "alt": "freshers at Addis Ababa University",
+      "file": "assets/freshers.image",
+      "sha256": "bba78ff2614339a01efe1284ee984879a6d5e5c2370e0e3660d2a492257db94d",
+      "bytes": 238237
+    },
+    "recreationAndsports": {
+      "url": "https://aau.edu.et/images/recreationAndsports.jpg",
+      "alt": "recreationAndsports at Addis Ababa University",
+      "file": "assets/recreationAndsports.image",
+      "sha256": "0a5b7cd827d109258c8b2830ea0c2b49735c46d705dde2a6dfa912a0b96b75b0",
+      "bytes": 182512
+    },
+    "kennedy1-min": {
+      "url": "https://aau.edu.et/_next/image?url=%2Fimages%2Fkennedy1-min.jpg&w=1920&q=75",
+      "alt": "kennedy1 min at Addis Ababa University",
+      "file": "assets/kennedy1-min.image",
+      "sha256": "bcbf1dc9d7a71b7149ef7cd5d39784f0d071be99eae74c6c548d24150ea173db",
+      "bytes": 395332,
+      "original_url": "https://aau.edu.et/images/kennedy1-min.jpg"
+    },
+    "alamoudi": {
+      "url": "https://aau.edu.et/_next/image?url=%2Fimages%2Falamoudi.jpg&w=1920&q=75",
+      "alt": "alamoudi at Addis Ababa University",
+      "file": "assets/alamoudi.image",
+      "sha256": "9657f228672f41e4451174d46c97bba6d2c5f4d1d848f9a42b889a13f0f9ff1d",
+      "bytes": 255559,
+      "original_url": "https://aau.edu.et/images/alamoudi.jpg"
+    },
+    "logo": {
+      "url": "https://aau.edu.et/images/aauLogo.png",
+      "alt": "Addis Ababa University logo",
+      "file": "assets/logo.image",
+      "sha256": "0295c4df783f0ada3271e1d0d8e2f5d5b597206303a6cb3338827d8760726e5c",
+      "bytes": 83802
+    },
+    "news-0": {
+      "url": "https://volume.aau.edu.et/4,3d9ee547fdddec.jpg?width=1200&height=auto",
+      "alt": "Addis Ababa University Launches Digital Content Creation and Freelancing Training for Students",
+      "file": "assets/news-0.image",
+      "sha256": "e103d66e63e5acc125771f4628a643d01083c341c56dbd3a0cdb8ae75099328b",
+      "bytes": 133822
+    },
+    "news-1": {
+      "url": "https://volume.aau.edu.et/4,3d9ed9af9a16e7.jpg?width=1200&height=auto",
+      "alt": "Tikur Anbessa Specialized Hospital Inaugurates Two Modern Operating Theatres for Pediatric Surgery",
+      "file": "assets/news-1.image",
+      "sha256": "be403cb71feee9738b5eeda664b37a81196b02c927113170c95c43f9d1e391e2",
+      "bytes": 449619
+    },
+    "news-2": {
+      "url": "https://volume.aau.edu.et/4,3d9ecfa24150c1.jpg?width=1200&height=auto",
+      "alt": "AAU and U.S. Mission to the African Union Launch Economic and Policy Dialogue Center",
+      "file": "assets/news-2.image",
+      "sha256": "a0fbe625fe86cdb6bd65892bc26b8767e4c8d41e83407eeb669d23b3635054e3",
+      "bytes": 175250
+    },
+    "news-3": {
+      "url": "https://volume.aau.edu.et/7,3d9eb91099d67e.jpg?width=1200&height=auto",
+      "alt": "Addis Ababa University Hosts International Dissemination Workshop on Maternal Death Surveillance and Response",
+      "file": "assets/news-3.image",
+      "sha256": "995d74f45e5b08cddb7eb1edd4b73321f0d3b53a28b51e97d882a5859f82c2d0",
+      "bytes": 212987
+    },
+    "news-4": {
+      "url": "https://volume.aau.edu.et/5,3d9eb1d8fa87e8.jpg?width=1200&height=auto",
+      "alt": "AAU Hosts 2nd CIDRA International Academic Conference to Strengthen Europe–Africa Dialogue on Multilevel Governance",
+      "file": "assets/news-4.image",
+      "sha256": "3a6566f8210e40d716a5aac1dfb94d67799591c66b99f7abd6974f9a5ec64b30",
+      "bytes": 194508
+    },
+    "campus-0": {
+      "url": "https://volume.aau.edu.et/4,0a6be30b96c5.jpg?width=1200&height=auto",
+      "alt": "Sefere Selam Campus",
+      "file": "assets/campus-0.image",
+      "sha256": "a2da2ff8c848c312bf8107951c9a876be0353f1cb34fb1ef811a1e259232fb6a",
+      "bytes": 201346
+    },
+    "campus-1": {
+      "url": "https://volume.aau.edu.et/3,0a6a104c3cf0.jpg?width=1200&height=auto",
+      "alt": "FBE Campus",
+      "file": "assets/campus-1.image",
+      "sha256": "147dd867e8b409a80f175729366fe7ba1c4b6f698e46e216f15d66beb656a1a1",
+      "bytes": 145755
+    },
+    "campus-2": {
+      "url": "https://volume.aau.edu.et/5,0a69352477eb.jpg?width=1200&height=auto",
+      "alt": "Lideta Campus",
+      "file": "assets/campus-2.image",
+      "sha256": "8cb3eed9d83df6c6090cf0161b786fe86e95864d348d16eb48a63d019f753eb0",
+      "bytes": 155615
+    },
+    "campus-3": {
+      "url": "https://volume.aau.edu.et/2,0a68cb1e3e82.jpg?width=1200&height=auto",
+      "alt": "Tikur Anbessa Campus",
+      "file": "assets/campus-3.image",
+      "sha256": "24c6254f2c8c45ddc215878e23f3acecb0662276a100169d15e27371d5ea3851",
+      "bytes": 114186
+    },
+    "campus-4": {
+      "url": "https://volume.aau.edu.et/3,0a67526e2274.jpg?width=1200&height=auto",
+      "alt": "Alle Fine Arts Campus ",
+      "file": "assets/campus-4.image",
+      "sha256": "46da5d244eb243d827dfca905dc1666040c3680bf7f801437d9e0932022ebb6f",
+      "bytes": 80504
+    },
+    "campus-5": {
+      "url": "https://volume.aau.edu.et/5,0a66aa7e919a.jpg?width=1200&height=auto",
+      "alt": "Yared School of Music campus",
+      "file": "assets/campus-5.image",
+      "sha256": "e557c015ca33e71fba4e1cdfa5a10aeb87ae998a5312cfd8041085d48eab140c",
+      "bytes": 118998
+    },
+    "campus-6": {
+      "url": "https://volume.aau.edu.et/1,0a6552623734.jpg?width=1200&height=auto",
+      "alt": "Commerce Campus",
+      "file": "assets/campus-6.image",
+      "sha256": "1705d7e1066637b322ae7579a2976657da2efbe7bd5e2377e297449e53742934",
+      "bytes": 121495
+    },
+    "campus-7": {
+      "url": "https://volume.aau.edu.et/7,0a64ef6f7eb3.jpg?width=1200&height=auto",
+      "alt": "Bishoftu Campus",
+      "file": "assets/campus-7.image",
+      "sha256": "8373761d219101fe1af8872a9b80d232167229d1e74d9bdc71b99be9cf17971b",
+      "bytes": 79027
+    },
+    "campus-8": {
+      "url": "https://volume.aau.edu.et/3,0a63cd3aac19.jpg?width=1200&height=auto",
+      "alt": "Science Campus",
+      "file": "assets/campus-8.image",
+      "sha256": "5736c89e29aabc46d80f69a0d37e353bb69b911153df9f135b552f39df6aaec5",
+      "bytes": 152044
+    },
+    "campus-9": {
+      "url": "https://volume.aau.edu.et/4,0a3c956f5c51.jpg?width=1200&height=auto",
+      "alt": "Amist Kilo Campus",
+      "file": "assets/campus-9.image",
+      "sha256": "e7fddd3119ae66764f5c451586171a607510063579944fa34d12b29b2bc9d877",
+      "bytes": 132244
+    },
+    "campus-10": {
+      "url": "https://volume.aau.edu.et/1,0a3871120585.jpg?width=1200&height=auto",
+      "alt": "Sidist Kilo Campus",
+      "file": "assets/campus-10.image",
+      "sha256": "9453d5de76ceabdeac0657586a30658597592e1ae826faa1fa2c1c036f7b79c6",
+      "bytes": 148404
+    },
+    "campus-11": {
+      "url": "https://volume.aau.edu.et/3,0a37585a804d.jpg?width=1200&height=auto",
+      "alt": "Entoto Fine Arts Center",
+      "file": "assets/campus-11.image",
+      "sha256": "5393cb62fe68a4396c2dc83a404a05195ebf499c1840881cc82eeb7bfcae47f1",
+      "bytes": 177104
+    },
+    "partner-0": {
+      "url": "https://volume.aau.edu.et/1,3d9c42a53b1c2e.jpg?width=600&height=auto",
+      "alt": "the Belgian Development Cooperation logo",
+      "file": "assets/partner-0.image",
+      "sha256": "7eca51220c68c68da2c664c90c3523529d7fdcb283f0406c3ffaf3e14b06f488",
+      "bytes": 20626
+    },
+    "partner-1": {
+      "url": "https://volume.aau.edu.et/4,3d9c4353addd14.jpg?width=600&height=auto",
+      "alt": "VLIR-UOS logo",
+      "file": "assets/partner-1.image",
+      "sha256": "9b001eebe3e2b2d902a9b933469ff28fe842a937f08a901ee3325e0abe319384",
+      "bytes": 87476
+    },
+    "partner-2": {
+      "url": "https://volume.aau.edu.et/2,3d9e71196b50ca.jpg?width=600&height=auto",
+      "alt": "Ethio-Telecom logo",
+      "file": "assets/partner-2.image",
+      "sha256": "073e498ec0481993dc7b9f9962248c386dfce54154de9f7a73a71c9c932c2001",
+      "bytes": 16239
+    },
+    "partner-3": {
+      "url": "https://volume.aau.edu.et/3,0b6635b67178.jpg?width=600&height=auto",
+      "alt": "Africa Special NEP (RSAS)   logo",
+      "file": "assets/partner-3.image",
+      "sha256": "4c5b9c78263143a492de3aad6785aa29202316a3c42514f736993252b9d6032d",
+      "bytes": 8867
+    },
+    "partner-4": {
+      "url": "https://volume.aau.edu.et/5,0a6d1aa91ef7.jpg?width=600&height=auto",
+      "alt": "Sida logo",
+      "file": "assets/partner-4.image",
+      "sha256": "981c00e4148c88c4cb77ec7f05e90a57ba2afdf691155d6c5b5a302a2904b5af",
+      "bytes": 5776
+    }
+  },
+  "news": [
+    {
+      "id": "dd1aa7a8-6a1d-4f45-806c-2b0249f34db4",
+      "title": "Addis Ababa University Launches Digital Content Creation and Freelancing Training for Students",
+      "summary": "A student training initiative connects academic work with opportunities in digital publishing and freelance careers.",
+      "image": "news-0",
+      "source": "https://aau.edu.et/news/detail?title=Addis~Ababa~University~Launches~Digital~Content~Creation~and~Freelancing~Training~for~Students",
+      "source_date": "2026-11-21T14:40:54.588Z",
+      "category": "News"
+    },
+    {
+      "id": "1b2f0405-2f81-4691-b795-cf3241c94080",
+      "title": "Tikur Anbessa Specialized Hospital Inaugurates Two Modern Operating Theatres for Pediatric Surgery",
+      "summary": "New paediatric operating facilities expand surgical care at Tikur Anbessa Specialized Hospital.",
+      "image": "news-1",
+      "source": "https://aau.edu.et/news/detail?title=Tikur~Anbessa~Specialized~Hospital~Inaugurates~Two~Modern~Operating~Theatres~for~Pediatric~Surgery",
+      "source_date": "2026-11-19T07:23:37.125Z",
+      "category": "News"
+    },
+    {
+      "id": "7cfd5501-0d29-4e3a-a989-22d04afbd4c2",
+      "title": "AAU and U.S. Mission to the African Union Launch Economic and Policy Dialogue Center",
+      "summary": "A new centre supports economic research and policy dialogue with the U.S. Mission to the African Union.",
+      "image": "news-2",
+      "source": "https://aau.edu.et/news/detail?title=AAU~and~U.S.~Mission~to~the~African~Union~Launch~Economic~and~Policy~Dialogue~Center",
+      "source_date": "2026-11-16T14:26:57.990Z",
+      "category": "News"
+    },
+    {
+      "id": "988af3cc-e495-4dc9-b5a2-07c8a4b2c239",
+      "title": "Addis Ababa University Hosts International Dissemination Workshop on Maternal Death Surveillance and Response",
+      "summary": "An international workshop examines how maternal mortality data can improve prevention and health-system response.",
+      "image": "news-3",
+      "source": "https://aau.edu.et/news/detail?title=Addis~Ababa~University~Hosts~International~Dissemination~Workshop~on~Maternal~Death~Surveillance~and~Response",
+      "source_date": "2026-11-08T08:18:59.536Z",
+      "category": "News"
+    },
+    {
+      "id": "2eed3fd5-5fd2-4547-b407-c88b6994fe38",
+      "title": "AAU Hosts 2nd CIDRA International Academic Conference to Strengthen Europe–Africa Dialogue on Multilevel Governance",
+      "summary": "An academic conference brings European and African researchers together to discuss multilevel governance.",
+      "image": "news-4",
+      "source": "https://aau.edu.et/news/detail?title=AAU~Hosts~2nd~CIDRA~International~Academic~Conference~to~Strengthen~Europe%E2%80%93Africa~Dialogue~on~Multilevel~Governance",
+      "source_date": "2026-11-04T14:02:17.896Z",
+      "category": "News"
+    }
+  ],
+  "announcements": [
+    {
+      "id": "279a613b-c997-4695-a52d-7e45bbe4f2b2",
+      "title": "External Vaccancy Announcement",
+      "summary": "Read the original AAU announcement for the full notice, dates, eligibility and contact information.",
+      "source": "https://aau.edu.et/announcements/detail?title=External~Vaccancy~Announcement",
+      "source_date": "2026-11-20T09:10:36.842Z",
+      "category": "Announcements"
+    },
+    {
+      "id": "41c99bee-3fa6-4941-8df0-7e605c90f243",
+      "title": "For Addis Ababa University undergraduate students",
+      "summary": "Read the original AAU announcement for the full notice, dates, eligibility and contact information.",
+      "source": "https://aau.edu.et/announcements/detail?title=For~Addis~Ababa~University~undergraduate~students",
+      "source_date": "2026-11-16T07:42:38.071Z",
+      "category": "Announcements"
+    },
+    {
+      "id": "07892223-75fc-44be-93b4-471ee2510888",
+      "title": "AAU accredited as a CISI testing center",
+      "summary": "Read the original AAU announcement for the full notice, dates, eligibility and contact information.",
+      "source": "https://aau.edu.et/announcements/detail?title=AAU~accredited~as~a~CISI~testing~center",
+      "source_date": "2026-11-06T13:58:32.120Z",
+      "category": "Announcements"
+    },
+    {
+      "id": "203d33ec-389a-4de6-9579-b4102e90689c",
+      "title": "አስቸኳይ ማስታወቂያ!",
+      "summary": "Read the original AAU announcement for the full notice, dates, eligibility and contact information.",
+      "source": "https://aau.edu.et/announcements/detail?title=%E1%8A%A0%E1%88%B5%E1%89%B8%E1%8A%B3%E1%8B%AD~%E1%88%9B%E1%88%B5%E1%89%B3%E1%8B%88%E1%89%82%E1%8B%AB%21",
+      "source_date": "2026-11-06T11:59:17.200Z",
+      "category": "Announcements"
+    },
+    {
+      "id": "af598c65-8203-4d2a-a28c-8b895cc61e2a",
+      "title": "AAU Connect September 2026, Edition XIX Continental Recognition",
+      "summary": "Read the original AAU announcement for the full notice, dates, eligibility and contact information.",
+      "source": "https://aau.edu.et/announcements/detail?title=AAU~Connect~September~2026%2C~Edition~XIX~Continental~Recognition",
+      "source_date": "2026-10-30T04:24:50.398Z",
+      "category": "Announcements"
+    }
+  ],
+  "campuses": [
+    {
+      "name": "Sefere Selam Campus",
+      "image": "campus-0",
+      "code": "CHS"
+    },
+    {
+      "name": "FBE Campus",
+      "image": "campus-1",
+      "code": "CBE"
+    },
+    {
+      "name": "Lideta Campus",
+      "image": "campus-2",
+      "code": "EiABC"
+    },
+    {
+      "name": "Tikur Anbessa Campus",
+      "image": "campus-3",
+      "code": "CHS"
+    },
+    {
+      "name": "Alle Fine Arts Campus",
+      "image": "campus-4",
+      "code": ""
+    },
+    {
+      "name": "Yared School of Music campus",
+      "image": "campus-5",
+      "code": "YS"
+    },
+    {
+      "name": "Commerce Campus",
+      "image": "campus-6",
+      "code": "SOC"
+    },
+    {
+      "name": "Bishoftu Campus",
+      "image": "campus-7",
+      "code": "CVMA"
+    },
+    {
+      "name": "Science Campus",
+      "image": "campus-8",
+      "code": "CNCS"
+    },
+    {
+      "name": "Amist Kilo Campus",
+      "image": "campus-9",
+      "code": "AAiT"
+    },
+    {
+      "name": "Sidist Kilo Campus",
+      "image": "campus-10",
+      "code": "SKC"
+    },
+    {
+      "name": "Entoto Fine Arts Center",
+      "image": "campus-11",
+      "code": "EFAC"
+    }
+  ],
+  "partners": [
+    {
+      "title": "the Belgian Development Cooperation",
+      "image": "partner-0"
+    },
+    {
+      "title": "VLIR-UOS",
+      "image": "partner-1"
+    },
+    {
+      "title": "Ethio-Telecom",
+      "image": "partner-2"
+    },
+    {
+      "title": "Africa Special NEP (RSAS)",
+      "image": "partner-3"
+    },
+    {
+      "title": "Sida",
+      "image": "partner-4"
+    }
+  ]
+}

@@ -50,6 +50,7 @@ export function InspectorFields({
       <Box sx={{ display: "grid", gap: 2 }}>
         {Object.entries(schema.properties ?? {})
           .filter(([key]) => key !== "id" && key !== "children")
+          .sort(([a],[b])=>Number(a==="items")-Number(b==="items"))
           .map(([key, child]) => {
             const label = prefix ? `${prefix} ${human(key)}` : human(key);
             const fieldPath = path ? `${path}.${key}` : key;
@@ -143,6 +144,23 @@ export function InspectorFields({
               );
             }
 
+            if(child.enum && ["panel_tone","heading_color","curve_border","background","text_color","tone"].includes(key)) {
+              const optional=!schema.required?.includes(key);
+              const selected=record[key]??(optional?"":child.enum[0]);
+              const colours:Record<string,string>={none:"transparent",auto:"transparent",inherit:"transparent",default:"transparent",light:"#ffffff",paper:"#ffffff",white:"#ffffff",brand:"primary.main",blue:"primary.main",dark:"#172536",navy:"primary.dark",inverse:"#ffffff",muted:"#64748b",mist:"#edf3f7",gold:key==="panel_tone"?"#f8edce":"#d8ad45",brand_gradient:"linear-gradient(135deg,#075985,#003459)",blue_gradient:"linear-gradient(135deg,#075985,#38bdf8)",dark_gradient:"linear-gradient(135deg,#082f49,#111827)",navy_gradient:"linear-gradient(135deg,#003459,#075985)"};
+              return <Box component="fieldset" key={key} sx={{border:0,p:0,m:0,minWidth:0}}>
+                <Typography component="legend" variant="body2" sx={{mb:1,fontWeight:600}}>{label}</Typography>
+                <Box role="group" aria-label={label} sx={{display:"grid",gridTemplateColumns:"repeat(3,minmax(0,1fr))",gap:1}}>
+                  {[...(optional?[""]:[]),...child.enum].map(option=>{const token=String(option);const active=selected===option;const name=token?human(token):"Default";const colour=colours[token]??"transparent";
+                    return <Button key={token} type="button" disabled={disabled} aria-label={`${label}: ${name}`} aria-pressed={active} onClick={()=>{if(token)update(option);else{const next={...record};delete next[key];onChange(next);}}}
+                      sx={{minWidth:0,minHeight:64,p:.75,gap:.5,flexDirection:"column",border:active?"2px solid":"1px solid",borderColor:active?"primary.main":"divider",bgcolor:active?"action.selected":"transparent",fontSize:11,textTransform:"none","&:focus-visible":{outline:"3px solid",outlineColor:"primary.main",outlineOffset:2}}}>
+                      <Box aria-hidden sx={{width:26,height:26,borderRadius:"50%",border:1,borderColor:"divider",...(colour.startsWith("linear")?{background:colour}:{bgcolor:colour}),...(colour==="transparent"?{backgroundImage:"linear-gradient(135deg,transparent 45%,#94a3b8 46%,#94a3b8 54%,transparent 55%)"}:{}),boxShadow:active?"0 0 0 2px white,0 0 0 3px #075985":undefined}}/>{name}
+                    </Button>;
+                  })}
+                </Box>
+                {messages.length||child.description?<Typography variant="caption" color={messages.length?"error":"text.secondary"} role={messages.length?"alert":undefined}>{messages.join(" ")||child.description}</Typography>:null}
+              </Box>;
+            }
             if (child.enum) {
               return (
                 <TextField
@@ -153,7 +171,7 @@ export function InspectorFields({
                   disabled={disabled}
                   value={String(record[key] ?? (schema.required?.includes(key)?child.enum[0]:""))}
                   error={messages.length > 0}
-                  helperText={messages.join(" ") || undefined}
+                  helperText={messages.join(" ") || child.description || undefined}
                   onChange={(event) => {
                     if(event.target.value===""){
                       const next={...record};delete next[key];onChange(next);
@@ -162,7 +180,7 @@ export function InspectorFields({
                 >
                   {!schema.required?.includes(key)?<MenuItem value="">Default</MenuItem>:null}
                   {child.enum.map((option) => (
-                    <MenuItem key={String(option)} value={String(option)}>{human(String(option))}</MenuItem>
+                    <MenuItem key={String(option)} value={String(option)}>{child.enumLabels?.[String(option)]??human(String(option))}</MenuItem>
                   ))}
                 </TextField>
               );
