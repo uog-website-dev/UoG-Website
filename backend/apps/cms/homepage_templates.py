@@ -14,7 +14,10 @@ MANIFESTS = tuple(json.loads((Path(__file__).parent / "schemas/homepage" / (code
 # from the active Site through the public widget runtime; manifests never carry
 # Site IDs or media URLs.
 EDITABLE_WIDGETS = frozenset({"headline", "editor", "features", "call_to_action", "button", "button_grid", "alert", "layout_slider", "anything_carousel", "hero_image", "image", "tabs", "accordion", "menu_anchor", "contact_form", "icon"})
-SITE_WIDGETS = frozenset({"site_logo", "site_title", "menu", "loop_grid"})
+# Site branding and menus come from the global header. Homepage templates may
+# only use dynamic content (loop_grid); chrome widgets are never allowed.
+SITE_WIDGETS = frozenset({"loop_grid"})
+CHROME_WIDGETS = frozenset({"site_logo", "site_title", "menu"})
 
 
 def validate_manifest(value):
@@ -32,6 +35,8 @@ def validate_manifest(value):
         raise ValidationError({"required_modules": "Declare PAGES and VISUAL_BUILDER dependencies."})
     layout = validate_layout(value["layout"], prefix="layout")
     for node, path in iter_nodes(layout, prefix="layout"):
+        if node["type"] in CHROME_WIDGETS:
+            raise ValidationError({path + ".type": "Site logo, Site title and menu belong to the global header and are not allowed in homepage templates."})
         if node["type"] not in EDITABLE_WIDGETS | SITE_WIDGETS | {"section", "column"}:
             raise ValidationError({path + ".type": "Starting templates must use registered approved components."})
         if node["type"] == "loop_grid" and node["props"].get("source") != "posts":

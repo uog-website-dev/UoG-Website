@@ -273,3 +273,19 @@ def test_illustrated_starter_publishes_to_its_site_and_retains_private_draft_iso
     again=api.client.get('/api/v1/site-context/homepage/',HTTP_HOST=ha)
     assert again.json()['title']=='Shared homepage release'
     assert again.json()['metadata']['visual_layout']==public.json()['metadata']['visual_layout']
+
+
+def test_homepage_templates_never_include_site_chrome():
+    """Branding and menus belong to the global header, not to a starting Page."""
+    chrome = {"site_logo", "site_title", "menu"}
+    for manifest in domain.MANIFESTS:
+        checked = domain.validate_manifest(manifest)
+        assert not {node["type"] for node, _ in iter_nodes(checked["layout"])} & chrome
+
+    forged = copy.deepcopy(domain.MANIFESTS[0])
+    forged["layout"]["rows"][0]["columns"][0]["children"].append(
+        {"id": "legacy-site-title", "type": "site_title", "props": {}},
+    )
+    with pytest.raises(ValidationError) as caught:
+        domain.validate_manifest(forged)
+    assert "global header" in str(caught.value)

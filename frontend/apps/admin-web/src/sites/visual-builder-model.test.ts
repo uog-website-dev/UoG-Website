@@ -1,11 +1,13 @@
 import {describe,it,expect} from "vitest";
 import {validateVisualLayout} from "@uog/types";
-import {categories,registry,newWidget,newRow,starterLayout,outline,insertWidget} from "./visual-builder-model";
+import {categories,registry,paletteRegistry,newWidget,newRow,starterLayout,outline,insertWidget,chromeWidgetsIn,LEGACY_CHROME_TYPES} from "./visual-builder-model";
 
 describe("Visual Builder contract helpers",()=>{
-  it("covers each of the 43 approved widget types once and produces valid initial properties",()=>{
+  it("keeps all 43 registered widget types valid while offering 40 in the palette",()=>{
     expect(registry).toHaveLength(43);
-    expect(categories.flatMap(value=>value.types).sort()).toEqual(registry.map(value=>value.type).sort());
+    // The palette deliberately omits legacy Site chrome while the registry
+    // keeps those nodes labelable and renderable for published layouts.
+    expect(categories.flatMap(value=>value.types).sort()).toEqual(paletteRegistry.map(value=>value.type).sort());
     for(const definition of registry){
       const row=newRow();row.columns[0]!.children=[newWidget(definition.type,{assetId:"00000000-0000-4000-8000-000000000001",altText:"Campus"})];
       const checked=validateVisualLayout({schema_version:1,rows:[row]});
@@ -33,5 +35,26 @@ describe("Visual Builder contract helpers",()=>{
     expect(next.rows[0]!.columns[0]!.children.at(-1)!.type).toBe("image_slider");
     first.children=Array.from({length:50},()=>newWidget("headline"));
     expect(()=>insertWidget(layout,{columnId:first.id},newWidget("headline"))).toThrow();
+  });
+  it("keeps Site logo, title and menu out of the authoring palette but breadcrumbs in it",()=>{
+    const palette=categories.flatMap(value=>value.types);
+    for(const type of LEGACY_CHROME_TYPES) expect(palette).not.toContain(type);
+    expect(palette).toContain("breadcrumbs");
+    expect(palette).toContain("page_title");
+    expect(palette).toHaveLength(new Set(palette).size);
+  });
+  it("renders legacy chrome nodes and reports them for migration without rewriting them",()=>{
+    const row=newRow();row.columns[0]!.children=[newWidget("site_logo"),newWidget("site_title"),newWidget("menu")];
+    const layout={schema_version:1 as const,rows:[row]};
+    expect(validateVisualLayout(layout).ok).toBe(true);
+    const original=JSON.stringify(layout);
+    expect(chromeWidgetsIn(layout).map(value=>value.type)).toEqual(["site_logo","site_title","menu"]);
+    expect(JSON.stringify(layout)).toBe(original);
+    expect(chromeWidgetsIn(starterLayout())).toEqual([]);
+  });
+  it("accepts the explicit chrome-free setting and rejects unknown values",()=>{
+    expect(validateVisualLayout({schema_version:1,rows:[],settings:{chrome:"none"}}).ok).toBe(true);
+    expect(validateVisualLayout({schema_version:1,rows:[],settings:{chrome:"global"}}).ok).toBe(true);
+    expect(validateVisualLayout({schema_version:1,rows:[],settings:{chrome:"hidden"}}).ok).toBe(false);
   });
 });

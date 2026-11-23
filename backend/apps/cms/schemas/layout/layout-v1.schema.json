@@ -13521,6 +13521,12 @@
         },
         "bleed": {
           "type": "boolean"
+        },
+        "chrome": {
+          "enum": [
+            "global",
+            "none"
+          ]
         }
       },
       "required": []

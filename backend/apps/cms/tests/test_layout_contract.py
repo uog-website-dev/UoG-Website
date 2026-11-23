@@ -131,3 +131,13 @@ def test_upgrade_from_pre_visual_contract_preserves_legacy_page():
         assert (page.blocks,page.blocks_version,page.metadata,page.revision_number)==before
     finally:
         MigrationExecutor(connection).migrate(latest)
+
+
+def test_page_chrome_setting_is_explicit_and_bounded():
+    base = {"schema_version": 1, "rows": []}
+    assert validate_layout({**base, "settings": {"chrome": "none"}})["settings"]["chrome"] == "none"
+    assert validate_layout({**base, "settings": {"chrome": "global"}})["settings"]["chrome"] == "global"
+    # Existing documents without the key keep the global shell.
+    assert "chrome" not in validate_layout({**base, "settings": {"bleed": False}})["settings"]
+    with pytest.raises(ValidationError):
+        validate_layout({**base, "settings": {"chrome": "hidden"}})
