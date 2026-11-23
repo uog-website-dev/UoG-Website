@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
+import { cache } from "react";
 import * as http from "node:http";
 import * as https from "node:https";
-import { EMPTY_SITE, pageMetadata, postMetadata, safePagePath, siteFromContext } from "@uog/ui/public-site";
-import type { PublicSiteContext } from "@uog/ui/public-site";
+import { EMPTY_SITE, menuPayloadForSite, pageMetadata, postMetadata, safePagePath, siteFromContext } from "@uog/ui/public-site";
+import type { PublicMenusPayload, PublicSiteContext } from "@uog/ui/public-site";
 
 const API = process.env.API_BASE_URL ?? "http://backend:8000/api";
 
@@ -36,6 +37,22 @@ export async function publicSiteForHost(host: string | null): Promise<PublicSite
   const response = await requestPublicApi("", host);
   return siteFromContext(response?.status ?? 0, response?.body ?? null);
 }
+
+/**
+ * Server-rendered menus for the Host-resolved Site.
+ *
+ * Request-scoped React cache keyed by both Host and Site id: one fetch per
+ * request, never a cross-request copy that could outlive a menu publication.
+ * The backend keeps the delivery cache and bumps it when a menu or location is
+ * published. A 404 (MENUS disabled or unknown Host) and any payload for a
+ * different Site fail closed to no navigation.
+ */
+export const publicMenusForHost = cache(async (host: string | null, siteId: number | null): Promise<PublicMenusPayload | null> => {
+  if (!host || !siteId || /[\s,/@\\]/.test(host)) return null;
+  const response = await requestPublicApi("menus/", host);
+  if (!response || response.status !== 200) return null;
+  return menuPayloadForSite(response.body, siteId);
+});
 
 async function resolvedSite(): Promise<{ site: PublicSiteContext; origin: string } | null> {
   const incoming = await headers();

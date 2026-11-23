@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { pageFromResponse, PublicPageView } from "./public-page";
 import {
   EMPTY_SITE,
+  menuPayloadForSite,
   pageMetadata,
   postMetadata,
   PUBLIC_CACHE_MODE,
@@ -18,6 +19,23 @@ import { PublicSiteFrame } from "./public-site-frame";
 import { PublicSiteBrandingProvider } from "./site-branding";
 import { SiteBrandingLockup, SiteBrandingMark } from "./site-branding";
 import { UogFooter, UogHeader } from "./UogShell";
+
+describe("host-scoped menu payloads", () => {
+  const payload = { site: 2, locations: { header: [{ label: "About", href: "/about", children: [] }] }, configured_locations: ["header"] };
+
+  it("accepts only the payload for the resolved Site", () => {
+    expect(menuPayloadForSite(payload, 2)).toEqual(payload);
+    expect(menuPayloadForSite(payload, 3)).toBeNull();
+    expect(menuPayloadForSite({ ...payload, site: "2" }, 2)).toBeNull();
+  });
+
+  it("fails closed for missing Site ids and malformed locations", () => {
+    expect(menuPayloadForSite(payload, null)).toBeNull();
+    expect(menuPayloadForSite(null, 2)).toBeNull();
+    expect(menuPayloadForSite({ site: 2 }, 2)).toBeNull();
+    expect(menuPayloadForSite({ site: 2, locations: [] }, 2)).toBeNull();
+  });
+});
 
 const informatics = {
   site: { id: 2, code: "INFORMATICS", name: "Informatics" },
