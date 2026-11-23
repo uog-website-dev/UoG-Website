@@ -36,6 +36,7 @@ export function SiteBrandingMark({ site, size = 56, width = size }: { site: Publ
     return (
       <Box
         role="img"
+        data-site-branding-mark=""
         aria-label={`${site.displayName || "University of Gondar"} logo fallback`}
         sx={{
           width,
@@ -60,6 +61,7 @@ export function SiteBrandingMark({ site, size = 56, width = size }: { site: Publ
   return (
     <Box
       component="img"
+      data-site-branding-mark=""
       src={source}
       alt={`${site.displayName} logo`}
       referrerPolicy="no-referrer"

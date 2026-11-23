@@ -65,7 +65,7 @@ function NavigationLink({item,context,children,rootTrigger=false,rootIndex}:{ite
  const href=item.unavailable?null:destination(item.href,context.siteOrigin,context.currentPath);
  if(!href)return <Box component="span" aria-disabled={item.unavailable||undefined} sx={{overflowWrap:"anywhere"}}>{children??item.label}{item.unavailable?" (unavailable)":""}</Box>;
  const active=current(href,context.currentPath,context.siteOrigin);
- return <Link data-nav-index={rootIndex} data-nav-trigger={rootTrigger||undefined} href={href} aria-current={active?"page":undefined} target={context.openLinksInNewTab?"_blank":undefined} rel={context.openLinksInNewTab?"noopener noreferrer":undefined} onClick={()=>context.onNavigate?.()} color="inherit" underline="none" sx={{display:"inline-flex",alignItems:"center",minHeight:44,maxWidth:"100%",overflowWrap:"anywhere",fontWeight:active?700:600,px:0.75,borderBottom:"2px solid",borderColor:active?"currentColor":"transparent","&:hover":{borderColor:"currentColor"},"&:focus-visible":{outline:"3px solid currentColor",outlineOffset:2,borderRadius:0.5}}}>{children??item.label}</Link>;
+ return <Link data-nav-index={rootIndex} data-nav-trigger={rootTrigger||undefined} href={href} aria-current={active?"page":undefined} target={context.openLinksInNewTab?"_blank":undefined} rel={context.openLinksInNewTab?"noopener noreferrer":undefined} onClick={()=>context.onNavigate?.()} color="inherit" underline="none" sx={{display:"inline-flex",alignItems:"center",minHeight:44,maxWidth:"100%",overflowWrap:"anywhere",fontWeight:active?700:600,px:0.75,textDecoration:active?"underline":"none",textUnderlineOffset:"5px",textDecorationThickness:"2px","&:hover":{textDecoration:"underline"},"&:focus-visible":{outline:"3px solid currentColor",outlineOffset:2,borderRadius:0.5}}}>{children??item.label}</Link>;
 }
 function MenuBranch({item,context,depth,collapsible}:{item:PublicMenuNode;context:LinkContext;depth:number;collapsible:boolean}) {
  const [expanded,setExpanded]=useState(false);
@@ -82,7 +82,7 @@ function MenuBranch({item,context,depth,collapsible}:{item:PublicMenuNode;contex
    <Box sx={{flex:1,minWidth:0}}><NavigationLink item={item} context={context}/></Box>
    {children&&collapsible?<IconButton ref={toggle} size="small" aria-label={`${expanded?"Hide":"Show"} ${item.label} submenu`} aria-expanded={expanded} aria-controls={expanded?id:undefined}
     onClick={()=>setExpanded(!expanded)} onKeyDown={event=>{if(event.key==="ArrowRight"){event.preventDefault();event.stopPropagation();setExpanded(true);requestAnimationFrame(()=>subtree.current?.querySelector<HTMLElement>("a[href],button")?.focus());}}}
-    sx={{width:36,height:44,flexShrink:0,color:"primary.main",borderRadius:1,"&:focus-visible":{outline:"3px solid",outlineColor:"primary.main",outlineOffset:-3}}}>
+    sx={{width:44,height:44,flexShrink:0,color:"primary.main",borderRadius:1,"&:focus-visible":{outline:"3px solid",outlineColor:"primary.main",outlineOffset:-3}}}>
     <ChevronRightRoundedIcon sx={{fontSize:19,transform:expanded?"rotate(90deg)":"none",transition:"transform 150ms ease","@media (prefers-reduced-motion:reduce)":{transition:"none"}}}/>
    </IconButton>:null}
   </Box>
@@ -214,7 +214,8 @@ function MobileMenuLinks({items,context,depth=0}:{items:PublicMenuNode[];context
  </Box>;
 }
 
-export function SiteNavigation({items,label,mobile=false,dropdown=false,currentPath,siteOrigin,openLinksInNewTab=false}:{items:PublicMenuNode[];label:string;mobile?:boolean;dropdown?:boolean;currentPath?:string;siteOrigin?:string;openLinksInNewTab?:boolean}){
+export interface DrawerSection {label:string;items:PublicMenuNode[];action?:{label:string;href:string}}
+export function SiteNavigation({items,label,mobile=false,dropdown=false,drawerSections=[],currentPath,siteOrigin,openLinksInNewTab=false}:{items:PublicMenuNode[];label:string;mobile?:boolean;dropdown?:boolean;drawerSections?:DrawerSection[];currentPath?:string;siteOrigin?:string;openLinksInNewTab?:boolean}){
  const [open,setOpen]=useState(false),[browserPath,setBrowserPath]=useState("");
  const menuId=useId();
  useEffect(()=>{const update=()=>setBrowserPath(window.location.pathname+window.location.search+window.location.hash);update();window.addEventListener("popstate",update);window.addEventListener("hashchange",update);return()=>{window.removeEventListener("popstate",update);window.removeEventListener("hashchange",update);};},[]);
@@ -225,10 +226,15 @@ export function SiteNavigation({items,label,mobile=false,dropdown=false,currentP
  return <Box component="nav" aria-label={label} sx={{px:2,py:mobile?1:0.5,minWidth:0,maxWidth:"100%"}}>
   {mobile?<>
    <Box sx={{display:{xs:"none",lg:"block"}}}><SiteNavigation items={items} label={`${label} desktop`} dropdown currentPath={context.currentPath} siteOrigin={siteOrigin} openLinksInNewTab={openLinksInNewTab}/></Box>
-   <IconButton aria-label={`Open ${label.toLowerCase()}`} aria-expanded={open} aria-controls={menuId} onClick={()=>setOpen(true)} sx={{color:"inherit",display:{xs:"inline-flex",lg:"none"},"&:focus-visible":{outline:"3px solid currentColor",outlineOffset:2}}}><MenuIcon/></IconButton>
-   <Drawer anchor="left" open={open} onClose={()=>setOpen(false)}><Box sx={{width:340,maxWidth:"calc(100vw - 16px)",boxSizing:"border-box",p:2}} id={menuId}>
-    <Box sx={{display:"flex",alignItems:"center",justifyContent:"space-between",mb:2,pb:1,borderBottom:1,borderColor:"divider"}}><Typography fontWeight={800}>Navigation</Typography><IconButton aria-label={`Close ${label.toLowerCase()}`} onClick={()=>setOpen(false)} sx={{"&:focus-visible":{outline:"3px solid currentColor",outlineOffset:2}}}><CloseIcon/></IconButton></Box>
+   <IconButton aria-label={`Open ${label.toLowerCase()}`} aria-expanded={open} aria-controls={menuId} onClick={()=>setOpen(true)} sx={{color:"inherit",display:{xs:"inline-flex",lg:"none"},minWidth:44,minHeight:44,"&:focus-visible":{outline:"3px solid currentColor",outlineOffset:2}}}><MenuIcon/></IconButton>
+   <Drawer anchor="left" open={open} onClose={()=>setOpen(false)}><Box sx={{width:340,maxWidth:"calc(100vw - 16px)",boxSizing:"border-box",p:2,pb:"calc(16px + env(safe-area-inset-bottom))"}} id={menuId}>
+    <Box sx={{display:"flex",alignItems:"center",justifyContent:"space-between",mb:2,pb:1,borderBottom:1,borderColor:"divider"}}><Typography component="h2" fontWeight={800} sx={{m:0}}>Navigation</Typography><IconButton aria-label={`Close ${label.toLowerCase()}`} onClick={()=>setOpen(false)} sx={{minWidth:44,minHeight:44,"&:focus-visible":{outline:"3px solid currentColor",outlineOffset:2}}}><CloseIcon/></IconButton></Box>
     <Box component="div" role="navigation" aria-label={label}><MobileMenuLinks items={items} context={{...context,onNavigate:()=>setOpen(false)}}/></Box>
+    {drawerSections.filter(section=>section.items.length||section.action).map(section=><Box component="section" key={section.label} sx={{mt:2.5,pt:2,borderTop:1,borderColor:"divider"}}>
+     <Typography component="h2" variant="overline" sx={{display:"block",fontWeight:800,letterSpacing:".06em",color:"text.secondary",mb:.5}}>{section.label}</Typography>
+     {section.items.length?<Box role="navigation" aria-label={section.label}><MobileMenuLinks items={section.items} context={{...context,onNavigate:()=>setOpen(false)}}/></Box>:null}
+     {section.action?<ButtonBase component="a" href={section.action.href} onClick={()=>{setOpen(false);context.onNavigate?.();}} sx={{display:"flex",alignItems:"center",width:"100%",minHeight:44,mt:1,px:1,fontWeight:700,textDecoration:"underline",textUnderlineOffset:"4px",borderRadius:1,"&:focus-visible":{outline:"3px solid currentColor",outlineOffset:2}}}>{section.action.label}</ButtonBase>:null}
+    </Box>)}
    </Box></Drawer>
   </>:<MenuLinks items={items} context={context} horizontal={label!=="Page sidebar"}/> }
  </Box>;
