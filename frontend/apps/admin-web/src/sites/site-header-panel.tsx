@@ -1,7 +1,7 @@
 "use client";
 import {useEffect,useState} from "react";
 import Link from "next/link";
-import {Alert,Box,Button,CircularProgress,FormControlLabel,Paper,Switch,TextField,Typography} from "@mui/material";
+import {Alert,Box,Button,CircularProgress,FormControlLabel,MenuItem,Paper,Switch,TextField,Typography} from "@mui/material";
 import {ThemeProvider} from "@mui/material/styles";
 import {defaultSiteHeader,headerSettingsFrom} from "@uog/types";
 import type {SiteHeaderSettings} from "@uog/types";
@@ -79,6 +79,15 @@ function HeaderEditor({siteId}:{siteId:number}) {
    {error?<Alert severity="error">{error}</Alert>:null}<FormErrorSummary errors={errors}/>{notice?<Alert severity="success" role="status">{notice}</Alert>:null}
    <Box sx={{display:"grid",gridTemplateColumns:{xs:"1fr",md:"1fr 1fr"},gap:3}}>
     <Box sx={{display:"grid",gap:2,alignContent:"start"}}>
+     <Typography component="h2" variant="h6">Appearance</Typography>
+     <TextField select id="header-variant" label="Header variant" value={values.variant ?? "standard"} disabled={saving} fullWidth
+       onChange={event=>set("variant",event.target.value as SiteHeaderSettings["variant"])}
+       helperText="Standard, centered or compact layout. Existing Sites keep Standard until changed."
+     >
+      <MenuItem value="standard">Standard</MenuItem>
+      <MenuItem value="centered">Centered</MenuItem>
+      <MenuItem value="compact">Compact</MenuItem>
+     </TextField>
      <Typography component="h2" variant="h6">Branding</Typography>
      <TextField id="header-brand-href" label="Logo and Site name link" value={values.brand_href} disabled={saving} fullWidth required
        onChange={event=>set("brand_href",event.target.value)} error={Boolean(errors.brand_href)}

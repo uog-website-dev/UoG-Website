@@ -25,6 +25,7 @@ MAX_URL = 2048
 def defaults():
     return {
         "brand_href": "/",
+        "variant": "standard",
         "search_enabled": True,
         "sticky": False,
         "cta_label": "",
@@ -56,7 +57,7 @@ def _safe_destination(value, *, allow_empty=True):
 
 def validate_header(values):
     errors = {}
-    for field in ("brand_href", "cta_label", "cta_url"):
+    for field in ("brand_href", "variant", "cta_label", "cta_url"):
         value = values.get(field)
         if not isinstance(value, str):
             errors[field] = "Enter plain text."
@@ -65,6 +66,8 @@ def validate_header(values):
     for field in ("search_enabled", "sticky", "language_switcher"):
         if type(values.get(field)) is not bool:
             errors[field] = "Choose on or off."
+    if "variant" not in errors and values.get("variant") not in {"standard", "centered", "compact"}:
+        errors["variant"] = "Choose an approved header variant."
     if "brand_href" not in errors:
         try:
             _safe_destination(values.get("brand_href"), allow_empty=False)

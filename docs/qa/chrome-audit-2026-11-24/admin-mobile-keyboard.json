@@ -1,0 +1,61 @@
+{
+  "open": {
+    "rootRole": "presentation",
+    "rootAria": null,
+    "paperRole": null,
+    "paperAria": null,
+    "tabindex": "-1",
+    "active": {
+      "tag": "DIV",
+      "label": null,
+      "role": null,
+      "text": "UoG AdministrationDigital platformUniversity of Gondar Main "
+    },
+    "html": "<div class=\"MuiPaper-root MuiPaper-elevation MuiPaper-elevation16 MuiDrawer-paper MuiDrawer-paperAnchorLeft mui-14whhl8-MuiPaper-root-MuiDrawer-paper\" tabindex=\"-1\" style=\"--Paper-shadow: 0px 8px 10px -5px rgba(0,0,0,0.2),0px 16px 24px 2px rgba(0,0,0,0.14),0px 6px 30px 5px rgba(0,0,0,0.12); transform: none; transition: transform 225ms cubic-bezier(0, 0, 0.2, 1);\"><div class=\"MuiBox-root mui-1a3b1gj\"><div class=\"MuiBox-root mui-120nera\"><div class=\"MuiBox-root mui-tztboy\" aria-hidden=\"true\"><svg "
+  },
+  "tabs": [
+    {
+      "tag": "BUTTON",
+      "label": "Close navigation menu",
+      "text": "",
+      "inDrawer": true
+    },
+    {
+      "tag": "BUTTON",
+      "label": "Workspace: University of Gondar Main Site",
+      "text": "University of Gondar Main Site",
+      "inDrawer": true
+    },
+    {
+      "tag": "A",
+      "label": null,
+      "text": "DashboardSite content overview",
+      "inDrawer": true
+    },
+    {
+      "tag": "A",
+      "label": null,
+      "text": "PagesSite pages and workflow",
+      "inDrawer": true
+    },
+    {
+      "tag": "A",
+      "label": null,
+      "text": "SidebarsReusable Page navigation regions",
+      "inDrawer": true
+    },
+    {
+      "tag": "A",
+      "label": null,
+      "text": "Visual BuilderCompose a visual Page layout",
+      "inDrawer": true
+    }
+  ],
+  "escape": {
+    "open": false,
+    "focus": {
+      "tag": "BUTTON",
+      "label": "Open navigation menu"
+    }
+  }
+}

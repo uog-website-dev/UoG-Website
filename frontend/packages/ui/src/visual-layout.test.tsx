@@ -4,6 +4,7 @@ import { describe, it, expect, vi } from "vitest";
 import { validateVisualLayout, widgetRegistry, adaptLegacyBlocks } from "@uog/types";
 import type { VisualLayout, WidgetNode } from "@uog/types";
 import fixtures from "../../types/src/layout/fixtures.json";
+import aauFixture from "../../types/src/layout/aau-comparison.fixture.json";
 import { PublicPageView, pageFromResponse } from "./public-page";
 
 // jsdom has no SVG animation engine; actual player controls are exercised in Edge.
@@ -57,6 +58,16 @@ describe("shared visual layout fixtures",()=>{
     expect(first).toEqual(adaptLegacyBlocks(legacy));
     expect(first.rows[0]!.columns[0]!.children[0]!.id).toBe("existing-id");
     expect(legacy[1]!.html).toBe("<p>Old content</p>");
+  });
+  it("accepts approved style tokens and still rejects unsafe values",()=>{
+    const layout=structuredClone(fixtures[0]!.layout) as any;
+    layout.rows[0].style={...layout.rows[0].style,background:"navy",text_color:"#112233"};
+    expect(validateVisualLayout(layout).ok).toBe(true);
+    layout.rows[0].style.background="url(evil)";
+    expect(validateVisualLayout(layout).ok).toBe(false);
+  });
+  it("accepts the AAU comparison layout with hero tones and curve borders",()=>{
+    expect(validateVisualLayout(aauFixture).ok).toBe(true);
   });
   it("rejects duplicate item identity, over-node limits and oversized payloads",()=>{
     const layout=structuredClone(fixtures[0]!.layout) as any;

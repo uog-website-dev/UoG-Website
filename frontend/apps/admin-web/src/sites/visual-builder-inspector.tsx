@@ -18,6 +18,79 @@ import {
 
 const human = (key: string) => key.replaceAll("_", " ").replace(/^./, (value) => value.toUpperCase());
 
+/** Style fields rendered as colour swatches rather than plain selects. */
+const SWATCH_KEYS = ["panel_tone", "heading_color", "curve_border", "background", "text_color", "tone"];
+const HEX_COLOUR = /^#[0-9A-Fa-f]{6}$/u;
+
+interface TokenChoice {
+  tokens: unknown[];
+  enumLabels?: Record<string, string>;
+  customHex: boolean;
+}
+
+/**
+ * Recognises an enum field or a token-or-hex union such as Background, whose
+ * branches are approved tokens plus an optional custom #RRGGBB colour.
+ */
+function tokenChoice(child: PropertySchema): TokenChoice | null {
+  if (child.enum) return { tokens: child.enum, enumLabels: child.enumLabels, customHex: false };
+  if (!child.oneOf) return null;
+  const tokenBranch = child.oneOf.find((branch) => branch.enum);
+  if (!tokenBranch?.enum) return null;
+  const isHex = (branch: PropertySchema) => branch.type === "string" && branch.pattern === "^#[0-9A-Fa-f]{6}$";
+  if (!child.oneOf.every((branch) => Boolean(branch.enum) || isHex(branch))) return null;
+  return {
+    tokens: tokenBranch.enum,
+    enumLabels: tokenBranch.enumLabels ?? child.enumLabels,
+    customHex: child.oneOf.some(isHex),
+  };
+}
+
+const SWATCH_COLOURS: Record<string, string> = {none:"transparent",auto:"transparent",inherit:"transparent",default:"transparent",light:"#ffffff",paper:"#ffffff",white:"#ffffff",brand:"primary.main",blue:"primary.main",dark:"#172536",navy:"primary.dark",inverse:"#ffffff",muted:"#64748b",mist:"#edf3f7",gold:"#f8edce",brand_gradient:"linear-gradient(135deg,#075985,#003459)",blue_gradient:"linear-gradient(135deg,#075985,#38bdf8)",dark_gradient:"linear-gradient(135deg,#082f49,#111827)",navy_gradient:"linear-gradient(135deg,#003459,#075985)"};
+
+/** Token swatches plus, for token-or-hex unions, a native colour picker. */
+function TokenColourField({label, fieldKey, value, choice, optional, disabled, messages, description, onChange, onClear}: {
+  label: string;
+  fieldKey: string;
+  value: unknown;
+  choice: TokenChoice;
+  optional: boolean;
+  disabled: boolean;
+  messages: string[];
+  description?: string;
+  onChange: (value: unknown) => void;
+  onClear: () => void;
+}) {
+  const current = typeof value === "string" ? value : "";
+  const custom = choice.customHex && HEX_COLOUR.test(current);
+  const tokenColour = SWATCH_COLOURS[current];
+  const pickerValue = custom ? current : tokenColour && HEX_COLOUR.test(tokenColour) ? tokenColour : "#075985";
+  const helper = messages.join(" ")
+    || description
+    || (choice.customHex ? "Choose an approved token or pick any colour. Default removes the custom colour." : "");
+  return <Box component="fieldset" sx={{border:0,p:0,m:0,minWidth:0}}>
+    <Typography component="legend" variant="body2" sx={{mb:1,fontWeight:600}}>{label}</Typography>
+    <Box role="group" aria-label={label} sx={{display:"grid",gridTemplateColumns:"repeat(3,minmax(0,1fr))",gap:1}}>
+      {[...(optional?[""]:[]),...choice.tokens].map(option=>{const token=String(option);const active=current===token;const name=token?(choice.enumLabels?.[token]??human(token)):"Default";const colour=token==="gold"&&fieldKey!=="panel_tone"?"#d8ad45":SWATCH_COLOURS[token]??"transparent";
+        return <Button key={token} type="button" disabled={disabled} aria-label={`${label}: ${name}`} aria-pressed={active} onClick={()=>{if(token)onChange(option);else onClear();}}
+          sx={{minWidth:0,minHeight:64,p:.75,gap:.5,flexDirection:"column",border:active?"2px solid":"1px solid",borderColor:active?"primary.main":"divider",bgcolor:active?"action.selected":"transparent",fontSize:11,textTransform:"none","&:focus-visible":{outline:"3px solid",outlineColor:"primary.main",outlineOffset:2}}}>
+          <Box aria-hidden sx={{width:26,height:26,borderRadius:"50%",border:1,borderColor:"divider",...(colour.startsWith("linear")?{background:colour}:{bgcolor:colour}),...(colour==="transparent"?{backgroundImage:"linear-gradient(135deg,transparent 45%,#94a3b8 46%,#94a3b8 54%,transparent 55%)"}:{}),boxShadow:active?"0 0 0 2px white,0 0 0 3px #075985":undefined}}/>{name}
+        </Button>;
+      })}
+    </Box>
+    {choice.customHex?<Box sx={{mt:1,display:"flex",alignItems:"center",gap:1,flexWrap:"wrap"}}>
+      <Box component="label" sx={{display:"inline-flex",alignItems:"center",gap:1,border:"1px solid",borderColor:"divider",borderRadius:1,p:.5,pr:1.25,cursor:disabled?"default":"pointer","&:focus-within":{outline:"3px solid",outlineColor:"primary.main",outlineOffset:2}}}>
+        <Box component="input" type="color" aria-label={`${label} custom colour`} value={pickerValue} disabled={disabled}
+          onChange={(event)=>onChange(event.target.value)}
+          sx={{width:40,height:30,p:0,border:0,borderRadius:.75,bgcolor:"transparent",cursor:"inherit","&::-webkit-color-swatch-wrapper":{p:0},"&::-webkit-color-swatch":{border:0,borderRadius:"4px"},"&::-moz-color-swatch":{border:0,borderRadius:"4px"}}}/>
+        <Typography variant="caption" component="span" sx={{fontFamily:"monospace",fontSize:12}}>{custom?current:"Pick a colour"}</Typography>
+      </Box>
+      <Typography variant="caption" color="text.secondary">Or choose an approved token above.</Typography>
+    </Box>:null}
+    {messages.length||helper?<Typography variant="caption" color={messages.length?"error":"text.secondary"} role={messages.length?"alert":undefined} sx={{mt:choice.customHex?0.5:0,display:"block"}}>{messages.join(" ")||helper}</Typography>:null}
+  </Box>;
+}
+
 export interface InspectorFieldsProps {
   schema: PropertySchema;
   value: unknown;
@@ -144,22 +217,22 @@ export function InspectorFields({
               );
             }
 
-            if(child.enum && ["panel_tone","heading_color","curve_border","background","text_color","tone"].includes(key)) {
+            const choice = SWATCH_KEYS.includes(key) ? tokenChoice(child) : null;
+            if (choice) {
               const optional=!schema.required?.includes(key);
-              const selected=record[key]??(optional?"":child.enum[0]);
-              const colours:Record<string,string>={none:"transparent",auto:"transparent",inherit:"transparent",default:"transparent",light:"#ffffff",paper:"#ffffff",white:"#ffffff",brand:"primary.main",blue:"primary.main",dark:"#172536",navy:"primary.dark",inverse:"#ffffff",muted:"#64748b",mist:"#edf3f7",gold:key==="panel_tone"?"#f8edce":"#d8ad45",brand_gradient:"linear-gradient(135deg,#075985,#003459)",blue_gradient:"linear-gradient(135deg,#075985,#38bdf8)",dark_gradient:"linear-gradient(135deg,#082f49,#111827)",navy_gradient:"linear-gradient(135deg,#003459,#075985)"};
-              return <Box component="fieldset" key={key} sx={{border:0,p:0,m:0,minWidth:0}}>
-                <Typography component="legend" variant="body2" sx={{mb:1,fontWeight:600}}>{label}</Typography>
-                <Box role="group" aria-label={label} sx={{display:"grid",gridTemplateColumns:"repeat(3,minmax(0,1fr))",gap:1}}>
-                  {[...(optional?[""]:[]),...child.enum].map(option=>{const token=String(option);const active=selected===option;const name=token?human(token):"Default";const colour=colours[token]??"transparent";
-                    return <Button key={token} type="button" disabled={disabled} aria-label={`${label}: ${name}`} aria-pressed={active} onClick={()=>{if(token)update(option);else{const next={...record};delete next[key];onChange(next);}}}
-                      sx={{minWidth:0,minHeight:64,p:.75,gap:.5,flexDirection:"column",border:active?"2px solid":"1px solid",borderColor:active?"primary.main":"divider",bgcolor:active?"action.selected":"transparent",fontSize:11,textTransform:"none","&:focus-visible":{outline:"3px solid",outlineColor:"primary.main",outlineOffset:2}}}>
-                      <Box aria-hidden sx={{width:26,height:26,borderRadius:"50%",border:1,borderColor:"divider",...(colour.startsWith("linear")?{background:colour}:{bgcolor:colour}),...(colour==="transparent"?{backgroundImage:"linear-gradient(135deg,transparent 45%,#94a3b8 46%,#94a3b8 54%,transparent 55%)"}:{}),boxShadow:active?"0 0 0 2px white,0 0 0 3px #075985":undefined}}/>{name}
-                    </Button>;
-                  })}
-                </Box>
-                {messages.length||child.description?<Typography variant="caption" color={messages.length?"error":"text.secondary"} role={messages.length?"alert":undefined}>{messages.join(" ")||child.description}</Typography>:null}
-              </Box>;
+              return <TokenColourField
+                key={key}
+                label={label}
+                fieldKey={key}
+                value={record[key]}
+                choice={choice}
+                optional={optional}
+                disabled={disabled}
+                messages={messages}
+                description={child.description}
+                onChange={update}
+                onClear={()=>{const next={...record};delete next[key];onChange(next);}}
+              />;
             }
             if (child.enum) {
               return (

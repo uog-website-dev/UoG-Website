@@ -104,6 +104,7 @@ export function PublicSiteFooter({site,items=[],settings=site.footer,siteOrigin,
    </Box>
    <Box sx={{mt:{xs:4,md:6},pt:3,borderTop:1,borderColor:"rgba(255,255,255,.2)",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:2}}>
     {config.social_links.length?<Box component="nav" aria-label="Social media" sx={{display:"flex",flexWrap:"wrap",gap:.5}}>{config.social_links.map(link=>{const {label,icon:Icon}=platforms[link.platform];return <IconButton component="a" key={link.platform} href={link.url} target="_blank" rel="noopener noreferrer" aria-label={`${label} (opens in a new tab)`} sx={{color:"inherit",minWidth:44,minHeight:44,"&:hover":{bgcolor:"rgba(255,255,255,.12)"},...focus}}><Icon/></IconButton>;})}</Box>:null}
+    {config.legal_links?.length ? <Box component="nav" aria-label="Legal and accessibility links" sx={{display:"flex",flexWrap:"wrap",gap:2,alignItems:"center"}}>{config.legal_links.map(link=>{const external=link.url.startsWith("http");return <Link key={link.label} href={link.url} target={external?"_blank":undefined} rel={external?"noopener noreferrer":undefined} color="inherit" underline="hover" aria-label={external?`${link.label} (opens in a new tab)`:undefined} sx={{minHeight:44,display:"inline-flex",alignItems:"center",...focus}}>{link.label}</Link>;})}</Box>:null}
     <Typography variant="body2" sx={{opacity:.8,ml:{md:"auto"},lineHeight:1.7}}>{copyright}</Typography>
    </Box>
   </Container>
