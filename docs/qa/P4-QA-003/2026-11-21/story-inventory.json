@@ -1,510 +1,510 @@
-{
-  "source": "Committed HEAD identifiers, expanded Post range; reconcile against the authoritative sprint/Issue export",
-  "source_commit": "63d297cc691077ee08f59c93a4b9237c33c00361",
-  "stories": [
-    {
-      "id": "P4-ADMIN-001",
-      "pr": [
-        "https://github.com/uog-website-dev/UoG-Website/pull/93"
-      ],
-      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
-      "review": null,
-      "tests": null,
-      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
-      "qa_evidence": null,
-      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
-      "commits": [
-        "2c3c7754544fbb4cda8bc6fac72443a42cf5004f",
-        "9bf1582ece630f506b28a6fa010fb35addd22114"
-      ]
-    },
-    {
-      "id": "P4-ADMIN-002",
-      "pr": [
-        "https://github.com/uog-website-dev/UoG-Website/pull/94"
-      ],
-      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
-      "review": null,
-      "tests": null,
-      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
-      "qa_evidence": null,
-      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
-      "commits": [
-        "6b5da93057f4fd6c71222380da4d21e17041768c",
-        "3beedac23470569f548506a01f69c2046d33acd5"
-      ]
-    },
-    {
-      "id": "P4-HOME-001",
-      "pr": [
-        "https://github.com/uog-website-dev/UoG-Website/pull/77"
-      ],
-      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
-      "review": null,
-      "tests": [
-        "backend/apps/cms/tests/test_homepage.py",
-        "backend/apps/cms/tests/test_homepage_assignment.py",
-        "backend/apps/cms/tests/test_homepage_templates.py"
-      ],
-      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
-      "qa_evidence": "docs/qa/homepage-templates-2026-11-15/README.md",
-      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
-      "commits": [
-        "6f199a8bbf693a00f8dcef8b4ce5335460beba6b",
-        "57543835104280125eca2809558434ae56a26eef"
-      ]
-    },
-    {
-      "id": "P4-HOME-002",
-      "pr": [
-        "https://github.com/uog-website-dev/UoG-Website/pull/86"
-      ],
-      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
-      "review": null,
-      "tests": [
-        "backend/apps/cms/tests/test_homepage.py",
-        "backend/apps/cms/tests/test_homepage_assignment.py",
-        "backend/apps/cms/tests/test_homepage_templates.py"
-      ],
-      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
-      "qa_evidence": "docs/qa/homepage-templates-2026-11-19/README.md",
-      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
-      "commits": [
-        "49fcbbd2c20e71b46c04d7838d63bad65101f622",
-        "35202361d2b5cba3722c5d6587441ede991d9a02"
-      ]
-    },
-    {
-      "id": "P4-HOME-003",
-      "pr": [
-        "https://github.com/uog-website-dev/UoG-Website/pull/87"
-      ],
-      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
-      "review": null,
-      "tests": [
-        "backend/apps/cms/tests/test_homepage.py",
-        "backend/apps/cms/tests/test_homepage_assignment.py",
-        "backend/apps/cms/tests/test_homepage_templates.py"
-      ],
-      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
-      "qa_evidence": "docs/qa/homepage-templates-2026-11-19/README.md",
-      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
-      "commits": [
-        "49e30bfbcc5c084bd64e589118761d16e493557b",
-        "b50a23983b324bd8a89433d1202a13e1f326a570"
-      ]
-    },
-    {
-      "id": "P4-HOME-004",
-      "pr": [
-        "https://github.com/uog-website-dev/UoG-Website/pull/88"
-      ],
-      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
-      "review": null,
-      "tests": [
-        "backend/apps/cms/tests/test_homepage.py",
-        "backend/apps/cms/tests/test_homepage_assignment.py",
-        "backend/apps/cms/tests/test_homepage_templates.py"
-      ],
-      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
-      "qa_evidence": "docs/qa/homepage-publish-restore-2026-11-19/README.md",
-      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
-      "commits": [
-        "aada09a714fc9dc4243e25f2386beee34e48e26c",
-        "4566bae54b45f652bfbfbda9c0799df869a67522"
-      ]
-    },
-    {
-      "id": "P4-MENU-001",
-      "pr": [
-        "https://github.com/uog-website-dev/UoG-Website/pull/73"
-      ],
-      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
-      "review": null,
-      "tests": [
-        "backend/apps/cms/tests/test_menus.py",
-        "backend/apps/cms/tests/test_menu_api.py",
-        "backend/apps/cms/tests/test_menu_delivery.py",
-        "backend/apps/cms/tests/test_menu_destinations.py",
-        "backend/apps/cms/tests/test_menu_directory.py",
-        "backend/apps/cms/tests/test_menu_integrity.py",
-        "backend/apps/cms/tests/test_menu_locations.py",
-        "backend/apps/cms/tests/test_menu_preview.py"
-      ],
-      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
-      "qa_evidence": "docs/qa/menu-directory-2026-11-14/README.md",
-      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
-      "commits": [
-        "b6d4e3d23ef1031f78d58c79f78b0204d9aa398c",
-        "81007f9df40fa848ead9c4bf52759d81449df409"
-      ]
-    },
-    {
-      "id": "P4-MENU-002",
-      "pr": [
-        "https://github.com/uog-website-dev/UoG-Website/pull/74"
-      ],
-      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
-      "review": null,
-      "tests": [
-        "backend/apps/cms/tests/test_menus.py",
-        "backend/apps/cms/tests/test_menu_api.py",
-        "backend/apps/cms/tests/test_menu_delivery.py",
-        "backend/apps/cms/tests/test_menu_destinations.py",
-        "backend/apps/cms/tests/test_menu_directory.py",
-        "backend/apps/cms/tests/test_menu_integrity.py",
-        "backend/apps/cms/tests/test_menu_locations.py",
-        "backend/apps/cms/tests/test_menu_preview.py"
-      ],
-      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
-      "qa_evidence": "docs/qa/menu-destinations-2026-11-14/README.md",
-      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
-      "commits": [
-        "d48f8e10a6d26b0ffe3de17f243baec45a0fccc0",
-        "6073437db411f9d3e4cf205d9ffe0429f102efec"
-      ]
-    },
-    {
-      "id": "P4-MENU-003",
-      "pr": [
-        "https://github.com/uog-website-dev/UoG-Website/pull/75"
-      ],
-      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
-      "review": null,
-      "tests": [
-        "backend/apps/cms/tests/test_menus.py",
-        "backend/apps/cms/tests/test_menu_api.py",
-        "backend/apps/cms/tests/test_menu_delivery.py",
-        "backend/apps/cms/tests/test_menu_destinations.py",
-        "backend/apps/cms/tests/test_menu_directory.py",
-        "backend/apps/cms/tests/test_menu_integrity.py",
-        "backend/apps/cms/tests/test_menu_locations.py",
-        "backend/apps/cms/tests/test_menu_preview.py"
-      ],
-      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
-      "qa_evidence": "docs/qa/menu-locations-2026-11-15/README.md",
-      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
-      "commits": [
-        "a63e47400882a0adaeecb58f692bc73e4a931c21"
-      ]
-    },
-    {
-      "id": "P4-MENU-004",
-      "pr": [
-        "https://github.com/uog-website-dev/UoG-Website/pull/76"
-      ],
-      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
-      "review": null,
-      "tests": [
-        "backend/apps/cms/tests/test_menus.py",
-        "backend/apps/cms/tests/test_menu_api.py",
-        "backend/apps/cms/tests/test_menu_delivery.py",
-        "backend/apps/cms/tests/test_menu_destinations.py",
-        "backend/apps/cms/tests/test_menu_directory.py",
-        "backend/apps/cms/tests/test_menu_integrity.py",
-        "backend/apps/cms/tests/test_menu_locations.py",
-        "backend/apps/cms/tests/test_menu_preview.py"
-      ],
-      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
-      "qa_evidence": "docs/qa/menu-rendering-2026-11-15/README.md",
-      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
-      "commits": [
-        "562ac24c03e38892dcc59f6e1c8d7b09efdaa2fb",
-        "352ae514fc345a9fdcd87eabd5a48e22771f2dbf"
-      ]
-    },
-    {
-      "id": "P4-PAGE-001",
-      "pr": null,
-      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
-      "review": null,
-      "tests": null,
-      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
-      "qa_evidence": "docs/qa/page-layouts-2026-11-14/README.md",
-      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
-      "commits": [
-        "da667a22d4647640438d2a97cf4759e2031916e4",
-        "132d3b8ae42f52c61dc453b079c841ede2b0d79e"
-      ]
-    },
-    {
-      "id": "P4-PAGE-003",
-      "pr": [
-        "https://github.com/uog-website-dev/UoG-Website/pull/72"
-      ],
-      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
-      "review": null,
-      "tests": [
-        "backend/apps/cms/tests/test_sidebars.py",
-        "backend/apps/cms/tests/test_sidebar_widgets.py"
-      ],
-      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
-      "qa_evidence": "docs/qa/sidebar-widgets-2026-11-14/README.md",
-      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
-      "commits": [
-        "55d2e6a262f2ca17f5eda8a268e9d5ac075f0a20",
-        "09a186b44986da48a692a1b8fe0fd801be796f7e"
-      ]
-    },
-    {
-      "id": "P4-POST-001",
-      "pr": [
-        "https://github.com/uog-website-dev/UoG-Website/pull/67"
-      ],
-      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
-      "review": null,
-      "tests": [
-        "backend/tests/test_post_media_race.py",
-        "backend/apps/cms/tests/test_posts_api.py",
-        "backend/apps/cms/tests/test_post_media.py",
-        "backend/apps/cms/tests/test_post_workflow_migration.py",
-        "backend/apps/cms/tests/test_post_working_drafts.py",
-        "backend/apps/cms/tests/test_public_posts.py"
-      ],
-      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
-      "qa_evidence": "docs/qa/post-editor-2026-11-13/README.md",
-      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
-      "commits": [
-        "5aa894afd6eb2b1efccc47f0058a2862d38f44eb",
-        "648cc34ffa520dc2e65fb3f7040d3743eb004d60"
-      ]
-    },
-    {
-      "id": "P4-POST-002",
-      "pr": [
-        "https://github.com/uog-website-dev/UoG-Website/pull/67"
-      ],
-      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
-      "review": null,
-      "tests": [
-        "backend/tests/test_post_media_race.py",
-        "backend/apps/cms/tests/test_posts_api.py",
-        "backend/apps/cms/tests/test_post_media.py",
-        "backend/apps/cms/tests/test_post_workflow_migration.py",
-        "backend/apps/cms/tests/test_post_working_drafts.py",
-        "backend/apps/cms/tests/test_public_posts.py"
-      ],
-      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
-      "qa_evidence": "docs/qa/post-metadata-2026-11-13/README.md",
-      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
-      "commits": [
-        "5aa894afd6eb2b1efccc47f0058a2862d38f44eb",
-        "648cc34ffa520dc2e65fb3f7040d3743eb004d60"
-      ]
-    },
-    {
-      "id": "P4-POST-003",
-      "pr": [
-        "https://github.com/uog-website-dev/UoG-Website/pull/67"
-      ],
-      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
-      "review": null,
-      "tests": [
-        "backend/tests/test_post_media_race.py",
-        "backend/apps/cms/tests/test_posts_api.py",
-        "backend/apps/cms/tests/test_post_media.py",
-        "backend/apps/cms/tests/test_post_workflow_migration.py",
-        "backend/apps/cms/tests/test_post_working_drafts.py",
-        "backend/apps/cms/tests/test_public_posts.py"
-      ],
-      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
-      "qa_evidence": "docs/qa/post-media-2026-11-13/README.md",
-      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
-      "commits": [
-        "5aa894afd6eb2b1efccc47f0058a2862d38f44eb",
-        "648cc34ffa520dc2e65fb3f7040d3743eb004d60"
-      ]
-    },
-    {
-      "id": "P4-POST-004",
-      "pr": [
-        "https://github.com/uog-website-dev/UoG-Website/pull/67"
-      ],
-      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
-      "review": null,
-      "tests": [
-        "backend/tests/test_post_media_race.py",
-        "backend/apps/cms/tests/test_posts_api.py",
-        "backend/apps/cms/tests/test_post_media.py",
-        "backend/apps/cms/tests/test_post_workflow_migration.py",
-        "backend/apps/cms/tests/test_post_working_drafts.py",
-        "backend/apps/cms/tests/test_public_posts.py"
-      ],
-      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
-      "qa_evidence": "docs/qa/post-workflow-2026-11-13/README.md",
-      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
-      "commits": [
-        "5aa894afd6eb2b1efccc47f0058a2862d38f44eb",
-        "648cc34ffa520dc2e65fb3f7040d3743eb004d60"
-      ]
-    },
-    {
-      "id": "P4-POST-005",
-      "pr": [
-        "https://github.com/uog-website-dev/UoG-Website/pull/67"
-      ],
-      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
-      "review": null,
-      "tests": [
-        "backend/tests/test_post_media_race.py",
-        "backend/apps/cms/tests/test_posts_api.py",
-        "backend/apps/cms/tests/test_post_media.py",
-        "backend/apps/cms/tests/test_post_workflow_migration.py",
-        "backend/apps/cms/tests/test_post_working_drafts.py",
-        "backend/apps/cms/tests/test_public_posts.py"
-      ],
-      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
-      "qa_evidence": "docs/qa/public-post-detail-2026-11-13/README.md",
-      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
-      "commits": [
-        "5aa894afd6eb2b1efccc47f0058a2862d38f44eb",
-        "648cc34ffa520dc2e65fb3f7040d3743eb004d60"
-      ]
-    },
-    {
-      "id": "P4-POST-006",
-      "pr": [
-        "https://github.com/uog-website-dev/UoG-Website/pull/67"
-      ],
-      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
-      "review": null,
-      "tests": [
-        "backend/tests/test_post_media_race.py",
-        "backend/apps/cms/tests/test_posts_api.py",
-        "backend/apps/cms/tests/test_post_media.py",
-        "backend/apps/cms/tests/test_post_workflow_migration.py",
-        "backend/apps/cms/tests/test_post_working_drafts.py",
-        "backend/apps/cms/tests/test_public_posts.py"
-      ],
-      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
-      "qa_evidence": "docs/qa/public-news-2026-11-13/README.md",
-      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
-      "commits": [
-        "5aa894afd6eb2b1efccc47f0058a2862d38f44eb",
-        "648cc34ffa520dc2e65fb3f7040d3743eb004d60"
-      ]
-    },
-    {
-      "id": "P4-POST-007",
-      "pr": [
-        "https://github.com/uog-website-dev/UoG-Website/pull/67"
-      ],
-      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
-      "review": null,
-      "tests": [
-        "backend/tests/test_post_media_race.py",
-        "backend/apps/cms/tests/test_posts_api.py",
-        "backend/apps/cms/tests/test_post_media.py",
-        "backend/apps/cms/tests/test_post_workflow_migration.py",
-        "backend/apps/cms/tests/test_post_working_drafts.py",
-        "backend/apps/cms/tests/test_public_posts.py"
-      ],
-      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
-      "qa_evidence": "docs/qa/public-news-2026-11-13/README.md",
-      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
-      "commits": [
-        "5aa894afd6eb2b1efccc47f0058a2862d38f44eb",
-        "648cc34ffa520dc2e65fb3f7040d3743eb004d60"
-      ]
-    },
-    {
-      "id": "P4-QA-001",
-      "pr": null,
-      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
-      "review": null,
-      "tests": [
-        "backend/apps/cms/tests/test_membership_authorization.py"
-      ],
-      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
-      "qa_evidence": "docs/qa/main-workflow-2026-11-21/README.md",
-      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
-      "commits": [
-        "72ab91847c5d02d4f518521547111a1d4033bcf5"
-      ]
-    },
-    {
-      "id": "P4-QA-002",
-      "pr": null,
-      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
-      "review": null,
-      "tests": [
-        "backend/apps/cms/tests/test_membership_authorization.py"
-      ],
-      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
-      "qa_evidence": "docs/qa/college-workflow-2026-11-21/README.md",
-      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
-      "commits": [
-        "63d297cc691077ee08f59c93a4b9237c33c00361"
-      ]
-    },
-    {
-      "id": "P4-SEO-001",
-      "pr": [
-        "https://github.com/uog-website-dev/UoG-Website/pull/89"
-      ],
-      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
-      "review": null,
-      "tests": null,
-      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
-      "qa_evidence": null,
-      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
-      "commits": [
-        "c1ea7ad8c93cb5cc759d82a794a59e0dfc2da453",
-        "b7703ba4d92026c7200fcaf30634e8d8e646e25b"
-      ]
-    },
-    {
-      "id": "P4-SEO-002",
-      "pr": [
-        "https://github.com/uog-website-dev/UoG-Website/pull/90"
-      ],
-      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
-      "review": null,
-      "tests": null,
-      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
-      "qa_evidence": null,
-      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
-      "commits": [
-        "24d390e71ee5530c52fbf47614f209509bcaccdc",
-        "95b598713a267717c3124fd675a2e00b7ab57b33"
-      ]
-    },
-    {
-      "id": "P4-SITE-001",
-      "pr": [
-        "https://github.com/uog-website-dev/UoG-Website/pull/91"
-      ],
-      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
-      "review": null,
-      "tests": null,
-      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
-      "qa_evidence": null,
-      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
-      "commits": [
-        "e169a79f353ce050646e44f8657f2d9237821b5e",
-        "9cfd2695502b021277fe01255c5e1086718a94fd"
-      ]
-    },
-    {
-      "id": "P4-SITE-002",
-      "pr": [
-        "https://github.com/uog-website-dev/UoG-Website/pull/92"
-      ],
-      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
-      "review": null,
-      "tests": null,
-      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
-      "qa_evidence": null,
-      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
-      "commits": [
-        "1a1992a83951e4d1ed8d3fa3f3e478e0cd30643c",
-        "04de9c779bd2eac96def98bde71376207c206be0"
-      ]
-    }
-  ],
-  "needs_reconciliation": [
-    "P4-PAGE-002 does not occur as an explicit committed story ID; the reusable-sidebar commit is labelled P4-PAGE-001. Confirm official sprint/Issue mapping.",
-    "Any committed story omitted from Git identifiers requires official sprint-board reconciliation.",
-    "PR merge presence is not a named code-review approval."
-  ]
+{
+  "source": "Committed HEAD identifiers, expanded Post range; reconcile against the authoritative sprint/Issue export",
+  "source_commit": "63d297cc691077ee08f59c93a4b9237c33c00361",
+  "stories": [
+    {
+      "id": "P4-ADMIN-001",
+      "pr": [
+        "https://github.com/uog-website-dev/UoG-Website/pull/93"
+      ],
+      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
+      "review": null,
+      "tests": null,
+      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
+      "qa_evidence": null,
+      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
+      "commits": [
+        "2c3c7754544fbb4cda8bc6fac72443a42cf5004f",
+        "9bf1582ece630f506b28a6fa010fb35addd22114"
+      ]
+    },
+    {
+      "id": "P4-ADMIN-002",
+      "pr": [
+        "https://github.com/uog-website-dev/UoG-Website/pull/94"
+      ],
+      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
+      "review": null,
+      "tests": null,
+      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
+      "qa_evidence": null,
+      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
+      "commits": [
+        "6b5da93057f4fd6c71222380da4d21e17041768c",
+        "3beedac23470569f548506a01f69c2046d33acd5"
+      ]
+    },
+    {
+      "id": "P4-HOME-001",
+      "pr": [
+        "https://github.com/uog-website-dev/UoG-Website/pull/77"
+      ],
+      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
+      "review": null,
+      "tests": [
+        "backend/apps/cms/tests/test_homepage.py",
+        "backend/apps/cms/tests/test_homepage_assignment.py",
+        "backend/apps/cms/tests/test_homepage_templates.py"
+      ],
+      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
+      "qa_evidence": "docs/qa/homepage-templates-2026-11-15/README.md",
+      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
+      "commits": [
+        "6f199a8bbf693a00f8dcef8b4ce5335460beba6b",
+        "57543835104280125eca2809558434ae56a26eef"
+      ]
+    },
+    {
+      "id": "P4-HOME-002",
+      "pr": [
+        "https://github.com/uog-website-dev/UoG-Website/pull/86"
+      ],
+      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
+      "review": null,
+      "tests": [
+        "backend/apps/cms/tests/test_homepage.py",
+        "backend/apps/cms/tests/test_homepage_assignment.py",
+        "backend/apps/cms/tests/test_homepage_templates.py"
+      ],
+      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
+      "qa_evidence": "docs/qa/homepage-templates-2026-11-19/README.md",
+      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
+      "commits": [
+        "49fcbbd2c20e71b46c04d7838d63bad65101f622",
+        "35202361d2b5cba3722c5d6587441ede991d9a02"
+      ]
+    },
+    {
+      "id": "P4-HOME-003",
+      "pr": [
+        "https://github.com/uog-website-dev/UoG-Website/pull/87"
+      ],
+      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
+      "review": null,
+      "tests": [
+        "backend/apps/cms/tests/test_homepage.py",
+        "backend/apps/cms/tests/test_homepage_assignment.py",
+        "backend/apps/cms/tests/test_homepage_templates.py"
+      ],
+      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
+      "qa_evidence": "docs/qa/homepage-templates-2026-11-19/README.md",
+      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
+      "commits": [
+        "49e30bfbcc5c084bd64e589118761d16e493557b",
+        "b50a23983b324bd8a89433d1202a13e1f326a570"
+      ]
+    },
+    {
+      "id": "P4-HOME-004",
+      "pr": [
+        "https://github.com/uog-website-dev/UoG-Website/pull/88"
+      ],
+      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
+      "review": null,
+      "tests": [
+        "backend/apps/cms/tests/test_homepage.py",
+        "backend/apps/cms/tests/test_homepage_assignment.py",
+        "backend/apps/cms/tests/test_homepage_templates.py"
+      ],
+      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
+      "qa_evidence": "docs/qa/homepage-publish-restore-2026-11-19/README.md",
+      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
+      "commits": [
+        "aada09a714fc9dc4243e25f2386beee34e48e26c",
+        "4566bae54b45f652bfbfbda9c0799df869a67522"
+      ]
+    },
+    {
+      "id": "P4-MENU-001",
+      "pr": [
+        "https://github.com/uog-website-dev/UoG-Website/pull/73"
+      ],
+      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
+      "review": null,
+      "tests": [
+        "backend/apps/cms/tests/test_menus.py",
+        "backend/apps/cms/tests/test_menu_api.py",
+        "backend/apps/cms/tests/test_menu_delivery.py",
+        "backend/apps/cms/tests/test_menu_destinations.py",
+        "backend/apps/cms/tests/test_menu_directory.py",
+        "backend/apps/cms/tests/test_menu_integrity.py",
+        "backend/apps/cms/tests/test_menu_locations.py",
+        "backend/apps/cms/tests/test_menu_preview.py"
+      ],
+      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
+      "qa_evidence": "docs/qa/menu-directory-2026-11-14/README.md",
+      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
+      "commits": [
+        "b6d4e3d23ef1031f78d58c79f78b0204d9aa398c",
+        "81007f9df40fa848ead9c4bf52759d81449df409"
+      ]
+    },
+    {
+      "id": "P4-MENU-002",
+      "pr": [
+        "https://github.com/uog-website-dev/UoG-Website/pull/74"
+      ],
+      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
+      "review": null,
+      "tests": [
+        "backend/apps/cms/tests/test_menus.py",
+        "backend/apps/cms/tests/test_menu_api.py",
+        "backend/apps/cms/tests/test_menu_delivery.py",
+        "backend/apps/cms/tests/test_menu_destinations.py",
+        "backend/apps/cms/tests/test_menu_directory.py",
+        "backend/apps/cms/tests/test_menu_integrity.py",
+        "backend/apps/cms/tests/test_menu_locations.py",
+        "backend/apps/cms/tests/test_menu_preview.py"
+      ],
+      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
+      "qa_evidence": "docs/qa/menu-destinations-2026-11-14/README.md",
+      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
+      "commits": [
+        "d48f8e10a6d26b0ffe3de17f243baec45a0fccc0",
+        "6073437db411f9d3e4cf205d9ffe0429f102efec"
+      ]
+    },
+    {
+      "id": "P4-MENU-003",
+      "pr": [
+        "https://github.com/uog-website-dev/UoG-Website/pull/75"
+      ],
+      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
+      "review": null,
+      "tests": [
+        "backend/apps/cms/tests/test_menus.py",
+        "backend/apps/cms/tests/test_menu_api.py",
+        "backend/apps/cms/tests/test_menu_delivery.py",
+        "backend/apps/cms/tests/test_menu_destinations.py",
+        "backend/apps/cms/tests/test_menu_directory.py",
+        "backend/apps/cms/tests/test_menu_integrity.py",
+        "backend/apps/cms/tests/test_menu_locations.py",
+        "backend/apps/cms/tests/test_menu_preview.py"
+      ],
+      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
+      "qa_evidence": "docs/qa/menu-locations-2026-11-15/README.md",
+      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
+      "commits": [
+        "a63e47400882a0adaeecb58f692bc73e4a931c21"
+      ]
+    },
+    {
+      "id": "P4-MENU-004",
+      "pr": [
+        "https://github.com/uog-website-dev/UoG-Website/pull/76"
+      ],
+      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
+      "review": null,
+      "tests": [
+        "backend/apps/cms/tests/test_menus.py",
+        "backend/apps/cms/tests/test_menu_api.py",
+        "backend/apps/cms/tests/test_menu_delivery.py",
+        "backend/apps/cms/tests/test_menu_destinations.py",
+        "backend/apps/cms/tests/test_menu_directory.py",
+        "backend/apps/cms/tests/test_menu_integrity.py",
+        "backend/apps/cms/tests/test_menu_locations.py",
+        "backend/apps/cms/tests/test_menu_preview.py"
+      ],
+      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
+      "qa_evidence": "docs/qa/menu-rendering-2026-11-15/README.md",
+      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
+      "commits": [
+        "562ac24c03e38892dcc59f6e1c8d7b09efdaa2fb",
+        "352ae514fc345a9fdcd87eabd5a48e22771f2dbf"
+      ]
+    },
+    {
+      "id": "P4-PAGE-001",
+      "pr": null,
+      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
+      "review": null,
+      "tests": null,
+      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
+      "qa_evidence": "docs/qa/page-layouts-2026-11-14/README.md",
+      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
+      "commits": [
+        "da667a22d4647640438d2a97cf4759e2031916e4",
+        "132d3b8ae42f52c61dc453b079c841ede2b0d79e"
+      ]
+    },
+    {
+      "id": "P4-PAGE-003",
+      "pr": [
+        "https://github.com/uog-website-dev/UoG-Website/pull/72"
+      ],
+      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
+      "review": null,
+      "tests": [
+        "backend/apps/cms/tests/test_sidebars.py",
+        "backend/apps/cms/tests/test_sidebar_widgets.py"
+      ],
+      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
+      "qa_evidence": "docs/qa/sidebar-widgets-2026-11-14/README.md",
+      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
+      "commits": [
+        "55d2e6a262f2ca17f5eda8a268e9d5ac075f0a20",
+        "09a186b44986da48a692a1b8fe0fd801be796f7e"
+      ]
+    },
+    {
+      "id": "P4-POST-001",
+      "pr": [
+        "https://github.com/uog-website-dev/UoG-Website/pull/67"
+      ],
+      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
+      "review": null,
+      "tests": [
+        "backend/tests/test_post_media_race.py",
+        "backend/apps/cms/tests/test_posts_api.py",
+        "backend/apps/cms/tests/test_post_media.py",
+        "backend/apps/cms/tests/test_post_workflow_migration.py",
+        "backend/apps/cms/tests/test_post_working_drafts.py",
+        "backend/apps/cms/tests/test_public_posts.py"
+      ],
+      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
+      "qa_evidence": "docs/qa/post-editor-2026-11-13/README.md",
+      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
+      "commits": [
+        "5aa894afd6eb2b1efccc47f0058a2862d38f44eb",
+        "648cc34ffa520dc2e65fb3f7040d3743eb004d60"
+      ]
+    },
+    {
+      "id": "P4-POST-002",
+      "pr": [
+        "https://github.com/uog-website-dev/UoG-Website/pull/67"
+      ],
+      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
+      "review": null,
+      "tests": [
+        "backend/tests/test_post_media_race.py",
+        "backend/apps/cms/tests/test_posts_api.py",
+        "backend/apps/cms/tests/test_post_media.py",
+        "backend/apps/cms/tests/test_post_workflow_migration.py",
+        "backend/apps/cms/tests/test_post_working_drafts.py",
+        "backend/apps/cms/tests/test_public_posts.py"
+      ],
+      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
+      "qa_evidence": "docs/qa/post-metadata-2026-11-13/README.md",
+      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
+      "commits": [
+        "5aa894afd6eb2b1efccc47f0058a2862d38f44eb",
+        "648cc34ffa520dc2e65fb3f7040d3743eb004d60"
+      ]
+    },
+    {
+      "id": "P4-POST-003",
+      "pr": [
+        "https://github.com/uog-website-dev/UoG-Website/pull/67"
+      ],
+      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
+      "review": null,
+      "tests": [
+        "backend/tests/test_post_media_race.py",
+        "backend/apps/cms/tests/test_posts_api.py",
+        "backend/apps/cms/tests/test_post_media.py",
+        "backend/apps/cms/tests/test_post_workflow_migration.py",
+        "backend/apps/cms/tests/test_post_working_drafts.py",
+        "backend/apps/cms/tests/test_public_posts.py"
+      ],
+      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
+      "qa_evidence": "docs/qa/post-media-2026-11-13/README.md",
+      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
+      "commits": [
+        "5aa894afd6eb2b1efccc47f0058a2862d38f44eb",
+        "648cc34ffa520dc2e65fb3f7040d3743eb004d60"
+      ]
+    },
+    {
+      "id": "P4-POST-004",
+      "pr": [
+        "https://github.com/uog-website-dev/UoG-Website/pull/67"
+      ],
+      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
+      "review": null,
+      "tests": [
+        "backend/tests/test_post_media_race.py",
+        "backend/apps/cms/tests/test_posts_api.py",
+        "backend/apps/cms/tests/test_post_media.py",
+        "backend/apps/cms/tests/test_post_workflow_migration.py",
+        "backend/apps/cms/tests/test_post_working_drafts.py",
+        "backend/apps/cms/tests/test_public_posts.py"
+      ],
+      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
+      "qa_evidence": "docs/qa/post-workflow-2026-11-13/README.md",
+      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
+      "commits": [
+        "5aa894afd6eb2b1efccc47f0058a2862d38f44eb",
+        "648cc34ffa520dc2e65fb3f7040d3743eb004d60"
+      ]
+    },
+    {
+      "id": "P4-POST-005",
+      "pr": [
+        "https://github.com/uog-website-dev/UoG-Website/pull/67"
+      ],
+      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
+      "review": null,
+      "tests": [
+        "backend/tests/test_post_media_race.py",
+        "backend/apps/cms/tests/test_posts_api.py",
+        "backend/apps/cms/tests/test_post_media.py",
+        "backend/apps/cms/tests/test_post_workflow_migration.py",
+        "backend/apps/cms/tests/test_post_working_drafts.py",
+        "backend/apps/cms/tests/test_public_posts.py"
+      ],
+      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
+      "qa_evidence": "docs/qa/public-post-detail-2026-11-13/README.md",
+      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
+      "commits": [
+        "5aa894afd6eb2b1efccc47f0058a2862d38f44eb",
+        "648cc34ffa520dc2e65fb3f7040d3743eb004d60"
+      ]
+    },
+    {
+      "id": "P4-POST-006",
+      "pr": [
+        "https://github.com/uog-website-dev/UoG-Website/pull/67"
+      ],
+      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
+      "review": null,
+      "tests": [
+        "backend/tests/test_post_media_race.py",
+        "backend/apps/cms/tests/test_posts_api.py",
+        "backend/apps/cms/tests/test_post_media.py",
+        "backend/apps/cms/tests/test_post_workflow_migration.py",
+        "backend/apps/cms/tests/test_post_working_drafts.py",
+        "backend/apps/cms/tests/test_public_posts.py"
+      ],
+      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
+      "qa_evidence": "docs/qa/public-news-2026-11-13/README.md",
+      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
+      "commits": [
+        "5aa894afd6eb2b1efccc47f0058a2862d38f44eb",
+        "648cc34ffa520dc2e65fb3f7040d3743eb004d60"
+      ]
+    },
+    {
+      "id": "P4-POST-007",
+      "pr": [
+        "https://github.com/uog-website-dev/UoG-Website/pull/67"
+      ],
+      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
+      "review": null,
+      "tests": [
+        "backend/tests/test_post_media_race.py",
+        "backend/apps/cms/tests/test_posts_api.py",
+        "backend/apps/cms/tests/test_post_media.py",
+        "backend/apps/cms/tests/test_post_workflow_migration.py",
+        "backend/apps/cms/tests/test_post_working_drafts.py",
+        "backend/apps/cms/tests/test_public_posts.py"
+      ],
+      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
+      "qa_evidence": "docs/qa/public-news-2026-11-13/README.md",
+      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
+      "commits": [
+        "5aa894afd6eb2b1efccc47f0058a2862d38f44eb",
+        "648cc34ffa520dc2e65fb3f7040d3743eb004d60"
+      ]
+    },
+    {
+      "id": "P4-QA-001",
+      "pr": null,
+      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
+      "review": null,
+      "tests": [
+        "backend/apps/cms/tests/test_membership_authorization.py"
+      ],
+      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
+      "qa_evidence": "docs/qa/main-workflow-2026-11-21/README.md",
+      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
+      "commits": [
+        "72ab91847c5d02d4f518521547111a1d4033bcf5"
+      ]
+    },
+    {
+      "id": "P4-QA-002",
+      "pr": null,
+      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
+      "review": null,
+      "tests": [
+        "backend/apps/cms/tests/test_membership_authorization.py"
+      ],
+      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
+      "qa_evidence": "docs/qa/college-workflow-2026-11-21/README.md",
+      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
+      "commits": [
+        "63d297cc691077ee08f59c93a4b9237c33c00361"
+      ]
+    },
+    {
+      "id": "P4-SEO-001",
+      "pr": [
+        "https://github.com/uog-website-dev/UoG-Website/pull/89"
+      ],
+      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
+      "review": null,
+      "tests": null,
+      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
+      "qa_evidence": null,
+      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
+      "commits": [
+        "c1ea7ad8c93cb5cc759d82a794a59e0dfc2da453",
+        "b7703ba4d92026c7200fcaf30634e8d8e646e25b"
+      ]
+    },
+    {
+      "id": "P4-SEO-002",
+      "pr": [
+        "https://github.com/uog-website-dev/UoG-Website/pull/90"
+      ],
+      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
+      "review": null,
+      "tests": null,
+      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
+      "qa_evidence": null,
+      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
+      "commits": [
+        "24d390e71ee5530c52fbf47614f209509bcaccdc",
+        "95b598713a267717c3124fd675a2e00b7ab57b33"
+      ]
+    },
+    {
+      "id": "P4-SITE-001",
+      "pr": [
+        "https://github.com/uog-website-dev/UoG-Website/pull/91"
+      ],
+      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
+      "review": null,
+      "tests": null,
+      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
+      "qa_evidence": null,
+      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
+      "commits": [
+        "e169a79f353ce050646e44f8657f2d9237821b5e",
+        "9cfd2695502b021277fe01255c5e1086718a94fd"
+      ]
+    },
+    {
+      "id": "P4-SITE-002",
+      "pr": [
+        "https://github.com/uog-website-dev/UoG-Website/pull/92"
+      ],
+      "pr_basis": "Local Git merge metadata/manual supplied links; remote review approval not inferred",
+      "review": null,
+      "tests": null,
+      "tests_basis": "Candidate test-module mapping; execution outcomes are in current regression summary, not inferred from file existence",
+      "qa_evidence": null,
+      "qa_evidence_freshness": "Historical committed evidence; release-commit review still required",
+      "commits": [
+        "1a1992a83951e4d1ed8d3fa3f3e478e0cd30643c",
+        "04de9c779bd2eac96def98bde71376207c206be0"
+      ]
+    }
+  ],
+  "needs_reconciliation": [
+    "P4-PAGE-002 does not occur as an explicit committed story ID; the reusable-sidebar commit is labelled P4-PAGE-001. Confirm official sprint/Issue mapping.",
+    "Any committed story omitted from Git identifiers requires official sprint-board reconciliation.",
+    "PR merge presence is not a named code-review approval."
+  ]
 }

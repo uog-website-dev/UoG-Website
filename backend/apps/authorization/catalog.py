@@ -42,6 +42,11 @@ CAPABILITIES = (
     Capability("content.pages.submit_review", "Submit pages for review", "Submit a page into review. Not executable: no review workflow exists.", "content", "page", "submit_review", "HIGH", False),
     Capability("content.pages.approve", "Approve pages", "Approve a page review. Not executable: no review workflow exists.", "content", "page", "approve", "HIGH", False),
     Capability("content.posts.view", "View posts", "Read posts within assigned Site scope.", "content", "post", "view"),
+    Capability("content.documents.view", "View documents", "Read documents within assigned Site scope.", "content", "document", "view"),
+    Capability("content.documents.create", "Create documents", "Create Site documents.", "content", "document", "create"),
+    Capability("content.documents.update", "Update documents", "Edit Site documents.", "content", "document", "update"),
+    Capability("content.documents.delete", "Delete documents", "Delete Site documents.", "content", "document", "delete", "HIGH", False),
+    Capability("content.documents.publish", "Publish documents", "Publish Site documents.", "content", "document", "publish", "HIGH", False),
     Capability("content.posts.create", "Create posts", "Create draft posts within assigned Site scope.", "content", "post", "create"),
     Capability("content.posts.update", "Update posts", "Edit posts within assigned Site scope.", "content", "post", "update"),
     Capability("content.posts.delete", "Delete posts", "Delete posts within assigned Site scope.", "content", "post", "delete", "HIGH", False),
@@ -71,6 +76,7 @@ PLATFORM_ADMIN = frozenset({
     "platform.roles.update", "platform.roles.assign_permissions", "sites.view", "sites.create", "sites.update",
     "content.pages.view", "content.pages.create", "content.pages.update", "content.pages.delete", "content.pages.publish",
     "content.posts.view", "content.posts.create", "content.posts.update", "content.posts.delete", "content.posts.publish",
+    "content.documents.view", "content.documents.create", "content.documents.update", "content.documents.delete", "content.documents.publish",
     "audit.logs.view", "audit.logs.export",
 })
 ORG_ADMIN = frozenset({
@@ -82,6 +88,7 @@ ORG_ADMIN = frozenset({
     "content.pages.delete", "content.pages.publish",
     "content.posts.view", "content.posts.create", "content.posts.update",
     "content.posts.delete", "content.posts.publish",
+    "content.documents.view", "content.documents.create", "content.documents.update", "content.documents.delete", "content.documents.publish",
 })
 SITE_ADMIN = frozenset({
     "content.media.view", "content.media.upload", "content.media.delete",
@@ -92,6 +99,7 @@ SITE_ADMIN = frozenset({
     "content.pages.delete", "content.pages.publish",
     "content.posts.view", "content.posts.create", "content.posts.update",
     "content.posts.delete", "content.posts.publish",
+    "content.documents.view", "content.documents.create", "content.documents.update", "content.documents.delete", "content.documents.publish",
 })
 EDITOR = frozenset({
     "sites.view", "content.media.view", "content.media.upload",
@@ -99,19 +107,21 @@ EDITOR = frozenset({
     "content.menus.view",
     "content.pages.view", "content.pages.create", "content.pages.update",
     "content.posts.view", "content.posts.create", "content.posts.update",
+    "content.documents.view", "content.documents.create", "content.documents.update",
 })
 REVIEWER = frozenset({"sites.view", "content.media.view", "content.pages.view", "content.posts.view", "menu.read"})
 PUBLISHER = frozenset({
     "sites.view", "content.media.view",
     "content.pages.view", "content.pages.publish",
     "content.posts.view", "content.posts.publish",
+    "content.documents.view", "content.documents.publish",
     "menu.read", "menu.publish",
 })
 VIEWER = frozenset({
     "menu.read",
     "content.menus.view",
     "platform.dashboard.view", "platform.organizations.view", "platform.users.view", "platform.roles.view",
-    "sites.view", "content.pages.view", "content.posts.view",
+    "sites.view", "content.pages.view", "content.posts.view", "content.documents.view",
 })
 
 STANDARD_ROLES = (

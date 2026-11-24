@@ -10,12 +10,12 @@
 export const CENTRAL_MODULE_PERMISSION = "platform.sites.manage_registry";
 
 export interface SiteSection {
-  key: "header" | "footer" | "appearance" | "dashboard" | "sidebars" | "pages" | "builder" | "homepage" | "posts" | "menus" | "media" | "users";
+  key: "header" | "footer" | "appearance" | "dashboard" | "sidebars" | "pages" | "builder" | "homepage" | "posts" | "documents" | "menus" | "media" | "users";
   label: string;
-  segment: "header" | "footer" | "appearance" | "" | "sidebars" | "pages" | "builder" | "homepage" | "posts" | "menus" | "media" | "users";
-  module: "PAGES" | "POSTS" | "MENUS" | "MEDIA" | "VISUAL_BUILDER" | null;
+  segment: "header" | "footer" | "appearance" | "" | "sidebars" | "pages" | "builder" | "homepage" | "posts" | "documents" | "menus" | "media" | "users";
+  module: "PAGES" | "POSTS" | "DOCUMENTS" | "MENUS" | "MEDIA" | "VISUAL_BUILDER" | null;
   /** Any one enabled module satisfies the gate; used when two modules qualify. */
-  modules?: readonly ("PAGES" | "POSTS" | "MENUS" | "MEDIA" | "VISUAL_BUILDER")[];
+  modules?: readonly ("PAGES" | "POSTS" | "DOCUMENTS" | "MENUS" | "MEDIA" | "VISUAL_BUILDER")[];
   permissions: readonly string[];
 }
 
@@ -69,6 +69,7 @@ export const SITE_SECTIONS: readonly SiteSection[] = [
       "content.posts.publish",
     ],
   },
+  { key: "documents", label: "Documents", segment: "documents", module: "DOCUMENTS", permissions: ["content.documents.view", "content.documents.create", "content.documents.update", "content.documents.publish"] },
   { key: "media", label: "Media", segment: "media", module: "MEDIA", permissions: ["content.media.view"] },
   {
     key: "users",

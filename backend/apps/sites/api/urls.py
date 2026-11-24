@@ -4,6 +4,7 @@ from apps.cms.api.homepage_templates import HomepageTemplateCatalogue, HomepageT
 from rest_framework.routers import SimpleRouter
 
 from apps.cms.api.pages import SitePageViewSet
+from apps.cms.api.documents import SiteDocumentCategoryViewSet, SiteDocumentViewSet
 from apps.cms.api.sidebars import SidebarViewSet
 from apps.cms.api.menus import MenuViewSet, MenuItemViewSet
 from apps.cms.api.menu_delivery import MenuInheritanceDetailView, MenuInheritanceListView
@@ -20,6 +21,8 @@ router.register(r"(?P<site_pk>[0-9]+)/menus/(?P<menu_pk>[0-9a-f-]{36})/items", M
 router.register(r"(?P<site_pk>[0-9]+)/menus", MenuViewSet, basename="menu")
 router.register(r"(?P<site_pk>[0-9]+)/section-templates", SectionTemplateViewSet, basename="section-template")
 router.register(r"(?P<site_pk>[^/.]+)/pages", SitePageViewSet, basename="site-page")
+router.register(r"(?P<site_pk>[^/.]+)/documents", SiteDocumentViewSet, basename="site-document")
+router.register(r"(?P<site_pk>[^/.]+)/document-categories", SiteDocumentCategoryViewSet, basename="site-document-category")
 router.register(r"(?P<site_pk>[^/.]+)/posts", PostViewSet, basename="site-post")
 router.register(r"(?P<site_pk>[^/.]+)/categories", CategoryViewSet, basename="site-category")
 router.register(r"(?P<site_pk>[^/.]+)/tags", TagViewSet, basename="site-tag")
