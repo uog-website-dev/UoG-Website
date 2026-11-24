@@ -20,6 +20,7 @@ from .models import Site
 from .models.header import HEADER_FIELDS, SiteHeader
 
 MAX_URL = 2048
+MAX_BRAND_QUOTE_LENGTH = 280
 
 
 def defaults():
@@ -28,6 +29,7 @@ def defaults():
         "variant": "standard",
         "search_enabled": True,
         "sticky": False,
+        "brand_quote": "",
         "cta_label": "",
         "cta_url": "",
         "language_switcher": False,
@@ -57,7 +59,7 @@ def _safe_destination(value, *, allow_empty=True):
 
 def validate_header(values):
     errors = {}
-    for field in ("brand_href", "variant", "cta_label", "cta_url"):
+    for field in ("brand_href", "variant", "brand_quote", "cta_label", "cta_url"):
         value = values.get(field)
         if not isinstance(value, str):
             errors[field] = "Enter plain text."
@@ -75,6 +77,8 @@ def validate_header(values):
             errors["brand_href"] = "Use a same-site path such as / or an https URL."
     if len(values.get("cta_label", "") or "") > 120:
         errors["cta_label"] = "Use at most 120 characters."
+    if "brand_quote" not in errors and len(values.get("brand_quote", "")) > MAX_BRAND_QUOTE_LENGTH:
+        errors["brand_quote"] = f"Use at most {MAX_BRAND_QUOTE_LENGTH} characters."
     cta_url = values.get("cta_url", "") or ""
     cta_label = (values.get("cta_label", "") or "").strip()
     if cta_url:
@@ -101,7 +105,7 @@ def published_header_values(row):
 
 
 def header_has_unpublished_changes(row):
-    return header_values(row) != (row.published_settings if row and isinstance(row.published_settings, dict) else defaults())
+    return header_values(row) != published_header_values(row)
 
 
 def header_etag(site_id, row):

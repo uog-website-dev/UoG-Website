@@ -1,14 +1,24 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
+import { publicLogoSource } from "@uog/ui/public-site";
 
 import { PublicSiteChrome } from "@/public-site";
 import { publicMenusForHost, publicSiteForHost } from "@/public-metadata";
 
 import "./globals.css";
 
-export const metadata: Metadata = {
-  title: "University of Gondar — Public Portal",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const host = (await headers()).get("host");
+  const logo = publicLogoSource(await publicSiteForHost(host));
+  return {
+    title: "University of Gondar — Public Portal",
+    icons: {
+      icon: logo
+        ? [{ url: logo, type: "image/webp", sizes: "any" }]
+        : [{ url: "/favicon.ico", type: "image/x-icon" }],
+    },
+  };
+}
 
 export default async function RootLayout({
   children,

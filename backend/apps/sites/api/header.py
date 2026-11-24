@@ -12,6 +12,7 @@ class HeaderSettingsSerializer(StrictFields, serializers.Serializer):
     brand_href = serializers.CharField(max_length=2048, required=False)
     search_enabled = serializers.BooleanField(required=False)
     sticky = serializers.BooleanField(required=False)
+    brand_quote = serializers.CharField(max_length=280, allow_blank=True, required=False)
     cta_label = serializers.CharField(max_length=120, allow_blank=True, required=False)
     cta_url = serializers.CharField(max_length=2048, allow_blank=True, required=False)
     language_switcher = serializers.BooleanField(required=False)

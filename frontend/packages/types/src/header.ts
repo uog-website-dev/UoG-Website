@@ -13,6 +13,8 @@ export interface SiteHeaderSettings {
   search_enabled: boolean;
   /** Keep the header visible while the page scrolls. */
   sticky: boolean;
+  /** Optional plain-text quote displayed beneath the Site name. */
+  brand_quote: string;
   cta_label: string;
   cta_url: string;
   language_switcher: boolean;
@@ -24,6 +26,7 @@ export function defaultSiteHeader(): SiteHeaderSettings {
     brand_href: "/",
     search_enabled: true,
     sticky: false,
+    brand_quote: "",
     cta_label: "",
     cta_url: "",
     language_switcher: false,
@@ -60,6 +63,9 @@ export function headerSettingsFrom(value: unknown): SiteHeaderSettings {
   }
   for (const key of ["search_enabled", "sticky", "language_switcher"] as const) {
     if (typeof row[key] === "boolean") result[key] = row[key];
+  }
+  if (typeof row.brand_quote === "string" && row.brand_quote.length <= 280) {
+    result.brand_quote = row.brand_quote;
   }
   if (typeof row.cta_label === "string" && row.cta_label.length <= 120) {
     result.cta_label = row.cta_label;

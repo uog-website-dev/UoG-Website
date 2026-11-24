@@ -7,6 +7,7 @@ import {
   menuPayloadForSite,
   pageMetadata,
   postMetadata,
+  publicLogoSource,
   PUBLIC_CACHE_MODE,
   PUBLIC_CACHE_SLA,
   publicFetchInit,
@@ -71,7 +72,14 @@ describe("siteFromContext", () => {
     expect(hosts.map((site) => site.domain)).toEqual(["uog.edu.et", "informatics.uog.edu.et", null]);
     expect(hosts.map((site) => site.canonicalDomain)).toEqual(["uog.edu.et", "informatics.uog.edu.et", null]);
     expect(hosts[1]?.logoUrl).toBe("/api/v1/site-context/identity/logo/");
+    expect(publicLogoSource(hosts[1]!)).toBe("/api/v1/site-context/identity/logo/");
+    const versioned = siteFromContext(200, {
+      ...informatics,
+      configuration: { ...informatics.configuration, branding_revision: "b".repeat(64) },
+    });
+    expect(publicLogoSource(versioned)).toBe(`/api/v1/site-context/identity/logo/?v=${"b".repeat(64)}`);
     expect(hosts[2]?.logoUrl).toBeNull();
+    expect(publicLogoSource(hosts[2]!)).toBeNull();
     expect(siteFromContext(200, { ...informatics, configuration: { ...informatics.configuration, logo_url: "https://private.example/logo.png" } }).logoUrl).toBeNull();
     expect(hosts[2]?.theme).toBe("high-contrast");
     expect(hosts[1]?.modules.posts).toBe(true);

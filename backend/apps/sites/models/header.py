@@ -21,6 +21,7 @@ class SiteHeader(models.Model):
     ), default="standard")
     search_enabled = models.BooleanField(default=True)
     sticky = models.BooleanField(default=False)
+    brand_quote = models.CharField(max_length=280, blank=True, default="")
     cta_label = models.CharField(max_length=120, blank=True, default="")
     cta_url = models.CharField(max_length=2048, blank=True, default="")
     language_switcher = models.BooleanField(default=False)
@@ -67,6 +68,6 @@ class SiteHeader(models.Model):
 
 
 HEADER_FIELDS = (
-    "brand_href", "variant", "search_enabled", "sticky", "cta_label", "cta_url",
+    "brand_href", "variant", "search_enabled", "sticky", "brand_quote", "cta_label", "cta_url",
     "language_switcher",
 )

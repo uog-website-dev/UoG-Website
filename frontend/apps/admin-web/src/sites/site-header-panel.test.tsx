@@ -11,8 +11,8 @@ import {SiteHeaderPanel} from "./site-header-panel";
 
 const envelope:SiteHeaderEnvelope={
  site:4,version:1,
- settings:{brand_href:"/",search_enabled:true,sticky:false,cta_label:"",cta_url:"",language_switcher:false},
- published_settings:{brand_href:"/",search_enabled:true,sticky:false,cta_label:"",cta_url:"",language_switcher:false},
+ settings:{brand_href:"/",search_enabled:true,sticky:false,brand_quote:"",cta_label:"",cta_url:"",language_switcher:false},
+ published_settings:{brand_href:"/",search_enabled:true,sticky:false,brand_quote:"",cta_label:"",cta_url:"",language_switcher:false},
  has_unpublished_changes:false,published_at:null,previous_available:false,
  menus:{header:[{label:"About",href:"/about"}],utility:[]},
  menu_state:{header:{published:"Main",draft:"Main",is_published:true,has_changes:false},utility:{published:null,draft:null,is_published:false,has_changes:false}},
@@ -58,6 +58,18 @@ describe("SiteHeaderPanel",()=>{
   fireEvent.click(screen.getByRole("button",{name:"Save draft"}));
   await screen.findByText(/Header draft saved\. Nothing is public until you publish it/);
   expect(actions.updateSiteHeader.mock.calls[0][2].sticky).toBe(true);
+ });
+
+ it("previews and saves the plain-text quote beneath the Site name",async()=>{
+  await open();
+  const quote="Knowledge serves humanity.";
+  fireEvent.change(screen.getByLabelText("Quote beneath Site name"),{target:{value:quote}});
+  const preview=screen.getByRole("region",{name:"Header preview"});
+  expect(preview.querySelector("[data-site-branding-quote]")?.textContent).toBe(quote);
+  actions.updateSiteHeader.mockResolvedValue({ok:true,data:{data:{...envelope,version:2,has_unpublished_changes:true,settings:{...envelope.settings,brand_quote:quote}},etag:'"site-header-4-v2"'}});
+  fireEvent.click(screen.getByRole("button",{name:"Save draft"}));
+  await screen.findByText(/Header draft saved\. Nothing is public until you publish it/);
+  expect(actions.updateSiteHeader.mock.calls[0][2].brand_quote).toBe(quote);
  });
 
  it("publishes saved values and restores the previous publication into the draft",async()=>{

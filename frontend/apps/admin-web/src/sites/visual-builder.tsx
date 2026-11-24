@@ -614,6 +614,10 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
         return;
       }
       if(result.data.site!==siteId || result.data.id!==pageId)throw new Error("The workflow returned a different Page context.");
+      if(pendingWorkflow.action==="publish" && result.data.draft_of) {
+        router.replace(`/sites/${siteId}/admin/pages/${result.data.draft_of}/builder`);
+        return;
+      }
       setPage(result.data);setPendingWorkflow(null);setWorkflowPreview(null);
       setMessage(`Workflow ${pendingWorkflow.action} completed. Status is now ${result.data.status}.`);
       if(!["DRAFT","UNPUBLISHED"].includes(result.data.status)){setDirty(false);}
@@ -1105,19 +1109,26 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
               error={!headingPlan.ok}
               helperText={headingPlan.ok?"The Page title is the main H1 unless a hero is set to H1.":headingPlan.message}
               FormHelperTextProps={{role:headingPlan.ok?undefined:"alert"}}
-              onChange={event=>change({...layout,settings:{...layout.settings,show_title:event.target.value==="visible"}})}>
+              onChange={event=>{
+                const showTitle=event.target.value==="visible";
+                const next=structuredClone(layout);
+                next.settings={...next.settings,show_title:showTitle};
+                if(!showTitle && headingPlan.layoutH1Count===0){
+                  const hero=outline(next).find(entry=>entry.kind==="widget" && entry.node.type==="hero_image");
+                  if(hero?.kind==="widget" && hero.node.type==="hero_image")hero.node.props.heading_level=1;
+                }
+                change(next);
+              }}>
               <MenuItem value="visible">Show title</MenuItem><MenuItem value="hidden">Hide title visually</MenuItem>
             </TextField>
             <TextField select fullWidth size="small" sx={{mt:2}} label="Content width" value={widthPlan.width} disabled={saving}
-              helperText="Content keeps a 24 px safe gutter on every screen size."
+              helperText="Full width uses all available space. Every option keeps a 24 px safe gutter; use Edge-to-edge bleed to remove it."
               onChange={event=>change({...layout,settings:{...layout.settings,content_width:event.target.value as "full"|"wide"|"reading"}})}>
-              <MenuItem value="wide">Wide · 1280px</MenuItem><MenuItem value="reading">Reading · 880px</MenuItem>
-              {widthPlan.legacyFullWidth?<MenuItem value="full">Full width · legacy</MenuItem>:null}
+              <MenuItem value="wide">Wide · 1280px</MenuItem><MenuItem value="full">Full width · 100%</MenuItem><MenuItem value="reading">Reading · 880px</MenuItem>
             </TextField>
             <FormControlLabel sx={{mt:2,alignItems:"flex-start",ml:0,gap:1}} control={<Switch size="small" checked={widthPlan.bleed} disabled={saving} inputProps={{"aria-describedby":"page-bleed-help"}} onChange={event=>change({...layout,settings:{...layout.settings,bleed:event.target.checked}})}/>}
               label={<Box><Typography variant="body2">Edge-to-edge bleed</Typography><Typography id="page-bleed-help" variant="caption" color="text.secondary" component="p">Off by default. Turning it on lets this Page reach the viewport edge instead of keeping its safe gutter.</Typography></Box>}/>
             {widthPlan.bleed?<Alert severity="warning" role="alert" sx={{mt:1}}>{widthPlan.warning}</Alert>:null}
-            {widthPlan.legacyFullWidth?<Alert severity="info" sx={{mt:1}}>This Page uses the legacy Full width setting. Choose Wide or Reading, or turn on bleed deliberately.</Alert>:null}
             <FormControlLabel sx={{mt:2,alignItems:"flex-start",ml:0,gap:1}} control={<Switch size="small" checked={layout.settings?.chrome==="none"} disabled={saving} inputProps={{"aria-describedby":"page-chrome-help"}} onChange={event=>{if(event.target.checked)setChromeDialog(true);else change({...layout,settings:{...layout.settings,chrome:"global"}});}}/>}
               label={<Box><Typography variant="body2">Hide the global header and footer</Typography><Typography id="page-chrome-help" variant="caption" color="text.secondary" component="p">Off by default. Turning it on removes the Site header and footer from this Page and adds a small “Site home” navigation bar above the content. Homepage templates never use this mode.</Typography></Box>}/>
             {layout.settings?.chrome==="none"?<Alert severity="warning" role="alert" sx={{mt:1}}>Global header and footer are hidden on this Page. Preview shows the in-page navigation bar. Nothing else on the Site changes.</Alert>:null}
