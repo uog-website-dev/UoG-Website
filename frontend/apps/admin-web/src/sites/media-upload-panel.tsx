@@ -41,10 +41,11 @@ function LocalPreview({file}: {file: File}) {
 }
 
 /** Separate retry identities and bounded parallel uploads, with recoverable metadata saves. */
-export function MediaUploadPanel({siteId, policy, inputRef, onAccepted, onBusyChange, onReady}: {
+export function MediaUploadPanel({siteId, policy, inputRef, onAccepted, onBusyChange, onReady, documentsOnly = false}: {
   siteId: number; policy: UploadPolicy; inputRef: RefObject<HTMLInputElement | null>;
   onAccepted: (asset: MediaAssetRecord) => void; onBusyChange?: (busy: boolean) => void;
   onReady?: (ready: boolean) => void;
+  documentsOnly?: boolean;
 }) {
   const dropLabelId=useId(),dropHelpId=useId();
   useEffect(() => {onReady?.(true); return () => onReady?.(false);}, [onReady]);
@@ -76,9 +77,19 @@ export function MediaUploadPanel({siteId, policy, inputRef, onAccepted, onBusyCh
     if (categories.length > 10 || categories.some(v => v.length > 64)) return "Use up to 10 categories, each no longer than 64 characters.";
     if (entry.alt.length > 255) return "Alt text must be no longer than 255 characters for use in Pages.";
     if (entry.file.size === 0) return "Empty files cannot be uploaded.";
-    const limit = entry.file.type === "application/pdf" ? policy.pdf_max_bytes : entry.file.type === "text/plain" ? policy.text_max_bytes : policy.image_max_bytes;
+    const extension = `.${entry.file.name.split(".").at(-1)?.toLowerCase() ?? ""}`;
+    const expectedTypes: Record<string,string> = {".png":"image/png",".jpg":"image/jpeg",".jpeg":"image/jpeg",".webp":"image/webp",".txt":"text/plain",".pdf":"application/pdf",".docx":"application/vnd.openxmlformats-officedocument.wordprocessingml.document",".xlsx":"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",".zip":"application/zip"};
+    const expected = expectedTypes[extension];
+    if (!expected || !(policy.extensions ?? Object.keys(expectedTypes)).includes(extension)) return "Unsupported file type. Choose PDF, DOCX, XLSX, ZIP, PNG, JPEG, WebP or plain text.";
+    if (documentsOnly && ![".pdf", ".docx", ".xlsx", ".zip"].includes(extension)) return "Choose a PDF, DOCX, XLSX or ZIP document.";
+    if (entry.file.type && entry.file.type !== expected) return "The file extension and browser file type do not match.";
+    const limit = extension === ".pdf"
+      ? policy.pdf_max_bytes
+      : [".docx", ".xlsx", ".zip"].includes(extension)
+      ? Math.min(policy.document_max_bytes ?? policy.pdf_max_bytes, 50 * 1024 * 1024)
+      : expected === "text/plain" ? policy.text_max_bytes : policy.image_max_bytes;
     if (entry.file.size > limit) return `This file exceeds its ${mediaBytes(limit)} limit.`;
-    if (entry.file.type && !policy.mime_types.includes(entry.file.type)) return "Unsupported file type. Choose PNG, JPEG, WebP, PDF or plain text.";
+    if (!policy.mime_types.includes(expected)) return "This file type is not enabled by the Site upload policy.";
     return null;
   };
   const transfer = async (entry: UploadEntry) => {
@@ -134,7 +145,7 @@ export function MediaUploadPanel({siteId, policy, inputRef, onAccepted, onBusyCh
   const completed = entries.filter(item => item.phase === "complete").length;
   const pending = entries.length-completed;
   return <Box sx={{display:"grid",gap:2}}>
-    <input ref={inputRef} type="file" multiple accept={policy.mime_types.join(",")} aria-label="Upload media file" style={{display:"none"}} disabled={busy} onChange={event => { add(Array.from(event.target.files ?? [])); event.target.value=""; }} />
+    <input ref={inputRef} type="file" multiple accept={documentsOnly ? ".pdf,.docx,.xlsx,.zip" : (policy.extensions ?? policy.mime_types).join(",")} aria-label="Upload media file" style={{display:"none"}} disabled={busy} onChange={event => { add(Array.from(event.target.files ?? [])); event.target.value=""; }} />
     <Box
       onClick={() => { if (!busy) inputRef.current?.click(); }}
       onDragEnter={event => { event.preventDefault(); if (Array.from(event.dataTransfer.types).includes("Files")) { dragDepth.current++; setDragging(true); } }}
@@ -150,7 +161,7 @@ export function MediaUploadPanel({siteId, policy, inputRef, onAccepted, onBusyCh
       </Box>
       <Box id={dropHelpId}>
       <Typography variant="body2" color="text.secondary" align="center">Select one or multiple files. Add names, categories and alt text before uploading.</Typography>
-      <Typography variant="caption" color="text.secondary" align="center">PNG, JPEG, WebP up to {mediaBytes(policy.image_max_bytes)} | PDF up to {mediaBytes(policy.pdf_max_bytes)} | Text up to {mediaBytes(policy.text_max_bytes)}</Typography>
+      <Typography variant="caption" color="text.secondary" align="center">{documentsOnly ? `PDF up to ${mediaBytes(policy.pdf_max_bytes)} | DOCX, XLSX and ZIP up to ${mediaBytes(policy.document_max_bytes ?? policy.pdf_max_bytes)}` : `PNG, JPEG, WebP up to ${mediaBytes(policy.image_max_bytes)} | PDF up to ${mediaBytes(policy.pdf_max_bytes)} | DOCX, XLSX and ZIP up to ${mediaBytes(policy.document_max_bytes ?? policy.pdf_max_bytes)} | Text up to ${mediaBytes(policy.text_max_bytes)}`}</Typography>
       </Box>
     </Box>
     {notice ? <Alert severity="info">{notice}</Alert> : null}

@@ -1,5 +1,5 @@
-{
-  "secret_findings": 0,
-  "http_trace_rows": 2176,
-  "checked": "env secrets, disposable account passwords/access tokens, JWT pattern; no response bodies or auth headers retained"
+{
+  "secret_findings": 0,
+  "http_trace_rows": 2176,
+  "checked": "env secrets, disposable account passwords/access tokens, JWT pattern; no response bodies or auth headers retained"
 }

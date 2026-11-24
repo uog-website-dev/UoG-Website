@@ -84,6 +84,19 @@ def revision_snapshot(content):
             else:
                 identifiers = []
             snapshot[field] = sorted({str(pk) for pk in identifiers})
+    elif content._meta.model_name == "document":
+        snapshot.update({
+            "title": content.title, "slug": content.slug,
+            "description": content.description,
+            "file_reference": content.file_reference,
+            "version": content.version,
+            "effective_date": content.effective_date.isoformat() if content.effective_date else None,
+            "visibility": content.visibility,
+            "categories": sorted({str(pk) for pk in content._pending_categories})
+            if getattr(content, "_pending_categories", None) is not None
+            else sorted(str(pk) for pk in content.categories.values_list("pk", flat=True))
+            if content.pk and not content._state.adding else [],
+        })
     return snapshot
 
 
@@ -151,6 +164,9 @@ def create_content_revision(
     if content._meta.model_name == "post":
         from apps.api.post_media import record_post_images
         record_post_images(content, revision, using=using)
+    elif content._meta.model_name == "document":
+        from apps.media.document_references import record_document_file
+        record_document_file(content, revision, using=using)
     _prune_revisions(
         content.pk,
         using=using,

@@ -48,6 +48,11 @@ CAPABILITIES = (
     Capability("content.posts.submit_review", "Submit posts for review", "Reserved. Post review uses a Site CMS author assignment, not this catalog code.", "content", "post", "submit_review", "HIGH", False),
     Capability("content.posts.approve", "Approve posts", "Reserved. Post approval uses a Site CMS reviewer assignment, not this catalog code.", "content", "post", "approve", "HIGH", False),
     Capability("content.posts.publish", "Publish posts", "Show the Posts section to a publisher. Publishing still requires the Site CMS publisher role.", "content", "post", "publish", "HIGH", False),
+    Capability("content.documents.view", "View documents", "Read Site-owned document records.", "content", "document", "view"),
+    Capability("content.documents.create", "Create documents", "Create draft documents within assigned Site scope.", "content", "document", "create"),
+    Capability("content.documents.update", "Update documents", "Edit documents within assigned Site scope.", "content", "document", "update"),
+    Capability("content.documents.delete", "Delete documents", "Delete documents under the Site retention and audit policy.", "content", "document", "delete", "HIGH", False),
+    Capability("content.documents.publish", "Publish documents", "Show the Documents section to a publisher; CMS publisher grant is required.", "content", "document", "publish", "HIGH", False),
     Capability("content.menus.view", "View menus", "Legacy catalog record. Menu APIs require menu.read; this code is not an alias.", "content", "menu", "view"),
     Capability("content.menus.manage", "Manage menus", "Legacy catalog record. Menu APIs require menu.write/menu.publish; this code is not an alias.", "content", "menu", "manage", "HIGH", False),
     Capability("content.media.view", "View media", "Read Site-owned asset metadata and placement references.", "content", "media", "view"),
@@ -71,6 +76,7 @@ PLATFORM_ADMIN = frozenset({
     "platform.roles.update", "platform.roles.assign_permissions", "sites.view", "sites.create", "sites.update",
     "content.pages.view", "content.pages.create", "content.pages.update", "content.pages.delete", "content.pages.publish",
     "content.posts.view", "content.posts.create", "content.posts.update", "content.posts.delete", "content.posts.publish",
+    "content.documents.view", "content.documents.create", "content.documents.update", "content.documents.delete", "content.documents.publish",
     "audit.logs.view", "audit.logs.export",
 })
 ORG_ADMIN = frozenset({
@@ -82,6 +88,7 @@ ORG_ADMIN = frozenset({
     "content.pages.delete", "content.pages.publish",
     "content.posts.view", "content.posts.create", "content.posts.update",
     "content.posts.delete", "content.posts.publish",
+    "content.documents.view", "content.documents.create", "content.documents.update", "content.documents.delete", "content.documents.publish",
 })
 SITE_ADMIN = frozenset({
     "content.media.view", "content.media.upload", "content.media.delete",
@@ -92,6 +99,7 @@ SITE_ADMIN = frozenset({
     "content.pages.delete", "content.pages.publish",
     "content.posts.view", "content.posts.create", "content.posts.update",
     "content.posts.delete", "content.posts.publish",
+    "content.documents.view", "content.documents.create", "content.documents.update", "content.documents.delete", "content.documents.publish",
 })
 EDITOR = frozenset({
     "sites.view", "content.media.view", "content.media.upload",
@@ -99,12 +107,14 @@ EDITOR = frozenset({
     "content.menus.view",
     "content.pages.view", "content.pages.create", "content.pages.update",
     "content.posts.view", "content.posts.create", "content.posts.update",
+    "content.documents.view", "content.documents.create", "content.documents.update",
 })
-REVIEWER = frozenset({"sites.view", "content.media.view", "content.pages.view", "content.posts.view", "menu.read"})
+REVIEWER = frozenset({"sites.view", "content.media.view", "content.pages.view", "content.posts.view", "content.documents.view", "menu.read"})
 PUBLISHER = frozenset({
     "sites.view", "content.media.view",
     "content.pages.view", "content.pages.publish",
     "content.posts.view", "content.posts.publish",
+    "content.documents.view", "content.documents.publish",
     "menu.read", "menu.publish",
 })
 VIEWER = frozenset({
@@ -112,6 +122,7 @@ VIEWER = frozenset({
     "content.menus.view",
     "platform.dashboard.view", "platform.organizations.view", "platform.users.view", "platform.roles.view",
     "sites.view", "content.pages.view", "content.posts.view",
+    "content.documents.view",
 })
 
 STANDARD_ROLES = (

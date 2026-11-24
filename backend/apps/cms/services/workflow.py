@@ -368,6 +368,10 @@ def _content_instance(base, *, using):
     post = Post.objects.using(using).filter(pk=base.pk).first()
     if post is not None:
         return post
+    from ..models import Document
+    document = Document.objects.using(using).filter(pk=base.pk).first()
+    if document is not None:
+        return document
     return base
 
 
@@ -444,6 +448,17 @@ def _create_publication_snapshot(content, *, using, approval=None):
                     "id", "code", "name", "slug",
                 )
             ],
+        })
+    elif content._meta.model_name == "document":
+        payload.update({
+            "title": content.title, "slug": content.slug,
+            "description": content.description,
+            "file_reference": content.file_reference,
+            "version": content.version,
+            "effective_date": content.effective_date.isoformat() if content.effective_date else None,
+            "visibility": content.visibility,
+            "categories": [{"id": str(row.pk), "name": row.name, "slug": row.slug}
+                for row in content.categories.order_by("name", "id")],
         })
     PublishedContentSnapshot.objects.using(using).create(
         content_id=content.pk,

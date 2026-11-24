@@ -2,6 +2,7 @@
 import io
 import os
 import uuid
+import zipfile
 from contextlib import contextmanager
 from datetime import timedelta
 
@@ -29,6 +30,26 @@ def png():
     stream = io.BytesIO()
     Image.new("RGB", (2, 3), "red").save(stream, format="PNG")
     return stream.getvalue()
+
+
+def office_package(kind):
+    stream = io.BytesIO()
+    with zipfile.ZipFile(stream, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr("[Content_Types].xml", "<Types xmlns='http://schemas.openxmlformats.org/package/2006/content-types'/>")
+        archive.writestr("_rels/.rels", "<Relationships xmlns='http://schemas.openxmlformats.org/package/2006/relationships'/>")
+        if kind == "docx":
+            archive.writestr("word/document.xml", "<document xmlns='http://schemas.openxmlformats.org/wordprocessingml/2006/main'/>")
+        elif kind == "xlsx":
+            archive.writestr("xl/workbook.xml", "<workbook xmlns='http://schemas.openxmlformats.org/spreadsheetml/2006/main'/>")
+        else:
+            archive.writestr("README.txt", "Site document bundle")
+    return stream.getvalue()
+
+
+def pdf_document():
+    writer = PdfWriter(); writer.add_blank_page(width=100, height=100)
+    output = io.BytesIO(); writer.write(output)
+    return output.getvalue()
 
 
 class MemoryStorage:
@@ -101,6 +122,38 @@ def test_upload_processing_worker_and_ready_picker_have_one_identity(media_world
     assert MediaAsset.objects.count() == 1 and MediaUploadAttempt.objects.count() == 1
     process_asset(asset.pk, storage=storage)
     assert MediaAsset.objects.count() == 1
+
+
+def test_document_file_replacement_keeps_each_revision_asset_reference(media_world, storage):
+    from apps.cms.models import Document
+    from apps.media.document_references import validate_document_file
+    from apps.media.models import MediaAssetReference
+
+    world = media_world
+    first = upload_asset(world.actor, world.a.pk, io.BytesIO(pdf_document()),
+                         filename="policy.pdf", request_key=uuid.uuid4(), storage=storage)
+    process_asset(first.pk, storage=storage)
+    document = Document.objects.create(
+        site=world.a, title="Records policy", slug="records-policy",
+        file_reference=f"sites/{world.a.pk}/assets/{first.pk}",
+        created_by=world.actor, updated_by=world.actor,
+    )
+    first_revision = document.revisions.get(revision_number=1)
+    assert MediaAssetReference.objects.filter(page_revision=first_revision, asset=first).exists()
+    with pytest.raises(ValidationError, match="belongs to another Site"):
+        validate_document_file(f"sites/{world.b.pk}/assets/{first.pk}", world.b.pk)
+
+    second = upload_asset(world.actor, world.a.pk, io.BytesIO(pdf_document()),
+                          filename="policy-revised.pdf", request_key=uuid.uuid4(), storage=storage)
+    process_asset(second.pk, storage=storage)
+    document.file_reference = f"sites/{world.a.pk}/assets/{second.pk}"
+    document.version = "2.0"
+    document.save()
+    second_revision = document.revisions.get(revision_number=2)
+    assert document.pk == first_revision.content_id
+    assert MediaAssetReference.objects.filter(page_revision=first_revision, asset=first).exists()
+    assert MediaAssetReference.objects.filter(page_revision=second_revision, asset=second).exists()
+    assert first.references.exists() and second.references.exists()
 
 
 def test_interrupted_write_retry_and_cleanup_cannot_delete_success(media_world, storage):
@@ -191,6 +244,82 @@ def test_pdf_text_and_image_validation_and_active_pdf_rejection(settings):
         inspect_upload(io.BytesIO(b"text"), spool)
 
 
+def test_docx_xlsx_and_zip_uploads_are_quarantined_until_package_validation(media_world, storage, settings):
+    w = media_world
+    settings.MEDIA_UPLOAD_MAX_BYTES = 50 * 1024 * 1024
+    settings.MEDIA_DOCUMENT_MAX_BYTES = 50 * 1024 * 1024
+    client = APIClient(); client.force_authenticate(w.actor)
+    policy = client.get(f"/api/v1/sites/{w.a.pk}/assets/upload-policy/").json()
+    assert policy["document_max_bytes"] == 50 * 1024 * 1024
+    assert {".pdf", ".docx", ".xlsx", ".zip"}.issubset(policy["extensions"])
+    expected = {
+        "report.docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "budget.xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "bundle.zip": "application/zip",
+    }
+    for filename, mime in expected.items():
+        kind = filename.rsplit(".", 1)[-1]
+        asset = upload_asset(w.actor, w.a.pk, io.BytesIO(office_package(kind)), filename=filename,
+            request_key=uuid.uuid4(), storage=storage)
+        assert asset.status == "PENDING" and asset.detected_mime == mime
+        assert asset.site_id == w.a.pk and asset.byte_count > 0 and len(asset.checksum) == 64
+        assert asset.storage_reference.startswith(f"platform-private:sites/{w.a.pk}/uploads/")
+        assert process_asset(asset.pk, storage=storage).status == "READY"
+    listed = client.get(f"/api/v1/sites/{w.a.pk}/assets/?type=document")
+    assert listed.status_code == 200 and listed.json()["count"] == 3
+
+
+def test_document_download_remains_quarantined_until_worker_validation(media_world, storage, monkeypatch):
+    w = media_world
+    monkeypatch.setattr("apps.media.api.ObjectStorage", lambda: storage)
+    body = office_package("docx")
+    asset = upload_asset(w.actor, w.a.pk, io.BytesIO(body), filename="report.docx",
+        request_key=uuid.uuid4(), storage=storage)
+    client = APIClient(); client.force_authenticate(w.actor)
+    url = f"/api/v1/sites/{w.a.pk}/assets/{asset.pk}/download/"
+    assert client.get(url).status_code == 404
+    process_asset(asset.pk, storage=storage)
+    response = client.get(url)
+    assert response.status_code == 200 and response.content == body
+    assert response["Content-Disposition"].startswith("attachment;")
+    assert "storage_reference" not in response.headers
+    assert client.get(f"/api/v1/sites/{w.b.pk}/assets/{asset.pk}/download/").status_code == 403
+
+
+def test_office_and_zip_reject_extension_mismatch_corruption_and_unsafe_members(media_world, storage):
+    w = media_world
+    cases = [
+        ("report.docx", office_package("xlsx")),
+        ("bundle.zip", b"PK\x03\x04not a zip archive"),
+        ("unsafe.zip", office_package("zip")),
+    ]
+    unsafe = io.BytesIO()
+    with zipfile.ZipFile(unsafe, "w") as archive:
+        archive.writestr("../public.exe", b"MZ" + b"x" * 128)
+    cases[-1] = ("unsafe.zip", unsafe.getvalue())
+    for filename, body in cases:
+        with pytest.raises(ValidationError):
+            upload_asset(w.actor, w.a.pk, io.BytesIO(body), filename=filename,
+                request_key=uuid.uuid4(), storage=storage)
+    assert not MediaAsset.objects.exists() and not storage.objects
+
+
+def test_configured_50_mib_document_limit_is_inclusive_and_rejects_one_byte_over(settings):
+    from apps.media.uploads import inspect_upload
+    limit = 50 * 1024 * 1024
+    settings.MEDIA_UPLOAD_MAX_BYTES = limit
+    settings.MEDIA_DOCUMENT_MAX_BYTES = limit
+    settings.MEDIA_PDF_MAX_BYTES = limit
+    writer = PdfWriter(); writer.add_blank_page(width=100, height=100)
+    base = io.BytesIO(); writer.write(base); prefix = base.getvalue()
+    exact = prefix + b" " * (limit - len(prefix))
+    with io.BytesIO() as spool:
+        result = inspect_upload(io.BytesIO(exact), spool, filename="boundary.pdf")
+        assert result["byte_count"] == limit
+    with pytest.raises(UploadTooLarge), io.BytesIO() as spool:
+        inspect_upload(io.BytesIO(exact + b" "), spool, filename="too-large.pdf")
+
+
 def test_worker_detects_object_tampering_and_never_exposes_ready(media_world, storage):
     asset = upload(media_world, storage)
     storage.objects[tuple(asset.storage_reference.split(":", 1))] = b"different bytes"
@@ -229,7 +358,14 @@ def test_real_private_minio_interrupted_put_retry_worker_and_cleanup(media_world
         with pytest.raises(HTTPError) as denied:
             urlopen(f"{settings.AWS_S3_ENDPOINT_URL}/{bucket}/{key}")
         assert denied.value.code == 403
-        assert MediaAsset.objects.count() == 1
+        document = upload_asset(w.actor, w.a.pk, io.BytesIO(office_package("docx")),
+            filename="private-report.docx", request_key=uuid.uuid4(), storage=real)
+        assert process_asset(document.pk, storage=real).status == "READY"
+        doc_bucket, doc_key = document.storage_reference.split(":", 1)
+        with pytest.raises(HTTPError) as private_document:
+            urlopen(f"{settings.AWS_S3_ENDPOINT_URL}/{doc_bucket}/{doc_key}")
+        assert private_document.value.code == 403
+        assert MediaAsset.objects.count() == 2
         failed = MediaUploadAttempt.objects.get(state="FAILED")
         from django.http import Http404
         with pytest.raises(Http404), real.open(*failed.storage_reference.split(":", 1)):
@@ -260,6 +396,12 @@ def test_site_editor_can_enter_own_workspace_and_upload_but_not_archive(media_wo
     assert client.get(f"/api/v1/sites/{w.a.pk}/modules/").status_code == 200
     asset = upload(w, storage)
     assert process_asset(asset.pk, storage=storage).status == "READY"
+    document_asset = upload_asset(w.actor, w.a.pk, io.BytesIO(office_package("docx")),
+        filename="editor-report.docx", request_key=uuid.uuid4(), storage=storage)
+    assert process_asset(document_asset.pk, storage=storage).status == "READY"
+    pdf_asset = upload_asset(w.actor, w.a.pk, io.BytesIO(pdf_document()),
+        filename="editor-policy.pdf", request_key=uuid.uuid4(), storage=storage)
+    assert process_asset(pdf_asset.pk, storage=storage).status == "READY"
     with pytest.raises(PermissionDenied):
         update_asset(w.actor, w.a.pk, asset.pk, changes={"status": "ARCHIVED"})
     assert client.get(f"/api/v1/sites/{w.b.pk}/assets/").status_code == 403
