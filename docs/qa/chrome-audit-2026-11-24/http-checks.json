@@ -1,0 +1,26 @@
+[
+  {
+    "path": "/robots.txt",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "bodyStart": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=dev"
+  },
+  {
+    "path": "/sitemap.xml",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "bodyStart": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=dev"
+  },
+  {
+    "path": "/favicon.ico",
+    "status": 200,
+    "contentType": "image/x-icon",
+    "bodyStart": "\u0000\u0000\u0001\u0000\u0001\u0000\u0010\u0010\u0000\u0000\u0001\u0000 \u0000h\u0004\u0000\u0000\u0016\u0000\u0000\u0000(\u0000\u0000\u0000\u0010\u0000\u0000\u0000 \u0000\u0000\u0000\u0001\u0000 \u0000\u0000\u0000\u0000\u0000@\u0004\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000(���(���(���(���(���(���(���(���(���(�"
+  },
+  {
+    "path": "/does-not-exist-audit",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "bodyStart": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=dev"
+  }
+]

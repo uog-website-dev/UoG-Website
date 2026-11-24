@@ -1,0 +1,299 @@
+{
+  "audit": "P4-F-CHROME remaining public/admin surfaces",
+  "capturedAt": "2026-11-24T09:50:03.510Z",
+  "reviewDate": "2026-11-24",
+  "workspace": "D:/Projects/Website_Project/UoG-Website",
+  "repository": {
+    "commit": "a4ecbe023c2fa9faa1a14d74d9c1be27f26ca10d",
+    "shortCommit": "a4ecbe0",
+    "branch": "P4-F-CHROME-08"
+  },
+  "baselineDirtyFiles": [
+    "M backend/apps/sites/api/footer.py",
+    " M backend/apps/sites/api/header.py",
+    " M backend/apps/sites/footer.py",
+    " M backend/apps/sites/header.py",
+    " M backend/apps/sites/models/footer.py",
+    " M backend/apps/sites/models/header.py",
+    " M frontend/apps/admin-web/src/sites/site-footer-panel.tsx",
+    " M frontend/apps/admin-web/src/sites/site-header-panel.tsx",
+    " M frontend/apps/public-web/src/public-menus.tsx",
+    " M frontend/packages/types/src/footer.ts",
+    " M frontend/packages/types/src/header.ts",
+    " M frontend/packages/ui/src/public-site-header.tsx",
+    " M frontend/packages/ui/src/site-footer.tsx",
+    " M frontend/packages/ui/src/theme.ts",
+    "?? backend/apps/sites/migrations/0017_sitefooter_legal_links_siteheader_variant.py"
+  ],
+  "auditAddedFiles": [
+    "?? docs/qa/chrome-audit-2026-11-24/"
+  ],
+  "productCodeChangedByAudit": false,
+  "compose": {
+    "project": "uog-digital-platform",
+    "services": [
+      {
+        "service": "backend",
+        "state": "running",
+        "health": "healthy",
+        "image": "uog-backend:dev",
+        "ports": "8000->8000,8000->8000"
+      },
+      {
+        "service": "celery-beat",
+        "state": "running",
+        "health": null,
+        "image": "uog-backend:dev",
+        "ports": "0->8000"
+      },
+      {
+        "service": "celery-worker",
+        "state": "running",
+        "health": "healthy",
+        "image": "uog-backend:dev",
+        "ports": "0->8000"
+      },
+      {
+        "service": "frontend-admin",
+        "state": "running",
+        "health": "healthy",
+        "image": "uog-frontend:dev",
+        "ports": "3001->3000,3001->3000"
+      },
+      {
+        "service": "frontend-public",
+        "state": "running",
+        "health": "healthy",
+        "image": "uog-frontend:dev",
+        "ports": "3000->3000,3000->3000"
+      },
+      {
+        "service": "keycloak",
+        "state": "running",
+        "health": "healthy",
+        "image": "quay.io/keycloak/keycloak:26.8.1",
+        "ports": "8080->8080,8080->8080"
+      },
+      {
+        "service": "keycloak-db",
+        "state": "running",
+        "health": "healthy",
+        "image": "postgres:16.15-alpine",
+        "ports": "0->5432"
+      },
+      {
+        "service": "minio",
+        "state": "running",
+        "health": "healthy",
+        "image": "pgsty/silo:RELEASE.2026-10-18T00-00-00Z",
+        "ports": "9000->9000,9000->9000,9001->9001,9001->9001"
+      },
+      {
+        "service": "nginx",
+        "state": "running",
+        "health": "healthy",
+        "image": "nginx:1.31.7-alpine",
+        "ports": "80->80,80->80"
+      },
+      {
+        "service": "postgres",
+        "state": "running",
+        "health": "healthy",
+        "image": "postgres:16.15-alpine",
+        "ports": "5432->5432,5432->5432"
+      },
+      {
+        "service": "redis-broker",
+        "state": "running",
+        "health": "healthy",
+        "image": "redis:7.4.11-alpine",
+        "ports": "0->6379"
+      },
+      {
+        "service": "redis-cache",
+        "state": "running",
+        "health": "healthy",
+        "image": "redis:7.4.11-alpine",
+        "ports": "0->6379"
+      }
+    ]
+  },
+  "reviewHosts": {
+    "main": "www.uog.local",
+    "childSites": [
+      "coi.uog.local",
+      "aau-review.localhost",
+      "article-media-post-14a6169c2f.uog.local",
+      "layout-45dfd491f4a.uog.local",
+      "cmhs.uog.local",
+      "news-disabled-post-14a6169c2f.uog.local"
+    ]
+  },
+  "access": {
+    "adminUrl": "http://localhost/admin",
+    "publicUrl": "http://www.uog.local/",
+    "credentials": "Seeded development account documented in the repository; not repeated in this evidence."
+  },
+  "tools": {
+    "node": "v22.15.1",
+    "browser": "Microsoft Edge 158.0.4370.33 (headless)",
+    "automation": "playwright-core from scripts/perf",
+    "axe": "4.14.0",
+    "performanceMethod": "PerformanceObserver FCP/LCP/CLS in Chromium; equivalent to Lighthouse lab signals, not a Lighthouse audit"
+  },
+  "matrix": {
+    "widths": [
+      320,
+      360,
+      390,
+      768,
+      1024,
+      1280,
+      1440,
+      1920
+    ],
+    "publicRuns": 26,
+    "responsiveRows": 74,
+    "adminRuns": 17,
+    "performanceRuns": 5
+  },
+  "fixtures": {
+    "activeSites": 87,
+    "archivedSites": 15,
+    "totalSites": 102,
+    "themes": {
+      "institutional": 102,
+      "high-contrast": 0
+    },
+    "defaultLanguages": {
+      "en": 1,
+      "en-us": 101
+    },
+    "cmsPages": 902
+  },
+  "fixtureDump": {
+    "path": "docs/qa/chrome-audit-2026-11-24/review-fixtures.sql.gz",
+    "bytes": 382123,
+    "sha256": "8c5cd0f24b05b1fdf263a1454eb60239fe848808a22df67f0e9374289b76e0f5"
+  },
+  "isolation": {
+    "method": "Post-run PostgreSQL SHARE lock proof; the audit itself ran under ACCESS SHARE and is therefore not proven write-isolated.",
+    "tables": [
+      "cms_page",
+      "api_page",
+      "api_post",
+      "cms_menu",
+      "cms_menuitem",
+      "cms_menulocationassignment",
+      "sites_site",
+      "sites_siteheader",
+      "sites_sitefooter"
+    ],
+    "lockMode": "SHARE",
+    "locksObserved": 9,
+    "writeAttempt": "UPDATE cms_page ... with lock_timeout=400ms",
+    "writeResult": "ERROR: canceling statement due to lock timeout",
+    "readDuringLock": "Public and admin pages continued to render",
+    "lockReleased": true,
+    "transactionCommitted": true,
+    "lockHeldSeconds": 7,
+    "auditRun": {
+      "lockMode": "ACCESS SHARE",
+      "blocksRowWrites": false,
+      "continuousWriteIsolationProven": false,
+      "note": "The main audit session used ACCESS SHARE, which does not block UPDATE/INSERT/DELETE. No fixture change was observed, but continuous isolation is not proven."
+    },
+    "postRunProof": {
+      "lockMode": "SHARE",
+      "blocksRowWrites": true,
+      "writeAttemptResult": "ERROR: canceling statement due to lock timeout",
+      "locksObserved": 9,
+      "readDuringLock": true,
+      "lockReleased": true
+    }
+  },
+  "evidenceFiles": [
+    "404-1440.png",
+    "404-390.png",
+    "BACKLOG.md",
+    "README.md",
+    "admin-appearance-1440.png",
+    "admin-appearance-390.png",
+    "admin-builder-1440.png",
+    "admin-builder-390.png",
+    "admin-footer-1440.png",
+    "admin-footer-390.png",
+    "admin-header-1440.png",
+    "admin-keyboard.json",
+    "admin-media-1440.png",
+    "admin-menus-1440.png",
+    "admin-menus-390.png",
+    "admin-mobile-keyboard.json",
+    "admin-mobile-nav-open.png",
+    "admin-mobile.json",
+    "admin-page-new-1440.png",
+    "admin-pages-1440.png",
+    "admin-posts-1440.png",
+    "admin-run.json",
+    "admin-site-dashboard-1440.png",
+    "admin-site-dashboard-390.png",
+    "admin-warm.json",
+    "admin-workspace-1440.png",
+    "admin-workspace-390.png",
+    "admin.json",
+    "category-1440.png",
+    "category-320.png",
+    "category-390.png",
+    "category-empty-1440.png",
+    "category-empty-390.png",
+    "console-issues.json",
+    "contact-1440.png",
+    "contact-390.png",
+    "contrast-incomplete.json",
+    "environment.json",
+    "home-child-1440.png",
+    "home-child-390.png",
+    "home-empty-1440.png",
+    "home-empty-390.png",
+    "home-main-1440.png",
+    "home-main-320.png",
+    "home-main-390.png",
+    "home-main-768.png",
+    "http-checks.json",
+    "keyboard.json",
+    "menus-disabled-1440.png",
+    "menus-disabled-390.png",
+    "metadata.json",
+    "page-1440.png",
+    "page-390.png",
+    "page-768.png",
+    "perf-detail.json",
+    "performance.json",
+    "post-detail-1440.png",
+    "post-detail-390.png",
+    "posts-1440.png",
+    "posts-320.png",
+    "posts-390.png",
+    "posts-disabled-1440.png",
+    "posts-disabled-390.png",
+    "public-accessibility.json",
+    "public-run.json",
+    "reproduce.md",
+    "responsive.json",
+    "review-fixtures.sql.gz",
+    "search-1440.png",
+    "search-390.png",
+    "search-contact.json",
+    "search-results-1440.png",
+    "search-results-390.png",
+    "search-results.json",
+    "sidebar-left-1440.png",
+    "sidebar-left-390.png",
+    "sidebar-right-1440.png",
+    "sidebar-right-390.png",
+    "state-homepage-api-500.png",
+    "state-posts-api-500.png",
+    "states.json"
+  ],
+  "evidenceIndexUpdatedAt": "2026-11-24T09:54:03.624Z"
+}

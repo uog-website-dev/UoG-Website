@@ -1,0 +1,258 @@
+[
+  {
+    "target": "home-main",
+    "url": "http://www.uog.local/",
+    "lcp": 1444,
+    "cls": 0,
+    "fcp": 492,
+    "longTasks": 1,
+    "longTaskMs": 253,
+    "shifts": [],
+    "ttfb": 372.70000000018626,
+    "domContentLoaded": 415.80000000004657,
+    "load": 1131.8000000000466,
+    "transferBytes": 16433,
+    "resourceCount": 10,
+    "resourceBytes": 4554359,
+    "fonts": [],
+    "images": [
+      {
+        "loading": "auto",
+        "natural": "300x195",
+        "src": "tp://www.uog.local/api/v1/site-context/identity/logo/?v=94c3b02b45c3096f160c0b754aedec036d56d6beda5b100545413ed7cf7173df"
+      },
+      {
+        "loading": "auto",
+        "natural": "300x195",
+        "src": "tp://www.uog.local/api/v1/site-context/identity/logo/?v=94c3b02b45c3096f160c0b754aedec036d56d6beda5b100545413ed7cf7173df"
+      }
+    ],
+    "imageCount": 2,
+    "lazyImages": 0,
+    "eagerImages": 2
+  },
+  {
+    "target": "page",
+    "url": "http://www.uog.local/mainqa-8995d437-information",
+    "lcp": 1596,
+    "cls": 0,
+    "fcp": 616,
+    "longTasks": 2,
+    "longTaskMs": 554,
+    "shifts": [],
+    "ttfb": 537.8000000000466,
+    "domContentLoaded": 614.0999999998603,
+    "load": 1346.8999999999069,
+    "transferBytes": 19110,
+    "resourceCount": 10,
+    "resourceBytes": 4550916,
+    "fonts": [],
+    "images": [
+      {
+        "loading": "auto",
+        "natural": "300x195",
+        "src": "tp://www.uog.local/api/v1/site-context/identity/logo/?v=94c3b02b45c3096f160c0b754aedec036d56d6beda5b100545413ed7cf7173df"
+      },
+      {
+        "loading": "auto",
+        "natural": "300x195",
+        "src": "tp://www.uog.local/api/v1/site-context/identity/logo/?v=94c3b02b45c3096f160c0b754aedec036d56d6beda5b100545413ed7cf7173df"
+      }
+    ],
+    "imageCount": 2,
+    "lazyImages": 0,
+    "eagerImages": 2
+  },
+  {
+    "target": "posts",
+    "url": "http://aau-review.localhost/posts",
+    "lcp": 1956,
+    "cls": 0.309,
+    "fcp": 588,
+    "longTasks": 9,
+    "longTaskMs": 1416,
+    "shifts": [
+      {
+        "value": 0.103,
+        "sources": [
+          "FOOTER"
+        ]
+      },
+      {
+        "value": 0.103,
+        "sources": [
+          "FOOTER"
+        ]
+      },
+      {
+        "value": 0.103,
+        "sources": [
+          "FOOTER"
+        ]
+      }
+    ],
+    "ttfb": 438.30000000004657,
+    "domContentLoaded": 483.0999999998603,
+    "load": 1305,
+    "transferBytes": 18565,
+    "resourceCount": 14,
+    "resourceBytes": 4595612,
+    "fonts": [],
+    "images": [
+      {
+        "loading": "auto",
+        "natural": "427x423",
+        "src": "u-review.localhost/api/v1/site-context/identity/logo/?v=ba1b4b54c43b316106d5bb8fbc089167dc810303353a092ab3b517a2456675f7"
+      },
+      {
+        "loading": "lazy",
+        "natural": "320x213",
+        "src": "http://aau-review.localhost/api/v1/site-context/media/b7af58f7-e982-4c39-9815-300af59db983/?variant=thumbnail"
+      },
+      {
+        "loading": "lazy",
+        "natural": "320x147",
+        "src": "http://aau-review.localhost/api/v1/site-context/media/21d0b91b-ca79-481f-84eb-3cdf96b96691/?variant=thumbnail"
+      },
+      {
+        "loading": "lazy",
+        "natural": "320x143",
+        "src": "http://aau-review.localhost/api/v1/site-context/media/fd93baec-d1e4-4a3a-b36d-7985c05f99fd/?variant=thumbnail"
+      },
+      {
+        "loading": "lazy",
+        "natural": "320x240",
+        "src": "http://aau-review.localhost/api/v1/site-context/media/69f5802b-788c-4141-82d1-ae29584d6a13/?variant=thumbnail"
+      },
+      {
+        "loading": "lazy",
+        "natural": "320x180",
+        "src": "http://aau-review.localhost/api/v1/site-context/media/406f0e7c-638d-42b2-b33b-a0e1bf700cce/?variant=thumbnail"
+      },
+      {
+        "loading": "auto",
+        "natural": "427x423",
+        "src": "u-review.localhost/api/v1/site-context/identity/logo/?v=ba1b4b54c43b316106d5bb8fbc089167dc810303353a092ab3b517a2456675f7"
+      }
+    ],
+    "imageCount": 7,
+    "lazyImages": 5,
+    "eagerImages": 2
+  },
+  {
+    "target": "post-detail",
+    "url": "http://aau-review.localhost/posts/aau-reference-dd1aa7a8",
+    "lcp": 2204,
+    "cls": 0.38571064814814815,
+    "fcp": 652,
+    "longTasks": 4,
+    "longTaskMs": 1644,
+    "shifts": [
+      {
+        "value": 0.014377083333333334,
+        "sources": [
+          "FOOTER"
+        ]
+      },
+      {
+        "value": 0.014377083333333334,
+        "sources": [
+          "FOOTER"
+        ]
+      },
+      {
+        "value": 0.014377083333333334,
+        "sources": [
+          "FOOTER"
+        ]
+      },
+      {
+        "value": 0.014377083333333334,
+        "sources": [
+          "FOOTER"
+        ]
+      },
+      {
+        "value": 0.0820505787037037,
+        "sources": [
+          "DIV",
+          "DIV"
+        ]
+      },
+      {
+        "value": 0.0820505787037037,
+        "sources": [
+          "DIV",
+          "DIV"
+        ]
+      },
+      {
+        "value": 0.0820505787037037,
+        "sources": [
+          "DIV",
+          "DIV"
+        ]
+      },
+      {
+        "value": 0.0820505787037037,
+        "sources": [
+          "DIV",
+          "DIV"
+        ]
+      }
+    ],
+    "ttfb": 576.8000000000466,
+    "domContentLoaded": 626,
+    "load": 1820.5,
+    "transferBytes": 18630,
+    "resourceCount": 11,
+    "resourceBytes": 6077612,
+    "fonts": [],
+    "images": [
+      {
+        "loading": "auto",
+        "natural": "427x423",
+        "src": "u-review.localhost/api/v1/site-context/identity/logo/?v=ba1b4b54c43b316106d5bb8fbc089167dc810303353a092ab3b517a2456675f7"
+      },
+      {
+        "loading": "auto",
+        "natural": "427x423",
+        "src": "u-review.localhost/api/v1/site-context/identity/logo/?v=ba1b4b54c43b316106d5bb8fbc089167dc810303353a092ab3b517a2456675f7"
+      },
+      {
+        "loading": "lazy",
+        "natural": "1200x800",
+        "src": "http://aau-review.localhost/api/v1/site-context/media/b7af58f7-e982-4c39-9815-300af59db983/?variant=display"
+      },
+      {
+        "loading": "auto",
+        "natural": "427x423",
+        "src": "u-review.localhost/api/v1/site-context/identity/logo/?v=ba1b4b54c43b316106d5bb8fbc089167dc810303353a092ab3b517a2456675f7"
+      }
+    ],
+    "imageCount": 4,
+    "lazyImages": 1,
+    "eagerImages": 3
+  },
+  {
+    "target": "sidebar-left",
+    "url": "http://layout-45dfd491f4a.uog.local/left-sidebar",
+    "lcp": 1532,
+    "cls": 0,
+    "fcp": 516,
+    "longTasks": 10,
+    "longTaskMs": 1850,
+    "shifts": [],
+    "ttfb": 411.10000000009313,
+    "domContentLoaded": 500.80000000004657,
+    "load": 1308,
+    "transferBytes": 13707,
+    "resourceCount": 13,
+    "resourceBytes": 4537403,
+    "fonts": [],
+    "images": [],
+    "imageCount": 0,
+    "lazyImages": 0,
+    "eagerImages": 0
+  }
+]

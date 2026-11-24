@@ -2,7 +2,11 @@
  * Header presentation is Site-owned; header and utility navigation stay in the
  * existing published menu locations. No HTML, CSS or JavaScript is accepted.
  */
+export type SiteHeaderVariant = "standard" | "centered" | "compact";
+
 export interface SiteHeaderSettings {
+  /** Approved header layout variant. Defaults to standard. */
+  variant?: SiteHeaderVariant;
   /** Destination for the logo and Site display name. Same-site path or http(s). */
   brand_href: string;
   /** Search is additionally hidden when neither PAGES nor POSTS is enabled. */
@@ -16,6 +20,7 @@ export interface SiteHeaderSettings {
 
 export function defaultSiteHeader(): SiteHeaderSettings {
   return {
+    variant: "standard",
     brand_href: "/",
     search_enabled: true,
     sticky: false,
@@ -50,6 +55,9 @@ export function headerSettingsFrom(value: unknown): SiteHeaderSettings {
   const row = value as Record<string, unknown>;
   const brand = safeHeaderHref(row.brand_href);
   if (brand) result.brand_href = brand;
+  if (typeof row.variant === "string" && ["standard", "centered", "compact"].includes(row.variant)) {
+    result.variant = row.variant as SiteHeaderVariant;
+  }
   for (const key of ["search_enabled", "sticky", "language_switcher"] as const) {
     if (typeof row[key] === "boolean") result[key] = row[key];
   }

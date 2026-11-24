@@ -1,0 +1,322 @@
+[
+  {
+    "target": "home-main",
+    "template": "Homepage",
+    "width": 1440,
+    "url": "http://www.uog.local/",
+    "httpStatus": 200,
+    "violations": [],
+    "incomplete": [],
+    "passes": 25
+  },
+  {
+    "target": "home-main",
+    "template": "Homepage",
+    "width": 390,
+    "url": "http://www.uog.local/",
+    "httpStatus": 200,
+    "violations": [],
+    "incomplete": [],
+    "passes": 23
+  },
+  {
+    "target": "home-child",
+    "template": "Homepage (child Site)",
+    "width": 1440,
+    "url": "http://coi.uog.local/",
+    "httpStatus": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 3
+      }
+    ],
+    "passes": 30
+  },
+  {
+    "target": "home-child",
+    "template": "Homepage (child Site)",
+    "width": 390,
+    "url": "http://coi.uog.local/",
+    "httpStatus": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 3
+      }
+    ],
+    "passes": 28
+  },
+  {
+    "target": "page",
+    "template": "Page",
+    "width": 1440,
+    "url": "http://www.uog.local/mainqa-8995d437-information",
+    "httpStatus": 200,
+    "violations": [],
+    "incomplete": [],
+    "passes": 25
+  },
+  {
+    "target": "page",
+    "template": "Page",
+    "width": 390,
+    "url": "http://www.uog.local/mainqa-8995d437-information",
+    "httpStatus": 200,
+    "violations": [],
+    "incomplete": [],
+    "passes": 25
+  },
+  {
+    "target": "posts",
+    "template": "Post list",
+    "width": 1440,
+    "url": "http://aau-review.localhost/posts",
+    "httpStatus": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 3
+      }
+    ],
+    "passes": 28
+  },
+  {
+    "target": "posts",
+    "template": "Post list",
+    "width": 390,
+    "url": "http://aau-review.localhost/posts",
+    "httpStatus": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 3
+      }
+    ],
+    "passes": 28
+  },
+  {
+    "target": "post-detail",
+    "template": "Post detail",
+    "width": 1440,
+    "url": "http://aau-review.localhost/posts/aau-reference-dd1aa7a8",
+    "httpStatus": 200,
+    "violations": [],
+    "incomplete": [],
+    "passes": 25
+  },
+  {
+    "target": "post-detail",
+    "template": "Post detail",
+    "width": 390,
+    "url": "http://aau-review.localhost/posts/aau-reference-dd1aa7a8",
+    "httpStatus": 200,
+    "violations": [],
+    "incomplete": [],
+    "passes": 25
+  },
+  {
+    "target": "category",
+    "template": "Category archive",
+    "width": 1440,
+    "url": "http://article-media-post-14a6169c2f.uog.local/posts/categories/research-655af51c8f",
+    "httpStatus": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 1
+      }
+    ],
+    "passes": 26
+  },
+  {
+    "target": "category",
+    "template": "Category archive",
+    "width": 390,
+    "url": "http://article-media-post-14a6169c2f.uog.local/posts/categories/research-655af51c8f",
+    "httpStatus": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 1
+      }
+    ],
+    "passes": 26
+  },
+  {
+    "target": "category-empty",
+    "template": "Empty category archive",
+    "width": 1440,
+    "url": "http://article-media-post-14a6169c2f.uog.local/posts/categories/empty-655af51c8f",
+    "httpStatus": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 1
+      }
+    ],
+    "passes": 26
+  },
+  {
+    "target": "category-empty",
+    "template": "Empty category archive",
+    "width": 390,
+    "url": "http://article-media-post-14a6169c2f.uog.local/posts/categories/empty-655af51c8f",
+    "httpStatus": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 1
+      }
+    ],
+    "passes": 26
+  },
+  {
+    "target": "404",
+    "template": "Not found",
+    "width": 1440,
+    "url": "http://aau-review.localhost/does-not-exist-audit",
+    "httpStatus": 200,
+    "violations": [],
+    "incomplete": [],
+    "passes": 25
+  },
+  {
+    "target": "404",
+    "template": "Not found",
+    "width": 390,
+    "url": "http://aau-review.localhost/does-not-exist-audit",
+    "httpStatus": 200,
+    "violations": [],
+    "incomplete": [],
+    "passes": 25
+  },
+  {
+    "target": "sidebar-left",
+    "template": "Left sidebar",
+    "width": 1440,
+    "url": "http://layout-45dfd491f4a.uog.local/left-sidebar",
+    "httpStatus": 200,
+    "violations": [],
+    "incomplete": [],
+    "passes": 24
+  },
+  {
+    "target": "sidebar-left",
+    "template": "Left sidebar",
+    "width": 390,
+    "url": "http://layout-45dfd491f4a.uog.local/left-sidebar",
+    "httpStatus": 200,
+    "violations": [],
+    "incomplete": [],
+    "passes": 24
+  },
+  {
+    "target": "sidebar-right",
+    "template": "Right sidebar",
+    "width": 1440,
+    "url": "http://layout-45dfd491f4a.uog.local/right-sidebar",
+    "httpStatus": 200,
+    "violations": [],
+    "incomplete": [],
+    "passes": 24
+  },
+  {
+    "target": "sidebar-right",
+    "template": "Right sidebar",
+    "width": 390,
+    "url": "http://layout-45dfd491f4a.uog.local/right-sidebar",
+    "httpStatus": 200,
+    "violations": [],
+    "incomplete": [],
+    "passes": 24
+  },
+  {
+    "target": "home-empty",
+    "template": "Homepage fallback",
+    "width": 1440,
+    "url": "http://cmhs.uog.local/",
+    "httpStatus": 200,
+    "violations": [],
+    "incomplete": [],
+    "passes": 21
+  },
+  {
+    "target": "home-empty",
+    "template": "Homepage fallback",
+    "width": 390,
+    "url": "http://cmhs.uog.local/",
+    "httpStatus": 200,
+    "violations": [],
+    "incomplete": [],
+    "passes": 21
+  },
+  {
+    "target": "posts-disabled",
+    "template": "Module disabled",
+    "width": 1440,
+    "url": "http://news-disabled-post-14a6169c2f.uog.local/posts",
+    "httpStatus": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 2
+      }
+    ],
+    "passes": 26
+  },
+  {
+    "target": "posts-disabled",
+    "template": "Module disabled",
+    "width": 390,
+    "url": "http://news-disabled-post-14a6169c2f.uog.local/posts",
+    "httpStatus": 200,
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 2
+      }
+    ],
+    "passes": 26
+  },
+  {
+    "target": "menus-disabled",
+    "template": "Menus disabled",
+    "width": 1440,
+    "url": "http://layout-45dfd491f4a.uog.local/left-sidebar",
+    "httpStatus": 200,
+    "violations": [],
+    "incomplete": [],
+    "passes": 24
+  },
+  {
+    "target": "menus-disabled",
+    "template": "Menus disabled",
+    "width": 390,
+    "url": "http://layout-45dfd491f4a.uog.local/left-sidebar",
+    "httpStatus": 200,
+    "violations": [],
+    "incomplete": [],
+    "passes": 24
+  }
+]

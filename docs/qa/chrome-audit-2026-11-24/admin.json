@@ -1,0 +1,2151 @@
+[
+  {
+    "name": "workspace",
+    "route": "/",
+    "width": 1440,
+    "status": 200,
+    "readyMs": 2483,
+    "error": "",
+    "consoleErrors": [],
+    "title": "UoG Admin Console",
+    "h1": [
+      "Dashboard"
+    ],
+    "h2": [],
+    "headings": [
+      {
+        "level": 6,
+        "text": "Digital Platform — Admin Console"
+      },
+      {
+        "level": 6,
+        "text": "UoG Administration"
+      },
+      {
+        "level": 1,
+        "text": "Dashboard"
+      },
+      {
+        "level": 6,
+        "text": "Management sections"
+      },
+      {
+        "level": 6,
+        "text": "Organizations"
+      },
+      {
+        "level": 6,
+        "text": "Sites"
+      },
+      {
+        "level": 6,
+        "text": "Modules"
+      },
+      {
+        "level": 6,
+        "text": "Backend connectivity"
+      }
+    ],
+    "overflow": false,
+    "bodyText": "Skip to main content\n⚙ UoG\nDigital Platform — Admin Console\ndevuser@uog.et\nSign out\nUoG Administration\nDigital platform\nChoose workspace\nPLATFORM ADMINISTRATION\nDashboard\n\nConsole overview\n\nOrganizations\n\nInstitutional structure\n\nSites\n\nManaged websites\n\nDomains\n\nWebsite addresses\n\nModules\n\nCapability registry\n\nAccess control\n\nRoles, permissions and assignments\n\nAdmin workspace\nUniversity of Gondar\nHome\n/\n\nDashboard\n\nDashboard\n\nUniversity of Gondar Digital Platform — administration console.\n\nCon",
+    "smallTargetCount": 4,
+    "smallTargets": [
+      {
+        "tag": "BUTTON",
+        "text": "Sign out",
+        "w": 51,
+        "h": 23
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Workspace: Choose workspace",
+        "w": 251,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Home",
+        "w": 66,
+        "h": 24
+      },
+      {
+        "tag": "A",
+        "text": "health endpoint",
+        "w": 103,
+        "h": 17
+      }
+    ],
+    "buttons": [
+      "Open navigation menu",
+      "Sign out",
+      "Workspace: Choose workspace"
+    ],
+    "violations": [
+      {
+        "id": "label-content-name-mismatch",
+        "impact": "serious",
+        "help": "Elements must have their visible text as part of their accessible name",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.14/label-content-name-mismatch?application=axeAPI",
+        "nodes": [
+          {
+            "target": [
+              "a[aria-label=\"Open the Organizations section\"]"
+            ],
+            "html": "<a class=\"MuiButtonBase-root MuiCardActionArea-root mui-nb4faz-MuiButtonBase-root-MuiCardActionArea-root\" tabindex=\"0\" aria-label=\"Open the Organizations section\" href=\"/admin/organizations\">",
+            "failureSummary": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+          },
+          {
+            "target": [
+              "a[aria-label=\"Open the Sites section\"]"
+            ],
+            "html": "<a class=\"MuiButtonBase-root MuiCardActionArea-root mui-nb4faz-MuiButtonBase-root-MuiCardActionArea-root\" tabindex=\"0\" aria-label=\"Open the Sites section\" href=\"/admin/sites\">",
+            "failureSummary": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+          },
+          {
+            "target": [
+              "a[aria-label=\"Open the Modules section\"]"
+            ],
+            "html": "<a class=\"MuiButtonBase-root MuiCardActionArea-root mui-nb4faz-MuiButtonBase-root-MuiCardActionArea-root\" tabindex=\"0\" aria-label=\"Open the Modules section\" href=\"/admin/modules\">",
+            "failureSummary": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+          }
+        ]
+      }
+    ],
+    "incomplete": [],
+    "passes": 26
+  },
+  {
+    "name": "workspace",
+    "route": "/",
+    "width": 390,
+    "status": 200,
+    "readyMs": 2383,
+    "error": "",
+    "consoleErrors": [],
+    "title": "UoG Admin Console",
+    "h1": [
+      "Dashboard"
+    ],
+    "h2": [],
+    "headings": [
+      {
+        "level": 6,
+        "text": "Digital Platform — Admin Console"
+      },
+      {
+        "level": 6,
+        "text": "UoG Administration"
+      },
+      {
+        "level": 1,
+        "text": "Dashboard"
+      },
+      {
+        "level": 6,
+        "text": "Management sections"
+      },
+      {
+        "level": 6,
+        "text": "Organizations"
+      },
+      {
+        "level": 6,
+        "text": "Sites"
+      },
+      {
+        "level": 6,
+        "text": "Modules"
+      },
+      {
+        "level": 6,
+        "text": "Backend connectivity"
+      }
+    ],
+    "overflow": false,
+    "bodyText": "Skip to main content\n⚙ UoG\nDigital Platform — Admin Console\nSign out\nHome\n/\n\nDashboard\n\nDashboard\n\nUniversity of Gondar Digital Platform — administration console.\n\nConnected to the platform API. The sections below read and write through the Django API using your Keycloak session. The server decides every request: it enforces the platform-admin role, rejects stale writes, and applies the organization and site lifecycle rules — any refusal is shown on the screen that caused it.\nManagement sections",
+    "smallTargetCount": 3,
+    "smallTargets": [
+      {
+        "tag": "BUTTON",
+        "text": "Open navigation menu",
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Sign out",
+        "w": 51,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "Home",
+        "w": 66,
+        "h": 24
+      }
+    ],
+    "buttons": [
+      "Open navigation menu",
+      "Sign out",
+      "Workspace: Choose workspace"
+    ],
+    "violations": [
+      {
+        "id": "label-content-name-mismatch",
+        "impact": "serious",
+        "help": "Elements must have their visible text as part of their accessible name",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.14/label-content-name-mismatch?application=axeAPI",
+        "nodes": [
+          {
+            "target": [
+              "a[aria-label=\"Open the Organizations section\"]"
+            ],
+            "html": "<a class=\"MuiButtonBase-root MuiCardActionArea-root mui-nb4faz-MuiButtonBase-root-MuiCardActionArea-root\" tabindex=\"0\" aria-label=\"Open the Organizations section\" href=\"/admin/organizations\">",
+            "failureSummary": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+          },
+          {
+            "target": [
+              "a[aria-label=\"Open the Sites section\"]"
+            ],
+            "html": "<a class=\"MuiButtonBase-root MuiCardActionArea-root mui-nb4faz-MuiButtonBase-root-MuiCardActionArea-root\" tabindex=\"0\" aria-label=\"Open the Sites section\" href=\"/admin/sites\">",
+            "failureSummary": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+          },
+          {
+            "target": [
+              "a[aria-label=\"Open the Modules section\"]"
+            ],
+            "html": "<a class=\"MuiButtonBase-root MuiCardActionArea-root mui-nb4faz-MuiButtonBase-root-MuiCardActionArea-root\" tabindex=\"0\" aria-label=\"Open the Modules section\" href=\"/admin/modules\">",
+            "failureSummary": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+          }
+        ]
+      }
+    ],
+    "incomplete": [],
+    "passes": 25
+  },
+  {
+    "name": "site-dashboard",
+    "route": "/sites/17/admin",
+    "width": 1440,
+    "status": 200,
+    "readyMs": 4805,
+    "error": "",
+    "consoleErrors": [],
+    "title": "Site administration · UoG Admin Console",
+    "h1": [
+      "University of Gondar Main Site"
+    ],
+    "h2": [
+      "Quick actions",
+      "Content summary",
+      "Recent content activity"
+    ],
+    "headings": [
+      {
+        "level": 6,
+        "text": "Digital Platform — Admin Console"
+      },
+      {
+        "level": 6,
+        "text": "UoG Administration"
+      },
+      {
+        "level": 1,
+        "text": "University of Gondar Main Site"
+      },
+      {
+        "level": 2,
+        "text": "Quick actions"
+      },
+      {
+        "level": 2,
+        "text": "Content summary"
+      },
+      {
+        "level": 3,
+        "text": "Pages"
+      },
+      {
+        "level": 3,
+        "text": "Posts"
+      },
+      {
+        "level": 3,
+        "text": "Media"
+      },
+      {
+        "level": 3,
+        "text": "Users"
+      },
+      {
+        "level": 3,
+        "text": "Menus"
+      },
+      {
+        "level": 2,
+        "text": "Recent content activity"
+      }
+    ],
+    "overflow": false,
+    "bodyText": "Skip to main content\n⚙ UoG\nDigital Platform — Admin Console\ndevuser@uog.et\nSign out\nUoG Administration\nDigital platform\nUniversity of Gondar Main Site\nSITE ADMINISTRATION\n\nUniversity of Gondar Main Site\n\nActive\nDashboard\n\nSite content overview\n\nPages\n\nSite pages and workflow\n\nSidebars\n\nReusable Page navigation regions\n\nVisual Builder\n\nCompose a visual Page layout\n\nHomepage Settings\n\nAssign the published Site root\n\nHeader\n\nHeader branding, navigation, search and call to action\n\nFooter\n\nFooter con",
+    "smallTargetCount": 14,
+    "smallTargets": [
+      {
+        "tag": "BUTTON",
+        "text": "Sign out",
+        "w": 51,
+        "h": 23
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Workspace: University of Gondar Main Site",
+        "w": 251,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Home",
+        "w": 66,
+        "h": 24
+      },
+      {
+        "tag": "A",
+        "text": "University of Gondar Main Site",
+        "w": 203,
+        "h": 24
+      },
+      {
+        "tag": "A",
+        "text": "View Public Website for University of Gondar Main Site at ww",
+        "w": 194,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Create page",
+        "w": 138,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Visual Builder",
+        "w": 151,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Homepage Settings",
+        "w": 189,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Manage navigation",
+        "w": 184,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Open pages",
+        "w": 86,
+        "h": 31
+      }
+    ],
+    "buttons": [
+      "Open navigation menu",
+      "Sign out",
+      "Workspace: University of Gondar Main Site"
+    ],
+    "violations": [],
+    "incomplete": [],
+    "passes": 28
+  },
+  {
+    "name": "site-dashboard",
+    "route": "/sites/17/admin",
+    "width": 390,
+    "status": 200,
+    "readyMs": 4135,
+    "error": "",
+    "consoleErrors": [],
+    "title": "Site administration · UoG Admin Console",
+    "h1": [
+      "University of Gondar Main Site"
+    ],
+    "h2": [
+      "Quick actions",
+      "Content summary",
+      "Recent content activity"
+    ],
+    "headings": [
+      {
+        "level": 6,
+        "text": "Digital Platform — Admin Console"
+      },
+      {
+        "level": 6,
+        "text": "UoG Administration"
+      },
+      {
+        "level": 1,
+        "text": "University of Gondar Main Site"
+      },
+      {
+        "level": 2,
+        "text": "Quick actions"
+      },
+      {
+        "level": 2,
+        "text": "Content summary"
+      },
+      {
+        "level": 3,
+        "text": "Pages"
+      },
+      {
+        "level": 3,
+        "text": "Posts"
+      },
+      {
+        "level": 3,
+        "text": "Media"
+      },
+      {
+        "level": 3,
+        "text": "Users"
+      },
+      {
+        "level": 3,
+        "text": "Menus"
+      },
+      {
+        "level": 2,
+        "text": "Recent content activity"
+      }
+    ],
+    "overflow": false,
+    "bodyText": "Skip to main content\n⚙ UoG\nDigital Platform — Admin Console\nSign out\nHome\n/\nUniversity of Gondar Main Site\n/\n\nDashboard\n\nSITE ADMINISTRATION\nUniversity of Gondar Main Site\nActive\n\nMAIN\n\nUniversity of Gondar\n\nView Public Website\nwww.uog.local\nQuick actions\nCreate page\nVisual Builder\nHomepage Settings\nManage navigation\nContent summary\nUpdated 12:24:03 PM | Cached snapshot\nPages\nTotal\n4\nDraft\n0\nIn review\n0\nPublished\n2\nOpen pages\nPosts\nTotal\n1\nDraft\n0\nIn review\n0\nPublished\n1\nOpen posts\nMedia\nAssets\n",
+    "smallTargetCount": 10,
+    "smallTargets": [
+      {
+        "tag": "BUTTON",
+        "text": "Open navigation menu",
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Sign out",
+        "w": 51,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "Home",
+        "w": 66,
+        "h": 24
+      },
+      {
+        "tag": "A",
+        "text": "University of Gondar Main Site",
+        "w": 203,
+        "h": 24
+      },
+      {
+        "tag": "A",
+        "text": "View Public Website for University of Gondar Main Site at ww",
+        "w": 194,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Create page",
+        "w": 138,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Visual Builder",
+        "w": 151,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Homepage Settings",
+        "w": 189,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Manage navigation",
+        "w": 184,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Open pages",
+        "w": 86,
+        "h": 31
+      }
+    ],
+    "buttons": [
+      "Open navigation menu",
+      "Sign out",
+      "Workspace: University of Gondar Main Site"
+    ],
+    "violations": [],
+    "incomplete": [],
+    "passes": 28
+  },
+  {
+    "name": "appearance",
+    "route": "/sites/17/admin/appearance",
+    "width": 1440,
+    "status": 200,
+    "readyMs": 6832,
+    "error": "",
+    "consoleErrors": [],
+    "title": "Site administration · UoG Admin Console",
+    "h1": [
+      "Appearance"
+    ],
+    "h2": [],
+    "headings": [
+      {
+        "level": 6,
+        "text": "Digital Platform — Admin Console"
+      },
+      {
+        "level": 6,
+        "text": "UoG Administration"
+      },
+      {
+        "level": 1,
+        "text": "Appearance"
+      },
+      {
+        "level": 6,
+        "text": "Site logo"
+      }
+    ],
+    "overflow": false,
+    "bodyText": "Skip to main content\n⚙ UoG\nDigital Platform — Admin Console\ndevuser@uog.et\nSign out\nUoG Administration\nDigital platform\nUniversity of Gondar Main Site\nSITE ADMINISTRATION\n\nUniversity of Gondar Main Site\n\nActive\nDashboard\n\nSite content overview\n\nPages\n\nSite pages and workflow\n\nSidebars\n\nReusable Page navigation regions\n\nVisual Builder\n\nCompose a visual Page layout\n\nHomepage Settings\n\nAssign the published Site root\n\nHeader\n\nHeader branding, navigation, search and call to action\n\nFooter\n\nFooter con",
+    "smallTargetCount": 10,
+    "smallTargets": [
+      {
+        "tag": "BUTTON",
+        "text": "Sign out",
+        "w": 51,
+        "h": 23
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Workspace: University of Gondar Main Site",
+        "w": 251,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Home",
+        "w": 66,
+        "h": 24
+      },
+      {
+        "tag": "A",
+        "text": "University of Gondar Main Site",
+        "w": 203,
+        "h": 24
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Change image",
+        "w": 113,
+        "h": 37
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Remove image",
+        "w": 117,
+        "h": 37
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 814,
+        "h": 21
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Save appearance",
+        "w": 149,
+        "h": 37
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Reload current settings",
+        "w": 176,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Central module registry",
+        "w": 159,
+        "h": 31
+      }
+    ],
+    "buttons": [
+      "Open navigation menu",
+      "Sign out",
+      "Workspace: University of Gondar Main Site",
+      "Change image",
+      "Remove image",
+      "Save appearance",
+      "Reload current settings"
+    ],
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 2
+      }
+    ],
+    "passes": 30
+  },
+  {
+    "name": "appearance",
+    "route": "/sites/17/admin/appearance",
+    "width": 390,
+    "status": 200,
+    "readyMs": 6209,
+    "error": "",
+    "consoleErrors": [],
+    "title": "Site administration · UoG Admin Console",
+    "h1": [
+      "Appearance"
+    ],
+    "h2": [],
+    "headings": [
+      {
+        "level": 6,
+        "text": "Digital Platform — Admin Console"
+      },
+      {
+        "level": 6,
+        "text": "UoG Administration"
+      },
+      {
+        "level": 1,
+        "text": "Appearance"
+      },
+      {
+        "level": 6,
+        "text": "Site logo"
+      }
+    ],
+    "overflow": false,
+    "bodyText": "Skip to main content\n⚙ UoG\nDigital Platform — Admin Console\nSign out\nHome\n/\nUniversity of Gondar Main Site\n/\n\nAppearance\n\nAppearance\n\nPublic branding for University of Gondar Main Site. These settings apply across this Site; other Sites and platform defaults are unchanged.\n\nPublic Site title\nPublic Site title\n\nLeave blank to use the Site name.\n\nSite logo\n\nuniversity-of-gondar-logo.png\n\nAsset ID: fc4a8262-540b-4900-874a-5ee03964d76c\n\nChange image\nRemove image\nChoose a ready image from this Site’s",
+    "smallTargetCount": 9,
+    "smallTargets": [
+      {
+        "tag": "BUTTON",
+        "text": "Open navigation menu",
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Sign out",
+        "w": 51,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "Home",
+        "w": 66,
+        "h": 24
+      },
+      {
+        "tag": "A",
+        "text": "University of Gondar Main Site",
+        "w": 203,
+        "h": 24
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Change image",
+        "w": 113,
+        "h": 37
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Remove image",
+        "w": 117,
+        "h": 37
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 324,
+        "h": 21
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Save appearance",
+        "w": 149,
+        "h": 37
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Reload current settings",
+        "w": 176,
+        "h": 37
+      }
+    ],
+    "buttons": [
+      "Open navigation menu",
+      "Sign out",
+      "Workspace: University of Gondar Main Site",
+      "Change image",
+      "Remove image",
+      "Save appearance",
+      "Reload current settings"
+    ],
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 2
+      }
+    ],
+    "passes": 29
+  },
+  {
+    "name": "header",
+    "route": "/sites/17/admin/header",
+    "width": 1440,
+    "status": 200,
+    "readyMs": 5944,
+    "error": "",
+    "consoleErrors": [],
+    "title": "Site administration · UoG Admin Console",
+    "h1": [
+      "Header"
+    ],
+    "h2": [
+      "Appearance",
+      "Branding",
+      "Call to action",
+      "Behaviour",
+      "Navigation",
+      "Live preview"
+    ],
+    "headings": [
+      {
+        "level": 6,
+        "text": "Digital Platform — Admin Console"
+      },
+      {
+        "level": 6,
+        "text": "UoG Administration"
+      },
+      {
+        "level": 1,
+        "text": "Header"
+      },
+      {
+        "level": 2,
+        "text": "Appearance"
+      },
+      {
+        "level": 2,
+        "text": "Branding"
+      },
+      {
+        "level": 2,
+        "text": "Call to action"
+      },
+      {
+        "level": 2,
+        "text": "Behaviour"
+      },
+      {
+        "level": 2,
+        "text": "Navigation"
+      },
+      {
+        "level": 2,
+        "text": "Live preview"
+      }
+    ],
+    "overflow": false,
+    "bodyText": "Skip to main content\n⚙ UoG\nDigital Platform — Admin Console\ndevuser@uog.et\nSign out\nUoG Administration\nDigital platform\nUniversity of Gondar Main Site\nSITE ADMINISTRATION\n\nUniversity of Gondar Main Site\n\nActive\nDashboard\n\nSite content overview\n\nPages\n\nSite pages and workflow\n\nSidebars\n\nReusable Page navigation regions\n\nVisual Builder\n\nCompose a visual Page layout\n\nHomepage Settings\n\nAssign the published Site root\n\nHeader\n\nHeader branding, navigation, search and call to action\n\nFooter\n\nFooter con",
+    "smallTargetCount": 9,
+    "smallTargets": [
+      {
+        "tag": "BUTTON",
+        "text": "Sign out",
+        "w": 51,
+        "h": 23
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Workspace: University of Gondar Main Site",
+        "w": 251,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Home",
+        "w": 66,
+        "h": 24
+      },
+      {
+        "tag": "A",
+        "text": "University of Gondar Main Site",
+        "w": 203,
+        "h": 24
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 511,
+        "h": 21
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 114,
+        "h": 38
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 114,
+        "h": 38
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 114,
+        "h": 38
+      },
+      {
+        "tag": "A",
+        "text": "Manage header and utility menus",
+        "w": 241,
+        "h": 37
+      }
+    ],
+    "buttons": [
+      "Open navigation menu",
+      "Sign out",
+      "Workspace: University of Gondar Main Site",
+      "Save draft",
+      "Publish header",
+      "Restore previous published header",
+      "Reload current settings",
+      "Desktop",
+      "Mobile",
+      "About Us",
+      "Academics",
+      "Administration",
+      "Research",
+      "Services",
+      "Open site header",
+      "Search this Site"
+    ],
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 4
+      }
+    ],
+    "passes": 30
+  },
+  {
+    "name": "footer",
+    "route": "/sites/17/admin/footer",
+    "width": 1440,
+    "status": 200,
+    "readyMs": 15767,
+    "error": "",
+    "consoleErrors": [],
+    "title": "Site administration · UoG Admin Console",
+    "h1": [
+      "Footer"
+    ],
+    "h2": [
+      "About and copyright",
+      "Contact information",
+      "Radio or featured link",
+      "Newsletter and support",
+      "Social profiles",
+      "Legal and accessibility links",
+      "Footer columns",
+      "Draft preview",
+      "Stay connected with University of Gondar",
+      "University Main - FooterUniversity Main - Footer",
+      "Main review mainqa-8995d437 University resourcesMain review mainqa-8995d437 University resources",
+      "University Main - Quick LinksUniversity Main - Quick Links"
+    ],
+    "headings": [
+      {
+        "level": 6,
+        "text": "Digital Platform — Admin Console"
+      },
+      {
+        "level": 6,
+        "text": "UoG Administration"
+      },
+      {
+        "level": 1,
+        "text": "Footer"
+      },
+      {
+        "level": 2,
+        "text": "About and copyright"
+      },
+      {
+        "level": 2,
+        "text": "Contact information"
+      },
+      {
+        "level": 2,
+        "text": "Radio or featured link"
+      },
+      {
+        "level": 2,
+        "text": "Newsletter and support"
+      },
+      {
+        "level": 2,
+        "text": "Social profiles"
+      },
+      {
+        "level": 2,
+        "text": "Legal and accessibility links"
+      },
+      {
+        "level": 2,
+        "text": "Footer columns"
+      },
+      {
+        "level": 6,
+        "text": "Column 1 · links from “University Main - Footer”"
+      },
+      {
+        "level": 6,
+        "text": "Column 2 · links from “Main review mainqa-8995d437 University resources”"
+      },
+      {
+        "level": 6,
+        "text": "Column 3 · links from “University Main - Quick Links”"
+      },
+      {
+        "level": 2,
+        "text": "Draft preview"
+      },
+      {
+        "level": 2,
+        "text": "Stay connected with University of Gondar"
+      },
+      {
+        "level": 2,
+        "text": "University Main - FooterUniversity Main - Footer"
+      },
+      {
+        "level": 2,
+        "text": "Main review mainqa-8995d437 University resourcesMain review mainqa-8995d437 University resources"
+      },
+      {
+        "level": 2,
+        "text": "University Main - Quick LinksUniversity Main - Quick Links"
+      }
+    ],
+    "overflow": false,
+    "bodyText": "Skip to main content\n⚙ UoG\nDigital Platform — Admin Console\ndevuser@uog.et\nSign out\nUoG Administration\nDigital platform\nUniversity of Gondar Main Site\nSITE ADMINISTRATION\n\nUniversity of Gondar Main Site\n\nActive\nDashboard\n\nSite content overview\n\nPages\n\nSite pages and workflow\n\nSidebars\n\nReusable Page navigation regions\n\nVisual Builder\n\nCompose a visual Page layout\n\nHomepage Settings\n\nAssign the published Site root\n\nHeader\n\nHeader branding, navigation, search and call to action\n\nFooter\n\nFooter con",
+    "smallTargetCount": 4,
+    "smallTargets": [
+      {
+        "tag": "BUTTON",
+        "text": "Sign out",
+        "w": 51,
+        "h": 23
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Workspace: University of Gondar Main Site",
+        "w": 251,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Home",
+        "w": 66,
+        "h": 24
+      },
+      {
+        "tag": "A",
+        "text": "University of Gondar Main Site",
+        "w": 203,
+        "h": 24
+      }
+    ],
+    "buttons": [
+      "Open navigation menu",
+      "Sign out",
+      "Workspace: University of Gondar Main Site",
+      "Add social profile",
+      "Add legal or accessibility link",
+      "Move column 1 up",
+      "Move column 1 down",
+      "Move column 2 up",
+      "Move column 2 down",
+      "Move column 3 up",
+      "Move column 3 down",
+      "Save draft",
+      "Publish footer",
+      "Restore previous published footer",
+      "Reload current settings",
+      "University Main - Footer",
+      "More University Main - Footer links",
+      "Main review mainqa-8995d437 University resources",
+      "University Main - Quick Links"
+    ],
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 10
+      }
+    ],
+    "passes": 29
+  },
+  {
+    "name": "footer",
+    "route": "/sites/17/admin/footer",
+    "width": 390,
+    "status": 200,
+    "readyMs": 5728,
+    "error": "",
+    "consoleErrors": [],
+    "title": "Site administration · UoG Admin Console",
+    "h1": [
+      "Footer"
+    ],
+    "h2": [
+      "About and copyright",
+      "Contact information",
+      "Radio or featured link",
+      "Newsletter and support",
+      "Social profiles",
+      "Legal and accessibility links",
+      "Footer columns",
+      "Draft preview",
+      "Stay connected with University of Gondar",
+      "University Main - FooterUniversity Main - Footer",
+      "Main review mainqa-8995d437 University resourcesMain review mainqa-8995d437 University resources",
+      "University Main - Quick LinksUniversity Main - Quick Links"
+    ],
+    "headings": [
+      {
+        "level": 6,
+        "text": "Digital Platform — Admin Console"
+      },
+      {
+        "level": 6,
+        "text": "UoG Administration"
+      },
+      {
+        "level": 1,
+        "text": "Footer"
+      },
+      {
+        "level": 2,
+        "text": "About and copyright"
+      },
+      {
+        "level": 2,
+        "text": "Contact information"
+      },
+      {
+        "level": 2,
+        "text": "Radio or featured link"
+      },
+      {
+        "level": 2,
+        "text": "Newsletter and support"
+      },
+      {
+        "level": 2,
+        "text": "Social profiles"
+      },
+      {
+        "level": 2,
+        "text": "Legal and accessibility links"
+      },
+      {
+        "level": 2,
+        "text": "Footer columns"
+      },
+      {
+        "level": 6,
+        "text": "Column 1 · links from “University Main - Footer”"
+      },
+      {
+        "level": 6,
+        "text": "Column 2 · links from “Main review mainqa-8995d437 University resources”"
+      },
+      {
+        "level": 6,
+        "text": "Column 3 · links from “University Main - Quick Links”"
+      },
+      {
+        "level": 2,
+        "text": "Draft preview"
+      },
+      {
+        "level": 2,
+        "text": "Stay connected with University of Gondar"
+      },
+      {
+        "level": 2,
+        "text": "University Main - FooterUniversity Main - Footer"
+      },
+      {
+        "level": 2,
+        "text": "Main review mainqa-8995d437 University resourcesMain review mainqa-8995d437 University resources"
+      },
+      {
+        "level": 2,
+        "text": "University Main - Quick LinksUniversity Main - Quick Links"
+      }
+    ],
+    "overflow": false,
+    "bodyText": "Skip to main content\n⚙ UoG\nDigital Platform — Admin Console\nSign out\nHome\n/\nUniversity of Gondar Main Site\n/\n\nFooter\n\nFooter\n\nContact information, social profiles and footer content for University of Gondar Main Site.\n\nAbout and copyright\nShort description\nShort description\n\nOptional introduction beneath the Site logo. Plain text only.\n\nHeading for ungrouped links\nHeading for ungrouped links\nCopyright text\nCopyright text\n\nUse {year} for the current year and {site} for the public Site title.\n\nCon",
+    "smallTargetCount": 4,
+    "smallTargets": [
+      {
+        "tag": "BUTTON",
+        "text": "Open navigation menu",
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Sign out",
+        "w": 51,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "Home",
+        "w": 66,
+        "h": 24
+      },
+      {
+        "tag": "A",
+        "text": "University of Gondar Main Site",
+        "w": 203,
+        "h": 24
+      }
+    ],
+    "buttons": [
+      "Open navigation menu",
+      "Sign out",
+      "Workspace: University of Gondar Main Site",
+      "Add social profile",
+      "Add legal or accessibility link",
+      "Move column 1 up",
+      "Move column 1 down",
+      "Move column 2 up",
+      "Move column 2 down",
+      "Move column 3 up",
+      "Move column 3 down",
+      "Save draft",
+      "Publish footer",
+      "Restore previous published footer",
+      "Reload current settings",
+      "University Main - Footer",
+      "More University Main - Footer links",
+      "Main review mainqa-8995d437 University resources",
+      "University Main - Quick Links"
+    ],
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6
+      }
+    ],
+    "passes": 28
+  },
+  {
+    "name": "menus",
+    "route": "/sites/17/admin/menus",
+    "width": 1440,
+    "status": 200,
+    "readyMs": 18855,
+    "error": "",
+    "consoleErrors": [],
+    "title": "Site administration · UoG Admin Console",
+    "h1": [],
+    "h2": [
+      "Template menu locations"
+    ],
+    "headings": [
+      {
+        "level": 6,
+        "text": "Digital Platform — Admin Console"
+      },
+      {
+        "level": 6,
+        "text": "UoG Administration"
+      },
+      {
+        "level": 6,
+        "text": "Navigation"
+      },
+      {
+        "level": 2,
+        "text": "Template menu locations"
+      },
+      {
+        "level": 3,
+        "text": "Primary Header"
+      },
+      {
+        "level": 3,
+        "text": "Utility Header"
+      },
+      {
+        "level": 3,
+        "text": "Footer"
+      },
+      {
+        "level": 3,
+        "text": "Page Sidebar"
+      },
+      {
+        "level": 6,
+        "text": "Ownership"
+      },
+      {
+        "level": 6,
+        "text": "Main Navigation"
+      }
+    ],
+    "overflow": false,
+    "bodyText": "Skip to main content\n⚙ UoG\nDigital Platform — Admin Console\ndevuser@uog.et\nSign out\nUoG Administration\nDigital platform\nUniversity of Gondar Main Site\nSITE ADMINISTRATION\n\nUniversity of Gondar Main Site\n\nActive\nDashboard\n\nSite content overview\n\nPages\n\nSite pages and workflow\n\nSidebars\n\nReusable Page navigation regions\n\nVisual Builder\n\nCompose a visual Page layout\n\nHomepage Settings\n\nAssign the published Site root\n\nHeader\n\nHeader branding, navigation, search and call to action\n\nFooter\n\nFooter con",
+    "smallTargetCount": 22,
+    "smallTargets": [
+      {
+        "tag": "BUTTON",
+        "text": "Sign out",
+        "w": 51,
+        "h": 23
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Workspace: University of Gondar Main Site",
+        "w": 251,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Home",
+        "w": 66,
+        "h": 24
+      },
+      {
+        "tag": "A",
+        "text": "University of Gondar Main Site",
+        "w": 203,
+        "h": 24
+      },
+      {
+        "tag": "A",
+        "text": "Preview draft navigation",
+        "w": 1046,
+        "h": 37
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Refresh locations",
+        "w": 1046,
+        "h": 37
+      },
+      {
+        "tag": "SELECT",
+        "text": "UnassignedMain Navigation (published)Main review mainqa-8995",
+        "w": 481,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Save Primary Header draft",
+        "w": 195,
+        "h": 37
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Publish Primary Header",
+        "w": 193,
+        "h": 37
+      },
+      {
+        "tag": "SELECT",
+        "text": "UnassignedMain Navigation (published)Main review mainqa-8995",
+        "w": 481,
+        "h": 40
+      }
+    ],
+    "buttons": [
+      "Open navigation menu",
+      "Sign out",
+      "Workspace: University of Gondar Main Site",
+      "Refresh locations",
+      "Save Primary Header draft",
+      "Publish Primary Header",
+      "Save Utility Header draft",
+      "Publish Utility Header",
+      "Move footer column 1 left",
+      "Remove footer column 1",
+      "Move footer column 2 left",
+      "Remove footer column 2",
+      "Move footer column 3 left",
+      "Remove footer column 3",
+      "Add footer column",
+      "Save Footer draft",
+      "Publish Footer",
+      "Save Page Sidebar draft",
+      "Publish Page Sidebar",
+      "Main Navigation / main-review-mainqa-8995d437-main-navigation / Published",
+      "Main review mainqa-8995d437 In this section / main-review-mainqa-8995d437-in-this-section / Published",
+      "Main review mainqa-8995d437 University resources / main-review-mainqa-8995d437-university-resources / Published",
+      "University Main - Footer / main-sample-footer / Published",
+      "University Main - Primary Navigation / main-sample-primary / Published",
+      "University Main - Quick Links / main-sample-utility / Published",
+      "Retire Main Navigation",
+      "Edit Main Navigation",
+      "Move Main navigation up",
+      "Move Main navigation down",
+      "Nest Main navigation"
+    ],
+    "violations": [
+      {
+        "id": "label-content-name-mismatch",
+        "impact": "serious",
+        "help": "Elements must have their visible text as part of their accessible name",
+        "helpUrl": "https://dequeuniversity.com/rules/axe/4.14/label-content-name-mismatch?application=axeAPI",
+        "nodes": [
+          {
+            "target": [
+              "button[aria-label=\"Move footer column 1 left\"]"
+            ],
+            "html": "<button class=\"MuiButtonBase-root M...\" tabindex=\"-1\" type=\"button\" disabled=\"\" aria-label=\"Move footer column 1...\">",
+            "failureSummary": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+          },
+          {
+            "target": [
+              "button[aria-label=\"Move footer column 2 left\"]"
+            ],
+            "html": "<button class=\"MuiButtonBase-root M...\" tabindex=\"0\" type=\"button\" aria-label=\"Move footer column 2...\">",
+            "failureSummary": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+          },
+          {
+            "target": [
+              "button[aria-label=\"Move footer column 3 left\"]"
+            ],
+            "html": "<button class=\"MuiButtonBase-root M...\" tabindex=\"0\" type=\"button\" aria-label=\"Move footer column 3...\">",
+            "failureSummary": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+          }
+        ]
+      }
+    ],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": 1
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6
+      }
+    ],
+    "passes": 29
+  },
+  {
+    "name": "menus",
+    "route": "/sites/17/admin/menus",
+    "width": 390,
+    "status": 200,
+    "readyMs": 7143,
+    "error": "",
+    "consoleErrors": [],
+    "title": "Site administration · UoG Admin Console",
+    "h1": [],
+    "h2": [
+      "Template menu locations"
+    ],
+    "headings": [
+      {
+        "level": 6,
+        "text": "Digital Platform — Admin Console"
+      },
+      {
+        "level": 6,
+        "text": "UoG Administration"
+      },
+      {
+        "level": 6,
+        "text": "Navigation"
+      },
+      {
+        "level": 2,
+        "text": "Template menu locations"
+      },
+      {
+        "level": 3,
+        "text": "Primary Header"
+      },
+      {
+        "level": 3,
+        "text": "Utility Header"
+      },
+      {
+        "level": 3,
+        "text": "Footer"
+      },
+      {
+        "level": 3,
+        "text": "Page Sidebar"
+      },
+      {
+        "level": 6,
+        "text": "Ownership"
+      },
+      {
+        "level": 6,
+        "text": "Main Navigation"
+      }
+    ],
+    "overflow": false,
+    "bodyText": "Skip to main content\n⚙ UoG\nDigital Platform — Admin Console\nSign out\nHome\n/\nUniversity of Gondar Main Site\n/\n\nMenus\n\nNavigation\n\nMenus for Site 17. Create multiple named menus, choose one to manage its items, and optionally assign a navigation location. A central menu belongs to the platform. An inherited menu stays on its owning Site; this Site only records whether public delivery should include it.\n\nTemplate menu locations\n\nSave an assignment draft, then publish it to change public navigation.",
+    "smallTargetCount": 10,
+    "smallTargets": [
+      {
+        "tag": "BUTTON",
+        "text": "Open navigation menu",
+        "w": 40,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Sign out",
+        "w": 51,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "Home",
+        "w": 66,
+        "h": 24
+      },
+      {
+        "tag": "A",
+        "text": "University of Gondar Main Site",
+        "w": 203,
+        "h": 24
+      },
+      {
+        "tag": "A",
+        "text": "Preview draft navigation",
+        "w": 324,
+        "h": 37
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Refresh locations",
+        "w": 324,
+        "h": 37
+      },
+      {
+        "tag": "SELECT",
+        "text": "UnassignedMain Navigation (published)Main review mainqa-8995",
+        "w": 290,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Save Primary Header draft",
+        "w": 195,
+        "h": 37
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Publish Primary Header",
+        "w": 193,
+        "h": 37
+      },
+      {
+        "tag": "SELECT",
+        "text": "UnassignedMain Navigation (published)Main review mainqa-8995",
+        "w": 290,
+        "h": 40
+      }
+    ],
+    "buttons": [
+      "Open navigation menu",
+      "Sign out",
+      "Workspace: University of Gondar Main Site",
+      "Refresh locations",
+      "Save Primary Header draft",
+      "Publish Primary Header",
+      "Save Utility Header draft",
+      "Publish Utility Header",
+      "Move footer column 1 left",
+      "Remove footer column 1",
+      "Move footer column 2 left",
+      "Remove footer column 2",
+      "Move footer column 3 left",
+      "Remove footer column 3",
+      "Add footer column",
+      "Save Footer draft",
+      "Publish Footer",
+      "Save Page Sidebar draft",
+      "Publish Page Sidebar",
+      "Main Navigation / main-review-mainqa-8995d437-main-navigation / Published",
+      "Main review mainqa-8995d437 In this section / main-review-mainqa-8995d437-in-this-section / Published",
+      "Main review mainqa-8995d437 University resources / main-review-mainqa-8995d437-university-resources / Published",
+      "University Main - Footer / main-sample-footer / Published",
+      "University Main - Primary Navigation / main-sample-primary / Published",
+      "University Main - Quick Links / main-sample-utility / Published",
+      "Retire Main Navigation",
+      "Edit Main Navigation",
+      "Move Main navigation up",
+      "Move Main navigation down",
+      "Nest Main navigation"
+    ],
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious",
+        "nodes": 1
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 2
+      }
+    ],
+    "passes": 28
+  },
+  {
+    "name": "pages",
+    "route": "/sites/17/admin/pages",
+    "width": 1440,
+    "status": 200,
+    "readyMs": 6044,
+    "error": "",
+    "consoleErrors": [],
+    "title": "Site administration · UoG Admin Console",
+    "h1": [],
+    "h2": [
+      "Pages"
+    ],
+    "headings": [
+      {
+        "level": 6,
+        "text": "Digital Platform — Admin Console"
+      },
+      {
+        "level": 6,
+        "text": "UoG Administration"
+      },
+      {
+        "level": 2,
+        "text": "Pages"
+      },
+      {
+        "level": 3,
+        "text": "Page status dashboard"
+      },
+      {
+        "level": 6,
+        "text": "4"
+      },
+      {
+        "level": 6,
+        "text": "0"
+      },
+      {
+        "level": 6,
+        "text": "0"
+      },
+      {
+        "level": 6,
+        "text": "0"
+      },
+      {
+        "level": 6,
+        "text": "2"
+      },
+      {
+        "level": 6,
+        "text": "1"
+      },
+      {
+        "level": 6,
+        "text": "1"
+      }
+    ],
+    "overflow": false,
+    "bodyText": "Skip to main content\n⚙ UoG\nDigital Platform — Admin Console\ndevuser@uog.et\nSign out\nUoG Administration\nDigital platform\nUniversity of Gondar Main Site\nSITE ADMINISTRATION\n\nUniversity of Gondar Main Site\n\nActive\nDashboard\n\nSite content overview\n\nPages\n\nSite pages and workflow\n\nSidebars\n\nReusable Page navigation regions\n\nVisual Builder\n\nCompose a visual Page layout\n\nHomepage Settings\n\nAssign the published Site root\n\nHeader\n\nHeader branding, navigation, search and call to action\n\nFooter\n\nFooter con",
+    "smallTargetCount": 29,
+    "smallTargets": [
+      {
+        "tag": "BUTTON",
+        "text": "Sign out",
+        "w": 51,
+        "h": 23
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Workspace: University of Gondar Main Site",
+        "w": 251,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Home",
+        "w": 66,
+        "h": 24
+      },
+      {
+        "tag": "A",
+        "text": "University of Gondar Main Site",
+        "w": 203,
+        "h": 24
+      },
+      {
+        "tag": "A",
+        "text": "Homepage Settings",
+        "w": 165,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Create page",
+        "w": 138,
+        "h": 37
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 223,
+        "h": 40
+      },
+      {
+        "tag": "DIV",
+        "text": "​",
+        "w": 180,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 180,
+        "h": 21
+      },
+      {
+        "tag": "DIV",
+        "text": "​",
+        "w": 180,
+        "h": 40
+      }
+    ],
+    "buttons": [
+      "Open navigation menu",
+      "Sign out",
+      "Workspace: University of Gondar Main Site",
+      "Apply",
+      "Reset",
+      "Review queue",
+      "Workflow history for QA shared main homepage p4brand-0b2c8ca6",
+      "Revisions for QA shared main homepage p4brand-0b2c8ca6",
+      "Edit a draft of QA shared main homepage p4brand-0b2c8ca6",
+      "Unpublish QA shared main homepage p4brand-0b2c8ca6",
+      "Archive QA shared main homepage p4brand-0b2c8ca6",
+      "Workflow history for Main review mainqa-8995d437 homepage",
+      "Revisions for Main review mainqa-8995d437 homepage",
+      "Publish Main review mainqa-8995d437 homepage",
+      "Archive Main review mainqa-8995d437 homepage",
+      "Restore Main review mainqa-8995d437 homepage",
+      "Workflow history for Main review mainqa-8995d437 homepage",
+      "Revisions for Main review mainqa-8995d437 homepage",
+      "Workflow history for Main review mainqa-8995d437 university information",
+      "Revisions for Main review mainqa-8995d437 university information",
+      "Edit a draft of Main review mainqa-8995d437 university information",
+      "Unpublish Main review mainqa-8995d437 university information",
+      "Archive Main review mainqa-8995d437 university information",
+      "Set Main review mainqa-8995d437 university information as homepage",
+      "Previous page",
+      "Next page"
+    ],
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 1
+      }
+    ],
+    "passes": 31
+  },
+  {
+    "name": "posts",
+    "route": "/sites/17/admin/posts",
+    "width": 1440,
+    "status": 200,
+    "readyMs": 13453,
+    "error": "",
+    "consoleErrors": [],
+    "title": "Site administration · UoG Admin Console",
+    "h1": [],
+    "h2": [
+      "Posts"
+    ],
+    "headings": [
+      {
+        "level": 6,
+        "text": "Digital Platform — Admin Console"
+      },
+      {
+        "level": 6,
+        "text": "UoG Administration"
+      },
+      {
+        "level": 2,
+        "text": "Posts"
+      }
+    ],
+    "overflow": false,
+    "bodyText": "Skip to main content\n⚙ UoG\nDigital Platform — Admin Console\ndevuser@uog.et\nSign out\nUoG Administration\nDigital platform\nUniversity of Gondar Main Site\nSITE ADMINISTRATION\n\nUniversity of Gondar Main Site\n\nActive\nDashboard\n\nSite content overview\n\nPages\n\nSite pages and workflow\n\nSidebars\n\nReusable Page navigation regions\n\nVisual Builder\n\nCompose a visual Page layout\n\nHomepage Settings\n\nAssign the published Site root\n\nHeader\n\nHeader branding, navigation, search and call to action\n\nFooter\n\nFooter con",
+    "smallTargetCount": 27,
+    "smallTargets": [
+      {
+        "tag": "BUTTON",
+        "text": "Sign out",
+        "w": 51,
+        "h": 23
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Workspace: University of Gondar Main Site",
+        "w": 251,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Home",
+        "w": 66,
+        "h": 24
+      },
+      {
+        "tag": "A",
+        "text": "University of Gondar Main Site",
+        "w": 203,
+        "h": 24
+      },
+      {
+        "tag": "A",
+        "text": "Create Post",
+        "w": 135,
+        "h": 37
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 223,
+        "h": 40
+      },
+      {
+        "tag": "DIV",
+        "text": "​",
+        "w": 180,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 180,
+        "h": 21
+      },
+      {
+        "tag": "DIV",
+        "text": "​",
+        "w": 180,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 180,
+        "h": 21
+      }
+    ],
+    "buttons": [
+      "Open navigation menu",
+      "Sign out",
+      "Workspace: University of Gondar Main Site",
+      "Apply",
+      "Reset",
+      "Workflow history for Main review mainqa-8995d437 university news",
+      "Unpublish Main review mainqa-8995d437 university news",
+      "Archive Main review mainqa-8995d437 university news",
+      "Previous page",
+      "Next page"
+    ],
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 2
+      }
+    ],
+    "passes": 32
+  },
+  {
+    "name": "media",
+    "route": "/sites/17/admin/media",
+    "width": 1440,
+    "status": 200,
+    "readyMs": 12752,
+    "error": "",
+    "consoleErrors": [],
+    "title": "Site administration · UoG Admin Console",
+    "h1": [],
+    "h2": [
+      "Media Library"
+    ],
+    "headings": [
+      {
+        "level": 6,
+        "text": "Digital Platform — Admin Console"
+      },
+      {
+        "level": 6,
+        "text": "UoG Administration"
+      },
+      {
+        "level": 2,
+        "text": "Media Library"
+      }
+    ],
+    "overflow": false,
+    "bodyText": "Skip to main content\n⚙ UoG\nDigital Platform — Admin Console\ndevuser@uog.et\nSign out\nUoG Administration\nDigital platform\nUniversity of Gondar Main Site\nSITE ADMINISTRATION\n\nUniversity of Gondar Main Site\n\nActive\nDashboard\n\nSite content overview\n\nPages\n\nSite pages and workflow\n\nSidebars\n\nReusable Page navigation regions\n\nVisual Builder\n\nCompose a visual Page layout\n\nHomepage Settings\n\nAssign the published Site root\n\nHeader\n\nHeader branding, navigation, search and call to action\n\nFooter\n\nFooter con",
+    "smallTargetCount": 20,
+    "smallTargets": [
+      {
+        "tag": "BUTTON",
+        "text": "Sign out",
+        "w": 51,
+        "h": 23
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Workspace: University of Gondar Main Site",
+        "w": 251,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Home",
+        "w": 66,
+        "h": 24
+      },
+      {
+        "tag": "A",
+        "text": "University of Gondar Main Site",
+        "w": 203,
+        "h": 24
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Upload files",
+        "w": 137,
+        "h": 37
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 452,
+        "h": 40
+      },
+      {
+        "tag": "DIV",
+        "text": "​",
+        "w": 160,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 160,
+        "h": 21
+      },
+      {
+        "tag": "DIV",
+        "text": "​",
+        "w": 160,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 160,
+        "h": 21
+      }
+    ],
+    "buttons": [
+      "Open navigation menu",
+      "Sign out",
+      "Workspace: University of Gondar Main Site",
+      "Upload files",
+      "Drop files to upload or click to browse",
+      "Search media",
+      "Clear filters",
+      "Refresh media",
+      "Grid view",
+      "List view",
+      "Preview WhatsApp Image 2025-08-14 at 10.37.59_380a38ce",
+      "Edit details for WhatsApp Image 2025-08-14 at 10.37.59_380a38ce.jpg",
+      "Preview university-of-gondar-logo",
+      "Edit details for university-of-gondar-logo.png",
+      "Preview Main review mainqa-8995d437 campus illustration",
+      "Edit details for main-workflow-campus.png",
+      "Previous",
+      "Next"
+    ],
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 4
+      }
+    ],
+    "passes": 30
+  },
+  {
+    "name": "page-new",
+    "route": "/sites/17/admin/pages/new",
+    "width": 1440,
+    "status": 200,
+    "readyMs": 17150,
+    "error": "",
+    "consoleErrors": [],
+    "title": "Site administration · UoG Admin Console",
+    "h1": [
+      "Create Page"
+    ],
+    "h2": [],
+    "headings": [
+      {
+        "level": 6,
+        "text": "Digital Platform — Admin Console"
+      },
+      {
+        "level": 6,
+        "text": "UoG Administration"
+      },
+      {
+        "level": 1,
+        "text": "Create Page"
+      },
+      {
+        "level": 3,
+        "text": "Advanced"
+      },
+      {
+        "level": 6,
+        "text": "Content blocks"
+      }
+    ],
+    "overflow": false,
+    "bodyText": "Skip to main content\n⚙ UoG\nDigital Platform — Admin Console\ndevuser@uog.et\nSign out\nUoG Administration\nDigital platform\nUniversity of Gondar Main Site\nSITE ADMINISTRATION\n\nUniversity of Gondar Main Site\n\nActive\nDashboard\n\nSite content overview\n\nPages\n\nSite pages and workflow\n\nSidebars\n\nReusable Page navigation regions\n\nVisual Builder\n\nCompose a visual Page layout\n\nHomepage Settings\n\nAssign the published Site root\n\nHeader\n\nHeader branding, navigation, search and call to action\n\nFooter\n\nFooter con",
+    "smallTargetCount": 12,
+    "smallTargets": [
+      {
+        "tag": "BUTTON",
+        "text": "Sign out",
+        "w": 51,
+        "h": 23
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Workspace: University of Gondar Main Site",
+        "w": 251,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Home",
+        "w": 66,
+        "h": 24
+      },
+      {
+        "tag": "A",
+        "text": "University of Gondar Main Site",
+        "w": 203,
+        "h": 24
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Cancel",
+        "w": 64,
+        "h": 37
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Create Page",
+        "w": 114,
+        "h": 37
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 1046,
+        "h": 21
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 1046,
+        "h": 21
+      },
+      {
+        "tag": "A",
+        "text": "Manage reusable sidebars",
+        "w": 1046,
+        "h": 37
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 1046,
+        "h": 21
+      }
+    ],
+    "buttons": [
+      "Open navigation menu",
+      "Sign out",
+      "Workspace: University of Gondar Main Site",
+      "Cancel",
+      "Create Page",
+      "Advanced",
+      "Choose uploaded image",
+      "Add slider",
+      "Add gallery",
+      "Add heading block",
+      "Add paragraph block",
+      "Add image block",
+      "Add button block",
+      "Add list block",
+      "Add section block",
+      "Preview draft"
+    ],
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 6
+      }
+    ],
+    "passes": 29
+  },
+  {
+    "name": "builder",
+    "route": "/sites/102/admin/pages/180d0b82-420d-4d86-838d-d6fb33423029/builder",
+    "width": 1440,
+    "status": 200,
+    "readyMs": 20828,
+    "error": "",
+    "consoleErrors": [],
+    "title": "Site administration · UoG Admin Console",
+    "h1": [],
+    "h2": [],
+    "headings": [],
+    "overflow": false,
+    "bodyText": "This Page uses an unsupported or invalid layout. Its saved content has not been changed. Back to Pages\nRetry",
+    "smallTargetCount": 2,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "Back to Pages",
+        "w": 114,
+        "h": 37
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Retry",
+        "w": 64,
+        "h": 37
+      }
+    ],
+    "buttons": [
+      "Retry"
+    ],
+    "violations": [],
+    "incomplete": [],
+    "passes": 21
+  },
+  {
+    "name": "builder",
+    "route": "/sites/102/admin/pages/180d0b82-420d-4d86-838d-d6fb33423029/builder",
+    "width": 390,
+    "status": 200,
+    "readyMs": 7507,
+    "error": "",
+    "consoleErrors": [],
+    "title": "Site administration · UoG Admin Console",
+    "h1": [],
+    "h2": [],
+    "headings": [],
+    "overflow": false,
+    "bodyText": "This Page uses an unsupported or invalid layout. Its saved content has not been changed. Back to Pages\nRetry",
+    "smallTargetCount": 2,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "Back to Pages",
+        "w": 114,
+        "h": 37
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Retry",
+        "w": 64,
+        "h": 37
+      }
+    ],
+    "buttons": [
+      "Retry"
+    ],
+    "violations": [],
+    "incomplete": [],
+    "passes": 21
+  }
+]

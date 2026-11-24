@@ -8,6 +8,7 @@ from .serializers import StrictFields
 
 
 class HeaderSettingsSerializer(StrictFields, serializers.Serializer):
+    variant = serializers.ChoiceField(choices=("standard", "centered", "compact"), required=False)
     brand_href = serializers.CharField(max_length=2048, required=False)
     search_enabled = serializers.BooleanField(required=False)
     sticky = serializers.BooleanField(required=False)
