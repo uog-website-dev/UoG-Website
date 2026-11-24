@@ -30,7 +30,7 @@ const previewKey = (asset: MediaAssetRecord) => `${asset.id}:${asset.thumbnail_s
 
 /** Shared library and ready-only picker. Selection always passes an asset ID. */
 interface MediaLibraryProps {
-  siteId: number; canUpload: boolean; canDelete?: boolean; onSelect?: (asset: MediaAssetRecord) => void; imagesOnly?: boolean;
+  siteId: number; canUpload: boolean; canDelete?: boolean; onSelect?: (asset: MediaAssetRecord) => void; imagesOnly?: boolean; documentsOnly?: boolean;
 }
 
 /** Site changes reset editable state; library controls restore only in their scoped cache. */
@@ -38,15 +38,15 @@ export function MediaLibrary(props: MediaLibraryProps) {
   return <SiteMediaLibrary key={`${props.siteId}:${Boolean(props.onSelect)}:${Boolean(props.imagesOnly)}`} {...props} />;
 }
 
-function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, imagesOnly = false }: MediaLibraryProps) {
+function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, imagesOnly = false, documentsOnly = false }: MediaLibraryProps) {
   const [layout, setLayout] = useSectionState<"grid" | "list">(siteId, imagesOnly ? "media-images" : "media", "layout", "grid", !onSelect);
   const [page, setPage] = useSectionState(siteId, imagesOnly ? "media-images" : "media", "page", 1, !onSelect);
   const [failedPreviews, setFailedPreviews] = useState<Set<string>>(new Set());
   const [previewVersion, setPreviewVersion] = useState(0);
-  const [filters, setFilters] = useSectionState<MediaListQuery>(siteId, imagesOnly ? "media-images" : "media", "filters", {}, !onSelect);
+  const [filters, setFilters] = useSectionState<MediaListQuery>(siteId, imagesOnly ? "media-images" : "media", "filters", documentsOnly ? {type:"document"} : {}, !onSelect);
   const [search, setSearch] = useSectionState(siteId, imagesOnly ? "media-images" : "media", "search", "", !onSelect);
   const [status, setStatus] = useSectionState<MediaStatus | "">(siteId, imagesOnly ? "media-images" : "media", "status", "", !onSelect);
-  const [type, setType] = useSectionState<"image" | "document" | "">(siteId, imagesOnly ? "media-images" : "media", "type", "", !onSelect);
+  const [type, setType] = useSectionState<"image" | "document" | "">(siteId, imagesOnly ? "media-images" : "media", "type", documentsOnly ? "document" : "", !onSelect);
   const [confirmDeletion, setConfirmDeletion] = useState(false);
   const [removalNotice, setRemovalNotice] = useState<string | null>(null);
   const [viewerAsset, setViewerAsset] = useState<MediaAssetRecord | null>(null);
@@ -151,7 +151,7 @@ function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, imag
   };
   const activeReferences = inventory.data?.asset_id === detailId ? inventory.data.references : [];
   const inUse = activeReferences.length > 0;
-  const visible = (rows.data?.results ?? []).filter((asset) => asset.site === siteId && (!onSelect || (asset.status === "READY" && asset.processing_state === "READY" && !["PROCESSING", "FAILED", "UNAVAILABLE"].includes(asset.thumbnail_status))) && (!imagesOnly || asset.detected_mime.startsWith("image/")));
+  const visible = (rows.data?.results ?? []).filter((asset) => asset.site === siteId && (!onSelect || (asset.status === "READY" && asset.processing_state === "READY" && !["PROCESSING", "FAILED", "UNAVAILABLE"].includes(asset.thumbnail_status))) && (!imagesOnly || asset.detected_mime.startsWith("image/")) && (!documentsOnly || ["application/pdf","text/plain"].includes(asset.detected_mime)));
   const metadataChanged = currentDetail && (altText !== currentDetail.alt_text || mediaName !== (currentDetail.display_name || currentDetail.original_filename) || JSON.stringify(mediaCategories(categoryText)) !== JSON.stringify(currentDetail.categories ?? []));
   return <Box data-perf-section="media" data-perf-pending={rows.loading || policy.loading ? "true" : "false"} component="section" aria-label="Site media library" sx={{ display: "grid", gap: 2.5, minWidth: 0, bgcolor: "grey.50", p: { xs: 1.5, sm: 2.5 }, borderRadius: 2 }}>
     <Box sx={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:2,flexWrap:"wrap"}}>

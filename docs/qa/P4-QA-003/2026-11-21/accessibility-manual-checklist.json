@@ -1,16 +1,16 @@
-{
-  "status": "PENDING_HUMAN_REVIEW",
-  "target": "WCAG 2.1 AA",
-  "scope_approval": null,
-  "exceptions_accepted": [],
-  "required_reviews": [
-    "Keyboard focus order and visible focus at narrow/wide viewports",
-    "Screen-reader names, landmark/heading hierarchy and announcements",
-    "Builder canvas/palette/inspector and template application",
-    "Media picker/upload, review/approval dialogs and secure preview",
-    "Keycloak sign-in and session expiry",
-    "Manual contrast checks for gradients/images and disabled-control exemptions",
-    "Zoom/reflow and form validation/failure recovery"
-  ],
-  "automation_limits": "Axe passes are a subset, not a conformance certificate; incomplete rules and findings require disposition."
+{
+  "status": "PENDING_HUMAN_REVIEW",
+  "target": "WCAG 2.1 AA",
+  "scope_approval": null,
+  "exceptions_accepted": [],
+  "required_reviews": [
+    "Keyboard focus order and visible focus at narrow/wide viewports",
+    "Screen-reader names, landmark/heading hierarchy and announcements",
+    "Builder canvas/palette/inspector and template application",
+    "Media picker/upload, review/approval dialogs and secure preview",
+    "Keycloak sign-in and session expiry",
+    "Manual contrast checks for gradients/images and disabled-control exemptions",
+    "Zoom/reflow and form validation/failure recovery"
+  ],
+  "automation_limits": "Axe passes are a subset, not a conformance certificate; incomplete rules and findings require disposition."
 }

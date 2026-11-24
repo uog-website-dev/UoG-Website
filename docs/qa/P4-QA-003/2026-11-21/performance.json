@@ -1,16 +1,16 @@
-{
-  "status": "BLOCKED_NOT_RUN",
-  "target": {
-    "p95_load_ms_strictly_less_than": 1500,
-    "concurrent_users": 500
-  },
-  "environment": "QA endpoint and production-like configuration not supplied",
-  "workload": null,
-  "methodology_approval": null,
-  "raw_samples": [],
-  "p95_load_ms": null,
-  "observed_concurrent_users": null,
-  "historical_api_concurrency": 4,
-  "historical_evidence": "docs/qa/P0-PERF-010/2026-11-20/api-load.json",
-  "historical_cached_return_budget_status": "FAIL against prior proposed 300 ms, distinct from requested 1500 ms load target"
+{
+  "status": "BLOCKED_NOT_RUN",
+  "target": {
+    "p95_load_ms_strictly_less_than": 1500,
+    "concurrent_users": 500
+  },
+  "environment": "QA endpoint and production-like configuration not supplied",
+  "workload": null,
+  "methodology_approval": null,
+  "raw_samples": [],
+  "p95_load_ms": null,
+  "observed_concurrent_users": null,
+  "historical_api_concurrency": 4,
+  "historical_evidence": "docs/qa/P0-PERF-010/2026-11-20/api-load.json",
+  "historical_cached_return_budget_status": "FAIL against prior proposed 300 ms, distinct from requested 1500 ms load target"
 }
