@@ -9,7 +9,7 @@ import { serializeApiError } from "@/organizations/contract";
 import type { ActionResult } from "@/organizations/contract";
 
 export type MediaAssetRecord = MediaAsset;
-export interface UploadPolicy { image_max_bytes: number; text_max_bytes: number; pdf_max_bytes: number; mime_types: string[] }
+export interface UploadPolicy { image_max_bytes: number; text_max_bytes: number; pdf_max_bytes: number; document_max_bytes?: number; extensions?: string[]; mime_types: string[] }
 async function client() {
   return createApiClient({fetchFn:serverApiFetch, baseUrl: process.env.API_BASE_URL ?? "http://backend:8000/api", accessToken: (await getAccessToken()) ?? undefined });
 }

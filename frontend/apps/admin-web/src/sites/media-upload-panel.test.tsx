@@ -4,14 +4,26 @@ import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 const { updateSiteMedia }=vi.hoisted(()=>({updateSiteMedia:vi.fn()}));
 vi.mock("@/app/sites/media-actions",()=>({updateSiteMedia}));
 import { MediaUploadPanel } from "./media-upload-panel";
-const policy={image_max_bytes:20971520,pdf_max_bytes:20971520,text_max_bytes:5242880,mime_types:["image/png","image/jpeg","image/webp","application/pdf","text/plain"]};
+const policy={image_max_bytes:20971520,pdf_max_bytes:52428800,document_max_bytes:52428800,text_max_bytes:5242880,extensions:[".png",".jpg",".jpeg",".webp",".txt",".pdf",".docx",".xlsx",".zip"],mime_types:["image/png","image/jpeg","image/webp","application/pdf","text/plain","application/vnd.openxmlformats-officedocument.wordprocessingml.document","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet","application/zip"]};
 const asset=(id:string,site=11)=>({id,site,display_name:"Campus",categories:[],original_filename:`${id}.png`,detected_mime:"image/png",content_type:"image/png",alt_text:"",status:"PENDING",processing_state:"PROCESSING"});
-function Harness({siteId=11,accept=vi.fn()}:{siteId?:number;accept?:(value:any)=>void}) {const ref=useRef<HTMLInputElement|null>(null);return <MediaUploadPanel key={siteId} siteId={siteId} policy={policy} inputRef={ref} onAccepted={accept} />;}
+function Harness({siteId=11,accept=vi.fn(),documentsOnly=false}:{siteId?:number;accept?:(value:any)=>void;documentsOnly?:boolean}) {const ref=useRef<HTMLInputElement|null>(null);return <MediaUploadPanel key={siteId} siteId={siteId} policy={policy} inputRef={ref} onAccepted={accept} documentsOnly={documentsOnly} />;}
 const choose=(files:File[])=>fireEvent.change(screen.getByLabelText("Upload media file"),{target:{files}});
 beforeEach(()=>{vi.clearAllMocks();updateSiteMedia.mockImplementation(async(site:number,id:string,change:unknown)=>({ok:true,data:{...asset(id,site),...change as object}}));});
 afterEach(()=>{vi.restoreAllMocks();vi.unstubAllGlobals();});
 
 describe("Media upload queue",()=>{
+ it("accepts picker and drop uploads for DOCX/ZIP through the same Site upload flow",async()=>{
+  const send=vi.spyOn(globalThis,"fetch").mockImplementation(async(input)=>new Response(JSON.stringify({...asset("document"),original_filename:new URL(String(input),"http://localhost").searchParams.get("filename")} ),{status:202}));
+  render(<Harness documentsOnly/>);
+  choose([new File(["word"],"report.docx",{type:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"})]);
+  fireEvent.drop(screen.getByRole("button",{name:"Drop files to upload or click to browse"}),{dataTransfer:{files:[new File(["zip"],"bundle.zip",{type:"application/zip"})]}});
+  fireEvent.click(screen.getByRole("button",{name:"Upload 2 files"}));
+  await screen.findByText(/Upload finished/);
+  expect(send).toHaveBeenCalledTimes(2);
+  expect(send.mock.calls.map(call=>new URL(String(call[0]),"http://localhost").searchParams.get("filename")).sort()).toEqual(["bundle.zip","report.docx"]);
+  expect(updateSiteMedia).toHaveBeenCalledTimes(2);
+ });
+
  it("drops multiple files and persists each file's name, categories and alt text",async()=>{
   const send=vi.spyOn(globalThis,"fetch");
   send.mockImplementation(async(input)=>new Response(JSON.stringify(asset(String(input).includes("first.png")?"one":"two")),{status:202}));
@@ -41,6 +53,19 @@ describe("Media upload queue",()=>{
   fireEvent.click(screen.getByRole("button",{name:"Retry metadata"}));
   await screen.findByText(/Upload finished/);
   expect(send).toHaveBeenCalledTimes(1);expect(updateSiteMedia).toHaveBeenCalledTimes(2);
+ });
+
+ it("keeps a failed selected document available and retries with the same upload identity",async()=>{
+  const send=vi.spyOn(globalThis,"fetch").mockRejectedValueOnce(new Error("offline")).mockResolvedValueOnce(new Response(JSON.stringify({...asset("doc-1"),original_filename:"report.docx",detected_mime:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"}),{status:202}));
+  render(<Harness/>);choose([new File(["office"],"report.docx",{type:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"})]);
+  expect(screen.getByText("report.docx")).toBeTruthy();expect(screen.getByText("6 B")).toBeTruthy();
+  fireEvent.click(screen.getByRole("button",{name:"Upload 1 file"}));
+  await screen.findByText("offline");
+  fireEvent.click(screen.getByRole("button",{name:"Retry upload"}));
+  await screen.findByText(/Upload finished/);
+  expect(send).toHaveBeenCalledTimes(2);
+  expect((send.mock.calls[0]?.[1]?.headers as Record<string,string>)["Idempotency-Key"]).toBe((send.mock.calls[1]?.[1]?.headers as Record<string,string>)["Idempotency-Key"]);
+  expect(updateSiteMedia).toHaveBeenCalledWith(11,"doc-1",expect.objectContaining({display_name:"report"}));
  });
 
  it("rejects oversized and unsupported files before sending and keeps valid peers",async()=>{

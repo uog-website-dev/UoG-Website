@@ -77,6 +77,9 @@ describe("site administration matrix", () => {
       permissions: ["content.pages.update"],
     })).toBe("module_disabled");
     expect(sectionDecision(sectionByKey("posts"), editor)).toBe("module_disabled");
+    expect(sectionDecision(sectionByKey("documents"), {enabledModuleCodes:["MEDIA"],permissions:["content.documents.view"]})).toBe("module_disabled");
+    expect(sectionDecision(sectionByKey("documents"), {enabledModuleCodes:["DOCUMENTS"],permissions:["content.pages.view"]})).toBe("permission_denied");
+    expect(sectionDecision(sectionByKey("documents"), {enabledModuleCodes:["DOCUMENTS"],permissions:["content.documents.view"]})).toBe("visible");
   });
 
   it("hides a section when the user lacks that permission", () => {

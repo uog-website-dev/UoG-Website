@@ -154,7 +154,7 @@ def _process_asset(asset_id, *, storage=None):
     try:
         bucket, key = storage_parts(asset.storage_reference, asset.site_id)
         with storage.open(bucket, key) as incoming, tempfile.TemporaryFile() as spool:
-            technical = inspect_upload(incoming, spool)
+            technical = inspect_upload(incoming, spool, filename=asset.original_filename)
             if not original_matches(asset, technical):
                 raise ValidationError("Original metadata mismatch.")
             variants = {name: render_variant(spool, name) for name in VARIANTS} if technical["detected_mime"].startswith("image/") else {}

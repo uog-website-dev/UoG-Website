@@ -390,8 +390,10 @@ CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 CELERY_TASK_DEFAULT_RETRY_DELAY = 10
 
 # Upload policy is independent of the legacy catalog's object inspection cap.
-MEDIA_UPLOAD_MAX_BYTES = config("MEDIA_UPLOAD_MAX_BYTES", default=20 * 1024 * 1024, cast=int)
-MEDIA_PDF_MAX_BYTES = config("MEDIA_PDF_MAX_BYTES", default=20 * 1024 * 1024, cast=int)
+MEDIA_UPLOAD_MAX_BYTES = config("MEDIA_UPLOAD_MAX_BYTES", default=50 * 1024 * 1024, cast=int)
+MEDIA_IMAGE_MAX_BYTES = config("MEDIA_IMAGE_MAX_BYTES", default=20 * 1024 * 1024, cast=int)
+MEDIA_PDF_MAX_BYTES = config("MEDIA_PDF_MAX_BYTES", default=50 * 1024 * 1024, cast=int)
+MEDIA_DOCUMENT_MAX_BYTES = config("MEDIA_DOCUMENT_MAX_BYTES", default=50 * 1024 * 1024, cast=int)
 MEDIA_TEXT_MAX_BYTES = config("MEDIA_TEXT_MAX_BYTES", default=5 * 1024 * 1024, cast=int)
 MEDIA_IMAGE_MAX_PIXELS = config("MEDIA_IMAGE_MAX_PIXELS", default=40_000_000, cast=int)
 MEDIA_UPLOAD_LEASE_SECONDS = config("MEDIA_UPLOAD_LEASE_SECONDS", default=900, cast=int)

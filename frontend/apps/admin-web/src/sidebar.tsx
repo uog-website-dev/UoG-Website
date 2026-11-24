@@ -80,7 +80,7 @@ const SITE_SECTION_DESCRIPTIONS: Record<SiteSection["key"], string> = {
   header: "Header branding, navigation, search and call to action",
   footer: "Footer content, contact and social links",
   posts: "News and announcements",
-  documents: "Official Site files",
+  documents: "Official Site documents",
   menus: "Header and footer navigation",
   media: "Private Site media library",
   users: "Site members and roles",
@@ -339,7 +339,7 @@ function SiteNav({
             icon={SITE_SECTION_ICONS[section.key]}
             active={active}
             onNavigate={onNavigate}
-            onIntent={["pages", "posts", "menus", "media"].includes(section.key) && !active ? () => prefetch.schedule(section.key) : undefined}
+            onIntent={["pages", "posts", "documents", "menus", "media"].includes(section.key) && !active ? () => prefetch.schedule(section.key) : undefined}
             onEndIntent={prefetch.cancel}
           />
         );

@@ -1,74 +1,127 @@
-"""Site scoped document management API."""
-import hashlib
-from django.core.exceptions import ValidationError as DomainValidationError
-from django.db import IntegrityError
+"""Site-scoped document authoring API."""
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.db import IntegrityError, transaction
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from rest_framework import serializers, mixins
-from rest_framework.decorators import action
-from rest_framework.exceptions import PermissionDenied
+from rest_framework import serializers
+from rest_framework.exceptions import NotFound
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.renderers import BaseRenderer
-from django.http import HttpResponse
-from django.utils.http import content_disposition_header
-from django.db.models import Q
+from rest_framework.views import APIView
+from rest_framework.parsers import JSONParser, FormParser, MultiPartParser
+from drf_spectacular.utils import OpenApiParameter, extend_schema
+
 from apps.accounts.authentication import KeycloakBearerAuthentication
 from apps.sites.models import Site
 from apps.sites.selectors.modules import module_is_available
-from apps.cms.authorization import require_cms_grant
-from apps.cms.models import Document, DocumentCategory, ContentRole, ContentStatus
-from apps.cms.services.workflow import transition_content
-from apps.api.document_media import validate_document_file
-from apps.media.models import MediaAsset
-from apps.media.storage import ObjectStorage
+from ..authorization import require_cms_grant, cms_administrator_allows
+from ..models import ContentRole, Document, DocumentCategory
+from ..services.workflow import transition_content
 
-class DocumentFileRenderer(BaseRenderer):
-    media_type = "application/octet-stream"
-    format = "document"
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        return data if isinstance(data, bytes) else b""
+
+class DocumentCategorySerializer(serializers.ModelSerializer):
+    slug = serializers.SlugField(required=False, allow_blank=True, max_length=128)
+    class Meta:
+        model = DocumentCategory
+        fields = ("id", "name", "slug")
+        read_only_fields = ("id",)
+
+    def validate_name(self, value):
+        if not value.strip():
+            raise serializers.ValidationError("Enter a category name.")
+        return value.strip()
+
+    def validate(self, attrs):
+        if not attrs.get("slug"):
+            from django.utils.text import slugify
+            attrs["slug"] = slugify(attrs.get("name", ""))[:128]
+        if not attrs.get("slug"):
+            raise serializers.ValidationError({"name": "Use a category name containing letters or numbers."})
+        return attrs
 
 
 class DocumentSerializer(serializers.ModelSerializer):
-    categories = serializers.PrimaryKeyRelatedField(many=True, required=False, queryset=DocumentCategory.objects.filter(is_active=True))
+    slug = serializers.SlugField(required=False, allow_blank=True, max_length=255)
+    categories = serializers.PrimaryKeyRelatedField(queryset=DocumentCategory.objects.none(), many=True, required=False)
+    categories_detail = DocumentCategorySerializer(source="categories", many=True, read_only=True)
+    creator = serializers.IntegerField(source="created_by_id", read_only=True)
     file_type = serializers.SerializerMethodField()
+    original_filename = serializers.SerializerMethodField()
+    file_size = serializers.SerializerMethodField()
+
     class Meta:
         model = Document
-        fields = ("id", "site", "title", "slug", "description", "file_reference", "file_type", "categories", "status", "visibility", "version", "effective_date", "published_at", "created_by", "updated_by", "created_at", "updated_at", "revision_number")
-        read_only_fields = ("id", "site", "status", "published_at", "created_by", "updated_by", "created_at", "updated_at", "revision_number")
+        fields = ("id", "site", "title", "slug", "description", "file_reference", "file_type", "original_filename", "file_size", "categories", "categories_detail", "status", "creator", "created_at", "updated_at", "revision_number", "published_at", "version", "effective_date", "visibility")
+        read_only_fields = ("id", "site", "status", "creator", "created_at", "updated_at", "revision_number", "published_at", "categories_detail")
+
+    def get_file_type(self, obj):
+        return self._asset(obj).detected_mime
+
+    def get_original_filename(self, obj):
+        return self._asset(obj).original_filename
+
+    def get_file_size(self, obj):
+        return self._asset(obj).byte_count
+
+    def _asset(self, obj):
+        from apps.media.document_references import validate_document_file
+        cache = self.context.setdefault("document_asset_cache", {})
+        if obj.pk not in cache:
+            cache[obj.pk] = validate_document_file(obj.file_reference, obj.site_id)
+        return cache[obj.pk]
+
+    def get_fields(self):
+        fields = super().get_fields()
+        site_id = self.context.get("site_id")
+        fields["categories"].child_relation.queryset = DocumentCategory.objects.filter(site_id=site_id, is_active=True)
+        return fields
+
     def validate_title(self, value):
-        if not value.strip(): raise serializers.ValidationError("Enter a document title.")
-        return value.strip()
-    def validate_description(self, value):
-        from apps.cms.blocks import sanitize_rich_text
-        return sanitize_rich_text(value)
-    def validate_categories(self, value):
-        site_id = getattr(self.context.get("site"), "pk", getattr(self.instance, "site_id", None))
-        if any(category.site_id != site_id or not category.is_active for category in value):
-            raise serializers.ValidationError("Choose categories belonging to this Site.")
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError("Enter a document title.")
         return value
+
     def validate_file_reference(self, value):
-        site_id = getattr(self.context.get("site"), "pk", getattr(self.instance, "site_id", None))
+        from apps.media.document_references import validate_document_file
+        site_id = getattr(self.instance, "site_id", None) or self.context.get("site_id")
         try:
             validate_document_file(value, site_id)
-        except DomainValidationError as error:
-            raise serializers.ValidationError(error.message_dict.get("file_reference", error.messages)) from error
+        except ValidationError as error:
+            raise serializers.ValidationError(error.message_dict if hasattr(error, "message_dict") else error.messages) from error
         return value
-    def get_file_type(self, obj):
-        try: return validate_document_file(obj.file_reference, obj.site_id).detected_mime
-        except DomainValidationError: return ""
+
+    def validate(self, attrs):
+        instance = self.instance
+        site_id = getattr(instance, "site_id", None) or self.context.get("site_id")
+        for category in attrs.get("categories", []):
+            if category.site_id != site_id or not category.is_active:
+                raise serializers.ValidationError({"categories": "Choose active categories belonging to this Site."})
+        if not instance:
+            attrs.setdefault("created_by", self.context["request"].user)
+        attrs["updated_by"] = self.context["request"].user
+        if not attrs.get("slug") and not instance:
+            from django.utils.text import slugify
+            attrs["slug"] = slugify(attrs.get("title", ""))[:255]
+        slug = attrs.get("slug", getattr(instance, "slug", ""))
+        if slug and Document.objects.filter(site_id=site_id, slug=slug).exclude(pk=getattr(instance, "pk", None)).exists():
+            raise serializers.ValidationError({"slug": "A document with this slug already exists in this Site."})
+        return attrs
+
     def create(self, validated_data):
-        cats = validated_data.pop("categories", [])
-        doc = Document(**validated_data)
-        doc._pending_categories = cats
-        doc.save()
-        return doc
+        categories = validated_data.pop("categories", [])
+        document = Document(site_id=self.context["site_id"], **validated_data)
+        document._pending_categories = categories
+        document.save()
+        return document
+
     def update(self, instance, validated_data):
-        cats = validated_data.pop("categories", None)
-        for key, value in validated_data.items(): setattr(instance, key, value)
-        if cats is not None: instance._pending_categories = cats
+        categories = validated_data.pop("categories", None)
+        for field, value in validated_data.items():
+            setattr(instance, field, value)
+        if categories is not None:
+            instance._pending_categories = categories
         instance.save()
         return instance
 
@@ -79,146 +132,150 @@ class DocumentPagination(PageNumberPagination):
     max_page_size = 100
 
 
-class DocumentListQuery(serializers.Serializer):
-    search=serializers.CharField(required=False,allow_blank=True,max_length=255)
-    category=serializers.UUIDField(required=False)
-    status=serializers.ChoiceField(choices=ContentStatus.choices,required=False)
-    file_type=serializers.ChoiceField(choices=("pdf","text"),required=False)
-    visibility=serializers.ChoiceField(choices=("PUBLIC","UNLISTED","HIDDEN"),required=False)
-    def to_internal_value(self,data):
-        allowed=set(self.fields)|{"page","page_size"}
-        errors={key:["Unknown query parameter."] for key in set(data)-allowed}
-        if hasattr(data,"getlist"):
-            errors.update({key:["Supply this query parameter only once."] for key in data if len(data.getlist(key))!=1})
-        if errors: raise serializers.ValidationError(errors)
-        return super().to_internal_value({key:value for key,value in data.items() if key in self.fields})
+class DocumentListResponse(serializers.Serializer):
+    count = serializers.IntegerField()
+    next = serializers.URLField(allow_null=True)
+    previous = serializers.URLField(allow_null=True)
+    results = DocumentSerializer(many=True)
 
 
-class DocumentCategorySerializer(serializers.ModelSerializer):
-    slug = serializers.SlugField(max_length=128, required=False)
-    class Meta:
-        model = DocumentCategory
-        fields = ("id", "site", "name", "slug", "is_active", "created_at")
-        read_only_fields = ("id", "site", "created_at")
-    def validate_name(self, value):
-        value=value.strip()
-        if not value: raise serializers.ValidationError("Enter a category name.")
-        return value
-    def validate(self, attrs):
-        if not attrs.get("slug"):
-            attrs["slug"] = __import__('django.utils.text',fromlist=['slugify']).slugify(attrs.get("name", getattr(self.instance,"name","")))
-        return attrs
-
-
-class SiteDocumentCategoryViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
-    mixins.RetrieveModelMixin, mixins.UpdateModelMixin, GenericViewSet):
-    authentication_classes=[KeycloakBearerAuthentication]
-    permission_classes=[IsAuthenticated]
-    serializer_class=DocumentCategorySerializer
-    pagination_class=DocumentPagination
-    def _site(self):
-        site=get_object_or_404(Site,pk=self.kwargs["site_pk"])
-        if not module_is_available(site.pk,"DOCUMENTS"):
-            raise serializers.ValidationError({"reason":"module_disabled","module":"DOCUMENTS"})
-        return site
-    def _authorize(self,write=False):
-        site=self._site()
-        require_cms_grant(self.request.user,site.pk,(ContentRole.AUTHOR,) if write else ContentRole.values,request=self.request)
-        return site
-    def get_queryset(self): return DocumentCategory.objects.filter(site_id=self.kwargs["site_pk"])
-    def list(self,request,*args,**kwargs): self._authorize(); return super().list(request,*args,**kwargs)
-    def retrieve(self,request,*args,**kwargs): self._authorize(); return super().retrieve(request,*args,**kwargs)
-    def create(self,request,*args,**kwargs):
-        site=self._authorize(True); serializer=self.get_serializer(data=request.data); serializer.is_valid(raise_exception=True); row=serializer.save(site=site); return Response(self.get_serializer(row).data,status=201)
-    def partial_update(self,request,*args,**kwargs):
-        self._authorize(True); row=get_object_or_404(self.get_queryset(),pk=self.kwargs["pk"]); serializer=self.get_serializer(row,data=request.data,partial=True); serializer.is_valid(raise_exception=True); return Response(self.get_serializer(serializer.save()).data)
-    def update(self,request,*args,**kwargs): return self.partial_update(request,*args,**kwargs)
-
-
-class SiteDocumentViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, GenericViewSet):
+class SiteDocuments(APIView):
     authentication_classes = [KeycloakBearerAuthentication]
     permission_classes = [IsAuthenticated]
-    serializer_class = DocumentSerializer
-    pagination_class = DocumentPagination
-    lookup_value_regex = r"[0-9a-f-]{36}"
+    parser_classes = [JSONParser, FormParser, MultiPartParser]
 
-    def _site(self): return get_object_or_404(Site, pk=self.kwargs["site_pk"])
-    def _gate(self, write=False):
-        site = self._site()
+    def site(self, request, site_pk):
+        site = get_object_or_404(Site, pk=site_pk)
         if not module_is_available(site.pk, "DOCUMENTS"):
-            raise serializers.ValidationError({"reason":"module_disabled", "module":"DOCUMENTS"})
-        require_cms_grant(self.request.user, site.pk, (ContentRole.AUTHOR,) if write else ContentRole.values, request=self.request)
+            raise NotFound("Documents are not enabled for this Site.")
         return site
-    def get_queryset(self): return Document.objects.filter(site_id=self.kwargs["site_pk"]).prefetch_related("categories")
-    def list(self, request, *args, **kwargs):
-        self._gate()
-        params=DocumentListQuery(data=request.query_params)
-        params.is_valid(raise_exception=True)
-        filters=params.validated_data
-        qs=self.get_queryset()
-        term=filters.get("search", "").strip()
-        if term: qs=qs.filter(Q(title__icontains=term))
-        for key in ("status", "visibility"):
-            if key in filters: qs=qs.filter(**{key:filters[key]})
-        if "file_type" in filters:
-            mime={"pdf":"application/pdf","text":"text/plain"}[filters["file_type"]]
-            assets=MediaAsset.objects.filter(site_id=self.kwargs["site_pk"],detected_mime=mime).values_list("pk",flat=True)
-            qs=qs.filter(file_reference__in=[f"sites/{self.kwargs['site_pk']}/assets/{pk}" for pk in assets])
-        if "category" in filters: qs=qs.filter(categories__pk=filters["category"])
-        qs=qs.distinct()
-        paginator=self.pagination_class()
-        page=paginator.paginate_queryset(qs,request,view=self)
-        return paginator.get_paginated_response(self.get_serializer(page,many=True).data)
-    def retrieve(self, request, *args, **kwargs): self._gate(); return super().retrieve(request,*args,**kwargs)
-    def create(self, request, *args, **kwargs):
-        site=self._gate(write=True); s=self.get_serializer(data=request.data,context={**self.get_serializer_context(),"site":site}); s.is_valid(raise_exception=True)
-        try: doc=s.save(site=site,created_by=request.user,updated_by=request.user)
-        except IntegrityError as e: raise serializers.ValidationError({"slug":"A document with this slug already exists in this Site."}) from e
-        return Response(self.get_serializer(doc).data,status=201)
-    def partial_update(self, request, *args, **kwargs):
-        site=self._gate(write=True); doc=get_object_or_404(self.get_queryset(),pk=self.kwargs["pk"]); s=self.get_serializer(doc,data=request.data,partial=True,context={**self.get_serializer_context(),"site":site}); s.is_valid(raise_exception=True); doc=s.save(updated_by=request.user); return Response(self.get_serializer(doc).data)
-    def update(self, request, *args, **kwargs): return self.partial_update(request,*args,**kwargs)
-    def destroy(self, request, *args, **kwargs):
-        site=self._site()
-        if not module_is_available(site.pk,"DOCUMENTS"): raise serializers.ValidationError({"reason":"module_disabled","module":"DOCUMENTS"})
-        require_cms_grant(request.user,site.pk,(ContentRole.AUTHOR,),request=request)
-        doc=get_object_or_404(self.get_queryset(),pk=self.kwargs["pk"])
-        from apps.authorization.services import permission_granted
-        if not permission_granted(request.user,"content.documents.delete",site_id=site.pk,request=request): raise PermissionDenied("Document deletion permission is required.")
-        doc.delete()
-        return Response(status=204)
-    @action(detail=True,methods=["post"])
-    def publish(self,request,*args,**kwargs):
-        site=self._gate(write=True); doc=get_object_or_404(self.get_queryset(),pk=self.kwargs["pk"])
-        require_cms_grant(request.user,site.pk,(ContentRole.PUBLISHER,),request=request)
-        result=transition_content(doc.pk,action="publish",actor=request.user)
-        return Response(self.get_serializer(get_object_or_404(self.get_queryset(),pk=result.pk)).data)
-    @action(detail=True,methods=["post"])
-    def unpublish(self,request,*args,**kwargs):
-        site=self._gate(write=True); doc=get_object_or_404(self.get_queryset(),pk=self.kwargs["pk"])
-        require_cms_grant(request.user,site.pk,(ContentRole.PUBLISHER,),request=request)
-        result=transition_content(doc.pk,action="unpublish",actor=request.user)
-        return Response(self.get_serializer(get_object_or_404(self.get_queryset(),pk=result.pk)).data)
 
-    @action(detail=True, methods=["get"], renderer_classes=[DocumentFileRenderer])
-    def preview(self, request, *args, **kwargs):
-        site=self._gate()
-        doc=get_object_or_404(self.get_queryset(),pk=self.kwargs["pk"])
-        asset=validate_document_file(doc.file_reference, site.pk)
+    def grant(self, request, site, write=False, delete=False, publish=False):
+        roles = (ContentRole.AUTHOR,) if write or delete else tuple(ContentRole.values)
+        require_cms_grant(request.user, site.pk, roles, request=request)
+
+    @extend_schema(tags=["CMS documents"], responses={200: DocumentListResponse}, parameters=[
+        OpenApiParameter("search", str, description="Case-insensitive document title search."),
+        OpenApiParameter("category", str, description="Site document category UUID."),
+        OpenApiParameter("status", str, enum=["DRAFT","IN_REVIEW","APPROVED","PUBLISHED","UNPUBLISHED","ARCHIVED"]),
+        OpenApiParameter("file_type", str, description="Detected MIME type."),
+        OpenApiParameter("visibility", str, enum=["PUBLIC","UNLISTED","HIDDEN"]),
+        OpenApiParameter("page", int), OpenApiParameter("page_size", int),
+    ])
+    def get(self, request, site_pk, document_id=None):
+        site = self.site(request, site_pk)
+        self.grant(request, site)
+        if document_id:
+            document = get_object_or_404(Document, pk=document_id, site_id=site.pk)
+            return Response(DocumentSerializer(document, context={"site_id": site.pk}).data)
+        rows = Document.objects.filter(site_id=site.pk).select_related("site").prefetch_related("categories")
+        search = request.query_params.get("search", "").strip()
+        category = request.query_params.get("category")
+        status = request.query_params.get("status")
+        file_type = request.query_params.get("file_type")
+        visibility = request.query_params.get("visibility")
+        if search: rows = rows.filter(Q(title__icontains=search))
+        if category: rows = rows.filter(categories__pk=category)
+        if status: rows = rows.filter(status=status)
+        if visibility: rows = rows.filter(visibility=visibility)
+        if file_type:
+            from apps.media.models import MediaAsset
+            asset_ids = MediaAsset.objects.filter(site_id=site.pk, detected_mime=file_type).values_list("pk", flat=True)
+            rows = rows.filter(file_reference__in=[f"sites/{site.pk}/assets/{asset_id}" for asset_id in asset_ids])
+        rows = rows.distinct().order_by("-updated_at", "id")
+        paginator = DocumentPagination()
+        page = paginator.paginate_queryset(rows, request, view=self)
+        return paginator.get_paginated_response(DocumentSerializer(page, many=True, context={"site_id": site.pk}).data)
+
+    @extend_schema(tags=["CMS documents"], request=DocumentSerializer, responses={201: DocumentSerializer})
+    @transaction.atomic
+    def post(self, request, site_pk):
+        site = self.site(request, site_pk)
+        self.grant(request, site, write=True)
+        serializer = DocumentSerializer(data=request.data, context={"request": request, "site_id": site.pk})
+        serializer.is_valid(raise_exception=True)
         try:
-            bucket,key=asset.storage_reference.split(":",1)
-            with ObjectStorage().open(bucket,key) as stream:
-                body=stream.read(asset.byte_count+1)
-        except Exception as error:
-            from rest_framework.exceptions import APIException
-            raise APIException("The document file is temporarily unavailable.") from error
-        if len(body)!=asset.byte_count or hashlib.sha256(body).hexdigest()!=asset.checksum:
-            from django.http import Http404
-            raise Http404("Document unavailable.")
-        response=HttpResponse(body,content_type=asset.detected_mime)
-        response["Content-Disposition"]=content_disposition_header(True,asset.original_filename)
-        response["Cache-Control"]="private, no-store"
-        response["X-Robots-Tag"]="noindex, nofollow"
-        response["X-Content-Type-Options"]="nosniff"
-        response["Vary"]="Authorization, Cookie, Host"
-        return response
+            document = serializer.save()
+        except ValidationError as error:
+            raise serializers.ValidationError(error.message_dict if hasattr(error, "message_dict") else error.messages) from error
+        return Response(DocumentSerializer(document, context={"site_id": site.pk}).data, status=201)
+
+
+class SiteDocumentDetail(APIView):
+    authentication_classes = [KeycloakBearerAuthentication]
+    permission_classes = [IsAuthenticated]
+    parser_classes = [JSONParser]
+
+    def _record(self, request, site_pk, document_id, write=False):
+        site = get_object_or_404(Site, pk=site_pk)
+        if not module_is_available(site.pk, "DOCUMENTS"):
+            raise NotFound("Documents are not enabled for this Site.")
+        require_cms_grant(request.user, site.pk, (ContentRole.AUTHOR,) if write else tuple(ContentRole.values), request=request)
+        return get_object_or_404(Document, pk=document_id, site_id=site.pk)
+
+    @extend_schema(tags=["CMS documents"], responses={200: DocumentSerializer})
+    def get(self, request, site_pk, document_id):
+        obj = self._record(request, site_pk, document_id)
+        return Response(DocumentSerializer(obj, context={"site_id": obj.site_id}).data)
+
+    @extend_schema(tags=["CMS documents"], request=DocumentSerializer, responses={200: DocumentSerializer})
+    @transaction.atomic
+    def patch(self, request, site_pk, document_id):
+        obj = self._record(request, site_pk, document_id, write=True)
+        serializer = DocumentSerializer(obj, data=request.data, partial=True, context={"request": request, "site_id": obj.site_id})
+        serializer.is_valid(raise_exception=True)
+        try:
+            obj = serializer.save()
+        except ValidationError as error:
+            raise serializers.ValidationError(error.message_dict if hasattr(error, "message_dict") else error.messages) from error
+        return Response(DocumentSerializer(obj, context={"site_id": obj.site_id}).data)
+
+    @extend_schema(tags=["CMS documents"], responses={204: None})
+    def delete(self, request, site_pk, document_id):
+        site = get_object_or_404(Site, pk=site_pk)
+        if not module_is_available(site.pk, "DOCUMENTS"):
+            raise NotFound("Documents are not enabled for this Site.")
+        if not cms_administrator_allows(request.user, site.pk):
+            raise PermissionDenied("A Site Administrator is required to delete documents.")
+        obj = get_object_or_404(Document, pk=document_id, site_id=site.pk)
+        obj.updated_by = request.user
+        obj.delete()
+        return Response(status=204)
+
+
+class SiteDocumentWorkflow(SiteDocumentDetail):
+    @extend_schema(tags=["CMS documents"], request=None, responses={200: DocumentSerializer})
+    def post(self, request, site_pk, document_id, action):
+        obj = self._record(request, site_pk, document_id)
+        require_cms_grant(request.user, obj.site_id, (ContentRole.PUBLISHER,) if action in ("publish", "unpublish") else (ContentRole.AUTHOR,), request=request)
+        if action not in ("publish", "unpublish"):
+            return Response({"detail": "Unknown document action."}, status=404)
+        transition = "publish" if action == "publish" else "unpublish"
+        obj = transition_content(obj.pk, action=transition, actor=request.user, comment="Document administration")
+        return Response(DocumentSerializer(obj, context={"site_id": obj.site_id}).data)
+
+
+class SiteDocumentCategories(APIView):
+    authentication_classes = [KeycloakBearerAuthentication]
+    permission_classes = [IsAuthenticated]
+    @extend_schema(tags=["CMS documents"], responses={200: DocumentCategorySerializer(many=True)})
+    def get(self, request, site_pk):
+        site = get_object_or_404(Site, pk=site_pk)
+        if not module_is_available(site.pk, "DOCUMENTS"):
+            raise NotFound("Documents are not enabled for this Site.")
+        require_cms_grant(request.user, site.pk, tuple(ContentRole.values), request=request)
+        return Response(DocumentCategorySerializer(DocumentCategory.objects.filter(site_id=site.pk, is_active=True), many=True).data)
+
+    @extend_schema(tags=["CMS documents"], request=DocumentCategorySerializer, responses={201: DocumentCategorySerializer})
+    def post(self, request, site_pk):
+        site = get_object_or_404(Site, pk=site_pk)
+        if not module_is_available(site.pk, "DOCUMENTS"):
+            raise NotFound("Documents are not enabled for this Site.")
+        require_cms_grant(request.user, site.pk, (ContentRole.AUTHOR,), request=request)
+        serializer = DocumentCategorySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            category = DocumentCategory.objects.create(site=site, **serializer.validated_data)
+        except IntegrityError as error:
+            raise serializers.ValidationError({"slug": "A category with this slug already exists in this Site."}) from error
+        return Response(DocumentCategorySerializer(category).data, status=201)
