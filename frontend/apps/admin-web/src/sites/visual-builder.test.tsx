@@ -5,13 +5,13 @@ import type {SitePageRecord} from "@/app/sites/page-actions";
 import type {ActionResult} from "@/organizations/contract";
 import {starterLayout} from "./visual-builder-model";
 
-const {load,save,open,push,preview,transition,listTemplates,createTemplate,insertTemplate}=vi.hoisted(()=>({load:vi.fn(),save:vi.fn(),open:vi.fn(),push:vi.fn(),preview:vi.fn(),transition:vi.fn(),listTemplates:vi.fn(),createTemplate:vi.fn(),insertTemplate:vi.fn()}));
+const {load,save,open,push,replace,preview,transition,listTemplates,createTemplate,insertTemplate}=vi.hoisted(()=>({load:vi.fn(),save:vi.fn(),open:vi.fn(),push:vi.fn(),replace:vi.fn(),preview:vi.fn(),transition:vi.fn(),listTemplates:vi.fn(),createTemplate:vi.fn(),insertTemplate:vi.fn()}));
 vi.mock("@/app/sites/page-actions",()=>({
   getSiteVisualDraft:load,saveSiteVisualDraft:save,openWorkingDraft:open,
   getSitePagePreview:preview,transitionSitePage:transition,
   listSiteSectionTemplates:listTemplates,createSiteSectionTemplate:createTemplate,insertSiteSectionTemplate:insertTemplate,
 }));
-vi.mock("next/navigation",()=>({useRouter:()=>({push}),usePathname:()=>"/sites/11/admin/pages",useParams:()=>({pageId:"00000000-0000-4000-8000-000000000001"})}));
+vi.mock("next/navigation",()=>({useRouter:()=>({push,replace}),usePathname:()=>"/sites/11/admin/pages",useParams:()=>({pageId:"00000000-0000-4000-8000-000000000001"})}));
 vi.mock("next/link",()=>({default:({children,href,...props}:React.ComponentProps<"a">)=><a href={href} {...props}>{children}</a>}));
 vi.mock("@/sites/media-picker",()=>({MediaPickerDialog:()=>null}));
 import {VisualBuilder} from "./visual-builder";
@@ -208,6 +208,30 @@ describe("Visual Builder workspace",()=>{
     expect(screen.getByText(/Revision 3 · IN_REVIEW/)).toBeTruthy();
     expect(screen.getByText("Review revision")).toBeTruthy();
   });
+  it("returns to the live Page after publishing its working draft",async()=>{
+    const livePageId="00000000-0000-4000-8000-000000000003";
+    load.mockResolvedValue({ok:true,data:record({
+      status:"APPROVED",
+      metadata:{},
+      draft_of:livePageId,
+      available_actions:["publish"],
+    })});
+    transition.mockResolvedValue({ok:true,data:record({
+      status:"ARCHIVED",
+      metadata:{},
+      draft_of:livePageId,
+      available_actions:[],
+    })});
+    const user=userEvent.setup();
+    render(<VisualBuilder {...props}/>);
+    await user.click(await screen.findByRole("button",{name:"Publish Admissions"}));
+    const dialog=await screen.findByRole("dialog");
+    await user.click(within(dialog).getByRole("button",{name:"Confirm publish"}));
+    await waitFor(()=>expect(replace).toHaveBeenCalledWith(
+      `/sites/11/admin/pages/${livePageId}/builder`,
+    ));
+    expect(push).not.toHaveBeenCalled();
+  });
   it("uses the canonical saved tree/revision and keeps local undo distinct from CMS history",async()=>{
     save.mockImplementation(async(_site:number,_id:string,_etag:string,tree:unknown)=>({ok:true,data:record({metadata:{visual_layout:tree},etag:'"revision-2"',revision_number:2})}));
     const user=userEvent.setup();render(<VisualBuilder {...props}/>);
@@ -376,6 +400,18 @@ describe("Visual Builder workspace",()=>{
     expect(screen.queryByText(/Page title is shown/i)).toBeNull();
     expect(screen.getAllByRole("heading",{level:1})).toHaveLength(1);
   });
+  it("promotes the first hero to H1 when hiding a Page title",async()=>{
+    const user=userEvent.setup();
+    load.mockResolvedValue({ok:true,data:record({metadata:{visual_layout:heroLayout(true,2)}})});
+    render(<VisualBuilder {...props}/>);
+    await screen.findByRole("region",{name:"Live Page canvas"});
+    await user.click(screen.getByRole("button",{name:"Page settings"}));
+    fireEvent.mouseDown(screen.getByRole("combobox",{name:"Page title"}));
+    fireEvent.click(await screen.findByRole("option",{name:"Hide title visually"}));
+    await waitFor(()=>expect((screen.getByRole("button",{name:"Save draft"}) as HTMLButtonElement).disabled).toBe(false));
+    expect(screen.getAllByRole("heading",{level:1})).toHaveLength(1);
+    expect(screen.getByRole("heading",{name:"Welcome",level:1})).toBeTruthy();
+  });
   it("defaults page width to Wide and warns only when bleed is enabled",async()=>{
     const user=userEvent.setup();
     load.mockResolvedValue({ok:true,data:record({metadata:{visual_layout:starterLayout()}})});
@@ -385,6 +421,11 @@ describe("Visual Builder workspace",()=>{
     const width=screen.getByRole("combobox",{name:"Content width"});
     expect(width.textContent).toContain("Wide · 1280px");
     expect(screen.getByText(/24 px safe gutter/)).toBeTruthy();
+    fireEvent.mouseDown(width);
+    fireEvent.click(await screen.findByRole("option",{name:"Full width · 100%"}));
+    const canvas=screen.getByRole("region",{name:"Live Page canvas"});
+    expect(canvas.querySelector("[data-page-width]")?.getAttribute("data-page-width")).toBe("full");
+    expect(canvas.querySelector("[data-page-gutter]")?.getAttribute("data-page-gutter")).toBe("24px");
     const bleed=screen.getByRole("checkbox",{name:/Edge-to-edge bleed/}) as HTMLInputElement;
     expect(bleed.checked).toBe(false);
     expect(screen.queryByText(/Bleed removes the 24 px safe gutter/)).toBeNull();

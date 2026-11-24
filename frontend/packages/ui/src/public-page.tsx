@@ -93,6 +93,7 @@ export interface PublicPageDocument {
   sidebar_id?: string | null;
   sidebar_snapshot?: SidebarSnapshot;
   locale?: string;
+  is_homepage?: boolean;
   path: string;
   site: number | null;
   blocks: PublicBlock[];
@@ -117,7 +118,7 @@ export function pageFromResponse(status: number, body: unknown): PublicPageDocum
   if (status !== 200 || body == null || typeof body !== "object" || Array.isArray(body)) {
     return null;
   }
-  const row = body as { title?: unknown; path?: unknown; status?: unknown; blocks?: unknown; site?: unknown; metadata?: unknown; seo?: unknown; layout?: unknown; sidebar_id?: unknown; sidebar_snapshot?: unknown; locale?: unknown };
+  const row = body as { title?: unknown; path?: unknown; status?: unknown; blocks?: unknown; site?: unknown; metadata?: unknown; seo?: unknown; layout?: unknown; sidebar_id?: unknown; sidebar_snapshot?: unknown; locale?: unknown; is_homepage?: unknown };
   if (row.status != null && row.status !== "PUBLISHED") return null;
   if (typeof row.title !== "string" || !row.title.trim()) return null;
   const path = typeof row.path === "string" && row.path.startsWith("/") ? row.path : "/";
@@ -132,6 +133,7 @@ export function pageFromResponse(status: number, body: unknown): PublicPageDocum
     sidebar_id: typeof row.sidebar_id === "string" ? row.sidebar_id : null,
     sidebar_snapshot: sidebarFromResponse(row.sidebar_snapshot, typeof row.site === "number" ? row.site : null, typeof row.sidebar_id === "string" ? row.sidebar_id : null),
     locale: typeof row.locale === "string" ? row.locale : undefined,
+    is_homepage: row.is_homepage === true,
     path,
     site: typeof row.site === "number" ? row.site : null,
     blocks: normalizeBlocks(row.blocks),
@@ -447,6 +449,7 @@ export function PublicPageView({ page, privateMediaBase, viewportWidth }: { page
     <PrivateMediaBase.Provider value={privateMediaBase ?? null}>
       <Box
         data-page-layout={shell}
+        data-page-homepage={page.visual_layout && page.is_homepage ? "true" : undefined}
         data-page-width={pageWidth?.width}
         data-page-bleed={pageWidth?.bleed ? "true" : undefined}
         data-page-gutter={pageWidth ? `${pageWidth.gutter}px` : undefined}

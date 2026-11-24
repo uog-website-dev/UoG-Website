@@ -25,9 +25,10 @@ const published = {
 const image = "00000000-0000-4000-8000-000000000001";
 
 /** A visual Page whose only layout widget is one hero. */
-function visualPage(settings?: { show_title?: boolean; chrome?: "global" | "none" }, headingLevel?: 1 | 2) {
+function visualPage(settings?: { show_title?: boolean; chrome?: "global" | "none" }, headingLevel?: 1 | 2, isHomepage = false) {
   return pageFromResponse(200, {
     ...published,
+    is_homepage: isHomepage,
     blocks: [],
     metadata: {
       visual_layout: {
@@ -87,6 +88,11 @@ describe("paragraphParts", () => {
 });
 
 describe("PublicPageView", () => {
+  it("marks the visual homepage so its first section can sit directly below the Site header", () => {
+    const { container } = render(<PublicPageView page={visualPage(undefined, undefined, true)} />);
+    expect(container.querySelector('[data-page-homepage="true"]')).toBeTruthy();
+  });
+
   it("keeps the global chrome unless the Page explicitly opts out", () => {
     const { container } = render(<PublicPageView page={visualPage()} />);
     expect(container.querySelector("[data-page-chrome]")).toBeNull();

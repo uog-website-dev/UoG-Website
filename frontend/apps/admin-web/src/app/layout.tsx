@@ -4,12 +4,12 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
-import {UogFooter,UogHeader} from "@uog/ui/shell";
 import {UogThemeProvider} from "@uog/ui/theme-provider";
 import {ToastProvider} from "@uog/ui/toast";
 
 import { redirect } from "next/navigation";
 
+import { APP_BASE_PATH } from "@/base-path";
 import { getAccessToken } from "@/access-token";
 import {getCacheIdentity} from "@/cache-identity";
 import {SessionSignOutForm} from "@/session-sign-out-form";
@@ -56,30 +56,66 @@ export default async function AdminLayout({
       <html lang="en" suppressHydrationWarning>
         <body>
           <UogThemeProvider>
-            <UogHeader title="Admin Console" />
             <Box
               component="main"
-              sx={{ display: "flex", justifyContent: "center", px: 2, py: { xs: 8, sm: 12 } }}
+              sx={{
+                position: "relative",
+                display: "grid",
+                placeItems: "center",
+                minHeight: "100dvh",
+                overflow: "hidden",
+                px: 2,
+                py: { xs: 4, sm: 8 },
+                background: "radial-gradient(circle at 12% 18%, rgba(23, 74, 120, .12), transparent 28rem), radial-gradient(circle at 88% 84%, rgba(213, 163, 58, .16), transparent 24rem), #f3f6fa",
+              }}
             >
-              <Paper elevation={3} sx={{ p: { xs: 3, sm: 5 }, maxWidth: 440, textAlign: "center" }}>
-                <Typography variant="h5" component="h1" sx={{ fontWeight: 700, mb: 1.5 }}>
-                  Sign in required
-                </Typography>
-                <Typography color="text.secondary" sx={{ mb: 3 }}>
-                  The administration console is restricted to University of Gondar
-                  staff. Sign in with your university account to continue.
-                </Typography>
-                <Suspense fallback={null}>
-                  <SignInNotice />
-                </Suspense>
-                <form action={signInWithKeycloak}>
-                  <Button type="submit" variant="contained" size="large" fullWidth>
-                    Sign in with Keycloak
-                  </Button>
-                </form>
-              </Paper>
+              <Box sx={{ width: "min(100%, 29rem)" }}>
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: { xs: 3, sm: 5 },
+                    textAlign: "center",
+                    border: "1px solid",
+                    borderColor: "rgba(194, 207, 222, .8)",
+                    borderTop: "4px solid",
+                    borderTopColor: "secondary.main",
+                    borderRadius: 4,
+                    boxShadow: "0 24px 65px rgba(31, 55, 82, .12), 0 3px 10px rgba(31, 55, 82, .04)",
+                    bgcolor: "background.paper",
+                  }}
+                >
+                  <Box
+                    component="img"
+                    src={`${APP_BASE_PATH}/uog-main-logo.webp`}
+                    alt="University of Gondar logo"
+                    sx={{ display: "block", width: 144, height: 96, objectFit: "contain", mx: "auto", mb: 2 }}
+                  />
+                  <Typography variant="overline" color="primary.main" sx={{ fontWeight: 800, letterSpacing: ".12em" }}>
+                    UoG Digital Platform
+                  </Typography>
+                  <Typography variant="h4" component="h1" sx={{ fontWeight: 800, letterSpacing: "-.03em", mt: 0.5 }}>
+                    Sign in to continue
+                  </Typography>
+                  <Typography color="text.secondary" sx={{ mt: 1.5, mb: 3 }}>
+                    Use your University of Gondar account to access administration and publishing tools.
+                  </Typography>
+                  <Suspense fallback={null}>
+                    <SignInNotice />
+                  </Suspense>
+                  <form action={signInWithKeycloak}>
+                    <Button type="submit" variant="contained" size="large" fullWidth sx={{ minHeight: 52, fontWeight: 700 }}>
+                      Continue to sign in
+                    </Button>
+                  </form>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 3 }}>
+                    Secure access for University of Gondar staff
+                  </Typography>
+                </Paper>
+              </Box>
+              <Typography component="footer" variant="caption" color="text.secondary" sx={{ position: "absolute", bottom: 20, px: 2, textAlign: "center" }}>
+                © {new Date().getFullYear()} University of Gondar · Digital Platform
+              </Typography>
             </Box>
-            <UogFooter apiBaseUrl={undefined} />
           </UogThemeProvider>
         </body>
       </html>

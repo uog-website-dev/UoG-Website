@@ -2,9 +2,10 @@
 
 Open **Site Administration → Header** with Site settings permission. Each Site saves and renders its own header; the Main Site and every child Site use the same screen and the same public component as the live Site.
 
-Configure the destination of the logo and Site name, whether search appears, sticky behaviour, a call-to-action button and the language-switcher preference. The logo, display name and theme continue to follow **Appearance**.
+Configure the destination of the logo and Site name, an optional plain-text quote beneath the Site name, whether search appears, sticky behaviour, a call-to-action button and the language-switcher preference. The logo, display name and theme continue to follow **Appearance**.
 
 - **Logo and Site name link** accepts a same-site path such as `/` or `/about`, or an absolute `http(s)` URL. Empty values, protocol-relative URLs, credentials in URLs, control characters and `javascript:`/`data:` destinations are rejected.
+- **Quote beneath Site name** is optional plain text, limited to 280 characters. It is rendered as text and is only public after the header draft is published.
 - **Call to action** needs both a label and a destination. A label without a destination, or a destination without a label, fails validation. Only safe destinations are rendered.
 - **Search** additionally requires PAGES or POSTS to be enabled for the Site. Turning the switch on has no effect while both modules are off.
 - **Sticky** keeps the header visible while scrolling.
@@ -23,7 +24,7 @@ No raw HTML, CSS or JavaScript is accepted anywhere in the contract.
 
 ## Schema and rollback
 
-Migration `sites.0015_site_header_settings` adds one optional settings row per Site with immutable Site ownership, a server-managed version and audited writes (`SITE_HEADER_CREATED`). Migration `sites.0016_footer_header_publication` adds the publication snapshots and seeds the published copy from existing values, so visitors see no change on deploy. Existing Sites need no backfill and keep the safe default header (logo/name linking to `/`, search on, no CTA, not sticky). Reversing 0016 removes publication history, so export it before rollback; reversing 0015 removes header settings only; menus, branding and footer settings are untouched. Reverse/forward rehearsal completed locally on 2026-11-23. Export settings before downgrading a Site that has real values.
+Migration `sites.0015_site_header_settings` adds one optional settings row per Site with immutable Site ownership, a server-managed version and audited writes (`SITE_HEADER_CREATED`). Migration `sites.0016_footer_header_publication` adds the publication snapshots and seeds the published copy from existing values, so visitors see no change on deploy. Migration `sites.0018_siteheader_brand_quote` adds the optional quote field; older published snapshots resolve it to the empty default. Existing Sites keep the safe default header (logo/name linking to `/`, search on, no CTA, not sticky). Reversing 0018 removes the quote field; reversing 0016 removes publication history, so export it before rollback; reversing 0015 removes header settings only; menus, branding and footer settings are untouched. Export settings before downgrading a Site that has real values.
 
 ## Verification
 

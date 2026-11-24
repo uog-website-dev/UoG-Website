@@ -92,6 +92,9 @@ function HeaderEditor({siteId}:{siteId:number}) {
      <TextField id="header-brand-href" label="Logo and Site name link" value={values.brand_href} disabled={saving} fullWidth required
        onChange={event=>set("brand_href",event.target.value)} error={Boolean(errors.brand_href)}
        helperText={errors.brand_href??"A same-site path such as / or an https URL. Raw HTML, CSS and JavaScript are not accepted."} slotProps={{htmlInput:{maxLength:2048}}}/>
+     <TextField id="header-brand-quote" label="Quote beneath Site name" value={values.brand_quote} disabled={saving} fullWidth multiline minRows={2}
+       onChange={event=>set("brand_quote",event.target.value)} error={Boolean(errors.brand_quote)}
+       helperText={errors.brand_quote??"Optional plain-text quote displayed beneath the Site name."} slotProps={{htmlInput:{maxLength:280}}}/>
     </Box>
     <Box sx={{display:"grid",gap:2,alignContent:"start"}}>
      <Typography component="h2" variant="h6">Call to action</Typography>

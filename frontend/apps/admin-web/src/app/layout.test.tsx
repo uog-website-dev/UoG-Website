@@ -57,8 +57,9 @@ describe("admin session gate", () => {
   it("shows the sign-in screen and renders none of the protected routes when signed out", async () => {
     const html = await renderLayout(null);
 
-    expect(html).toContain("Sign in required");
-    expect(html).toContain("Sign in with Keycloak");
+    expect(html).toContain("Sign in to continue");
+    expect(html).toContain("Continue to sign in");
+    expect(html).toContain("src=\"/admin/uog-main-logo.webp\"");
     expect(html).not.toContain("protected-subtree");
     expect(html).not.toContain("Sign out");
     expect(html).not.toContain("Sign-in did not complete");
@@ -69,7 +70,7 @@ describe("admin session gate", () => {
     const html = await renderLayout(null);
 
     expect(html).toContain("Sign-in did not complete");
-    expect(html).toContain("Sign in with Keycloak");
+    expect(html).toContain("Continue to sign in");
     expect(html).not.toContain("protected-subtree");
   });
 
@@ -81,7 +82,7 @@ describe("admin session gate", () => {
     expect(html).toContain("protected-subtree");
     expect(html).toContain("devuser@uog.et");
     expect(html).toContain("Sign out");
-    expect(html).not.toContain("Sign in required");
+    expect(html).not.toContain("Sign in to continue");
   });
 
   it("sends an expired session to sign out and sign in again instead of rendering the console", async () => {
