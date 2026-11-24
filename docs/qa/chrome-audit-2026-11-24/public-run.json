@@ -1,0 +1,104 @@
+{
+  "startedAt": "2026-11-24T09:23:23.506Z",
+  "browser": "158.0.4370.33",
+  "axe": "4.14.0",
+  "targets": [
+    {
+      "id": "home-main",
+      "host": "www.uog.local",
+      "path": "/",
+      "template": "Homepage",
+      "url": "http://www.uog.local/"
+    },
+    {
+      "id": "home-child",
+      "host": "coi.uog.local",
+      "path": "/",
+      "template": "Homepage (child Site)",
+      "url": "http://coi.uog.local/"
+    },
+    {
+      "id": "page",
+      "host": "www.uog.local",
+      "path": "/mainqa-8995d437-information",
+      "template": "Page",
+      "url": "http://www.uog.local/mainqa-8995d437-information"
+    },
+    {
+      "id": "posts",
+      "host": "aau-review.localhost",
+      "path": "/posts",
+      "template": "Post list",
+      "url": "http://aau-review.localhost/posts"
+    },
+    {
+      "id": "post-detail",
+      "host": "aau-review.localhost",
+      "path": "/posts/aau-reference-dd1aa7a8",
+      "template": "Post detail",
+      "url": "http://aau-review.localhost/posts/aau-reference-dd1aa7a8"
+    },
+    {
+      "id": "category",
+      "host": "article-media-post-14a6169c2f.uog.local",
+      "path": "/posts/categories/research-655af51c8f",
+      "template": "Category archive",
+      "url": "http://article-media-post-14a6169c2f.uog.local/posts/categories/research-655af51c8f"
+    },
+    {
+      "id": "category-empty",
+      "host": "article-media-post-14a6169c2f.uog.local",
+      "path": "/posts/categories/empty-655af51c8f",
+      "template": "Empty category archive",
+      "url": "http://article-media-post-14a6169c2f.uog.local/posts/categories/empty-655af51c8f"
+    },
+    {
+      "id": "404",
+      "host": "aau-review.localhost",
+      "path": "/does-not-exist-audit",
+      "template": "Not found",
+      "url": "http://aau-review.localhost/does-not-exist-audit"
+    },
+    {
+      "id": "sidebar-left",
+      "host": "layout-45dfd491f4a.uog.local",
+      "path": "/left-sidebar",
+      "template": "Left sidebar",
+      "url": "http://layout-45dfd491f4a.uog.local/left-sidebar"
+    },
+    {
+      "id": "sidebar-right",
+      "host": "layout-45dfd491f4a.uog.local",
+      "path": "/right-sidebar",
+      "template": "Right sidebar",
+      "url": "http://layout-45dfd491f4a.uog.local/right-sidebar"
+    },
+    {
+      "id": "home-empty",
+      "host": "cmhs.uog.local",
+      "path": "/",
+      "template": "Homepage fallback",
+      "url": "http://cmhs.uog.local/"
+    },
+    {
+      "id": "posts-disabled",
+      "host": "news-disabled-post-14a6169c2f.uog.local",
+      "path": "/posts",
+      "template": "Module disabled",
+      "url": "http://news-disabled-post-14a6169c2f.uog.local/posts"
+    },
+    {
+      "id": "menus-disabled",
+      "host": "layout-45dfd491f4a.uog.local",
+      "path": "/left-sidebar",
+      "template": "Menus disabled",
+      "url": "http://layout-45dfd491f4a.uog.local/left-sidebar"
+    }
+  ],
+  "counts": {
+    "a11y": 26,
+    "meta": 26,
+    "responsive": 74,
+    "performance": 5
+  }
+}

@@ -20,6 +20,7 @@ class SiteFooter(models.Model):
     support_url=models.URLField(max_length=2048,blank=True,default="")
     copyright_text=models.CharField(max_length=300,default=COPYRIGHT_DEFAULT)
     social_links=models.JSONField(default=list,blank=True)
+    legal_links=models.JSONField(default=list,blank=True)
     # Ordered public column copy. Each menu id references the Site's own menu;
     # the public heading never falls back to that internal menu name once set.
     columns=models.JSONField(default=list,blank=True)
@@ -55,4 +56,4 @@ class SiteFooter(models.Model):
             super().save(*args,**kwargs)
             self.refresh_from_db(fields=["version"])
 
-FOOTER_FIELDS=("newsletter_label","newsletter_url","support_label","support_url","description","address","email","phone","links_heading","highlight_label","highlight_url","copyright_text","social_links","columns")
+FOOTER_FIELDS=("newsletter_label","newsletter_url","support_label","support_url","description","address","email","phone","links_heading","highlight_label","highlight_url","copyright_text","social_links","legal_links","columns")

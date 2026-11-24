@@ -1,0 +1,40 @@
+{
+  "before": {
+    "buttons": [
+      {
+        "label": "Open navigation menu",
+        "text": "",
+        "visible": true
+      },
+      {
+        "label": null,
+        "text": "Sign out",
+        "visible": true
+      },
+      {
+        "label": "Workspace: University of Gondar Main Site",
+        "text": "University of Gondar Main Site",
+        "visible": false
+      }
+    ],
+    "workspace": [
+      {
+        "label": "Workspace: University of Gondar Main Site",
+        "visible": false
+      }
+    ]
+  },
+  "navCount": 1,
+  "afterOpen": {
+    "url": "http://localhost/admin/sites/17/admin",
+    "dialogs": [],
+    "drawers": [
+      {
+        "text": "UoG Administration\nDigital platform\nUniversity of Gondar Main Site\nSITE ADMINISTRATION\n\nUniversity of Gondar Main Site\n\nActive\nDashboard\n\nSite content overview\n\nPages\n\nSite pages and workflow\n\nSidebars\n\nReusable Page navigation regions\n\nVisual Builder\n\nCompose a visual Page layout\n\nHomepage Settings",
+        "visible": true
+      }
+    ]
+  },
+  "closeCount": 1,
+  "afterClose": 0
+}

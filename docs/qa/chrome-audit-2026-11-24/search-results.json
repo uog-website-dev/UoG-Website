@@ -1,0 +1,48 @@
+[
+  {
+    "width": 1440,
+    "initial": {
+      "tag": "DIV",
+      "label": null
+    },
+    "text": "Search University of Gondar Search published Pages and news Search published Pages and news Search Page QA shared main homepage p4brand-0b2c8ca6 Page Main review mainqa-8995d437 university information News Main review mainqa-8995d437 university news",
+    "links": [
+      {
+        "text": "QA shared main homepage p4brand-0b2c8ca6",
+        "href": "/qa-shared-main-homepage-p4brand-0b2c8ca6"
+      },
+      {
+        "text": "Main review mainqa-8995d437 university information",
+        "href": "/mainqa-8995d437-information"
+      },
+      {
+        "text": "Main review mainqa-8995d437 university news",
+        "href": "/posts/mainqa-8995d437-news"
+      }
+    ],
+    "violations": []
+  },
+  {
+    "width": 390,
+    "initial": {
+      "tag": "DIV",
+      "label": null
+    },
+    "text": "Search University of Gondar Search published Pages and news Search published Pages and news Search Page QA shared main homepage p4brand-0b2c8ca6 Page Main review mainqa-8995d437 university information News Main review mainqa-8995d437 university news",
+    "links": [
+      {
+        "text": "QA shared main homepage p4brand-0b2c8ca6",
+        "href": "/qa-shared-main-homepage-p4brand-0b2c8ca6"
+      },
+      {
+        "text": "Main review mainqa-8995d437 university information",
+        "href": "/mainqa-8995d437-information"
+      },
+      {
+        "text": "Main review mainqa-8995d437 university news",
+        "href": "/posts/mainqa-8995d437-news"
+      }
+    ],
+    "violations": []
+  }
+]

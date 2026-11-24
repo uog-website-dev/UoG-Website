@@ -1,0 +1,2483 @@
+[
+  {
+    "target": "home-main",
+    "width": 1440,
+    "overflow": false,
+    "scrollWidth": 1440,
+    "viewportWidth": 1440,
+    "headerHeight": 160,
+    "brandClipped": true,
+    "mobileTrigger": false,
+    "desktopNav": true,
+    "smallTargets": [],
+    "smallTargetCount": 0,
+    "overflowingElements": []
+  },
+  {
+    "target": "home-main",
+    "width": 390,
+    "overflow": false,
+    "scrollWidth": 390,
+    "viewportWidth": 390,
+    "headerHeight": 71,
+    "brandClipped": false,
+    "mobileTrigger": true,
+    "desktopNav": false,
+    "smallTargets": [],
+    "smallTargetCount": 0,
+    "overflowingElements": []
+  },
+  {
+    "target": "home-child",
+    "width": 1440,
+    "overflow": false,
+    "scrollWidth": 1440,
+    "viewportWidth": 1440,
+    "headerHeight": 160,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": true,
+    "smallTargets": [],
+    "smallTargetCount": 0,
+    "overflowingElements": []
+  },
+  {
+    "target": "home-child",
+    "width": 390,
+    "overflow": false,
+    "scrollWidth": 390,
+    "viewportWidth": 390,
+    "headerHeight": 71,
+    "brandClipped": true,
+    "mobileTrigger": true,
+    "desktopNav": false,
+    "smallTargets": [],
+    "smallTargetCount": 0,
+    "overflowingElements": []
+  },
+  {
+    "target": "page",
+    "width": 1440,
+    "overflow": false,
+    "scrollWidth": 1440,
+    "viewportWidth": 1440,
+    "headerHeight": 160,
+    "brandClipped": true,
+    "mobileTrigger": false,
+    "desktopNav": true,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "In this section",
+        "w": 98,
+        "h": 17
+      }
+    ],
+    "smallTargetCount": 1,
+    "overflowingElements": []
+  },
+  {
+    "target": "page",
+    "width": 390,
+    "overflow": false,
+    "scrollWidth": 390,
+    "viewportWidth": 390,
+    "headerHeight": 71,
+    "brandClipped": false,
+    "mobileTrigger": true,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "In this section",
+        "w": 98,
+        "h": 17
+      }
+    ],
+    "smallTargetCount": 1,
+    "overflowingElements": []
+  },
+  {
+    "target": "posts",
+    "width": 1440,
+    "overflow": false,
+    "scrollWidth": 1440,
+    "viewportWidth": 1440,
+    "headerHeight": 160,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": true,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "Apply",
+        "w": 64,
+        "h": 37
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 223,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 223,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Apply",
+        "w": 72,
+        "h": 37
+      }
+    ],
+    "smallTargetCount": 4,
+    "overflowingElements": []
+  },
+  {
+    "target": "posts",
+    "width": 390,
+    "overflow": false,
+    "scrollWidth": 390,
+    "viewportWidth": 390,
+    "headerHeight": 71,
+    "brandClipped": false,
+    "mobileTrigger": true,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 358,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 358,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Apply",
+        "w": 358,
+        "h": 37
+      }
+    ],
+    "smallTargetCount": 3,
+    "overflowingElements": []
+  },
+  {
+    "target": "post-detail",
+    "width": 1440,
+    "overflow": false,
+    "scrollWidth": 1440,
+    "viewportWidth": 1440,
+    "headerHeight": 160,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": true,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "Apply",
+        "w": 64,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "posts",
+        "w": 33,
+        "h": 23
+      }
+    ],
+    "smallTargetCount": 2,
+    "overflowingElements": []
+  },
+  {
+    "target": "post-detail",
+    "width": 390,
+    "overflow": false,
+    "scrollWidth": 390,
+    "viewportWidth": 390,
+    "headerHeight": 71,
+    "brandClipped": false,
+    "mobileTrigger": true,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "posts",
+        "w": 33,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "Back to posts",
+        "w": 105,
+        "h": 26
+      }
+    ],
+    "smallTargetCount": 2,
+    "overflowingElements": []
+  },
+  {
+    "target": "category",
+    "width": 1440,
+    "overflow": false,
+    "scrollWidth": 1440,
+    "viewportWidth": 1440,
+    "headerHeight": 107,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "posts",
+        "w": 33,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "categories",
+        "w": 65,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "All news",
+        "w": 74,
+        "h": 37
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 223,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Apply",
+        "w": 72,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Research 655af51c8f",
+        "w": 326,
+        "h": 17
+      },
+      {
+        "tag": "A",
+        "text": "Research update 4",
+        "w": 185,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "Research 655af51c8f",
+        "w": 326,
+        "h": 17
+      },
+      {
+        "tag": "A",
+        "text": "Research update 3",
+        "w": 185,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "Research 655af51c8f",
+        "w": 326,
+        "h": 17
+      },
+      {
+        "tag": "A",
+        "text": "Research update 2",
+        "w": 185,
+        "h": 23
+      }
+    ],
+    "smallTargetCount": 11,
+    "overflowingElements": []
+  },
+  {
+    "target": "category",
+    "width": 390,
+    "overflow": false,
+    "scrollWidth": 390,
+    "viewportWidth": 390,
+    "headerHeight": 67,
+    "brandClipped": true,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "posts",
+        "w": 33,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "categories",
+        "w": 65,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "All news",
+        "w": 74,
+        "h": 37
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 358,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Apply",
+        "w": 358,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Research 655af51c8f",
+        "w": 316,
+        "h": 17
+      },
+      {
+        "tag": "A",
+        "text": "Research update 4",
+        "w": 185,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "Research 655af51c8f",
+        "w": 316,
+        "h": 17
+      }
+    ],
+    "smallTargetCount": 8,
+    "overflowingElements": []
+  },
+  {
+    "target": "category-empty",
+    "width": 1440,
+    "overflow": false,
+    "scrollWidth": 1440,
+    "viewportWidth": 1440,
+    "headerHeight": 107,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "posts",
+        "w": 33,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "categories",
+        "w": 65,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "All news",
+        "w": 74,
+        "h": 37
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 223,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Apply",
+        "w": 72,
+        "h": 37
+      }
+    ],
+    "smallTargetCount": 5,
+    "overflowingElements": []
+  },
+  {
+    "target": "category-empty",
+    "width": 390,
+    "overflow": false,
+    "scrollWidth": 390,
+    "viewportWidth": 390,
+    "headerHeight": 67,
+    "brandClipped": true,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "posts",
+        "w": 33,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "categories",
+        "w": 65,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "All news",
+        "w": 74,
+        "h": 37
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 358,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Apply",
+        "w": 358,
+        "h": 37
+      }
+    ],
+    "smallTargetCount": 5,
+    "overflowingElements": []
+  },
+  {
+    "target": "404",
+    "width": 1440,
+    "overflow": false,
+    "scrollWidth": 1440,
+    "viewportWidth": 1440,
+    "headerHeight": 160,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": true,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "Apply",
+        "w": 64,
+        "h": 37
+      }
+    ],
+    "smallTargetCount": 1,
+    "overflowingElements": []
+  },
+  {
+    "target": "404",
+    "width": 390,
+    "overflow": false,
+    "scrollWidth": 390,
+    "viewportWidth": 390,
+    "headerHeight": 71,
+    "brandClipped": false,
+    "mobileTrigger": true,
+    "desktopNav": false,
+    "smallTargets": [],
+    "smallTargetCount": 0,
+    "overflowingElements": []
+  },
+  {
+    "target": "sidebar-left",
+    "width": 1440,
+    "overflow": false,
+    "scrollWidth": 1440,
+    "viewportWidth": 1440,
+    "headerHeight": 107,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "Site home",
+        "w": 212,
+        "h": 26
+      },
+      {
+        "tag": "A",
+        "text": "University Full Width",
+        "w": 212,
+        "h": 26
+      },
+      {
+        "tag": "A",
+        "text": "University Right Sidebar",
+        "w": 212,
+        "h": 26
+      }
+    ],
+    "smallTargetCount": 3,
+    "overflowingElements": []
+  },
+  {
+    "target": "sidebar-left",
+    "width": 390,
+    "overflow": false,
+    "scrollWidth": 390,
+    "viewportWidth": 390,
+    "headerHeight": 67,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "Site home",
+        "w": 294,
+        "h": 26
+      },
+      {
+        "tag": "A",
+        "text": "University Full Width",
+        "w": 294,
+        "h": 26
+      },
+      {
+        "tag": "A",
+        "text": "University Right Sidebar",
+        "w": 294,
+        "h": 26
+      }
+    ],
+    "smallTargetCount": 3,
+    "overflowingElements": []
+  },
+  {
+    "target": "sidebar-right",
+    "width": 1440,
+    "overflow": false,
+    "scrollWidth": 1440,
+    "viewportWidth": 1440,
+    "headerHeight": 107,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "Site home",
+        "w": 212,
+        "h": 26
+      },
+      {
+        "tag": "A",
+        "text": "University Full Width",
+        "w": 212,
+        "h": 26
+      },
+      {
+        "tag": "A",
+        "text": "University Left Sidebar",
+        "w": 212,
+        "h": 26
+      }
+    ],
+    "smallTargetCount": 3,
+    "overflowingElements": []
+  },
+  {
+    "target": "sidebar-right",
+    "width": 390,
+    "overflow": false,
+    "scrollWidth": 390,
+    "viewportWidth": 390,
+    "headerHeight": 67,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "Site home",
+        "w": 294,
+        "h": 26
+      },
+      {
+        "tag": "A",
+        "text": "University Full Width",
+        "w": 294,
+        "h": 26
+      },
+      {
+        "tag": "A",
+        "text": "University Left Sidebar",
+        "w": 294,
+        "h": 26
+      }
+    ],
+    "smallTargetCount": 3,
+    "overflowingElements": []
+  },
+  {
+    "target": "home-empty",
+    "width": 1440,
+    "overflow": false,
+    "scrollWidth": 1440,
+    "viewportWidth": 1440,
+    "headerHeight": 107,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [],
+    "smallTargetCount": 0,
+    "overflowingElements": []
+  },
+  {
+    "target": "home-empty",
+    "width": 390,
+    "overflow": false,
+    "scrollWidth": 390,
+    "viewportWidth": 390,
+    "headerHeight": 67,
+    "brandClipped": true,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [],
+    "smallTargetCount": 0,
+    "overflowingElements": []
+  },
+  {
+    "target": "posts-disabled",
+    "width": 1440,
+    "overflow": false,
+    "scrollWidth": 1440,
+    "viewportWidth": 1440,
+    "headerHeight": 107,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 223,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 223,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Apply",
+        "w": 72,
+        "h": 37
+      }
+    ],
+    "smallTargetCount": 3,
+    "overflowingElements": []
+  },
+  {
+    "target": "posts-disabled",
+    "width": 390,
+    "overflow": false,
+    "scrollWidth": 390,
+    "viewportWidth": 390,
+    "headerHeight": 67,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 358,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 358,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Apply",
+        "w": 358,
+        "h": 37
+      }
+    ],
+    "smallTargetCount": 3,
+    "overflowingElements": []
+  },
+  {
+    "target": "menus-disabled",
+    "width": 1440,
+    "overflow": false,
+    "scrollWidth": 1440,
+    "viewportWidth": 1440,
+    "headerHeight": 107,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "Site home",
+        "w": 212,
+        "h": 26
+      },
+      {
+        "tag": "A",
+        "text": "University Full Width",
+        "w": 212,
+        "h": 26
+      },
+      {
+        "tag": "A",
+        "text": "University Right Sidebar",
+        "w": 212,
+        "h": 26
+      }
+    ],
+    "smallTargetCount": 3,
+    "overflowingElements": []
+  },
+  {
+    "target": "menus-disabled",
+    "width": 390,
+    "overflow": false,
+    "scrollWidth": 390,
+    "viewportWidth": 390,
+    "headerHeight": 67,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "Site home",
+        "w": 294,
+        "h": 26
+      },
+      {
+        "tag": "A",
+        "text": "University Full Width",
+        "w": 294,
+        "h": 26
+      },
+      {
+        "tag": "A",
+        "text": "University Right Sidebar",
+        "w": 294,
+        "h": 26
+      }
+    ],
+    "smallTargetCount": 3,
+    "overflowingElements": []
+  },
+  {
+    "target": "home-main",
+    "width": 320,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 320,
+    "viewportWidth": 320,
+    "headerHeight": 71,
+    "brandClipped": true,
+    "mobileTrigger": true,
+    "desktopNav": false,
+    "smallTargets": [],
+    "smallTargetCount": 0,
+    "overflowingElements": []
+  },
+  {
+    "target": "home-main",
+    "width": 360,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 360,
+    "viewportWidth": 360,
+    "headerHeight": 71,
+    "brandClipped": false,
+    "mobileTrigger": true,
+    "desktopNav": false,
+    "smallTargets": [],
+    "smallTargetCount": 0,
+    "overflowingElements": []
+  },
+  {
+    "target": "home-main",
+    "width": 390,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 390,
+    "viewportWidth": 390,
+    "headerHeight": 71,
+    "brandClipped": false,
+    "mobileTrigger": true,
+    "desktopNav": false,
+    "smallTargets": [],
+    "smallTargetCount": 0,
+    "overflowingElements": []
+  },
+  {
+    "target": "home-main",
+    "width": 768,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 768,
+    "viewportWidth": 768,
+    "headerHeight": 71,
+    "brandClipped": false,
+    "mobileTrigger": true,
+    "desktopNav": false,
+    "smallTargets": [],
+    "smallTargetCount": 0,
+    "overflowingElements": []
+  },
+  {
+    "target": "home-main",
+    "width": 1024,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 1024,
+    "viewportWidth": 1024,
+    "headerHeight": 107,
+    "brandClipped": false,
+    "mobileTrigger": true,
+    "desktopNav": false,
+    "smallTargets": [],
+    "smallTargetCount": 0,
+    "overflowingElements": []
+  },
+  {
+    "target": "home-main",
+    "width": 1280,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 1280,
+    "viewportWidth": 1280,
+    "headerHeight": 160,
+    "brandClipped": true,
+    "mobileTrigger": false,
+    "desktopNav": true,
+    "smallTargets": [],
+    "smallTargetCount": 0,
+    "overflowingElements": []
+  },
+  {
+    "target": "home-main",
+    "width": 1440,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 1440,
+    "viewportWidth": 1440,
+    "headerHeight": 160,
+    "brandClipped": true,
+    "mobileTrigger": false,
+    "desktopNav": true,
+    "smallTargets": [],
+    "smallTargetCount": 0,
+    "overflowingElements": []
+  },
+  {
+    "target": "home-main",
+    "width": 1920,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 1920,
+    "viewportWidth": 1920,
+    "headerHeight": 160,
+    "brandClipped": true,
+    "mobileTrigger": false,
+    "desktopNav": true,
+    "smallTargets": [],
+    "smallTargetCount": 0,
+    "overflowingElements": []
+  },
+  {
+    "target": "page",
+    "width": 320,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 320,
+    "viewportWidth": 320,
+    "headerHeight": 71,
+    "brandClipped": true,
+    "mobileTrigger": true,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "In this section",
+        "w": 98,
+        "h": 17
+      }
+    ],
+    "smallTargetCount": 1,
+    "overflowingElements": []
+  },
+  {
+    "target": "page",
+    "width": 360,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 360,
+    "viewportWidth": 360,
+    "headerHeight": 71,
+    "brandClipped": false,
+    "mobileTrigger": true,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "In this section",
+        "w": 98,
+        "h": 17
+      }
+    ],
+    "smallTargetCount": 1,
+    "overflowingElements": []
+  },
+  {
+    "target": "page",
+    "width": 390,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 390,
+    "viewportWidth": 390,
+    "headerHeight": 71,
+    "brandClipped": false,
+    "mobileTrigger": true,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "In this section",
+        "w": 98,
+        "h": 17
+      }
+    ],
+    "smallTargetCount": 1,
+    "overflowingElements": []
+  },
+  {
+    "target": "page",
+    "width": 768,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 768,
+    "viewportWidth": 768,
+    "headerHeight": 71,
+    "brandClipped": false,
+    "mobileTrigger": true,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "In this section",
+        "w": 98,
+        "h": 17
+      }
+    ],
+    "smallTargetCount": 1,
+    "overflowingElements": []
+  },
+  {
+    "target": "page",
+    "width": 1024,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 1024,
+    "viewportWidth": 1024,
+    "headerHeight": 107,
+    "brandClipped": false,
+    "mobileTrigger": true,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "In this section",
+        "w": 98,
+        "h": 17
+      }
+    ],
+    "smallTargetCount": 1,
+    "overflowingElements": []
+  },
+  {
+    "target": "page",
+    "width": 1280,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 1280,
+    "viewportWidth": 1280,
+    "headerHeight": 160,
+    "brandClipped": true,
+    "mobileTrigger": false,
+    "desktopNav": true,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "In this section",
+        "w": 98,
+        "h": 17
+      }
+    ],
+    "smallTargetCount": 1,
+    "overflowingElements": []
+  },
+  {
+    "target": "page",
+    "width": 1440,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 1440,
+    "viewportWidth": 1440,
+    "headerHeight": 160,
+    "brandClipped": true,
+    "mobileTrigger": false,
+    "desktopNav": true,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "In this section",
+        "w": 98,
+        "h": 17
+      }
+    ],
+    "smallTargetCount": 1,
+    "overflowingElements": []
+  },
+  {
+    "target": "page",
+    "width": 1920,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 1920,
+    "viewportWidth": 1920,
+    "headerHeight": 160,
+    "brandClipped": true,
+    "mobileTrigger": false,
+    "desktopNav": true,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "In this section",
+        "w": 98,
+        "h": 17
+      }
+    ],
+    "smallTargetCount": 1,
+    "overflowingElements": []
+  },
+  {
+    "target": "posts",
+    "width": 320,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 320,
+    "viewportWidth": 320,
+    "headerHeight": 71,
+    "brandClipped": true,
+    "mobileTrigger": true,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 288,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 288,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Apply",
+        "w": 288,
+        "h": 37
+      }
+    ],
+    "smallTargetCount": 3,
+    "overflowingElements": []
+  },
+  {
+    "target": "posts",
+    "width": 360,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 360,
+    "viewportWidth": 360,
+    "headerHeight": 71,
+    "brandClipped": true,
+    "mobileTrigger": true,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 328,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 328,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Apply",
+        "w": 328,
+        "h": 37
+      }
+    ],
+    "smallTargetCount": 3,
+    "overflowingElements": []
+  },
+  {
+    "target": "posts",
+    "width": 390,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 390,
+    "viewportWidth": 390,
+    "headerHeight": 71,
+    "brandClipped": false,
+    "mobileTrigger": true,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 358,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 358,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Apply",
+        "w": 358,
+        "h": 37
+      }
+    ],
+    "smallTargetCount": 3,
+    "overflowingElements": []
+  },
+  {
+    "target": "posts",
+    "width": 768,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 768,
+    "viewportWidth": 768,
+    "headerHeight": 71,
+    "brandClipped": false,
+    "mobileTrigger": true,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 223,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 223,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Apply",
+        "w": 72,
+        "h": 37
+      }
+    ],
+    "smallTargetCount": 3,
+    "overflowingElements": []
+  },
+  {
+    "target": "posts",
+    "width": 1024,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 1024,
+    "viewportWidth": 1024,
+    "headerHeight": 107,
+    "brandClipped": false,
+    "mobileTrigger": true,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "Apply",
+        "w": 64,
+        "h": 37
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 223,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 223,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Apply",
+        "w": 72,
+        "h": 37
+      }
+    ],
+    "smallTargetCount": 4,
+    "overflowingElements": []
+  },
+  {
+    "target": "posts",
+    "width": 1280,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 1280,
+    "viewportWidth": 1280,
+    "headerHeight": 160,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": true,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "Apply",
+        "w": 64,
+        "h": 37
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 223,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 223,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Apply",
+        "w": 72,
+        "h": 37
+      }
+    ],
+    "smallTargetCount": 4,
+    "overflowingElements": []
+  },
+  {
+    "target": "posts",
+    "width": 1440,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 1440,
+    "viewportWidth": 1440,
+    "headerHeight": 160,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": true,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "Apply",
+        "w": 64,
+        "h": 37
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 223,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 223,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Apply",
+        "w": 72,
+        "h": 37
+      }
+    ],
+    "smallTargetCount": 4,
+    "overflowingElements": []
+  },
+  {
+    "target": "posts",
+    "width": 1920,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 1920,
+    "viewportWidth": 1920,
+    "headerHeight": 160,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": true,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "Apply",
+        "w": 64,
+        "h": 37
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 223,
+        "h": 40
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 223,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Apply",
+        "w": 72,
+        "h": 37
+      }
+    ],
+    "smallTargetCount": 4,
+    "overflowingElements": []
+  },
+  {
+    "target": "post-detail",
+    "width": 320,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 320,
+    "viewportWidth": 320,
+    "headerHeight": 71,
+    "brandClipped": true,
+    "mobileTrigger": true,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "posts",
+        "w": 33,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "Back to posts",
+        "w": 105,
+        "h": 26
+      }
+    ],
+    "smallTargetCount": 2,
+    "overflowingElements": []
+  },
+  {
+    "target": "post-detail",
+    "width": 360,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 360,
+    "viewportWidth": 360,
+    "headerHeight": 71,
+    "brandClipped": true,
+    "mobileTrigger": true,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "posts",
+        "w": 33,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "Back to posts",
+        "w": 105,
+        "h": 26
+      }
+    ],
+    "smallTargetCount": 2,
+    "overflowingElements": []
+  },
+  {
+    "target": "post-detail",
+    "width": 390,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 390,
+    "viewportWidth": 390,
+    "headerHeight": 71,
+    "brandClipped": false,
+    "mobileTrigger": true,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "posts",
+        "w": 33,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "Back to posts",
+        "w": 105,
+        "h": 26
+      }
+    ],
+    "smallTargetCount": 2,
+    "overflowingElements": []
+  },
+  {
+    "target": "post-detail",
+    "width": 768,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 768,
+    "viewportWidth": 768,
+    "headerHeight": 71,
+    "brandClipped": false,
+    "mobileTrigger": true,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "posts",
+        "w": 33,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "Back to posts",
+        "w": 105,
+        "h": 26
+      }
+    ],
+    "smallTargetCount": 2,
+    "overflowingElements": []
+  },
+  {
+    "target": "post-detail",
+    "width": 1024,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 1024,
+    "viewportWidth": 1024,
+    "headerHeight": 107,
+    "brandClipped": false,
+    "mobileTrigger": true,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "Apply",
+        "w": 64,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "posts",
+        "w": 33,
+        "h": 23
+      }
+    ],
+    "smallTargetCount": 2,
+    "overflowingElements": []
+  },
+  {
+    "target": "post-detail",
+    "width": 1280,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 1280,
+    "viewportWidth": 1280,
+    "headerHeight": 160,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": true,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "Apply",
+        "w": 64,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "posts",
+        "w": 33,
+        "h": 23
+      }
+    ],
+    "smallTargetCount": 2,
+    "overflowingElements": []
+  },
+  {
+    "target": "post-detail",
+    "width": 1440,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 1440,
+    "viewportWidth": 1440,
+    "headerHeight": 160,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": true,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "Apply",
+        "w": 64,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "posts",
+        "w": 33,
+        "h": 23
+      }
+    ],
+    "smallTargetCount": 2,
+    "overflowingElements": []
+  },
+  {
+    "target": "post-detail",
+    "width": 1920,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 1920,
+    "viewportWidth": 1920,
+    "headerHeight": 160,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": true,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "Apply",
+        "w": 64,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "posts",
+        "w": 33,
+        "h": 23
+      }
+    ],
+    "smallTargetCount": 2,
+    "overflowingElements": []
+  },
+  {
+    "target": "category",
+    "width": 320,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 320,
+    "viewportWidth": 320,
+    "headerHeight": 67,
+    "brandClipped": true,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "posts",
+        "w": 33,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "categories",
+        "w": 65,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "All news",
+        "w": 74,
+        "h": 37
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 288,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Apply",
+        "w": 288,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Research 655af51c8f",
+        "w": 246,
+        "h": 17
+      },
+      {
+        "tag": "A",
+        "text": "Research update 4",
+        "w": 185,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "Research 655af51c8f",
+        "w": 246,
+        "h": 17
+      },
+      {
+        "tag": "A",
+        "text": "Research update 3",
+        "w": 185,
+        "h": 23
+      }
+    ],
+    "smallTargetCount": 9,
+    "overflowingElements": []
+  },
+  {
+    "target": "category",
+    "width": 360,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 360,
+    "viewportWidth": 360,
+    "headerHeight": 67,
+    "brandClipped": true,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "posts",
+        "w": 33,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "categories",
+        "w": 65,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "All news",
+        "w": 74,
+        "h": 37
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 328,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Apply",
+        "w": 328,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Research 655af51c8f",
+        "w": 286,
+        "h": 17
+      },
+      {
+        "tag": "A",
+        "text": "Research update 4",
+        "w": 185,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "Research 655af51c8f",
+        "w": 286,
+        "h": 17
+      },
+      {
+        "tag": "A",
+        "text": "Research update 3",
+        "w": 185,
+        "h": 23
+      }
+    ],
+    "smallTargetCount": 9,
+    "overflowingElements": []
+  },
+  {
+    "target": "category",
+    "width": 390,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 390,
+    "viewportWidth": 390,
+    "headerHeight": 67,
+    "brandClipped": true,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "posts",
+        "w": 33,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "categories",
+        "w": 65,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "All news",
+        "w": 74,
+        "h": 37
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 358,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Apply",
+        "w": 358,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Research 655af51c8f",
+        "w": 316,
+        "h": 17
+      },
+      {
+        "tag": "A",
+        "text": "Research update 4",
+        "w": 185,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "Research 655af51c8f",
+        "w": 316,
+        "h": 17
+      }
+    ],
+    "smallTargetCount": 8,
+    "overflowingElements": []
+  },
+  {
+    "target": "category",
+    "width": 768,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 768,
+    "viewportWidth": 768,
+    "headerHeight": 67,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "posts",
+        "w": 33,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "categories",
+        "w": 65,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "All news",
+        "w": 74,
+        "h": 37
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 223,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Apply",
+        "w": 72,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Research 655af51c8f",
+        "w": 306,
+        "h": 17
+      },
+      {
+        "tag": "A",
+        "text": "Research update 4",
+        "w": 185,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "Research 655af51c8f",
+        "w": 306,
+        "h": 17
+      },
+      {
+        "tag": "A",
+        "text": "Research update 3",
+        "w": 185,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "Research 655af51c8f",
+        "w": 306,
+        "h": 17
+      },
+      {
+        "tag": "A",
+        "text": "Research update 2",
+        "w": 185,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "Research 655af51c8f",
+        "w": 306,
+        "h": 17
+      }
+    ],
+    "smallTargetCount": 13,
+    "overflowingElements": []
+  },
+  {
+    "target": "category",
+    "width": 1024,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 1024,
+    "viewportWidth": 1024,
+    "headerHeight": 107,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "posts",
+        "w": 33,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "categories",
+        "w": 65,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "All news",
+        "w": 74,
+        "h": 37
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 223,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Apply",
+        "w": 72,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Research 655af51c8f",
+        "w": 434,
+        "h": 17
+      },
+      {
+        "tag": "A",
+        "text": "Research update 4",
+        "w": 185,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "Research 655af51c8f",
+        "w": 434,
+        "h": 17
+      },
+      {
+        "tag": "A",
+        "text": "Research update 3",
+        "w": 185,
+        "h": 23
+      }
+    ],
+    "smallTargetCount": 9,
+    "overflowingElements": []
+  },
+  {
+    "target": "category",
+    "width": 1280,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 1280,
+    "viewportWidth": 1280,
+    "headerHeight": 107,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "posts",
+        "w": 33,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "categories",
+        "w": 65,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "All news",
+        "w": 74,
+        "h": 37
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 223,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Apply",
+        "w": 72,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Research 655af51c8f",
+        "w": 326,
+        "h": 17
+      },
+      {
+        "tag": "A",
+        "text": "Research update 4",
+        "w": 185,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "Research 655af51c8f",
+        "w": 326,
+        "h": 17
+      },
+      {
+        "tag": "A",
+        "text": "Research update 3",
+        "w": 185,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "Research 655af51c8f",
+        "w": 326,
+        "h": 17
+      },
+      {
+        "tag": "A",
+        "text": "Research update 2",
+        "w": 185,
+        "h": 23
+      }
+    ],
+    "smallTargetCount": 11,
+    "overflowingElements": []
+  },
+  {
+    "target": "category",
+    "width": 1440,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 1440,
+    "viewportWidth": 1440,
+    "headerHeight": 107,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "posts",
+        "w": 33,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "categories",
+        "w": 65,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "All news",
+        "w": 74,
+        "h": 37
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 223,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Apply",
+        "w": 72,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Research 655af51c8f",
+        "w": 326,
+        "h": 17
+      },
+      {
+        "tag": "A",
+        "text": "Research update 4",
+        "w": 185,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "Research 655af51c8f",
+        "w": 326,
+        "h": 17
+      },
+      {
+        "tag": "A",
+        "text": "Research update 3",
+        "w": 185,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "Research 655af51c8f",
+        "w": 326,
+        "h": 17
+      },
+      {
+        "tag": "A",
+        "text": "Research update 2",
+        "w": 185,
+        "h": 23
+      }
+    ],
+    "smallTargetCount": 11,
+    "overflowingElements": []
+  },
+  {
+    "target": "category",
+    "width": 1920,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 1920,
+    "viewportWidth": 1920,
+    "headerHeight": 107,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "posts",
+        "w": 33,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "categories",
+        "w": 65,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "All news",
+        "w": 74,
+        "h": 37
+      },
+      {
+        "tag": "INPUT",
+        "text": "",
+        "w": 223,
+        "h": 40
+      },
+      {
+        "tag": "BUTTON",
+        "text": "Apply",
+        "w": 72,
+        "h": 37
+      },
+      {
+        "tag": "A",
+        "text": "Research 655af51c8f",
+        "w": 326,
+        "h": 17
+      },
+      {
+        "tag": "A",
+        "text": "Research update 4",
+        "w": 185,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "Research 655af51c8f",
+        "w": 326,
+        "h": 17
+      },
+      {
+        "tag": "A",
+        "text": "Research update 3",
+        "w": 185,
+        "h": 23
+      },
+      {
+        "tag": "A",
+        "text": "Research 655af51c8f",
+        "w": 326,
+        "h": 17
+      },
+      {
+        "tag": "A",
+        "text": "Research update 2",
+        "w": 185,
+        "h": 23
+      }
+    ],
+    "smallTargetCount": 11,
+    "overflowingElements": []
+  },
+  {
+    "target": "sidebar-left",
+    "width": 320,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 320,
+    "viewportWidth": 320,
+    "headerHeight": 67,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "Site home",
+        "w": 224,
+        "h": 26
+      },
+      {
+        "tag": "A",
+        "text": "University Full Width",
+        "w": 224,
+        "h": 26
+      },
+      {
+        "tag": "A",
+        "text": "University Right Sidebar",
+        "w": 224,
+        "h": 26
+      }
+    ],
+    "smallTargetCount": 3,
+    "overflowingElements": []
+  },
+  {
+    "target": "sidebar-left",
+    "width": 360,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 360,
+    "viewportWidth": 360,
+    "headerHeight": 67,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "Site home",
+        "w": 264,
+        "h": 26
+      },
+      {
+        "tag": "A",
+        "text": "University Full Width",
+        "w": 264,
+        "h": 26
+      },
+      {
+        "tag": "A",
+        "text": "University Right Sidebar",
+        "w": 264,
+        "h": 26
+      }
+    ],
+    "smallTargetCount": 3,
+    "overflowingElements": []
+  },
+  {
+    "target": "sidebar-left",
+    "width": 390,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 390,
+    "viewportWidth": 390,
+    "headerHeight": 67,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "Site home",
+        "w": 294,
+        "h": 26
+      },
+      {
+        "tag": "A",
+        "text": "University Full Width",
+        "w": 294,
+        "h": 26
+      },
+      {
+        "tag": "A",
+        "text": "University Right Sidebar",
+        "w": 294,
+        "h": 26
+      }
+    ],
+    "smallTargetCount": 3,
+    "overflowingElements": []
+  },
+  {
+    "target": "sidebar-left",
+    "width": 768,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 768,
+    "viewportWidth": 768,
+    "headerHeight": 67,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "Site home",
+        "w": 672,
+        "h": 26
+      },
+      {
+        "tag": "A",
+        "text": "University Full Width",
+        "w": 672,
+        "h": 26
+      },
+      {
+        "tag": "A",
+        "text": "University Right Sidebar",
+        "w": 672,
+        "h": 26
+      }
+    ],
+    "smallTargetCount": 3,
+    "overflowingElements": []
+  },
+  {
+    "target": "sidebar-left",
+    "width": 1024,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 1024,
+    "viewportWidth": 1024,
+    "headerHeight": 107,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "Site home",
+        "w": 212,
+        "h": 26
+      },
+      {
+        "tag": "A",
+        "text": "University Full Width",
+        "w": 212,
+        "h": 26
+      },
+      {
+        "tag": "A",
+        "text": "University Right Sidebar",
+        "w": 212,
+        "h": 26
+      }
+    ],
+    "smallTargetCount": 3,
+    "overflowingElements": []
+  },
+  {
+    "target": "sidebar-left",
+    "width": 1280,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 1280,
+    "viewportWidth": 1280,
+    "headerHeight": 107,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "Site home",
+        "w": 212,
+        "h": 26
+      },
+      {
+        "tag": "A",
+        "text": "University Full Width",
+        "w": 212,
+        "h": 26
+      },
+      {
+        "tag": "A",
+        "text": "University Right Sidebar",
+        "w": 212,
+        "h": 26
+      }
+    ],
+    "smallTargetCount": 3,
+    "overflowingElements": []
+  },
+  {
+    "target": "sidebar-left",
+    "width": 1440,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 1440,
+    "viewportWidth": 1440,
+    "headerHeight": 107,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "Site home",
+        "w": 212,
+        "h": 26
+      },
+      {
+        "tag": "A",
+        "text": "University Full Width",
+        "w": 212,
+        "h": 26
+      },
+      {
+        "tag": "A",
+        "text": "University Right Sidebar",
+        "w": 212,
+        "h": 26
+      }
+    ],
+    "smallTargetCount": 3,
+    "overflowingElements": []
+  },
+  {
+    "target": "sidebar-left",
+    "width": 1920,
+    "matrix": true,
+    "overflow": false,
+    "scrollWidth": 1920,
+    "viewportWidth": 1920,
+    "headerHeight": 107,
+    "brandClipped": false,
+    "mobileTrigger": false,
+    "desktopNav": false,
+    "smallTargets": [
+      {
+        "tag": "A",
+        "text": "Site home",
+        "w": 212,
+        "h": 26
+      },
+      {
+        "tag": "A",
+        "text": "University Full Width",
+        "w": 212,
+        "h": 26
+      },
+      {
+        "tag": "A",
+        "text": "University Right Sidebar",
+        "w": 212,
+        "h": 26
+      }
+    ],
+    "smallTargetCount": 3,
+    "overflowingElements": []
+  }
+]

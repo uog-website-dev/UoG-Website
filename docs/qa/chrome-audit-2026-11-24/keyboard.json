@@ -1,0 +1,23 @@
+[
+  {
+    "check": "mobile drawer",
+    "closeFocused": false,
+    "tabStayedInside": true,
+    "escapeClosed": true,
+    "focusRestored": true
+  },
+  {
+    "check": "search dialog",
+    "inputFocused": false,
+    "tabStayedInside": true,
+    "escapeClosed": true,
+    "focusRestored": true
+  },
+  {
+    "check": "footer disclosure",
+    "initial": "false",
+    "opened": "true",
+    "closed": "false",
+    "keyboardOperable": true
+  }
+]
