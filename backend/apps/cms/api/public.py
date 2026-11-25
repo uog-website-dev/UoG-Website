@@ -6,6 +6,8 @@ from django.utils import timezone
 from django.http import HttpResponse, Http404
 from django.utils.http import content_disposition_header
 from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db.models import CharField, Value
+from django.db.models.functions import Cast, Concat
 
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import serializers
@@ -153,7 +155,57 @@ class PublicDocumentSerializer(serializers.Serializer):
     categories = PublicTaxonomySerializer(many=True)
     visible_to_public = serializers.BooleanField()
     require_login_to_download = serializers.BooleanField()
+    file_type = serializers.ChoiceField(choices=(
+        "application/pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/zip",
+    ))
     file_url = serializers.CharField()
+
+
+class PublicDocumentQuery(serializers.Serializer):
+    category = serializers.SlugField(required=False, max_length=128)
+    search = serializers.CharField(required=False, allow_blank=True, max_length=200)
+    file_type = serializers.ChoiceField(required=False, choices=(
+        "pdf", "docx", "xlsx", "zip", "application/pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/zip",
+    ))
+
+    def to_internal_value(self, data):
+        allowed = set(self.fields) | {"page", "page_size"}
+        errors = {key: ["Unknown query parameter."] for key in set(data) - allowed}
+        if hasattr(data, "getlist"):
+            errors.update({key: ["Supply this query parameter only once."] for key in data if len(data.getlist(key)) != 1})
+        if errors:
+            raise serializers.ValidationError(errors)
+        return super().to_internal_value({key: value for key, value in data.items() if key in self.fields})
+
+
+class PublicDocumentPageSerializer(serializers.Serializer):
+    count = serializers.IntegerField()
+    next = serializers.URLField(allow_null=True)
+    previous = serializers.URLField(allow_null=True)
+    results = PublicDocumentSerializer(many=True)
+
+
+class PublicDocumentPagination(PublicPagePagination):
+    def get_page_size(self, request):
+        raw = request.query_params.get("page_size")
+        if raw is None:
+            return self.page_size
+        normalized = raw.lstrip("0") or "0"
+        if not raw.isascii() or not raw.isdecimal() or len(normalized) > 3 or not 1 <= int(normalized) <= self.max_page_size:
+            raise serializers.ValidationError({"page_size": "Use an integer from 1 to 100."})
+        return int(normalized)
+
+    def paginate_queryset(self, queryset, request, view=None):
+        page = request.query_params.get("page")
+        if page is not None and (not page.isascii() or not page.isdecimal() or not page.strip("0")):
+            raise serializers.ValidationError({"page": "Use a positive page number."})
+        return super().paginate_queryset(queryset, request, view=view)
 
 
 class PublicPostPageSerializer(serializers.Serializer):
@@ -390,34 +442,52 @@ class PublicDocumentCategoriesView(APIView):
             raise NotFound("The requested category was not found.")
         categories = Category.objects.filter(
             site_id=site.pk, kind=Category.Kind.DOCUMENTS, is_active=True,
-            documents__site_id=site.pk, documents__status=ContentStatus.PUBLISHED,
-            documents__published_at__lte=timezone.now(),
-            documents__visibility=Visibility.PUBLIC, documents__visible_to_public=True,
-        ).distinct().order_by("position", "name")
+        ).order_by("position", "name")
         return Response(PublicTaxonomySerializer(categories, many=True).data)
 
 
 class PublicDocumentListView(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
-    pagination_class = PublicPagePagination
+    pagination_class = PublicDocumentPagination
     http_method_names = ["get", "head", "options"]
 
     @extend_schema(tags=["Public Documents"], parameters=[
         OpenApiParameter("category", str, description="Active document category slug."),
         OpenApiParameter("search", str, description="Document title search."),
+        OpenApiParameter("file_type", str, enum=["pdf", "docx", "xlsx", "zip"], description="Detected document type."),
         OpenApiParameter("page", int), OpenApiParameter("page_size", int),
-    ], responses=PublicPagePagination)
+    ], responses=PublicDocumentPageSerializer)
     def get(self, request):
         site = _resolved_site(request)
         if not module_available_on_request(request, "DOCUMENTS"):
             raise NotFound("The requested document was not found.")
+        query = PublicDocumentQuery(data=request.query_params)
+        query.is_valid(raise_exception=True)
         rows = Document.objects.filter(
             site_id=site.pk, status=ContentStatus.PUBLISHED,
             published_at__lte=timezone.now(),
             visibility=Visibility.PUBLIC, visible_to_public=True,
         ).prefetch_related("categories")
-        category_slug = request.query_params.get("category", "").strip()
+        from apps.media.models import MediaAsset
+        ready_assets = MediaAsset.objects.filter(
+            site_id=site.pk, status=MediaAsset.Status.READY, deleted_at__isnull=True,
+            processing__state="READY",
+        )
+        document_file_type = query.validated_data.get("file_type")
+        if document_file_type:
+            type_aliases = {
+                "pdf": "application/pdf",
+                "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "zip": "application/zip",
+            }
+            ready_assets = ready_assets.filter(detected_mime=type_aliases.get(document_file_type, document_file_type))
+        ready_references = ready_assets.annotate(
+            document_reference=Concat(Value(f"sites/{site.pk}/assets/"), Cast("pk", output_field=CharField()))
+        ).values("document_reference")
+        rows = rows.filter(file_reference__in=ready_references)
+        category_slug = query.validated_data.get("category", "")
         if category_slug:
             category = Category.objects.filter(
                 site_id=site.pk, kind=Category.Kind.DOCUMENTS,
@@ -427,19 +497,29 @@ class PublicDocumentListView(APIView):
                 rows = rows.none()
             else:
                 rows = rows.filter(categories=category)
-        search = request.query_params.get("search", "").strip()
+        search = query.validated_data.get("search", "").strip()
         if search:
             rows = rows.filter(title__icontains=search)
         paginator = self.pagination_class()
         page = paginator.paginate_queryset(rows.distinct().order_by("-published_at", "id"), request, view=self)
+        asset_ids = [document.file_reference.rsplit("/", 1)[-1] for document in page]
+        detected_types = {
+            str(asset.pk): asset.detected_mime
+            for asset in MediaAsset.objects.filter(
+                pk__in=asset_ids, site_id=site.pk, status=MediaAsset.Status.READY,
+                deleted_at__isnull=True, processing__state="READY",
+            )
+        }
         data = []
         for document in page:
+            asset_id = document.file_reference.rsplit("/", 1)[-1]
             data.append({
                 "id": document.pk, "title": document.title, "slug": document.slug,
                 "description": document.description, "version": document.version,
                 "effective_date": document.effective_date, "published_at": document.published_at,
                 "visible_to_public": document.visible_to_public,
                 "require_login_to_download": document.require_login_to_download,
+                "file_type": detected_types[asset_id],
                 "file_url": f"/api/v1/site-context/documents/{document.pk}/file/",
                 "categories": list(document.categories.filter(kind=Category.Kind.DOCUMENTS, is_active=True).values("id", "code", "name", "slug")),
             })

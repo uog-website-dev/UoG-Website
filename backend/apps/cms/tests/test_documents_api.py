@@ -52,6 +52,44 @@ def add(client, site, title, **extra):
     return client.post(ROOT.format(site=site.pk), payload, content_type="application/json")
 
 
+def ready_pdf_asset(site, user):
+    """Build a scan-ready Site-owned PDF using the real media lifecycle."""
+    import io
+    from apps.media.models import MediaAsset, MediaProcessing
+    from apps.media.processing import process_asset
+    from apps.media.services import _media_write_session
+    from pypdf import PdfWriter
+
+    writer = PdfWriter()
+    writer.add_blank_page(width=100, height=100)
+    output = io.BytesIO()
+    writer.write(output)
+    body = output.getvalue()
+
+    class MemoryStorage:
+        def __init__(self):
+            self.objects = {}
+        @contextmanager
+        def open(self, bucket, key):
+            yield io.BytesIO(self.objects[(bucket, key)])
+
+    storage = MemoryStorage()
+    reference = f"platform-documents:sites/{site.pk}/assets/{uuid4()}"
+    bucket, key = reference.split(":", 1)
+    storage.objects[(bucket, key)] = body
+    with _media_write_session(user, site.pk):
+        asset = MediaAsset.objects.create(
+            site=site, storage_reference=reference, original_filename="policy.pdf",
+            detected_mime="application/pdf", byte_count=len(body),
+            checksum=hashlib.sha256(body).hexdigest(), status="PENDING",
+            created_by=user, updated_by=user,
+        )
+        MediaProcessing.objects.create(asset=asset, state="QUEUED")
+    asset = process_asset(asset.pk, storage=storage)
+    assert asset.status == "READY" and asset.processing.state == "READY"
+    return asset
+
+
 def test_create_edit_validation_search_filters_and_pagination(document_client, sites):
     client, user = document_client
     site, other = sites
@@ -345,13 +383,21 @@ def test_public_document_category_filter_is_site_and_publication_scoped(document
     activate_site(site.pk)
     SiteDomain.objects.create(site=site, hostname=f"docs-{site.pk}.uog.edu.et", is_primary=True, status="ACTIVE")
     category = Category.objects.create(site=site, kind=Category.Kind.DOCUMENTS, code="DOC_PUBLIC", name="Policies", slug="policies")
-    document = Document.objects.create(site=site, title="Public policy", slug="public-policy", file_reference=f"sites/{site.pk}/assets/{uuid4()}", created_by=user, updated_by=user)
+    asset = ready_pdf_asset(site, user)
+    document = Document.objects.create(site=site, title="Public policy", slug="public-policy", file_reference=f"sites/{site.pk}/assets/{asset.pk}", created_by=user, updated_by=user)
     document.categories.add(category)
     transition_with_site_role(document, "submit", user)
     reviewer = get_user_model().objects.create_user(username="doc-public-reviewer")
     transition_with_site_role(document, "approve", reviewer)
     publisher = get_user_model().objects.create_user(username="doc-public-publisher")
     transition_with_site_role(document, "publish", publisher)
+    second_asset = ready_pdf_asset(site, user)
+    second_document = Document.objects.create(site=site, title="Public form", slug="public-form", file_reference=f"sites/{site.pk}/assets/{second_asset.pk}", created_by=user, updated_by=user)
+    transition_with_site_role(second_document, "submit", user)
+    second_reviewer = get_user_model().objects.create_user(username="doc-public-reviewer-two")
+    transition_with_site_role(second_document, "approve", second_reviewer)
+    second_publisher = get_user_model().objects.create_user(username="doc-public-publisher-two")
+    transition_with_site_role(second_document, "publish", second_publisher)
     hidden_category = Category.objects.create(site=site, kind=Category.Kind.DOCUMENTS, code="DOC_HIDDEN", name="Hidden category", slug="hidden-category", is_active=False)
     hidden_document = Document.objects.create(site=site, title="Hidden policy", slug="hidden-policy", file_reference=f"sites/{site.pk}/assets/{uuid4()}", visibility="HIDDEN", created_by=user, updated_by=user)
     hidden_document.categories.add(category)
@@ -373,7 +419,29 @@ def test_public_document_category_filter_is_site_and_publication_scoped(document
     response = client.get(root + "?category=policies", HTTP_HOST=f"docs-{site.pk}.uog.edu.et")
     assert response.status_code == 200 and response.json()["count"] == 1
     assert response.json()["results"][0]["id"] == str(document.pk)
+    assert response.json()["results"][0]["file_type"] == "application/pdf"
+    assert client.get(root + "?file_type=pdf", HTTP_HOST=f"docs-{site.pk}.uog.edu.et").json()["count"] == 2
+    assert client.get(root + "?file_type=zip", HTTP_HOST=f"docs-{site.pk}.uog.edu.et").json()["count"] == 0
+    assert client.get(root + "?search=Public+policy", HTTP_HOST=f"docs-{site.pk}.uog.edu.et").json()["count"] == 1
+    assert client.get(root + "?search=does-not-exist", HTTP_HOST=f"docs-{site.pk}.uog.edu.et").json()["count"] == 0
+    paginated = client.get(root + "?page=1&page_size=1", HTTP_HOST=f"docs-{site.pk}.uog.edu.et")
+    assert paginated.status_code == 200 and paginated.json()["count"] == 2
+    assert paginated.json()["next"] and len(paginated.json()["results"]) == 1
+    second_page = client.get(root + "?page=2&page_size=1", HTTP_HOST=f"docs-{site.pk}.uog.edu.et")
+    assert second_page.status_code == 200 and second_page.json()["previous"]
+    assert second_page.json()["results"][0]["id"] != paginated.json()["results"][0]["id"]
     assert client.get(root + "?category=foreign", HTTP_HOST=f"docs-{site.pk}.uog.edu.et").json()["count"] == 0
     assert client.get(root + "?category=hidden-category", HTTP_HOST=f"docs-{site.pk}.uog.edu.et").json()["count"] == 0
+    assert client.get(root + "?category=%2Fbad", HTTP_HOST=f"docs-{site.pk}.uog.edu.et").status_code == 400
+    assert client.get(root + "?page=0", HTTP_HOST=f"docs-{site.pk}.uog.edu.et").status_code == 400
+    assert client.get(root + "?page_size=1000", HTTP_HOST=f"docs-{site.pk}.uog.edu.et").status_code == 400
     public_categories = client.get(root + "categories/", HTTP_HOST=f"docs-{site.pk}.uog.edu.et").json()
     assert [row["id"] for row in public_categories] == [str(category.pk)]
+    serialized = response.json()["results"][0]
+    assert not {"storage_reference", "file_reference", "site_id"}.intersection(serialized)
+    assert str(hidden_document.pk) not in {row["id"] for row in client.get(root, HTTP_HOST=f"docs-{site.pk}.uog.edu.et").json()["results"]}
+    activate_site(other.pk)
+    other_host = f"docs-{other.pk}.uog.edu.et"
+    SiteDomain.objects.create(site=other, hostname=other_host, is_primary=True, status="ACTIVE")
+    other_listing = client.get(root, HTTP_HOST=other_host)
+    assert other_listing.status_code == 200 and other_listing.json()["count"] == 0

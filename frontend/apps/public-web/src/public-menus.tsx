@@ -6,7 +6,7 @@
  * The URL has no Site id. A 404 (unknown host or MENUS disabled) renders no
  * navigation instead of falling back to another Site.
  */
-import { Box, Button, Link } from "@mui/material";
+import { Box, Button, Container, Link } from "@mui/material";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
@@ -29,12 +29,13 @@ function Breadcrumbs() {
   const segments = pathname.split("/").filter(Boolean);
   let href = "";
   return (
-    <Box component="nav" aria-label="Breadcrumb" sx={{ py: 1 }}>
+    <Container maxWidth="lg" component="nav" aria-label="Breadcrumb" sx={{ py: 1 }}>
       <Box component="ol" sx={{ display: "flex", flexWrap: "wrap", gap: 1, listStyle: "none", p: 0, m: 0, fontSize: ".875rem" }}>
         {segments.map((segment, index) => {
           href += "/" + segment;
           const last = index === segments.length - 1;
-          const label = decodeURIComponent(segment).replace(/-/g, " ");
+          const words = decodeURIComponent(segment).replace(/-/g, " ");
+          const label = words.charAt(0).toUpperCase() + words.slice(1);
           return (
             <Box component="li" key={href} sx={{ display: "inline-flex", alignItems: "center", gap: 1 }}>
               {index > 0 ? <span aria-hidden>/</span> : null}
@@ -47,7 +48,7 @@ function Breadcrumbs() {
           );
         })}
       </Box>
-    </Box>
+    </Container>
   );
 }
 
