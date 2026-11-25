@@ -161,6 +161,7 @@ class PublicDocumentSerializer(serializers.Serializer):
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         "application/zip",
     ))
+    file_size = serializers.IntegerField(min_value=0)
     file_url = serializers.CharField()
 
 
@@ -503,8 +504,8 @@ class PublicDocumentListView(APIView):
         paginator = self.pagination_class()
         page = paginator.paginate_queryset(rows.distinct().order_by("-published_at", "id"), request, view=self)
         asset_ids = [document.file_reference.rsplit("/", 1)[-1] for document in page]
-        detected_types = {
-            str(asset.pk): asset.detected_mime
+        ready_assets = {
+            str(asset.pk): asset
             for asset in MediaAsset.objects.filter(
                 pk__in=asset_ids, site_id=site.pk, status=MediaAsset.Status.READY,
                 deleted_at__isnull=True, processing__state="READY",
@@ -519,7 +520,8 @@ class PublicDocumentListView(APIView):
                 "effective_date": document.effective_date, "published_at": document.published_at,
                 "visible_to_public": document.visible_to_public,
                 "require_login_to_download": document.require_login_to_download,
-                "file_type": detected_types[asset_id],
+                "file_type": ready_assets[asset_id].detected_mime,
+                "file_size": ready_assets[asset_id].byte_count,
                 "file_url": f"/api/v1/site-context/documents/{document.pk}/file/",
                 "categories": list(document.categories.filter(kind=Category.Kind.DOCUMENTS, is_active=True).values("id", "code", "name", "slug")),
             })
@@ -557,6 +559,8 @@ class PublicDocumentFileView(APIView):
             bucket, key = asset.storage_reference.split(":", 1)
             with ObjectStorage().open(bucket, key) as stream:
                 body = stream.read(asset.byte_count + 1)
+        except Http404:
+            raise Http404("Document file is unavailable.") from None
         except Exception as error:
             from rest_framework.exceptions import APIException
             raise APIException("Document storage is temporarily unavailable.") from error
