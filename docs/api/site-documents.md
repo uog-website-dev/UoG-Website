@@ -10,10 +10,15 @@ Document management is mounted under `/api/v1/sites/{site_id}/documents/` and us
 | `PATCH /documents/{uuid}/` | Update editable fields while preserving the content UUID and revision/publication history |
 | `DELETE /documents/{uuid}/` | Site Administrator deletion through the CMS retention and audit hooks |
 | `GET /documents/categories/` | List active Site-owned document categories |
-| `POST /documents/categories/` | Add a category as a Site Editor or Administrator |
+| `POST /documents/categories/` | Add a document taxonomy category as a Site Administrator |
+| `GET /documents/categories/{uuid}/` | Retrieve a category within the selected Site |
+| `PATCH /documents/categories/{uuid}/` | Rename, reorder, describe, or activate/deactivate a category without breaking document links |
+| `DELETE /documents/categories/{uuid}/` | Delete an unused category; returns a validation error while documents reference it |
 | `POST /documents/{uuid}/publish/` | Publish through the CMS workflow |
 | `POST /documents/{uuid}/unpublish/` | Unpublish through the CMS workflow |
 
 Document uploads use the existing Media Library multipart endpoint. The document `file_reference` is the opaque Site asset identifier returned by the media API (`sites/{site_id}/assets/{asset_uuid}`), never a MinIO path. The media API enforces type, size, Site ownership, and processing readiness. Upload/download contracts are described in [media-uploads.md](media-uploads.md).
+
+Categories reuse the shared `api.Category` taxonomy model with `kind=DOCUMENTS`; the existing `/categories/` API remains reserved for Post categories. Names and active slugs follow the shared Site and locale uniqueness rules. Category deletion is blocked while linked documents exist; deactivation retains links and existing documents. Public delivery is available at `/api/v1/site-context/documents/` with `search`, `category` slug, `page`, and `page_size`; `/documents/categories/` returns active categories with at least one public published document. Both endpoints resolve Site ownership from the trusted host and honor the `DOCUMENTS` module gate.
 
 Responses include the immutable content UUID, current status, revision number, publication timestamp, effective date, visibility, categories, original filename, detected MIME type, and byte size. Drafts are created by default. Empty titles and files that are foreign, unsupported, unavailable, or awaiting required security processing are rejected with field-level validation errors.

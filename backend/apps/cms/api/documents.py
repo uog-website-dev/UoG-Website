@@ -16,15 +16,17 @@ from apps.accounts.authentication import KeycloakBearerAuthentication
 from apps.sites.models import Site
 from apps.sites.selectors.modules import module_is_available
 from ..authorization import require_cms_grant, cms_administrator_allows
-from ..models import ContentRole, Document, DocumentCategory
+from ..models import ContentRole, Document
+from apps.api.models import Category
 from ..services.workflow import transition_content
 
 
 class DocumentCategorySerializer(serializers.ModelSerializer):
+    code = serializers.CharField(required=False, max_length=64)
     slug = serializers.SlugField(required=False, allow_blank=True, max_length=128)
     class Meta:
-        model = DocumentCategory
-        fields = ("id", "name", "slug")
+        model = Category
+        fields = ("id", "code", "name", "slug", "description", "position", "is_active", "locale", "created_at", "updated_at")
         read_only_fields = ("id",)
 
     def validate_name(self, value):
@@ -35,7 +37,10 @@ class DocumentCategorySerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         if not attrs.get("slug"):
             from django.utils.text import slugify
-            attrs["slug"] = slugify(attrs.get("name", ""))[:128]
+            if attrs.get("name"):
+                attrs["slug"] = slugify(attrs["name"])[:128]
+            elif self.instance:
+                attrs["slug"] = self.instance.slug
         if not attrs.get("slug"):
             raise serializers.ValidationError({"name": "Use a category name containing letters or numbers."})
         return attrs
@@ -43,7 +48,7 @@ class DocumentCategorySerializer(serializers.ModelSerializer):
 
 class DocumentSerializer(serializers.ModelSerializer):
     slug = serializers.SlugField(required=False, allow_blank=True, max_length=255)
-    categories = serializers.PrimaryKeyRelatedField(queryset=DocumentCategory.objects.none(), many=True, required=False)
+    categories = serializers.PrimaryKeyRelatedField(queryset=Category.objects.none(), many=True, required=False)
     categories_detail = DocumentCategorySerializer(source="categories", many=True, read_only=True)
     creator = serializers.IntegerField(source="created_by_id", read_only=True)
     file_type = serializers.SerializerMethodField()
@@ -74,7 +79,7 @@ class DocumentSerializer(serializers.ModelSerializer):
     def get_fields(self):
         fields = super().get_fields()
         site_id = self.context.get("site_id")
-        fields["categories"].child_relation.queryset = DocumentCategory.objects.filter(site_id=site_id, is_active=True)
+        fields["categories"].child_relation.queryset = Category.objects.filter(site_id=site_id, is_active=True, kind=Category.Kind.DOCUMENTS)
         return fields
 
     def validate_title(self, value):
@@ -96,7 +101,7 @@ class DocumentSerializer(serializers.ModelSerializer):
         instance = self.instance
         site_id = getattr(instance, "site_id", None) or self.context.get("site_id")
         for category in attrs.get("categories", []):
-            if category.site_id != site_id or not category.is_active:
+            if category.site_id != site_id or not category.is_active or category.kind != Category.Kind.DOCUMENTS:
                 raise serializers.ValidationError({"categories": "Choose active categories belonging to this Site."})
         if not instance:
             attrs.setdefault("created_by", self.context["request"].user)
@@ -259,23 +264,70 @@ class SiteDocumentCategories(APIView):
     authentication_classes = [KeycloakBearerAuthentication]
     permission_classes = [IsAuthenticated]
     @extend_schema(tags=["CMS documents"], responses={200: DocumentCategorySerializer(many=True)})
-    def get(self, request, site_pk):
+    def get(self, request, site_pk, category_id=None):
         site = get_object_or_404(Site, pk=site_pk)
         if not module_is_available(site.pk, "DOCUMENTS"):
             raise NotFound("Documents are not enabled for this Site.")
         require_cms_grant(request.user, site.pk, tuple(ContentRole.values), request=request)
-        return Response(DocumentCategorySerializer(DocumentCategory.objects.filter(site_id=site.pk, is_active=True), many=True).data)
+        rows = Category.objects.filter(site_id=site.pk, kind=Category.Kind.DOCUMENTS)
+        if category_id:
+            return Response(DocumentCategorySerializer(get_object_or_404(rows, pk=category_id)).data)
+        if request.query_params.get("include_inactive") != "true":
+            rows = rows.filter(is_active=True)
+        return Response(DocumentCategorySerializer(rows.order_by("position", "name"), many=True).data)
 
     @extend_schema(tags=["CMS documents"], request=DocumentCategorySerializer, responses={201: DocumentCategorySerializer})
     def post(self, request, site_pk):
         site = get_object_or_404(Site, pk=site_pk)
         if not module_is_available(site.pk, "DOCUMENTS"):
             raise NotFound("Documents are not enabled for this Site.")
-        require_cms_grant(request.user, site.pk, (ContentRole.AUTHOR,), request=request)
+        if not cms_administrator_allows(request.user, site.pk):
+            raise PermissionDenied("A Site Administrator is required to manage document categories.")
         serializer = DocumentCategorySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        if not serializer.validated_data.get("code"):
+            serializer.validated_data["code"] = "DOC_" + serializer.validated_data["slug"].upper().replace("-", "_")[:59]
         try:
-            category = DocumentCategory.objects.create(site=site, **serializer.validated_data)
-        except IntegrityError as error:
-            raise serializers.ValidationError({"slug": "A category with this slug already exists in this Site."}) from error
+            category = Category(site=site, kind=Category.Kind.DOCUMENTS, created_by=request.user, updated_by=request.user, **serializer.validated_data)
+            category.full_clean()
+            category.save()
+        except (IntegrityError, ValidationError) as error:
+            raise serializers.ValidationError({"slug": "An active category with this slug already exists in this Site and language."}) from error
         return Response(DocumentCategorySerializer(category).data, status=201)
+
+    def patch(self, request, site_pk, category_id):
+        return self._update(request, site_pk, category_id, partial=True)
+
+    def put(self, request, site_pk, category_id):
+        return self._update(request, site_pk, category_id, partial=False)
+
+    def _update(self, request, site_pk, category_id, *, partial):
+        site = get_object_or_404(Site, pk=site_pk)
+        if not module_is_available(site.pk, "DOCUMENTS"):
+            raise NotFound("Documents are not enabled for this Site.")
+        if not cms_administrator_allows(request.user, site.pk):
+            raise PermissionDenied("A Site Administrator is required to manage document categories.")
+        category = get_object_or_404(Category, pk=category_id, site_id=site.pk, kind=Category.Kind.DOCUMENTS)
+        serializer = DocumentCategorySerializer(category, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        for field, value in serializer.validated_data.items():
+            setattr(category, field, value)
+        category.updated_by = request.user
+        try:
+            category.full_clean()
+            category.save()
+        except (IntegrityError, ValidationError) as error:
+            raise serializers.ValidationError({"slug": "An active category with this slug already exists in this Site and language."}) from error
+        return Response(DocumentCategorySerializer(category).data)
+
+    def delete(self, request, site_pk, category_id):
+        site = get_object_or_404(Site, pk=site_pk)
+        if not module_is_available(site.pk, "DOCUMENTS"):
+            raise NotFound("Documents are not enabled for this Site.")
+        if not cms_administrator_allows(request.user, site.pk):
+            raise PermissionDenied("A Site Administrator is required to delete document categories.")
+        category = get_object_or_404(Category, pk=category_id, site_id=site.pk, kind=Category.Kind.DOCUMENTS)
+        if category.documents.exists():
+            raise serializers.ValidationError({"detail": "This category is assigned to documents. Deactivate it to retain those associations."})
+        category.delete()
+        return Response(status=204)

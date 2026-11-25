@@ -12,6 +12,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.api.models import Category, Post
+from ..models import Document
 from apps.api.serializers import ArticleDocumentField
 from apps.sites.selectors.modules import module_available_on_request, module_is_available
 
@@ -137,6 +138,17 @@ class PublicPostDetailSerializer(PublicPostListSerializer):
     editor_document = serializers.JSONField(required=False,allow_null=True)
 
 
+class PublicDocumentSerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    title = serializers.CharField()
+    slug = serializers.CharField()
+    description = serializers.CharField(allow_blank=True)
+    version = serializers.CharField(allow_blank=True)
+    effective_date = serializers.DateField(allow_null=True)
+    published_at = serializers.DateTimeField()
+    categories = PublicTaxonomySerializer(many=True)
+
+
 class PublicPostPageSerializer(serializers.Serializer):
     count = serializers.IntegerField()
     next = serializers.URLField(allow_null=True)
@@ -216,7 +228,7 @@ class PublicPostListView(APIView):
         if category_slug is not None:
             if "category" in filters:
                 raise serializers.ValidationError({"category":"The archive path selects the category; omit this parameter."})
-            category = Category.objects.filter(site_id=site.pk,locale=locale,is_active=True,status=ContentStatus.PUBLISHED,published_at__lte=timezone.now(),slug=category_slug).first()
+            category = Category.objects.filter(site_id=site.pk,locale=locale,kind=Category.Kind.POSTS,is_active=True,status=ContentStatus.PUBLISHED,published_at__lte=timezone.now(),slug=category_slug).first()
             if category is None:
                 raise NotFound("The requested category was not found.")
             filters["category"] = category.slug
@@ -317,7 +329,7 @@ def _post_snapshot_data(posts, *, detail):
 
 def _eligible_category_links(rows,site_id,locale):
     allowed = {str(pk) for pk in Category.objects.filter(
-        site_id=site_id,locale=locale,is_active=True,status=ContentStatus.PUBLISHED,published_at__lte=timezone.now(),
+        site_id=site_id,locale=locale,kind=Category.Kind.POSTS,is_active=True,status=ContentStatus.PUBLISHED,published_at__lte=timezone.now(),
     ).values_list("pk",flat=True)}
     return [{**row,"categories":[term for term in row["categories"] if str(term["id"]) in allowed]} for row in rows]
 
@@ -357,6 +369,71 @@ def _public_post_headers(response, version):
 def _require_posts_module(request):
     if not module_available_on_request(request, "POSTS"):
         raise NotFound("The requested Post was not found.")
+
+
+class PublicDocumentCategoriesView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+    http_method_names = ["get", "head", "options"]
+
+    @extend_schema(tags=["Public Documents"], responses=PublicTaxonomySerializer(many=True))
+    def get(self, request):
+        site = _resolved_site(request)
+        if not module_available_on_request(request, "DOCUMENTS"):
+            raise NotFound("The requested category was not found.")
+        categories = Category.objects.filter(
+            site_id=site.pk, kind=Category.Kind.DOCUMENTS, is_active=True,
+            documents__site_id=site.pk, documents__status=ContentStatus.PUBLISHED,
+            documents__published_at__lte=timezone.now(),
+            documents__visibility=Visibility.PUBLIC,
+        ).distinct().order_by("position", "name")
+        return Response(PublicTaxonomySerializer(categories, many=True).data)
+
+
+class PublicDocumentListView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+    pagination_class = PublicPagePagination
+    http_method_names = ["get", "head", "options"]
+
+    @extend_schema(tags=["Public Documents"], parameters=[
+        OpenApiParameter("category", str, description="Active document category slug."),
+        OpenApiParameter("search", str, description="Document title search."),
+        OpenApiParameter("page", int), OpenApiParameter("page_size", int),
+    ], responses=PublicPagePagination)
+    def get(self, request):
+        site = _resolved_site(request)
+        if not module_available_on_request(request, "DOCUMENTS"):
+            raise NotFound("The requested document was not found.")
+        rows = Document.objects.filter(
+            site_id=site.pk, status=ContentStatus.PUBLISHED,
+            published_at__lte=timezone.now(),
+            visibility=Visibility.PUBLIC,
+        ).prefetch_related("categories")
+        category_slug = request.query_params.get("category", "").strip()
+        if category_slug:
+            category = Category.objects.filter(
+                site_id=site.pk, kind=Category.Kind.DOCUMENTS,
+                slug=category_slug, is_active=True,
+            ).first()
+            if not category:
+                rows = rows.none()
+            else:
+                rows = rows.filter(categories=category)
+        search = request.query_params.get("search", "").strip()
+        if search:
+            rows = rows.filter(title__icontains=search)
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(rows.distinct().order_by("-published_at", "id"), request, view=self)
+        data = []
+        for document in page:
+            data.append({
+                "id": document.pk, "title": document.title, "slug": document.slug,
+                "description": document.description, "version": document.version,
+                "effective_date": document.effective_date, "published_at": document.published_at,
+                "categories": list(document.categories.filter(kind=Category.Kind.DOCUMENTS, is_active=True).values("id", "code", "name", "slug")),
+            })
+        return paginator.get_paginated_response(PublicDocumentSerializer(data, many=True).data)
 
 
 class PublicPageListView(APIView):

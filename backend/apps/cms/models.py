@@ -526,26 +526,13 @@ class Document(SiteContent):
                 return super().delete(*args, **kwargs)
 
 
-class DocumentCategory(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    site = models.ForeignKey("sites.Site", on_delete=models.PROTECT, related_name="document_categories")
-    name = models.CharField(max_length=120)
-    slug = models.SlugField(max_length=128)
-    is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ("name", "id")
-        constraints = [models.UniqueConstraint(fields=("site", "slug"), name="cms_doc_category_site_slug_uniq")]
-
-
 class Document(SiteContent):
     """Site-owned official file with retained, revision-bound asset references."""
     title = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255)
     description = models.TextField(blank=True, default="")
     file_reference = models.CharField(max_length=512)
-    categories = models.ManyToManyField(DocumentCategory, blank=True, related_name="documents")
+    categories = models.ManyToManyField("api.Category", blank=True, related_name="documents")
     version = models.CharField(max_length=40, blank=True, default="")
     effective_date = models.DateField(null=True, blank=True)
     visibility = models.CharField(max_length=12, default="PUBLIC", choices=[("PUBLIC", "Public"), ("UNLISTED", "Unlisted"), ("HIDDEN", "Hidden")])
@@ -569,7 +556,11 @@ class Document(SiteContent):
         category_ids = [item.pk for item in pending] if pending is not None else (
             self.categories.values_list("pk", flat=True) if self.pk else []
         )
-        if category_ids and DocumentCategory.objects.filter(pk__in=category_ids, site_id=self.site_id, is_active=True).count() != len(set(category_ids)):
+        from apps.api.models import Category
+        category_rows = Category.objects.filter(pk__in=category_ids, site_id=self.site_id, kind=Category.Kind.DOCUMENTS)
+        if category_ids and category_rows.count() != len(set(category_ids)):
+            raise ValidationError({"categories": "Choose document categories belonging to this Site."})
+        if pending is not None and category_ids and category_rows.filter(is_active=True).count() != len(set(category_ids)):
             raise ValidationError({"categories": "Choose active categories belonging to this Site."})
         if self.site_id and self.slug and Document.objects.filter(site_id=self.site_id, slug=self.slug).exclude(pk=self.pk).exists():
             raise ValidationError({"slug": "A document with this slug already exists in this Site."})
