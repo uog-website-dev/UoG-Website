@@ -29,6 +29,7 @@ router.register(r"(?P<site_pk>[^/.]+)/modules", SiteModuleViewSet, basename="sit
 router.register("", SiteViewSet, basename="site")
 urlpatterns = [
     path("<int:site_pk>/documents/categories/", SiteDocumentCategories.as_view(), name="site-document-categories"),
+    path("<int:site_pk>/documents/categories/<uuid:category_id>/", SiteDocumentCategories.as_view(), name="site-document-category-detail"),
     path("<int:site_pk>/documents/", SiteDocuments.as_view(), name="site-documents"),
     path("<int:site_pk>/documents/<uuid:document_id>/", SiteDocumentDetail.as_view(), name="site-document-detail"),
     path("<int:site_pk>/documents/<uuid:document_id>/<str:action>/", SiteDocumentWorkflow.as_view(), name="site-document-workflow"),

@@ -323,6 +323,9 @@ class PostSerializer(StrictContentFields, serializers.ModelSerializer):
 
     def validate_categories(self, value):
         site_id = self._site_id()
+        wrong_kind = [str(category.pk) for category in value if category.kind != Category.Kind.POSTS]
+        if wrong_kind:
+            raise serializers.ValidationError("Choose Post categories only.")
         foreign = [
             str(category.pk) for category in value
             if site_id is not None and category.site_id != site_id

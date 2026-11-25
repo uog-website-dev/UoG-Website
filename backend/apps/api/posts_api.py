@@ -601,6 +601,9 @@ class CategoryViewSet(TaxonomyViewSet):
     serializer_class = CategorySerializer
     route = "categories"
 
+    def get_queryset(self):
+        return super().get_queryset().filter(kind=Category.Kind.POSTS)
+
     @extend_schema(
         tags=["Posts"],
         parameters=[

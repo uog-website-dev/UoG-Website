@@ -22,5 +22,5 @@ DELETE FROM sites_module_implementation WHERE code='DOCUMENTS';
 """
 
 class Migration(migrations.Migration):
-    dependencies = [('cms','0038_documentcategory_document_and_more'),('sites','0016_footer_header_publication')]
+    dependencies = [('cms','0039_document_categories'),('sites','0016_footer_header_publication')]
     operations = [migrations.RunSQL(FORWARD, REVERSE)]

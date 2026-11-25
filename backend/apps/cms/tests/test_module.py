@@ -39,7 +39,7 @@ def test_cms_packages_import_and_application_loads():
     assert config.name == "apps.cms"
     assert "apps.cms" in settings.INSTALLED_APPS
     assert {model.__name__ for model in config.get_models()} == {
-        "SiteContent", "Page", "PageRedirect", "Document", "DocumentCategory", "LegacyCMSRoleReconciliation",
+        "SiteContent", "Page", "PageRedirect", "Document", "LegacyCMSRoleReconciliation",
         "ContentWorkflowTransition", "PublishedContentSnapshot",
         "ContentRevision", "SitePublicationVersion",
         "Menu", "MenuItem", "MenuInheritance", "MenuDeliveryVersion", "MenuLocationAssignment",
@@ -64,6 +64,7 @@ def test_cms_mounts_scoped_workflow_revision_admin_and_public_routes():
     assert {
         "site-context", "public-menus", "public-page-list", "public-homepage",
         "public-page-detail", "public-post-list", "public-post-detail", "public-media-image",
+        "public-document-list", "public-document-categories",
     } <= {pattern.name for pattern in context_urls.urlpatterns}
 
 

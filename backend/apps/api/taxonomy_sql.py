@@ -46,6 +46,7 @@ BEGIN
             WHERE t.sitecontent_ptr_id <> NEW.sitecontent_ptr_id
               AND t.is_active
               AND NEW.is_active
+              AND COALESCE(to_jsonb(t)->>'kind', 'POSTS') = COALESCE(to_jsonb(NEW)->>'kind', 'POSTS')
               AND t.slug = NEW.slug
               AND c.site_id = own.site_id
               AND c.locale = own.locale

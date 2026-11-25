@@ -8,5 +8,9 @@ FORWARD = PREVIOUS.replace(NEEDLE, NEEDLE[:-1] + " OR EXISTS(SELECT 1 FROM cms_d
 assert FORWARD != PREVIOUS
 
 class Migration(migrations.Migration):
-    dependencies = [('media','0014_restore_guarded_processing_deletion'),('cms','0038_documentcategory_document_and_more')]
+    # Keep the trigger migration on the Media branch. Plpgsql resolves the
+    # cms_document reference when the guard executes, after the CMS schema
+    # migrations have completed; adding a cross-app dependency here can leave
+    # deployed databases with media.0015 recorded before cms.0038.
+    dependencies = [('media','0014_restore_guarded_processing_deletion')]
     operations = [migrations.RunSQL(FORWARD, PREVIOUS)]
