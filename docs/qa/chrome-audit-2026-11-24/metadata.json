@@ -1,0 +1,1714 @@
+[
+  {
+    "target": "home-main",
+    "width": 1440,
+    "title": "University of Gondar — Public Portal",
+    "lang": "en",
+    "description": [
+      "University of Gondar"
+    ],
+    "canonical": [],
+    "og": {},
+    "twitter": {},
+    "robots": [],
+    "hreflang": [],
+    "favicon": [
+      "/favicon.ico"
+    ],
+    "jsonLd": 0,
+    "headings": [
+      {
+        "level": 1,
+        "text": "QA shared main homepage p4brand-0b2c8ca6"
+      },
+      {
+        "level": 2,
+        "text": "Stay connected with University of Gondar"
+      },
+      {
+        "level": 2,
+        "text": "University Main - FooterUniversity Main - Footer"
+      },
+      {
+        "level": 2,
+        "text": "Main review mainqa-8995d437 University resourcesMain review mainqa-8995d437 University resources"
+      },
+      {
+        "level": 2,
+        "text": "University Main - Quick LinksUniversity Main - Quick Links"
+      }
+    ],
+    "h1": [
+      "QA shared main homepage p4brand-0b2c8ca6"
+    ],
+    "landmarks": {
+      "header": 1,
+      "main": 1,
+      "footer": 1,
+      "navs": [
+        "Site utility",
+        "Site header",
+        "Site header desktop",
+        "Footer navigation"
+      ]
+    },
+    "skipLink": true,
+    "brandText": "University of Gondar",
+    "brandClipped": true,
+    "bodyWidth": 1440,
+    "viewportWidth": 1440
+  },
+  {
+    "target": "home-main",
+    "width": 390,
+    "title": "University of Gondar — Public Portal",
+    "lang": "en",
+    "description": [
+      "University of Gondar"
+    ],
+    "canonical": [],
+    "og": {},
+    "twitter": {},
+    "robots": [],
+    "hreflang": [],
+    "favicon": [
+      "/favicon.ico"
+    ],
+    "jsonLd": 0,
+    "headings": [
+      {
+        "level": 1,
+        "text": "QA shared main homepage p4brand-0b2c8ca6"
+      },
+      {
+        "level": 2,
+        "text": "Stay connected with University of Gondar"
+      },
+      {
+        "level": 2,
+        "text": "University Main - FooterUniversity Main - Footer"
+      },
+      {
+        "level": 2,
+        "text": "Main review mainqa-8995d437 University resourcesMain review mainqa-8995d437 University resources"
+      },
+      {
+        "level": 2,
+        "text": "University Main - Quick LinksUniversity Main - Quick Links"
+      }
+    ],
+    "h1": [
+      "QA shared main homepage p4brand-0b2c8ca6"
+    ],
+    "landmarks": {
+      "header": 1,
+      "main": 1,
+      "footer": 1,
+      "navs": [
+        "Site utility",
+        "Site header",
+        "Site header desktop",
+        "Footer navigation"
+      ]
+    },
+    "skipLink": true,
+    "brandText": "University of Gondar",
+    "brandClipped": false,
+    "bodyWidth": 390,
+    "viewportWidth": 390
+  },
+  {
+    "target": "home-child",
+    "width": 1440,
+    "title": "University of Gondar — Public Portal",
+    "lang": "en",
+    "description": [
+      "College of Informatics"
+    ],
+    "canonical": [],
+    "og": {},
+    "twitter": {},
+    "robots": [],
+    "hreflang": [],
+    "favicon": [
+      "/favicon.ico"
+    ],
+    "jsonLd": 0,
+    "headings": [
+      {
+        "level": 1,
+        "text": "Informatics Home"
+      },
+      {
+        "level": 2,
+        "text": "Explore ideas. Shape the digital future."
+      },
+      {
+        "level": 2,
+        "text": "Our impact in the community"
+      },
+      {
+        "level": 2,
+        "text": "Learn"
+      },
+      {
+        "level": 2,
+        "text": "Discover"
+      },
+      {
+        "level": 2,
+        "text": "Connect"
+      },
+      {
+        "level": 2,
+        "text": "Quick links"
+      },
+      {
+        "level": 2,
+        "text": "Explore life at Informatics"
+      },
+      {
+        "level": 2,
+        "text": "Student life"
+      },
+      {
+        "level": 2,
+        "text": "Beyond the classroom"
+      },
+      {
+        "level": 2,
+        "text": "Learning and campus facilities"
+      },
+      {
+        "level": 2,
+        "text": "Research and discovery"
+      },
+      {
+        "level": 2,
+        "text": "Latest news"
+      },
+      {
+        "level": 2,
+        "text": "Explore our campus"
+      },
+      {
+        "level": 2,
+        "text": "Partnership and collaboration"
+      },
+      {
+        "level": 3,
+        "text": "Work with Informatics"
+      },
+      {
+        "level": 2,
+        "text": "Contact Informatics"
+      },
+      {
+        "level": 2,
+        "text": "Explore"
+      },
+      {
+        "level": 2,
+        "text": "Resources"
+      },
+      {
+        "level": 2,
+        "text": "Connect"
+      },
+      {
+        "level": 2,
+        "text": "Stay connected with College of Informatics"
+      },
+      {
+        "level": 2,
+        "text": "College resourcesCollege resources"
+      },
+      {
+        "level": 2,
+        "text": "College navigationCollege navigation"
+      }
+    ],
+    "h1": [
+      "Informatics Home"
+    ],
+    "landmarks": {
+      "header": 1,
+      "main": 1,
+      "footer": 1,
+      "navs": [
+        "Site utility",
+        "Site header",
+        "Site header desktop",
+        "Breadcrumbs",
+        "Footer navigation",
+        "Social media"
+      ]
+    },
+    "skipLink": true,
+    "brandText": "College of Informatics",
+    "brandClipped": false,
+    "bodyWidth": 1440,
+    "viewportWidth": 1440
+  },
+  {
+    "target": "home-child",
+    "width": 390,
+    "title": "University of Gondar — Public Portal",
+    "lang": "en",
+    "description": [
+      "College of Informatics"
+    ],
+    "canonical": [],
+    "og": {},
+    "twitter": {},
+    "robots": [],
+    "hreflang": [],
+    "favicon": [
+      "/favicon.ico"
+    ],
+    "jsonLd": 0,
+    "headings": [
+      {
+        "level": 1,
+        "text": "Informatics Home"
+      },
+      {
+        "level": 2,
+        "text": "Explore ideas. Shape the digital future."
+      },
+      {
+        "level": 2,
+        "text": "Our impact in the community"
+      },
+      {
+        "level": 2,
+        "text": "Learn"
+      },
+      {
+        "level": 2,
+        "text": "Discover"
+      },
+      {
+        "level": 2,
+        "text": "Connect"
+      },
+      {
+        "level": 2,
+        "text": "Quick links"
+      },
+      {
+        "level": 2,
+        "text": "Explore life at Informatics"
+      },
+      {
+        "level": 2,
+        "text": "Student life"
+      },
+      {
+        "level": 2,
+        "text": "Beyond the classroom"
+      },
+      {
+        "level": 2,
+        "text": "Learning and campus facilities"
+      },
+      {
+        "level": 2,
+        "text": "Research and discovery"
+      },
+      {
+        "level": 2,
+        "text": "Latest news"
+      },
+      {
+        "level": 2,
+        "text": "Explore our campus"
+      },
+      {
+        "level": 2,
+        "text": "Partnership and collaboration"
+      },
+      {
+        "level": 3,
+        "text": "Work with Informatics"
+      },
+      {
+        "level": 2,
+        "text": "Contact Informatics"
+      },
+      {
+        "level": 2,
+        "text": "Explore"
+      },
+      {
+        "level": 2,
+        "text": "Resources"
+      },
+      {
+        "level": 2,
+        "text": "Connect"
+      },
+      {
+        "level": 2,
+        "text": "Stay connected with College of Informatics"
+      },
+      {
+        "level": 2,
+        "text": "College resourcesCollege resources"
+      },
+      {
+        "level": 2,
+        "text": "College navigationCollege navigation"
+      }
+    ],
+    "h1": [
+      "Informatics Home"
+    ],
+    "landmarks": {
+      "header": 1,
+      "main": 1,
+      "footer": 1,
+      "navs": [
+        "Site utility",
+        "Site header",
+        "Site header desktop",
+        "Breadcrumbs",
+        "Footer navigation",
+        "Social media"
+      ]
+    },
+    "skipLink": true,
+    "brandText": "College of Informatics",
+    "brandClipped": true,
+    "bodyWidth": 390,
+    "viewportWidth": 390
+  },
+  {
+    "target": "page",
+    "width": 1440,
+    "title": "Main review mainqa-8995d437 university information",
+    "lang": "en",
+    "description": [
+      "University of Gondar"
+    ],
+    "canonical": [
+      "http://www.uog.local/mainqa-8995d437-information"
+    ],
+    "og": {
+      "og:title": "Main review mainqa-8995d437 university information",
+      "og:description": "University of Gondar",
+      "og:url": "http://www.uog.local/mainqa-8995d437-information",
+      "og:type": "website"
+    },
+    "twitter": {
+      "twitter:card": "summary",
+      "twitter:title": "Main review mainqa-8995d437 university information",
+      "twitter:description": "University of Gondar"
+    },
+    "robots": [],
+    "hreflang": [],
+    "favicon": [
+      "/favicon.ico"
+    ],
+    "jsonLd": 0,
+    "headings": [
+      {
+        "level": 1,
+        "text": "Main review mainqa-8995d437 university information"
+      },
+      {
+        "level": 2,
+        "text": "Main review mainqa-8995d437 sidebar"
+      },
+      {
+        "level": 3,
+        "text": "Main review mainqa-8995d437 In this section"
+      },
+      {
+        "level": 2,
+        "text": "Stay connected with University of Gondar"
+      },
+      {
+        "level": 2,
+        "text": "University Main - FooterUniversity Main - Footer"
+      },
+      {
+        "level": 2,
+        "text": "Main review mainqa-8995d437 University resourcesMain review mainqa-8995d437 University resources"
+      },
+      {
+        "level": 2,
+        "text": "University Main - Quick LinksUniversity Main - Quick Links"
+      }
+    ],
+    "h1": [
+      "Main review mainqa-8995d437 university information"
+    ],
+    "landmarks": {
+      "header": 1,
+      "main": 1,
+      "footer": 1,
+      "navs": [
+        "Site utility",
+        "Site header",
+        "Site header desktop",
+        "Breadcrumb",
+        "Main review mainqa-8995d437 In this section",
+        "Footer navigation"
+      ]
+    },
+    "skipLink": true,
+    "brandText": "University of Gondar",
+    "brandClipped": true,
+    "bodyWidth": 1440,
+    "viewportWidth": 1440
+  },
+  {
+    "target": "page",
+    "width": 390,
+    "title": "Main review mainqa-8995d437 university information",
+    "lang": "en",
+    "description": [
+      "University of Gondar"
+    ],
+    "canonical": [
+      "http://www.uog.local/mainqa-8995d437-information"
+    ],
+    "og": {
+      "og:title": "Main review mainqa-8995d437 university information",
+      "og:description": "University of Gondar",
+      "og:url": "http://www.uog.local/mainqa-8995d437-information",
+      "og:type": "website"
+    },
+    "twitter": {
+      "twitter:card": "summary",
+      "twitter:title": "Main review mainqa-8995d437 university information",
+      "twitter:description": "University of Gondar"
+    },
+    "robots": [],
+    "hreflang": [],
+    "favicon": [
+      "/favicon.ico"
+    ],
+    "jsonLd": 0,
+    "headings": [
+      {
+        "level": 1,
+        "text": "Main review mainqa-8995d437 university information"
+      },
+      {
+        "level": 2,
+        "text": "Main review mainqa-8995d437 sidebar"
+      },
+      {
+        "level": 3,
+        "text": "Main review mainqa-8995d437 In this section"
+      },
+      {
+        "level": 2,
+        "text": "Stay connected with University of Gondar"
+      },
+      {
+        "level": 2,
+        "text": "University Main - FooterUniversity Main - Footer"
+      },
+      {
+        "level": 2,
+        "text": "Main review mainqa-8995d437 University resourcesMain review mainqa-8995d437 University resources"
+      },
+      {
+        "level": 2,
+        "text": "University Main - Quick LinksUniversity Main - Quick Links"
+      }
+    ],
+    "h1": [
+      "Main review mainqa-8995d437 university information"
+    ],
+    "landmarks": {
+      "header": 1,
+      "main": 1,
+      "footer": 1,
+      "navs": [
+        "Site utility",
+        "Site header",
+        "Site header desktop",
+        "Breadcrumb",
+        "Main review mainqa-8995d437 In this section",
+        "Footer navigation"
+      ]
+    },
+    "skipLink": true,
+    "brandText": "University of Gondar",
+    "brandClipped": false,
+    "bodyWidth": 390,
+    "viewportWidth": 390
+  },
+  {
+    "target": "posts",
+    "width": 1440,
+    "title": "University of Gondar — Public Portal",
+    "lang": "en",
+    "description": [],
+    "canonical": [],
+    "og": {},
+    "twitter": {},
+    "robots": [],
+    "hreflang": [],
+    "favicon": [
+      "/favicon.ico"
+    ],
+    "jsonLd": 0,
+    "headings": [
+      {
+        "level": 1,
+        "text": "News"
+      },
+      {
+        "level": 2,
+        "text": "Addis Ababa University Launches Digital Content Creation and Freelancing Training for Students"
+      },
+      {
+        "level": 2,
+        "text": "Tikur Anbessa Specialized Hospital Inaugurates Two Modern Operating Theatres for Pediatric Surgery"
+      },
+      {
+        "level": 2,
+        "text": "AAU and U.S. Mission to the African Union Launch Economic and Policy Dialogue Center"
+      },
+      {
+        "level": 2,
+        "text": "Addis Ababa University Hosts International Dissemination Workshop on Maternal Death Surveillance and Response"
+      },
+      {
+        "level": 2,
+        "text": "AAU Hosts 2nd CIDRA International Academic Conference to Strengthen Europe–Africa Dialogue on Multilevel Governance"
+      },
+      {
+        "level": 2,
+        "text": "External Vaccancy Announcement"
+      },
+      {
+        "level": 2,
+        "text": "For Addis Ababa University undergraduate students"
+      },
+      {
+        "level": 2,
+        "text": "AAU accredited as a CISI testing center"
+      },
+      {
+        "level": 2,
+        "text": "አስቸኳይ ማስታወቂያ!"
+      },
+      {
+        "level": 2,
+        "text": "AAU Connect September 2026, Edition XIX Continental Recognition"
+      },
+      {
+        "level": 2,
+        "text": "Stay connected with Addis Ababa University"
+      },
+      {
+        "level": 2,
+        "text": "EssentialsEssentials"
+      },
+      {
+        "level": 2,
+        "text": "About usAbout us"
+      },
+      {
+        "level": 2,
+        "text": "ResourcesResources"
+      },
+      {
+        "level": 2,
+        "text": "Quick linksQuick links"
+      }
+    ],
+    "h1": [
+      "News"
+    ],
+    "landmarks": {
+      "header": 1,
+      "main": 1,
+      "footer": 1,
+      "navs": [
+        "Site utility",
+        "Site header",
+        "Site header desktop",
+        "Breadcrumb",
+        "News pagination",
+        "Footer navigation"
+      ]
+    },
+    "skipLink": true,
+    "brandText": "Addis Ababa University",
+    "brandClipped": false,
+    "bodyWidth": 1440,
+    "viewportWidth": 1440
+  },
+  {
+    "target": "posts",
+    "width": 390,
+    "title": "University of Gondar — Public Portal",
+    "lang": "en",
+    "description": [],
+    "canonical": [],
+    "og": {},
+    "twitter": {},
+    "robots": [],
+    "hreflang": [],
+    "favicon": [
+      "/favicon.ico"
+    ],
+    "jsonLd": 0,
+    "headings": [
+      {
+        "level": 1,
+        "text": "News"
+      },
+      {
+        "level": 2,
+        "text": "Addis Ababa University Launches Digital Content Creation and Freelancing Training for Students"
+      },
+      {
+        "level": 2,
+        "text": "Tikur Anbessa Specialized Hospital Inaugurates Two Modern Operating Theatres for Pediatric Surgery"
+      },
+      {
+        "level": 2,
+        "text": "AAU and U.S. Mission to the African Union Launch Economic and Policy Dialogue Center"
+      },
+      {
+        "level": 2,
+        "text": "Addis Ababa University Hosts International Dissemination Workshop on Maternal Death Surveillance and Response"
+      },
+      {
+        "level": 2,
+        "text": "AAU Hosts 2nd CIDRA International Academic Conference to Strengthen Europe–Africa Dialogue on Multilevel Governance"
+      },
+      {
+        "level": 2,
+        "text": "External Vaccancy Announcement"
+      },
+      {
+        "level": 2,
+        "text": "For Addis Ababa University undergraduate students"
+      },
+      {
+        "level": 2,
+        "text": "AAU accredited as a CISI testing center"
+      },
+      {
+        "level": 2,
+        "text": "አስቸኳይ ማስታወቂያ!"
+      },
+      {
+        "level": 2,
+        "text": "AAU Connect September 2026, Edition XIX Continental Recognition"
+      },
+      {
+        "level": 2,
+        "text": "Stay connected with Addis Ababa University"
+      },
+      {
+        "level": 2,
+        "text": "EssentialsEssentials"
+      },
+      {
+        "level": 2,
+        "text": "About usAbout us"
+      },
+      {
+        "level": 2,
+        "text": "ResourcesResources"
+      },
+      {
+        "level": 2,
+        "text": "Quick linksQuick links"
+      }
+    ],
+    "h1": [
+      "News"
+    ],
+    "landmarks": {
+      "header": 1,
+      "main": 1,
+      "footer": 1,
+      "navs": [
+        "Site utility",
+        "Site header",
+        "Site header desktop",
+        "Breadcrumb",
+        "News pagination",
+        "Footer navigation"
+      ]
+    },
+    "skipLink": true,
+    "brandText": "Addis Ababa University",
+    "brandClipped": false,
+    "bodyWidth": 390,
+    "viewportWidth": 390
+  },
+  {
+    "target": "post-detail",
+    "width": 1440,
+    "title": "Addis Ababa University Launches Digital Content Creation and Freelancing Training for Students",
+    "lang": "en",
+    "description": [
+      "A student training initiative connects academic work with opportunities in digital publishing and freelance careers."
+    ],
+    "canonical": [
+      "http://aau-review.uog.local/posts/aau-reference-dd1aa7a8"
+    ],
+    "og": {
+      "og:title": "Addis Ababa University Launches Digital Content Creation and Freelancing Training for Students",
+      "og:description": "A student training initiative connects academic work with opportunities in digital publishing and freelance careers.",
+      "og:url": "http://aau-review.uog.local/posts/aau-reference-dd1aa7a8",
+      "og:type": "article"
+    },
+    "twitter": {
+      "twitter:card": "summary",
+      "twitter:title": "Addis Ababa University Launches Digital Content Creation and Freelancing Training for Students",
+      "twitter:description": "A student training initiative connects academic work with opportunities in digital publishing and freelance careers."
+    },
+    "robots": [],
+    "hreflang": [],
+    "favicon": [
+      "/favicon.ico"
+    ],
+    "jsonLd": 0,
+    "headings": [
+      {
+        "level": 1,
+        "text": "Addis Ababa University Launches Digital Content Creation and Freelancing Training for Students"
+      },
+      {
+        "level": 2,
+        "text": "Reference summary"
+      },
+      {
+        "level": 2,
+        "text": "Stay connected with Addis Ababa University"
+      },
+      {
+        "level": 2,
+        "text": "EssentialsEssentials"
+      },
+      {
+        "level": 2,
+        "text": "About usAbout us"
+      },
+      {
+        "level": 2,
+        "text": "ResourcesResources"
+      },
+      {
+        "level": 2,
+        "text": "Quick linksQuick links"
+      }
+    ],
+    "h1": [
+      "Addis Ababa University Launches Digital Content Creation and Freelancing Training for Students"
+    ],
+    "landmarks": {
+      "header": 2,
+      "main": 1,
+      "footer": 1,
+      "navs": [
+        "Site utility",
+        "Site header",
+        "Site header desktop",
+        "Breadcrumb",
+        "Footer navigation"
+      ]
+    },
+    "skipLink": true,
+    "brandText": "Addis Ababa University",
+    "brandClipped": false,
+    "bodyWidth": 1440,
+    "viewportWidth": 1440
+  },
+  {
+    "target": "post-detail",
+    "width": 390,
+    "title": "Addis Ababa University Launches Digital Content Creation and Freelancing Training for Students",
+    "lang": "en",
+    "description": [
+      "A student training initiative connects academic work with opportunities in digital publishing and freelance careers."
+    ],
+    "canonical": [
+      "http://aau-review.uog.local/posts/aau-reference-dd1aa7a8"
+    ],
+    "og": {
+      "og:title": "Addis Ababa University Launches Digital Content Creation and Freelancing Training for Students",
+      "og:description": "A student training initiative connects academic work with opportunities in digital publishing and freelance careers.",
+      "og:url": "http://aau-review.uog.local/posts/aau-reference-dd1aa7a8",
+      "og:type": "article"
+    },
+    "twitter": {
+      "twitter:card": "summary",
+      "twitter:title": "Addis Ababa University Launches Digital Content Creation and Freelancing Training for Students",
+      "twitter:description": "A student training initiative connects academic work with opportunities in digital publishing and freelance careers."
+    },
+    "robots": [],
+    "hreflang": [],
+    "favicon": [
+      "/favicon.ico"
+    ],
+    "jsonLd": 0,
+    "headings": [
+      {
+        "level": 1,
+        "text": "Addis Ababa University Launches Digital Content Creation and Freelancing Training for Students"
+      },
+      {
+        "level": 2,
+        "text": "Reference summary"
+      },
+      {
+        "level": 2,
+        "text": "Stay connected with Addis Ababa University"
+      },
+      {
+        "level": 2,
+        "text": "EssentialsEssentials"
+      },
+      {
+        "level": 2,
+        "text": "About usAbout us"
+      },
+      {
+        "level": 2,
+        "text": "ResourcesResources"
+      },
+      {
+        "level": 2,
+        "text": "Quick linksQuick links"
+      }
+    ],
+    "h1": [
+      "Addis Ababa University Launches Digital Content Creation and Freelancing Training for Students"
+    ],
+    "landmarks": {
+      "header": 2,
+      "main": 1,
+      "footer": 1,
+      "navs": [
+        "Site utility",
+        "Site header",
+        "Site header desktop",
+        "Breadcrumb",
+        "Footer navigation"
+      ]
+    },
+    "skipLink": true,
+    "brandText": "Addis Ababa University",
+    "brandClipped": false,
+    "bodyWidth": 390,
+    "viewportWidth": 390
+  },
+  {
+    "target": "category",
+    "width": 1440,
+    "title": "University of Gondar — Public Portal",
+    "lang": "en",
+    "description": [],
+    "canonical": [],
+    "og": {},
+    "twitter": {},
+    "robots": [],
+    "hreflang": [],
+    "favicon": [
+      "/favicon.ico"
+    ],
+    "jsonLd": 0,
+    "headings": [
+      {
+        "level": 1,
+        "text": "Research 655af51c8f"
+      },
+      {
+        "level": 2,
+        "text": "Research update 4"
+      },
+      {
+        "level": 2,
+        "text": "Research update 3"
+      },
+      {
+        "level": 2,
+        "text": "Research update 2"
+      },
+      {
+        "level": 2,
+        "text": "Research update 1"
+      },
+      {
+        "level": 2,
+        "text": "Research update 0"
+      }
+    ],
+    "h1": [
+      "Research 655af51c8f"
+    ],
+    "landmarks": {
+      "header": 1,
+      "main": 1,
+      "footer": 1,
+      "navs": [
+        "Breadcrumb",
+        "News pagination"
+      ]
+    },
+    "skipLink": true,
+    "brandText": "Article editor QA post-14a6169c2f",
+    "brandClipped": false,
+    "bodyWidth": 1440,
+    "viewportWidth": 1440
+  },
+  {
+    "target": "category",
+    "width": 390,
+    "title": "University of Gondar — Public Portal",
+    "lang": "en",
+    "description": [],
+    "canonical": [],
+    "og": {},
+    "twitter": {},
+    "robots": [],
+    "hreflang": [],
+    "favicon": [
+      "/favicon.ico"
+    ],
+    "jsonLd": 0,
+    "headings": [
+      {
+        "level": 1,
+        "text": "Research 655af51c8f"
+      },
+      {
+        "level": 2,
+        "text": "Research update 4"
+      },
+      {
+        "level": 2,
+        "text": "Research update 3"
+      },
+      {
+        "level": 2,
+        "text": "Research update 2"
+      },
+      {
+        "level": 2,
+        "text": "Research update 1"
+      },
+      {
+        "level": 2,
+        "text": "Research update 0"
+      }
+    ],
+    "h1": [
+      "Research 655af51c8f"
+    ],
+    "landmarks": {
+      "header": 1,
+      "main": 1,
+      "footer": 1,
+      "navs": [
+        "Breadcrumb",
+        "News pagination"
+      ]
+    },
+    "skipLink": true,
+    "brandText": "Article editor QA post-14a6169c2f",
+    "brandClipped": true,
+    "bodyWidth": 390,
+    "viewportWidth": 390
+  },
+  {
+    "target": "category-empty",
+    "width": 1440,
+    "title": "University of Gondar — Public Portal",
+    "lang": "en",
+    "description": [],
+    "canonical": [],
+    "og": {},
+    "twitter": {},
+    "robots": [],
+    "hreflang": [],
+    "favicon": [
+      "/favicon.ico"
+    ],
+    "jsonLd": 0,
+    "headings": [
+      {
+        "level": 1,
+        "text": "Empty 655af51c8f"
+      }
+    ],
+    "h1": [
+      "Empty 655af51c8f"
+    ],
+    "landmarks": {
+      "header": 1,
+      "main": 1,
+      "footer": 1,
+      "navs": [
+        "Breadcrumb"
+      ]
+    },
+    "skipLink": true,
+    "brandText": "Article editor QA post-14a6169c2f",
+    "brandClipped": false,
+    "bodyWidth": 1440,
+    "viewportWidth": 1440
+  },
+  {
+    "target": "category-empty",
+    "width": 390,
+    "title": "University of Gondar — Public Portal",
+    "lang": "en",
+    "description": [],
+    "canonical": [],
+    "og": {},
+    "twitter": {},
+    "robots": [],
+    "hreflang": [],
+    "favicon": [
+      "/favicon.ico"
+    ],
+    "jsonLd": 0,
+    "headings": [
+      {
+        "level": 1,
+        "text": "Empty 655af51c8f"
+      }
+    ],
+    "h1": [
+      "Empty 655af51c8f"
+    ],
+    "landmarks": {
+      "header": 1,
+      "main": 1,
+      "footer": 1,
+      "navs": [
+        "Breadcrumb"
+      ]
+    },
+    "skipLink": true,
+    "brandText": "Article editor QA post-14a6169c2f",
+    "brandClipped": true,
+    "bodyWidth": 390,
+    "viewportWidth": 390
+  },
+  {
+    "target": "404",
+    "width": 1440,
+    "title": "University of Gondar — Public Portal",
+    "lang": "en",
+    "description": [
+      "Addis Ababa University"
+    ],
+    "canonical": [],
+    "og": {},
+    "twitter": {},
+    "robots": [],
+    "hreflang": [],
+    "favicon": [
+      "/favicon.ico"
+    ],
+    "jsonLd": 0,
+    "headings": [
+      {
+        "level": 2,
+        "text": "Stay connected with Addis Ababa University"
+      },
+      {
+        "level": 2,
+        "text": "EssentialsEssentials"
+      },
+      {
+        "level": 2,
+        "text": "About usAbout us"
+      },
+      {
+        "level": 2,
+        "text": "ResourcesResources"
+      },
+      {
+        "level": 2,
+        "text": "Quick linksQuick links"
+      }
+    ],
+    "h1": [],
+    "landmarks": {
+      "header": 1,
+      "main": 1,
+      "footer": 1,
+      "navs": [
+        "Site utility",
+        "Site header",
+        "Site header desktop",
+        "Breadcrumb",
+        "Footer navigation"
+      ]
+    },
+    "skipLink": true,
+    "brandText": "Addis Ababa University",
+    "brandClipped": false,
+    "bodyWidth": 1440,
+    "viewportWidth": 1440
+  },
+  {
+    "target": "404",
+    "width": 390,
+    "title": "University of Gondar — Public Portal",
+    "lang": "en",
+    "description": [
+      "Addis Ababa University"
+    ],
+    "canonical": [],
+    "og": {},
+    "twitter": {},
+    "robots": [],
+    "hreflang": [],
+    "favicon": [
+      "/favicon.ico"
+    ],
+    "jsonLd": 0,
+    "headings": [
+      {
+        "level": 2,
+        "text": "Stay connected with Addis Ababa University"
+      },
+      {
+        "level": 2,
+        "text": "EssentialsEssentials"
+      },
+      {
+        "level": 2,
+        "text": "About usAbout us"
+      },
+      {
+        "level": 2,
+        "text": "ResourcesResources"
+      },
+      {
+        "level": 2,
+        "text": "Quick linksQuick links"
+      }
+    ],
+    "h1": [],
+    "landmarks": {
+      "header": 1,
+      "main": 1,
+      "footer": 1,
+      "navs": [
+        "Site utility",
+        "Site header",
+        "Site header desktop",
+        "Breadcrumb",
+        "Footer navigation"
+      ]
+    },
+    "skipLink": true,
+    "brandText": "Addis Ababa University",
+    "brandClipped": false,
+    "bodyWidth": 390,
+    "viewportWidth": 390
+  },
+  {
+    "target": "sidebar-left",
+    "width": 1440,
+    "title": "University Left Sidebar",
+    "lang": "en",
+    "description": [
+      "Layout Site A"
+    ],
+    "canonical": [
+      "http://layout-45dfd491f4a.uog.local/left-sidebar"
+    ],
+    "og": {
+      "og:title": "University Left Sidebar",
+      "og:description": "Layout Site A",
+      "og:url": "http://layout-45dfd491f4a.uog.local/left-sidebar",
+      "og:type": "website"
+    },
+    "twitter": {
+      "twitter:card": "summary",
+      "twitter:title": "University Left Sidebar",
+      "twitter:description": "Layout Site A"
+    },
+    "robots": [],
+    "hreflang": [],
+    "favicon": [
+      "/favicon.ico"
+    ],
+    "jsonLd": 0,
+    "headings": [
+      {
+        "level": 1,
+        "text": "University Left Sidebar"
+      },
+      {
+        "level": 2,
+        "text": "Retained builder content"
+      },
+      {
+        "level": 2,
+        "text": "Explore this Site"
+      }
+    ],
+    "h1": [
+      "University Left Sidebar"
+    ],
+    "landmarks": {
+      "header": 1,
+      "main": 1,
+      "footer": 1,
+      "navs": [
+        "Breadcrumb",
+        "Published Pages"
+      ]
+    },
+    "skipLink": true,
+    "brandText": "Layout Site A",
+    "brandClipped": false,
+    "bodyWidth": 1440,
+    "viewportWidth": 1440
+  },
+  {
+    "target": "sidebar-left",
+    "width": 390,
+    "title": "University Left Sidebar",
+    "lang": "en",
+    "description": [
+      "Layout Site A"
+    ],
+    "canonical": [
+      "http://layout-45dfd491f4a.uog.local/left-sidebar"
+    ],
+    "og": {
+      "og:title": "University Left Sidebar",
+      "og:description": "Layout Site A",
+      "og:url": "http://layout-45dfd491f4a.uog.local/left-sidebar",
+      "og:type": "website"
+    },
+    "twitter": {
+      "twitter:card": "summary",
+      "twitter:title": "University Left Sidebar",
+      "twitter:description": "Layout Site A"
+    },
+    "robots": [],
+    "hreflang": [],
+    "favicon": [
+      "/favicon.ico"
+    ],
+    "jsonLd": 0,
+    "headings": [
+      {
+        "level": 1,
+        "text": "University Left Sidebar"
+      },
+      {
+        "level": 2,
+        "text": "Retained builder content"
+      },
+      {
+        "level": 2,
+        "text": "Explore this Site"
+      }
+    ],
+    "h1": [
+      "University Left Sidebar"
+    ],
+    "landmarks": {
+      "header": 1,
+      "main": 1,
+      "footer": 1,
+      "navs": [
+        "Breadcrumb",
+        "Published Pages"
+      ]
+    },
+    "skipLink": true,
+    "brandText": "Layout Site A",
+    "brandClipped": false,
+    "bodyWidth": 390,
+    "viewportWidth": 390
+  },
+  {
+    "target": "sidebar-right",
+    "width": 1440,
+    "title": "University Right Sidebar",
+    "lang": "en",
+    "description": [
+      "Layout Site A"
+    ],
+    "canonical": [
+      "http://layout-45dfd491f4a.uog.local/right-sidebar"
+    ],
+    "og": {
+      "og:title": "University Right Sidebar",
+      "og:description": "Layout Site A",
+      "og:url": "http://layout-45dfd491f4a.uog.local/right-sidebar",
+      "og:type": "website"
+    },
+    "twitter": {
+      "twitter:card": "summary",
+      "twitter:title": "University Right Sidebar",
+      "twitter:description": "Layout Site A"
+    },
+    "robots": [],
+    "hreflang": [],
+    "favicon": [
+      "/favicon.ico"
+    ],
+    "jsonLd": 0,
+    "headings": [
+      {
+        "level": 1,
+        "text": "University Right Sidebar"
+      },
+      {
+        "level": 2,
+        "text": "Retained builder content"
+      },
+      {
+        "level": 2,
+        "text": "Explore this Site"
+      }
+    ],
+    "h1": [
+      "University Right Sidebar"
+    ],
+    "landmarks": {
+      "header": 1,
+      "main": 1,
+      "footer": 1,
+      "navs": [
+        "Breadcrumb",
+        "Published Pages"
+      ]
+    },
+    "skipLink": true,
+    "brandText": "Layout Site A",
+    "brandClipped": false,
+    "bodyWidth": 1440,
+    "viewportWidth": 1440
+  },
+  {
+    "target": "sidebar-right",
+    "width": 390,
+    "title": "University Right Sidebar",
+    "lang": "en",
+    "description": [
+      "Layout Site A"
+    ],
+    "canonical": [
+      "http://layout-45dfd491f4a.uog.local/right-sidebar"
+    ],
+    "og": {
+      "og:title": "University Right Sidebar",
+      "og:description": "Layout Site A",
+      "og:url": "http://layout-45dfd491f4a.uog.local/right-sidebar",
+      "og:type": "website"
+    },
+    "twitter": {
+      "twitter:card": "summary",
+      "twitter:title": "University Right Sidebar",
+      "twitter:description": "Layout Site A"
+    },
+    "robots": [],
+    "hreflang": [],
+    "favicon": [
+      "/favicon.ico"
+    ],
+    "jsonLd": 0,
+    "headings": [
+      {
+        "level": 1,
+        "text": "University Right Sidebar"
+      },
+      {
+        "level": 2,
+        "text": "Retained builder content"
+      },
+      {
+        "level": 2,
+        "text": "Explore this Site"
+      }
+    ],
+    "h1": [
+      "University Right Sidebar"
+    ],
+    "landmarks": {
+      "header": 1,
+      "main": 1,
+      "footer": 1,
+      "navs": [
+        "Breadcrumb",
+        "Published Pages"
+      ]
+    },
+    "skipLink": true,
+    "brandText": "Layout Site A",
+    "brandClipped": false,
+    "bodyWidth": 390,
+    "viewportWidth": 390
+  },
+  {
+    "target": "home-empty",
+    "width": 1440,
+    "title": "University of Gondar — Public Portal",
+    "lang": "en",
+    "description": [],
+    "canonical": [],
+    "og": {},
+    "twitter": {},
+    "robots": [],
+    "hreflang": [],
+    "favicon": [
+      "/favicon.ico"
+    ],
+    "jsonLd": 0,
+    "headings": [],
+    "h1": [],
+    "landmarks": {
+      "header": 1,
+      "main": 1,
+      "footer": 1,
+      "navs": []
+    },
+    "skipLink": true,
+    "brandText": "College of Medicine and Health Sciences",
+    "brandClipped": false,
+    "bodyWidth": 1440,
+    "viewportWidth": 1440
+  },
+  {
+    "target": "home-empty",
+    "width": 390,
+    "title": "University of Gondar — Public Portal",
+    "lang": "en",
+    "description": [],
+    "canonical": [],
+    "og": {},
+    "twitter": {},
+    "robots": [],
+    "hreflang": [],
+    "favicon": [
+      "/favicon.ico"
+    ],
+    "jsonLd": 0,
+    "headings": [],
+    "h1": [],
+    "landmarks": {
+      "header": 1,
+      "main": 1,
+      "footer": 1,
+      "navs": []
+    },
+    "skipLink": true,
+    "brandText": "College of Medicine and Health Sciences",
+    "brandClipped": true,
+    "bodyWidth": 390,
+    "viewportWidth": 390
+  },
+  {
+    "target": "posts-disabled",
+    "width": 1440,
+    "title": "University of Gondar — Public Portal",
+    "lang": "en",
+    "description": [],
+    "canonical": [],
+    "og": {},
+    "twitter": {},
+    "robots": [],
+    "hreflang": [],
+    "favicon": [
+      "/favicon.ico"
+    ],
+    "jsonLd": 0,
+    "headings": [
+      {
+        "level": 1,
+        "text": "News"
+      }
+    ],
+    "h1": [
+      "News"
+    ],
+    "landmarks": {
+      "header": 1,
+      "main": 1,
+      "footer": 1,
+      "navs": [
+        "Breadcrumb"
+      ]
+    },
+    "skipLink": true,
+    "brandText": "Disabled news QA",
+    "brandClipped": false,
+    "bodyWidth": 1440,
+    "viewportWidth": 1440
+  },
+  {
+    "target": "posts-disabled",
+    "width": 390,
+    "title": "University of Gondar — Public Portal",
+    "lang": "en",
+    "description": [],
+    "canonical": [],
+    "og": {},
+    "twitter": {},
+    "robots": [],
+    "hreflang": [],
+    "favicon": [
+      "/favicon.ico"
+    ],
+    "jsonLd": 0,
+    "headings": [
+      {
+        "level": 1,
+        "text": "News"
+      }
+    ],
+    "h1": [
+      "News"
+    ],
+    "landmarks": {
+      "header": 1,
+      "main": 1,
+      "footer": 1,
+      "navs": [
+        "Breadcrumb"
+      ]
+    },
+    "skipLink": true,
+    "brandText": "Disabled news QA",
+    "brandClipped": false,
+    "bodyWidth": 390,
+    "viewportWidth": 390
+  },
+  {
+    "target": "menus-disabled",
+    "width": 1440,
+    "title": "University Left Sidebar",
+    "lang": "en",
+    "description": [
+      "Layout Site A"
+    ],
+    "canonical": [
+      "http://layout-45dfd491f4a.uog.local/left-sidebar"
+    ],
+    "og": {
+      "og:title": "University Left Sidebar",
+      "og:description": "Layout Site A",
+      "og:url": "http://layout-45dfd491f4a.uog.local/left-sidebar",
+      "og:type": "website"
+    },
+    "twitter": {
+      "twitter:card": "summary",
+      "twitter:title": "University Left Sidebar",
+      "twitter:description": "Layout Site A"
+    },
+    "robots": [],
+    "hreflang": [],
+    "favicon": [
+      "/favicon.ico"
+    ],
+    "jsonLd": 0,
+    "headings": [
+      {
+        "level": 1,
+        "text": "University Left Sidebar"
+      },
+      {
+        "level": 2,
+        "text": "Retained builder content"
+      },
+      {
+        "level": 2,
+        "text": "Explore this Site"
+      }
+    ],
+    "h1": [
+      "University Left Sidebar"
+    ],
+    "landmarks": {
+      "header": 1,
+      "main": 1,
+      "footer": 1,
+      "navs": [
+        "Breadcrumb",
+        "Published Pages"
+      ]
+    },
+    "skipLink": true,
+    "brandText": "Layout Site A",
+    "brandClipped": false,
+    "bodyWidth": 1440,
+    "viewportWidth": 1440
+  },
+  {
+    "target": "menus-disabled",
+    "width": 390,
+    "title": "University Left Sidebar",
+    "lang": "en",
+    "description": [
+      "Layout Site A"
+    ],
+    "canonical": [
+      "http://layout-45dfd491f4a.uog.local/left-sidebar"
+    ],
+    "og": {
+      "og:title": "University Left Sidebar",
+      "og:description": "Layout Site A",
+      "og:url": "http://layout-45dfd491f4a.uog.local/left-sidebar",
+      "og:type": "website"
+    },
+    "twitter": {
+      "twitter:card": "summary",
+      "twitter:title": "University Left Sidebar",
+      "twitter:description": "Layout Site A"
+    },
+    "robots": [],
+    "hreflang": [],
+    "favicon": [
+      "/favicon.ico"
+    ],
+    "jsonLd": 0,
+    "headings": [
+      {
+        "level": 1,
+        "text": "University Left Sidebar"
+      },
+      {
+        "level": 2,
+        "text": "Retained builder content"
+      },
+      {
+        "level": 2,
+        "text": "Explore this Site"
+      }
+    ],
+    "h1": [
+      "University Left Sidebar"
+    ],
+    "landmarks": {
+      "header": 1,
+      "main": 1,
+      "footer": 1,
+      "navs": [
+        "Breadcrumb",
+        "Published Pages"
+      ]
+    },
+    "skipLink": true,
+    "brandText": "Layout Site A",
+    "brandClipped": false,
+    "bodyWidth": 390,
+    "viewportWidth": 390
+  }
+]

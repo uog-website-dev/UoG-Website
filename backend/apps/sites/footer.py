@@ -31,7 +31,7 @@ def defaults():
         "newsletter_label": "", "newsletter_url": "", "support_label": "", "support_url": "",
         "description": "", "address": "", "email": "", "phone": "",
         "links_heading": "Explore", "highlight_label": "", "highlight_url": "",
-        "copyright_text": COPYRIGHT_DEFAULT, "social_links": [], "columns": [],
+        "copyright_text": COPYRIGHT_DEFAULT, "social_links": [], "legal_links": [], "columns": [],
     }
 
 
@@ -84,7 +84,7 @@ def validate_column_menus(site_id, columns):
 def validate_footer(values):
     errors = {}
     for field in FOOTER_FIELDS:
-        if field in ("social_links", "columns"):
+        if field in ("social_links", "legal_links", "columns"):
             continue
         value = values.get(field)
         if not isinstance(value, str) or any(ord(c) < 32 and c not in "\n\r\t" for c in value):
@@ -126,6 +126,30 @@ def validate_footer(values):
                 validate_link(item["url"], https_only=True)
             except ValidationError:
                 errors[key + ".url"] = "Use a safe HTTPS social profile URL."
+    legal_links = values.get("legal_links")
+    if not isinstance(legal_links, list) or len(legal_links) > 10:
+        errors["legal_links"] = "Use at most ten legal or accessibility links."
+    else:
+        seen = set()
+        for index, item in enumerate(legal_links):
+            key = f"legal_links.{index}"
+            if not isinstance(item, dict) or set(item) - {"label", "url"} or not item.get("label") or not item.get("url"):
+                errors[key] = "Add a label and URL."
+                continue
+            label = item["label"]
+            if not isinstance(label, str) or not label.strip() or len(label) > 80:
+                errors[f"{key}.label"] = "Use a public label of at most 80 characters."
+            url = item["url"]
+            if not isinstance(url, str) or len(url) > 2048:
+                errors[f"{key}.url"] = "Use a safe URL."
+            else:
+                try:
+                    validate_link(url)
+                except ValidationError:
+                    errors[f"{key}.url"] = "Use a safe HTTP or HTTPS URL."
+                if label in seen:
+                    errors[f"{key}.label"] = "Use a unique link label."
+                seen.add(label)
     errors.update(validate_columns(values.get("columns")))
     if errors:
         raise ValidationError(errors)

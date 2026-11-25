@@ -61,6 +61,18 @@ def revision_snapshot(content):
             "position": content.position,
             "is_homepage": content.is_homepage,
         })
+    elif content._meta.label_lower == "cms.document":
+        snapshot.update({"title": content.title, "slug": content.slug,
+                         "description": content.description,
+                         "file_reference": content.file_reference,
+                         "version": content.version,
+                         "effective_date": content.effective_date.isoformat() if content.effective_date else None,
+                         "visibility": content.visibility,
+                         "categories": sorted(str(pk) for pk in (
+                             [category.pk for category in content._pending_categories]
+                             if getattr(content, "_pending_categories", None) is not None
+                             else (content.categories.values_list("pk", flat=True) if content.pk is not None else [])
+                         ))})
     elif content._meta.model_name == "post":
         # Posts are multi-table children of SiteContent; their own columns are
         # part of the revision so a Post edit advances the content revision.

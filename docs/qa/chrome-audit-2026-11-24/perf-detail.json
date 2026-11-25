@@ -1,0 +1,240 @@
+[
+  {
+    "name": "posts",
+    "url": "http://aau-review.localhost/posts",
+    "fontFamily": "Inter, \"Source Sans 3\", \"Helvetica Neue\", Arial, sans-serif",
+    "fonts": [
+      {
+        "family": "__nextjs-Geist",
+        "status": "unloaded",
+        "weight": "400 600"
+      },
+      {
+        "family": "__nextjs-Geist Mono",
+        "status": "unloaded",
+        "weight": "400 600"
+      },
+      {
+        "family": "__nextjs-Geist",
+        "status": "unloaded",
+        "weight": "400 600"
+      },
+      {
+        "family": "__nextjs-Geist Mono",
+        "status": "unloaded",
+        "weight": "400 600"
+      }
+    ],
+    "images": [
+      {
+        "src": "http://aau-review.localhost/api/v1/site-context/identity/logo/?v=ba1b4b54c43b316106d5bb8fbc089167dc810303353a092ab3b517a2456675f7",
+        "natural": [
+          427,
+          423
+        ],
+        "attr": [
+          null,
+          null
+        ],
+        "loading": "auto",
+        "box": [
+          100,
+          75
+        ]
+      },
+      {
+        "src": "http://aau-review.localhost/api/v1/site-context/media/b7af58f7-e982-4c39-9815-300af59db983/?variant=thumbnail",
+        "natural": [
+          320,
+          213
+        ],
+        "attr": [
+          null,
+          null
+        ],
+        "loading": "lazy",
+        "box": [
+          366,
+          244
+        ]
+      },
+      {
+        "src": "http://aau-review.localhost/api/v1/site-context/media/21d0b91b-ca79-481f-84eb-3cdf96b96691/?variant=thumbnail",
+        "natural": [
+          0,
+          0
+        ],
+        "attr": [
+          null,
+          null
+        ],
+        "loading": "lazy",
+        "box": [
+          366,
+          206
+        ]
+      },
+      {
+        "src": "http://aau-review.localhost/api/v1/site-context/media/fd93baec-d1e4-4a3a-b36d-7985c05f99fd/?variant=thumbnail",
+        "natural": [
+          0,
+          0
+        ],
+        "attr": [
+          null,
+          null
+        ],
+        "loading": "lazy",
+        "box": [
+          366,
+          206
+        ]
+      },
+      {
+        "src": "http://aau-review.localhost/api/v1/site-context/media/69f5802b-788c-4141-82d1-ae29584d6a13/?variant=thumbnail",
+        "natural": [
+          0,
+          0
+        ],
+        "attr": [
+          null,
+          null
+        ],
+        "loading": "lazy",
+        "box": [
+          366,
+          206
+        ]
+      },
+      {
+        "src": "http://aau-review.localhost/api/v1/site-context/media/406f0e7c-638d-42b2-b33b-a0e1bf700cce/?variant=thumbnail",
+        "natural": [
+          0,
+          0
+        ],
+        "attr": [
+          null,
+          null
+        ],
+        "loading": "lazy",
+        "box": [
+          366,
+          206
+        ]
+      },
+      {
+        "src": "http://aau-review.localhost/api/v1/site-context/identity/logo/?v=ba1b4b54c43b316106d5bb8fbc089167dc810303353a092ab3b517a2456675f7",
+        "natural": [
+          427,
+          423
+        ],
+        "attr": [
+          null,
+          null
+        ],
+        "loading": "auto",
+        "box": [
+          180,
+          180
+        ]
+      }
+    ],
+    "footerHeight": 698.25,
+    "fontRequests": []
+  },
+  {
+    "name": "post-detail",
+    "url": "http://aau-review.localhost/posts/aau-reference-dd1aa7a8",
+    "fontFamily": "Inter, \"Source Sans 3\", \"Helvetica Neue\", Arial, sans-serif",
+    "fonts": [
+      {
+        "family": "__nextjs-Geist",
+        "status": "unloaded",
+        "weight": "400 600"
+      },
+      {
+        "family": "__nextjs-Geist Mono",
+        "status": "unloaded",
+        "weight": "400 600"
+      },
+      {
+        "family": "__nextjs-Geist",
+        "status": "unloaded",
+        "weight": "400 600"
+      },
+      {
+        "family": "__nextjs-Geist Mono",
+        "status": "unloaded",
+        "weight": "400 600"
+      }
+    ],
+    "images": [
+      {
+        "src": "http://aau-review.localhost/api/v1/site-context/identity/logo/?v=ba1b4b54c43b316106d5bb8fbc089167dc810303353a092ab3b517a2456675f7",
+        "natural": [
+          427,
+          423
+        ],
+        "attr": [
+          null,
+          null
+        ],
+        "loading": "auto",
+        "box": [
+          100,
+          75
+        ]
+      },
+      {
+        "src": "http://aau-review.localhost/api/v1/site-context/identity/logo/?v=ba1b4b54c43b316106d5bb8fbc089167dc810303353a092ab3b517a2456675f7",
+        "natural": [
+          427,
+          423
+        ],
+        "attr": [
+          null,
+          null
+        ],
+        "loading": "auto",
+        "box": [
+          44,
+          44
+        ]
+      },
+      {
+        "src": "http://aau-review.localhost/api/v1/site-context/media/b7af58f7-e982-4c39-9815-300af59db983/?variant=display",
+        "natural": [
+          1200,
+          800
+        ],
+        "attr": [
+          null,
+          null
+        ],
+        "loading": "lazy",
+        "box": [
+          1152,
+          440
+        ]
+      },
+      {
+        "src": "http://aau-review.localhost/api/v1/site-context/identity/logo/?v=ba1b4b54c43b316106d5bb8fbc089167dc810303353a092ab3b517a2456675f7",
+        "natural": [
+          427,
+          423
+        ],
+        "attr": [
+          null,
+          null
+        ],
+        "loading": "auto",
+        "box": [
+          180,
+          180
+        ]
+      }
+    ],
+    "footerHeight": 698.25,
+    "fontRequests": []
+  }
+]

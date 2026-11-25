@@ -1,0 +1,64 @@
+[
+  {
+    "name": "posts",
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": [
+          {
+            "target": [
+              "#_R_6einebnaellb_"
+            ],
+            "html": "<input aria-invalid=\"false\" id=\"_R_6einebnaellb_\" type=\"text\" class=\"MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputSizeSmall mui-1pzfmz2-MuiInputBase-input-MuiOutlinedInput-input\" value=\"\">",
+            "summary": "Fix any of the following:\n  Element has no value; test color contrast with a value entered"
+          },
+          {
+            "target": [
+              "#_R_aeinebnaellb_"
+            ],
+            "html": "<input aria-invalid=\"false\" id=\"_R_aeinebnaellb_\" type=\"text\" class=\"MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputSizeSmall mui-1pzfmz2-MuiInputBase-input-MuiOutlinedInput-input\" value=\"\">",
+            "summary": "Fix any of the following:\n  Element has no value; test color contrast with a value entered"
+          },
+          {
+            "target": [
+              "a[href$=\"aau-reference-988af3cc\"]"
+            ],
+            "html": "<a class=\"MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineHover mui-1p1j1lx-MuiTypography-root-MuiLink-root\" href=\"/posts/aau-reference-988af3cc\">Addis Ababa University Hosts International Dissemination Workshop on Maternal Death Surveillance and Response</a>",
+            "summary": "Fix any of the following:\n  Element's background color could not be determined because it is overlapped by another element"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "home-child",
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": [
+          {
+            "target": [
+              "#_r_e_"
+            ],
+            "html": "<input aria-invalid=\"false\" id=\"_r_e_\" required=\"\" maxlength=\"200\" class=\"MuiInputBase-input MuiOutlinedInput-input mui-16wblaj-MuiInputBase-input-MuiOutlinedInput-input\" type=\"text\" value=\"\" name=\"name\">",
+            "summary": "Fix any of the following:\n  Element has no value; test color contrast with a value entered"
+          },
+          {
+            "target": [
+              "#_r_f_"
+            ],
+            "html": "<input aria-invalid=\"false\" id=\"_r_f_\" required=\"\" maxlength=\"254\" class=\"MuiInputBase-input MuiOutlinedInput-input mui-16wblaj-MuiInputBase-input-MuiOutlinedInput-input\" type=\"email\" value=\"\" name=\"email\">",
+            "summary": "Fix any of the following:\n  Element has no value; test color contrast with a value entered"
+          },
+          {
+            "target": [
+              "#_r_g_"
+            ],
+            "html": "<textarea aria-invalid=\"false\" id=\"_r_g_\" name=\"message\" required=\"\" maxlength=\"5000\" class=\"MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputMultiline mui-w4nesw-MuiInputBase-input-MuiOutlinedInput-input\" style=\"height: 92px;\"></textarea>",
+            "summary": "Fix any of the following:\n  Element has no value; test color contrast with a value entered"
+          }
+        ]
+      }
+    ]
+  }
+]

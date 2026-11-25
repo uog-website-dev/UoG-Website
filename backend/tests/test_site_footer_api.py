@@ -62,6 +62,24 @@ def test_public_footer_is_hostname_scoped(client, settings):
     assert client.get('/api/v1/site-context/', HTTP_HOST='unknown-footer.uog.edu.et').status_code == 404
 
 
+def test_footer_legal_links_accept_empty_and_saved_entries(client,oidc,owner,settings):
+    settings.DEBUG=True;settings.ORGANIZATIONS_DEV_WRITES_ENABLED=True
+    site=Site.objects.create(code='FOOTER-LEGAL',name='Site',organization_unit=owner)
+    _site_admin_client(client,oidc,site)
+    url=f'/api/v1/sites/{site.pk}/footer/'
+    tag=client.get(url)['ETag']
+    empty=client.patch(url,{'legal_links':[]},content_type='application/json',HTTP_IF_MATCH=tag)
+    assert empty.status_code==200,empty.content
+    assert empty.json()['settings']['legal_links']==[]
+    links=[{'label':'Privacy','url':'https://example.org/privacy'},{'label':'Accessibility','url':'https://example.org/accessibility'}]
+    saved=client.patch(url,{'legal_links':links},content_type='application/json',HTTP_IF_MATCH=empty['ETag'])
+    assert saved.status_code==200,saved.content
+    assert saved.json()['settings']['legal_links']==links
+    rejected=client.patch(url,{'legal_links':[{'label':'Privacy','url':'javascript:alert(1)'}]},content_type='application/json',HTTP_IF_MATCH=saved['ETag'])
+    assert rejected.status_code==400
+    assert 'Enter plain text.' not in str(rejected.json())
+    assert rejected.json()['error']['details']['legal_links.0.url']==['Use a safe HTTP or HTTPS URL.']
+
 def test_footer_hosted_services_require_safe_https_and_labels(client,oidc,owner,settings):
     settings.DEBUG=True;settings.ORGANIZATIONS_DEV_WRITES_ENABLED=True
     site=Site.objects.create(code='FOOTER-SERVICES',name='Site',organization_unit=owner)

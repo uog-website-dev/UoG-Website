@@ -40313,6 +40313,9 @@ components:
           type: boolean
         sticky:
           type: boolean
+        brand_quote:
+          type: string
+          maxLength: 280
         cta_label:
           type: string
           maxLength: 120
@@ -51915,6 +51918,9 @@ components:
           type: boolean
         sticky:
           type: boolean
+        brand_quote:
+          type: string
+          maxLength: 280
         cta_label:
           type: string
           maxLength: 120

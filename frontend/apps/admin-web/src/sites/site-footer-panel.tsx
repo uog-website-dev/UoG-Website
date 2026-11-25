@@ -107,8 +107,15 @@ function FooterEditor({siteId}:{siteId:number}) {
     </Box>)}
     <Box><Button disabled={saving||values.social_links.length>=7} onClick={()=>{const platform=FOOTER_SOCIAL_PLATFORMS.find(candidate=>!values.social_links.some(link=>link.platform===candidate));if(platform)setValues(previous=>({...previous,social_links:[...previous.social_links,{platform,url:""}]}));}}>Add social profile</Button></Box>
    </Box>
-   <Box sx={{display:"grid",gap:2}}>
-    <Typography component="h2" variant="h6">Footer columns</Typography>
+      <Box sx={{display:"grid",gap:2}}><Typography component="h2" variant="h6">Legal and accessibility links</Typography><Typography variant="body2" color="text.secondary">Footer links for privacy, accessibility, terms or related policies. They open safely in a new tab when external.</Typography>
+    {values.legal_links.map((link,index)=><Box key={index} sx={{display:"flex",gap:1,flexWrap:{xs:"wrap",md:"nowrap"}}}>
+     <TextField id={`footer-legal-label-${index}`} label={`Link ${index+1} label`} value={link.label} disabled={saving} onChange={event=>setValues(previous=>({...previous,legal_links:previous.legal_links.map((item,position)=>position===index?{...item,label:event.target.value}:item)}))} sx={{width:{xs:"100%",md:240}}}/>
+     <TextField id={`footer-legal-url-${index}`} label={`Link ${index+1} URL`} value={link.url} disabled={saving} onChange={event=>setValues(previous=>({...previous,legal_links:previous.legal_links.map((item,position)=>position===index?{...item,url:event.target.value}:item)}))} error={Boolean(errors[`legal_links.${index}.url`]||errors[`legal_links.${index}.label`])} helperText={errors[`legal_links.${index}.url`]??errors[`legal_links.${index}.label`]??"HTTP or HTTPS URL"} sx={{flex:1,minWidth:{xs:"100%",md:180}}}/>
+     <IconButton aria-label={`Remove legal link ${index+1}`} disabled={saving} onClick={()=>setValues(previous=>({...previous,legal_links:previous.legal_links.filter((_,position)=>position!==index)}))}><DeleteOutlineIcon/></IconButton>
+    </Box>)}
+    <Box><Button disabled={saving||values.legal_links.length>=10} onClick={()=>setValues(previous=>({...previous,legal_links:[...previous.legal_links,{label:"",url:""}]}))}>Add legal or accessibility link</Button></Box>
+   </Box>
+   <Box sx={{display:"grid",gap:2}}><Typography component="h2" variant="h6">Footer columns</Typography>
     <Typography variant="body2" color="text.secondary">These public headings are independent of the internal menu names. Keep the menu names for your team; visitors see the headings and descriptions here. Assign or reorder menus in Menus, then use the arrows below to set the public order.</Typography>
     {values.columns.map((column,index)=>{
      const menuName=loaded.columns.find(row=>row.menu===column.menu)?.menu_name??"Unavailable Site menu";

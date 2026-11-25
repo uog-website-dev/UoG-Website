@@ -57,7 +57,6 @@ describe("Professional visual presentation",()=>{
  if(hero.type!=="layout_slider")throw Error("fixture");const node=hero.props.items[0].children[0];
  if(node.type!=="hero_image")throw Error("fixture");
  Object.assign(node.props,{pattern:"diamonds",panel_tone:"brand_gradient",curve_border:"gold",curve_border_width:8,heading_level:3,heading_size:"xl",heading_weight:"heavy",heading_case:"uppercase",text_align:"center",body_size:"lg"});
- console.log("HERO_VALIDATION", JSON.stringify(validateVisualLayout(layout)));
  expect(validateVisualLayout(layout).ok).toBe(true);
  const view=render(<PublicPageView page={pageFromResponse(200,{title:"Home",site:11,blocks:[],metadata:{visual_layout:layout}})} viewportWidth={1280}/>);
  expect(view.getByRole("heading",{name:"Discover research",level:3})).toBeTruthy();
@@ -77,6 +76,33 @@ for(const layout of ["split","split_reverse"] as const)it(`paints tone behind th
  const frame=view.container.querySelector("[data-hero-frame]")!;
  expect(getComputedStyle(frame).backgroundImage).toContain("linear-gradient");
  expect(getComputedStyle(view.getByRole("region",{name:"Slide text and actions"})).backgroundImage).not.toContain("linear-gradient");view.unmount();
+});
+
+it("applies custom section and hero colours chosen in the picker",()=>{
+ const layout=scene();
+ layout.rows[0]!.style={...layout.rows[0]!.style,background:"#112233",text_color:"#abcdef"};
+ const slider=layout.rows[0]!.columns[0]!.children[0]!;
+ if(slider.type!=="layout_slider")throw new Error("fixture");
+ const hero=slider.props.items[0]!.children[0]!;
+ if(hero.type!=="hero_image")throw new Error("fixture");
+ Object.assign(hero.props,{layout:"split",mask:"curve",panel_tone:"#0a2540",curve_border:"#00ff00",heading_color:"#ff0000"});
+ expect(validateVisualLayout(layout).ok).toBe(true);
+ const view=render(<PublicPageView page={pageFromResponse(200,{title:"Home",site:11,blocks:[],metadata:{visual_layout:layout}})} viewportWidth={1280}/>);
+ const section=view.container.querySelector('[data-node-id="row"]') as HTMLElement;
+ expect(getComputedStyle(section).backgroundColor).toBe("rgb(17, 34, 51)");
+ expect(getComputedStyle(section).color).toBe("rgb(171, 205, 239)");
+ const frame=view.container.querySelector("[data-hero-frame]") as HTMLElement;
+ expect(getComputedStyle(frame).backgroundColor).toBe("rgb(10, 37, 64)");
+ expect(getComputedStyle(frame.firstElementChild as HTMLElement).backgroundColor).toBe("rgb(0, 255, 0)");
+ expect(getComputedStyle(view.getByRole("heading",{name:"Discover research"})).color).toBe("rgb(255, 0, 0)");
+ expect(getComputedStyle(view.getByRole("region",{name:"Slide text and actions"})).color).toBe("rgb(255, 255, 255)");
+ view.unmount();
+});
+
+it("chooses readable ink for a light custom panel tone",()=>{
+ const view=render(<HeroView props={{asset_id:image,alt:"Campus",title:"Light panel",layout:"split",panel_tone:"#f8edce"}} siteId={null} width={1280}/>);
+ expect(getComputedStyle(view.getByRole("region",{name:"Slide text and actions"})).color).toBe("rgb(23, 37, 54)");
+ view.unmount();
 });
 
 it("renders two linked information cards over a hero without mutating their IDs",()=>{

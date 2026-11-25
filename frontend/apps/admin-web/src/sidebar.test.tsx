@@ -73,6 +73,7 @@ describe("DesktopSidebar — platform workspace", () => {
     const nav = await screen.findByRole("navigation", { name: "Admin sections" });
     await within(nav).findByText("Organizations");
     expect(screen.getByText("UoG Administration")).toBeTruthy();
+    expect(screen.getByRole("img", { name: "University of Gondar logo" }).getAttribute("src")).toBe("/admin/uog-main-logo.webp");
     expect(screen.getByText("Admin workspace")).toBeTruthy();
     expect(linkNamed("Dashboard")?.getAttribute("href")).toBe("/");
     expect(linkNamed("Organizations")?.getAttribute("href")).toBe("/organizations");
@@ -165,7 +166,7 @@ describe("DesktopSidebar — Site workspace", () => {
     // MENUS is enabled but menu.read was not granted; POSTS is not enabled.
     expect(within(nav).queryAllByRole("link").some((link) => link.textContent?.includes("Menus"))).toBe(false);
     expect(within(nav).queryAllByRole("link").some((link) => link.textContent?.includes("Posts"))).toBe(false);
-    expect(screen.getByRole("button", {name: /^Workspace:/}).textContent).toContain("Informatics");
+    expect(screen.queryByRole("button", {name: /^Workspace:/})).toBeNull();
     expect(fetchMock).toHaveBeenCalledWith("/admin/api/workspace/?site=2", expect.objectContaining({ cache: "no-store" }));
   });
 

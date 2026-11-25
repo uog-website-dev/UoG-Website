@@ -1,0 +1,170 @@
+[
+  {
+    "target": "home-main",
+    "width": 1440,
+    "errors": []
+  },
+  {
+    "target": "home-main",
+    "width": 390,
+    "errors": []
+  },
+  {
+    "target": "home-child",
+    "width": 1440,
+    "errors": [
+      "requestfailed: http://coi.uog.local/api/v1/site-context/widgets/?source=breadcrumbs&page_id=f0d5599a-a7ed-4e75-95fc-6f8173001df7 net::ERR_ABORTED",
+      "requestfailed: http://coi.uog.local/api/v1/site-context/widgets/?source=posts&limit=4 net::ERR_ABORTED"
+    ]
+  },
+  {
+    "target": "home-child",
+    "width": 390,
+    "errors": [
+      "requestfailed: http://coi.uog.local/api/v1/site-context/widgets/?source=breadcrumbs&page_id=f0d5599a-a7ed-4e75-95fc-6f8173001df7 net::ERR_ABORTED",
+      "requestfailed: http://coi.uog.local/api/v1/site-context/widgets/?source=posts&limit=4 net::ERR_ABORTED"
+    ]
+  },
+  {
+    "target": "page",
+    "width": 1440,
+    "errors": []
+  },
+  {
+    "target": "page",
+    "width": 390,
+    "errors": []
+  },
+  {
+    "target": "posts",
+    "width": 1440,
+    "errors": []
+  },
+  {
+    "target": "posts",
+    "width": 390,
+    "errors": []
+  },
+  {
+    "target": "post-detail",
+    "width": 1440,
+    "errors": []
+  },
+  {
+    "target": "post-detail",
+    "width": 390,
+    "errors": []
+  },
+  {
+    "target": "category",
+    "width": 1440,
+    "errors": []
+  },
+  {
+    "target": "category",
+    "width": 390,
+    "errors": []
+  },
+  {
+    "target": "category-empty",
+    "width": 1440,
+    "errors": []
+  },
+  {
+    "target": "category-empty",
+    "width": 390,
+    "errors": []
+  },
+  {
+    "target": "404",
+    "width": 1440,
+    "errors": [
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ]
+  },
+  {
+    "target": "404",
+    "width": 390,
+    "errors": [
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ]
+  },
+  {
+    "target": "sidebar-left",
+    "width": 1440,
+    "errors": [
+      "requestfailed: http://layout-45dfd491f4a.uog.local/api/v1/site-context/pages/?page_size=20&locale=en-us net::ERR_ABORTED",
+      "requestfailed: http://layout-45dfd491f4a.uog.local/api/v1/site-context/menus/?location=sidebar net::ERR_ABORTED",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ]
+  },
+  {
+    "target": "sidebar-left",
+    "width": 390,
+    "errors": [
+      "requestfailed: http://layout-45dfd491f4a.uog.local/api/v1/site-context/pages/?page_size=20&locale=en-us net::ERR_ABORTED",
+      "requestfailed: http://layout-45dfd491f4a.uog.local/api/v1/site-context/menus/?location=sidebar net::ERR_ABORTED",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ]
+  },
+  {
+    "target": "sidebar-right",
+    "width": 1440,
+    "errors": [
+      "requestfailed: http://layout-45dfd491f4a.uog.local/api/v1/site-context/pages/?page_size=20&locale=en-us net::ERR_ABORTED",
+      "requestfailed: http://layout-45dfd491f4a.uog.local/api/v1/site-context/menus/?location=sidebar net::ERR_ABORTED",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ]
+  },
+  {
+    "target": "sidebar-right",
+    "width": 390,
+    "errors": [
+      "requestfailed: http://layout-45dfd491f4a.uog.local/api/v1/site-context/pages/?page_size=20&locale=en-us net::ERR_ABORTED",
+      "requestfailed: http://layout-45dfd491f4a.uog.local/api/v1/site-context/menus/?location=sidebar net::ERR_ABORTED",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ]
+  },
+  {
+    "target": "home-empty",
+    "width": 1440,
+    "errors": [
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ]
+  },
+  {
+    "target": "home-empty",
+    "width": 390,
+    "errors": [
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ]
+  },
+  {
+    "target": "posts-disabled",
+    "width": 1440,
+    "errors": []
+  },
+  {
+    "target": "posts-disabled",
+    "width": 390,
+    "errors": []
+  },
+  {
+    "target": "menus-disabled",
+    "width": 1440,
+    "errors": [
+      "requestfailed: http://layout-45dfd491f4a.uog.local/api/v1/site-context/pages/?page_size=20&locale=en-us net::ERR_ABORTED",
+      "requestfailed: http://layout-45dfd491f4a.uog.local/api/v1/site-context/menus/?location=sidebar net::ERR_ABORTED",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ]
+  },
+  {
+    "target": "menus-disabled",
+    "width": 390,
+    "errors": [
+      "requestfailed: http://layout-45dfd491f4a.uog.local/api/v1/site-context/pages/?page_size=20&locale=en-us net::ERR_ABORTED",
+      "requestfailed: http://layout-45dfd491f4a.uog.local/api/v1/site-context/menus/?location=sidebar net::ERR_ABORTED",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ]
+  }
+]

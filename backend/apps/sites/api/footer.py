@@ -14,6 +14,10 @@ class SocialLinkSerializer(StrictFields, serializers.Serializer):
     url = serializers.CharField(max_length=2048)
 
 
+class LegalLinkSerializer(StrictFields, serializers.Serializer):
+    label = serializers.CharField(max_length=80)
+    url = serializers.CharField(max_length=2048)
+
 class FooterColumnSerializer(StrictFields, serializers.Serializer):
     menu = serializers.CharField(max_length=36, allow_null=True, required=False)
     heading = serializers.CharField(max_length=80)
@@ -34,6 +38,7 @@ class FooterSettingsSerializer(StrictFields, serializers.Serializer):
     highlight_url = serializers.CharField(max_length=2048, allow_blank=True, required=False)
     copyright_text = serializers.CharField(max_length=300, required=False)
     social_links = SocialLinkSerializer(many=True, max_length=7, required=False)
+    legal_links = LegalLinkSerializer(many=True, max_length=10, required=False)
     columns = FooterColumnSerializer(many=True, max_length=4, required=False)
 
 

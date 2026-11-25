@@ -5,8 +5,9 @@ import type { ReactNode } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
-import { EMPTY_SITE } from "./public-site";
+import { EMPTY_SITE, publicLogoSource as getPublicLogoSource } from "./public-site";
 import type { PublicSiteContext } from "./public-site";
+export { publicLogoSource } from "./public-site";
 
 const PublicSiteBrandingContext = createContext<PublicSiteContext>(EMPTY_SITE);
 
@@ -18,16 +19,9 @@ export function usePublicSiteBranding(): PublicSiteContext {
   return useContext(PublicSiteBrandingContext);
 }
 
-/** Keep the route host-scoped while changing its identity after an approved update. */
-export function publicLogoSource(site: PublicSiteContext): string | null {
-  if (site.logoUrl !== "/api/v1/site-context/identity/logo/") return null;
-  return /^[a-f0-9]{64}$/.test(site.brandingRevision ?? "")
-    ? `${site.logoUrl}?v=${site.brandingRevision}` : site.logoUrl;
-}
-
 /** Responsive, Site-bound logo with a branded text fallback and no broken-image state. */
 export function SiteBrandingMark({ site, size = 56, width = size }: { site: PublicSiteContext; size?: number; width?: number }) {
-  const source = publicLogoSource(site);
+  const source = getPublicLogoSource(site);
   const [failed, setFailed] = useState(false);
   useEffect(() => setFailed(false), [site]);
   const dimensions = size;
@@ -84,10 +78,12 @@ export function SiteBrandingLockup({
   site,
   compact = false,
   inverse = false,
+  quote = "",
 }: {
   site: PublicSiteContext;
   compact?: boolean;
   inverse?: boolean;
+  quote?: string;
 }) {
   return (
     <Box
@@ -98,18 +94,31 @@ export function SiteBrandingLockup({
       sx={{ display: "inline-flex", alignItems: "center", gap: compact ? 1 : 1.5, minWidth: 0 }}
     >
       <SiteBrandingMark site={site} size={compact ? 44 : 75} width={compact ? 44 : 100} />
-      <Typography
-        component="span"
-        variant={compact ? "subtitle2" : "subtitle1"}
-        sx={{
-          minWidth: 0,
-          overflowWrap: "anywhere",
-          fontWeight: 700,
-          color: inverse ? "primary.contrastText" : "text.primary",
-        }}
-      >
-        {site.displayName}
-      </Typography>
+      <Box component="span" sx={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
+        <Typography
+          component="span"
+          data-site-branding-name=""
+          variant={compact ? "subtitle2" : "subtitle1"}
+          sx={{
+            minWidth: 0,
+            overflowWrap: "anywhere",
+            fontWeight: 700,
+            color: inverse ? "primary.contrastText" : "text.primary",
+          }}
+        >
+          {site.displayName}
+        </Typography>
+        {quote.trim() ? (
+          <Typography
+            component="span"
+            data-site-branding-quote=""
+            variant="caption"
+            sx={{ lineHeight: 1.2, fontStyle: "italic", color: inverse ? "primary.contrastText" : "text.secondary" }}
+          >
+            {quote}
+          </Typography>
+        ) : null}
+      </Box>
     </Box>
   );
 }
