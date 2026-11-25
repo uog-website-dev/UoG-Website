@@ -21,14 +21,15 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
 import { UogFooter, UogHeader } from "@uog/ui/shell";
 import type { ReactNode } from "react";
 
 import { useSessionWatch } from "@/session-watch";
 import { DesktopSidebar, MobileNavDrawer } from "@/sidebar";
 import { usePathname } from "next/navigation";
-import { normalizeAdminPathname } from "@/navigation";
-import {WorkspaceProvider} from "@/workspace";
+import { hasPlatformWorkspace, normalizeAdminPathname, siteWorkspaceId } from "@/navigation";
+import { useWorkspace, WorkspaceProvider } from "@/workspace";
 import {AdminQueryProvider} from "@/data/admin-query-provider";
 
 /** Visually hidden until focused — first tab stop on every page. */
@@ -69,6 +70,12 @@ function ShellContent({
   const [navOpen, setNavOpen] = useState(false);
   useSessionWatch();
   const currentPath=normalizeAdminPathname(usePathname());
+  const siteId = siteWorkspaceId(currentPath);
+  const workspace = useWorkspace(siteId);
+  const sitePortal = siteId !== null && (workspace.status !== "ready" || !hasPlatformWorkspace(workspace.data.platformPermissions));
+  const siteName = workspace.status === "ready" && workspace.data.site?.id === siteId
+    ? workspace.data.site.name
+    : "Loading Site workspace…";
   if(/^\/sites\/[1-9][0-9]*\/admin\/pages\/[^/]+\/(builder|preview)\/?$/.test(currentPath) || /^\/sites\/[1-9][0-9]*\/admin\/menus\/preview\/?$/.test(currentPath)){
     return <Box component="main" id="main-content" sx={{minHeight:"100dvh",bgcolor:"background.paper"}}>{children}</Box>;
   }
@@ -91,7 +98,17 @@ function ShellContent({
       </Box>
 
       <UogHeader
-        title="Digital Platform — Admin Console"
+        title={sitePortal ? "" : "Digital Platform — Admin Console"}
+        brand={sitePortal ? (
+          <Box sx={{ display: "flex", flexDirection: "column", minWidth: 0, lineHeight: 1.25 }}>
+            <Typography component="span" variant="subtitle1" sx={{ fontWeight: 800, whiteSpace: "nowrap" }}>
+              UoG Administration Digital Platform
+            </Typography>
+            <Typography component="span" variant="body2" sx={{ opacity: 0.85, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {siteName}
+            </Typography>
+          </Box>
+        ) : undefined}
         actions={actions}
         leading={
           <IconButton

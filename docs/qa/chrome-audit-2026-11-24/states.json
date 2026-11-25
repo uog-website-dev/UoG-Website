@@ -1,0 +1,17 @@
+[
+  {
+    "state": "homepage API 500",
+    "text": "Skip to content\nRegistrar\nLibrary\nJournals\nContact\nUniversity of Gondar\nHome\nAbout Us\nAcademics\nAdministration\nResearch\nServices\nNews\nThe homepage is temporarily unavailable.\nRetry\nStay connected with University of Gondar\nSubscribe to our Newsletter.\nUniversity of Gondar\n\nDevoted for Excellence!\n\nGondar, Ethiopia.\ninfo@uog.edu.et\n+251 910 1530 87\nStay Tuned 99.4FM\nUniversity Main - Footer\nAbout UoG\nAcademic Units\nResearch\nCommunity Service\nLibrary\nRegistrar\nMore\nMain review mainqa-8995d437 Unive",
+    "alert": 2
+  },
+  {
+    "state": "post list API 500",
+    "text": "Skip to content\nEvents\nDocuments\nPublications\nServices\nAddis Ababa University\nHome\nLatest news\nAbout\nAdmission\nAcademics\nResearch\nServices\nApply\nposts\nNews\nCategory\nCategory\nTag\nTag\nApply\nNews is temporarily unavailable. Please try again.\nTry again\nReturn to first page\nStay connected with Addis Ababa University\nVisit AAU newsletter\nAddis Ababa University\n\nLocal AAU reference comparison for CMS review. Original university content: aau.edu.et.\n\nStay Tuned 99.4FM\n\nEssentials\nContact us\nMedia Gallery\nEmergency Services\nArchive\nAbout us\nHistory\nLeadership\nPresidents\nOverview\nResources\nEvents\nDocume",
+    "alert": 2
+  },
+  {
+    "state": "offline post list",
+    "text": "Looks like you're not connected to the internet\n\nLet's get you back online!\n\nERR_INTERNET_DISCONNECTED\nTroubleshoot\nWant to play a game while you wait?\nLaunch game\nMicrosoft Edge",
+    "alert": 0
+  }
+]

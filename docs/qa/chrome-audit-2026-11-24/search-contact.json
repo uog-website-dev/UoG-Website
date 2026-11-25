@@ -1,0 +1,72 @@
+{
+  "search": [
+    {
+      "width": 1440,
+      "initialFocus": {
+        "tag": "DIV",
+        "label": null,
+        "id": ""
+      },
+      "bodyText": "Search University of Gondar Search published Pages and news Search published Pages and news Search No published content matches your search.",
+      "violations": [],
+      "desc": {
+        "title": "QA shared main homepage p4brand-0b2c8ca6",
+        "h1": [
+          "QA shared main homepage p4brand-0b2c8ca6"
+        ],
+        "dialogLabel": "_R_4laallb_",
+        "active": {
+          "tag": "DIV",
+          "label": null
+        },
+        "links": []
+      }
+    },
+    {
+      "width": 390,
+      "initialFocus": {
+        "tag": "DIV",
+        "label": null,
+        "id": ""
+      },
+      "bodyText": "Search University of Gondar Search published Pages and news Search published Pages and news Search No published content matches your search.",
+      "violations": [],
+      "desc": {
+        "title": "University of Gondar — Public Portal",
+        "h1": [
+          "QA shared main homepage p4brand-0b2c8ca6"
+        ],
+        "dialogLabel": "_R_4laallb_",
+        "active": {
+          "tag": "DIV",
+          "label": null
+        },
+        "links": []
+      }
+    }
+  ],
+  "contact": [
+    {
+      "width": 1440,
+      "details": {
+        "hash": "#contact",
+        "exists": true,
+        "sectionText": "",
+        "headings": [],
+        "forms": []
+      },
+      "violations": []
+    },
+    {
+      "width": 390,
+      "details": {
+        "hash": "#contact",
+        "exists": true,
+        "sectionText": "",
+        "headings": [],
+        "forms": []
+      },
+      "violations": []
+    }
+  ]
+}

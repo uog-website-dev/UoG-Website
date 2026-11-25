@@ -37,6 +37,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 
 import {
+  hasPlatformWorkspace,
   isNavItemActive,
   normalizeAdminPathname,
   siteWorkspaceId,
@@ -51,6 +52,7 @@ import {
 import type { WorkspaceState } from "@/workspace";
 import {WorkspaceSwitcher} from "@/workspace-switcher";
 import {useSectionPrefetch} from "@/data/section-prefetch";
+import {APP_BASE_PATH} from "@/base-path";
 
 const DRAWER_WIDTH = 296;
 
@@ -64,6 +66,7 @@ const SITE_SECTION_ICONS: Record<SiteSection["key"], SvgIconComponent> = {
   header: VerticalAlignTopOutlinedIcon,
   footer: VerticalAlignBottomOutlinedIcon,
   posts: ArticleIcon,
+  documents: DescriptionIcon,
   menus: AccountTreeIcon,
   media: ArticleIcon,
   users: GroupIcon,
@@ -79,6 +82,7 @@ const SITE_SECTION_DESCRIPTIONS: Record<SiteSection["key"], string> = {
   header: "Header branding, navigation, search and call to action",
   footer: "Footer content, contact and social links",
   posts: "News and announcements",
+  documents: "Official Site documents",
   menus: "Header and footer navigation",
   media: "Private Site media library",
   users: "Site members and roles",
@@ -87,22 +91,8 @@ const SITE_SECTION_DESCRIPTIONS: Record<SiteSection["key"], string> = {
 function SidebarBrand() {
   return (
     <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-      <Box
-        aria-hidden="true"
-        sx={{
-          display: "grid",
-          placeItems: "center",
-          width: 42,
-          height: 42,
-          flexShrink: 0,
-          borderRadius: 2.5,
-          color: "common.white",
-          background: "linear-gradient(145deg, #064b86 0%, #003366 100%)",
-          boxShadow: "0 5px 12px rgba(0, 51, 102, 0.2)",
-        }}
-      >
-        <AccountBalanceRoundedIcon fontSize="small" />
-      </Box>
+      <Box component="img" src={`${APP_BASE_PATH}/uog-main-logo.webp`} alt="University of Gondar logo"
+        sx={{ width: 52, height: 42, flexShrink: 0, objectFit: "contain", borderRadius: 1, bgcolor: "common.white" }} />
       <Box sx={{ minWidth: 0 }}>
         <Typography variant="subtitle2" fontWeight={800} color="text.primary">
           UoG Administration
@@ -207,13 +197,14 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const currentPath = normalizeAdminPathname(pathname);
   const siteId = siteWorkspaceId(currentPath);
   const state = useWorkspace(siteId);
+  const siteOnlyWorkspace = siteId !== null
+    && (state.status !== "ready" || !hasPlatformWorkspace(state.data.platformPermissions));
 
   return (
     <Box data-perf-navigation-ready={state.status === "ready" ? "true" : "false"} sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-      <Box sx={{ px: 2.75 }}>
+      {!siteOnlyWorkspace ? <Box sx={{ px: 2.75 }}>
         <WorkspaceSwitcher state={state} onNavigate={onNavigate} />
-
-      </Box>
+      </Box> : null}
       {siteId == null ? (
         <PlatformNav state={state} currentPath={currentPath} onNavigate={onNavigate} />
       ) : (
@@ -337,7 +328,7 @@ function SiteNav({
             icon={SITE_SECTION_ICONS[section.key]}
             active={active}
             onNavigate={onNavigate}
-            onIntent={["pages", "posts", "menus", "media"].includes(section.key) && !active ? () => prefetch.schedule(section.key) : undefined}
+            onIntent={["pages", "posts", "documents", "menus", "media"].includes(section.key) && !active ? () => prefetch.schedule(section.key) : undefined}
             onEndIntent={prefetch.cancel}
           />
         );

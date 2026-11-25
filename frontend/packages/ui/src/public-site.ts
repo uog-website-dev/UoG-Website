@@ -53,6 +53,13 @@ export const EMPTY_SITE: PublicSiteContext = {
   modules: { pages: false, posts: false, menus: false },
 };
 
+/** Site-bound logo URL with a revision token so browser icon caches refresh on branding changes. */
+export function publicLogoSource(site: PublicSiteContext): string | null {
+  if (site.logoUrl !== "/api/v1/site-context/identity/logo/") return null;
+  return /^[a-f0-9]{64}$/.test(site.brandingRevision ?? "")
+    ? `${site.logoUrl}?v=${site.brandingRevision}` : site.logoUrl;
+}
+
 export function siteFromContext(status: number, body: unknown): PublicSiteContext {
   if (status !== 200 || body == null || typeof body !== "object" || Array.isArray(body)) {
     return EMPTY_SITE;

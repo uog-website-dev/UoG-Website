@@ -165,3 +165,25 @@ it("selects theme colours using labelled swatches and restores the default",()=>
  fireEvent.click(view.getByRole("button",{name:"Panel tone: Gold"}));expect(onChange).toHaveBeenLastCalledWith({panel_tone:"gold"});
  fireEvent.click(view.getByRole("button",{name:"Panel tone: Default"}));expect(onChange).toHaveBeenLastCalledWith({});view.unmount();
 });
+
+it("offers swatches plus a native colour picker for token-or-hex style unions",()=>{
+ const onChange=vi.fn();
+ const schema={type:"object",properties:{
+   background:{oneOf:[{enum:["none","navy","gold"]},{type:"string",pattern:"^#[0-9A-Fa-f]{6}$"}]},
+   text_color:{oneOf:[{enum:["default","inverse"]},{type:"string",pattern:"^#[0-9A-Fa-f]{6}$"}]},
+ }};
+ const view=render(<InspectorFields schema={schema} value={{background:"navy",text_color:"#112233"}} onChange={onChange}/>);
+ expect(view.getByRole("button",{name:"Background: Navy"}).getAttribute("aria-pressed")).toBe("true");
+ const textPicker=view.getByLabelText("Text color custom colour") as HTMLInputElement;
+ expect(textPicker.type).toBe("color");
+ expect(textPicker.value).toBe("#112233");
+ fireEvent.click(view.getByRole("button",{name:"Background: Gold"}));
+ expect(onChange).toHaveBeenLastCalledWith({background:"gold",text_color:"#112233"});
+ const picker=view.getByLabelText("Background custom colour") as HTMLInputElement;
+ expect(picker.type).toBe("color");
+ fireEvent.change(picker,{target:{value:"#abc123"}});
+ expect(onChange).toHaveBeenLastCalledWith({background:"#abc123",text_color:"#112233"});
+ fireEvent.click(view.getByRole("button",{name:"Background: Default"}));
+ expect(onChange).toHaveBeenLastCalledWith({text_color:"#112233"});
+ view.unmount();
+});

@@ -59,6 +59,11 @@ export function PublicSiteHeader({
 }: PublicSiteHeaderProps) {
   const config = headerSettingsFrom(settings);
   const brand = destination(config.brand_href, siteOrigin, preview) ?? (preview ? undefined : "/");
+  const variant = config.variant ?? "standard";
+  const compact = variant === "compact";
+  const centered = variant === "centered";
+  const languages = Array.isArray(site.languages) ? site.languages : [];
+  const showLanguageSwitcher = Boolean(config.language_switcher && languages.length > 1);
   const searchVisible = config.search_enabled && (site.modules.pages || site.modules.posts);
   // `config.language_switcher` is persisted and validated, but this platform
   // has no locale-prefixed public routes yet, so there is nothing to switch to
@@ -77,6 +82,7 @@ export function PublicSiteHeader({
     <Box
       component="header"
       data-site-header={site.id ?? "unresolved"}
+      data-site-header-variant={variant}
       data-site-header-sticky={config.sticky ? "true" : undefined}
       sx={{
         bgcolor: "primary.main",
@@ -94,7 +100,7 @@ export function PublicSiteHeader({
           <SiteNavigation items={utilityItems} label="Site utility" />
         </Container>
       ) : null}
-      <Container maxWidth="lg" data-mobile-header-row sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: { xs: 1, md: 2 }, "& [data-site-branding] > span": { fontSize: { xs: ".875rem", md: "1.2rem" }, letterSpacing: "-.015em", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: { xs: 200, sm: "none" } }, "& [data-site-branding-mark]": { width: { xs: 40, md: 100 }, height: { xs: 40, md: 75 }, fontSize: { xs: ".7rem", md: "1rem" }, flexShrink: 0 }, minHeight: { xs: 64, md: 104 }, py: { xs: 0.5, md: 1.5 }, boxSizing: "border-box" }}>
+      <Container maxWidth="lg" data-mobile-header-row sx={{ display: "flex", alignItems: "center", justifyContent: centered ? "center" : "space-between", flexDirection: centered ? "column" : "row", gap: { xs: 1, md: 2 }, "& [data-site-branding-name]": { fontSize: { xs: ".875rem", md: "1.2rem" }, letterSpacing: "-.015em", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: { xs: 200, sm: "none" } }, "& [data-site-branding-quote]": { fontSize: { xs: ".625rem", md: ".75rem" }, lineHeight: 1.2, overflowWrap: "anywhere", whiteSpace: "normal" }, "& [data-site-branding-mark]": { width: { xs: compact ? 32 : 40, md: compact ? 64 : 100 }, height: { xs: compact ? 32 : 40, md: compact ? 48 : 75 }, fontSize: { xs: ".7rem", md: "1rem" }, flexShrink: 0 }, minHeight: { xs: compact ? 56 : 64, md: compact ? 72 : 104 }, py: { xs: compact ? 0.25 : 0.5, md: compact ? 0.75 : 1.5 }, boxSizing: "border-box" }}>
         <Link
           href={brand ?? "/"}
           color="inherit"
@@ -103,8 +109,13 @@ export function PublicSiteHeader({
           rel={preview ? "noopener noreferrer" : undefined}
           sx={{ minWidth: 0, minHeight: 44, flex: "1 1 auto", display: "inline-flex", alignItems: "center", gap: 1.25, ...focus }}
         >
-          {privateLogo ? <Box component="img" src={privateLogo} alt={`${site.displayName} logo`} sx={{ width: { xs: 40, md: 100 }, height: { xs: 40, md: 75 }, objectFit: "contain", flex: "0 0 auto" }} /> : <SiteBrandingLockup site={site} inverse />}
-          {privateLogo ? <Box component="span" sx={{ fontWeight: 700 }}>{site.displayName}</Box> : null}
+          {privateLogo ? <Box component="img" data-site-branding-mark="" src={privateLogo} alt={`${site.displayName} logo`} sx={{ width: { xs: 40, md: 100 }, height: { xs: 40, md: 75 }, objectFit: "contain", flex: "0 0 auto" }} /> : <SiteBrandingLockup site={site} inverse quote={config.brand_quote} />}
+          {privateLogo ? (
+            <Box component="span" sx={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
+              <Box component="span" data-site-branding-name="" sx={{ fontWeight: 700 }}>{site.displayName}</Box>
+              {config.brand_quote.trim() ? <Box component="span" data-site-branding-quote="">{config.brand_quote}</Box> : null}
+            </Box>
+          ) : null}
         </Link>
         <Box sx={{ display: "flex", alignItems: "center", flexShrink: 0, gap: { xs: 0.5, md: 1 } }}>
           <SiteNavigation items={headerItems} label="Site header" mobile drawerSections={[
@@ -121,6 +132,11 @@ export function PublicSiteHeader({
             >
               {config.cta_label}
             </Button>
+          ) : null}
+          {showLanguageSwitcher ? (
+            <Box component="select" aria-label="Language" defaultValue={languages[0]} onChange={(event) => { document.documentElement.lang = event.target.value; }} sx={{ minHeight: 44, border: 1, borderColor: "rgba(255,255,255,.35)", borderRadius: 1, bgcolor: "transparent", color: "inherit", px: 1 }}>
+              {languages.map((language) => <option key={language} value={language}>{language}</option>)}
+            </Box>
           ) : null}
           {searchVisible ? <PublicSiteSearch site={site} /> : null}
         </Box>

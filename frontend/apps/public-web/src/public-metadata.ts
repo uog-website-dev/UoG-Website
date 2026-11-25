@@ -32,11 +32,11 @@ async function requestPublicApi(path: string, host: string): Promise<{ status: n
 }
 
 /** Resolve public Site branding from the request Host without accepting Site ids. */
-export async function publicSiteForHost(host: string | null): Promise<PublicSiteContext> {
+export const publicSiteForHost = cache(async (host: string | null): Promise<PublicSiteContext> => {
   if (!host || /[\s,/@\\]/.test(host)) return EMPTY_SITE;
   const response = await requestPublicApi("", host);
   return siteFromContext(response?.status ?? 0, response?.body ?? null);
-}
+});
 
 /**
  * Server-rendered menus for the Host-resolved Site.

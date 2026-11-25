@@ -5,21 +5,18 @@
  * width, the same horizontal gutter and the same bleed decision, so this
  * module is the single source of truth for both surfaces.
  *
- * - `wide` (the default) caps content at 1280 px, `reading` at 880 px.
- * - `full` is a legacy token: content is 100% of the available width but it
- *   never removes the gutter and never bleeds on its own.
+ * - `wide` (the default) caps content at 1280 px, `reading` at 880 px, and
+ *   `full` uses all available width.
  * - Bleed is an explicit, separate setting (`settings.bleed === true`) and is
  *   the only thing that removes the minimum safe gutter.
  * - Missing, unknown or invalid width values fall back to the safe default.
  */
-import type { VisualLayout } from "@uog/types";
-
 /** Minimum horizontal inset every Page keeps unless it explicitly bleeds. */
 export const PAGE_SAFE_GUTTER_PX = 24;
 
-export const PAGE_CONTENT_WIDTHS = { reading: 880, wide: 1280 } as const;
+export const PAGE_CONTENT_WIDTHS = { full: "100%", reading: 880, wide: 1280 } as const;
 
-export type PageWidthToken = keyof typeof PAGE_CONTENT_WIDTHS | "full";
+export type PageWidthToken = keyof typeof PAGE_CONTENT_WIDTHS;
 
 export const DEFAULT_PAGE_WIDTH: PageWidthToken = "wide";
 
@@ -32,13 +29,11 @@ export interface PageWidthResolution {
   /** Width token after the safe fallback. */
   width: PageWidthToken;
   /** CSS max-width for the Page content column. */
-  maxWidth: number | "100%";
+  maxWidth: (typeof PAGE_CONTENT_WIDTHS)[PageWidthToken];
   /** Horizontal inset in pixels; 0 only for an explicit bleed. */
   gutter: number;
   /** True only when `settings.bleed` is literally `true`. */
   bleed: boolean;
-  /** True for the legacy `full` token that a migration converts to Wide. */
-  legacyFullWidth: boolean;
   /** Human label shared by the builder control and documentation. */
   label: string;
   /** Warning shown while bleed is enabled; empty otherwise. */
@@ -53,8 +48,8 @@ function isWidthToken(value: unknown): value is PageWidthToken {
 }
 
 function labelFor(width: PageWidthToken): string {
+  if (width === "full") return "Full width · 100%";
   if (width === "reading") return "Reading · 880px";
-  if (width === "full") return "Full width · legacy";
   return "Wide · 1280px";
 }
 
@@ -67,12 +62,9 @@ export function resolvePageWidth(
   const bleed = settings?.bleed === true;
   return {
     width,
-    // An explicit bleed is the only thing that removes the width cap as well as
-    // the gutter, so content can reach the viewport edge.
-    maxWidth: bleed || width === "full" ? "100%" : PAGE_CONTENT_WIDTHS[width],
+    maxWidth: bleed ? "100%" : PAGE_CONTENT_WIDTHS[width],
     gutter: bleed ? 0 : PAGE_SAFE_GUTTER_PX,
     bleed,
-    legacyFullWidth: width === "full",
     label: labelFor(width),
     warning: bleed ? BLEED_WARNING : "",
   };
@@ -99,9 +91,4 @@ export function withSafePageWidth(layout: unknown): unknown {
     changed = true;
   }
   return changed ? { ...doc, settings } : layout;
-}
-
-/** True when the stored layout still uses the legacy full token. */
-export function isLegacyFullWidth(layout: Pick<VisualLayout, "settings"> | null | undefined): boolean {
-  return layout?.settings?.content_width === "full";
 }

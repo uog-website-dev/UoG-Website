@@ -14,7 +14,6 @@ export {
   PAGE_CONTENT_WIDTHS,
   PAGE_SAFE_GUTTER_PX,
   PAGE_WIDTH_ERROR_PATH,
-  isLegacyFullWidth,
   resolvePageWidth,
 } from "./page-width";
 export type { PageWidthResolution, PageWidthToken } from "./page-width";

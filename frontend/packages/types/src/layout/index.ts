@@ -42,12 +42,34 @@ export function validateVisualLayout(value: unknown): LayoutValidation {
     const json = JSON.stringify(value);
     if (!json || new TextEncoder().encode(json).length > schemaData["x-limits"].max_bytes) return {ok:false, errors:{visual_layout:["Layout exceeds its JSON byte limit."]}};
   } catch { return {ok:false, errors:{visual_layout:["Use a bounded JSON document."]}}; }
+  /** Bool-only check for scalar alternatives such as a token or a hex colour. */
+  function conforms(data: unknown, schema: Schema): boolean {
+    if (schema.oneOf) return schema.oneOf.some(item => conforms(data, item));
+    if ("const" in schema) return data === schema.const;
+    if (schema.enum) return schema.enum.some(item => JSON.stringify(item) === JSON.stringify(data));
+    if (schema.type === "string") {
+      if (typeof data !== "string") return false;
+      return !schema.pattern || new RegExp(schema.pattern, "u").exec(data)?.[0] === data;
+    }
+    if (schema.type === "boolean") return typeof data === "boolean";
+    if (schema.type === "integer") return typeof data === "number" && Number.isInteger(data);
+    if (schema.type === "number") return typeof data === "number" && Number.isFinite(data);
+    if (schema.type === "object") return data !== null && typeof data === "object" && !Array.isArray(data);
+    if (schema.type === "array") return Array.isArray(data);
+    return true;
+  }
+
   function check(data: unknown, schema: Schema, path: string): void {
     const object = data !== null && typeof data === "object" && !Array.isArray(data) ? data as Record<string, unknown> : null;
     if (schema.oneOf) {
-      const candidate = schema.oneOf.find(item => object && item.properties?.type?.const === object.type);
-      if (!candidate) reject(`${path}.type`, "Unknown widget or nested Section. Use a registered leaf widget.");
-      else check(data, candidate, path);
+      const nodeSchemas = schema.oneOf.filter(item => item.properties?.type?.const !== undefined);
+      if (nodeSchemas.length === schema.oneOf.length) {
+        const candidate = nodeSchemas.find(item => object && item.properties?.type?.const === object.type);
+        if (!candidate) reject(`${path}.type`, "Unknown widget or nested Section. Use a registered leaf widget.");
+        else check(data, candidate, path);
+      } else if (!schema.oneOf.some(item => conforms(data, item))) {
+        reject(path, "Use an approved token or value.");
+      }
       return;
     }
     if ("const" in schema && data !== schema.const) reject(path, "Unsupported value or schema version.");

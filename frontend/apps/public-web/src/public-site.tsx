@@ -54,6 +54,8 @@ export function PublicSiteChrome({ children, initialSite = EMPTY_SITE, initialMe
       // A visual Page owns its own safe gutter (see @uog/ui resolvePageWidth),
       // so the shell must not add a second inset.
       "&:has([data-page-width])": { px: 0 },
+      // Homepage heroes begin directly below the Site header.
+      "&:has([data-page-homepage='true'])": { pt: 0 },
       // Wide/Reading caps must apply to the whole viewport, not a 1200 px shell.
       "&:has([data-page-layout='FULL_WIDTH'][data-page-width])": { maxWidth: "none" },
       // Only an explicit Page bleed releases the surrounding shell.

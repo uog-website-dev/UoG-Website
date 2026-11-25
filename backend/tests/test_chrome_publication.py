@@ -7,6 +7,7 @@ from apps.sites.api.footer import public_footer
 from apps.sites.api.header import public_header
 from apps.sites.chrome_lint import lint_footer, lint_page
 from apps.sites.footer import apply_footer_column_copy
+from apps.sites.header import header_has_unpublished_changes, header_values
 from apps.sites.models import Site, SiteFooter, SiteHeader
 from tests.test_site_appearance_api import owner, _site_admin_client  # noqa: F401
 
@@ -202,13 +203,16 @@ def test_header_draft_publish_lint_and_isolation(client, oidc, owner, settings):
     _admin(client, oidc, site)
     url = f"/api/v1/sites/{site.pk}/header/"
     etag = client.get(url)["ETag"]
-    saved = client.patch(url, {"sticky": True, "cta_label": "Apply now", "cta_url": "https://example.org/apply"}, content_type="application/json", HTTP_IF_MATCH=etag)
+    quote = "Knowledge serves humanity."
+    saved = client.patch(url, {"sticky": True, "brand_quote": quote, "cta_label": "Apply now", "cta_url": "https://example.org/apply"}, content_type="application/json", HTTP_IF_MATCH=etag)
     assert saved.status_code == 200, saved.content
     assert saved.json()["has_unpublished_changes"] is True
     assert public_header(site)["sticky"] is False
+    assert public_header(site)["brand_quote"] == ""
     published = client.post(f"{url}publish/", HTTP_IF_MATCH=saved["ETag"])
     assert published.status_code == 200, published.content
     assert public_header(site)["sticky"] is True
+    assert public_header(site)["brand_quote"] == quote
     assert public_header(site)["cta_label"] == "Apply now"
     assert SiteHeader.objects.get(site=site).published_by is not None
     AuditEvent.objects.get(action="SITE_HEADER_PUBLISHED", entity_id=str(site.pk))
@@ -218,6 +222,31 @@ def test_header_draft_publish_lint_and_isolation(client, oidc, owner, settings):
     assert client.post(f"/api/v1/sites/{other.pk}/header/publish/", HTTP_IF_MATCH='"whatever"').status_code == 403
     client.defaults.clear()
     assert client.post(f"{url}publish/", HTTP_IF_MATCH='"whatever"').status_code in (401, 403)
+
+
+def test_legacy_header_publication_defaults_new_quote_without_false_pending(owner):
+    site = _site(owner, "CHROME-HEADER-LEGACY")
+    row = SiteHeader.objects.create(site=site)
+    row.published_settings = {key: value for key, value in header_values(row).items() if key != "brand_quote"}
+    row.save(update_fields=["published_settings"])
+
+    assert public_header(site)["brand_quote"] == ""
+    assert header_has_unpublished_changes(row) is False
+
+
+def test_header_quote_rejects_more_than_280_characters(client, oidc, owner, settings):
+    settings.DEBUG = True
+    settings.ORGANIZATIONS_DEV_WRITES_ENABLED = True
+    site = _site(owner, "CHROME-HEADER-QUOTE-LENGTH")
+    _enable(site, "MENUS", "PAGES")
+    _admin(client, oidc, site)
+    url = f"/api/v1/sites/{site.pk}/header/"
+    etag = client.get(url)["ETag"]
+
+    response = client.patch(url, {"brand_quote": "q" * 281}, content_type="application/json", HTTP_IF_MATCH=etag)
+
+    assert response.status_code == 400
+    assert "brand_quote" in str(response.json())
 
 
 def test_header_lint_blocks_internal_copy(client, oidc, owner, settings):

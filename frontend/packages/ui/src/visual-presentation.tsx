@@ -24,13 +24,27 @@ const sizes = {
   lg:"clamp(1.5rem,4cqi,3rem)", xl:"clamp(2rem,5cqi,4rem)", display:"clamp(2.25rem,6cqi,5rem)",
 };
 
+const HEX_COLOUR = /^#[0-9A-Fa-f]{6}$/u;
+/** Approved custom colours are stored as #rrggbb and pass straight through. */
+const customColour = (value: unknown): string | undefined =>
+  typeof value === "string" && HEX_COLOUR.test(value) ? value : undefined;
+/** Pick white or the dark brand ink for readable text on a custom panel colour. */
+function readableText(hex: string): "#ffffff" | "#172536" {
+  const channel = (offset: number) => {
+    const value = parseInt(hex.slice(offset, offset + 2), 16) / 255;
+    return value <= 0.03928 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+  };
+  const luminance = 0.2126 * channel(1) + 0.7152 * channel(3) + 0.0722 * channel(5);
+  return luminance < 0.4 ? "#ffffff" : "#172536";
+}
+
 export function decorativeStyle(style:LayoutStyle={}) {
-  const background=(theme:Theme)=>({none:'transparent',paper:theme.palette.background.paper,mist:theme.palette.action.hover,navy:theme.palette.primary.dark,blue:theme.palette.primary.main,gold:theme.palette.secondary.main,blue_gradient:`linear-gradient(120deg,${theme.palette.primary.main},${theme.palette.primary.light})`,navy_gradient:`linear-gradient(120deg,${theme.palette.primary.dark},${theme.palette.primary.main})`})[style.background??'none'];
+  const background=(theme:Theme)=>customColour(style.background) ?? ({none:'transparent',paper:theme.palette.background.paper,mist:theme.palette.action.hover,navy:theme.palette.primary.dark,blue:theme.palette.primary.main,gold:theme.palette.secondary.main,blue_gradient:`linear-gradient(120deg,${theme.palette.primary.main},${theme.palette.primary.light})`,navy_gradient:`linear-gradient(120deg,${theme.palette.primary.dark},${theme.palette.primary.main})`})[style.background??'none'];
   const height={natural:"auto",compact:200,medium:360,tall:520}[style.image_height??"natural"];
   return {
     ...(style.content_width?{width:"100%",maxWidth:{full:"100%",wide:1280,reading:880}[style.content_width],mx:"auto"}:{}),
     p:{none:0,sm:1.5,md:3,lg:5,xl:8}[style.padding??"none"],
-    color:(theme:Theme)=>({default:"inherit",brand:theme.palette.primary.main,inverse:theme.palette.primary.contrastText,muted:theme.palette.text.secondary})[style.text_color??"default"],
+    color:(theme:Theme)=>customColour(style.text_color) ?? ({default:"inherit",brand:theme.palette.primary.main,inverse:theme.palette.primary.contrastText,muted:theme.palette.text.secondary})[style.text_color??"default"],
     ...(style.background ? {background} : {}),
     borderRadius:{none:0,sm:1,md:2,lg:4,pill:12}[style.radius??"none"],
     border:style.border && style.border!=="none"?"1px solid":undefined,
@@ -83,9 +97,11 @@ export function HeroView({props,siteId,width,demoteH1=false}:{props:WidgetPropsM
   const contentHeight=props.height==="compact"?320:props.height==="tall"?440:360;
   const pattern=props.pattern??(split?"heritage":"none");
   const tone=props.panel_tone??"inherit";
-  const panelBackground={background:tone==="brand_gradient"?"linear-gradient(135deg,var(--mui-palette-primary-main,#075985),var(--mui-palette-primary-dark,#003459))":tone==="dark_gradient"?"linear-gradient(135deg,#082f49,#111827)":undefined,bgcolor:tone==="mist"?"#edf3f7":tone==="gold"?"#f8edce":tone==="brand"?"primary.main":tone==="dark"?"primary.dark":tone==="light"?"background.paper":undefined};
+  const toneHex=customColour(props.panel_tone);
+  const toneText=toneHex?readableText(toneHex):undefined;
+  const panelBackground={background:tone==="brand_gradient"?"linear-gradient(135deg,var(--mui-palette-primary-main,#075985),var(--mui-palette-primary-dark,#003459))":tone==="dark_gradient"?"linear-gradient(135deg,#082f49,#111827)":undefined,bgcolor:toneHex ?? (tone==="mist"?"#edf3f7":tone==="gold"?"#f8edce":tone==="brand"?"primary.main":tone==="dark"?"primary.dark":tone==="light"?"background.paper":undefined)};
   const heritagePattern="url(\"data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96"><path d="M8 0v24h32v16H24v32H0M56 0v16h24v32h16M96 72H64V56H48v32h40v8M8 40h8v16H8" fill="none" stroke="#76a6bd" stroke-width="9"/></svg>')+"\")";
-  const inverse=overlay||["brand","dark","brand_gradient","dark_gradient"].includes(tone);
+  const inverse=overlay||["brand","dark","brand_gradient","dark_gradient"].includes(tone)||toneText==="#ffffff";
   const curved=props.mask==="curve"&&wide&&split;
   const curve=mode==="split_reverse"?"ellipse(98% 100% at 100% 50%)":"ellipse(98% 100% at 0% 50%)";
   const edge=props.curve_border??"none",edgeWidth=props.curve_border_width??8;
@@ -94,7 +110,7 @@ export function HeroView({props,siteId,width,demoteH1=false}:{props:WidgetPropsM
   const media=<Box sx={{minWidth:0,minHeight:0,height:"100%",position:"relative",
     order:mode==="split_reverse" && wide?2:0,
     clipPath:curved?curve:undefined,
-    bgcolor:edge==="white"?"white":edge==="gold"?"#d8ad45":"primary.main",
+    bgcolor:customColour(edge) ?? (edge==="white"?"white":edge==="gold"?"#d8ad45":"primary.main"),
     ...(curved&&edge!=="none"?{"& > *":{clipPath:curve,transform:`translateX(${mode==="split_reverse"?edgeWidth:-edgeWidth}px)`}}:{}),
     borderRadius:props.mask==="rounded"?4:0,overflow:"hidden",
     "& > *":{...(curved&&edge!=="none"?{clipPath:curve,transform:`translateX(${mode==="split_reverse"?edgeWidth:-edgeWidth}px)`}:{}),position:"absolute",inset:0,width:"100%",height:"100%"},"& figure,& picture":{display:"block",m:0,height:"100%",width:"100%"},"& img":{display:"block",width:"100%",height:"100%",maxHeight:"none",objectFit:"cover",objectPosition:props.image_position??"center"},
@@ -110,13 +126,13 @@ export function HeroView({props,siteId,width,demoteH1=false}:{props:WidgetPropsM
   return <Box ref={root} data-hero-frame data-hero-height={props.height??"medium"} sx={{...(split?panelBackground:{}),position:"relative",display:"grid",height:overlay||split&&wide?height:280+contentHeight,gridTemplateRows:overlay||split&&wide?"minmax(0,1fr)":`280px minmax(0,${contentHeight}px)`,gridTemplateColumns:split&&wide?`minmax(0,${mode==="split_reverse"?100-ratio:ratio}fr) minmax(0,${mode==="split_reverse"?ratio:100-ratio}fr)`:"minmax(0,1fr)",isolation:"isolate",overflow:"hidden"}}>
     {overlay?<Box sx={{position:"absolute",inset:0}}>{media}</Box>:media}
     {overlay?<Box aria-hidden="true" sx={{position:"absolute",inset:0,background:"linear-gradient(90deg,rgba(0,25,50,.88),rgba(0,25,50,.3))"}}/>:null}
-    <Box tabIndex={0} role="region" aria-label="Slide text and actions" sx={{"&:focus-visible":{outline:"3px solid",outlineColor:"secondary.main",outlineOffset:-4},position:"relative",zIndex:1,display:"flex",flexDirection:"column",justifyContent:"safe center",gap:3,p:{xs:3,md:5},pb:{xs:3,md:8},overflowY:"auto",textAlign:props.text_align??"left",alignItems:props.text_align==="center"?"center":props.text_align==="right"?"flex-end":undefined,color:inverse?"white":["light","mist","gold"].includes(tone)?"#172536":"inherit",...(split||hasCards?{}:panelBackground),minWidth:0,minHeight:0}}>
+    <Box tabIndex={0} role="region" aria-label="Slide text and actions" sx={{"&:focus-visible":{outline:"3px solid",outlineColor:"secondary.main",outlineOffset:-4},position:"relative",zIndex:1,display:"flex",flexDirection:"column",justifyContent:"safe center",gap:3,p:{xs:3,md:5},pb:{xs:3,md:8},overflowY:"auto",textAlign:props.text_align??"left",alignItems:props.text_align==="center"?"center":props.text_align==="right"?"flex-end":undefined,color:toneText ?? (inverse?"white":["light","mist","gold"].includes(tone)?"#172536":"inherit"),...(split||hasCards?{}:panelBackground),minWidth:0,minHeight:0}}>
       {pattern!=="none"?<Box aria-hidden="true" data-hero-pattern={pattern} sx={{position:"absolute",inset:0,pointerEvents:"none",backgroundImage:patternImage,backgroundSize:pattern==="grid"?"36px 36px":pattern==="dots"?"20px 20px":"88px 88px",opacity:pattern==="heritage"?.22:.075,maskImage:"linear-gradient(110deg,transparent 10%,black 100%)",zIndex:-1}}/>:null}
       {hasCards&&props.cards_label?<Typography sx={{alignSelf:"flex-start",bgcolor:"white",color:"#172536",px:2,py:1,fontWeight:700}}>{props.cards_label}</Typography>:null}
       <Box sx={hasCards?{display:"grid",gridTemplateColumns:wide?"minmax(0,1fr) minmax(0,1.3fr) minmax(0,1fr)":"minmax(0,1fr)",gap:3,alignItems:"center",width:"100%"}:undefined}>
       {hasCards&&wide?card(props.items![0]!):null}
       <Box sx={{display:"grid",gap:3,minWidth:0,textAlign:hasCards?"center":props.text_align}}>
-      <Typography component={headingComponent} sx={{fontSize:props.heading_size?sizes[props.heading_size]:"clamp(1.75rem,4cqi,3.5rem)",fontWeight:{regular:400,medium:500,bold:700,heavy:800}[props.heading_weight??"bold"],color:props.heading_color==="white"?"white":props.heading_color==="gold"?"#d8ad45":props.heading_color==="brand"?"primary.main":props.heading_color==="dark"?"#172536":"inherit",textTransform:props.heading_case==="uppercase"?"uppercase":"none",lineHeight:1.12,m:0,overflowWrap:"anywhere"}}>{props.title}</Typography>
+      <Typography component={headingComponent} sx={{fontSize:props.heading_size?sizes[props.heading_size]:"clamp(1.75rem,4cqi,3.5rem)",fontWeight:{regular:400,medium:500,bold:700,heavy:800}[props.heading_weight??"bold"],color:customColour(props.heading_color) ?? (props.heading_color==="white"?"white":props.heading_color==="gold"?"#d8ad45":props.heading_color==="brand"?"primary.main":props.heading_color==="dark"?"#172536":"inherit"),textTransform:props.heading_case==="uppercase"?"uppercase":"none",lineHeight:1.12,m:0,overflowWrap:"anywhere"}}>{props.title}</Typography>
       {props.text?<Typography sx={{maxWidth:"60ch",fontSize:{sm:".95rem",md:"1.1rem",lg:"1.3rem"}[props.body_size??"md"],lineHeight:1.7}}>{props.text}</Typography>:null}
       {props.actions?.length?<Box sx={{display:"flex",gap:1.5,flexWrap:"wrap"}}>{props.actions.map((action,index)=><PresentationLink key={action.id} {...action} inverse={inverse} showArrow variant={index===0?"solid":"outline"}/>)}</Box>:null}
       </Box>

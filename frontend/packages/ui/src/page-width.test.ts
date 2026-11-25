@@ -16,7 +16,6 @@ describe("resolvePageWidth", () => {
       expect(resolved.gutter).toBe(PAGE_SAFE_GUTTER_PX);
       expect(resolved.gutter).toBe(24);
       expect(resolved.bleed).toBe(false);
-      expect(resolved.legacyFullWidth).toBe(false);
       expect(resolved.label).toBe("Wide · 1280px");
     }
   });
@@ -28,16 +27,15 @@ describe("resolvePageWidth", () => {
     expect(resolvePageWidth({ content_width: "wide" })).toMatchObject({
       width: "wide", maxWidth: 1280, gutter: 24, bleed: false,
     });
-    expect(PAGE_CONTENT_WIDTHS).toEqual({ reading: 880, wide: 1280 });
+    expect(PAGE_CONTENT_WIDTHS).toEqual({ full: "100%", reading: 880, wide: 1280 });
   });
 
-  it("never bleeds for the legacy full token", () => {
+  it("uses the available width while preserving the safe gutter for Full width", () => {
     const resolved = resolvePageWidth({ content_width: "full" });
-    expect(resolved.maxWidth).toBe("100%");
-    expect(resolved.bleed).toBe(false);
-    expect(resolved.gutter).toBe(PAGE_SAFE_GUTTER_PX);
-    expect(resolved.legacyFullWidth).toBe(true);
-    expect(resolved.label).toBe("Full width · legacy");
+    expect(resolved).toMatchObject({
+      width: "full", maxWidth: "100%", bleed: false, gutter: PAGE_SAFE_GUTTER_PX,
+      label: "Full width · 100%",
+    });
   });
 
   it("only bleeds when the explicit setting is literally true", () => {
@@ -60,7 +58,6 @@ describe("resolvePageWidth", () => {
       expect(resolved.width).toBe("wide");
       expect(resolved.maxWidth).toBe(1280);
       expect(resolved.gutter).toBe(PAGE_SAFE_GUTTER_PX);
-      expect(resolved.legacyFullWidth).toBe(false);
     }
   });
 
