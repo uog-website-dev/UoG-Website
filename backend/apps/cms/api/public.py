@@ -1,7 +1,11 @@
 """Published-only Page delivery for the Site resolved from the request Host."""
 from urllib.parse import urlencode
+import hashlib
 
 from django.utils import timezone
+from django.http import HttpResponse, Http404
+from django.utils.http import content_disposition_header
+from django.core.exceptions import ValidationError as DjangoValidationError
 
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import serializers
@@ -147,6 +151,9 @@ class PublicDocumentSerializer(serializers.Serializer):
     effective_date = serializers.DateField(allow_null=True)
     published_at = serializers.DateTimeField()
     categories = PublicTaxonomySerializer(many=True)
+    visible_to_public = serializers.BooleanField()
+    require_login_to_download = serializers.BooleanField()
+    file_url = serializers.CharField()
 
 
 class PublicPostPageSerializer(serializers.Serializer):
@@ -385,7 +392,7 @@ class PublicDocumentCategoriesView(APIView):
             site_id=site.pk, kind=Category.Kind.DOCUMENTS, is_active=True,
             documents__site_id=site.pk, documents__status=ContentStatus.PUBLISHED,
             documents__published_at__lte=timezone.now(),
-            documents__visibility=Visibility.PUBLIC,
+            documents__visibility=Visibility.PUBLIC, documents__visible_to_public=True,
         ).distinct().order_by("position", "name")
         return Response(PublicTaxonomySerializer(categories, many=True).data)
 
@@ -408,7 +415,7 @@ class PublicDocumentListView(APIView):
         rows = Document.objects.filter(
             site_id=site.pk, status=ContentStatus.PUBLISHED,
             published_at__lte=timezone.now(),
-            visibility=Visibility.PUBLIC,
+            visibility=Visibility.PUBLIC, visible_to_public=True,
         ).prefetch_related("categories")
         category_slug = request.query_params.get("category", "").strip()
         if category_slug:
@@ -431,9 +438,63 @@ class PublicDocumentListView(APIView):
                 "id": document.pk, "title": document.title, "slug": document.slug,
                 "description": document.description, "version": document.version,
                 "effective_date": document.effective_date, "published_at": document.published_at,
+                "visible_to_public": document.visible_to_public,
+                "require_login_to_download": document.require_login_to_download,
+                "file_url": f"/api/v1/site-context/documents/{document.pk}/file/",
                 "categories": list(document.categories.filter(kind=Category.Kind.DOCUMENTS, is_active=True).values("id", "code", "name", "slug")),
             })
         return paginator.get_paginated_response(PublicDocumentSerializer(data, many=True).data)
+
+
+class PublicDocumentFileView(APIView):
+    """Live authorization check on every download; no signed URLs to revoke."""
+    permission_classes = [AllowAny]
+    http_method_names = ["get", "head", "options"]
+
+    @extend_schema(tags=["Public Documents"], responses={(200, "application/octet-stream"): {"type": "string", "format": "binary"}})
+    def get(self, request, document_id):
+        site = _resolved_site(request)
+        if not module_available_on_request(request, "DOCUMENTS"):
+            raise NotFound("The requested document was not found.")
+        document = Document.objects.filter(
+            pk=document_id, site_id=site.pk, status=ContentStatus.PUBLISHED,
+            published_at__lte=timezone.now(), visibility=Visibility.PUBLIC,
+            visible_to_public=True,
+        ).first()
+        if document is None:
+            raise NotFound("The requested document was not found.")
+        if document.require_login_to_download and not request.user.is_authenticated:
+            from rest_framework.exceptions import NotAuthenticated
+            raise NotAuthenticated("Sign in to download this document.")
+        from apps.media.document_references import validate_document_file
+        from apps.media.models import MediaAsset
+        from apps.media.storage import ObjectStorage
+        try:
+            asset = validate_document_file(document.file_reference, site.pk)
+        except (Http404, DjangoValidationError) as error:
+            raise Http404("Document file is unavailable.") from error
+        try:
+            bucket, key = asset.storage_reference.split(":", 1)
+            with ObjectStorage().open(bucket, key) as stream:
+                body = stream.read(asset.byte_count + 1)
+        except Exception as error:
+            from rest_framework.exceptions import APIException
+            raise APIException("Document storage is temporarily unavailable.") from error
+        if len(body) != asset.byte_count or hashlib.sha256(body).hexdigest() != asset.checksum:
+            raise Http404("Document file is unavailable.")
+        if not MediaAsset.objects.filter(
+            pk=asset.pk, site_id=site.pk, status=MediaAsset.Status.READY,
+            deleted_at__isnull=True, processing__state="READY",
+        ).exists():
+            raise Http404("Document file is unavailable.")
+        response = HttpResponse(body, content_type=asset.detected_mime)
+        inline = request.query_params.get("inline") == "1" and asset.detected_mime == "application/pdf"
+        response["Content-Disposition"] = content_disposition_header(not inline, asset.original_filename)
+        response["Cache-Control"] = "private, no-store"
+        response["X-Content-Type-Options"] = "nosniff"
+        response["X-Robots-Tag"] = "noindex, nofollow"
+        response["Vary"] = "Authorization, Cookie, Host"
+        return response
 
 
 class PublicPageListView(APIView):

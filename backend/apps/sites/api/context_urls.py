@@ -11,6 +11,7 @@ from apps.cms.api.public import (
     PublicCategoryArchiveView,
     PublicDocumentCategoriesView,
     PublicDocumentListView,
+    PublicDocumentFileView,
 )
 
 from apps.cms.api.public_search import PublicSearch
@@ -32,6 +33,7 @@ urlpatterns = [
     path("posts/", PublicPostListView.as_view(), name="public-post-list"),
     path("documents/categories/", PublicDocumentCategoriesView.as_view(), name="public-document-categories"),
     path("documents/", PublicDocumentListView.as_view(), name="public-document-list"),
+    path("documents/<uuid:document_id>/file/", PublicDocumentFileView.as_view(), name="public-document-file"),
     path("posts/<slug:post_slug>/", PublicPostDetailView.as_view(), name="public-post-detail"),
     path(
         "homepage/",

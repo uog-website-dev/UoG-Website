@@ -15,7 +15,7 @@ vi.mock("@/app/sites/document-actions",()=>({
  getSiteDocument:async(_site:number,id:string)=>({ok:true,data:docs.find(row=>row.id===id)}),
  getSiteDocumentCategories:async()=>({ok:true,data:[]}),
  createSiteDocumentCategory:async()=>({ok:true,data:{id:"cat-1",name:"Policies",slug:"policies"}}),
- saveSiteDocument:async(_site:number,input:Partial<SiteDocument>,id?:string)=>{saved(input,id);if(id){docs=docs.map(row=>row.id===id?{...row,...input,updated_at:new Date().toISOString()}:row);return{ok:true,data:docs.find(row=>row.id===id)}}const row:SiteDocument={id:"doc-1",site:17,title:input.title??"",slug:"annual-report",description:input.description??"",file_reference:input.file_reference??"",file_type:"application/pdf",original_filename:"policy.pdf",file_size:128,status:"DRAFT",creator:1,created_at:"2026-01-01T00:00:00Z",updated_at:"2026-01-01T00:00:00Z",revision_number:1,published_at:null,version:input.version??"",effective_date:null,visibility:"PUBLIC",categories:[]};docs=[row];return{ok:true,data:row}},
+ saveSiteDocument:async(_site:number,input:Partial<SiteDocument>,id?:string)=>{saved(input,id);if(id){docs=docs.map(row=>row.id===id?{...row,...input,updated_at:new Date().toISOString()}:row);return{ok:true,data:docs.find(row=>row.id===id)}}const row:SiteDocument={id:"doc-1",site:17,title:input.title??"",slug:"annual-report",description:input.description??"",file_reference:input.file_reference??"",file_type:"application/pdf",original_filename:"policy.pdf",file_size:128,status:"DRAFT",creator:1,created_at:"2026-01-01T00:00:00Z",updated_at:"2026-01-01T00:00:00Z",revision_number:1,published_at:null,version:input.version??"",effective_date:null,visibility:"PUBLIC",visible_to_public:input.visible_to_public??true,require_login_to_download:input.require_login_to_download??false,categories:[]};docs=[row];return{ok:true,data:row}},
  documentWorkflow:async()=>({ok:true,data:docs[0]}),deleteSiteDocument:async()=>({ok:true,data:null}),
 }));
 vi.mock("@/sites/media-library",()=>({MediaLibrary:({onSelect}:{onSelect:(asset:{id:string;original_filename:string;byte_count:number})=>void})=><button onClick={()=>onSelect({id:"asset-1",original_filename:"policy.pdf",byte_count:128})}>Select policy.pdf</button>}));
@@ -49,7 +49,7 @@ describe("Site Documents authoring",()=>{
  });
  it("hides document creation and editing controls without management permission",async()=>{
   permissions=["content.documents.view"];
-  docs=[{id:"view-only",site:17,title:"Read-only policy",slug:"policy",description:"",file_reference:"sites/17/assets/file",file_type:"application/pdf",original_filename:"policy.pdf",file_size:10,categories:[],status:"DRAFT",creator:1,created_at:"2026-01-01T00:00:00Z",updated_at:"2026-01-01T00:00:00Z",revision_number:1,published_at:null,version:"1",effective_date:null,visibility:"PUBLIC"}];
+  docs=[{id:"view-only",site:17,title:"Read-only policy",slug:"policy",description:"",file_reference:"sites/17/assets/file",file_type:"application/pdf",original_filename:"policy.pdf",file_size:10,categories:[],status:"DRAFT",creator:1,created_at:"2026-01-01T00:00:00Z",updated_at:"2026-01-01T00:00:00Z",revision_number:1,published_at:null,version:"1",effective_date:null,visibility:"PUBLIC",visible_to_public:true,require_login_to_download:false}];
   render(<SiteDocuments/>);
   expect(screen.queryByRole("button",{name:"Add New Document"})).toBeNull();
   expect(screen.queryByRole("button",{name:"Edit"})).toBeNull();

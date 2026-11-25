@@ -1,5 +1,7 @@
 """Document CRUD, scoping, revision history and module gates."""
 from uuid import uuid4
+from contextlib import contextmanager
+import hashlib
 from types import SimpleNamespace
 
 import pytest
@@ -7,6 +9,7 @@ from django.contrib.auth import get_user_model
 from django.core.management import call_command
 
 from apps.cms.models import ContentRole, Document
+from apps.audit.models import AuditEvent
 from apps.api.models import Category
 from apps.cms.tests.support import grant_cms_role, transition_with_site_role
 from apps.sites.models import Module
@@ -65,6 +68,7 @@ def test_create_edit_validation_search_filters_and_pagination(document_client, s
     assert edited.json()["id"] == identifier
     assert edited.json()["revision_number"] > original_revision
     assert Document.objects.get(pk=identifier).updated_by == user
+    assert AuditEvent.objects.filter(entity_type="cms.document", entity_id=identifier, action="DOCUMENT_UPDATED").exists()
     assert client.get(ROOT.format(site=other.pk) + f"{identifier}/").status_code == 403
     assert client.patch(ROOT.format(site=other.pk) + f"{identifier}/", {"title":"Foreign edit"}, content_type="application/json").status_code == 403
     assert add(client, site, " ").status_code == 400
@@ -82,6 +86,27 @@ def test_create_edit_validation_search_filters_and_pagination(document_client, s
     paginated = client.get(ROOT.format(site=site.pk) + "?page=1&page_size=1")
     assert paginated.status_code == 200 and paginated.json()["count"] == 3
     assert paginated.json()["next"] and len(paginated.json()["results"]) == 1
+
+
+def test_document_metadata_is_sanitized_and_access_settings_validate(document_client, sites):
+    client, _ = document_client
+    site, _ = sites
+    response = add(client, site, "Metadata", description='<p><strong>Safe</strong><script>alert(1)</script><u>underlined</u><a href="javascript:alert(1)">link</a></p>', version="  2.1  ", effective_date="2026-12-01", require_login_to_download=True)
+    assert response.status_code == 201, response.content
+    data = response.json()
+    assert data["version"] == "2.1"
+    assert data["effective_date"] == "2026-12-01"
+    assert data["visible_to_public"] is True and data["require_login_to_download"] is True
+    assert "<script" not in data["description"] and "javascript:" not in data["description"]
+    assert "<strong>Safe</strong>" in data["description"] and "<u>underlined</u>" in data["description"]
+    invalid_date = client.patch(ROOT.format(site=site.pk) + f"{data['id']}/", {"effective_date":"not-a-date"}, content_type="application/json")
+    assert invalid_date.status_code == 400 and "effective_date" in invalid_date.json()["error"]["details"]
+    invalid_visibility = client.patch(ROOT.format(site=site.pk) + f"{data['id']}/", {"visibility":"SECRET"}, content_type="application/json")
+    assert invalid_visibility.status_code == 400 and "visibility" in invalid_visibility.json()["error"]["details"]
+    private = client.patch(ROOT.format(site=site.pk) + f"{data['id']}/", {"visible_to_public":False}, content_type="application/json")
+    assert private.status_code == 200 and private.json()["visibility"] == "HIDDEN"
+    assert private.json()["visible_to_public"] is False and private.json()["require_login_to_download"] is True
+    assert AuditEvent.objects.filter(entity_type="cms.document", entity_id=data["id"], action="DOCUMENT_UPDATED").count() >= 1
 
 
 def test_permission_and_disabled_module_gates(document_client, sites, oidc, client):
@@ -103,6 +128,145 @@ def test_permission_and_disabled_module_gates(document_client, sites, oidc, clie
     disable_module_for_site(site.pk, Module.objects.get(code="DOCUMENTS").pk)
     assert client.get(ROOT.format(site=site.pk)).status_code == 404
     assert client.get(ROOT.format(site=site.pk) + f"{record.pk}/").status_code == 404
+
+
+def test_publishing_requires_publisher_grant(document_client, sites):
+    client, author = document_client
+    site, _ = sites
+    response = add(client, site, "Publish permission check")
+    document_id = response.json()["id"]
+    denied = client.post(ROOT.format(site=site.pk) + f"{document_id}/publish/", {}, content_type="application/json")
+    assert denied.status_code == 403
+    assert Document.objects.get(pk=document_id).status == "DRAFT"
+    assert not AuditEvent.objects.filter(entity_id=document_id, action="CONTENT_PUBLISHED").exists()
+
+
+def test_publication_revalidates_ready_file(document_client, sites, monkeypatch):
+    from django.core.exceptions import ValidationError
+    client, author = document_client
+    site, _ = sites
+    created = add(client, site, "File readiness check")
+    document = Document.objects.get(pk=created.json()["id"])
+    transition_with_site_role(document, "submit", author)
+    reviewer = get_user_model().objects.create_user(username="readiness-reviewer")
+    transition_with_site_role(document, "approve", reviewer)
+    monkeypatch.setattr(
+        "apps.media.document_references.validate_document_file",
+        lambda *args, **kwargs: (_ for _ in ()).throw(ValidationError({"file_reference": "Wait for the security scan."})),
+    )
+    publisher = get_user_model().objects.create_user(username="readiness-publisher")
+    with pytest.raises(ValidationError, match="security scan"):
+        transition_with_site_role(document, "publish", publisher)
+    document.refresh_from_db()
+    assert document.status == "APPROVED"
+    assert not AuditEvent.objects.filter(entity_id=str(document.pk), action="CONTENT_PUBLISHED").exists()
+
+
+def test_public_document_access_matrix_and_unpublish_revocation(document_client, sites, oidc, monkeypatch):
+    import io
+    from apps.media.models import MediaAsset, MediaProcessing
+    from apps.media.processing import process_asset
+    from pypdf import PdfWriter
+    from apps.sites.models import SiteDomain
+    from apps.sites.services.lifecycle import activate_site
+
+    client, author = document_client
+    site, _ = sites
+    activate_site(site.pk)
+    host = f"docs-{site.pk}.uog.edu.et"
+    SiteDomain.objects.create(site=site, hostname=host, is_primary=True, status="ACTIVE")
+    writer = PdfWriter()
+    writer.add_blank_page(width=100, height=100)
+    pdf = io.BytesIO()
+    writer.write(pdf)
+    body = pdf.getvalue()
+
+    class MemoryStorage:
+        def __init__(self):
+            self.objects = {}
+        @contextmanager
+        def open(self, bucket, key):
+            yield io.BytesIO(self.objects[(bucket, key)])
+
+    def ready_asset(filename):
+        from apps.media.services import _media_write_session
+        storage = MemoryStorage()
+        reference = f"platform-documents:sites/{site.pk}/assets/{uuid4()}"
+        bucket, key = reference.split(":", 1)
+        storage.objects[(bucket, key)] = body
+        with _media_write_session(author, site.pk):
+            asset = MediaAsset.objects.create(
+                site=site, storage_reference=reference,
+                original_filename=filename, detected_mime="application/pdf", byte_count=len(body),
+                checksum=hashlib.sha256(body).hexdigest(), status="PENDING", created_by=author, updated_by=author,
+            )
+            MediaProcessing.objects.create(asset=asset, state="QUEUED")
+        asset = process_asset(asset.pk, storage=storage)
+        assert asset.status == "READY" and asset.processing.state == "READY"
+        return asset
+
+    assets = {}
+    def validate(reference, site_id):
+        asset_id = reference.rsplit("/", 1)[-1]
+        asset = MediaAsset.objects.get(pk=asset_id, site_id=site_id)
+        assets[asset_id] = asset
+        return asset
+    @contextmanager
+    def open_object(self, bucket, key):
+        yield io.BytesIO(body)
+    monkeypatch.setattr("apps.media.document_references.validate_document_file", validate)
+    monkeypatch.setattr("apps.media.storage.ObjectStorage.open", open_object)
+
+    def publish(title, *, visible=True, login=False):
+        asset = ready_asset(f"{title}.pdf")
+        document = Document.objects.create(
+            site=site, title=title, slug=f"{title.lower().replace(' ', '-')}-{uuid4().hex[:6]}",
+            file_reference=f"sites/{site.pk}/assets/{asset.pk}",
+            visibility="PUBLIC" if visible else "HIDDEN", visible_to_public=visible,
+            require_login_to_download=login, created_by=author, updated_by=author,
+        )
+        transition_with_site_role(document, "submit", author)
+        reviewer = get_user_model().objects.create_user(username=f"reviewer-{uuid4().hex[:6]}")
+        transition_with_site_role(document, "approve", reviewer)
+        publisher = get_user_model().objects.create_user(username=f"publisher-{uuid4().hex[:6]}")
+        transition_with_site_role(document, "publish", publisher)
+        return document
+
+    draft_asset = ready_asset("draft.pdf")
+    draft = Document.objects.create(site=site, title="Draft only", slug="draft-only", file_reference=f"sites/{site.pk}/assets/{draft_asset.pk}", created_by=author, updated_by=author)
+    public = publish("Public anonymous")
+    login_required = publish("Public login", login=True)
+    hidden = publish("Private hidden", visible=False)
+    root = "/api/v1/site-context/documents/"
+    listing = client.get(root, HTTP_HOST=host)
+    listed_ids = {row["id"] for row in listing.json()["results"]}
+    assert str(public.pk) in listed_ids and str(login_required.pk) in listed_ids
+    assert str(draft.pk) not in listed_ids and str(hidden.pk) not in listed_ids
+    assert listing.json()["results"][0].get("require_login_to_download") is not None
+
+    from django.test import Client
+    anonymous = Client()
+    public_url = root + f"{public.pk}/file/"
+    login_url = root + f"{login_required.pk}/file/"
+    hidden_url = root + f"{hidden.pk}/file/"
+    draft_url = root + f"{draft.pk}/file/"
+    public_file = anonymous.get(public_url, HTTP_HOST=host)
+    assert public_file.status_code == 200 and public_file.content == body
+    assert public_file["Cache-Control"] == "private, no-store"
+    assert anonymous.get(login_url, HTTP_HOST=host).status_code == 401
+    assert anonymous.get(hidden_url, HTTP_HOST=host).status_code == 404
+    assert anonymous.get(draft_url, HTTP_HOST=host).status_code == 404
+
+    eligible = client
+    assert eligible.get(login_url, HTTP_HOST=host).status_code == 200
+    assert eligible.get(hidden_url, HTTP_HOST=host).status_code == 404
+    transition_with_site_role(public, "unpublish", get_user_model().objects.create_user(username="revoker"))
+    assert anonymous.get(public_url, HTTP_HOST=host).status_code == 404
+    assert AuditEvent.objects.filter(entity_id=str(public.pk), action="CONTENT_PUBLISHED").exists()
+    assert AuditEvent.objects.filter(entity_id=str(public.pk), action="CONTENT_UNPUBLISHED").exists()
+    disable_module_for_site(site.pk, Module.objects.get(code="DOCUMENTS").pk)
+    assert anonymous.get(root, HTTP_HOST=host).status_code == 404
+    assert anonymous.get(public_url, HTTP_HOST=host).status_code == 404
 
 
 def test_edit_keeps_publication_history_and_file_references(document_client, sites):

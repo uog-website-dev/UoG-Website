@@ -2,7 +2,11 @@ from django.db import migrations
 
 def enable_documents(apps, schema_editor):
     Module = apps.get_model('sites', 'Module')
-    Module.objects.update_or_create(code='DOCUMENTS', defaults={'name':'Documents','description':'Site document administration.','status':'PLANNED','is_enabled':False,'configuration_schema':{'schema_version':1,'properties':[]}})
+    # Be safe when this migration is applied after a module registry seed has
+    # already created the row: update_or_create would first reset an
+    # IMPLEMENTED row to PLANNED, which the registry's lifecycle trigger
+    # correctly rejects.
+    Module.objects.get_or_create(code='DOCUMENTS', defaults={'name':'Documents','description':'Site document administration.','status':'PLANNED','is_enabled':False,'configuration_schema':{'schema_version':1,'properties':[]}})
     with schema_editor.connection.cursor() as cursor:
         cursor.execute("INSERT INTO sites_module_implementation(code) VALUES ('DOCUMENTS') ON CONFLICT DO NOTHING")
     Module.objects.filter(code='DOCUMENTS').update(status='IMPLEMENTED',is_enabled=True)

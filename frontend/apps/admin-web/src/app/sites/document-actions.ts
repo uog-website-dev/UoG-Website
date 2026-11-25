@@ -6,7 +6,7 @@ import {serverApiFetch} from "@/performance/server-fetch";
 import type {ActionResult} from "@/organizations/contract";
 
 export type SiteDocumentStatus = "DRAFT" | "IN_REVIEW" | "APPROVED" | "PUBLISHED" | "UNPUBLISHED" | "ARCHIVED";
-export interface SiteDocument {id:string;site:number;title:string;slug:string;description:string;file_reference:string;file_type:string;original_filename:string;file_size:number;categories:string[];categories_detail?:{id:string;name:string;slug:string}[];status:SiteDocumentStatus;creator:number|null;created_at:string;updated_at:string;revision_number:number;published_at:string|null;version:string;effective_date:string|null;visibility:"PUBLIC"|"UNLISTED"|"HIDDEN"}
+export interface SiteDocument {id:string;site:number;title:string;slug:string;description:string;file_reference:string;file_type:string;original_filename:string;file_size:number;categories:string[];categories_detail?:{id:string;name:string;slug:string}[];status:SiteDocumentStatus;creator:number|null;created_at:string;updated_at:string;revision_number:number;published_at:string|null;version:string;effective_date:string|null;visibility:"PUBLIC"|"UNLISTED"|"HIDDEN";visible_to_public:boolean;require_login_to_download:boolean}
 export interface DocumentQuery {search?:string;category?:string;status?:SiteDocumentStatus;file_type?:string;visibility?:string;page?:number;page_size?:number}
 export interface DocumentPage {count:number;next:string|null;previous:string|null;results:SiteDocument[]}
 export interface DocumentCategory {id:string;code:string;name:string;slug:string;description:string;position:number;is_active:boolean}
