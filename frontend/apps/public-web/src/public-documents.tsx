@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import type { MouseEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
@@ -19,7 +20,7 @@ interface PublicCategory { id: string; name: string; slug: string }
 interface PublicDocument {
   id: string; title: string; slug: string; description: string; version: string;
   effective_date: string | null; published_at: string; require_login_to_download: boolean;
-  file_type: string; file_url: string; categories: PublicCategory[];
+  file_type: string; file_size: number; file_url: string; categories: PublicCategory[];
 }
 interface PageResult { count: number; next: string | null; previous: string | null; results: PublicDocument[] }
 const FILE_TYPES: Record<string, string> = {
@@ -37,7 +38,7 @@ function safePage(value: unknown): PageResult | null {
   for (const item of row.results) {
     if (!item || typeof item !== "object" || Array.isArray(item)) return null;
     const doc = item as Record<string, unknown>;
-    if (typeof doc.id !== "string" || typeof doc.title !== "string" || typeof doc.file_url !== "string" || !doc.file_url.startsWith("/api/v1/site-context/documents/") || typeof doc.file_type !== "string" || !FILE_TYPES[doc.file_type]) return null;
+    if (typeof doc.id !== "string" || typeof doc.title !== "string" || typeof doc.file_url !== "string" || !doc.file_url.startsWith("/api/v1/site-context/documents/") || typeof doc.file_type !== "string" || !FILE_TYPES[doc.file_type] || !Number.isSafeInteger(doc.file_size) || Number(doc.file_size) < 0) return null;
     results.push({
       id: doc.id, title: doc.title, slug: typeof doc.slug === "string" ? doc.slug : "",
       description: typeof doc.description === "string" ? doc.description.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim() : "",
@@ -46,11 +47,133 @@ function safePage(value: unknown): PageResult | null {
       published_at: typeof doc.published_at === "string" ? doc.published_at : "",
       require_login_to_download: doc.require_login_to_download === true,
       file_type: doc.file_type,
+      file_size: Number(doc.file_size),
       file_url: `/api/documents/${encodeURIComponent(doc.id)}/file/`,
       categories: Array.isArray(doc.categories) ? doc.categories.filter((category): category is PublicCategory => !!category && typeof category === "object" && typeof (category as PublicCategory).id === "string" && typeof (category as PublicCategory).name === "string" && typeof (category as PublicCategory).slug === "string") : [],
     });
   }
   return { count: Number(row.count), next: typeof row.next === "string" ? row.next : null, previous: typeof row.previous === "string" ? row.previous : null, results };
+}
+
+function formatFileSize(size: number) {
+  if (size < 1024) return `${size} B`;
+  const units = ["KB", "MB", "GB"];
+  let value = size / 1024;
+  let unit = 0;
+  while (value >= 1024 && unit < units.length - 1) { value /= 1024; unit += 1; }
+  return `${value.toFixed(value >= 10 ? 0 : 1)} ${units[unit]}`;
+}
+
+function responseFilename(disposition: string | null, fallback: string) {
+  const encoded = disposition?.match(/filename\*=UTF-8''([^;]+)/i)?.[1];
+  if (encoded) {
+    try { return decodeURIComponent(encoded.replace(/^\"|\"$/g, "")); } catch { /* fall through to plain filename */ }
+  }
+  return disposition?.match(/filename=\"?([^\";]+)\"?/i)?.[1] || fallback;
+}
+
+function DocumentCard({ document }: { document: PublicDocument }) {
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [error, setError] = useState("");
+  const [signInHref, setSignInHref] = useState("");
+  const isPdf = document.file_type === "application/pdf";
+  const typeLabel = FILE_TYPES[document.file_type];
+  const extension = typeLabel.toLowerCase();
+  const attachmentUrl = `/api/documents/${encodeURIComponent(document.id)}/file/`;
+  const inlineUrl = `${attachmentUrl}?inline=1`;
+
+  async function accessFile(event: MouseEvent<HTMLAnchorElement>, inline: boolean) {
+    event.preventDefault();
+    setError(""); setSignInHref("");
+    const previewWindow = inline ? window.open("about:blank", "_blank") : null;
+    if (previewWindow) previewWindow.opener = null;
+    if (inline && !previewWindow) {
+      setError("Your browser blocked the new tab. Use Download PDF instead.");
+      return;
+    }
+    try {
+      const response = await fetch(inline ? inlineUrl : attachmentUrl, { credentials: "same-origin", cache: "no-store" });
+      if (response.status === 401) {
+        previewWindow?.close();
+        setError("Sign in is required to access this document.");
+        const callbackUrl = `${window.location.pathname}${window.location.search}`;
+        setSignInHref(`/api/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`);
+        return;
+      }
+      if (!response.ok) {
+        previewWindow?.close();
+        setError("This document file is currently unavailable. Please try again later.");
+        return;
+      }
+      const contentType = response.headers.get("content-type")?.split(";")[0].trim().toLowerCase();
+      if (contentType !== document.file_type || (inline && contentType !== "application/pdf")) {
+        previewWindow?.close();
+        setError("The file could not be opened safely because its type did not match the document.");
+        return;
+      }
+      const blobUrl = URL.createObjectURL(await response.blob());
+      if (inline && previewWindow) {
+        previewWindow.location.replace(blobUrl);
+        window.setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000);
+      } else {
+        const anchor = window.document.createElement("a");
+        anchor.href = blobUrl;
+        anchor.download = responseFilename(response.headers.get("content-disposition"), `${document.slug || "document"}.${extension}`);
+        anchor.click();
+        window.setTimeout(() => URL.revokeObjectURL(blobUrl), 1_000);
+      }
+    } catch {
+      previewWindow?.close();
+      setError("This document file is currently unavailable. Please try again later.");
+    }
+  }
+
+  return <Card
+    variant="outlined"
+    data-document-card="true"
+    data-details-open={detailsOpen ? "true" : "false"}
+    onMouseEnter={() => setDetailsOpen(true)}
+    onMouseLeave={event => { if (!event.currentTarget.contains(window.document.activeElement)) setDetailsOpen(false); }}
+    onFocusCapture={() => setDetailsOpen(true)}
+    onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setDetailsOpen(false); }}
+    sx={{
+      height: "100%", overflow: "hidden", "&:focus-within": { outline: "3px solid", outlineColor: "primary.main", outlineOffset: 2 },
+      "& .document-details": { display: "grid", gridTemplateRows: "0fr", opacity: 0, visibility: "hidden", transition: "grid-template-rows 180ms ease, opacity 180ms ease" },
+      "& .document-details-inner": { overflow: "hidden", minHeight: 0 },
+      "&:focus-within .document-details": { gridTemplateRows: "1fr", opacity: 1, visibility: "visible", pb: 1 },
+      "&[data-details-open='true'] .document-details": { gridTemplateRows: "1fr", opacity: 1, visibility: "visible", pb: 1 },
+      "@media (hover: hover) and (pointer: fine)": { "&:hover .document-details": { gridTemplateRows: "1fr", opacity: 1, visibility: "visible", pb: 1 } },
+      "@media (prefers-reduced-motion: reduce)": { "& .document-details": { transition: "none" } },
+    }}
+  >
+    <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 1, height: "100%", boxSizing: "border-box" }}>
+      <Box component="span" role="img" aria-label={`${typeLabel} file`} sx={{ width: 46, height: 56, border: 1, borderColor: "primary.main", borderRadius: 1, color: "primary.main", bgcolor: "action.hover", display: "inline-flex", alignItems: "flex-end", justifyContent: "center", pb: 0.6, boxSizing: "border-box", fontSize: "0.7rem", fontWeight: 800, position: "relative", "&::before": { content: "\"\"", position: "absolute", right: 0, top: 0, width: 11, height: 11, bgcolor: "background.paper", borderLeft: 1, borderBottom: 1, borderColor: "primary.main", borderBottomLeftRadius: 1 } }}>{typeLabel}</Box>
+      <Typography variant="h2" component="h2" sx={{ fontSize: "1.3rem", fontWeight: 650 }}>{document.title}</Typography>
+      <Button type="button" size="small" aria-expanded={detailsOpen} onClick={() => setDetailsOpen(true)} sx={{ minHeight: 40 }}>Details</Button>
+      <Box className="document-details" aria-label={`${document.title} details`}>
+        <Box className="document-details-inner" sx={{ display: "flex", flexDirection: "column", gap: 0.75 }}>
+          {document.description ? <Typography><strong>Description:</strong> {document.description}</Typography> : null}
+          {document.categories.length ? <Typography><strong>Category:</strong> {document.categories.map(item => item.name).join(", ")}</Typography> : null}
+          {document.version ? <Typography><strong>Version:</strong> {document.version}</Typography> : null}
+          {document.effective_date ? <Typography><strong>Effective date:</strong> {document.effective_date}</Typography> : null}
+          <Typography><strong>File type:</strong> {typeLabel}</Typography>
+          <Typography><strong>File size:</strong> {formatFileSize(document.file_size)}</Typography>
+        </Box>
+      </Box>
+      <Link
+        href={isPdf ? inlineUrl : attachmentUrl}
+        target={isPdf ? "_blank" : undefined}
+        rel={isPdf ? "noopener noreferrer" : undefined}
+        download={!isPdf ? true : undefined}
+        onClick={event => void accessFile(event, isPdf)}
+        underline="always"
+        sx={{ mt: "auto", minHeight: 44, display: "inline-flex", alignItems: "center", "&:focus-visible": { outline: "3px solid", outlineColor: "primary.main", outlineOffset: 2 } }}
+        aria-label={isPdf ? `Open ${document.title} in a new tab` : `Download ${document.title}`}
+      >{isPdf ? "View PDF" : `Download ${typeLabel}`}{document.require_login_to_download ? " (sign in required)" : ""}</Link>
+      {isPdf ? <Link href={attachmentUrl} download onClick={event => void accessFile(event, false)} sx={{ minHeight: 44, display: "inline-flex", alignItems: "center" }} aria-label={`Download ${document.title} as PDF`}>Download PDF</Link> : null}
+      {error ? <Alert severity="error" role="alert" sx={{ width: "100%" }}>{error}{signInHref ? <> <Link href={signInHref}>Sign in</Link> to continue.</> : null}</Alert> : null}
+    </CardContent>
+  </Card>;
 }
 
 export function PublicDocumentsPage() {
@@ -139,13 +262,7 @@ export function PublicDocumentsPage() {
       {current?.error ? <Alert severity="error">{current.error}<Button onClick={() => navigate(page)}>Try again</Button></Alert> : null}
       {result && result.count === 0 ? <Typography role="status">{category || query || fileType ? "No published documents match these filters." : "No published documents are available for this Site yet."}</Typography> : null}
       {result?.results.length ? <Box component="ul" aria-label="Published documents" sx={{ listStyle: "none", m: 0, p: 0, display: "grid", gridTemplateColumns: { xs: "minmax(0, 1fr)", sm: "repeat(2, minmax(0, 1fr))", lg: "repeat(3, minmax(0, 1fr))" }, gap: 2 }}>
-      {result.results.map(document => <Box component="li" key={document.id} sx={{ minWidth: 0 }}><Card variant="outlined" sx={{ height: "100%", "&:focus-within": { outline: "3px solid", outlineColor: "primary.main", outlineOffset: 2 } }}><CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 1, height: "100%", boxSizing: "border-box" }}>
-        <Box component="span" role="img" aria-label={`${FILE_TYPES[document.file_type]} file`} sx={{ width: 46, height: 56, border: 1, borderColor: "primary.main", borderRadius: 1, color: "primary.main", bgcolor: "action.hover", display: "inline-flex", alignItems: "flex-end", justifyContent: "center", pb: 0.6, boxSizing: "border-box", fontSize: "0.7rem", fontWeight: 800, position: "relative", "&::before": { content: '""', position: "absolute", right: 0, top: 0, width: 11, height: 11, bgcolor: "background.paper", borderLeft: 1, borderBottom: 1, borderColor: "primary.main", borderBottomLeftRadius: 1 } }}>{FILE_TYPES[document.file_type]}</Box>
-        <Typography variant="h2" component="h2" sx={{ fontSize: "1.3rem", fontWeight: 650 }}>{document.title}</Typography>
-        {document.description ? <Typography>{document.description}</Typography> : null}
-        <Typography variant="body2" color="text.secondary">{document.categories.map(item => item.name).join(", ")}{document.version ? ` · Version ${document.version}` : ""}{document.effective_date ? ` · Effective ${document.effective_date}` : ""}</Typography>
-        <Link href={document.file_url} underline="always" sx={{ mt: "auto", minHeight: 44, display: "inline-flex", alignItems: "center", "&:focus-visible": { outline: "3px solid", outlineColor: "primary.main", outlineOffset: 2 } }} aria-label={`Download ${document.title}`}>Download {document.require_login_to_download ? "(sign in required)" : FILE_TYPES[document.file_type]}</Link>
-      </CardContent></Card></Box>)}
+      {result.results.map(document => <Box component="li" key={document.id} sx={{ minWidth: 0 }}><DocumentCard document={document} /></Box>)}
       </Box> : null}
       {result && result.count > 0 ? <Box component="nav" aria-label="Document pagination" sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2 }}>
         <Button disabled={!result.previous} onClick={() => navigate(page - 1)}>Previous page</Button>

@@ -226,37 +226,53 @@ def test_public_document_access_matrix_and_unpublish_revocation(document_client,
         def open(self, bucket, key):
             yield io.BytesIO(self.objects[(bucket, key)])
 
-    def ready_asset(filename):
+    file_bodies = {}
+    def ready_asset(filename, content=None):
         from apps.media.services import _media_write_session
+        content = body if content is None else content
         storage = MemoryStorage()
         reference = f"platform-documents:sites/{site.pk}/assets/{uuid4()}"
         bucket, key = reference.split(":", 1)
-        storage.objects[(bucket, key)] = body
+        storage.objects[(bucket, key)] = content
+        file_bodies[key] = content
+        detected_mime = {
+            ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            ".zip": "application/zip",
+        }.get(f".{filename.rsplit('.', 1)[-1].lower()}" if "." in filename else "", "application/pdf")
         with _media_write_session(author, site.pk):
             asset = MediaAsset.objects.create(
                 site=site, storage_reference=reference,
-                original_filename=filename, detected_mime="application/pdf", byte_count=len(body),
-                checksum=hashlib.sha256(body).hexdigest(), status="PENDING", created_by=author, updated_by=author,
+                original_filename=filename, detected_mime=detected_mime, byte_count=len(content),
+                checksum=hashlib.sha256(content).hexdigest(), status="PENDING", created_by=author, updated_by=author,
             )
             MediaProcessing.objects.create(asset=asset, state="QUEUED")
         asset = process_asset(asset.pk, storage=storage)
-        assert asset.status == "READY" and asset.processing.state == "READY"
+        assert asset.status == "READY" and asset.processing.state == "READY", asset.processing.failure_code
         return asset
 
     assets = {}
+    missing_storage_keys = set()
+    quarantined_references = set()
     def validate(reference, site_id):
+        if reference in quarantined_references:
+            from django.core.exceptions import ValidationError
+            raise ValidationError("Document file is quarantined.")
         asset_id = reference.rsplit("/", 1)[-1]
         asset = MediaAsset.objects.get(pk=asset_id, site_id=site_id)
         assets[asset_id] = asset
         return asset
     @contextmanager
     def open_object(self, bucket, key):
-        yield io.BytesIO(body)
+        if key in missing_storage_keys:
+            from django.http import Http404
+            raise Http404("Stored object not found.")
+        yield io.BytesIO(file_bodies[key])
     monkeypatch.setattr("apps.media.document_references.validate_document_file", validate)
     monkeypatch.setattr("apps.media.storage.ObjectStorage.open", open_object)
 
-    def publish(title, *, visible=True, login=False):
-        asset = ready_asset(f"{title}.pdf")
+    def publish(title, *, visible=True, login=False, asset=None):
+        asset = asset or ready_asset(f"{title}.pdf")
         document = Document.objects.create(
             site=site, title=title, slug=f"{title.lower().replace(' ', '-')}-{uuid4().hex[:6]}",
             file_reference=f"sites/{site.pk}/assets/{asset.pk}",
@@ -275,12 +291,29 @@ def test_public_document_access_matrix_and_unpublish_revocation(document_client,
     public = publish("Public anonymous")
     login_required = publish("Public login", login=True)
     hidden = publish("Private hidden", visible=False)
+    from zipfile import ZIP_DEFLATED, ZipFile
+    docx_stream = io.BytesIO()
+    with ZipFile(docx_stream, "w", compression=ZIP_DEFLATED) as package:
+        package.writestr("[Content_Types].xml", '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"></Types>')
+        package.writestr("_rels/.rels", '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>')
+        package.writestr("word/document.xml", '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body/></w:document>')
+    docx_body = docx_stream.getvalue()
+    docx_file = publish("Public Word document", asset=ready_asset("report.docx", docx_body))
+    removed_file = publish("Removed storage object")
+    removed_asset_id = removed_file.file_reference.rsplit("/", 1)[-1]
+    removed_asset = MediaAsset.objects.get(pk=removed_asset_id)
+    missing_storage_keys.add(removed_asset.storage_reference.split(":", 1)[1])
+    quarantined_file = publish("Quarantined file")
+    quarantined_references.add(quarantined_file.file_reference)
     root = "/api/v1/site-context/documents/"
     listing = client.get(root, HTTP_HOST=host)
     listed_ids = {row["id"] for row in listing.json()["results"]}
     assert str(public.pk) in listed_ids and str(login_required.pk) in listed_ids
     assert str(draft.pk) not in listed_ids and str(hidden.pk) not in listed_ids
     assert listing.json()["results"][0].get("require_login_to_download") is not None
+    public_row = next(row for row in listing.json()["results"] if row["id"] == str(public.pk))
+    assert public_row["file_type"] == "application/pdf"
+    assert public_row["file_size"] == len(body)
 
     from django.test import Client
     anonymous = Client()
@@ -291,9 +324,24 @@ def test_public_document_access_matrix_and_unpublish_revocation(document_client,
     public_file = anonymous.get(public_url, HTTP_HOST=host)
     assert public_file.status_code == 200 and public_file.content == body
     assert public_file["Cache-Control"] == "private, no-store"
+    assert public_file["Content-Type"] == "application/pdf"
+    assert public_file["Content-Disposition"].startswith("attachment;")
+    assert public_file["X-Content-Type-Options"] == "nosniff"
+    assert public_file["X-Robots-Tag"] == "noindex, nofollow"
+    inline_pdf = anonymous.get(public_url + "?inline=1", HTTP_HOST=host)
+    assert inline_pdf.status_code == 200 and inline_pdf.content == body
+    assert inline_pdf["Content-Type"] == "application/pdf"
+    assert inline_pdf["Content-Disposition"].startswith("inline;")
+    assert inline_pdf["Cache-Control"] == "private, no-store"
+    docx_response = anonymous.get(root + f"{docx_file.pk}/file/?inline=1", HTTP_HOST=host)
+    assert docx_response.status_code == 200 and docx_response.content == docx_body
+    assert docx_response["Content-Type"] == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    assert docx_response["Content-Disposition"].startswith("attachment;")
     assert anonymous.get(login_url, HTTP_HOST=host).status_code == 401
     assert anonymous.get(hidden_url, HTTP_HOST=host).status_code == 404
     assert anonymous.get(draft_url, HTTP_HOST=host).status_code == 404
+    assert anonymous.get(root + f"{removed_file.pk}/file/", HTTP_HOST=host).status_code == 404
+    assert anonymous.get(root + f"{quarantined_file.pk}/file/", HTTP_HOST=host).status_code == 404
 
     eligible = client
     assert eligible.get(login_url, HTTP_HOST=host).status_code == 200
