@@ -51,6 +51,11 @@ def approval_for(content, *, using):
 
 
 def validate_publication(content, *, using):
+    if content._meta.label_lower == "cms.document":
+        # Publication is the last security gate: revalidate metadata, category
+        # ownership, sanitized rich text and a READY, scanned Site-owned file.
+        content.full_clean()
+        return
     if isinstance(content, Page):
         from .sidebars import validate_publication as validate_sidebar_publication
         validate_sidebar_publication(content)

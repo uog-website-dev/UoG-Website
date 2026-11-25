@@ -18,6 +18,7 @@ from apps.sites.selectors.modules import module_is_available
 from ..authorization import require_cms_grant, cms_administrator_allows
 from ..models import ContentRole, Document
 from apps.api.models import Category
+from apps.audit.writer import record_event
 from ..services.workflow import transition_content
 
 
@@ -48,6 +49,8 @@ class DocumentCategorySerializer(serializers.ModelSerializer):
 
 class DocumentSerializer(serializers.ModelSerializer):
     slug = serializers.SlugField(required=False, allow_blank=True, max_length=255)
+    visible_to_public = serializers.BooleanField(required=False)
+    require_login_to_download = serializers.BooleanField(required=False)
     categories = serializers.PrimaryKeyRelatedField(queryset=Category.objects.none(), many=True, required=False)
     categories_detail = DocumentCategorySerializer(source="categories", many=True, read_only=True)
     creator = serializers.IntegerField(source="created_by_id", read_only=True)
@@ -57,7 +60,7 @@ class DocumentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Document
-        fields = ("id", "site", "title", "slug", "description", "file_reference", "file_type", "original_filename", "file_size", "categories", "categories_detail", "status", "creator", "created_at", "updated_at", "revision_number", "published_at", "version", "effective_date", "visibility")
+        fields = ("id", "site", "title", "slug", "description", "file_reference", "file_type", "original_filename", "file_size", "categories", "categories_detail", "status", "creator", "created_at", "updated_at", "revision_number", "published_at", "version", "effective_date", "visibility", "visible_to_public", "require_login_to_download")
         read_only_fields = ("id", "site", "status", "creator", "created_at", "updated_at", "revision_number", "published_at", "categories_detail")
 
     def get_file_type(self, obj):
@@ -88,6 +91,9 @@ class DocumentSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Enter a document title.")
         return value
 
+    def validate_version(self, value):
+        return value.strip()
+
     def validate_file_reference(self, value):
         from apps.media.document_references import validate_document_file
         site_id = getattr(self.instance, "site_id", None) or self.context.get("site_id")
@@ -100,6 +106,10 @@ class DocumentSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         instance = self.instance
         site_id = getattr(instance, "site_id", None) or self.context.get("site_id")
+        if "visible_to_public" in attrs:
+            attrs["visibility"] = "PUBLIC" if attrs["visible_to_public"] else "HIDDEN"
+        elif "visibility" in attrs:
+            attrs["visible_to_public"] = attrs["visibility"] == "PUBLIC"
         for category in attrs.get("categories", []):
             if category.site_id != site_id or not category.is_active or category.kind != Category.Kind.DOCUMENTS:
                 raise serializers.ValidationError({"categories": "Choose active categories belonging to this Site."})
@@ -129,6 +139,23 @@ class DocumentSerializer(serializers.ModelSerializer):
             instance._pending_categories = categories
         instance.save()
         return instance
+
+
+def _document_audit_snapshot(document):
+    return {
+        "site_id": document.site_id,
+        "title": document.title,
+        "slug": document.slug,
+        "description": document.description,
+        "version": document.version,
+        "effective_date": document.effective_date.isoformat() if document.effective_date else None,
+        "visibility": document.visibility,
+        "visible_to_public": document.visible_to_public,
+        "require_login_to_download": document.require_login_to_download,
+        "status": document.status,
+        "categories": sorted(str(value) for value in document.categories.values_list("pk", flat=True)),
+        "revision_number": document.revision_number,
+    }
 
 
 class DocumentPagination(PageNumberPagination):
@@ -203,6 +230,9 @@ class SiteDocuments(APIView):
             document = serializer.save()
         except ValidationError as error:
             raise serializers.ValidationError(error.message_dict if hasattr(error, "message_dict") else error.messages) from error
+        after = _document_audit_snapshot(document)
+        record_event(action="DOCUMENT_CREATED", entity_type="cms.document", entity_id=document.pk,
+                     after=after, changed_fields=after.keys())
         return Response(DocumentSerializer(document, context={"site_id": site.pk}).data, status=201)
 
 
@@ -227,12 +257,18 @@ class SiteDocumentDetail(APIView):
     @transaction.atomic
     def patch(self, request, site_pk, document_id):
         obj = self._record(request, site_pk, document_id, write=True)
+        before = _document_audit_snapshot(obj)
         serializer = DocumentSerializer(obj, data=request.data, partial=True, context={"request": request, "site_id": obj.site_id})
         serializer.is_valid(raise_exception=True)
         try:
             obj = serializer.save()
         except ValidationError as error:
             raise serializers.ValidationError(error.message_dict if hasattr(error, "message_dict") else error.messages) from error
+        after = _document_audit_snapshot(obj)
+        changed = [field for field in after if before.get(field) != after[field]]
+        if changed:
+            record_event(action="DOCUMENT_UPDATED", entity_type="cms.document", entity_id=obj.pk,
+                         before=before, after=after, changed_fields=changed)
         return Response(DocumentSerializer(obj, context={"site_id": obj.site_id}).data)
 
     @extend_schema(tags=["CMS documents"], responses={204: None})

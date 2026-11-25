@@ -334,6 +334,10 @@ class SiteContent(models.Model):
                 raise ValidationError(dict(error.error_dict)) from error
             raise
 
+    def _save_revision_relations(self, *, using):
+        """Hook for content types with revision-bound relations."""
+        return None
+
     def clean(self):
         self._validate_content()
         self._validate_blocks()
@@ -463,69 +467,6 @@ class SiteContent(models.Model):
             return result
 
 
-class DocumentCategory(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    site = models.ForeignKey("sites.Site", on_delete=models.PROTECT, related_name="document_categories")
-    name = models.CharField(max_length=120)
-    slug = models.SlugField(max_length=128)
-    is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    class Meta:
-        ordering = ("name", "id")
-        constraints = [models.UniqueConstraint(fields=("site", "slug"), name="cms_doc_category_site_slug_uniq")]
-
-
-class Document(SiteContent):
-    """Official file maintained within one Site's CMS."""
-    title = models.CharField(max_length=255)
-    slug = models.SlugField(max_length=255)
-    description = models.TextField(blank=True, default="")
-    file_reference = models.CharField(max_length=512)
-    categories = models.ManyToManyField(DocumentCategory, blank=True, related_name="documents")
-    version = models.CharField(max_length=40, blank=True, default="")
-    effective_date = models.DateField(null=True, blank=True)
-    visibility = models.CharField(max_length=12, default="PUBLIC", choices=[("PUBLIC", "Public"), ("UNLISTED", "Unlisted"), ("HIDDEN", "Hidden")])
-
-    class Meta:
-        ordering = ("-updated_at", "id")
-
-    def clean(self):
-        super().clean()
-        if not self.title or not self.title.strip():
-            raise ValidationError({"title": "Enter a document title."})
-        if not self.file_reference or not self.file_reference.strip():
-            raise ValidationError({"file_reference": "Upload a document file."})
-        from apps.api.document_media import validate_document_file
-        validate_document_file(self.file_reference, self.site_id)
-        from .blocks import sanitize_rich_text
-        self.description = sanitize_rich_text(self.description)
-
-    def _save_revision_relations(self, *, using):
-        """Persist related values inside the same transaction as the snapshot."""
-        categories = getattr(self, "_pending_categories", None)
-        if categories is not None:
-            self.categories.set(categories)
-            del self._pending_categories
-        if self.site_id and self.slug and Document.objects.filter(site_id=self.site_id, slug=self.slug).exclude(pk=self.pk).exists():
-            raise ValidationError({"slug": "A document with this slug already exists in this Site."})
-
-    def delete(self, *args, **kwargs):
-        from apps.media.services import detach_references_for_content
-        from .services.revisions import content_revision_delete
-
-        using = kwargs.get("using") or self._state.db or router.db_for_write(
-            type(self), instance=self,
-        )
-        with hierarchy_write(using=using):
-            detach_references_for_content(
-                self,
-                actor=self.updated_by or self.created_by,
-                using=using,
-            )
-            with content_revision_delete(using=using):
-                return super().delete(*args, **kwargs)
-
-
 class Document(SiteContent):
     """Site-owned official file with retained, revision-bound asset references."""
     title = models.CharField(max_length=255)
@@ -536,6 +477,8 @@ class Document(SiteContent):
     version = models.CharField(max_length=40, blank=True, default="")
     effective_date = models.DateField(null=True, blank=True)
     visibility = models.CharField(max_length=12, default="PUBLIC", choices=[("PUBLIC", "Public"), ("UNLISTED", "Unlisted"), ("HIDDEN", "Hidden")])
+    visible_to_public = models.BooleanField(default=True)
+    require_login_to_download = models.BooleanField(default=False)
 
     class Meta:
         ordering = ("-updated_at", "id")
@@ -552,6 +495,9 @@ class Document(SiteContent):
         validate_document_file(self.file_reference, self.site_id)
         from .blocks import sanitize_rich_text
         self.description = sanitize_rich_text(self.description)
+        if not isinstance(self.version, str):
+            raise ValidationError({"version": "Version must be text."})
+        self.version = self.version.strip()
         pending = getattr(self, "_pending_categories", None)
         category_ids = [item.pk for item in pending] if pending is not None else (
             self.categories.values_list("pk", flat=True) if self.pk else []
@@ -570,6 +516,22 @@ class Document(SiteContent):
         if categories is not None:
             self.categories.set(categories)
             del self._pending_categories
+
+    def delete(self, *args, **kwargs):
+        from apps.media.services import detach_references_for_content
+        from .services.revisions import content_revision_delete
+
+        using = kwargs.get("using") or self._state.db or router.db_for_write(
+            type(self), instance=self,
+        )
+        with hierarchy_write(using=using):
+            detach_references_for_content(
+                self,
+                actor=self.updated_by or self.created_by,
+                using=using,
+            )
+            with content_revision_delete(using=using):
+                return super().delete(*args, **kwargs)
 
 
 def _merge_revision_snapshot(before, candidate, update_fields):
