@@ -90,6 +90,18 @@ def test_widget_data_scopes_published_filtering_and_private_preview(world, clien
     assert api.get(f"/api/v1/sites/{b.pk}/pages/{page.pk}/widget-data/?source=identity").status_code in (403, 404)
 
 
+def test_document_widget_is_site_module_scoped(world, client):
+    a, b, ha, hb, page = world
+    path = "/api/v1/site-context/widgets/"
+    assert client.get(path, {"source":"documents"}, HTTP_HOST=ha).status_code == 404
+    _enable([a], "DOCUMENTS")
+    result = client.get(path, {"source":"documents", "limit":3, "document_sort":"title"}, HTTP_HOST=ha)
+    assert result.status_code == 200 and result.json()=={"site":a.pk,"source":"documents","results":[]}
+    assert client.get(path, {"source":"documents", "site":b.pk}, HTTP_HOST=ha).status_code == 400
+    disable_module_for_site(a.pk, Module.objects.get(code="DOCUMENTS").pk)
+    assert client.get(path, {"source":"documents"}, HTTP_HOST=ha).status_code == 404
+
+
 def test_contact_validation_replay_and_foreign_host_have_no_partial_writes(world, client):
     a, b, ha, hb, page = world
     path = f"/api/v1/site-context/contact/{page.pk}/contact.v1/"

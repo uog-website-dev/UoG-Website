@@ -24,6 +24,8 @@ export type { ApiErrorCode } from "./errors";
 
 export { createApiClient, describeApiError } from "./client";
 export type { ApiClient, ApiClientOptions, ApiResult } from "./client";
+export { fetchSiteWidgetData, SiteWidgetRequestError } from "./public-widgets";
+export type { SiteWidgetEnvelope } from "./public-widgets";
 
 export { buildQueryString, withQuery } from "./query";
 export type { QueryValue } from "./query";

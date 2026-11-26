@@ -38,7 +38,7 @@ vi.mock("@/app/sites/menu-actions", () => ({
   loadSiteNavigation: vi.fn(async () => ({ ok: true, data: { menus: [], inheritance: [] } })),
   loadMenuTargets: vi.fn(async () => ({
     ok: true,
-    data: { pages: [], posts: [], pagesAvailable: false, postsAvailable: false },
+    data: { pages: [], posts: [], pagesAvailable: false, postsAvailable: false, documentsAvailable: false },
   })),
   createSiteMenu: vi.fn(),
   createMenuLink: vi.fn(),

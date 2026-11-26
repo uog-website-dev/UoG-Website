@@ -516,3 +516,5 @@ export * from "./footer";
 export * from "./header";
 
 export { MAX_MENU_DEPTH } from "./navigation";
+export { DOCUMENTS_COPY, documentsCopy } from "./documents-copy";
+export type { DocumentsLanguage } from "./documents-copy";

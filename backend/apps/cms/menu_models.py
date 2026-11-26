@@ -172,6 +172,7 @@ class MenuItem(MenuRecord):
         CUSTOM = "custom", "Custom"
         NEWS = "news", "News listing"
         CATEGORY = "category", "News category"
+        DOCUMENTS = "docs", "Documents & Files"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     menu = models.ForeignKey(Menu, on_delete=models.PROTECT, related_name="items")
@@ -202,7 +203,7 @@ class MenuItem(MenuRecord):
                 deferrable=models.Deferrable.IMMEDIATE,
             ),
             models.CheckConstraint(condition=Q(label__gt=""), name="menu_item_label_required"),
-            models.CheckConstraint(condition=Q(item_type__in=["page", "post", "external", "custom", "news", "category"]), name="menu_item_type"),
+            models.CheckConstraint(condition=Q(item_type__in=["page", "post", "external", "custom", "news", "category", "docs"]), name="menu_item_type"),
             models.CheckConstraint(condition=Q(sort_order__gte=0), name="menu_item_sort_order"),
             models.CheckConstraint(
                 condition=~Q(target__contains="://") | Q(item_type="external"),
@@ -234,6 +235,13 @@ class MenuItem(MenuRecord):
 
     def _validate_target(self):
         kind = self.item_type
+        if kind == self.ItemType.DOCUMENTS:
+            from apps.sites.selectors.modules import module_is_available
+            if not module_is_available(self.site_id, "DOCUMENTS"):
+                raise ValidationError({"target": "The DOCUMENTS module is not enabled for this Site."})
+            if self.page_id or self.post_id or self.category_id or self.target or self.allow_cross_site:
+                raise ValidationError({"target": "Documents destinations use this Site's document directory."})
+            return
         if kind in {self.ItemType.NEWS, self.ItemType.CATEGORY}:
             from apps.sites.selectors.modules import module_is_available
             if not module_is_available(self.site_id, "POSTS"):

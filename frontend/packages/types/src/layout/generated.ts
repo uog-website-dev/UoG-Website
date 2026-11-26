@@ -43,6 +43,7 @@ export interface WidgetPropsMap {
   table_of_contents: { title: string; max_level: 2 | 3 | 4 };
   menu_anchor: { anchor: string };
   countdown: { ends_at: string; label: string };
+  document_list: { categories: Array<string>; limit: number; display: "grid" | "list"; sort: "newest" | "oldest" | "title"; title?: string };
 }
 export type WidgetType = keyof WidgetPropsMap;
 export type GapToken = "none" | "sm" | "md" | "lg";

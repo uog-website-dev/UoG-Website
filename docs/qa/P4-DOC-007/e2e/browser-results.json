@@ -1,0 +1,23 @@
+{
+  "site": 3,
+  "host": "informatics.uog.local",
+  "browser": "158.0.4370.33",
+  "results": [
+    {
+      "name": "Published widget requests configured Site categories, limit, and sort; restricted download link is retained",
+      "status": "PASS"
+    },
+    {
+      "name": "Document Grid is responsive at desktop, tablet, and phone widths without horizontal overflow",
+      "status": "PASS"
+    },
+    {
+      "name": "Empty widget state is announced when no eligible documents are returned",
+      "status": "PASS"
+    },
+    {
+      "name": "Widget transport failure is contained and Retry recovers without breaking the Page",
+      "status": "PASS"
+    }
+  ]
+}

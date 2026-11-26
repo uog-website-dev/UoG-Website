@@ -16,6 +16,7 @@ export default function VisualBuilderPage() {
         pageId={pageId}
         builderEnabled={builderEnabled}
         permissions={permissions}
+        defaultLanguage={site.defaultLanguage}
       />
     </SiteSection>
   );
