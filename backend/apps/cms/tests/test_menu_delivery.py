@@ -10,6 +10,7 @@ from apps.api.models import Post
 from apps.audit.models import AuditEvent
 from apps.authorization.models import Role, UserRoleAssignment
 from apps.cms.menu_cache import delivery_version
+from apps.cms.menu_assignment_models import MenuLocationAssignment
 from apps.cms.menu_models import Menu, MenuInheritance, MenuItem
 from apps.cms.tests.support import transition_with_site_role
 from apps.cms.selectors.menu_delivery import compose_location
@@ -314,3 +315,63 @@ def test_menu_changes_invalidate_only_affected_site_and_location_caches(family, 
     assert [row["label"] for row in client.get(PUBLIC + "?location=header", HTTP_HOST=_host(child)).json()["locations"]["header"]] == [
         "UoG", "Schools", "Department",
     ]
+
+
+def _publish_assignment(site, location, menu):
+    """Persist a published location assignment without going through the HTTP API."""
+    actor = get_user_model().objects.create_user(
+        username=f"assign-{site.pk}-{uuid4().hex[:8]}",
+    )
+    row = MenuLocationAssignment.objects.filter(site=site, location=location).first()
+    if row is None:
+        row = MenuLocationAssignment(site=site, location=location)
+    row.draft_menu = menu
+    row.published_menu = menu
+    row.draft_menus = []
+    row.published_menus = []
+    row.is_published = True
+    row.updated_by = actor
+    row.save()
+    return row
+
+
+def test_published_assignment_keeps_include_global_and_append_inheritance(family):
+    """Finding 1: a published assignment is the local segment, not a hard override of policy."""
+    main, parent, child, _sibling = family
+    global_menu = Menu.objects.create(site=main, location="header", name="Global", is_global=True)
+    _link(global_menu, "University")
+    parent_menu = Menu.objects.create(site=parent, location="header", name="Parent")
+    _link(parent_menu, "Colleges")
+    local_menu = Menu.objects.create(site=child, location="", name="Assigned local", code="assigned-local")
+    _link(local_menu, "Department")
+    _publish_assignment(child, "header", local_menu)
+    MenuInheritance.objects.create(
+        site=child, location="header", inherit_from=parent,
+        include_global=True, local_precedence="append",
+    )
+    assert _roots(child.pk) == [
+        ("University", "global"), ("Colleges", "inherited"), ("Department", "local"),
+    ]
+
+
+def test_child_inherits_parent_assigned_local_menu_not_composed_tree(family):
+    """Finding 1: inheritance copies the parent's assigned local menu only."""
+    main, parent, child, _sibling = family
+    global_menu = Menu.objects.create(site=main, location="header", name="Global", is_global=True)
+    _link(global_menu, "University")
+    parent_assigned = Menu.objects.create(
+        site=parent, location="", name="Parent assigned", code="parent-assigned",
+    )
+    _link(parent_assigned, "Assigned parent")
+    _publish_assignment(parent, "header", parent_assigned)
+    MenuInheritance.objects.create(
+        site=parent, location="header", include_global=True, local_precedence="override",
+    )
+    MenuInheritance.objects.create(
+        site=child, location="header", inherit_from=parent,
+        include_global=False, local_precedence="append",
+    )
+    # Parent composition includes global + assigned local.
+    assert _roots(parent.pk) == [("University", "global"), ("Assigned parent", "local")]
+    # Child inherits only the parent's local assignment, not the parent's global fragment.
+    assert _roots(child.pk) == [("Assigned parent", "inherited")]

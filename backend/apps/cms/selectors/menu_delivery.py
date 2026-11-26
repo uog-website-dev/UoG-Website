@@ -8,11 +8,13 @@ Precedence, from the start of the list:
    local menu is active. ``append`` places local items after segment 2.
    A missing policy is local-only: no global fragment and no parent.
 
-An inactive menu is absent. An inactive item hides its descendants. A page is
-shown only when it is published and PUBLIC or UNLISTED. A post is shown only
-when it is published. Hidden, draft, unpublished and missing targets drop the
-item and its descendants. External and custom items stay. Inheritance copies
-the parent's local menu only, so a parent's own parent is not pulled in.
+A published location assignment supplies the local segment but does not drop
+global or inherited segments. An inactive menu is absent. An inactive item
+hides its descendants. A page is shown only when it is published and PUBLIC
+or UNLISTED. A post is shown only when it is published. Hidden, draft,
+unpublished and missing targets drop the item and its descendants. External
+and custom items stay. Inheritance copies the parent's local menu only, so a
+parent's own parent is not pulled in.
 """
 from apps.sites.models import Site
 from apps.sites.selectors.modules import module_is_available
@@ -20,36 +22,129 @@ from apps.sites.selectors.modules import module_is_available
 from ..menu_models import Menu, MenuInheritance
 
 
-
-
 def compose_location(site_id, location):
-    from apps.sites.menu_locations import locations_for_site,MENU_SLOTS
-    from ..menu_assignment_models import MenuLocationAssignment
-    site=Site.objects.select_related('template').get(pk=site_id)
-    if location in MENU_SLOTS and location not in locations_for_site(site):return []
-    assigned=MenuLocationAssignment.objects.filter(site_id=site_id,location=location,is_published=True).select_related('published_menu').first()
-    if assigned and location=='footer' and assigned.published_menus:
-        return footer_columns(site_id,assigned.published_menus) if _site_serves(site_id) else []
-    if assigned:
-        return _project(assigned.published_menu,'local') if assigned.published_menu and not assigned.published_menu.is_global and assigned.published_menu.is_active and _site_serves(site_id) else []
+    from apps.sites.menu_locations import locations_for_site, MENU_SLOTS
+
+    site = Site.objects.select_related("template").get(pk=site_id)
+    if location in MENU_SLOTS and location not in locations_for_site(site):
+        return []
+    if not _site_serves(site_id):
+        return []
+    local_menu, local_menu_ids = resolve_local_menu(site_id, location, draft=False)
+    return compose_with_local(
+        site_id, location, local_menu=local_menu, local_menu_ids=local_menu_ids, draft=False,
+    )
+
+
+def compose_with_local(
+    site_id, location, *, local_menu=None, local_menu_ids=None, draft=False,
+):
+    """Compose global + inherited + the supplied local segment.
+
+    ``local_menu`` / ``local_menu_ids`` are the caller's resolved local segment
+    (published assignment, draft assignment, or legacy active menu). Preview
+    passes draft trees; public delivery passes published/active ones.
+    """
     policy = MenuInheritance.objects.filter(site_id=site_id, location=location).first()
     include_global = bool(policy and policy.include_global)
     inherit_from_id = policy.inherit_from_id if policy else None
     precedence = policy.local_precedence if policy else "override"
+
+    active_local = bool(local_menu_ids) or (
+        local_menu is not None
+        and not local_menu.is_global
+        and (draft or local_menu.is_active)
+    )
+
     items = []
-    if include_global and _site_serves(Menu.objects.filter(is_global=True, location=location, is_active=True).values_list("site_id", flat=True).first()):
-        global_menu = Menu.objects.filter(is_global=True, location=location, is_active=True).first()
-        items.extend(_project(global_menu, "global"))
-    local_menu = Menu.objects.filter(site_id=site_id, location=location, is_global=False, is_active=True).first()
-    use_parent = inherit_from_id and _site_serves(inherit_from_id) and not (local_menu and precedence == "override")
-    if use_parent:
-        parent_menu = Menu.objects.filter(
-            site_id=inherit_from_id, location=location, is_global=False, is_active=True,
+    if include_global and _site_serves(
+        Menu.objects.filter(
+            is_global=True, location=location, is_active=True,
+        ).values_list("site_id", flat=True).first()
+    ):
+        global_menu = Menu.objects.filter(
+            is_global=True, location=location, is_active=True,
         ).first()
-        items.extend(_project(parent_menu, "inherited"))
-    if local_menu is not None:
-        items.extend(_project(local_menu, "local"))
+        items.extend(_project(global_menu, "global", draft=False))
+
+    use_parent = (
+        inherit_from_id
+        and _site_serves(inherit_from_id)
+        and not (active_local and precedence == "override")
+    )
+    if use_parent:
+        parent_menu, parent_ids = resolve_local_menu(
+            inherit_from_id, location, draft=False,
+        )
+        if parent_ids:
+            items.extend(
+                _retag_source(
+                    footer_columns(inherit_from_id, parent_ids, draft=False),
+                    "inherited",
+                )
+            )
+        elif parent_menu is not None:
+            items.extend(_project(parent_menu, "inherited", draft=False))
+
+    if local_menu_ids:
+        items.extend(footer_columns(site_id, local_menu_ids, draft=draft))
+    elif local_menu is not None and (draft or local_menu.is_active):
+        items.extend(_project(local_menu, "local", draft=draft))
     return items
+
+
+def resolve_local_menu(site_id, location, *, draft=False):
+    """Return ``(menu, menu_ids)`` for this Site's local segment.
+
+    Published/draft assignments win over legacy location-matched menus.
+    An explicit published or draft unassignment yields ``(None, None)`` and
+    does not fall back to a legacy menu. Footer multi-menu assignments return
+    ``(None, ids)``.
+    """
+    from ..menu_assignment_models import MenuLocationAssignment
+
+    assigned = (
+        MenuLocationAssignment.objects
+        .filter(site_id=site_id, location=location)
+        .select_related("published_menu", "draft_menu")
+        .first()
+    )
+    if draft:
+        if assigned is not None:
+            if location == "footer" and assigned.draft_menus:
+                return None, list(assigned.draft_menus)
+            menu = assigned.draft_menu
+            if (
+                menu is not None
+                and menu.site_id == site_id
+                and not menu.is_global
+            ):
+                return menu, None
+            return None, None
+    elif assigned is not None and assigned.is_published:
+        if location == "footer" and assigned.published_menus:
+            return None, list(assigned.published_menus)
+        menu = assigned.published_menu
+        if (
+            menu is not None
+            and menu.site_id == site_id
+            and not menu.is_global
+            and menu.is_active
+        ):
+            return menu, None
+        return None, None
+
+    legacy = Menu.objects.filter(
+        site_id=site_id, location=location, is_global=False, is_active=True,
+    ).first()
+    return legacy, None
+
+
+def _retag_source(nodes, source):
+    return [
+        {**node, "source": source, "children": _retag_source(node.get("children") or [], source)}
+        for node in nodes
+    ]
 
 
 def _site_serves(site_id):
@@ -65,12 +160,13 @@ def _project(menu, source, *, draft=False):
     if menu is None:
         return []
     from ..menu_destinations import published_rows, resolve_destination, menu_origin
-    rows = list(menu.items.order_by("sort_order","id")[:1001]) if draft else published_rows(menu)
-    if len(rows)>1000:
-        if not draft:return []
+    rows = list(menu.items.order_by("sort_order", "id")[:1001]) if draft else published_rows(menu)
+    if len(rows) > 1000:
+        if not draft:
+            return []
         from django.core.exceptions import ValidationError
-        raise ValidationError({"tree":"A menu preview supports at most 1000 items."})
-    origin=menu_origin(menu.site_id) if source!="local" else None
+        raise ValidationError({"tree": "A menu preview supports at most 1000 items."})
+    origin = menu_origin(menu.site_id) if source != "local" else None
     children = {}
     for row in rows:
         children.setdefault(row.parent_id, []).append(row)
@@ -79,14 +175,14 @@ def _project(menu, source, *, draft=False):
         rendered = []
         for row in children.get(parent_id, ()):
             destination = resolve_destination(row)
-            if destination and destination.startswith("/") and source!="local":
-                destination=origin+destination if origin else None
+            if destination and destination.startswith("/") and source != "local":
+                destination = origin + destination if origin else None
             if not row.is_active or (destination is None and not draft):
                 continue
             rendered.append({
                 "label": row.label,
                 "href": destination or "",
-                **({"destination_status":"ready" if destination else "unavailable"} if draft else {}),
+                **({"destination_status": "ready" if destination else "unavailable"} if draft else {}),
                 "source": source,
                 "children": branch(row.pk),
             })
@@ -101,17 +197,19 @@ def footer_columns(site_id, ids, *, draft=False):
     Public output uses the footer settings' published headings, descriptions
     and order, so renaming the internal menu never changes visitor-facing copy.
     """
-    menus={str(m.pk):m for m in Menu.objects.filter(site_id=site_id,pk__in=ids,is_global=False)}
-    result=[]
+    menus = {str(m.pk): m for m in Menu.objects.filter(site_id=site_id, pk__in=ids, is_global=False)}
+    result = []
     for identifier in ids:
-        menu=menus.get(identifier)
+        menu = menus.get(identifier)
         if menu is None or (not draft and not menu.is_active):
             continue
-        result.append({'menu':str(menu.pk),'label':menu.name,'href':'','source':'local',
-                       'column':True,'children':_project(menu,'local',draft=draft)})
+        result.append({
+            "menu": str(menu.pk), "label": menu.name, "href": "", "source": "local",
+            "column": True, "children": _project(menu, "local", draft=draft),
+        })
     if not draft:
-        from apps.sites.footer import apply_footer_column_copy,published_footer_values
+        from apps.sites.footer import apply_footer_column_copy, published_footer_values
         from apps.sites.models import SiteFooter
-        row=SiteFooter.objects.filter(site_id=site_id).first()
-        result=apply_footer_column_copy(result,published_footer_values(row)['columns'])
+        row = SiteFooter.objects.filter(site_id=site_id).first()
+        result = apply_footer_column_copy(result, published_footer_values(row)["columns"])
     return result
