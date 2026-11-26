@@ -1,0 +1,249 @@
+[
+  {
+    "id": "home-main",
+    "url": "http://www.uog.local/",
+    "fcp": 376,
+    "lcp": 0,
+    "cls": 0,
+    "shifts": [],
+    "fonts": [
+      {
+        "family": "__nextjs-Geist",
+        "status": "unloaded"
+      },
+      {
+        "family": "__nextjs-Geist Mono",
+        "status": "unloaded"
+      },
+      {
+        "family": "__nextjs-Geist",
+        "status": "unloaded"
+      },
+      {
+        "family": "__nextjs-Geist Mono",
+        "status": "unloaded"
+      }
+    ],
+    "images": [
+      {
+        "loading": "auto",
+        "widthAttr": null,
+        "heightAttr": null,
+        "natural": "300x195",
+        "src": "http://www.uog.local/api/v1/site-context/identity/logo/?v=94c3b02b45c3096f160c0b754aedec036d56d6beda5b100545413ed7cf7173"
+      },
+      {
+        "loading": "auto",
+        "widthAttr": null,
+        "heightAttr": null,
+        "natural": "300x195",
+        "src": "http://www.uog.local/api/v1/site-context/identity/logo/?v=94c3b02b45c3096f160c0b754aedec036d56d6beda5b100545413ed7cf7173"
+      }
+    ],
+    "lazyImages": 0,
+    "eagerImages": 2
+  },
+  {
+    "id": "page",
+    "url": "http://www.uog.local/mainqa-8995d437-information",
+    "fcp": 508,
+    "lcp": 0,
+    "cls": 0,
+    "shifts": [],
+    "fonts": [
+      {
+        "family": "__nextjs-Geist",
+        "status": "unloaded"
+      },
+      {
+        "family": "__nextjs-Geist Mono",
+        "status": "unloaded"
+      },
+      {
+        "family": "__nextjs-Geist",
+        "status": "unloaded"
+      },
+      {
+        "family": "__nextjs-Geist Mono",
+        "status": "unloaded"
+      }
+    ],
+    "images": [
+      {
+        "loading": "auto",
+        "widthAttr": null,
+        "heightAttr": null,
+        "natural": "300x195",
+        "src": "http://www.uog.local/api/v1/site-context/identity/logo/?v=94c3b02b45c3096f160c0b754aedec036d56d6beda5b100545413ed7cf7173"
+      },
+      {
+        "loading": "auto",
+        "widthAttr": null,
+        "heightAttr": null,
+        "natural": "300x195",
+        "src": "http://www.uog.local/api/v1/site-context/identity/logo/?v=94c3b02b45c3096f160c0b754aedec036d56d6beda5b100545413ed7cf7173"
+      }
+    ],
+    "lazyImages": 0,
+    "eagerImages": 2
+  },
+  {
+    "id": "posts",
+    "url": "http://aau-review.localhost/posts",
+    "fcp": 572,
+    "lcp": 0,
+    "cls": 0,
+    "shifts": [],
+    "fonts": [
+      {
+        "family": "__nextjs-Geist",
+        "status": "unloaded"
+      },
+      {
+        "family": "__nextjs-Geist Mono",
+        "status": "unloaded"
+      },
+      {
+        "family": "__nextjs-Geist",
+        "status": "unloaded"
+      },
+      {
+        "family": "__nextjs-Geist Mono",
+        "status": "unloaded"
+      }
+    ],
+    "images": [
+      {
+        "loading": "auto",
+        "widthAttr": null,
+        "heightAttr": null,
+        "natural": "427x423",
+        "src": "http://aau-review.localhost/api/v1/site-context/identity/logo/?v=ba1b4b54c43b316106d5bb8fbc089167dc810303353a092ab3b517a"
+      },
+      {
+        "loading": "lazy",
+        "widthAttr": null,
+        "heightAttr": null,
+        "natural": "320x147",
+        "src": "http://aau-review.localhost/api/v1/site-context/media/21d0b91b-ca79-481f-84eb-3cdf96b96691/?variant=thumbnail"
+      },
+      {
+        "loading": "lazy",
+        "widthAttr": null,
+        "heightAttr": null,
+        "natural": "320x213",
+        "src": "http://aau-review.localhost/api/v1/site-context/media/b7af58f7-e982-4c39-9815-300af59db983/?variant=thumbnail"
+      },
+      {
+        "loading": "lazy",
+        "widthAttr": null,
+        "heightAttr": null,
+        "natural": "320x143",
+        "src": "http://aau-review.localhost/api/v1/site-context/media/fd93baec-d1e4-4a3a-b36d-7985c05f99fd/?variant=thumbnail"
+      },
+      {
+        "loading": "lazy",
+        "widthAttr": null,
+        "heightAttr": null,
+        "natural": "320x240",
+        "src": "http://aau-review.localhost/api/v1/site-context/media/69f5802b-788c-4141-82d1-ae29584d6a13/?variant=thumbnail"
+      },
+      {
+        "loading": "lazy",
+        "widthAttr": null,
+        "heightAttr": null,
+        "natural": "320x180",
+        "src": "http://aau-review.localhost/api/v1/site-context/media/406f0e7c-638d-42b2-b33b-a0e1bf700cce/?variant=thumbnail"
+      },
+      {
+        "loading": "auto",
+        "widthAttr": null,
+        "heightAttr": null,
+        "natural": "427x423",
+        "src": "http://aau-review.localhost/api/v1/site-context/identity/logo/?v=ba1b4b54c43b316106d5bb8fbc089167dc810303353a092ab3b517a"
+      }
+    ],
+    "lazyImages": 5,
+    "eagerImages": 2
+  },
+  {
+    "id": "post-detail",
+    "url": "http://aau-review.localhost/posts/aau-reference-dd1aa7a8",
+    "fcp": 516,
+    "lcp": 0,
+    "cls": 0,
+    "shifts": [],
+    "fonts": [
+      {
+        "family": "__nextjs-Geist",
+        "status": "unloaded"
+      },
+      {
+        "family": "__nextjs-Geist Mono",
+        "status": "unloaded"
+      },
+      {
+        "family": "__nextjs-Geist",
+        "status": "unloaded"
+      },
+      {
+        "family": "__nextjs-Geist Mono",
+        "status": "unloaded"
+      }
+    ],
+    "images": [
+      {
+        "loading": "auto",
+        "widthAttr": null,
+        "heightAttr": null,
+        "natural": "427x423",
+        "src": "http://aau-review.localhost/api/v1/site-context/identity/logo/?v=ba1b4b54c43b316106d5bb8fbc089167dc810303353a092ab3b517a"
+      },
+      {
+        "loading": "lazy",
+        "widthAttr": null,
+        "heightAttr": null,
+        "natural": "1200x800",
+        "src": "http://aau-review.localhost/api/v1/site-context/media/b7af58f7-e982-4c39-9815-300af59db983/?variant=display"
+      },
+      {
+        "loading": "auto",
+        "widthAttr": null,
+        "heightAttr": null,
+        "natural": "427x423",
+        "src": "http://aau-review.localhost/api/v1/site-context/identity/logo/?v=ba1b4b54c43b316106d5bb8fbc089167dc810303353a092ab3b517a"
+      }
+    ],
+    "lazyImages": 1,
+    "eagerImages": 2
+  },
+  {
+    "id": "sidebar-left",
+    "url": "http://layout-45dfd491f4a.uog.local/left-sidebar",
+    "fcp": 388,
+    "lcp": 0,
+    "cls": 0,
+    "shifts": [],
+    "fonts": [
+      {
+        "family": "__nextjs-Geist",
+        "status": "unloaded"
+      },
+      {
+        "family": "__nextjs-Geist Mono",
+        "status": "unloaded"
+      },
+      {
+        "family": "__nextjs-Geist",
+        "status": "unloaded"
+      },
+      {
+        "family": "__nextjs-Geist Mono",
+        "status": "unloaded"
+      }
+    ],
+    "images": [],
+    "lazyImages": 0,
+    "eagerImages": 0
+  }
+]

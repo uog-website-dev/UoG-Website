@@ -7,6 +7,20 @@ import {
 } from "./article-document";
 
 describe("versioned article rendering", () => {
+  it("renders long imported heading blocks as paragraphs and removes empty blocks", () => {
+    const first = "The hospital opened new facilities for pediatric care. ".repeat(5);
+    const second = "The new operating rooms will support treatment and training.";
+    const { container } = render(
+      <ArticleDocumentView
+        document={{ schema_version: 1, html: `<h2> </h2><h3>${first}<br>${second}</h3><p> </p>` }}
+      />,
+    );
+    expect(container.querySelectorAll("h2,h3,h4")).toHaveLength(0);
+    expect(container.querySelectorAll("p")).toHaveLength(2);
+    expect(container.textContent).toContain(first.trim());
+    expect(container.textContent).toContain(second);
+  });
+
   it("preserves supported semantics and safely renders hostile text and links", () => {
     const html =
       '<h2>Report</h2><h3>Section</h3><h4>Detail</h4><p><strong>Bold</strong> <em>Emphasis</em></p><ul><li>First</li></ul><ol><li>Second</li></ol><blockquote>Quote</blockquote><script>window.attack=1</script><p onclick="attack()"><a href="javascript:attack()">Unsafe</a><a href="https://uog.edu.et">University</a>&lt;img onerror=attack()&gt;</p>';

@@ -210,6 +210,11 @@ function DashboardContent() {
 
   return (
     <Box data-perf-section="dashboard" data-dashboard-summary-refreshing={summary.refreshing ? "true" : "false"} sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+      {/* The frame banner used to own the page heading; the dashboard keeps
+          its own H1 so the section still has one top-level title. */}
+      <Typography component="h1" variant="h4" sx={{ fontWeight: 700 }}>
+        Dashboard
+      </Typography>
       {canCreatePage || canManageMenus || canManageHomepage || canOpenBuilder ? (
         <Box component="section" aria-labelledby="site-quick-actions" sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
           <Typography id="site-quick-actions" variant="h6" component="h2" sx={{ fontWeight: 700 }}>

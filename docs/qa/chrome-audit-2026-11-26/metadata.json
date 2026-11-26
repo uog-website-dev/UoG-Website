@@ -1,0 +1,604 @@
+[
+  {
+    "id": "home-main",
+    "url": "http://www.uog.local/",
+    "title": "Main review mainqa-8995d437 university information",
+    "description": "University of Gondar",
+    "canonical": "",
+    "ogTitle": "",
+    "ogDescription": "",
+    "ogUrl": "",
+    "hreflang": [],
+    "jsonLd": 0,
+    "h1": [
+      "Main review mainqa-8995d437 university information"
+    ],
+    "landmarks": [
+      {
+        "tag": "header",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Site utility"
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Site header"
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Site header desktop"
+      },
+      {
+        "tag": "main",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Main review mainqa-8995d437 In this section"
+      },
+      {
+        "tag": "footer",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Footer navigation"
+      }
+    ],
+    "lang": "en"
+  },
+  {
+    "id": "home-child",
+    "url": "http://coi.uog.local/",
+    "title": "Informatics Home",
+    "description": "College of Informatics",
+    "canonical": "",
+    "ogTitle": "",
+    "ogDescription": "",
+    "ogUrl": "",
+    "hreflang": [],
+    "jsonLd": 0,
+    "h1": [
+      "Informatics Home"
+    ],
+    "landmarks": [
+      {
+        "tag": "header",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Site utility"
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Site header"
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Site header desktop"
+      },
+      {
+        "tag": "main",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Breadcrumbs"
+      },
+      {
+        "tag": "footer",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Footer navigation"
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Social media"
+      }
+    ],
+    "lang": "en"
+  },
+  {
+    "id": "page",
+    "url": "http://www.uog.local/mainqa-8995d437-information",
+    "title": "Main review mainqa-8995d437 university information",
+    "description": "University of Gondar",
+    "canonical": "http://www.uog.local/mainqa-8995d437-information",
+    "ogTitle": "Main review mainqa-8995d437 university information",
+    "ogDescription": "University of Gondar",
+    "ogUrl": "http://www.uog.local/mainqa-8995d437-information",
+    "hreflang": [],
+    "jsonLd": 0,
+    "h1": [
+      "Main review mainqa-8995d437 university information"
+    ],
+    "landmarks": [
+      {
+        "tag": "header",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Site utility"
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Site header"
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Site header desktop"
+      },
+      {
+        "tag": "main",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Breadcrumb"
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Main review mainqa-8995d437 In this section"
+      },
+      {
+        "tag": "footer",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Footer navigation"
+      }
+    ],
+    "lang": "en"
+  },
+  {
+    "id": "posts",
+    "url": "http://aau-review.localhost/posts",
+    "title": "University of Gondar — Public Portal",
+    "description": "",
+    "canonical": "",
+    "ogTitle": "",
+    "ogDescription": "",
+    "ogUrl": "",
+    "hreflang": [],
+    "jsonLd": 0,
+    "h1": [
+      "News"
+    ],
+    "landmarks": [
+      {
+        "tag": "header",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Site utility"
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Site header"
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Site header desktop"
+      },
+      {
+        "tag": "main",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Breadcrumb"
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "News pagination"
+      },
+      {
+        "tag": "footer",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Footer navigation"
+      }
+    ],
+    "lang": "en"
+  },
+  {
+    "id": "post-detail",
+    "url": "http://aau-review.localhost/posts/aau-reference-dd1aa7a8",
+    "title": "Addis Ababa University Launches Digital Content Creation and Freelancing Training for Students",
+    "description": "A student training initiative connects academic work with opportunities in digital publishing and freelance careers.",
+    "canonical": "http://aau-review.uog.local/posts/aau-reference-dd1aa7a8",
+    "ogTitle": "Addis Ababa University Launches Digital Content Creation and Freelancing Training for Students",
+    "ogDescription": "A student training initiative connects academic work with opportunities in digital publishing and freelance careers.",
+    "ogUrl": "http://aau-review.uog.local/posts/aau-reference-dd1aa7a8",
+    "hreflang": [],
+    "jsonLd": 0,
+    "h1": [
+      "Addis Ababa University Launches Digital Content Creation and Freelancing Training for Students"
+    ],
+    "landmarks": [
+      {
+        "tag": "header",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Site utility"
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Site header"
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Site header desktop"
+      },
+      {
+        "tag": "main",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Breadcrumb"
+      },
+      {
+        "tag": "header",
+        "role": "",
+        "label": "Article banner"
+      },
+      {
+        "tag": "footer",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Footer navigation"
+      }
+    ],
+    "lang": "en"
+  },
+  {
+    "id": "category",
+    "url": "http://article-media-post-14a6169c2f.uog.local/posts/categories/research-655af51c8f",
+    "title": "University of Gondar — Public Portal",
+    "description": "",
+    "canonical": "",
+    "ogTitle": "",
+    "ogDescription": "",
+    "ogUrl": "",
+    "hreflang": [],
+    "jsonLd": 0,
+    "h1": [
+      "Research 655af51c8f"
+    ],
+    "landmarks": [
+      {
+        "tag": "header",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "main",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Breadcrumb"
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "News pagination"
+      },
+      {
+        "tag": "footer",
+        "role": "",
+        "label": ""
+      }
+    ],
+    "lang": "en"
+  },
+  {
+    "id": "category-empty",
+    "url": "http://article-media-post-14a6169c2f.uog.local/posts/categories/empty-655af51c8f",
+    "title": "University of Gondar — Public Portal",
+    "description": "",
+    "canonical": "",
+    "ogTitle": "",
+    "ogDescription": "",
+    "ogUrl": "",
+    "hreflang": [],
+    "jsonLd": 0,
+    "h1": [
+      "Empty 655af51c8f"
+    ],
+    "landmarks": [
+      {
+        "tag": "header",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "main",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Breadcrumb"
+      },
+      {
+        "tag": "footer",
+        "role": "",
+        "label": ""
+      }
+    ],
+    "lang": "en"
+  },
+  {
+    "id": "404",
+    "url": "http://aau-review.localhost/does-not-exist-audit",
+    "title": "Addis Ababa University",
+    "description": "Addis Ababa University",
+    "canonical": "",
+    "ogTitle": "",
+    "ogDescription": "",
+    "ogUrl": "",
+    "hreflang": [],
+    "jsonLd": 0,
+    "h1": [],
+    "landmarks": [
+      {
+        "tag": "header",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Site utility"
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Site header"
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Site header desktop"
+      },
+      {
+        "tag": "main",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Breadcrumb"
+      },
+      {
+        "tag": "footer",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Footer navigation"
+      }
+    ],
+    "lang": "en"
+  },
+  {
+    "id": "sidebar-left",
+    "url": "http://layout-45dfd491f4a.uog.local/left-sidebar",
+    "title": "University Left Sidebar",
+    "description": "Layout Site A",
+    "canonical": "http://layout-45dfd491f4a.uog.local/left-sidebar",
+    "ogTitle": "University Left Sidebar",
+    "ogDescription": "Layout Site A",
+    "ogUrl": "http://layout-45dfd491f4a.uog.local/left-sidebar",
+    "hreflang": [],
+    "jsonLd": 0,
+    "h1": [
+      "University Left Sidebar"
+    ],
+    "landmarks": [
+      {
+        "tag": "header",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "main",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Breadcrumb"
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Published Pages"
+      },
+      {
+        "tag": "footer",
+        "role": "",
+        "label": ""
+      }
+    ],
+    "lang": "en"
+  },
+  {
+    "id": "sidebar-right",
+    "url": "http://layout-45dfd491f4a.uog.local/right-sidebar",
+    "title": "University Right Sidebar",
+    "description": "Layout Site A",
+    "canonical": "http://layout-45dfd491f4a.uog.local/right-sidebar",
+    "ogTitle": "University Right Sidebar",
+    "ogDescription": "Layout Site A",
+    "ogUrl": "http://layout-45dfd491f4a.uog.local/right-sidebar",
+    "hreflang": [],
+    "jsonLd": 0,
+    "h1": [
+      "University Right Sidebar"
+    ],
+    "landmarks": [
+      {
+        "tag": "header",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "main",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Breadcrumb"
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Published Pages"
+      },
+      {
+        "tag": "footer",
+        "role": "",
+        "label": ""
+      }
+    ],
+    "lang": "en"
+  },
+  {
+    "id": "home-empty",
+    "url": "http://cmhs.uog.local/",
+    "title": "University of Gondar — Public Portal",
+    "description": "",
+    "canonical": "",
+    "ogTitle": "",
+    "ogDescription": "",
+    "ogUrl": "",
+    "hreflang": [],
+    "jsonLd": 0,
+    "h1": [],
+    "landmarks": [
+      {
+        "tag": "header",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "main",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "footer",
+        "role": "",
+        "label": ""
+      }
+    ],
+    "lang": "en"
+  },
+  {
+    "id": "posts-disabled",
+    "url": "http://news-disabled-post-14a6169c2f.uog.local/posts",
+    "title": "University of Gondar — Public Portal",
+    "description": "",
+    "canonical": "",
+    "ogTitle": "",
+    "ogDescription": "",
+    "ogUrl": "",
+    "hreflang": [],
+    "jsonLd": 0,
+    "h1": [
+      "News"
+    ],
+    "landmarks": [
+      {
+        "tag": "header",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "main",
+        "role": "",
+        "label": ""
+      },
+      {
+        "tag": "nav",
+        "role": "",
+        "label": "Breadcrumb"
+      },
+      {
+        "tag": "footer",
+        "role": "",
+        "label": ""
+      }
+    ],
+    "lang": "en"
+  }
+]

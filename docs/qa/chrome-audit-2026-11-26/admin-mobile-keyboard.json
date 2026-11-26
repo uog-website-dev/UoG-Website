@@ -1,0 +1,13 @@
+{
+  "opened": true,
+  "initialFocus": {
+    "ariaLabel": "",
+    "text": "UoG AdministrationDigital platformChoose"
+  },
+  "drawerAttrs": {
+    "role": "",
+    "label": "Admin sections",
+    "tag": "NAV"
+  },
+  "restoredTo": "Open navigation menu"
+}

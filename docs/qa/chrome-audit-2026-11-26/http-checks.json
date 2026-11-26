@@ -1,0 +1,30 @@
+[
+  {
+    "host": "www.uog.local",
+    "path": "/robots.txt",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "bodyStart": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" as=\"image\" "
+  },
+  {
+    "host": "www.uog.local",
+    "path": "/sitemap.xml",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "bodyStart": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" as=\"image\" "
+  },
+  {
+    "host": "www.uog.local",
+    "path": "/favicon.ico",
+    "status": 200,
+    "contentType": "image/x-icon",
+    "bodyStart": "\u0000\u0000\u0001\u0000\u0001\u0000\u0010\u0010\u0000\u0000\u0001\u0000 \u0000h\u0004\u0000\u0000\u0016\u0000\u0000\u0000(\u0000\u0000\u0000\u0010\u0000\u0000\u0000 \u0000\u0000\u0000\u0001\u0000 \u0000\u0000\u0000\u0000\u0000@\u0004\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000(���(���(���(���(���(���(���(���(���(���(���(���(���(���(���(���(���b= �b= �b= �b= �b= �b= �b= �b="
+  },
+  {
+    "host": "aau-review.localhost",
+    "path": "/does-not-exist-audit",
+    "status": 200,
+    "contentType": "text/html; charset=utf-8",
+    "bodyStart": "<!DOCTYPE html><html lang=\"en\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" as=\"image\" "
+  }
+]

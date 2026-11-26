@@ -6,9 +6,9 @@
  * The URL has no Site id. A 404 (unknown host or MENUS disabled) renders no
  * navigation instead of falling back to another Site.
  */
-import { Box, Button, Link } from "@mui/material";
+import { Box, Breadcrumbs as MuiBreadcrumbs, Button, Link, Typography } from "@mui/material";
 import { usePathname } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { PublicSiteHeader, PublicSiteFooter, usePublicSiteBranding, menusFromResponse, publicFetchInit } from "@uog/ui";
 import type { PublicMenuNode } from "@uog/ui";
@@ -22,30 +22,66 @@ const EMPTY: { header: PublicMenuNode[]; footer: PublicMenuNode[]; utility?: Pub
 
 export const PUBLIC_MENUS_PATH = "/api/v1/site-context/menus/";
 
-function Breadcrumbs() {
+const BreadcrumbTitleContext = createContext<((title: string | null) => void) | null>(null);
+
+export function usePublicBreadcrumbTitle(title: string | null) {
+  const setTitle = useContext(BreadcrumbTitleContext);
+  useEffect(() => {
+    if (!setTitle) return;
+    setTitle(title);
+    return () => setTitle(null);
+  }, [setTitle, title]);
+}
+
+function Breadcrumbs({ postTitle }: { postTitle: string | null }) {
   const pathname = usePathname() || "/";
   if (pathname === "/") return null;
 
   const segments = pathname.split("/").filter(Boolean);
   let href = "";
+  const isPostDetail = segments[0] === "posts" && segments.length === 2;
   return (
-    <Box component="nav" aria-label="Breadcrumb" sx={{ py: 1 }}>
-      <Box component="ol" sx={{ display: "flex", flexWrap: "wrap", gap: 1, listStyle: "none", p: 0, m: 0, fontSize: ".875rem" }}>
+    <Box sx={{ bgcolor: "background.paper", borderBottom: 1, borderColor: "divider" }}>
+      <Box sx={{ maxWidth: 1120, width: "100%", mx: "auto", px: { xs: 2, sm: 3, md: 4 }, py: 1.25 }}>
+        <MuiBreadcrumbs
+          aria-label="Breadcrumb"
+          separator={<Box component="span" aria-hidden sx={{ color: "text.disabled", fontSize: "1.1rem" }}>›</Box>}
+          sx={{
+            fontSize: ".875rem",
+            "& .MuiBreadcrumbs-ol": { flexWrap: "nowrap" },
+            "& .MuiBreadcrumbs-li": { minWidth: 0 },
+          }}
+        >
+          <Link href="/" underline="hover" color="text.secondary" sx={{ whiteSpace: "nowrap", fontWeight: 500 }}>Home</Link>
         {segments.map((segment, index) => {
           href += "/" + segment;
           const last = index === segments.length - 1;
-          const label = decodeURIComponent(segment).replace(/-/g, " ");
+          const words = decodeURIComponent(segment).replace(/-/g, " ");
+          const label = segment === "posts"
+            ? "News"
+            : segment === "categories"
+              ? "Categories"
+              : isPostDetail && last
+                ? postTitle || "Article"
+                : words.replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
           return (
-            <Box component="li" key={href} sx={{ display: "inline-flex", alignItems: "center", gap: 1 }}>
-              {index > 0 ? <span aria-hidden>/</span> : null}
+            <Box component="span" key={href} sx={{ minWidth: 0, display: "inline-flex" }}>
               {last ? (
-                <Box component="span" aria-current="page" sx={{ fontWeight: 700 }}>{label}</Box>
+                <Typography
+                  component="span"
+                  aria-current="page"
+                  color="text.primary"
+                  sx={{ display: "block", maxWidth: { xs: 180, sm: 360, md: 600 }, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", fontWeight: 600 }}
+                >
+                  {label}
+                </Typography>
               ) : (
-                <Link href={href}>{label}</Link>
+                <Link href={href} underline="hover" color="text.secondary" sx={{ whiteSpace: "nowrap", fontWeight: 500 }}>{label}</Link>
               )}
             </Box>
           );
         })}
+        </MuiBreadcrumbs>
       </Box>
     </Box>
   );
@@ -106,6 +142,7 @@ function BackToTop() {
 
 export function PublicMenus({ children, initialMenus = null }: { children: ReactNode; initialMenus?: PublicMenusPayload | null }) {
   const site = usePublicSiteBranding();
+  const [postTitle, setPostTitle] = useState<string | null>(null);
   const serverMenus = useMemo(() => {
     const payload = menuPayloadForSite(initialMenus, site.id);
     return payload ? menusFromResponse(200, payload) : EMPTY;
@@ -147,15 +184,15 @@ export function PublicMenus({ children, initialMenus = null }: { children: React
   }, [site.id, site.modules.menus]);
 
   return (
-    <>
+    <BreadcrumbTitleContext.Provider value={setPostTitle}>
       <Link href="#main-content" sx={{ position: "absolute", left: 16, top: -100, zIndex: 1500, bgcolor: "background.paper", p: 2, "&:focus": { top: 12 } }}>Skip to content</Link>
       <PublicSiteHeader site={site} headerItems={menus.header} utilityItems={menus.utility ?? []} />
       <Box component="main" id="main-content" tabIndex={-1}>
-        <Breadcrumbs />
+        <Breadcrumbs postTitle={postTitle} />
         {children}
       </Box>
       <PublicSiteFooter site={site} items={menus.footer} />
       <BackToTop />
-    </>
+    </BreadcrumbTitleContext.Provider>
   );
 }

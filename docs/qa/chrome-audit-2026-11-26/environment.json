@@ -1,0 +1,41 @@
+{
+  "audit": "P4-F-CHROME remaining public and admin surfaces — re-verification",
+  "capturedAt": "2026-11-26T13:22:00Z",
+  "repositoryCommit": "546ef6d3e5f3aa83389d5238282cf327cef0fb62",
+  "productCodeChangedByAudit": false,
+  "reviewEnvironment": {
+    "stack": "local Docker Compose (uog-digital-platform)",
+    "isolation": "PostgreSQL SHARE lock held on cms_page, api_page, api_post, cms_menu, cms_menuitem, cms_menulocationassignment, sites_site, sites_siteheader, sites_sitefooter during public collection; concurrent UPDATE blocked with lock_timeout (see isolation.json)",
+    "hosts": {
+      "main": "www.uog.local (Site 17)",
+      "childSites": [
+        "coi.uog.local",
+        "aau-review.localhost",
+        "article-media-post-14a6169c2f.uog.local",
+        "layout-45dfd491f4a.uog.local",
+        "cmhs.uog.local",
+        "news-disabled-post-14a6169c2f.uog.local"
+      ]
+    },
+    "modulesObserved": ["MEDIA", "MENUS", "PAGES", "POSTS", "VISUAL_BUILDER"]
+  },
+  "tools": {
+    "browser": "Microsoft Edge headless via playwright-core",
+    "axe": "axe-core 4.14.0 (WCAG 2.0/2.1/2.2 A/AA tags)",
+    "performance": "PerformanceObserver FCP/LCP/CLS (lab, not Lighthouse/production)",
+    "runners": [
+      "scripts/qa-chrome-audit-runner.cjs",
+      "scripts/qa-chrome-audit-keyboard.cjs",
+      "scripts/qa-chrome-audit-admin.cjs",
+      "scripts/qa-chrome-audit-admin-warm.cjs",
+      "scripts/qa-chrome-audit-admin-site17.cjs"
+    ]
+  },
+  "priorPack": "docs/qa/chrome-audit-2026-11-24/",
+  "i18n": "sites_site.default_language: en-us=101, en=2; no public language switcher; no hreflang",
+  "notes": [
+    "No product application source was modified for this audit.",
+    "Audit runners under scripts/ are evidence harnesses only.",
+    "Main Site admin is Site id 17 (www.uog.local). Site 102 is AAU Builder Comparison."
+  ]
+}

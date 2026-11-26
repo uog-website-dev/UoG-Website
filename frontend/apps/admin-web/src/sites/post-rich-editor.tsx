@@ -77,6 +77,11 @@ export function PostRichEditor({
   canUseMedia = false,
   canUploadMedia = false,
   error = "",
+  label = "Article body",
+  toolbarLabel = "Article formatting",
+  placeholder = "Write your article content here…",
+  imageDialogTitle = "Insert article image",
+  linkDialogTitle = "Insert article link",
 }: {
   siteId?: number;
   canUseMedia?: boolean;
@@ -87,6 +92,13 @@ export function PostRichEditor({
   onSave: () => void;
   /** Field-level validation message shown under the article body. */
   error?: string;
+  /** Accessible name of the editable region. */
+  label?: string;
+  /** Accessible name of the formatting toolbar. */
+  toolbarLabel?: string;
+  placeholder?: string;
+  imageDialogTitle?: string;
+  linkDialogTitle?: string;
 }) {
   const editor = useRef<HTMLDivElement>(null);
   const lastEmitted = useRef<string | null>(null);
@@ -218,7 +230,7 @@ export function PostRichEditor({
     >
       <Box
         role="toolbar"
-        aria-label="Article formatting"
+        aria-label={toolbarLabel}
         sx={{
           display: "flex",
           gap: 0.25,
@@ -320,13 +332,13 @@ export function PostRichEditor({
               lineHeight: 1.8,
             }}
           >
-            Write your article content here…
+            {placeholder}
           </Typography>
         ) : null}
         <Box
           ref={editor}
           role="textbox"
-          aria-label="Article body"
+          aria-label={label}
           aria-multiline="true"
           aria-readonly={disabled}
           contentEditable={!disabled}
@@ -440,7 +452,7 @@ export function PostRichEditor({
         }}
         aria-labelledby="article-image-title"
       >
-        <DialogTitle id="article-image-title">Insert article image</DialogTitle>
+        <DialogTitle id="article-image-title">{imageDialogTitle}</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
@@ -487,7 +499,7 @@ export function PostRichEditor({
         maxWidth="sm"
         aria-labelledby="article-link-title"
       >
-        <DialogTitle id="article-link-title">Insert article link</DialogTitle>
+        <DialogTitle id="article-link-title">{linkDialogTitle}</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus

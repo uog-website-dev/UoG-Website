@@ -309,9 +309,16 @@ function SiteNav({
         </Typography>
       ) : null}
       {site && chip ? (
-        <Box sx={{ px: 1.25, pb: 0.5, display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
-          <Typography variant="body2" sx={{ fontWeight: 700, overflowWrap: "anywhere" }}>{site.name}</Typography>
-          <Chip size="small" variant="outlined" color={chip.color} label={chip.label} />
+        <Box sx={{ px: 1.25, pb: 0.5, display: "flex", flexDirection: "column", gap: 0.25 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
+            <Typography variant="body2" sx={{ fontWeight: 700, overflowWrap: "anywhere" }}>{site.name}</Typography>
+            <Chip size="small" variant="outlined" color={chip.color} label={chip.label} />
+          </Box>
+          {site.primaryDomain?.hostname ? (
+            <Typography variant="caption" color="text.secondary" sx={{ fontFamily: "monospace", overflowWrap: "anywhere" }}>
+              {site.primaryDomain.hostname}
+            </Typography>
+          ) : null}
         </Box>
       ) : null}
       {site && access ? sections.map((section) => {

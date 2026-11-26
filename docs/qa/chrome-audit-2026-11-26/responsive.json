@@ -1,0 +1,482 @@
+[
+  {
+    "id": "home-main",
+    "width": 320,
+    "overflow": false,
+    "documentWidth": 320,
+    "innerWidth": 320,
+    "headerHeight": 71,
+    "brandClip": false,
+    "brandText": "Registrar"
+  },
+  {
+    "id": "home-main",
+    "width": 360,
+    "overflow": false,
+    "documentWidth": 360,
+    "innerWidth": 360,
+    "headerHeight": 71,
+    "brandClip": false,
+    "brandText": "Registrar"
+  },
+  {
+    "id": "home-main",
+    "width": 390,
+    "overflow": false,
+    "documentWidth": 390,
+    "innerWidth": 390,
+    "headerHeight": 71,
+    "brandClip": false,
+    "brandText": "Registrar"
+  },
+  {
+    "id": "home-main",
+    "width": 768,
+    "overflow": false,
+    "documentWidth": 768,
+    "innerWidth": 768,
+    "headerHeight": 71,
+    "brandClip": false,
+    "brandText": "Registrar"
+  },
+  {
+    "id": "home-main",
+    "width": 1024,
+    "overflow": false,
+    "documentWidth": 1024,
+    "innerWidth": 1024,
+    "headerHeight": 107,
+    "brandClip": false,
+    "brandText": "Registrar"
+  },
+  {
+    "id": "home-main",
+    "width": 1280,
+    "overflow": false,
+    "documentWidth": 1280,
+    "innerWidth": 1280,
+    "headerHeight": 160,
+    "brandClip": false,
+    "brandText": "Registrar"
+  },
+  {
+    "id": "home-main",
+    "width": 1440,
+    "overflow": false,
+    "documentWidth": 1440,
+    "innerWidth": 1440,
+    "headerHeight": 160,
+    "brandClip": false,
+    "brandText": "Registrar"
+  },
+  {
+    "id": "home-main",
+    "width": 1920,
+    "overflow": false,
+    "documentWidth": 1920,
+    "innerWidth": 1920,
+    "headerHeight": 160,
+    "brandClip": false,
+    "brandText": "Registrar"
+  },
+  {
+    "id": "page",
+    "width": 320,
+    "overflow": false,
+    "documentWidth": 320,
+    "innerWidth": 320,
+    "headerHeight": 71,
+    "brandClip": false,
+    "brandText": "Registrar"
+  },
+  {
+    "id": "page",
+    "width": 360,
+    "overflow": false,
+    "documentWidth": 360,
+    "innerWidth": 360,
+    "headerHeight": 71,
+    "brandClip": false,
+    "brandText": "Registrar"
+  },
+  {
+    "id": "page",
+    "width": 390,
+    "overflow": false,
+    "documentWidth": 390,
+    "innerWidth": 390,
+    "headerHeight": 71,
+    "brandClip": false,
+    "brandText": "Registrar"
+  },
+  {
+    "id": "page",
+    "width": 768,
+    "overflow": false,
+    "documentWidth": 768,
+    "innerWidth": 768,
+    "headerHeight": 71,
+    "brandClip": false,
+    "brandText": "Registrar"
+  },
+  {
+    "id": "page",
+    "width": 1024,
+    "overflow": false,
+    "documentWidth": 1024,
+    "innerWidth": 1024,
+    "headerHeight": 107,
+    "brandClip": false,
+    "brandText": "Registrar"
+  },
+  {
+    "id": "page",
+    "width": 1280,
+    "overflow": false,
+    "documentWidth": 1280,
+    "innerWidth": 1280,
+    "headerHeight": 160,
+    "brandClip": false,
+    "brandText": "Registrar"
+  },
+  {
+    "id": "page",
+    "width": 1440,
+    "overflow": false,
+    "documentWidth": 1440,
+    "innerWidth": 1440,
+    "headerHeight": 160,
+    "brandClip": false,
+    "brandText": "Registrar"
+  },
+  {
+    "id": "page",
+    "width": 1920,
+    "overflow": false,
+    "documentWidth": 1920,
+    "innerWidth": 1920,
+    "headerHeight": 160,
+    "brandClip": false,
+    "brandText": "Registrar"
+  },
+  {
+    "id": "posts",
+    "width": 320,
+    "overflow": false,
+    "documentWidth": 320,
+    "innerWidth": 320,
+    "headerHeight": 71,
+    "brandClip": false,
+    "brandText": "Events"
+  },
+  {
+    "id": "posts",
+    "width": 360,
+    "overflow": false,
+    "documentWidth": 360,
+    "innerWidth": 360,
+    "headerHeight": 71,
+    "brandClip": false,
+    "brandText": "Events"
+  },
+  {
+    "id": "posts",
+    "width": 390,
+    "overflow": false,
+    "documentWidth": 390,
+    "innerWidth": 390,
+    "headerHeight": 71,
+    "brandClip": false,
+    "brandText": "Events"
+  },
+  {
+    "id": "posts",
+    "width": 768,
+    "overflow": false,
+    "documentWidth": 768,
+    "innerWidth": 768,
+    "headerHeight": 71,
+    "brandClip": false,
+    "brandText": "Events"
+  },
+  {
+    "id": "posts",
+    "width": 1024,
+    "overflow": false,
+    "documentWidth": 1024,
+    "innerWidth": 1024,
+    "headerHeight": 107,
+    "brandClip": false,
+    "brandText": "Events"
+  },
+  {
+    "id": "posts",
+    "width": 1280,
+    "overflow": false,
+    "documentWidth": 1280,
+    "innerWidth": 1280,
+    "headerHeight": 160,
+    "brandClip": false,
+    "brandText": "Events"
+  },
+  {
+    "id": "posts",
+    "width": 1440,
+    "overflow": false,
+    "documentWidth": 1440,
+    "innerWidth": 1440,
+    "headerHeight": 160,
+    "brandClip": false,
+    "brandText": "Events"
+  },
+  {
+    "id": "posts",
+    "width": 1920,
+    "overflow": false,
+    "documentWidth": 1920,
+    "innerWidth": 1920,
+    "headerHeight": 160,
+    "brandClip": false,
+    "brandText": "Events"
+  },
+  {
+    "id": "post-detail",
+    "width": 320,
+    "overflow": false,
+    "documentWidth": 320,
+    "innerWidth": 320,
+    "headerHeight": 71,
+    "brandClip": false,
+    "brandText": "Events"
+  },
+  {
+    "id": "post-detail",
+    "width": 360,
+    "overflow": false,
+    "documentWidth": 360,
+    "innerWidth": 360,
+    "headerHeight": 71,
+    "brandClip": false,
+    "brandText": "Events"
+  },
+  {
+    "id": "post-detail",
+    "width": 390,
+    "overflow": false,
+    "documentWidth": 390,
+    "innerWidth": 390,
+    "headerHeight": 71,
+    "brandClip": false,
+    "brandText": "Events"
+  },
+  {
+    "id": "post-detail",
+    "width": 768,
+    "overflow": false,
+    "documentWidth": 768,
+    "innerWidth": 768,
+    "headerHeight": 71,
+    "brandClip": false,
+    "brandText": "Events"
+  },
+  {
+    "id": "post-detail",
+    "width": 1024,
+    "overflow": false,
+    "documentWidth": 1024,
+    "innerWidth": 1024,
+    "headerHeight": 107,
+    "brandClip": false,
+    "brandText": "Events"
+  },
+  {
+    "id": "post-detail",
+    "width": 1280,
+    "overflow": false,
+    "documentWidth": 1280,
+    "innerWidth": 1280,
+    "headerHeight": 160,
+    "brandClip": false,
+    "brandText": "Events"
+  },
+  {
+    "id": "post-detail",
+    "width": 1440,
+    "overflow": false,
+    "documentWidth": 1440,
+    "innerWidth": 1440,
+    "headerHeight": 160,
+    "brandClip": false,
+    "brandText": "Events"
+  },
+  {
+    "id": "post-detail",
+    "width": 1920,
+    "overflow": false,
+    "documentWidth": 1920,
+    "innerWidth": 1920,
+    "headerHeight": 160,
+    "brandClip": false,
+    "brandText": "Events"
+  },
+  {
+    "id": "category",
+    "width": 320,
+    "overflow": true,
+    "documentWidth": 344,
+    "innerWidth": 320,
+    "headerHeight": 67,
+    "brandClip": false,
+    "brandText": "UoGArticle editor QA post-14a6169c2f"
+  },
+  {
+    "id": "category",
+    "width": 360,
+    "overflow": true,
+    "documentWidth": 363,
+    "innerWidth": 360,
+    "headerHeight": 67,
+    "brandClip": false,
+    "brandText": "UoGArticle editor QA post-14a6169c2f"
+  },
+  {
+    "id": "category",
+    "width": 390,
+    "overflow": false,
+    "documentWidth": 390,
+    "innerWidth": 390,
+    "headerHeight": 67,
+    "brandClip": false,
+    "brandText": "UoGArticle editor QA post-14a6169c2f"
+  },
+  {
+    "id": "category",
+    "width": 768,
+    "overflow": false,
+    "documentWidth": 768,
+    "innerWidth": 768,
+    "headerHeight": 67,
+    "brandClip": false,
+    "brandText": "UoGArticle editor QA post-14a6169c2f"
+  },
+  {
+    "id": "category",
+    "width": 1024,
+    "overflow": false,
+    "documentWidth": 1024,
+    "innerWidth": 1024,
+    "headerHeight": 107,
+    "brandClip": false,
+    "brandText": "UoGArticle editor QA post-14a6169c2f"
+  },
+  {
+    "id": "category",
+    "width": 1280,
+    "overflow": false,
+    "documentWidth": 1280,
+    "innerWidth": 1280,
+    "headerHeight": 107,
+    "brandClip": false,
+    "brandText": "UoGArticle editor QA post-14a6169c2f"
+  },
+  {
+    "id": "category",
+    "width": 1440,
+    "overflow": false,
+    "documentWidth": 1440,
+    "innerWidth": 1440,
+    "headerHeight": 107,
+    "brandClip": false,
+    "brandText": "UoGArticle editor QA post-14a6169c2f"
+  },
+  {
+    "id": "category",
+    "width": 1920,
+    "overflow": false,
+    "documentWidth": 1920,
+    "innerWidth": 1920,
+    "headerHeight": 107,
+    "brandClip": false,
+    "brandText": "UoGArticle editor QA post-14a6169c2f"
+  },
+  {
+    "id": "home-empty",
+    "width": 320,
+    "overflow": false,
+    "documentWidth": 320,
+    "innerWidth": 320,
+    "headerHeight": 67,
+    "brandClip": false,
+    "brandText": "UoGCollege of Medicine and Health Sciences"
+  },
+  {
+    "id": "home-empty",
+    "width": 360,
+    "overflow": false,
+    "documentWidth": 360,
+    "innerWidth": 360,
+    "headerHeight": 67,
+    "brandClip": false,
+    "brandText": "UoGCollege of Medicine and Health Sciences"
+  },
+  {
+    "id": "home-empty",
+    "width": 390,
+    "overflow": false,
+    "documentWidth": 390,
+    "innerWidth": 390,
+    "headerHeight": 67,
+    "brandClip": false,
+    "brandText": "UoGCollege of Medicine and Health Sciences"
+  },
+  {
+    "id": "home-empty",
+    "width": 768,
+    "overflow": false,
+    "documentWidth": 768,
+    "innerWidth": 768,
+    "headerHeight": 67,
+    "brandClip": false,
+    "brandText": "UoGCollege of Medicine and Health Sciences"
+  },
+  {
+    "id": "home-empty",
+    "width": 1024,
+    "overflow": false,
+    "documentWidth": 1024,
+    "innerWidth": 1024,
+    "headerHeight": 107,
+    "brandClip": false,
+    "brandText": "UoGCollege of Medicine and Health Sciences"
+  },
+  {
+    "id": "home-empty",
+    "width": 1280,
+    "overflow": false,
+    "documentWidth": 1280,
+    "innerWidth": 1280,
+    "headerHeight": 107,
+    "brandClip": false,
+    "brandText": "UoGCollege of Medicine and Health Sciences"
+  },
+  {
+    "id": "home-empty",
+    "width": 1440,
+    "overflow": false,
+    "documentWidth": 1440,
+    "innerWidth": 1440,
+    "headerHeight": 107,
+    "brandClip": false,
+    "brandText": "UoGCollege of Medicine and Health Sciences"
+  },
+  {
+    "id": "home-empty",
+    "width": 1920,
+    "overflow": false,
+    "documentWidth": 1920,
+    "innerWidth": 1920,
+    "headerHeight": 107,
+    "brandClip": false,
+    "brandText": "UoGCollege of Medicine and Health Sciences"
+  }
+]

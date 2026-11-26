@@ -18,7 +18,6 @@ import {containedImageHover,newsCardHover} from "./horizontal-cards";
 import { paragraphParts } from "./public-page";
 import { ArticleDocumentView } from "./article-document";
 import { VisualPostProvider, PostTitleWidget, PostExcerptWidget, FeaturedImageWidget } from "./widget-runtime";
-import { SiteBrandingLockup, usePublicSiteBranding } from "./site-branding";
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -137,7 +136,7 @@ function RichText({ html }: { html: string }): ReactNode {
   const parts = paragraphParts(html);
   if (parts.length === 0) return null;
   return (
-    <Typography component="p" sx={{ maxWidth: "65ch", overflowWrap: "anywhere" }}>
+    <Typography component="p" sx={{ maxWidth: "65ch", overflowWrap: "anywhere", color: "text.primary", fontSize: { xs: "1.05rem", md: "1.125rem" }, lineHeight: 1.85 }}>
       {parts.map((part, index) =>
         part.type === "link" ? (
           <Link key={index} href={part.href} rel="noopener noreferrer">
@@ -207,7 +206,6 @@ export function PublicPostDetail({
   /** When false, omit the public “Back to posts” link (private Site preview). */
   showListingLink?: boolean;
 }): ReactNode {
-  const site = usePublicSiteBranding();
   if (!post) {
     return (
       <Typography role="status" color="text.secondary">
@@ -215,7 +213,9 @@ export function PublicPostDetail({
       </Typography>
     );
   }
-  const taxonomy = [...post.categories.map((item) => item.name), ...post.tags.map((item) => item.name)];
+  const publishedAt = post.published_at && !Number.isNaN(Date.parse(post.published_at))
+    ? post.published_at
+    : null;
   const scoped = post.site !== undefined;
 
   return (
@@ -240,77 +240,88 @@ export function PublicPostDetail({
           component="header"
           aria-label="Article banner"
           sx={{
-            bgcolor: "primary.main",
-            color: "primary.contrastText",
-            mb: 3,
-            overflow: "hidden",
+            bgcolor: "background.paper",
+            color: "text.primary",
           }}
         >
-          {site.id !== null && (!scoped || post.site === site.id) ? (
-            <Box sx={{ px: { xs: 2, sm: 3 }, pt: 2 }}>
-              <SiteBrandingLockup site={site} compact inverse />
-            </Box>
-          ) : null}
-          {scoped ? <FeaturedImageWidget compact variant="hero" /> : null}
           <Box
             sx={{
-              px: { xs: 2, sm: 3 },
-              py: { xs: 3, sm: 4 },
-              maxWidth: "65ch",
-              "& .MuiTypography-root": { color: "inherit" },
+              maxWidth: 1120,
+              width: "100%",
+              mx: "auto",
+              px: { xs: 2, sm: 3, md: 4 },
+              pt: { xs: 3, md: 5 },
+              pb: { xs: 3, md: 4 },
             }}
           >
             {scoped ? (
-              <PostTitleWidget id="public-post-title" level={1} />
+              <Box sx={{ "& h1": { fontSize: { xs: "2rem", sm: "2.75rem", md: "3.25rem" }, lineHeight: 1.12, fontWeight: 750, letterSpacing: "-0.025em", overflowWrap: "anywhere", mt: 0, mb: 0 } }}>
+                <PostTitleWidget id="public-post-title" level={1} />
+              </Box>
             ) : (
               <Typography
                 id="public-post-title"
                 variant="h1"
                 component="h1"
-                sx={{ fontSize: { xs: "1.75rem", sm: "2.5rem" }, overflowWrap: "anywhere" }}
+                sx={{ fontSize: { xs: "2rem", sm: "2.75rem", md: "3.25rem" }, lineHeight: 1.12, fontWeight: 750, letterSpacing: "-0.025em", overflowWrap: "anywhere", mt: 0, mb: 0 }}
               >
                 {post.title}
               </Typography>
             )}
-            {scoped ? (
-              <Box sx={{ mt: 1, opacity: 0.9 }}>
-                <PostExcerptWidget />
-              </Box>
-            ) : post.excerpt ? (
-              <Typography sx={{ mt: 1, opacity: 0.9, overflowWrap: "anywhere" }}>{post.excerpt}</Typography>
+            {post.excerpt ? (
+              scoped ? (
+                <Box sx={{ mt: 2, maxWidth: "72ch", color: "text.secondary", fontSize: { xs: "1.05rem", md: "1.2rem" }, lineHeight: 1.65 }}>
+                  <PostExcerptWidget />
+                </Box>
+              ) : (
+                <Typography sx={{ mt: 2, maxWidth: "72ch", color: "text.secondary", fontSize: { xs: "1.05rem", md: "1.2rem" }, lineHeight: 1.65, overflowWrap: "anywhere" }}>{post.excerpt}</Typography>
+              )
+            ) : null}
+            {publishedAt || post.author ? (
+              <Typography
+                component="p"
+                variant="body2"
+                color="text.secondary"
+                sx={{ display: "flex", flexWrap: "wrap", gap: 1, alignItems: "center", mt: 2.5, mb: 0 }}
+              >
+                {publishedAt ? <Box component="time" dateTime={publishedAt}>{formatPublishedAt(publishedAt)}</Box> : null}
+                {publishedAt && post.author ? <Box component="span" aria-hidden>·</Box> : null}
+                {post.author ? <Box component="span">{post.author}</Box> : null}
+              </Typography>
             ) : null}
           </Box>
         </Box>
 
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 2, px: { xs: 2, sm: 3 }, pb: 4, maxWidth: "65ch", width: "100%" }}>
-          {showListingLink ? (
-            <Link href="/posts" underline="hover" sx={{ alignSelf: "flex-start", fontWeight: 600 }}>
-              Back to posts
-            </Link>
-          ) : null}
-          {post.published_at || post.author || taxonomy.length > 0 ? (
-            <Typography
-              component="p"
-              variant="body2"
-              color="text.secondary"
-              sx={{ display: "flex", flexWrap: "wrap", gap: 1, alignItems: "center" }}
-            >
-              {post.published_at ? (
-                <Box component="time" dateTime={post.published_at}>
-                  {formatPublishedAt(post.published_at)}
-                </Box>
-              ) : null}
-              {post.published_at && (post.author || taxonomy.length > 0) ? <Box component="span" aria-hidden>·</Box> : null}
-              {post.author ? <Box component="span">{post.author}</Box> : null}
-              {post.author && taxonomy.length > 0 ? <Box component="span" aria-hidden>·</Box> : null}
-              {taxonomy.length > 0 ? <Box component="span">{taxonomy.join(" · ")}</Box> : null}
-            </Typography>
-          ) : null}
+        {scoped ? (
+          <Box sx={{ maxWidth: 1120, width: "100%", mx: "auto", px: { xs: 2, sm: 3, md: 4 } }}>
+            <Box sx={{ overflow: "hidden", borderRadius: { xs: 1, sm: 2 }, boxShadow: 2, bgcolor: "action.hover" }}>
+              <FeaturedImageWidget compact variant="hero" />
+            </Box>
+          </Box>
+        ) : null}
+
+        {post.categories.length + post.tags.length > 0 ? (
+          <Box component="nav" aria-label="Article topics" sx={{ maxWidth: 760, width: "100%", mx: "auto", px: { xs: 2, sm: 3 }, pt: 2, display: "flex", flexWrap: "wrap", gap: 1 }}>
+            {post.categories.map((item) => (
+              <Link key={`category:${item.slug}`} href={`/posts/categories/${encodeURIComponent(item.slug)}`} underline="none" sx={{ px: 1.25, py: 0.5, borderRadius: 99, bgcolor: "action.hover", color: "text.secondary", fontSize: "0.8rem", fontWeight: 600, "&:hover": { bgcolor: "action.selected", color: "primary.main" } }}>
+                {item.name}
+              </Link>
+            ))}
+            {post.tags.map((item) => (
+              <Link key={`tag:${item.slug}`} href={`/posts?tag=${encodeURIComponent(item.slug)}`} underline="none" sx={{ px: 1.25, py: 0.5, borderRadius: 99, bgcolor: "action.hover", color: "text.secondary", fontSize: "0.8rem", fontWeight: 600, "&:hover": { bgcolor: "action.selected", color: "primary.main" } }}>
+                {item.name}
+              </Link>
+            ))}
+          </Box>
+        ) : null}
+
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: { xs: 3, md: 4 }, pb: { xs: 5, md: 7 }, maxWidth: 760, width: "100%", mx: "auto", px: { xs: 2, sm: 3 } }}>
           {post.editor_document ? (
             <ArticleDocumentView siteId={post.site} mediaBase={mediaBase} document={post.editor_document} />
           ) : (
             <RichText html={post.body} />
           )}
+          {showListingLink ? <Link href="/posts" underline="hover" sx={{ alignSelf: "flex-start", mt: 2, fontWeight: 600 }}>Back to posts</Link> : null}
         </Box>
       </Box>
     </VisualPostProvider>

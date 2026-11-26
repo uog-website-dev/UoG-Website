@@ -25,6 +25,7 @@ import {
   usePublicSiteBranding,
 } from "@uog/ui";
 import type { PublicPostDocument, PublicPostPageResult, PublicSiteContext } from "@uog/ui";
+import { usePublicBreadcrumbTitle } from "./public-menus";
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -151,6 +152,7 @@ function ScopedPublicPost({ slug }: { slug: string }) {
   const site = usePublicSiteBranding();
   const [post, setPost] = useState<PublicPostDocument | null>(null);
   const [ready, setReady] = useState(false);
+  usePublicBreadcrumbTitle(post?.title ?? null);
 
   useEffect(() => {
     if (!SLUG.test(slug)) {

@@ -141,6 +141,21 @@ def test_malicious_rich_text_is_sanitized_on_write_and_cannot_execute(sites):
     assert 'href="//evil.example"' not in stored
 
 
+def test_rich_text_keeps_quotes_for_published_pages(sites):
+    site = site_of(sites)
+    page = create_page_with_blocks(site, "quote", [{
+        "type": "paragraph",
+        "html": "<blockquote><p>Quoted <em>copy</em> <u>under</u> <code>code</code></p></blockquote>",
+    }])
+    stored = _content_blocks(page)[0]["html"]
+    assert "<blockquote>" in stored
+    assert "<em>copy</em>" in stored
+    # Storage keeps exactly the tags the public renderer can show: underline
+    # survives, an unknown inline tag is unwrapped to its text.
+    assert "<u>under</u>" in stored
+    assert "<code>" not in stored and "code" in stored
+
+
 def test_mutation_via_update_also_persists_the_sanitized_payload(sites):
     site = site_of(sites)
     page = create_page_with_blocks(site, "update-fields", [PARAGRAPH])

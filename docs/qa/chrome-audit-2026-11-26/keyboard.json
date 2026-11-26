@@ -1,0 +1,39 @@
+{
+  "search": {
+    "check": "search dialog",
+    "initialFocus": {
+      "tag": "DIV",
+      "role": "presentation",
+      "ariaLabel": "",
+      "name": "",
+      "id": "",
+      "labelledBy": ""
+    },
+    "inputFocused": false,
+    "dialog": {
+      "present": true,
+      "labelledBy": "_R_4laallb_",
+      "label": "",
+      "activeInside": false
+    },
+    "beforeTab": "<div class=\"MuiDialog-container MuiDialog-scrollPaper mui-19do60a-MuiDialog-container\" role=\"presentation\" tabindex=\"-1\"",
+    "tabStayedInside": true,
+    "escapeClosed": true,
+    "focusRestored": true,
+    "restoredLabel": "Search this Site"
+  },
+  "drawer": {
+    "check": "mobile drawer",
+    "initialFocus": {
+      "tag": "DIV",
+      "ariaLabel": "",
+      "text": "NavigationHomeAbout UsAcademicsAdministrationResearchService"
+    },
+    "closeFocused": false,
+    "tabStayedInside": true,
+    "escapeClosed": true,
+    "focusRestored": true,
+    "restoredLabel": "Open site header",
+    "note": "Public chrome uses 'Open site header' disclosure, not a separate navigation drawer role."
+  }
+}

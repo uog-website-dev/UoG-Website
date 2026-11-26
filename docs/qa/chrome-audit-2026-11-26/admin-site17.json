@@ -1,0 +1,224 @@
+[
+  {
+    "name": "site-dashboard",
+    "path": "/admin/sites/17/admin/",
+    "settled": true,
+    "title": "Site administration · UoG Admin Console",
+    "h1": [
+      "Dashboard"
+    ],
+    "bodySnippet": "Skip to main content ⚙ UoG Digital Platform — Admin Console devuser@uog.et Sign out UoG Administration Digital platform University of Gondar Main Site SITE ADMINISTRATION University of Gondar Main Site Active www.uog.local Dashboard Site content overview Pages Site pages and workflow Sidebars Reusable Page navigation regions Visual Builder Compose a visual Page layout Homepage Settings Assign the published Site root Header Header branding, navigation, search and call to action Footer Footer content, contact and social links Appearance Site logo, public title and theme Posts News and announcements Media Private Site media library Users Site members and roles Menus Header and footer navigation",
+    "stillLoading": false,
+    "axe": {
+      "violationCount": 0,
+      "violations": []
+    },
+    "apiSample": [
+      {
+        "status": 200,
+        "url": "http://localhost/admin/sites/17/admin/"
+      },
+      {
+        "status": 200,
+        "url": "http://localhost/admin/api/workspace/?site=17"
+      },
+      {
+        "status": 200,
+        "url": "http://localhost/admin/api/reads?site=17&resource=dashboard-summary"
+      },
+      {
+        "status": 200,
+        "url": "http://localhost/admin/api/reads?site=17&resource=dashboard-activity"
+      }
+    ]
+  },
+  {
+    "name": "appearance",
+    "path": "/admin/sites/17/admin/appearance",
+    "settled": true,
+    "title": "Site administration · UoG Admin Console",
+    "h1": [
+      "Appearance"
+    ],
+    "bodySnippet": "Skip to main content ⚙ UoG Digital Platform — Admin Console devuser@uog.et Sign out UoG Administration Digital platform University of Gondar Main Site SITE ADMINISTRATION University of Gondar Main Site Active www.uog.local Dashboard Site content overview Pages Site pages and workflow Sidebars Reusable Page navigation regions Visual Builder Compose a visual Page layout Homepage Settings Assign the published Site root Header Header branding, navigation, search and call to action Footer Footer content, contact and social links Appearance Site logo, public title and theme Posts News and announcements Media Private Site media library Users Site members and roles Menus Header and footer navigation",
+    "stillLoading": false,
+    "axe": {
+      "violationCount": 0,
+      "violations": []
+    },
+    "apiSample": [
+      {
+        "status": 200,
+        "url": "http://localhost/admin/sites/17/admin/appearance"
+      },
+      {
+        "status": 200,
+        "url": "http://localhost/admin/api/workspace/?site=17"
+      },
+      {
+        "status": 200,
+        "url": "http://localhost/admin/sites/17/admin/appearance"
+      },
+      {
+        "status": 200,
+        "url": "http://localhost/admin/sites/17/admin/appearance"
+      }
+    ]
+  },
+  {
+    "name": "header",
+    "path": "/admin/sites/17/admin/header",
+    "settled": true,
+    "title": "Site administration · UoG Admin Console",
+    "h1": [
+      "Header"
+    ],
+    "bodySnippet": "Skip to main content ⚙ UoG Digital Platform — Admin Console devuser@uog.et Sign out UoG Administration Digital platform University of Gondar Main Site SITE ADMINISTRATION University of Gondar Main Site Active www.uog.local Dashboard Site content overview Pages Site pages and workflow Sidebars Reusable Page navigation regions Visual Builder Compose a visual Page layout Homepage Settings Assign the published Site root Header Header branding, navigation, search and call to action Footer Footer content, contact and social links Appearance Site logo, public title and theme Posts News and announcements Media Private Site media library Users Site members and roles Menus Header and footer navigation",
+    "stillLoading": false,
+    "axe": {
+      "violationCount": 0,
+      "violations": []
+    },
+    "apiSample": [
+      {
+        "status": 200,
+        "url": "http://localhost/admin/sites/17/admin/header"
+      },
+      {
+        "status": 200,
+        "url": "http://localhost/admin/api/workspace/?site=17"
+      },
+      {
+        "status": 200,
+        "url": "http://localhost/admin/sites/17/admin/header"
+      },
+      {
+        "status": 200,
+        "url": "http://localhost/admin/sites/17/admin/header"
+      },
+      {
+        "status": 200,
+        "url": "http://localhost/admin/sites/17/media/fc4a8262-540b-4900-874a-5ee03964d76c/image?variant=thumbnail"
+      }
+    ]
+  },
+  {
+    "name": "footer",
+    "path": "/admin/sites/17/admin/footer",
+    "settled": true,
+    "title": "Site administration · UoG Admin Console",
+    "h1": [
+      "Footer"
+    ],
+    "bodySnippet": "Skip to main content ⚙ UoG Digital Platform — Admin Console devuser@uog.et Sign out UoG Administration Digital platform University of Gondar Main Site SITE ADMINISTRATION University of Gondar Main Site Active www.uog.local Dashboard Site content overview Pages Site pages and workflow Sidebars Reusable Page navigation regions Visual Builder Compose a visual Page layout Homepage Settings Assign the published Site root Header Header branding, navigation, search and call to action Footer Footer content, contact and social links Appearance Site logo, public title and theme Posts News and announcements Media Private Site media library Users Site members and roles Menus Header and footer navigation",
+    "stillLoading": false,
+    "axe": {
+      "violationCount": 0,
+      "violations": []
+    },
+    "apiSample": [
+      {
+        "status": 200,
+        "url": "http://localhost/admin/sites/17/admin/footer"
+      },
+      {
+        "status": 200,
+        "url": "http://localhost/admin/api/workspace/?site=17"
+      },
+      {
+        "status": 200,
+        "url": "http://localhost/admin/sites/17/admin/footer"
+      },
+      {
+        "status": 200,
+        "url": "http://localhost/admin/sites/17/admin/footer"
+      },
+      {
+        "status": 200,
+        "url": "http://localhost/admin/sites/17/media/fc4a8262-540b-4900-874a-5ee03964d76c/image?variant=thumbnail"
+      }
+    ]
+  },
+  {
+    "name": "menus",
+    "path": "/admin/sites/17/admin/menus",
+    "settled": true,
+    "title": "Site administration · UoG Admin Console",
+    "h1": [],
+    "bodySnippet": "Skip to main content ⚙ UoG Digital Platform — Admin Console devuser@uog.et Sign out UoG Administration Digital platform University of Gondar Main Site SITE ADMINISTRATION University of Gondar Main Site Active www.uog.local Dashboard Site content overview Pages Site pages and workflow Sidebars Reusable Page navigation regions Visual Builder Compose a visual Page layout Homepage Settings Assign the published Site root Header Header branding, navigation, search and call to action Footer Footer content, contact and social links Appearance Site logo, public title and theme Posts News and announcements Media Private Site media library Users Site members and roles Menus Header and footer navigation",
+    "stillLoading": false,
+    "axe": {
+      "violationCount": 0,
+      "violations": []
+    },
+    "apiSample": [
+      {
+        "status": 200,
+        "url": "http://localhost/admin/sites/17/admin/menus"
+      },
+      {
+        "status": 200,
+        "url": "http://localhost/admin/api/workspace/?site=17"
+      },
+      {
+        "status": 200,
+        "url": "http://localhost/admin/api/reads?site=17&resource=inheritance"
+      },
+      {
+        "status": 200,
+        "url": "http://localhost/admin/api/reads?site=17&resource=menus&page=1&page_size=100"
+      },
+      {
+        "status": 200,
+        "url": "http://localhost/admin/sites/17/admin/menus"
+      },
+      {
+        "status": 200,
+        "url": "http://localhost/admin/sites/17/admin/menus"
+      },
+      {
+        "status": 200,
+        "url": "http://localhost/admin/sites/17/admin/menus"
+      }
+    ]
+  },
+  {
+    "name": "pages",
+    "path": "/admin/sites/17/admin/pages",
+    "settled": true,
+    "title": "Site administration · UoG Admin Console",
+    "h1": [],
+    "bodySnippet": "Skip to main content ⚙ UoG Digital Platform — Admin Console devuser@uog.et Sign out UoG Administration Digital platform University of Gondar Main Site SITE ADMINISTRATION University of Gondar Main Site Active www.uog.local Dashboard Site content overview Pages Site pages and workflow Sidebars Reusable Page navigation regions Visual Builder Compose a visual Page layout Homepage Settings Assign the published Site root Header Header branding, navigation, search and call to action Footer Footer content, contact and social links Appearance Site logo, public title and theme Posts News and announcements Media Private Site media library Users Site members and roles Menus Header and footer navigation",
+    "stillLoading": false,
+    "axe": {
+      "violationCount": 0,
+      "violations": []
+    },
+    "apiSample": [
+      {
+        "status": 200,
+        "url": "http://localhost/admin/sites/17/admin/menus"
+      },
+      {
+        "status": 200,
+        "url": "http://localhost/admin/sites/17/admin/pages"
+      },
+      {
+        "status": 200,
+        "url": "http://localhost/admin/api/workspace/?site=17"
+      },
+      {
+        "status": 200,
+        "url": "http://localhost/admin/api/reads?site=17&resource=pages&page=1&page_size=20&ordering=-updated_at"
+      },
+      {
+        "status": 200,
+        "url": "http://localhost/admin/api/reads?site=17&resource=page-authors"
+      },
+      {
+        "status": 200,
+        "url": "http://localhost/admin/api/reads?site=17&resource=dashboard-summary"
+      }
+    ]
+  }
+]

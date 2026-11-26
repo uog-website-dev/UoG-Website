@@ -1,0 +1,141 @@
+{
+  "capturedAt": "2026-11-26T13:24:09.287Z",
+  "mainSiteId": 17,
+  "workspaceAndSite17": [
+    {
+      "name": "workspace",
+      "route": "/admin/",
+      "status": 200,
+      "readyMs": 5749,
+      "title": "UoG Admin Console",
+      "h1": [
+        "Dashboard"
+      ],
+      "bodySnippet": "Skip to main content ⚙ UoG Digital Platform — Admin Console devuser@uog.et Sign out UoG Administration Digital platform Choose workspace PLATFORM ADMINISTRATION Dashboard Console overview Organizations Institutional structure Sites Managed websites Domains Website addresses Modules Capability registry Access control Roles, permissions and assignments Admin workspace University of Gondar Home / Dashboard Dashboard University of Gondar Digital Platform — administration console. Connected to the pl",
+      "axe": {
+        "violationCount": 1,
+        "violations": [
+          {
+            "id": "label-content-name-mismatch",
+            "impact": "serious",
+            "description": "Ensure that elements labelled through their content must have their visible text as part of their accessible name",
+            "nodes": [
+              {
+                "target": [
+                  "a[aria-label=\"Open the Organizations section\"]"
+                ],
+                "failureSummary": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+              },
+              {
+                "target": [
+                  "a[aria-label=\"Open the Sites section\"]"
+                ],
+                "failureSummary": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+              },
+              {
+                "target": [
+                  "a[aria-label=\"Open the Modules section\"]"
+                ],
+                "failureSummary": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+              }
+            ]
+          }
+        ],
+        "passes": 27
+      }
+    },
+    {
+      "name": "site-dashboard",
+      "route": "/admin/sites/17/admin/",
+      "settled": true,
+      "h1": [
+        "Dashboard"
+      ],
+      "title": "Site administration · UoG Admin Console",
+      "bodySnippet": "Skip to main content ⚙ UoG Digital Platform — Admin Console devuser@uog.et Sign out UoG Administration Digital platform University of Gondar Main Site SITE ADMINISTRATION University of Gondar Main Site Active www.uog.local Dashboard Site content overview Pages Site pages and workflow Sidebars Reusable Page navigation regions Visual Builder Compose a visual Page layout Homepage Settings Assign the published Site root Header Header branding, navigation, search and call to action Footer Footer content, contact and social links Appearance Site logo, public title and theme Posts News and announcements Media Private Site media library Users Site members and roles Menus Header and footer navigation",
+      "axe": {
+        "violationCount": 0,
+        "violations": []
+      }
+    },
+    {
+      "name": "appearance",
+      "route": "/admin/sites/17/admin/appearance",
+      "settled": true,
+      "h1": [
+        "Appearance"
+      ],
+      "title": "Site administration · UoG Admin Console",
+      "bodySnippet": "Skip to main content ⚙ UoG Digital Platform — Admin Console devuser@uog.et Sign out UoG Administration Digital platform University of Gondar Main Site SITE ADMINISTRATION University of Gondar Main Site Active www.uog.local Dashboard Site content overview Pages Site pages and workflow Sidebars Reusable Page navigation regions Visual Builder Compose a visual Page layout Homepage Settings Assign the published Site root Header Header branding, navigation, search and call to action Footer Footer content, contact and social links Appearance Site logo, public title and theme Posts News and announcements Media Private Site media library Users Site members and roles Menus Header and footer navigation",
+      "axe": {
+        "violationCount": 0,
+        "violations": []
+      }
+    },
+    {
+      "name": "header",
+      "route": "/admin/sites/17/admin/header",
+      "settled": true,
+      "h1": [
+        "Header"
+      ],
+      "title": "Site administration · UoG Admin Console",
+      "bodySnippet": "Skip to main content ⚙ UoG Digital Platform — Admin Console devuser@uog.et Sign out UoG Administration Digital platform University of Gondar Main Site SITE ADMINISTRATION University of Gondar Main Site Active www.uog.local Dashboard Site content overview Pages Site pages and workflow Sidebars Reusable Page navigation regions Visual Builder Compose a visual Page layout Homepage Settings Assign the published Site root Header Header branding, navigation, search and call to action Footer Footer content, contact and social links Appearance Site logo, public title and theme Posts News and announcements Media Private Site media library Users Site members and roles Menus Header and footer navigation",
+      "axe": {
+        "violationCount": 0,
+        "violations": []
+      }
+    },
+    {
+      "name": "footer",
+      "route": "/admin/sites/17/admin/footer",
+      "settled": true,
+      "h1": [
+        "Footer"
+      ],
+      "title": "Site administration · UoG Admin Console",
+      "bodySnippet": "Skip to main content ⚙ UoG Digital Platform — Admin Console devuser@uog.et Sign out UoG Administration Digital platform University of Gondar Main Site SITE ADMINISTRATION University of Gondar Main Site Active www.uog.local Dashboard Site content overview Pages Site pages and workflow Sidebars Reusable Page navigation regions Visual Builder Compose a visual Page layout Homepage Settings Assign the published Site root Header Header branding, navigation, search and call to action Footer Footer content, contact and social links Appearance Site logo, public title and theme Posts News and announcements Media Private Site media library Users Site members and roles Menus Header and footer navigation",
+      "axe": {
+        "violationCount": 0,
+        "violations": []
+      }
+    },
+    {
+      "name": "menus",
+      "route": "/admin/sites/17/admin/menus",
+      "settled": true,
+      "h1": [],
+      "title": "Site administration · UoG Admin Console",
+      "bodySnippet": "Skip to main content ⚙ UoG Digital Platform — Admin Console devuser@uog.et Sign out UoG Administration Digital platform University of Gondar Main Site SITE ADMINISTRATION University of Gondar Main Site Active www.uog.local Dashboard Site content overview Pages Site pages and workflow Sidebars Reusable Page navigation regions Visual Builder Compose a visual Page layout Homepage Settings Assign the published Site root Header Header branding, navigation, search and call to action Footer Footer content, contact and social links Appearance Site logo, public title and theme Posts News and announcements Media Private Site media library Users Site members and roles Menus Header and footer navigation",
+      "axe": {
+        "violationCount": 0,
+        "violations": []
+      }
+    },
+    {
+      "name": "pages",
+      "route": "/admin/sites/17/admin/pages",
+      "settled": true,
+      "h1": [],
+      "title": "Site administration · UoG Admin Console",
+      "bodySnippet": "Skip to main content ⚙ UoG Digital Platform — Admin Console devuser@uog.et Sign out UoG Administration Digital platform University of Gondar Main Site SITE ADMINISTRATION University of Gondar Main Site Active www.uog.local Dashboard Site content overview Pages Site pages and workflow Sidebars Reusable Page navigation regions Visual Builder Compose a visual Page layout Homepage Settings Assign the published Site root Header Header branding, navigation, search and call to action Footer Footer content, contact and social links Appearance Site logo, public title and theme Posts News and announcements Media Private Site media library Users Site members and roles Menus Header and footer navigation",
+      "axe": {
+        "violationCount": 0,
+        "violations": []
+      }
+    }
+  ],
+  "mobileDrawer": {
+    "opened": true,
+    "initialFocus": {
+      "ariaLabel": "",
+      "text": "UoG AdministrationDigital platformChoose"
+    },
+    "drawerAttrs": {
+      "role": "",
+      "label": "Admin sections",
+      "tag": "NAV"
+    },
+    "restoredTo": "Open navigation menu"
+  }
+}

@@ -5,15 +5,17 @@
  *
  * Callers pass one document from `GET /api/v1/site-context/homepage/` or a
  * public page route. Drafts and a disabled PAGES module (404) render nothing.
- * Paragraph HTML is reduced to text and safe links. Script, event handlers
- * and javascript: targets never become markup.
+ * Paragraph HTML renders through `RichText`, which keeps the editor's inline
+ * formatting and safe links. Script, event handlers and javascript: targets
+ * never become markup.
  */
 import { createContext, useContext, useEffect, useState } from "react";
 import { validateVisualLayout, MAX_MENU_DEPTH } from "@uog/types";
 import type { VisualLayout } from "@uog/types";
 import { VisualLayoutView } from "./visual-layout";
+import { RichText } from "./rich-text";
 import { resolvePageHeading } from "./page-heading";
-import { resolvePageWidth, withSafePageWidth } from "./page-width";
+import { PAGE_CONTENT_WIDTHS, resolvePageWidth, withSafePageWidth } from "./page-width";
 import type { ReactNode } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -240,21 +242,8 @@ export function BlockView({ block, siteId }: { block: PublicBlock; siteId?: numb
     );
   }
   if (block.type === "paragraph" && block.html) {
-    const parts = paragraphParts(block.html);
-    if (parts.length === 0) return null;
-    return (
-      <Typography component="p" sx={{ maxWidth: "65ch", overflowWrap: "anywhere" }}>
-        {parts.map((part, index) =>
-          part.type === "link" ? (
-            <Link key={index} href={part.href} rel="noopener noreferrer">
-              {part.label}
-            </Link>
-          ) : (
-            <Box key={index} component="span">{index > 0 ? " " : ""}{part.value}</Box>
-          ),
-        )}
-      </Typography>
-    );
+    // Rich text keeps the editor's inline formatting, links and quotes.
+    return <RichText html={block.html} />;
   }
   if (block.type === "button" && block.label) {
     const href = block.href ? safeMenuHref(block.href) : null;
@@ -283,7 +272,7 @@ export function BlockView({ block, siteId }: { block: PublicBlock; siteId?: numb
   if (block.type === "list" && block.items && block.items.length > 0) {
     const Tag = block.style === "ordered" ? "ol" : "ul";
     return (
-      <Box component={Tag} sx={{ pl: 3, maxWidth: "65ch" }}>
+      <Box component={Tag} sx={{ pl: 3 }}>
         {block.items.map((item) => (
           <Typography key={item} component="li">{item}</Typography>
         ))}
@@ -431,6 +420,10 @@ export function PublicPageView({ page, privateMediaBase, viewportWidth }: { page
   const titleHidden = heading ? !heading.titleVisible : false;
   // One resolver drives the builder canvas and the public Page alike.
   const pageWidth = page.visual_layout ? resolvePageWidth(page.visual_layout.settings) : null;
+  // A block-built Page has no width setting of its own, so it uses the Reading
+  // column: one centred measure that titles, text, lists and media all share
+  // instead of narrow paragraphs hugging the left edge of a wide Page.
+  const contentMaxWidth = pageWidth?.maxWidth ?? PAGE_CONTENT_WIDTHS.reading;
   // Explicit opt-out only: a stored "global" or absent value keeps the shell.
   const chromeFree = page.visual_layout?.settings?.chrome === "none";
   // Device preview uses its explicit canvas width rather than the surrounding browser.
@@ -464,7 +457,7 @@ export function PublicPageView({ page, privateMediaBase, viewportWidth }: { page
         <Box
           component="article"
           aria-labelledby="public-page-title"
-          sx={{ gridArea: "content", display: "flex", flexDirection: "column", gap: 2, minWidth: 0, width: "100%", maxWidth: pageWidth?.maxWidth, mx: "auto", overflowWrap: "anywhere" }}
+          sx={{ gridArea: "content", display: "flex", flexDirection: "column", gap: 2, minWidth: 0, width: "100%", maxWidth: contentMaxWidth, mx: "auto", overflowWrap: "anywhere" }}
         >
           {chromeFree ? (
             <Box component="nav" aria-label="Page navigation" sx={{ borderBottom: 1, borderColor: "divider", pb: 1 }}>

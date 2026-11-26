@@ -87,6 +87,59 @@ describe("paragraphParts", () => {
   });
 });
 
+function renderParagraph(html: string) {
+  return render(<PublicPageView page={pageFromResponse(200, { ...published, blocks: [{ type: "paragraph", html }] })} />);
+}
+
+describe("published rich text", () => {
+  it("renders bold, italic, underline, line breaks, quotes and links", () => {
+    const html = '<p>Plain <strong>bold</strong> and <em>italic</em> <u>under</u> <a href="/about">link</a><br>next line</p><blockquote><p>A quoted line</p></blockquote>';
+    const { container } = renderParagraph(html);
+    expect(screen.getByText("bold").tagName).toBe("STRONG");
+    expect(screen.getByText("italic").tagName).toBe("EM");
+    expect(screen.getByText("under").tagName).toBe("U");
+    expect(screen.getByRole("link", { name: "link" }).getAttribute("href")).toBe("/about");
+    expect(container.querySelector("p br")).toBeTruthy();
+    expect(container.querySelector("blockquote p")?.textContent).toContain("A quoted line");
+  });
+
+  it("wraps a bare inline run in a paragraph", () => {
+    const { container } = renderParagraph("<strong>Loose bold</strong>");
+    expect(container.querySelector("p > strong")?.textContent).toBe("Loose bold");
+  });
+
+  it("unwraps markup outside the allowlist but keeps its text", () => {
+    const html = '<p><code>code</code> <span style="color:red" onclick="attack()">plain</span> <sub>sub</sub></p>';
+    const { container } = renderParagraph(html);
+    expect(container.querySelector("code, span, sub, [onclick]")).toBeNull();
+    expect(container.querySelector("p")?.textContent).toBe("code plain sub");
+  });
+
+  it("renders nothing for a paragraph with no visible text", () => {
+    const { container } = renderParagraph("<p> &nbsp; </p><p><br></p>");
+    expect(container.querySelector("p, blockquote, br")).toBeNull();
+  });
+
+  it("keeps site, http and mailto links but no script or protocol-relative targets", () => {
+    const html = '<p><a href="/about">Site</a><a href="https://portal.example.edu">Web</a><a href="mailto:info@uog.edu.et">Mail</a><a href="//evil.example/x">Relative</a><a href="javascript:alert(1)">Bad</a></p>';
+    const { container } = renderParagraph(html);
+    expect(screen.getByRole("link", { name: "Site" }).getAttribute("href")).toBe("/about");
+    expect(screen.getByRole("link", { name: "Web" }).getAttribute("href")).toBe("https://portal.example.edu/");
+    expect(screen.getByRole("link", { name: "Mail" }).getAttribute("href")).toBe("mailto:info@uog.edu.et");
+    expect(screen.queryByRole("link", { name: "Relative" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Bad" })).toBeNull();
+    expect(container.innerHTML).not.toContain("javascript:");
+  });
+
+  it("drops script, iframe and image content entirely", () => {
+    const html = '<p><strong>Safe</strong><script>alert(1)</script><iframe src="//evil.example"></iframe><img src="x" onerror="attack()"></p>';
+    const { container } = renderParagraph(html);
+    expect(container.querySelector("p strong")?.textContent).toBe("Safe");
+    expect(container.querySelector("script, iframe, img")).toBeNull();
+    expect(container.querySelector("p")?.textContent).toBe("Safe");
+  });
+});
+
 describe("PublicPageView", () => {
   it("marks the visual homepage so its first section can sit directly below the Site header", () => {
     const { container } = render(<PublicPageView page={visualPage(undefined, undefined, true)} />);
@@ -121,6 +174,14 @@ describe("PublicPageView", () => {
     expect(container.querySelectorAll("[data-widget-type]").length).toBe(3);
     expect(container.querySelector('[data-widget-type="site_title"]')?.textContent).toContain("placeholder");
   });
+  it("centres a block-built Page in one reading column instead of a narrow left column", () => {
+    const { container } = renderParagraph("<p>Body copy that should fill the page column.</p>");
+    const article = container.querySelector("article") as HTMLElement;
+    expect(getComputedStyle(article).maxWidth).toBe("880px");
+    // No narrower cap of its own: the paragraph fills the reading column.
+    expect(getComputedStyle(container.querySelector("p") as HTMLElement).maxWidth).toBe("");
+  });
+
   it("renders the published page and does not mount unsafe markup", () => {
     const { container } = render(<PublicPageView page={pageFromResponse(200, published)} />);
     expect(screen.getByRole("heading", { level: 1, name: "Admissions" })).toBeTruthy();
