@@ -747,7 +747,7 @@ export function SiteDetail({ site, permissions = [], error }: SiteDetailProps) {
 
       {section === "menus" ? (
       <Box component="section" aria-label="Menus">
-        <SiteMenusPanel siteId={site.id} menusEnabled={menusEnabled} permissions={permissions} />
+        <SiteMenusPanel siteId={site.id} menusEnabled={menusEnabled} permissions={permissions} language={site.default_language} />
       </Box>
       ) : null}
       {section === "pages" ? (

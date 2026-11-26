@@ -33,7 +33,7 @@ describe("shared visual layout fixtures",()=>{
     expect(JSON.stringify(fixture.layout)).toBe(original);
     if(!result.ok)expect(Object.keys(result.errors).every(path=>path.startsWith("metadata.visual_layout"))).toBe(true);
   });
-  it("exports exactly the product's 43 typed widgets",()=>expect(new Set(widgetRegistry.map(widget=>widget.type)).size).toBe(43));
+  it("exports the typed widget registry",()=>expect(new Set(widgetRegistry.map(widget=>widget.type)).size).toBe(44));
   it("renders three ordered columns and the scoped Slider without mutating IDs",()=>{
     const layout=structuredClone(fixtures[0]!.layout);
     const page=pageFromResponse(200,{title:"University",site:11,metadata:{visual_layout:layout},blocks:[]});

@@ -34,6 +34,7 @@ import type {
 import type { ActionResult } from "@/organizations/contract";
 
 import { MAX_MENU_DEPTH } from "@uog/types";
+import { documentsCopy } from "@uog/types";
 
 const PATH = /^\/(?:[a-z0-9][a-z0-9-]{0,63}(?:\/[a-z0-9][a-z0-9-]{0,63})*)?$/;
 
@@ -42,6 +43,7 @@ const EMPTY_TARGETS: MenuTargets = {
   posts: [],
   pagesAvailable: true,
   postsAvailable: true,
+  documentsAvailable: true,
 };
 
 function siblings(items: MenuItemRecord[], parent: string | null): MenuItemRecord[] {
@@ -107,9 +109,10 @@ function externalUrlError(value: string): string | null {
   return null;
 }
 
-function targetText(item: MenuItemRecord, targets: MenuTargets): string {
+function targetText(item: MenuItemRecord, targets: MenuTargets, language="en"): string {
   if (item.destination_status === "unavailable") return "Unavailable destination: update or disable before publishing";
   if (item.item_type === "news") return "Site news listing";
+  if (item.item_type === "docs") return documentsCopy(language).menuTarget;
   if (item.item_type === "category") return (targets.categories ?? []).find(row => row.id === item.category)?.label ?? "Unavailable category";
   if (item.item_type === "page") {
     const page = targets.pages.find((row) => row.id === item.page);
@@ -122,7 +125,8 @@ function targetText(item: MenuItemRecord, targets: MenuTargets): string {
   return item.target || "No target";
 }
 
-function targetError(kind: MenuItemKind, value: string, targets: MenuTargets): string | null {
+function targetError(kind: MenuItemKind, value: string, targets: MenuTargets, language="en"): string | null {
+  if (kind === "docs") return targets.documentsAvailable ? null : documentsCopy(language).unavailable;
   if (kind === "custom") {
     return PATH.test(value) ? null : "Use a same-site path such as /about.";
   }
@@ -146,6 +150,7 @@ export function MenuItemTree({
   showAvailability = true,
   onBusyChange,
   onSaved,
+  language="en",
 }: {
   siteId: number;
   state: MenuLocationState;
@@ -154,6 +159,7 @@ export function MenuItemTree({
   onChanged: () => void | Promise<void>;
   onBusyChange?: (busy: boolean) => void;
   onSaved?: () => void;
+  language?: string;
   /** The menu editor shows this once. Nested trees must not repeat it. */
   showAvailability?: boolean;
 }) {
@@ -306,7 +312,7 @@ export function MenuItemTree({
                   <Typography variant="caption" color="text.secondary">{depth===0?"Top-level item":`Submenu level ${depth} of 5`}</Typography>
                   <Typography sx={{ fontWeight: 600, overflowWrap: "anywhere" }}>{item.label}</Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ overflowWrap: "anywhere" }}>
-                    {targetText(item, targets)}
+                    {targetText(item, targets, language)}
                   </Typography>
                 </Box>
                 <Box
@@ -350,6 +356,7 @@ export function MenuItemTree({
                   initial={item}
                   items={items}
                   targets={targets}
+                  language={language}
                   enabled={enabled && !busy}
                   onSubmit={(input) => void run(
                     () => updateMenuItem(siteId, state.menu.id, item.id, state.etag, input),
@@ -375,6 +382,7 @@ export function MenuItemTree({
       {showAvailability && !targets.postsAvailable ? (
         <Alert severity="info">Posts are not available for this Site. Post targets stay blocked.</Alert>
       ) : null}
+      {showAvailability && !targets.documentsAvailable ? <Alert severity="info">{documentsCopy(language).unavailable}</Alert> : null}
       {items.length === 0 ? (
         <Typography variant="body2" color="text.secondary">This menu has no items yet.</Typography>
       ) : renderItems(null, 0)}
@@ -383,6 +391,7 @@ export function MenuItemTree({
         submitLabel="Add link"
         items={items}
         targets={targets}
+        language={language}
         enabled={enabled && !busy}
         onSubmit={(input) => void run(() => createMenuLink(siteId, state.menu.id, state.etag, input))}
       />
@@ -398,6 +407,7 @@ function ItemForm({
   targets,
   enabled,
   onSubmit,
+  language="en",
 }: {
   legend: string;
   submitLabel: string;
@@ -406,8 +416,9 @@ function ItemForm({
   targets: MenuTargets;
   enabled: boolean;
   onSubmit: (input: MenuItemInput) => void;
+  language?: string;
 }) {
-  const initialKind: MenuItemKind = initial?.item_type === "page" || initial?.item_type === "post" || initial?.item_type === "category" || initial?.item_type === "news" || initial?.item_type === "external"
+  const initialKind: MenuItemKind = initial?.item_type === "page" || initial?.item_type === "post" || initial?.item_type === "category" || initial?.item_type === "news" || initial?.item_type === "external" || initial?.item_type === "docs"
     ? initial.item_type
     : "custom";
   const [label, setLabel] = useState(initial?.label ?? "");
@@ -419,7 +430,8 @@ function ItemForm({
   const [parent, setParent] = useState(initial?.parent ?? "");
   const [warning, setWarning] = useState<string | null>(null);
   const value = kind === "page" ? page : kind === "post" ? post : kind === "category" ? category : target;
-  const problem = targetError(kind, value, targets);
+  const problem = targetError(kind, value, targets, language);
+  const copy=documentsCopy(language);
   const parents = items.filter((item) => (
     initial
       ? item.id !== initial.id && canPlace(items, initial.id, item.id)
@@ -428,7 +440,7 @@ function ItemForm({
 
   function submit(event: FormEvent) {
     event.preventDefault();
-    const message = targetError(kind, value, targets);
+    const message = targetError(kind, value, targets, language);
     if (message) {
       setWarning(message);
       return;
@@ -481,6 +493,7 @@ function ItemForm({
         <option value="page" disabled={!targets.pagesAvailable}>Page</option>
         <option value="post" disabled={!targets.postsAvailable}>Post</option>
         <option value="news" disabled={!targets.postsAvailable}>News listing</option>
+        <option value="docs" disabled={!targets.documentsAvailable}>{copy.menuLabel}</option>
         <option value="category" disabled={!targets.postsAvailable}>News category</option>
         <option value="external">External URL</option>
       </TextField>

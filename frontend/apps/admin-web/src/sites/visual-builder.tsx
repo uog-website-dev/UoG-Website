@@ -46,6 +46,7 @@ import {
   resetResponsiveProperty,
   setResponsiveProperty,
   validateVisualLayout,
+  documentsCopy,
 } from "@uog/types";
 import type {
   GapToken,
@@ -68,6 +69,7 @@ import {
 import type { SitePagePreview, SitePageRecord, SiteSectionTemplate } from "@/app/sites/page-actions";
 import { unwrap, reportActionResult } from "@/organizations/contract";
 import { APP_BASE_PATH } from "@/base-path";
+import { getSiteDocumentCategories } from "@/app/sites/document-actions";
 import { LazyMediaPickerDialog as MediaPickerDialog } from "@/sites/lazy-media-picker";
 import type { MediaPickerResult } from "@/sites/media-picker";
 import { ContentWorkflowButtons, ContentWorkflowDialog } from "@/sites/content-workflow";
@@ -106,7 +108,7 @@ const InspectorFields = dynamic(
 );
 
 export interface VisualBuilderProps {
-  siteId:number;siteName:string;pageId:string;builderEnabled:boolean|null;permissions:readonly string[];
+  siteId:number;siteName:string;pageId:string;builderEnabled:boolean|null;permissions:readonly string[];defaultLanguage?:string;
 }
 const ratios:LayoutSection["ratios"][]=[[100],[50,50],[60,40],[40,60],[70,30],[30,70],[75,25],[25,75],[1,1,1]];
 const human=(key:string)=>key.replaceAll("_"," ").replace(/^./,value=>value.toUpperCase());
@@ -120,14 +122,17 @@ export function VisualBuilder(props:VisualBuilderProps) {
   return <RenderProbe id="visual-builder"><BuilderWorkspace key={`${props.siteId}:${props.pageId}`} {...props}/></RenderProbe>;
 }
 
-function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProps) {
+function BuilderWorkspace({siteId,siteName,pageId,permissions,defaultLanguage="en"}:VisualBuilderProps) {
   const router=useRouter();
+  const widgetLabel=(type:string)=>type==="document_list"?documentsCopy(defaultLanguage).widgetName:labelFor(type);
   const [page,setPage]=useState<SitePageRecord|null>(null);
+  const [documentCategories,setDocumentCategories]=useState<Array<{id:string;name:string}>>([]);
   const [layout,setLayout]=useState<VisualLayout>(emptyLayout);
   const [selected,setSelected]=useState<string|null>(null);
   const [announcement,setAnnouncement]=useState("");
   const dragId=useRef<VisualDragPayload|null>(null);
   const suppressPaletteClick=useRef(false);
+  useEffect(()=>{let active=true;void getSiteDocumentCategories(siteId).then(result=>{if(active&&result.ok)setDocumentCategories(result.data.filter(row=>row.is_active).map(({id,name})=>({id,name})));});return()=>{active=false;};},[siteId]);
   const [dropHoverColumn,setDropHoverColumn]=useState<string|null>(null);
   function startDrag(event: { dataTransfer: DataTransfer | null; stopPropagation: () => void }, payload: VisualDragPayload) {
     dragId.current = payload;
@@ -409,7 +414,7 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
     }
     try {
       const widget=newWidget(type,asset);change(insertWidget(layout,context,widget),{selection:widget.id});
-      setPicker(null);setMedia(null);setAnnouncement(`${labelFor(type)} added.`);
+      setPicker(null);setMedia(null);setAnnouncement(`${widgetLabel(type)} added.`);
     }catch(cause){setError(cause instanceof Error?cause.message:"The widget could not be inserted.");}
   }
   function insertFromPalette(type:WidgetType, preferred:InsertionContext|null=null) {
@@ -436,7 +441,7 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
     try {
       const widget=newWidget(type);
       change(insertWidget(nextLayout,context,widget),{selection:widget.id});
-      setAnnouncement(`${labelFor(type)} added.`);
+      setAnnouncement(`${widgetLabel(type)} added.`);
     }catch(cause){setError(cause instanceof Error?cause.message:"The widget could not be inserted.");}
   }
   function removeSelected() {
@@ -629,7 +634,7 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
   const chromeWidgets=chromeWidgetsIn(layout);
   // Site branding and menus are part of the global header; legacy stored
   // widgets stay renderable but are never offered for new content.
-  const matchingWidgets=paletteRegistry.filter(value=>`${value.label} ${value.type}`.toLowerCase().includes(widgetQuery.toLowerCase().trim()));
+  const matchingWidgets=paletteRegistry.map(value=>({...value,label:widgetLabel(value.type)})).filter(value=>`${value.label} ${value.type}`.toLowerCase().includes(widgetQuery.toLowerCase().trim()));
   const canvasWidth=PREVIEW_VIEWPORTS[previewViewport].width;
   const canMoveSelected=!!entry && entry.kind!=="column";
   const canDuplicateSelected=!!entry && (entry.kind==="row" || entry.kind==="widget");
@@ -909,22 +914,22 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
                     }}
                     sx={{display:"grid",gap:0.5,p:0.75,border:"1px solid #3d516b",borderRadius:1}}>
                     <Box sx={{display:"flex",alignItems:"center",gap:0.5,minWidth:0}}>
-                      <IconButton size="small" draggable={!saving} disabled={saving} aria-label={`Drag ${labelFor(widget.type)}`}
+                      <IconButton size="small" draggable={!saving} disabled={saving} aria-label={`Drag ${widgetLabel(widget.type)}`}
                         onDragStart={event=>startDrag(event, `widget:${widget.id}`)} onDragEnd={finishDrag}
                         sx={{color:"#afd4ff",cursor:saving?"default":"grab","&:active":{cursor:"grabbing"}}}><DragIndicator fontSize="inherit"/></IconButton>
                       <Button data-focus-id={widget.id} size="small" sx={{color:"#edf3ff",justifyContent:"flex-start",textTransform:"none",minWidth:0,flex:1}}
-                        aria-pressed={selected===widget.id} onClick={()=>setSelected(widget.id)}>{labelFor(widget.type)}</Button>
+                        aria-pressed={selected===widget.id} onClick={()=>setSelected(widget.id)}>{widgetLabel(widget.type)}</Button>
                     </Box>
                     <Box sx={{display:"flex",gap:0.5,flexWrap:"wrap"}}>
                       <Button size="small" sx={{color:"#afd4ff",minWidth:32}} data-focus-id={widget.id}
-                        aria-label={`Move ${labelFor(widget.type)} up`} disabled={saving || widgetIndex===0}
+                        aria-label={`Move ${widgetLabel(widget.type)} up`} disabled={saving || widgetIndex===0}
                         onClick={()=>applyComposition(shiftWidget(layout,widget.id,-1))}>↑</Button>
                       <Button size="small" sx={{color:"#afd4ff",minWidth:32}} data-focus-id={widget.id}
-                        aria-label={`Move ${labelFor(widget.type)} down`} disabled={saving || widgetIndex===column.children.length-1}
+                        aria-label={`Move ${widgetLabel(widget.type)} down`} disabled={saving || widgetIndex===column.children.length-1}
                         onClick={()=>applyComposition(shiftWidget(layout,widget.id,1))}>↓</Button>
                       <Button size="small" sx={{color:"#afd4ff"}} disabled={saving}
                         onClick={event=>openPicker({columnId:column.id,index:widgetIndex+1},event.currentTarget)}
-                        aria-label={`Add here after ${labelFor(widget.type)}`}>Add here</Button>
+                        aria-label={`Add here after ${widgetLabel(widget.type)}`}>Add here</Button>
                     </Box>
                   </Box>)}
                   <Button fullWidth size="small" startIcon={<AddRounded/>} sx={{color:"#afd4ff"}} disabled={saving}
@@ -1031,6 +1036,8 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
               <InspectorFields
                 schema={schemaFor((entry.node as WidgetNode).type)}
                 value={(entry.node as WidgetNode).props}
+                documentCategories={documentCategories}
+                documentLanguage={defaultLanguage}
                 disabled={saving}
                 path={widgetPropsPath(layout, entry.id) ?? undefined}
                 errors={errors}
@@ -1159,7 +1166,7 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
         <Button variant="contained" disabled={saving || !templateName.trim()} onClick={()=>void saveSelectedAsTemplate()}>{saving?"Saving…":"Save template"}</Button>
       </DialogActions>
     </Dialog>
-    <WidgetPicker open={!!picker && !media} context={`${siteName} · ${page.title} · ${contextLabel}`} nested={!!picker?.widgetId} onChoose={type=>insert(type)} onClose={()=>setPicker(null)} returnFocus={()=>invoker.current?.focus()}/>
+    <WidgetPicker open={!!picker && !media} context={`${siteName} · ${page.title} · ${contextLabel}`} nested={!!picker?.widgetId} language={defaultLanguage} onChoose={type=>insert(type)} onClose={()=>setPicker(null)} returnFocus={()=>invoker.current?.focus()}/>
     {media?<MediaPickerDialog open siteId={siteId} canUpload={permissions.includes("content.media.upload")} returnFocusRef={mediaInvoker} onCancel={()=>setMedia(null)} onConfirm={result=>{if(media.type)insert(media.type,result);else{media.apply?.(result);setMedia(null);}}}/>:null}
     <ContentWorkflowDialog
       noun="Page"
@@ -1185,10 +1192,10 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions}:VisualBuilderProp
   </Box>;
 }
 
-function WidgetPicker({open,context,nested,onChoose,onClose,returnFocus}:{open:boolean;context:string;nested:boolean;onChoose:(type:WidgetType)=>void;onClose:()=>void;returnFocus:()=>void}) {
+function WidgetPicker({open,context,nested,language="en",onChoose,onClose,returnFocus}:{open:boolean;context:string;nested:boolean;language?:string;onChoose:(type:WidgetType)=>void;onClose:()=>void;returnFocus:()=>void}) {
   const [query,setQuery]=useState("");const [category,setCategory]=useState("All");
   useEffect(()=>{if(open){setQuery("");setCategory("All");}},[open]);
-  const matching=paletteRegistry.filter(value=>(!nested || ["hero_image","headline","editor","image","button"].includes(value.type)) && `${value.label} ${value.type}`.toLowerCase().includes(query.toLowerCase().trim()));
+  const matching=paletteRegistry.map(value=>({...value,label:value.type==="document_list"?documentsCopy(language).widgetName:value.label})).filter(value=>(!nested || ["hero_image","headline","editor","image","button"].includes(value.type)) && `${value.label} ${value.type}`.toLowerCase().includes(query.toLowerCase().trim()));
   const visible=matching.filter(value=>category==="All" || categories.find(item=>item.label===category)?.types.includes(value.type));
   function arrow(event:KeyboardEvent<HTMLDivElement>) {
     if(!(event.target as HTMLElement).hasAttribute("data-widget-card"))return;

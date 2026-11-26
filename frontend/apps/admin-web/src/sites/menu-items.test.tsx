@@ -25,6 +25,7 @@ const TARGETS: MenuTargets = {
   posts: [{ id: "post-1", label: "Campus news" }],
   pagesAvailable: true,
   postsAvailable: true,
+  documentsAvailable: true,
 };
 
 function state(): MenuLocationState {
@@ -49,10 +50,11 @@ function renderTree(
   current = state(),
   targets: MenuTargets = TARGETS,
   onChanged = vi.fn(),
+  language = "en",
 ) {
   return render(
     <ToastProvider>
-      <MenuItemTree siteId={11} state={current} targets={targets} enabled onChanged={onChanged} />
+      <MenuItemTree siteId={11} state={current} targets={targets} enabled onChanged={onChanged} language={language} />
     </ToastProvider>,
   );
 }
@@ -67,6 +69,20 @@ beforeEach(() => {
 });
 
 describe("MenuItemTree", () => {
+  it("creates the Site documents destination with localized labels and disables it when the module is off", async () => {
+    const localized=renderTree(state(), TARGETS, vi.fn(), "am-ET");
+    const form=screen.getByRole("form",{name:"Add to Header"});
+    expect(within(form).getByRole("option",{name:"ሰነዶች እና ፋይሎች"})).toHaveProperty("disabled",false);
+    fireEvent.change(within(form).getByLabelText(/Item label/),{target:{value:"የመመሪያ ሰነዶች"}});
+    fireEvent.change(within(form).getByLabelText("Item target"),{target:{value:"docs"}});
+    fireEvent.click(within(form).getByRole("button",{name:"Add link"}));
+    await waitFor(()=>expect(createMenuLink).toHaveBeenCalledWith(11,"menu-1",'"menu-1-v3"',expect.objectContaining({item_type:"docs",target:""})));
+
+    localized.unmount();
+    const unavailable=renderTree(state(),{...TARGETS,documentsAvailable:false},vi.fn(),"am");
+    expect(screen.getByRole("option",{name:"ሰነዶች እና ፋይሎች"})).toHaveProperty("disabled",true);
+    unavailable.unmount();
+  });
   it("moves, nests and lifts items from the keyboard for this Site only", async () => {
     const onChanged = vi.fn();
     renderTree(state(), TARGETS, onChanged);

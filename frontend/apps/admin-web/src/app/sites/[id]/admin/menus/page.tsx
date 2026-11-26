@@ -11,6 +11,7 @@ export default function SiteMenusAdminPage() {
         siteId={site.id}
         menusEnabled={enabledModuleCodes.includes("MENUS")}
         permissions={permissions}
+        language={site.defaultLanguage}
       />
     </SiteSection>
   );

@@ -81,7 +81,7 @@ beforeEach(() => {
   updateSiteMenu.mockResolvedValue({ ok: true, data: headerState().menu });
   loadMenuTargets.mockResolvedValue({
     ok: true,
-    data: { pages: [], posts: [], pagesAvailable: true, postsAvailable: true },
+    data: { pages: [], posts: [], pagesAvailable: true, postsAvailable: true, documentsAvailable: true },
   });
 });
 

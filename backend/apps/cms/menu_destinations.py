@@ -23,6 +23,8 @@ def published_rows(menu):
 def resolve_destination(item):
     from apps.api.models import Post, Category
     kind = item.item_type
+    if kind == 'docs':
+        return '/documents' if module_is_available(item.site_id, 'DOCUMENTS') else None
     if kind in {'external','custom'}:
         try:
             if kind == 'external': validate_external_url(item.target)

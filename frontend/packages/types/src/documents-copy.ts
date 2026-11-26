@@ -1,0 +1,56 @@
+/** Externalized copy for the Documents menu target and Page Builder widget. */
+export const DOCUMENTS_COPY = {
+  en: {
+    menuLabel: "Documents & Files",
+    widgetName: "Document List / Grid",
+    limitLabel: "Item limit",
+    displayLabel: "Display mode",
+    sortLabel: "Sort order",
+    titleLabel: "Section title",
+    grid: "Grid",
+    list: "List",
+    newest: "Newest first",
+    oldest: "Oldest first",
+    titleOrder: "Title",
+    menuTarget: "This Site's Documents & Files directory",
+    unavailable: "Documents are not available for this Site.",
+    categoryLabel: "Categories",
+    categoryHint: "Select active document categories. Leave blank to show every category.",
+    loading: "Loading documents…",
+    retry: "Retry",
+    loadError: "Documents could not be loaded. Try again.",
+    empty: "No published documents are available in this section.",
+    sectionLabel: "Documents and files",
+    download: "Download",
+    signInDownload: "Sign in to download",
+  },
+  am: {
+    menuLabel: "ሰነዶች እና ፋይሎች",
+    widgetName: "የሰነዶች ዝርዝር / ፍርግርግ",
+    limitLabel: "የንጥሎች ገደብ",
+    displayLabel: "የማሳያ ሁኔታ",
+    sortLabel: "የቅደም ተከተል አይነት",
+    titleLabel: "የክፍል ርዕስ",
+    grid: "ፍርግርግ",
+    list: "ዝርዝር",
+    newest: "አዲሶቹ መጀመሪያ",
+    oldest: "አሮጌዎቹ መጀመሪያ",
+    titleOrder: "ርዕስ",
+    menuTarget: "የዚህ ድረ-ገጽ የሰነዶች እና ፋይሎች ማውጫ",
+    unavailable: "ሰነዶች ለዚህ ድረ-ገጽ አይገኙም።",
+    categoryLabel: "ምድቦች",
+    categoryHint: "ንቁ የሰነድ ምድቦችን ይምረጡ። ሁሉንም ለማሳየት ባዶ ይተዉት።",
+    loading: "ሰነዶች በመጫን ላይ…",
+    retry: "እንደገና ይሞክሩ",
+    loadError: "ሰነዶችን መጫን አልተቻለም። እንደገና ይሞክሩ።",
+    empty: "በዚህ ክፍል የታተሙ ሰነዶች አልተገኙም።",
+    sectionLabel: "ሰነዶች እና ፋይሎች",
+    download: "አውርድ",
+    signInDownload: "ለማውረድ ይግቡ",
+  },
+} as const;
+
+export type DocumentsLanguage = "en" | "am";
+export function documentsCopy(language?: string) {
+  return DOCUMENTS_COPY[(language ?? "").toLowerCase().split(/[-_]/)[0] === "am" ? "am" : "en"];
+}

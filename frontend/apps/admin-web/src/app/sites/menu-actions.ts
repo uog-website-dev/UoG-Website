@@ -29,7 +29,7 @@ export interface MenuRecord {
   is_global: boolean;
 }
 
-export type MenuItemKind = "page" | "post" | "external" | "custom" | "news" | "category";
+export type MenuItemKind = "page" | "post" | "external" | "custom" | "news" | "category" | "docs";
 
 export interface MenuItemRecord {
   id: string;
@@ -66,6 +66,7 @@ export interface MenuTargets {
   categories?: MenuTargetOption[];
   pagesAvailable: boolean;
   postsAvailable: boolean;
+  documentsAvailable: boolean;
 }
 
 export interface MenuLocationState {

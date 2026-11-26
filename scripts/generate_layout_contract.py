@@ -63,6 +63,7 @@ PROFILES.update({
  "alert": obj({"text":LONG,"severity":{"enum":["info","warning","success","error"]}}),
  "toc": obj({"title":TEXT,"max_level":{"enum":[2,3,4]}}),
  "price": obj({"title":TEXT,"price":{"type":"string","maxLength":64},"items":items({"text":TEXT}),"label":TEXT,"href":HREF}),
+ "document_list": obj({"categories":{"type":"array","maxItems":50,"items":{"type":"string","pattern":"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"}},"limit":{"type":"integer","minimum":1,"maximum":50},"display":{"enum":["grid","list"]},"sort":{"enum":["newest","oldest","title"]},"title":{"type":"string","maxLength":120}},["categories","limit","display","sort"]),
 })
 PROFILES["hero"]["properties"].update({
  "layout":{"enum":["stacked","split","split_reverse","overlay"]},
@@ -102,6 +103,7 @@ CATALOG = {
  "taxonomy_filter":"taxonomy", "post_title":"identity", "post_excerpt":"identity",
  "featured_image":"identity", "alert":"alert", "table_of_contents":"toc",
  "menu_anchor":"anchor", "countdown":"countdown",
+ "document_list":"document_list",
 }
 def presentation_schema():
     return obj({"align": {"enum": ["start", "center", "end"]},
@@ -267,7 +269,7 @@ def main():
                 path.write_text(content, encoding="utf-8")
 
     if args.check:
-        frozen = ROOT / "backend/apps/cms/migrations/0036_layout_schema.json"
+        frozen = ROOT / "backend/apps/cms/migrations/0044_layout_schema.json"
         if json.loads(frozen.read_text(encoding="utf-8")) != build_schema(): raise SystemExit("Frozen migration schema drift")
     types_path=ROOT / "frontend/packages/types/src/layout/generated.ts"
     content=types_source()
