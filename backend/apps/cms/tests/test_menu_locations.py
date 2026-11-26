@@ -216,6 +216,32 @@ def test_footer_columns_db_guard_and_inactive_publish(api):
     assert not MenuLocationAssignment.objects.get(site=api.site,location='footer').is_published
 
 
+def test_deleting_assigned_menu_returns_409_menu_assigned(api):
+    """Finding 6: ProtectedError and footer-column guards surface as 409 menu_assigned."""
+    header=create(api,'HeaderSlot')
+    assigned=call(api,'header',{'version':0,'menu':header,'replace':True})
+    assert assigned.status_code==200,assigned.content
+    assert call(api,'header',{'version':assigned.json()['version']},'publish').status_code==200
+    footer_a=create(api,'FootA');footer_b=create(api,'FootB')
+    saved=call(api,'footer',{'version':0,'menus':[footer_a,footer_b]})
+    assert saved.status_code==200,saved.content
+    assert call(api,'footer',{'version':saved.json()['version']},'publish').status_code==200
+
+    # Empty the trees so children_present does not mask assignment protection.
+    for menu_id in (header, footer_a, footer_b):
+        url=api.base+str(menu_id)+'/'
+        for item in api.client.get(url+'tree/',**api.header).json()['items']:
+            assert api.client.delete(url+'items/'+item['id']+'/',HTTP_IF_MATCH=_tag(api,url),**api.header).status_code==204
+
+    blocked=api.client.delete(api.base+str(header)+'/',HTTP_IF_MATCH=_tag(api,api.base+str(header)+'/'),**api.header)
+    assert blocked.status_code==409,blocked.content
+    assert blocked.json()['error']['details']['reason']=='menu_assigned'
+
+    blocked=api.client.delete(api.base+str(footer_b)+'/',HTTP_IF_MATCH=_tag(api,api.base+str(footer_b)+'/'),**api.header)
+    assert blocked.status_code==409,blocked.content
+    assert blocked.json()['error']['details']['reason']=='menu_assigned'
+    assert Menu.objects.filter(pk__in=[header,footer_a,footer_b]).count()==3
+
 
 def test_extra_footer_menu_mutation_invalidates_the_assigned_slot(api):
     first=create(api,'Firstcolumn');second=create(api,'Extracolumn');host=_host(api.site)

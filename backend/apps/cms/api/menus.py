@@ -38,12 +38,16 @@ class MenuMissingVersion(APIException):
 
 @contextmanager
 def menu_errors():
+    from django.db.models.deletion import ProtectedError
+
     try:
         yield
     except domain.MenuPreconditionRequired as exc:
         raise MenuMissingVersion() from exc
     except domain.MenuConflict as exc:
         raise MenuAPIConflict({"reason": exc.reason}) from exc
+    except ProtectedError as exc:
+        raise MenuAPIConflict({"reason": "menu_assigned"}) from exc
     except DomainValidationError as exc:
         fields = getattr(exc, "message_dict", {"non_field_errors": exc.messages})
         reason = "invalid_tree" if "parent" in fields or "tree" in fields else (
@@ -56,6 +60,10 @@ def menu_errors():
         cause = exc.__cause__
         constraint = getattr(getattr(cause, "diag", None), "constraint_name", "") or ""
         state = getattr(cause, "sqlstate", None)
+        detail = (
+            getattr(getattr(cause, "diag", None), "message_primary", None)
+            or str(cause or exc)
+        ).lower()
         if constraint == "audit_write_failed":
             raise  # The shared handler returns a sanitized 503; transaction rolls back.
         conflicts = {
@@ -66,6 +74,12 @@ def menu_errors():
         }
         if constraint in conflicts or state in {"40001", "40P01"}:
             raise MenuAPIConflict({"reason": conflicts.get(constraint, "concurrent_write")}) from exc
+        if (
+            "footer column" in detail
+            or "menulocationassignment" in constraint
+            or "menulocationassignment" in detail
+        ):
+            raise MenuAPIConflict({"reason": "menu_assigned"}) from exc
         if state in {"23503", "23514"}:
             reason = "invalid_tree" if constraint in {"menu_parent_owner", "menu_acyclic", "menu_max_depth"} else (
                 "module_disabled" if constraint == "menu_module_enabled" else "invalid_target"
