@@ -50,10 +50,12 @@ def compose_with_local(
     inherit_from_id = policy.inherit_from_id if policy else None
     precedence = policy.local_precedence if policy else "override"
 
+    # Only an active local menu may override inheritance. Draft preview may
+    # still project an inactive working menu as the local segment.
     active_local = bool(local_menu_ids) or (
         local_menu is not None
         and not local_menu.is_global
-        and (draft or local_menu.is_active)
+        and local_menu.is_active
     )
 
     items = []
@@ -134,10 +136,12 @@ def resolve_local_menu(site_id, location, *, draft=False):
             return menu, None
         return None, None
 
-    legacy = Menu.objects.filter(
-        site_id=site_id, location=location, is_global=False, is_active=True,
-    ).first()
-    return legacy, None
+    legacy_qs = Menu.objects.filter(
+        site_id=site_id, location=location, is_global=False,
+    )
+    if not draft:
+        legacy_qs = legacy_qs.filter(is_active=True)
+    return legacy_qs.first(), None
 
 
 def _retag_source(nodes, source):

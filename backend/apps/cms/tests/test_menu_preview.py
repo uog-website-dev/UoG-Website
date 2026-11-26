@@ -1,11 +1,11 @@
 """Private draft rendering uses the same guarded projection without public effects."""
 import pytest
-from apps.cms.models import Menu,MenuItem
-from .test_menu_api import api,ready,_menu,_item,_post,_tag
-from .test_menu_locations import call,create,public
+from apps.cms.menu_models import Menu, MenuInheritance, MenuItem
+from apps.cms.tests.test_menu_delivery import _link, family
+from .test_menu_api import api, ready, _menu, _item, _post, _tag
+from .test_menu_locations import call, create, public
 from .test_public_posts import _host
-from .test_menu_delivery import family
-pytestmark=pytest.mark.django_db
+pytestmark = pytest.mark.django_db
 
 
 @pytest.mark.parametrize("debug",[True,False])
@@ -77,21 +77,83 @@ def test_disabled_module_blocks_private_and_public_and_extra_scope_parameters_ar
     assert api.client.get('/api/v1/site-context/menus/',HTTP_HOST=host).status_code==404
 
 
-def test_approved_inheritance_qualifies_links_without_exposing_parent_drafts(api,family):
-    from apps.cms.models import MenuInheritance
+def test_approved_inheritance_qualifies_links_without_exposing_parent_drafts(api, family):
     from apps.cms.menu_destinations import snapshot_items
-    main,_,child,_=family
-    menu=Menu.objects.create(site=main,location='header',name='Approved shared navigation')
-    item=MenuItem.objects.create(site=main,menu=menu,label='Approved parent label',item_type='custom',target='/parent')
-    menu.published_items=snapshot_items(menu);menu.save(update_fields=['published_items'])
-    item.label='Parent private draft';item.save()
-    MenuInheritance.objects.create(site=child,location='header',inherit_from=main,local_precedence='append')
-    result=api.client.get(api.base+'preview-navigation/',**api.header)
-    assert result.status_code==200,result.content
-    node=result.json()['locations']['header'][0]
-    assert node['label']=='Approved parent label'
-    assert node['href']==f'https://site-{main.pk}.uog.edu.et/parent'
-    assert b'Parent private draft' not in result.content
+    main, _, child, _ = family
+    menu = Menu.objects.create(site=main, location="header", name="Approved shared navigation")
+    item = MenuItem.objects.create(
+        site=main, menu=menu, label="Approved parent label", item_type="custom", target="/parent",
+    )
+    menu.published_items = snapshot_items(menu)
+    menu.save(update_fields=["published_items"])
+    item.label = "Parent private draft"
+    item.save()
+    MenuInheritance.objects.create(
+        site=child, location="header", inherit_from=main, local_precedence="append",
+    )
+    result = api.client.get(api.base + "preview-navigation/", **api.header)
+    assert result.status_code == 200, result.content
+    node = result.json()["locations"]["header"][0]
+    assert node["label"] == "Approved parent label"
+    assert node["href"] == f"https://site-{main.pk}.uog.edu.et/parent"
+    assert b"Parent private draft" not in result.content
+
+
+def test_inactive_local_does_not_override_inherited_preview(api, family):
+    """Finding 9: preview uses active local menus only when deciding override."""
+    main, parent, child, _ = family
+    global_menu = Menu.objects.create(site=main, location="header", name="Global", is_global=True)
+    _link(global_menu, "University")
+    parent_menu = Menu.objects.create(site=parent, location="header", name="Parent")
+    _link(parent_menu, "Colleges")
+    inactive = Menu.objects.create(
+        site=child, location="header", name="Inactive local", is_active=False,
+    )
+    _link(inactive, "Hidden local")
+    MenuInheritance.objects.create(
+        site=child, location="header", inherit_from=parent,
+        include_global=True, local_precedence="override",
+    )
+    result = api.client.get(api.base + "preview-navigation/", **api.header)
+    assert result.status_code == 200, result.content
+    roots = [
+        (node["label"], node["source"])
+        for node in result.json()["locations"]["header"]
+    ]
+    # Inactive local is still visible as a draft segment, but does not drop
+    # the inherited parent the way an active override would.
+    assert roots == [
+        ("University", "global"),
+        ("Colleges", "inherited"),
+        ("Hidden local", "local"),
+    ]
+
+
+def test_preview_assignment_draft_mirrors_public_precedence(api, family):
+    """Finding 9: draft assignment is the local segment; policy still composes."""
+    main, parent, child, _ = family
+    global_menu = Menu.objects.create(site=main, location="header", name="Global", is_global=True)
+    _link(global_menu, "University")
+    parent_menu = Menu.objects.create(site=parent, location="header", name="Parent")
+    _link(parent_menu, "Colleges")
+    local_id = create(api, "Department")
+    saved = call(api, "header", {"version": 0, "menu": local_id, "replace": True})
+    assert saved.status_code == 200, saved.content
+    MenuInheritance.objects.create(
+        site=child, location="header", inherit_from=parent,
+        include_global=True, local_precedence="append",
+    )
+    result = api.client.get(api.base + "preview-navigation/", **api.header)
+    assert result.status_code == 200, result.content
+    roots = [
+        (node["label"], node["source"])
+        for node in result.json()["locations"]["header"]
+    ]
+    assert roots == [
+        ("University", "global"),
+        ("Colleges", "inherited"),
+        ("Department", "local"),
+    ]
 
 
 def test_public_projection_omits_foreign_and_unpublished_branches(api,pages_module):
