@@ -1,4 +1,5 @@
 """Effective public menus: precedence, inheritance, cache scope and module gate."""
+from unittest.mock import patch
 from uuid import uuid4
 
 import pytest
@@ -164,6 +165,24 @@ def test_unpublished_targets_and_inactive_branches_are_omitted(family):
     _link(menu, "Visible news", item_type="post", post=visible, sort_order=4)
     assert _roots(child.pk) == [("Outside", "local"), ("Visible news", "local")]
     assert compose_location(child.pk, "header")[1]["href"] == "/posts/visible"
+
+
+def test_public_menu_cache_hit_skips_recompose(family, client):
+    """Finding 2: versioned cache must be returned without recomposing."""
+    _main, _parent, child, _sibling = family
+    menu = Menu.objects.create(site=child, location="header", name="Local")
+    _link(menu, "Department")
+    host = _host(child)
+    first = client.get(PUBLIC + "?location=header", HTTP_HOST=host)
+    assert first.status_code == 200
+    assert [row["label"] for row in first.json()["locations"]["header"]] == ["Department"]
+    with patch(
+        "apps.cms.api.menu_delivery.compose_location", wraps=compose_location,
+    ) as recomposed:
+        second = client.get(PUBLIC + "?location=header", HTTP_HOST=host)
+        assert second.status_code == 200
+        assert second.json()["locations"]["header"] == first.json()["locations"]["header"]
+        recomposed.assert_not_called()
 
 
 def test_post_publish_and_unpublish_invalidate_linked_menu_delivery(family):

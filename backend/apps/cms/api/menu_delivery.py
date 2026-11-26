@@ -82,10 +82,10 @@ def _cached_location(site_id, location):
     version = delivery_version(site_id, location)
     key = f"menu:{location}:delivery:{version}"
     cached = get_public_cache(site_id, key)
-    # Eligibility can change after a draft removes its live FK or a module is disabled.
+    if cached is not None:
+        return cached
     current = compose_location(site_id, location)
-    if cached != current:
-        set_public_cache(site_id, key, current)
+    set_public_cache(site_id, key, current)
     return current
 
 

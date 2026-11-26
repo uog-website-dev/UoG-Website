@@ -46,6 +46,7 @@ def _enable(site_id, module_id, *, configuration, operation, using):
     enablement.save(using=using)
     if before != "ENABLED":
         _audit(enablement, before, "ENABLED", operation, using=using)
+        _invalidate_menu_delivery(site_id, enablement.module.code, using=using)
     return enablement
 
 
@@ -63,4 +64,16 @@ def _disable(site_id, module_id, *, operation, using):
     enablement.save(using=using, update_fields=["is_enabled"])
     if changed:
         _audit(enablement, "ENABLED", "DISABLED", operation, using=using)
+        _invalidate_menu_delivery(site_id, enablement.module.code, using=using)
     return enablement
+
+
+_MENU_DESTINATION_MODULES = frozenset({"MENUS", "PAGES", "POSTS"})
+
+
+def _invalidate_menu_delivery(site_id, module_code, *, using):
+    if module_code not in _MENU_DESTINATION_MODULES:
+        return
+    from apps.cms.menu_cache import invalidate_site_menus
+
+    invalidate_site_menus(site_id, using=using)

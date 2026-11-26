@@ -44,6 +44,14 @@ def invalidate_delivery(site_id, location):
     _bump({site_id}, location)
 
 
+def invalidate_site_menus(site_id, *, using=DEFAULT_DB_ALIAS):
+    """Bump every location for a Site after destination modules change."""
+    from .menu_models import MENU_LOCATIONS
+
+    for location in MENU_LOCATIONS:
+        _bump({site_id}, location, using=using)
+
+
 def invalidate_post_delivery(post_id, *, using=DEFAULT_DB_ALIAS):
     """Invalidate local and inherited menu responses that link to a Post."""
     from .menu_models import MenuItem

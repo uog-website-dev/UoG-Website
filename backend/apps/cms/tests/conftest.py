@@ -54,6 +54,8 @@ def _isolate_external_services(settings):
     settings.CACHES = {
         "default": {
             "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "KEY_PREFIX": "uog",
+            "KEY_FUNCTION": "apps.core.cache.make_cache_key",
         }
     }
     settings.STORAGES = {
