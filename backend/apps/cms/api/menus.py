@@ -437,7 +437,7 @@ class MenuViewSet(MenuAPIBase):
             query = self._query(TreeQuery)
             return self._response(self._tree(menu, query["include_inactive"]), menu)
 
-    @extend_schema(parameters=[IF_MATCH], request=ReorderInput, responses=TreeOutput, description="menu.write (plus menu.publish for an active menu). Atomic sibling reorder: supply every sibling UUID exactly once; parent=null selects roots. Missing, duplicate or foreign IDs return invalid_order; stale If-Match returns 409 version_conflict.")
+    @extend_schema(parameters=[IF_MATCH], request=ReorderInput, responses=TreeOutput, description="menu.write. Stages an atomic sibling reorder on the working tree (public snapshot unchanged until activate). Supply every sibling UUID exactly once; parent=null selects roots. Missing, duplicate or foreign IDs return invalid_order; stale If-Match returns 409 version_conflict.")
     @action(detail=True, methods=["post"])
     def reorder(self, request, *args, **kwargs):
         with menu_errors(), hierarchy_write():
@@ -494,7 +494,7 @@ class MenuItemViewSet(MenuAPIBase):
             menu = self._menu()
             return self._response(ItemOutput(self._item(menu)).data, menu)
 
-    @extend_schema(parameters=[IF_MATCH], request=ItemInput, responses={201: ItemOutput}, description="menu.write (plus menu.publish for active menus). Site/menu identity derives from the URL. Missing sort_order appends to siblings. Internal foreign targets require explicit opt-in and target-Site content-view permission.")
+    @extend_schema(parameters=[IF_MATCH], request=ItemInput, responses={201: ItemOutput}, description="menu.write. Stages an item on the working tree; the public snapshot stays frozen until activate. Site/menu identity derives from the URL. Missing sort_order appends to siblings. Targets must belong to this Site.")
     def create(self, request, *args, **kwargs):
         with menu_errors(), hierarchy_write():
             menu = self._menu()
@@ -503,7 +503,7 @@ class MenuItemViewSet(MenuAPIBase):
             return self._response(ItemOutput(item).data, menu, status=201,
                 location=reverse("sites:menu-item-detail", kwargs={"site_pk": menu.site_id, "menu_pk": menu.pk, "pk": item.pk}))
 
-    @extend_schema(parameters=[IF_MATCH], request=ItemPatch, responses=ItemOutput, description="menu.write (plus menu.publish for active menus). Use move/reorder for parent and sibling positions. Unsafe targets return invalid_target.")
+    @extend_schema(parameters=[IF_MATCH], request=ItemPatch, responses=ItemOutput, description="menu.write. Stages an item edit on the working tree; the public snapshot stays frozen until activate. Use move/reorder for parent and sibling positions. Unsafe targets return invalid_target.")
     def partial_update(self, request, *args, **kwargs):
         with menu_errors(), hierarchy_write():
             menu = self._menu()
@@ -511,7 +511,7 @@ class MenuItemViewSet(MenuAPIBase):
             item = domain.update_menu_item(item.pk, actor=request.user, expected=self._expected(), **self._fields(self._input(ItemPatch)))
             return self._response(ItemOutput(item).data, menu)
 
-    @extend_schema(parameters=[IF_MATCH], responses={204: None}, description="menu.write (plus menu.publish for active menus). Delete a leaf only; a non-leaf returns 409 children_present. Response ETag is the new owning Menu token.")
+    @extend_schema(parameters=[IF_MATCH], responses={204: None}, description="menu.write. Stages leaf deletion on the working tree; the public snapshot stays frozen until activate. A non-leaf returns 409 children_present. Response ETag is the new owning Menu token.")
     def destroy(self, request, *args, **kwargs):
         with menu_errors(), hierarchy_write():
             menu = self._menu()
@@ -519,7 +519,7 @@ class MenuItemViewSet(MenuAPIBase):
             domain.delete_menu_record(item.pk, actor=request.user, expected=self._expected(), item=True)
             return self._response(None, menu, status=204)
 
-    @extend_schema(parameters=[IF_MATCH], request=MoveInput, responses=ItemOutput, description="menu.write (plus menu.publish for active menus). Atomic subtree move; position is the zero-based destination sibling index. One top-level item plus five submenu levels are supported. Cycles and excessive descendant depth return invalid_tree and roll back every changed position.")
+    @extend_schema(parameters=[IF_MATCH], request=MoveInput, responses=ItemOutput, description="menu.write. Stages an atomic subtree move on the working tree; the public snapshot stays frozen until activate. Position is the zero-based destination sibling index. One top-level item plus five submenu levels are supported. Cycles and excessive descendant depth return invalid_tree and roll back every changed position.")
     @action(detail=True, methods=["post"])
     def move(self, request, *args, **kwargs):
         with menu_errors(), hierarchy_write():

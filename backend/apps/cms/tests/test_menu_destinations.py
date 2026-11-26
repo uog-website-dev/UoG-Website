@@ -76,6 +76,7 @@ def test_unavailable_page_warns_and_blocks_promotion_without_replacing_public(ap
     assert api.client.get(api.base+'targets/',**api.header).json()['pages']==[]
 
 def test_editor_can_change_items_but_cannot_promote_and_stale_reorder_is_atomic(api):
+    """Finding 5: active-menu item edits need menu.write only; promote needs menu.publish."""
     from apps.authorization.models import UserRoleAssignment,Role
     url=_menu(api);a=_item(api,url,'First');b=_item(api,url,'Second')
     assert publish(api,url).status_code==200

@@ -17,8 +17,8 @@ covering the URL Site, its owning Organization subtree, or the platform.
 | Code | Authority |
 | --- | --- |
 | `menu.read` | Read menus, item inventory and trees, including disabled historical records. |
-| `menu.write` | Create inactive menus and mutate/delete draft structures. |
-| `menu.publish` | Activate/deactivate menus. Active-menu structural changes require **both** `menu.write` and `menu.publish`. |
+| `menu.write` | Create inactive menus and mutate/delete item trees. Item create/edit/reorder/move/delete on an active menu needs only `menu.write`; the public snapshot stays frozen until activate. |
+| `menu.publish` | Activate/deactivate menus and promote location assignments. Patching or deleting an **active** Menu row itself also requires `menu.publish`. |
 
 The backend entrypoint runs migrations as the migration role and then runs
 `python manage.py seed_rbac`. Reconcile that catalog after deployment: the
@@ -137,12 +137,11 @@ Sibling uniqueness is deferred only within the operation and rechecked before
 returning. Cycles, foreign parents, and subtree depth above six total levels (five submenu levels) are rejected;
 failure rolls back all positions, versions and audit events. A root is level one.
 
-Internal `page` UUID / `post` integer targets must exist in the Menu's Site.
-Foreign references need `allow_cross_site=true` **and** a target-Site content-view
-grant. A client flag never supplies permission. The target discriminant must
-match the sole Page/Post reference, or an external HTTP(S) URL / normalized
-custom same-Site path. Script/data schemes, credentials and encoded control or
-redirect-smuggling input are rejected. No external URLs are fetched or followed.
+Internal `page` / `post` targets must exist in the Menu's Site. Cross-site
+internal targets are rejected. The target discriminant must match the sole
+Page/Post reference, or an external HTTP(S) URL / normalized custom same-Site
+path. Script/data schemes, credentials and encoded control or redirect-smuggling
+input are rejected. No external URLs are fetched or followed.
 
 ## Errors and auditing
 
