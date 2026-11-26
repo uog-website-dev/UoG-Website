@@ -60,6 +60,15 @@ def test_scope_supported_slots_and_database_guards(api):
         MenuLocationAssignment.objects.bulk_create([MenuLocationAssignment(site=api.site,location='header',draft_menu=foreign)])
     assert not MenuLocationAssignment.objects.exists()
 
+
+def test_primary_menu_location_is_retired(api):
+    """Finding 8: primary is not assignable and cannot be stored on Menu rows."""
+    from django.core.exceptions import ValidationError
+    with pytest.raises(ValidationError, match='Primary is retired'):
+        Menu(site=api.site,name='Legacy primary',location='primary').full_clean()
+    created=api.client.post(api.base,{'name':'No primary','location':'primary'},content_type='application/json',**api.header)
+    assert created.status_code==400,created.content
+
 def test_restricted_template_and_legacy_fallback(api):
     from apps.sites.models import SiteTemplate
     template=SiteTemplate.objects.create(code='HEADER_ONLY',name='Header only',description='Restricted renderer',status='ACTIVE',menu_locations=['header'])

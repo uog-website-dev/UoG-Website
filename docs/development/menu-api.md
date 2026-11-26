@@ -69,7 +69,7 @@ Menu active flag; use move/reorder for existing item parents and positions.
 There is no cascading tree delete: nonempty menus and non-leaf items return
 `409 children_present`; deactivation is the usual retention operation.
 
-Locations are the controlled keys `header`, `footer`, `sidebar`, `primary`,
+Locations are the controlled keys `header`, `footer`, `sidebar`, and
 `secondary`. Exactly one Menu per `(Site, location)` is permitted, including
 inactive menus. Duplicates return `409 duplicate_location` and never replace or
 deactivate another Menu silently. The same location is valid in different Sites.

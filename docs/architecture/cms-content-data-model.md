@@ -89,7 +89,7 @@ See the [module registry](module-registry.md).
 ### Menu trees (P2-MENU-001)
 
 `cms.Menu` owns one Site and one registered location: `header`, `footer`,
-`sidebar`, `primary` or `secondary`. These configured location keys are a
+`sidebar` or `secondary`. These configured location keys are a
 controlled deployment contract; extending them requires a reviewed migration
 and an update to `MENU_LOCATIONS`. The unique `(site, location)` constraint
 allows the same location in different Sites. Menus and items have active flags.

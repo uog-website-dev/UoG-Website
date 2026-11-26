@@ -2,7 +2,7 @@
 
 Visitors receive navigation for the Site selected from the trusted Host.
 `GET /api/v1/site-context/menus/` accepts an optional `location` of `header`,
-`footer`, `sidebar`, `primary` or `secondary`. A Site id in the query string
+`footer`, `sidebar` or `secondary`. A Site id in the query string
 is rejected. `X-Forwarded-Host` is ignored. Responses vary by Host and are
 `Cache-Control: public, max-age=0, must-revalidate`.
 

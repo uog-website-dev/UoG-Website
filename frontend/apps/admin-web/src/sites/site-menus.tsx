@@ -42,7 +42,7 @@ import {MenuLocationPanel} from "@/sites/menu-locations";
 import { MenuItemTree } from "@/sites/menu-items";
 import { unwrap } from "@/organizations/contract";
 
-const PLACES: readonly MenuPlace[] = ["", "header", "footer", "sidebar", "primary", "secondary"];
+const PLACES: readonly MenuPlace[] = ["", "header", "footer", "sidebar", "secondary"];
 const NO_TARGETS: MenuTargets = { pages: [], posts: [], pagesAvailable: true, postsAvailable: true };
 
 function menuError(cause: unknown): string {

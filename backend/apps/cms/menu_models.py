@@ -21,7 +21,7 @@ CUSTOM_PATH = re.compile(r"\A/(?:[a-z0-9][a-z0-9-]{0,63}(?:/[a-z0-9][a-z0-9-]{0,
 MAX_MENU_DEPTH = 6  # Top-level destination plus five submenu levels.
 EXTERNAL_SCHEMES = frozenset({"http", "https"})
 REJECTED_SCHEMES = frozenset({"javascript", "data", "vbscript", "file"})
-MENU_LOCATIONS = ("header", "footer", "sidebar", "primary", "secondary")
+MENU_LOCATIONS = ("header", "footer", "sidebar", "secondary")
 LOCAL_PRECEDENCE = ("override", "append")
 MAX_INHERITANCE_HOPS = 8
 
@@ -129,6 +129,10 @@ class Menu(MenuRecord):
         super().clean()
         if not self.name:
             raise ValidationError({"name": "A menu name is required."})
+        if self.location == "primary":
+            raise ValidationError({
+                "location": "Primary is retired. Use header for the main navigation, or clear the location.",
+            })
         if self.location not in ("", *MENU_LOCATIONS) or (self.is_global and not self.location):
             raise ValidationError({"location": "Choose a configured menu location."})
         if self.pk and not self._state.adding:
