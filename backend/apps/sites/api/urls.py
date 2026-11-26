@@ -4,6 +4,7 @@ from apps.cms.api.homepage_templates import HomepageTemplateCatalogue, HomepageT
 from rest_framework.routers import SimpleRouter
 
 from apps.cms.api.pages import SitePageViewSet
+from apps.cms.api.documents import SiteDocuments, SiteDocumentCategories, SiteDocumentDetail, SiteDocumentWorkflow
 from apps.cms.api.sidebars import SidebarViewSet
 from apps.cms.api.menus import MenuViewSet, MenuItemViewSet
 from apps.cms.api.menu_delivery import MenuInheritanceDetailView, MenuInheritanceListView
@@ -27,6 +28,11 @@ router.register(r"(?P<site_pk>[^/.]+)/domains", SiteDomainViewSet, basename="sit
 router.register(r"(?P<site_pk>[^/.]+)/modules", SiteModuleViewSet, basename="sitemodule")
 router.register("", SiteViewSet, basename="site")
 urlpatterns = [
+    path("<int:site_pk>/documents/categories/", SiteDocumentCategories.as_view(), name="site-document-categories"),
+    path("<int:site_pk>/documents/categories/<uuid:category_id>/", SiteDocumentCategories.as_view(), name="site-document-category-detail"),
+    path("<int:site_pk>/documents/", SiteDocuments.as_view(), name="site-documents"),
+    path("<int:site_pk>/documents/<uuid:document_id>/", SiteDocumentDetail.as_view(), name="site-document-detail"),
+    path("<int:site_pk>/documents/<uuid:document_id>/<str:action>/", SiteDocumentWorkflow.as_view(), name="site-document-workflow"),
     path("<int:site_pk>/homepage-templates/", HomepageTemplateCatalogue.as_view(), name="homepage-template-catalogue"),
     path("<int:site_pk>/homepage-templates/prepare/", HomepageTemplatePrepare.as_view(), name="homepage-template-prepare"),
     path("<int:site_pk>/homepage-templates/apply/", HomepageTemplateApply.as_view(), name="homepage-template-apply"),

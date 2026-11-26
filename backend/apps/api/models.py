@@ -182,6 +182,8 @@ class Post(SiteContent):
                 .filter(pk__in=identifiers, site_id=self.site_id, is_active=True)
                 .order_by("pk")
             )
+            if field == "categories":
+                rows = [row for row in rows if row.kind == Category.Kind.POSTS]
             if len(rows) != len(identifiers):
                 raise ValidationError({field: "Select active taxonomy owned by this Site."})
             relation = getattr(self, field)
@@ -279,6 +281,13 @@ class Category(SiteContent):
     inactive categories may reuse a slug within a Site.
     """
 
+    class Kind(models.TextChoices):
+        POSTS = "POSTS", "Posts"
+        DOCUMENTS = "DOCUMENTS", "Documents"
+
+    kind = models.CharField(max_length=12, choices=Kind.choices, default=Kind.POSTS)
+    description = models.TextField(blank=True, default="")
+    position = models.PositiveIntegerField(default=0)
     code = models.CharField(
         max_length=64,
         validators=[
@@ -327,7 +336,7 @@ class Category(SiteContent):
             return
         duplicates = type(self).objects.filter(
             site_id=self.site_id, locale=self.locale, slug=self.slug,
-            is_active=True,
+            is_active=True, kind=self.kind,
         ).exclude(pk=self.pk)
         if duplicates.exists():
             raise ValidationError({

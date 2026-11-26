@@ -61,6 +61,20 @@ def revision_snapshot(content):
             "position": content.position,
             "is_homepage": content.is_homepage,
         })
+    elif content._meta.label_lower == "cms.document":
+        snapshot.update({"title": content.title, "slug": content.slug,
+                         "description": content.description,
+                         "file_reference": content.file_reference,
+                         "version": content.version,
+                         "effective_date": content.effective_date.isoformat() if content.effective_date else None,
+                         "visibility": content.visibility,
+                         "visible_to_public": content.visible_to_public,
+                         "require_login_to_download": content.require_login_to_download,
+                         "categories": sorted(str(pk) for pk in (
+                             [category.pk for category in content._pending_categories]
+                             if getattr(content, "_pending_categories", None) is not None
+                             else (content.categories.values_list("pk", flat=True) if content.pk is not None else [])
+                         ))})
     elif content._meta.model_name == "post":
         # Posts are multi-table children of SiteContent; their own columns are
         # part of the revision so a Post edit advances the content revision.
@@ -84,6 +98,27 @@ def revision_snapshot(content):
             else:
                 identifiers = []
             snapshot[field] = sorted({str(pk) for pk in identifiers})
+    elif content._meta.model_name == "document":
+        snapshot.update({
+            "title": content.title, "slug": content.slug,
+            "description": content.description,
+            "file_reference": content.file_reference,
+            "version": content.version,
+            "effective_date": content.effective_date.isoformat() if content.effective_date else None,
+            "visibility": content.visibility,
+            "visible_to_public": content.visible_to_public,
+            "require_login_to_download": content.require_login_to_download,
+            "categories": sorted({str(pk) for pk in content._pending_categories})
+            if getattr(content, "_pending_categories", None) is not None
+            else sorted(str(pk) for pk in content.categories.values_list("pk", flat=True))
+            if content.pk and not content._state.adding else [],
+        })
+    elif content._meta.label_lower == "api.category":
+        snapshot.update({
+            "kind": content.kind, "name": content.name, "slug": content.slug,
+            "code": content.code, "description": content.description,
+            "position": content.position, "is_active": content.is_active,
+        })
     return snapshot
 
 
@@ -151,6 +186,9 @@ def create_content_revision(
     if content._meta.model_name == "post":
         from apps.api.post_media import record_post_images
         record_post_images(content, revision, using=using)
+    elif content._meta.model_name == "document":
+        from apps.media.document_references import record_document_file
+        record_document_file(content, revision, using=using)
     _prune_revisions(
         content.pk,
         using=using,
@@ -319,6 +357,24 @@ def restore_content_revision(
                         if {str(term.pk) for term in terms} != identifiers:
                             raise ValidationError({field: "Historical taxonomy is unavailable for this Site."})
                         taxonomy[field] = terms
+            elif content._meta.model_name == "document":
+                from apps.api.models import Category
+                for field in ("title", "slug", "description", "file_reference", "version", "effective_date", "visibility", "visible_to_public", "require_login_to_download"):
+                    if field in payload:
+                        value = payload[field]
+                        if field == "effective_date" and value:
+                            from datetime import date
+                            value = date.fromisoformat(value)
+                        setattr(content, field, value)
+                if "categories" in payload:
+                    identifiers = set(payload["categories"])
+                    terms = list(Category.objects.using(using).filter(
+                        pk__in=identifiers, site_id=content.site_id,
+                        kind=Category.Kind.DOCUMENTS, is_active=True,
+                    ))
+                    if {str(term.pk) for term in terms} != identifiers:
+                        raise ValidationError({"categories": "Historical document categories are unavailable for this Site."})
+                    content._pending_categories = terms
 
         content.metadata = payload["metadata"]
         content.blocks = payload["blocks"]

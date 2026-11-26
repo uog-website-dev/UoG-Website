@@ -20,10 +20,11 @@ export default function HealthCheck() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Health lives at the backend root, not under /api.
+    // Use the admin app's same-origin proxy so the check also works when the
+    // frontend is opened directly on port 3001 instead of through nginx.
     const healthApi = createApiClient({ baseUrl: "" });
     healthApi
-      .get<HealthReport>("/health/ready")
+      .get<HealthReport>("/admin/health/ready")
       .then(setHealth)
       .catch(() =>
         setError(

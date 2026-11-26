@@ -38,7 +38,7 @@ export interface PublicSiteContext {
   /** Enabled public languages; locale-prefixed routes are not implemented yet. */
   languages?: string[];
   theme: "institutional" | "high-contrast";
-  modules: { pages: boolean; posts: boolean; menus: boolean };
+  modules: { pages: boolean; posts: boolean; menus: boolean; documents?: boolean };
 }
 
 export const EMPTY_SITE: PublicSiteContext = {
@@ -50,7 +50,7 @@ export const EMPTY_SITE: PublicSiteContext = {
   canonicalDomain: null,
   logoUrl: null,
   theme: "institutional",
-  modules: { pages: false, posts: false, menus: false },
+  modules: { pages: false, posts: false, menus: false, documents: false },
 };
 
 /** Site-bound logo URL with a revision token so browser icon caches refresh on branding changes. */
@@ -100,6 +100,7 @@ export function siteFromContext(status: number, body: unknown): PublicSiteContex
       pages: modules.includes("PAGES"),
       posts: modules.includes("POSTS"),
       menus: modules.includes("MENUS"),
+      documents: modules.includes("DOCUMENTS"),
     },
   };
 }
