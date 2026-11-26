@@ -163,7 +163,7 @@ def _site_serves(site_id):
 def _project(menu, source, *, draft=False):
     if menu is None:
         return []
-    from ..menu_destinations import published_rows, resolve_destination, menu_origin
+    from ..menu_destinations import published_rows, resolve_destinations, menu_origin
     rows = list(menu.items.order_by("sort_order", "id")[:1001]) if draft else published_rows(menu)
     if len(rows) > 1000:
         if not draft:
@@ -171,6 +171,7 @@ def _project(menu, source, *, draft=False):
         from django.core.exceptions import ValidationError
         raise ValidationError({"tree": "A menu preview supports at most 1000 items."})
     origin = menu_origin(menu.site_id) if source != "local" else None
+    destinations = resolve_destinations(rows)
     children = {}
     for row in rows:
         children.setdefault(row.parent_id, []).append(row)
@@ -178,7 +179,7 @@ def _project(menu, source, *, draft=False):
     def branch(parent_id):
         rendered = []
         for row in children.get(parent_id, ()):
-            destination = resolve_destination(row)
+            destination = destinations.get(getattr(row, "pk", None) or id(row))
             if destination and destination.startswith("/") and source != "local":
                 destination = origin + destination if origin else None
             if not row.is_active or (destination is None and not draft):

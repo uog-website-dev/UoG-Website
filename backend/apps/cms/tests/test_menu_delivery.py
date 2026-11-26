@@ -185,6 +185,29 @@ def test_public_menu_cache_hit_skips_recompose(family, client):
         recomposed.assert_not_called()
 
 
+def test_compose_location_destination_queries_stay_bounded(family):
+    """Finding 3: destination resolution must not query once per menu item."""
+    from django.db import connection
+    from django.test.utils import CaptureQueriesContext
+
+    _main, _parent, child, _sibling = family
+    menu = Menu.objects.create(site=child, location="header", name="Local")
+    for index in range(12):
+        post = _publish_post(Post.objects.create(
+            site=child, title=f"Story {index}", slug=f"story-{index}", content="Body",
+        ))
+        _link(menu, f"Story {index}", item_type="post", post=post, sort_order=index)
+    _link(menu, "News index", item_type="news", target="", sort_order=12)
+    _link(menu, "Campus", sort_order=13)
+    with CaptureQueriesContext(connection) as captured:
+        tree = compose_location(child.pk, "header")
+    # Batched destinations keep this under one query per linked target.
+    assert len(captured) <= 18, f"{len(captured)} queries: {[q['sql'] for q in captured]}"
+    assert len(tree) == 14
+    assert tree[0]["href"].startswith("/posts/")
+    assert tree[12]["href"] == "/posts"
+
+
 def test_post_publish_and_unpublish_invalidate_linked_menu_delivery(family):
     _main, _parent, child, _sibling = family
     menu = Menu.objects.create(site=child, location="header", name="Local")
