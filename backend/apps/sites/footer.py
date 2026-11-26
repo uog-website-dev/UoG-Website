@@ -187,6 +187,8 @@ def apply_footer_column_copy(nodes, columns):
                 "label": (column.get("heading") or "").strip() or node.get("label", ""),
                 "description": column.get("description", ""),
             }
+        else:
+            node = {**node, "description": node.get("description", "")}
         result.append(node)
     result.sort(key=lambda item: order.get(item.get("menu"), len(order)))
     return result

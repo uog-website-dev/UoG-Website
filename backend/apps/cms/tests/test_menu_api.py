@@ -418,6 +418,23 @@ def test_menu_openapi_contract_is_typed_scoped_and_documents_conflicts():
         assert "Omit to include both active and inactive" in active["description"]
 
 
+def test_public_menu_openapi_documents_footer_column_fields():
+    """Finding 11: public menu nodes declare menu, column and description."""
+    output = io.StringIO()
+    call_command("spectacular", stdout=output, validate=True, fail_on_warn=True)
+    schema = yaml.safe_load(output.getvalue())
+    node = schema["components"]["schemas"]["PublicMenuNode"]
+    properties = node.get("properties") or node.get("allOf", [{}])[-1].get("properties") or {}
+    # drf-spectacular may nest under allOf; also accept direct properties.
+    if not properties and "allOf" in node:
+        for part in node["allOf"]:
+            properties.update(part.get("properties") or {})
+    assert {"label", "href", "source", "children", "menu", "column", "description"} <= set(properties)
+    public = schema["paths"]["/api/v1/site-context/menus/"]["get"]
+    assert public["operationId"] == "public_site_menus"
+    assert "Public menus" in public["tags"]
+
+
 def test_local_location_edit_cross_site_block_and_central_menu_authority(api, settings):
     settings.DEBUG = False
     settings.ORGANIZATIONS_DEV_WRITES_ENABLED = False

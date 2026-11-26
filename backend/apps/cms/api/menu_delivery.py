@@ -29,6 +29,9 @@ class PublicMenuNodeSerializer(serializers.Serializer):
     href = serializers.CharField()
     source = serializers.ChoiceField(choices=("global", "inherited", "local"))
     children = serializers.ListField(child=serializers.JSONField())
+    menu = serializers.UUIDField(required=False)
+    column = serializers.BooleanField(required=False)
+    description = serializers.CharField(required=False, allow_blank=True)
 
 
 class PublicMenusSerializer(serializers.Serializer):

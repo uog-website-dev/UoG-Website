@@ -210,7 +210,7 @@ def footer_columns(site_id, ids, *, draft=False):
             continue
         result.append({
             "menu": str(menu.pk), "label": menu.name, "href": "", "source": "local",
-            "column": True, "children": _project(menu, "local", draft=draft),
+            "column": True, "description": "", "children": _project(menu, "local", draft=draft),
         })
     if not draft:
         from apps.sites.footer import apply_footer_column_copy, published_footer_values

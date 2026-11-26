@@ -194,6 +194,8 @@ def test_footer_columns_are_ordered_private_scoped_and_revalidated(api):
     assert [n['label'] for n in columns]==['Resources','University']
     assert columns[1]['children'][0]['label']=='University'
     assert all(n['column'] for n in columns)
+    assert [n['menu'] for n in columns]==[first,second]
+    assert all('description' in n for n in columns)
     assert call(api,'footer',{'version':0,'menus':[]}).status_code==409
     version=result.json()['version']
     for ids in [[first,first],[first]*5,[str(Menu.objects.create(site=api.other,name='Foreign column',location='').pk)]]:
