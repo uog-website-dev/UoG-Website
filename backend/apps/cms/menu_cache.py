@@ -53,14 +53,35 @@ def invalidate_site_menus(site_id, *, using=DEFAULT_DB_ALIAS):
 
 
 def invalidate_post_delivery(post_id, *, using=DEFAULT_DB_ALIAS):
-    """Invalidate local and inherited menu responses that link to a Post."""
+    """Invalidate menus that link to a Post (local, inherited, or global)."""
+    invalidate_linked_menus(post_id=post_id, using=using)
+
+
+def invalidate_linked_menus(
+    *, page_id=None, post_id=None, category_id=None, using=DEFAULT_DB_ALIAS,
+):
+    """Bump every menu that points at the given Page, Post, or Category."""
+    from django.db.models import Q
+
     from .menu_models import MenuItem
 
-    links = MenuItem.objects.using(using).filter(
-        post_id=post_id,
-    ).values_list("site_id", "menu__location").distinct()
-    for site_id, location in links:
-        invalidate_menu_state(site_id, location, False, using=using)
+    query = Q()
+    if page_id is not None:
+        query |= Q(page_id=page_id)
+    if post_id is not None:
+        query |= Q(post_id=post_id)
+    if category_id is not None:
+        query |= Q(category_id=category_id)
+    if not query:
+        return
+    links = (
+        MenuItem.objects.using(using)
+        .filter(query)
+        .values_list("site_id", "menu__location", "menu__is_global")
+        .distinct()
+    )
+    for site_id, location, is_global in links:
+        invalidate_menu_state(site_id, location, is_global, using=using)
 
 
 def delivery_version(site_id, location):

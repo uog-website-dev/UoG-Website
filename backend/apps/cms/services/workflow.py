@@ -182,6 +182,8 @@ def transition_content(
                             path=content.path,
                             using=using,
                         )
+                        from ..menu_cache import invalidate_linked_menus
+                        invalidate_linked_menus(page_id=content.pk, using=using)
                     elif content._meta.model_name == "post" and (
                         action in {"publish", "unpublish"}
                         or (action == "archive" and source == ContentStatus.PUBLISHED)
@@ -192,8 +194,14 @@ def transition_content(
                             path=f"/posts/{content.slug}",
                             using=using,
                         )
-                        from ..menu_cache import invalidate_post_delivery
-                        invalidate_post_delivery(content.pk, using=using)
+                        from ..menu_cache import invalidate_linked_menus
+                        invalidate_linked_menus(post_id=content.pk, using=using)
+                    elif content._meta.model_name == "category" and (
+                        action in {"publish", "unpublish"}
+                        or (action == "archive" and source == ContentStatus.PUBLISHED)
+                    ):
+                        from ..menu_cache import invalidate_linked_menus
+                        invalidate_linked_menus(category_id=content.pk, using=using)
         return content
 
 
@@ -275,6 +283,8 @@ def _publish_working_draft(draft, *, actor, comment, using, approval=None):
     bump_publication_version(
         target.site_id, target.locale, path=target.path, using=using,
     )
+    from ..menu_cache import invalidate_linked_menus
+    invalidate_linked_menus(page_id=target.pk, using=using)
     from apps.sites.chrome_lint import lint_page
     record_event(
         action="CONTENT_PUBLISHED",
@@ -305,7 +315,7 @@ def _publish_working_draft(draft, *, actor, comment, using, approval=None):
 
 def _publish_post_draft(draft, *, actor, comment, using, approval):
     from apps.api.models import Post
-    from ..menu_cache import invalidate_post_delivery
+    from ..menu_cache import invalidate_linked_menus
     target = Post.objects.using(using).select_for_update().get(pk=draft.draft_of_id)
     if target.site_id != draft.site_id or target.locale != draft.locale or target.status != ContentStatus.PUBLISHED:
         raise ValidationError({"status":"The original article must remain published on this Site and language."})
@@ -317,7 +327,7 @@ def _publish_post_draft(draft, *, actor, comment, using, approval):
         target.save(using=using,taxonomy=taxonomy)
     _create_publication_snapshot(target,using=using,approval=approval)
     bump_publication_version(target.site_id,target.locale,path=f"/posts/{target.slug}",using=using)
-    invalidate_post_delivery(target.pk,using=using)
+    invalidate_linked_menus(post_id=target.pk, using=using)
     record_event(action="CONTENT_PUBLISHED",entity_type="cms.sitecontent",entity_id=str(target.pk),
                  before=None,after={"working_draft_id":str(draft.pk)},changed_fields=["content","metadata"],using=using)
     draft.status = ContentStatus.ARCHIVED
@@ -364,10 +374,13 @@ def _content_instance(base, *, using):
     page = Page.objects.using(using).filter(pk=base.pk).first()
     if page is not None:
         return page
-    from apps.api.models import Post
+    from apps.api.models import Category, Post
     post = Post.objects.using(using).filter(pk=base.pk).first()
     if post is not None:
         return post
+    category = Category.objects.using(using).filter(pk=base.pk).first()
+    if category is not None:
+        return category
     return base
 
 

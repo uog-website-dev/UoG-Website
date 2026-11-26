@@ -69,7 +69,7 @@ def _link(menu, label, **overrides):
         "target": "/" + label.lower().replace(" ", "-"), "sort_order": 0,
     }
     values.update(overrides)
-    if values["item_type"] in {"page", "post"}:
+    if values["item_type"] in {"page", "post", "category", "news"}:
         values["target"] = ""
     return MenuItem.objects.create(**values)
 
@@ -230,6 +230,58 @@ def test_post_publish_and_unpublish_invalidate_linked_menu_delivery(family):
     assert delivery_version(child.pk, "header") > published_version
     assert _roots(child.pk) == []
     assert Post.objects.get(pk=post.pk).status == ContentStatus.UNPUBLISHED
+
+
+def test_page_category_and_global_post_invalidate_linked_menu_delivery(family, client):
+    """Finding 7: Page, Category and global-post targets must bump delivery versions."""
+    from apps.api.models import Category
+
+    main, _parent, child, sibling = family
+    MenuInheritance.objects.create(
+        site=child, location="header", include_global=True,
+        inherit_from=None, local_precedence="append",
+    )
+    global_menu = Menu.objects.create(
+        site=main, location="header", name="Global", is_global=True,
+    )
+    global_post = Post.objects.create(
+        site=main, title="University news", slug="university-news", content="Body",
+    )
+    _link(global_menu, "University news", item_type="post", post=global_post)
+
+    local = Menu.objects.create(site=child, location="header", name="Local")
+    page = create_page(site=child, title="About", slug="about")
+    _link(local, "About", item_type="page", page=page, sort_order=0)
+    category = Category.objects.create(site=child, code="RESEARCH", name="Research")
+    _link(local, "Research", item_type="category", category=category, sort_order=1)
+
+    before_child = delivery_version(child.pk, "header")
+    before_sibling = delivery_version(sibling.pk, "header")
+    assert client.get(PUBLIC + "?location=header", HTTP_HOST=_host(child)).status_code == 200
+
+    _publish_post(global_post)
+    after_global = delivery_version(child.pk, "header")
+    assert after_global > before_child
+    assert delivery_version(sibling.pk, "header") == before_sibling
+    assert ("University news", "global") in _roots(child.pk)
+
+    page_before = after_global
+    for action in ("submit", "approve", "publish"):
+        transition_with_site_role(
+            page, action,
+            get_user_model().objects.create_user(username=f"page-{action}-{uuid4().hex[:6]}"),
+        )
+    assert delivery_version(child.pk, "header") > page_before
+    assert ("About", "local") in _roots(child.pk)
+
+    category_before = delivery_version(child.pk, "header")
+    for action in ("submit", "approve", "publish"):
+        transition_with_site_role(
+            category, action,
+            get_user_model().objects.create_user(username=f"cat-{action}-{uuid4().hex[:6]}"),
+        )
+    assert delivery_version(child.pk, "header") > category_before
+    assert ("Research", "local") in _roots(child.pk)
 
 
 def test_inheritance_rejects_loops_and_does_not_grant_parent_management(family, client, oidc, settings):
