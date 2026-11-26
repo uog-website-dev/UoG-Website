@@ -127,6 +127,10 @@ class MenuOutput(serializers.ModelSerializer):
 
     def get_has_unpublished_changes(self, menu) -> bool:
         from ..menu_destinations import snapshot_items
+        # None means a trusted live projection (including an empty menu): nothing
+        # is staged until the first freeze or activate writes published_items.
+        if menu.published_items is None:
+            return False
         return menu.published_items != snapshot_items(menu)
 
     class Meta:

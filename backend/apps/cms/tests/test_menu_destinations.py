@@ -112,6 +112,26 @@ def test_first_api_edit_freezes_a_trusted_active_menu(api):
     menu.refresh_from_db();assert menu.published_items is not None
     assert view(api,host)==previous
 
+
+def test_empty_and_legacy_active_menus_report_no_unpublished_changes(api):
+    """Finding 10: None/empty published snapshots are not staged changes."""
+    from apps.cms.models import Menu
+    empty=Menu.objects.create(site=api.site,name='Empty import',location='header',is_active=True)
+    assert api.client.get(api.base+str(empty.pk)+'/',**api.header).json()['has_unpublished_changes'] is False
+    created=api.client.post(api.base,{'name':'Fresh empty'},content_type='application/json',**api.header)
+    assert created.status_code==201,created.content
+    url=created['Location']
+    assert created.json()['has_unpublished_changes'] is False
+    activated=_post(api,url+'activate/',{},created['ETag'])
+    assert activated.status_code==200,activated.content
+    assert activated.json()['has_unpublished_changes'] is False
+    Menu.objects.filter(pk=activated.json()['id']).update(published_items=None)
+    assert api.client.get(url,**api.header).json()['has_unpublished_changes'] is False
+    _item(api,url,'Later')
+    assert api.client.get(url,**api.header).json()['has_unpublished_changes'] is True
+    assert publish(api,url).status_code==200
+    assert api.client.get(url,**api.header).json()['has_unpublished_changes'] is False
+
 def test_category_retargeting_advances_etag_and_audits_without_publishing(api):
     from apps.audit.models import AuditEvent
     enable(api,'POSTS');url=_menu(api)

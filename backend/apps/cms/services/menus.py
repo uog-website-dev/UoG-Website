@@ -209,12 +209,13 @@ def set_menu_active(menu_id, *, actor, expected, active):
             for item in menu.items.filter(is_active=True):
                 if destination_state(item) != "ready":
                     raise ValidationError({f"items.{item.pk}.target": "Destination is unavailable or unpublished. Update or disable this item before publishing."})
+            # Empty menus store [] so has_unpublished_changes stays false until edits.
             menu.published_items = snapshot_items(menu)
         menu.is_active = active
         menu.save(update_fields=["is_active", "published_items"])
         if active:
             record_event(action="MENU_PUBLISHED", entity_type="cms.menu", entity_id=menu.pk,
-                after={"site_id":menu.site_id,"version":menu.version,"item_count":len(menu.published_items)}, changed_fields=["published_items"])
+                after={"site_id":menu.site_id,"version":menu.version,"item_count":len(menu.published_items or [])}, changed_fields=["published_items"])
         return menu
 
 
