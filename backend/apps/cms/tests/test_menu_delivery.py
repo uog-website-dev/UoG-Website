@@ -469,3 +469,41 @@ def test_child_inherits_parent_assigned_local_menu_not_composed_tree(family):
     assert _roots(parent.pk) == [("University", "global"), ("Assigned parent", "local")]
     # Child inherits only the parent's local assignment, not the parent's global fragment.
     assert _roots(child.pk) == [("Assigned parent", "inherited")]
+
+
+def test_inheritance_requires_parent_site_organization_hierarchy(family):
+    """Finding 12: inherit_from must share this Site's unit or be an ancestor unit."""
+    _main, parent, child, sibling = family
+    parent_menu = Menu.objects.create(site=parent, location="header", name="Parent")
+    _link(parent_menu, "Colleges")
+    sibling_menu = Menu.objects.create(site=sibling, location="header", name="Sibling")
+    _link(sibling_menu, "Hospital")
+    MenuInheritance.objects.create(
+        site=child, location="header", inherit_from=parent, local_precedence="append",
+    )
+    assert ("Colleges", "inherited") in _roots(child.pk)
+    with pytest.raises(ValidationError, match="organization unit|ancestor"):
+        MenuInheritance.objects.create(
+            site=child, location="footer", inherit_from=sibling, local_precedence="append",
+        )
+    # Delivery also ignores a corrupt cross-branch pointer written without validation.
+    MenuInheritance.objects.filter(site=child, location="header").update(inherit_from_id=sibling.pk)
+    assert ("Hospital", "inherited") not in _roots(child.pk)
+    assert ("Colleges", "inherited") not in _roots(child.pk)
+
+
+def test_published_menu_over_item_cap_raises_instead_of_empty(family):
+    """Finding 12: oversized published menus surface a bounded error, not []."""
+    _main, _parent, child, _sibling = family
+    menu = Menu.objects.create(site=child, location="header", name="Huge")
+    menu.published_items = [
+        {
+            "id": str(uuid4()), "site_id": child.pk, "label": f"Item {index}",
+            "item_type": "custom", "page_id": None, "post_id": None, "category_id": None,
+            "target": f"/item-{index}", "parent_id": None, "sort_order": index, "is_active": True,
+        }
+        for index in range(1001)
+    ]
+    Menu.objects.filter(pk=menu.pk).update(published_items=menu.published_items)
+    with pytest.raises(ValidationError, match="at most 1000"):
+        compose_location(child.pk, "header")

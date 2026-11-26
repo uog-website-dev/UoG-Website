@@ -59,18 +59,17 @@ def compose_with_local(
     )
 
     items = []
-    if include_global and _site_serves(
-        Menu.objects.filter(
-            is_global=True, location=location, is_active=True,
-        ).values_list("site_id", flat=True).first()
-    ):
-        global_menu = Menu.objects.filter(
-            is_global=True, location=location, is_active=True,
-        ).first()
+    global_menu = (
+        Menu.objects.filter(is_global=True, location=location, is_active=True).first()
+        if include_global else None
+    )
+    if global_menu is not None and _site_serves(global_menu.site_id):
         items.extend(_project(global_menu, "global", draft=False))
 
     use_parent = (
         inherit_from_id
+        and inherit_from_id != site_id
+        and _is_inheritance_parent(site_id, inherit_from_id)
         and _site_serves(inherit_from_id)
         and not (active_local and precedence == "override")
     )
@@ -160,16 +159,35 @@ def _site_serves(site_id):
     )
 
 
+def _is_inheritance_parent(site_id, inherit_from_id):
+    """Allow inherit_from only when its organization unit is this Site's unit or an ancestor."""
+    rows = dict(
+        Site.objects.filter(pk__in=(site_id, inherit_from_id)).values_list("pk", "organization_unit_id")
+    )
+    child_unit = rows.get(site_id)
+    parent_unit = rows.get(inherit_from_id)
+    if child_unit is None or parent_unit is None or inherit_from_id == site_id:
+        return False
+    if child_unit == parent_unit:
+        return True
+    from apps.organizations.models import OrganizationUnit
+    from apps.organizations.selectors.hierarchy import get_ancestors
+    try:
+        return any(unit.pk == parent_unit for unit in get_ancestors(child_unit))
+    except OrganizationUnit.DoesNotExist:
+        return False
+
+
 def _project(menu, source, *, draft=False):
     if menu is None:
         return []
+    from django.core.exceptions import ValidationError
     from ..menu_destinations import published_rows, resolve_destinations, menu_origin
     rows = list(menu.items.order_by("sort_order", "id")[:1001]) if draft else published_rows(menu)
     if len(rows) > 1000:
-        if not draft:
-            return []
-        from django.core.exceptions import ValidationError
-        raise ValidationError({"tree": "A menu preview supports at most 1000 items."})
+        raise ValidationError({
+            "tree": "A menu preview supports at most 1000 items." if draft else "A published menu supports at most 1000 items.",
+        })
     origin = menu_origin(menu.site_id) if source != "local" else None
     destinations = resolve_destinations(rows)
     children = {}

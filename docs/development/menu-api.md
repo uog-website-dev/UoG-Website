@@ -46,7 +46,7 @@ Menu and item inventories include **both active and inactive records** when
 `is_active` is omitted. Use `?is_active=true` or `?is_active=false` to filter
 explicitly. Invalid/empty boolean values and repeated query parameters return
 the standard HTTP 400 validation envelope with a request ID. Menu ordering is
-by location then UUID; item ordering is by sort order then UUID. Filtering keeps
+by name then UUID; item ordering is by sort order then UUID. Filtering keeps
 the same pagination contract (`page`, `page_size`, maximum 100).
 
 The base below is `/api/v1/sites/{site_id}/menus/`.
@@ -75,7 +75,7 @@ inactive menus. Duplicates return `409 duplicate_location` and never replace or
 deactivate another Menu silently. The same location is valid in different Sites.
 
 Lists use `page`, `page_size` (default 20, maximum 100), and optional `is_active`.
-Menu order is location/UUID; item inventory order is sort_order/UUID. Tree
+Menu order is name/UUID; item inventory order is sort_order/UUID. Tree
 responses contain at most 1,000 items in preorder, with the same item shape as
 CRUD. `include_inactive=true` is the tree default for editing. False hides an
 inactive Menu and each inactive item's entire branch. No N+1 target fetching is
@@ -137,11 +137,12 @@ Sibling uniqueness is deferred only within the operation and rechecked before
 returning. Cycles, foreign parents, and subtree depth above six total levels (five submenu levels) are rejected;
 failure rolls back all positions, versions and audit events. A root is level one.
 
-Internal `page` / `post` targets must exist in the Menu's Site. Cross-site
-internal targets are rejected. The target discriminant must match the sole
-Page/Post reference, or an external HTTP(S) URL / normalized custom same-Site
-path. Script/data schemes, credentials and encoded control or redirect-smuggling
-input are rejected. No external URLs are fetched or followed.
+Internal `page` / `post` / `category` targets are UUIDs (never integers) and must
+exist in the Menu's Site. Cross-site internal targets are rejected. The target
+discriminant must match the sole Page/Post/Category reference, or an external
+HTTP(S) URL / normalized custom same-Site path. Script/data schemes, credentials
+and encoded control or redirect-smuggling input are rejected. No external URLs
+are fetched or followed.
 
 ## Errors and auditing
 

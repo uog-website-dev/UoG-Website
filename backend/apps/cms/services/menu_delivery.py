@@ -17,8 +17,16 @@ def set_menu_inheritance(site_id, *, actor, location, inherit_from_id, include_g
         authorize_menu(actor, site_id, edit=True)
         if local_precedence not in LOCAL_PRECEDENCE:
             raise ValidationError({"local_precedence": "Choose override or append."})
-        if inherit_from_id is not None and not Site.objects.filter(pk=inherit_from_id).exists():
-            raise ValidationError({"inherit_from": "The parent Site does not exist."})
+        if inherit_from_id is not None:
+            if inherit_from_id == site_id:
+                raise ValidationError({"inherit_from": "A Site cannot inherit its own menu."})
+            if not Site.objects.filter(pk=inherit_from_id).exists():
+                raise ValidationError({"inherit_from": "The parent Site does not exist."})
+            from ..selectors.menu_delivery import _is_inheritance_parent
+            if not _is_inheritance_parent(site_id, inherit_from_id):
+                raise ValidationError({
+                    "inherit_from": "The parent Site must share this Site's organization unit or be an ancestor unit.",
+                })
         policy = MenuInheritance.objects.filter(site_id=site_id, location=location).first()
         created = policy is None
         if created:

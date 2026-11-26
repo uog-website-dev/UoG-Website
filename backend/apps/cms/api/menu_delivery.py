@@ -71,7 +71,11 @@ class PublicMenusView(APIView):
         query = PublicMenuQuery(data=request.query_params)
         query.is_valid(raise_exception=True)
         locations = (query.validated_data["location"],) if "location" in query.validated_data else MENU_LOCATIONS
-        payload = {location: _cached_location(site.pk, location) for location in locations}
+        from django.core.exceptions import ValidationError as DjangoValidationError
+        try:
+            payload = {location: _cached_location(site.pk, location) for location in locations}
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError(getattr(exc, "message_dict", None) or exc.messages)
         from ..menu_assignment_models import MenuLocationAssignment
         from apps.sites.menu_locations import locations_for_site
         configured=list(MenuLocationAssignment.objects.filter(site=site,is_published=True,location__in=locations_for_site(site)).values_list('location',flat=True))

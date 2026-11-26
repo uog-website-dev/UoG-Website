@@ -381,6 +381,11 @@ class MenuInheritance(models.Model):
         if self.inherit_from_id is not None and self.inherit_from_id == self.site_id:
             raise ValidationError({"inherit_from": "A Site cannot inherit its own menu."})
         if self.inherit_from_id is not None:
+            from .selectors.menu_delivery import _is_inheritance_parent
+            if not _is_inheritance_parent(self.site_id, self.inherit_from_id):
+                raise ValidationError({
+                    "inherit_from": "The parent Site must share this Site's organization unit or be an ancestor unit.",
+                })
             seen = {self.site_id}
             current = self.inherit_from_id
             hops = 0

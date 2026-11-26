@@ -416,6 +416,11 @@ def test_menu_openapi_contract_is_typed_scoped_and_documents_conflicts():
         active = next(parameter for parameter in paths[path]["get"]["parameters"] if parameter["name"] == "is_active")
         assert active.get("required", False) is False
         assert "Omit to include both active and inactive" in active["description"]
+    # Finding 12: Post (and Page/Category) targets are UUIDs, never integers.
+    for schema_name in ("ItemOutput", "ItemInputRequest", "PatchedItemPatchRequest"):
+        props = schema["components"]["schemas"][schema_name].get("properties") or {}
+        for field in ("page", "post", "category"):
+            assert props[field]["type"] == "string" and props[field]["format"] == "uuid", (schema_name, field, props.get(field))
 
 
 def test_public_menu_openapi_documents_footer_column_fields():
