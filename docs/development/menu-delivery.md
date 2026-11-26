@@ -38,7 +38,7 @@ Inactive items hide their descendants. A page link is included only when that
 Page is `PUBLISHED` and `PUBLIC` or `UNLISTED`. A post link is included only
 when `is_published` is true. Draft, hidden, unpublished and missing targets
 are omitted with their descendants. External and custom items remain.
-Cross-site page or post targets also require `allow_cross_site`.
+Cross-site Page/Post targets are not supported; use an external URL instead.
 
 The public item is `{label, href, source, children}`. `source` is `global`,
 `inherited` or `local`. `href` is the external URL, the custom path, the Page

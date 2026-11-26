@@ -67,7 +67,7 @@ def test_raw_cycle_parent_ownership_and_internal_target_integrity(ready):
         {"parent": root}, {"parent": child}, {"parent": foreign_parent},
         {"site": other}, {"item_type": "post", "target": "", "post": post},
         {"item_type": "page", "target": "", "page": page},
-        {"item_type": "page", "target": "", "page": page, "post": post, "allow_cross_site": True},
+        {"item_type": "page", "target": "", "page": page, "post": post},
     ):
         with pytest.raises(IntegrityError), transaction.atomic():
             MenuItem.objects.filter(pk=root.pk).update(**changes)
@@ -143,13 +143,13 @@ def test_authorized_services_deny_foreign_site_and_unsafe_cross_site_opt_in(read
         create_menu(actor=editor, site_id=other.pk, name="Header", location="header")
     foreign_page = create_page(site=other, title="Foreign", slug="foreign")
     with pytest.raises(ValidationError):
-        create_menu_item(menu.pk, actor=editor, label="leak", item_type="page", page=foreign_page, allow_cross_site=True)
+        create_menu_item(menu.pk, actor=editor, label="leak", item_type="page", page=foreign_page)
     UserRoleAssignment.objects.create(
         user=editor, role=Role.objects.get(code="viewer"), scope="SITE", site=other,
         organization=other.organization_unit,
     )
     with pytest.raises(ValidationError):
-        create_menu_item(menu.pk, actor=editor, expected=menu_etag(menu), label="shared", item_type="page", page=foreign_page, allow_cross_site=True)
+        create_menu_item(menu.pk, actor=editor, expected=menu_etag(menu), label="shared", item_type="page", page=foreign_page)
     local_page = create_page(site=site,title="Local",slug="local")
     linked = create_menu_item(menu.pk, actor=editor, expected=menu_etag(menu), label="local", item_type="page", page=local_page)
     assert linked.page_id == local_page.pk

@@ -24,7 +24,7 @@ from ..menu_models import Menu, MenuItem, require_menus_module, MAX_MENU_DEPTH
 MENU_FIELDS = frozenset({"code", "location", "name", "is_active", "is_global"})
 ITEM_FIELDS = frozenset({
     "label", "item_type", "page", "post", "target", "parent", "sort_order",
-    "is_active", "allow_cross_site", "page_id", "post_id", "parent_id", "category", "category_id",
+    "is_active", "page_id", "post_id", "parent_id", "category", "category_id",
 })
 
 
@@ -113,8 +113,6 @@ def _assign(instance, fields, allowed):
 
 
 def _target_permission(item, actor):
-    # The model's explicit cross-site flag is a trusted domain opt-in, not
-    # permission to read an arbitrary foreign draft in a user request.
     from apps.api.models import Post
     from ..models import Page
     model = Page if item.page_id else Post

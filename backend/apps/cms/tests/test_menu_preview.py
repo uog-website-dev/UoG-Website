@@ -156,17 +156,20 @@ def test_preview_assignment_draft_mirrors_public_precedence(api, family):
     ]
 
 
-def test_public_projection_omits_foreign_and_unpublished_branches(api,pages_module):
+def test_public_projection_omits_unpublished_branches_and_rejects_foreign_targets(api,pages_module):
+    """Finding 4: foreign Page targets cannot be stored; unpublished locals stay private."""
     from apps.cms.services.pages import create_page
-    from .test_public_posts import _publish
+    from django.core.exceptions import ValidationError
     _host(api.other)
-    foreign=_publish(create_page(site=api.other,title='Foreign published page',slug='foreign-page'))
+    foreign=create_page(site=api.other,title='Foreign published page',slug='foreign-page')
     menu=Menu.objects.create(site=api.site,name='Local public',location='header')
-    root=MenuItem.objects.create(menu=menu,site=api.site,label='Foreign content',item_type='page',page=foreign,allow_cross_site=True)
-    MenuItem.objects.create(menu=menu,site=api.site,parent=root,label='Hidden descendant',item_type='custom',target='/descendant')
+    with pytest.raises(ValidationError):
+        MenuItem.objects.create(menu=menu,site=api.site,label='Foreign content',item_type='page',page=foreign)
+    draft=create_page(site=api.site,title='Draft page',slug='draft-page')
+    MenuItem.objects.create(menu=menu,site=api.site,label='Draft page',item_type='page',page=draft)
     MenuItem.objects.create(menu=menu,site=api.site,label='Local visible',item_type='custom',target='/visible',sort_order=1)
     host=_host(api.site)
     response=api.client.get('/api/v1/site-context/menus/?location=header',HTTP_HOST=host)
     assert response.status_code==200
     assert [node['label'] for node in response.json()['locations']['header']]==['Local visible']
-    assert b'Foreign content' not in response.content and b'Hidden descendant' not in response.content
+    assert b'Draft page' not in response.content

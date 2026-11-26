@@ -161,7 +161,7 @@ class ItemOutput(serializers.ModelSerializer):
     class Meta:
         model = MenuItem
         fields = ("id", "menu", "site", "label", "item_type", "page", "post", "target", "parent",
-                  "sort_order", "is_active", "allow_cross_site", "category", "destination_status", "created_at", "updated_at")
+                  "sort_order", "is_active", "category", "destination_status", "created_at", "updated_at")
         read_only_fields = fields
 
 
@@ -175,7 +175,6 @@ class ItemInput(StrictFields, serializers.Serializer):
     parent = serializers.UUIDField(required=False, allow_null=True)
     sort_order = serializers.IntegerField(required=False, min_value=0)
     is_active = serializers.BooleanField(required=False)
-    allow_cross_site = serializers.BooleanField(required=False)
 
 
 class ItemPatch(ItemInput):

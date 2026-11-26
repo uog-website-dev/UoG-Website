@@ -77,7 +77,8 @@ def test_cycles_and_excessive_depth_are_rejected(ready):
     assert menu.items.count() == MAX_MENU_DEPTH
 
 
-def test_internal_targets_stay_on_the_site_unless_cross_site_is_explicit(ready):
+def test_internal_targets_must_belong_to_the_menu_site(ready):
+    """Finding 4: cross-site Page/Post menu targets are rejected."""
     site, other = ready
     menu = Menu.objects.create(site=site, location="header", name="Header")
     local_page = create_page(site=site, title="About", slug="about")
@@ -90,16 +91,10 @@ def test_internal_targets_stay_on_the_site_unless_cross_site_is_explicit(ready):
     _item(menu, "News", item_type=MenuItem.ItemType.POST, post=local_post, sort_order=1)
     with pytest.raises(ValidationError) as blocked_page:
         _item(menu, "Foreign page", item_type=MenuItem.ItemType.PAGE, page=foreign_page, sort_order=2)
-    assert "allow_cross_site" in str(blocked_page.value)
+    assert "belong to this Site" in str(blocked_page.value)
     with pytest.raises(ValidationError):
         _item(menu, "Foreign post", item_type=MenuItem.ItemType.POST, post=foreign_post, sort_order=2)
-
-    allowed = _item(
-        menu, "Shared", item_type=MenuItem.ItemType.PAGE, page=foreign_page,
-        allow_cross_site=True, sort_order=2,
-    )
-    assert allowed.page.site_id == other.pk
-    assert menu.items.count() == 3
+    assert menu.items.count() == 2
 
 
 @pytest.mark.parametrize("target", [

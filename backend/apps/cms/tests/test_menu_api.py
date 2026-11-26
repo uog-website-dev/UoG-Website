@@ -302,12 +302,11 @@ def test_page_post_targets_and_site_local_destination_policy_are_enforced(api):
         response = _post(api, url + "items/", {"label": kind, "item_type": kind, field: pk}, _tag(api, url))
         assert response.status_code == 201, response.content
         assert response.json()[field] == pk
-    body = {"label": "Foreign", "item_type": "page", "page": str(foreign.pk), "allow_cross_site": True}
+    body = {"label": "Foreign", "item_type": "page", "page": str(foreign.pk)}
     assert _post(api, url + "items/", body, _tag(api, url)).status_code == 400
     UserRoleAssignment.objects.create(user=api.user, role=Role.objects.get(code="viewer"), scope="SITE", site=api.other, organization=api.other.organization_unit)
-    denied = _post(api, url + "items/", {**body, "allow_cross_site": False}, _tag(api, url))
+    denied = _post(api, url + "items/", body, _tag(api, url))
     assert denied.status_code == 400 and denied.json()["error"]["details"]["reason"] == "invalid_target"
-    assert _post(api, url + "items/", body, _tag(api, url)).status_code == 400
 
 
 def test_all_changes_have_shared_site_actor_request_audit_and_urls_are_not_logged(api):

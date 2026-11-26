@@ -11,7 +11,7 @@ from .models import ContentStatus, Page, PublishedContentSnapshot, Visibility
 
 SNAPSHOT_FIELDS = (
     "id", "site_id", "label", "item_type", "page_id", "post_id", "category_id",
-    "target", "parent_id", "sort_order", "is_active", "allow_cross_site",
+    "target", "parent_id", "sort_order", "is_active",
 )
 
 
