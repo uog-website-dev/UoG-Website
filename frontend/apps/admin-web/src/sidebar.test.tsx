@@ -45,9 +45,9 @@ const PLATFORM_ADMIN: string[] = [
 let payload: WorkspacePayload;
 let fetchMock: ReturnType<typeof vi.fn>;
 
-function respond(next: {platformPermissions?: string[]; site?: {id: number; enabledModuleCodes: string[]; permissions: string[]}}) {
+function respond(next: {platformPermissions?: string[]; site?: {id: number; enabledModuleCodes: string[]; permissions: string[]; primaryDomain?: {hostname: string; status: "ACTIVE" | "INACTIVE"}}}) {
   const current = next.site;
-  payload = {schemaVersion: 1, version: "fixture-v1", platformPermissions: next.platformPermissions ?? [], site: current ? {...SITES.find(row => row.id === current.id)!, ...current, organization: {id: 1, name: "University"}, defaultLanguage: "en-us", enabledLanguages: ["en-us"], primaryDomain: null, homepageId: null} : null};
+  payload = {schemaVersion: 1, version: "fixture-v1", platformPermissions: next.platformPermissions ?? [], site: current ? {...SITES.find(row => row.id === current.id)!, ...current, organization: {id: 1, name: "University"}, defaultLanguage: "en-us", enabledLanguages: ["en-us"], primaryDomain: current.primaryDomain ?? null, homepageId: null} : null};
 }
 
 beforeEach(() => {
@@ -151,13 +151,19 @@ describe("DesktopSidebar — Site workspace", () => {
     pathname.mockReturnValue("/sites/2/admin/pages");
     respond({
       platformPermissions: [],
-      site: { id: 2, enabledModuleCodes: ["PAGES", "MENUS"], permissions: ["content.pages.view"] },
+      site: {
+        id: 2,
+        enabledModuleCodes: ["PAGES", "MENUS"],
+        permissions: ["content.pages.view"],
+        primaryDomain: { hostname: "informatics.uog.local", status: "ACTIVE" },
+      },
     });
     render(<DesktopSidebar />);
 
     const nav = await screen.findByRole("navigation", { name: "Site sections" });
     expect(await within(nav).findByText("Informatics")).toBeTruthy();
     expect(within(nav).getByText("Active")).toBeTruthy();
+    expect(within(nav).getByText("informatics.uog.local")).toBeTruthy();
     const pages = within(nav).getAllByRole("link").find((link) => link.textContent?.includes("Pages"));
     expect(pages?.getAttribute("href")).toBe("/sites/2/admin/pages");
     expect(pages?.getAttribute("aria-current")).toBe("page");

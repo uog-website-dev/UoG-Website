@@ -1,0 +1,24 @@
+[
+  {
+    "step": "land",
+    "url": "http://localhost/admin/",
+    "title": "UoG Admin Console",
+    "text": "UOG DIGITAL PLATFORM\nSign in to continue\n\nUse your University of Gondar account to access administration and publishing tools.\n\nContinue to sign in\nSecure access for University of Gondar staff\n© 2026 "
+  },
+  {
+    "step": "after-sign-in-click",
+    "url": "http://localhost/admin/",
+    "title": "UoG Admin Console"
+  },
+  {
+    "step": "pre-fill",
+    "url": "http://localhost:8080/realms/uog/protocol/openid-connect/auth?scope=openid+email+profile&response_type=code&client_id=admin-web&redirect_uri=http%3A%2F%2Flocalhost%2Fadmin%2Fapi%2Fauth%2Fcallback%2Fkeycloak&state=eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwia2lkIjoibHBTRVJ1dWxpR0lEcnJrdG41MFVnTHc4bDBzRVF2VER4QWRka1V4SUZVTHZxNFh2N3lXZTQxTlRxcXlKNmw1eE5jNnhGQXA1SUJBZGE3emg3WWpaeHcifQ..8sC9LpiH2nGiClZ8QpWOwA.1CTE66d7k1PDkUTCkOT4TapAXUgUt8HQN8S4IQEkliCTCKBK3GcgThT_0ijh5NapcjnxlNGWkqQzv4F4gUb35uI3SSqwMgFcnOXemQA_gAjGX_KUeaP6e1bdmebFQdSH_LR_GK2LBgIu_FqFwGueZ8AmqJiYa5JhxjFlyYjzvCUM5vDAfCUuBd3L1w-fyMuy.nD1pYIJmM5AlbSnaWqvB4AJ75fpvgRUm19QLC9Aj7Ig&code_challenge=N-MI4zUPB9OYrERUqlMl8myWT8oAXxocZ2Oa-ZsSB0M&code_challenge_method=S256&nonce=jN4m4VP9R-FiGvrje57xPmPuLUIFxKt94J6ytjJ2uyQ",
+    "hasUser": 1
+  },
+  {
+    "step": "post-submit",
+    "url": "http://localhost/admin/",
+    "title": "UoG Admin Console",
+    "text": "Skip to main content\n⚙ UoG\nDigital Platform — Admin Console\ndevuser@uog.et\nSign out\nUoG Administration\nDigital platform\nChoose workspace\nPLATFORM ADMINISTRATION\n\nLoading navigation…\n\nAdmin workspace\nUniversity of Gondar\n\nLoading workspace.."
+  }
+]

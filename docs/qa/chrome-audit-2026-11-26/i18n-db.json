@@ -1,0 +1,5 @@
+{
+  "siteLanguages": [{"language":"en-us","sites":101}, {"language":"en","sites":2}],
+  "note": "No multilingual public fixtures; languages are en-us (101) and en (2). No hreflang emitted. No public language switcher observed.",
+  "theme": "No dedicated appearance/theme mode table found; appearance is admin-configured per Site. High-contrast public fixture not present."
+}

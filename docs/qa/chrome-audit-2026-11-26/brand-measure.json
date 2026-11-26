@@ -1,0 +1,38 @@
+[
+  {
+    "width": 1280,
+    "found": true,
+    "text": "University of Gondar",
+    "scrollWidth": 184,
+    "clientWidth": 159,
+    "clipped": true,
+    "box": {
+      "w": 159,
+      "h": 28
+    }
+  },
+  {
+    "width": 1440,
+    "found": true,
+    "text": "University of Gondar",
+    "scrollWidth": 184,
+    "clientWidth": 159,
+    "clipped": true,
+    "box": {
+      "w": 159,
+      "h": 28
+    }
+  },
+  {
+    "width": 1920,
+    "found": true,
+    "text": "University of Gondar",
+    "scrollWidth": 184,
+    "clientWidth": 159,
+    "clipped": true,
+    "box": {
+      "w": 159,
+      "h": 28
+    }
+  }
+]

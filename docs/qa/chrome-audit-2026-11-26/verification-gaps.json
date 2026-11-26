@@ -1,0 +1,46 @@
+{
+  "gaps": [
+    {
+      "id": "G-01",
+      "severity": "Medium",
+      "title": "No real screen-reader verification",
+      "detail": "Keyboard notes exist for search and public/admin drawers. NVDA/VoiceOver announcements were not recorded.",
+      "story": "P4-F-CHROME-12"
+    },
+    {
+      "id": "G-02",
+      "severity": "Medium",
+      "title": "No high-contrast public fixture",
+      "detail": "Only institutional navy/gold chrome was measured. Theme dropdown exists in admin Appearance; no audited high-contrast public Site.",
+      "story": "P4-F-CHROME-12"
+    },
+    {
+      "id": "G-03",
+      "severity": "Medium",
+      "title": "No multilingual public fixture",
+      "detail": "DB languages are en-us (101) and en (2). No language switcher, menu locale matrix or hreflang behaviour to audit.",
+      "story": "P4-F-CHROME-12"
+    },
+    {
+      "id": "G-04",
+      "severity": "Medium",
+      "title": "No production-build Lighthouse baseline",
+      "detail": "PerformanceObserver lab metrics only. LCP often 0 without buffered observer; CLS 0 in this run vs higher Nov-24 values — treat as unstable lab signal.",
+      "story": "P4-F-CHROME-11"
+    },
+    {
+      "id": "G-05",
+      "severity": "Medium",
+      "title": "Cross-browser / device matrix incomplete",
+      "detail": "Evidence is Edge headless only across the responsive width matrix. Chrome, Firefox, Safari and real tablet chrome were not run.",
+      "story": "P4-F-CHROME-12"
+    },
+    {
+      "id": "G-06",
+      "severity": "Low",
+      "title": "Contact form deep evidence not re-shot",
+      "detail": "Child homepage includes contact; dedicated contact publish-copy checks remain covered by Nov-24 evidence and P4-F-CHROME-05.",
+      "story": "P4-F-CHROME-05"
+    }
+  ]
+}

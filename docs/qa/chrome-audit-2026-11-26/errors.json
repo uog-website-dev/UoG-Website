@@ -1,0 +1,6 @@
+[
+  {
+    "phase": "keyboard-drawer",
+    "error": "locator.click: Timeout 45000ms exceeded.\nCall log:\n  - waiting for getByRole('button', { name: /Open navigation|Menu|navigation menu/i }).first()\n"
+  }
+]

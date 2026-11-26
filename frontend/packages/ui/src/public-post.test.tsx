@@ -64,7 +64,7 @@ describe("PublicPostFeed and PublicPostDetail", () => {
     expect(screen.queryByText("secret")).toBeNull();
   });
 
-  it("binds article banner branding to the resolved Site context", () => {
+  it("starts the article header with its title without repeating Site branding", () => {
     const site = siteFromContext(200, {
       site: { id: 11, code: "INFORMATICS", name: "Informatics" },
       domain: "informatics.uog.edu.et",
@@ -77,17 +77,15 @@ describe("PublicPostFeed and PublicPostDetail", () => {
       modules: ["POSTS"],
     });
     const post = postFromResponse(200, published);
-    const { container } = render(
+    render(
       <PublicSiteBrandingProvider site={site}>
         <PublicPostDetail post={post} />
       </PublicSiteBrandingProvider>,
     );
     const banner = screen.getByRole("banner", { name: "Article banner" });
-    expect(banner.querySelector('[data-site-branding="INFORMATICS"]')).toBeTruthy();
-    expect(banner.querySelector('img[alt="College of Informatics logo"]')?.getAttribute("src")).toBe(
-      "/api/v1/site-context/identity/logo/",
-    );
-    expect(container.querySelector("[data-site-branding=MEDICINE]")).toBeNull();
+    expect(banner.querySelector("h1")?.textContent).toBe("Campus update");
+    expect(banner.querySelector("[data-site-branding]")).toBeNull();
+    expect(banner.querySelector('a[href="/posts"]')).toBeNull();
   });
 
   it("renders versioned editor_document bodies without executing hostile markup", () => {

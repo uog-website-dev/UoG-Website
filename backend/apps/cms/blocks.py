@@ -60,8 +60,12 @@ _REF_SEGMENT = re.compile(r"\A[a-z0-9][a-z0-9._-]*\Z")
 NOT_A_STRING = "must be a string"
 HREF_SCHEMES = ("http", "https", "mailto")
 
+#: Kept in sync with the public renderer's allowlist
+#: (frontend/packages/ui/src/rich-text.tsx): the editor offers bold, italic,
+#: quotes, lists and links, so nothing outside this set can reach a reader.
 _RICH_TEXT_TAGS = frozenset({
     "a", "p", "br", "strong", "b", "em", "i", "u", "s", "ul", "ol", "li",
+    "blockquote",
 })
 _RICH_TEXT_ATTRIBUTES = {"a": frozenset({"href", "title"})}
 

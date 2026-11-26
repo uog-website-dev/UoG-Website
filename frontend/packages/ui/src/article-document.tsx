@@ -135,6 +135,42 @@ function serialize(nodes: ArticleNode[]): string {
     })
     .join("");
 }
+function articleDisplayBlocks(nodes: ArticleNode[]): ArticleNode[] {
+  const textContent = (node: ArticleNode): string =>
+    node.tag === "text"
+      ? node.text ?? ""
+      : (node.children ?? []).map(textContent).join("");
+  const containsImage = (node: ArticleNode): boolean =>
+    node.tag === "img" || (node.children ?? []).some(containsImage);
+  const inlineTags = new Set(["text", "br", "strong", "em", "a", "img"]);
+
+  return nodes.flatMap((node) => {
+    const text = textContent(node).trim();
+    const hasImage = containsImage(node);
+    if ((node.tag === "p" || node.tag === "h2" || node.tag === "h3" || node.tag === "h4") && !text && !hasImage)
+      return [];
+
+    if (
+      (node.tag === "h2" || node.tag === "h3" || node.tag === "h4") &&
+      (text.length > 180 || hasImage) &&
+      (node.children ?? []).every((child) => inlineTags.has(child.tag))
+    ) {
+      const paragraphs: ArticleNode[][] = [[]];
+      for (const child of node.children ?? []) {
+        if (child.tag === "br") {
+          if (paragraphs[paragraphs.length - 1]!.length > 0) paragraphs.push([]);
+        } else {
+          paragraphs[paragraphs.length - 1]!.push(child);
+        }
+      }
+      return paragraphs
+        .filter((children) => children.some((child) => child.tag !== "text" || Boolean(child.text?.trim())))
+        .map((children) => ({ tag: "p", children }));
+    }
+
+    return [node];
+  });
+}
 export function normalizeArticleDocument(value: unknown): ArticleDocument {
   if (!value || typeof value !== "object" || Array.isArray(value))
     throw new Error("The article document is invalid.");
@@ -160,13 +196,13 @@ export function ArticleAssetImage({assetId, alt, siteId, mediaBase}: {assetId:st
   const [failed, setFailed] = useState(false);
   const src = mediaBase ? `${mediaBase}/${assetId}/image?variant=display` : `/api/v1/site-context/media/${assetId}/?variant=display`;
   if (failed) return <Box role="status">Image unavailable. {alt}</Box>;
-  return <Box component="img" src={src} alt={alt} loading="lazy" onError={() => setFailed(true)} sx={{maxWidth:"100%",height:"auto",display:"block",my:2}} />;
+  return <Box component="img" src={src} alt={alt} loading="lazy" onError={() => setFailed(true)} sx={{maxWidth:"100%",maxHeight:{xs:360,sm:520},width:"auto",height:"auto",mx:"auto",display:"block",my:3,borderRadius:1.5}} />;
 }
 
 export function ArticleDocumentView({ document, siteId, mediaBase }: { document: unknown; siteId?:number; mediaBase?:string }) {
   let nodes: ArticleNode[];
   try {
-    nodes = nodesFrom(normalizeArticleDocument(document).html);
+    nodes = articleDisplayBlocks(nodesFrom(normalizeArticleDocument(document).html));
   } catch {
     return <Box role="status">This article content is unavailable.</Box>;
   }
@@ -198,16 +234,24 @@ export function ArticleDocumentView({ document, siteId, mediaBase }: { document:
         maxWidth: "75ch",
         overflowWrap: "anywhere",
         lineHeight: 1.8,
-        "& h2": { fontSize: "clamp(1.5rem,3vw,2rem)" },
-        "& h3": { fontSize: "1.4rem" },
-        "& h4": { fontSize: "1.2rem" },
+        color: "text.primary",
+        "& > p": { my: 0, mb: 2.5, fontSize: { xs: "1.05rem", md: "1.125rem" }, lineHeight: 1.85 },
+        "& > h2": { mt: 4, mb: 1.5, fontSize: "clamp(1.5rem,3vw,2rem)", lineHeight: 1.25, fontWeight: 700 },
+        "& > h3": { mt: 3, mb: 1.25, fontSize: "1.35rem", lineHeight: 1.35, fontWeight: 700 },
+        "& > h4": { mt: 2.5, mb: 1, fontSize: "1.15rem", lineHeight: 1.4, fontWeight: 700 },
+        "& > ul, & > ol": { pl: 3, my: 2.5, fontSize: { xs: "1.05rem", md: "1.125rem" }, lineHeight: 1.8 },
+        "& li + li": { mt: 0.75 },
         "& blockquote": {
           borderLeft: "4px solid",
           borderColor: "primary.main",
           pl: 3,
           ml: 0,
+          py: 1,
+          borderRadius: 1,
+          bgcolor: "action.hover",
           color: "text.secondary",
         },
+        "& img": { borderRadius: 1.5 },
         "& a:focus-visible": {
           outline: "3px solid",
           outlineColor: "primary.main",

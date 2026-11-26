@@ -1,0 +1,172 @@
+[
+  {
+    "name": "workspace",
+    "route": "/admin/",
+    "readyMs": 4081,
+    "title": "UoG Admin Console",
+    "h1": [],
+    "bodySnippet": "Skip to main content ⚙ UoG Digital Platform — Admin Console devuser@uog.et Sign out UoG Administration Digital platform Choose workspace PLATFORM ADMINISTRATION Loading navigation… Admin workspace University of Gondar Loading workspace... © 2026 University of Gondar — Digital Platform (development environment)",
+    "hasUnsupportedLayout": false,
+    "axe": {
+      "violationCount": 2,
+      "violations": [
+        {
+          "id": "aria-progressbar-name",
+          "impact": "serious",
+          "description": "Ensure every ARIA progressbar node has an accessible name",
+          "nodes": [
+            {
+              "target": [
+                ".MuiCircularProgress-root"
+              ],
+              "failureSummary": "Fix any of the following:\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute"
+            }
+          ]
+        },
+        {
+          "id": "label-content-name-mismatch",
+          "impact": "serious",
+          "description": "Ensure that elements labelled through their content must have their visible text as part of their accessible name",
+          "nodes": [
+            {
+              "target": [
+                "a[aria-label=\"Open the Organizations section\"]"
+              ],
+              "failureSummary": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+            },
+            {
+              "target": [
+                "a[aria-label=\"Open the Sites section\"]"
+              ],
+              "failureSummary": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+            },
+            {
+              "target": [
+                "a[aria-label=\"Open the Modules section\"]"
+              ],
+              "failureSummary": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "name": "site-dashboard",
+    "route": "/admin/sites/17/admin/",
+    "readyMs": 3052,
+    "title": "Site administration · UoG Admin Console",
+    "h1": [],
+    "bodySnippet": "Skip to main content UoG Administration Digital Platform Loading Site workspace… devuser@uog.et Sign out UoG Administration Digital platform SITE ADMINISTRATION Loading navigation… Admin workspace University of Gondar Loading Site workspace… © 2026 University of Gondar — Digital Platform (development environment)",
+    "hasUnsupportedLayout": false,
+    "axe": {
+      "violationCount": 0,
+      "violations": []
+    }
+  },
+  {
+    "name": "appearance",
+    "route": "/admin/sites/17/admin/appearance",
+    "readyMs": 3956,
+    "title": "Site administration · UoG Admin Console",
+    "h1": [],
+    "bodySnippet": "Skip to main content UoG Administration Digital Platform Loading Site workspace… devuser@uog.et Sign out UoG Administration Digital platform SITE ADMINISTRATION Loading navigation… Admin workspace University of Gondar Loading Site workspace… © 2026 University of Gondar — Digital Platform (development environment)",
+    "hasUnsupportedLayout": false,
+    "axe": {
+      "violationCount": 0,
+      "violations": []
+    }
+  },
+  {
+    "name": "header",
+    "route": "/admin/sites/17/admin/header",
+    "readyMs": 3967,
+    "title": "Site administration · UoG Admin Console",
+    "h1": [],
+    "bodySnippet": "Skip to main content UoG Administration Digital Platform Loading Site workspace… devuser@uog.et Sign out UoG Administration Digital platform SITE ADMINISTRATION Loading navigation… Admin workspace University of Gondar Loading Site workspace… © 2026 University of Gondar — Digital Platform (development environment)",
+    "hasUnsupportedLayout": false,
+    "axe": {
+      "violationCount": 0,
+      "violations": []
+    }
+  },
+  {
+    "name": "footer",
+    "route": "/admin/sites/17/admin/footer",
+    "readyMs": 4769,
+    "title": "Site administration · UoG Admin Console",
+    "h1": [],
+    "bodySnippet": "Skip to main content UoG Administration Digital Platform Loading Site workspace… devuser@uog.et Sign out UoG Administration Digital platform SITE ADMINISTRATION Loading navigation… Admin workspace University of Gondar Loading Site workspace… © 2026 University of Gondar — Digital Platform (development environment)",
+    "hasUnsupportedLayout": false,
+    "axe": {
+      "violationCount": 0,
+      "violations": []
+    }
+  },
+  {
+    "name": "menus",
+    "route": "/admin/sites/17/admin/menus",
+    "readyMs": 5873,
+    "title": "Site administration · UoG Admin Console",
+    "h1": [],
+    "bodySnippet": "Skip to main content UoG Administration Digital Platform Loading Site workspace… devuser@uog.et Sign out UoG Administration Digital platform SITE ADMINISTRATION Loading navigation… Admin workspace University of Gondar Loading Site workspace… © 2026 University of Gondar — Digital Platform (development environment)",
+    "hasUnsupportedLayout": false,
+    "axe": {
+      "violationCount": 0,
+      "violations": []
+    }
+  },
+  {
+    "name": "pages",
+    "route": "/admin/sites/17/admin/pages",
+    "readyMs": 3975,
+    "title": "Site administration · UoG Admin Console",
+    "h1": [],
+    "bodySnippet": "Skip to main content UoG Administration Digital Platform Loading Site workspace… devuser@uog.et Sign out UoG Administration Digital platform SITE ADMINISTRATION Loading navigation… Admin workspace University of Gondar Loading Site workspace… © 2026 University of Gondar — Digital Platform (development environment)",
+    "hasUnsupportedLayout": false,
+    "axe": {
+      "violationCount": 0,
+      "violations": []
+    }
+  },
+  {
+    "name": "posts",
+    "route": "/admin/sites/17/admin/posts",
+    "readyMs": 4066,
+    "title": "Site administration · UoG Admin Console",
+    "h1": [],
+    "bodySnippet": "Skip to main content UoG Administration Digital Platform Loading Site workspace… devuser@uog.et Sign out UoG Administration Digital platform SITE ADMINISTRATION Loading navigation… Admin workspace University of Gondar Loading Site workspace… © 2026 University of Gondar — Digital Platform (development environment)",
+    "hasUnsupportedLayout": false,
+    "axe": {
+      "violationCount": 0,
+      "violations": []
+    }
+  },
+  {
+    "name": "builder-aau",
+    "route": "/admin/sites/102/admin/pages/180d0b82-420d-4d86-838d-d6fb33423029/builder",
+    "readyMs": 9070,
+    "title": "Site administration · UoG Admin Console",
+    "h1": [],
+    "bodySnippet": "AAU homepage comparison AAU Builder Comparison · Revision 36 · ARCHIVED Desktop Tablet Mobile Review revision Back to Pages Preview in new tab Page settings This Page is locked for review. Return to Pages to follow its CMS workflow.",
+    "hasUnsupportedLayout": false,
+    "axe": {
+      "violationCount": 1,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "nodes": [
+            {
+              "target": [
+                ".MuiChip-label"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.02 (foreground color: #1a2332, background color: #1a2128, font size: 9.8pt (13px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        }
+      ]
+    }
+  }
+]

@@ -1,0 +1,13 @@
+{
+  "lockMode": "SHARE",
+  "heldDuringCollection": true,
+  "writeAttemptBlocked": true,
+  "writeProof": {
+    "code": 3,
+    "out": "BEGIN\nSET\n",
+    "err": "ERROR:  canceling statement due to lock timeout\nLINE 1: UPDATE cms_page SET title=title\n               ^\n",
+    "blocked": true
+  },
+  "note": "SHARE lock started before first audited navigation and held for the public browser collection window. A leftover pg_sleep backend from the lock session was terminated after collection so later admin reads were not blocked.",
+  "postCollectionCleanup": "pg_terminate_backend on the SHARE/pg_sleep session after public evidence was written"
+}

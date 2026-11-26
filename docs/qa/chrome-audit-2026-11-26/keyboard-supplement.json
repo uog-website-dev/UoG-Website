@@ -1,0 +1,25 @@
+{
+  "searchFocus": {
+    "tag": "BUTTON",
+    "role": "",
+    "ariaLabel": "",
+    "type": "button",
+    "placeholder": "",
+    "text": "Research"
+  },
+  "searchDialog": {
+    "dialogPresent": false,
+    "labelledBy": "",
+    "label": "",
+    "inputs": []
+  },
+  "drawer": {
+    "buttons": [
+      {
+        "label": "Open site header",
+        "text": ""
+      }
+    ],
+    "opened": false
+  }
+}

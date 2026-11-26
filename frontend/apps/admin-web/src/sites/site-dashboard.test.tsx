@@ -19,6 +19,9 @@ function body():DashboardSummary {return {schema_version:1,site:11,generated_at:
  menus:{status:"ready",counts:{total:2,active:1,items:3}},media:{status:"ready",counts:{total:80}},users:{status:"ready",counts:{total:1}}}};}
 function dashboard(enabled=modules, permissions=all, extra?:React.ReactNode) {return render(<SiteAdminFrame site={site} enabledModuleCodes={enabled} permissions={permissions}><SiteDashboard/>{extra}</SiteAdminFrame>);}
 beforeEach(()=>{vi.clearAllMocks();summary.mockResolvedValue({ok:true,data:body()});activity.mockResolvedValue({ok:true,data:{site:11,generated_at:new Date().toISOString(),results:[]}});});
+it("keeps one level-one heading now that the frame banner is gone",()=>{
+ dashboard();expect(screen.getByRole("heading",{level:1,name:"Dashboard"})).toBeTruthy();expect(screen.getAllByRole("heading",{level:1})).toHaveLength(1);
+});
 it("renders five domains using one aggregate request without list fan-out",async()=>{
  dashboard();const pages=await screen.findByRole("region",{name:"Pages"});await waitFor(()=>expect(within(pages).getByText("8")).toBeTruthy());
  expect(within(screen.getByRole("region",{name:"Posts"})).getByText("5")).toBeTruthy();expect(within(screen.getByRole("region",{name:"Menus"})).getByText("3")).toBeTruthy();expect(within(screen.getByRole("region",{name:"Media"})).getByText("80")).toBeTruthy();

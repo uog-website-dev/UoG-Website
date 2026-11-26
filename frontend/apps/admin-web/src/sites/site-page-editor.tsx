@@ -36,6 +36,7 @@ import {
 import { listSiteSidebars } from "@/app/sites/sidebar-actions";
 import type { SidebarRecord } from "@/app/sites/sidebar-actions";
 import { LazyMediaPickerDialog as MediaPickerDialog } from "@/sites/lazy-media-picker";
+import { richTextBlocksFromHtml, richTextIsEmpty } from "@/sites/page-rich-content";
 import type { MediaPickerResult } from "@/sites/media-picker-model";
 import { imageRefForAsset } from "@/sites/site-image-field";
 import {
@@ -54,6 +55,11 @@ import { APP_BASE_PATH } from "@/base-path";
 const MediaBlockEditor = dynamic(
   () => import("@/sites/media-block-editor").then((module) => module.MediaBlockEditor),
   { loading: () => <Box role="status" aria-label="Loading media block controls"><Skeleton aria-hidden variant="rounded" height={72} /></Box> },
+);
+
+const PageRichEditor = dynamic(
+  () => import("@/sites/post-rich-editor").then((module) => module.PostRichEditor),
+  { loading: () => <Box role="status" aria-label="Loading Page content editor" sx={{ minHeight: 360 }}><Skeleton aria-hidden variant="rounded" height={360} /></Box> },
 );
 
 export interface PageLanguages {
@@ -253,10 +259,11 @@ function SitePageEditorContent({
   const mediaInvokeRef = useRef<HTMLButtonElement | null>(null);
   const [activePage, setActivePage] = useState<SitePageRecord | null>(null);
   const [form, setForm] = useState<PageForm>(() => emptyForm(defaultLocale));
+  const [body, setBody] = useState("");
   const [saving, setSaving] = useState(false);
   const isCurrentOperation = useSiteOperationGuard(siteId);
   const dirty = mode === "create"
-    ? JSON.stringify(form) !== JSON.stringify(emptyForm(defaultLocale))
+    ? JSON.stringify(form) !== JSON.stringify(emptyForm(defaultLocale)) || !richTextIsEmpty(body)
     : activePage !== null && JSON.stringify(form) !== JSON.stringify(formFromRecord(activePage, defaultLocale));
   useSiteDraftGuard(dirty);
   const [loadingPage, setLoadingPage] = useState(mode === "edit");
@@ -310,6 +317,7 @@ function SitePageEditorContent({
   useEffect(() => {
     if (mode === "create") {
       setForm(emptyForm(defaultLocale));
+      setBody("");
       setActivePage(null);
       setLoadingPage(false);
       return;
@@ -364,7 +372,7 @@ function SitePageEditorContent({
           visibility: form.visibility,
           metadata: metadataInput(form),
           seo: seoInput(form),
-          blocks: blockInputs(form),
+          blocks: [...richTextBlocksFromHtml(body, siteId), ...blockInputs(form)],
         }));
         if (!isCurrentOperation()) return;
         toast.success("Page created.");
@@ -511,6 +519,28 @@ function SitePageEditorContent({
         autoFocus
         required
       />
+      {mode === "create" ? (
+        <Box component="section" aria-label="Page content" sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+          <Typography variant="subtitle2">Page content</Typography>
+          <PageRichEditor
+            siteId={siteId}
+            canUseMedia={permissions.includes("content.media.view")}
+            canUploadMedia={permissions.includes("content.media.upload")}
+            value={body}
+            onChange={setBody}
+            disabled={!enabled}
+            onSave={() => void savePage()}
+            label="Page content"
+            toolbarLabel="Page content formatting"
+            placeholder="Write the Page content here…"
+            imageDialogTitle="Insert page image"
+            linkDialogTitle="Insert page link"
+          />
+          <Typography variant="caption" color="text.secondary">
+            Headings, paragraphs, lists and images become this Page&apos;s text blocks. Add buttons and other structured blocks under Content blocks.
+          </Typography>
+        </Box>
+      ) : null}
       <TextField select label="Page layout" value={form.layout} disabled={!enabled} onChange={event=>setForm(current=>({...current,layout:event.target.value,sidebar:event.target.value === "FULL_WIDTH" ? "" : current.sidebar}))} helperText="Changes are saved to this draft. Existing builder content is preserved. On mobile, content appears before navigation.">
         {Object.entries(PAGE_LAYOUTS).map(([code,label])=><MenuItem key={code} value={code}>{label}</MenuItem>)}
       </TextField>
@@ -693,7 +723,7 @@ function SitePageEditorContent({
                     title: form.title || "Untitled Page",
                     path: activePage?.path ?? `/${form.slug}`,
                     site: siteId,
-                    blocks: blockInputs(form),
+                    blocks: [...richTextBlocksFromHtml(body, siteId), ...blockInputs(form)],
                     ...(metadataInput(form).visual_layout ? {visual_layout:metadataInput(form).visual_layout as VisualLayout} : {}),
                     seo: seoPreview(seoInput(form)),
                   }}

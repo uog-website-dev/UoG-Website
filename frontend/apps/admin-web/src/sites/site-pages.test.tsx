@@ -407,6 +407,23 @@ describe("SitePagesPanel", () => {
     expect(slug).toHaveProperty("value", "grad-admissions");
   });
 
+  it("drafts rich text on the create screen and saves it as Page blocks", async () => {
+    renderEditor("create");
+    await screen.findByRole("heading", { name: "Create Page" });
+    fireEvent.change(screen.getByRole("textbox", { name: "Title" }), { target: { value: "Admissions" } });
+    const content = await screen.findByRole("textbox", { name: "Page content" });
+    content.innerHTML = "<h2>Welcome</h2><p>Apply <strong>now</strong>.</p><ul><li>Transcripts</li></ul>";
+    fireEvent.input(content);
+    fireEvent.click(screen.getByRole("button", { name: "Create Page" }));
+    await waitFor(() => expect(createSitePage).toHaveBeenCalledWith(11, expect.objectContaining({
+      blocks: [
+        { type: "heading", level: 2, text: "Welcome" },
+        { type: "paragraph", html: "<p>Apply <strong>now</strong>.</p>" },
+        { type: "list", style: "unordered", items: ["Transcripts"] },
+      ],
+    })));
+  });
+
   it("blocks create without create permission on the editor screen", async () => {
     renderEditor("create", { permissions: ["content.pages.view"] });
     expect(await screen.findByText(/do not have permission to create Pages/i)).toBeTruthy();

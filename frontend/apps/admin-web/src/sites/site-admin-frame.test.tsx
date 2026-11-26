@@ -50,22 +50,13 @@ beforeEach(() => {
 });
 
 describe("SiteAdminFrame", () => {
-  it("keeps the active Site name, status, code and organization visible", () => {
+  it("leaves Site identity to the navigation rail instead of a dashboard banner", () => {
     renderFrame({ enabledModuleCodes: ["PAGES"], permissions: ["content.pages.view"] });
-    const header = screen.getByRole("region", { name: "Active Site" });
-    expect(within(header).getByRole("heading", { level: 1, name: "Informatics" })).toBeTruthy();
-    expect(within(header).getByText("Active")).toBeTruthy();
-    expect(within(header).getByText("INFORMATICS")).toBeTruthy();
-    expect(within(header).getByText("College of Informatics")).toBeTruthy();
-    expect(screen.getByText(/Central module activation stays in platform administration/)).toBeTruthy();
+    expect(screen.queryByRole("region", { name: "Active Site" })).toBeNull();
+    expect(screen.queryByText("Site administration")).toBeNull();
+    expect(screen.queryByRole("link", { name: /View Public Website/ })).toBeNull();
     expect(screen.queryByRole("link", { name: "Central module registry" })).toBeNull();
-  });
-
-  it("names the organization by id when this account cannot read it", () => {
-    pathname.mockReturnValue("/sites/22/admin");
-    renderFrame({ enabledModuleCodes: [], permissions: [] }, medicine);
-    expect(screen.getByText("Organization unit #9")).toBeTruthy();
-    expect(screen.getByText("Suspended")).toBeTruthy();
+    expect(screen.queryByText(/Central module activation stays in platform administration/)).toBeNull();
   });
 
   it("shows the current section in the breadcrumb", () => {
@@ -76,23 +67,10 @@ describe("SiteAdminFrame", () => {
     expect(within(crumbs).getByRole("link", { name: "Informatics" }).getAttribute("href")).toBe("/sites/11/admin");
   });
 
-  it("keeps the Site administration banner on the dashboard only", () => {
-    const view = renderFrame({ enabledModuleCodes: ["PAGES"], permissions: ["content.pages.view"] });
-    expect(screen.getByRole("region", { name: "Active Site" })).toBeTruthy();
-
-    pathname.mockReturnValue("/sites/11/admin/pages");
-    view.rerender(
-      <SiteAdminFrame site={informatics} enabledModuleCodes={["PAGES"]} permissions={["content.pages.view"]}>
-        <p>Workspace</p>
-      </SiteAdminFrame>,
-    );
-    expect(screen.queryByRole("region", { name: "Active Site" })).toBeNull();
-    expect(screen.queryByText("Site administration")).toBeNull();
-  });
-
-  it("shows the central registry only when that permission was delegated", () => {
+  it("keeps the central registry out of the Site workspace even when delegated", () => {
     renderFrame({ enabledModuleCodes: [], permissions: ["platform.sites.manage_registry"] });
-    expect(screen.getByRole("link", { name: "Central module registry" }).getAttribute("href")).toBe("/modules");
+    expect(screen.queryByRole("link", { name: "Central module registry" })).toBeNull();
+    expect(screen.queryByText(/Central module activation stays in platform administration/)).toBeNull();
   });
 
   it("remounts per Site so a draft does not follow the user", () => {
@@ -109,7 +87,8 @@ describe("SiteAdminFrame", () => {
       </SiteAdminFrame>,
     );
     expect(screen.getByRole("textbox", { name: "Draft title" })).toHaveProperty("value", "");
-    expect(screen.getByRole("heading", { level: 1, name: "Medicine" })).toBeTruthy();
+    const crumbs = screen.getByRole("navigation", { name: "Breadcrumb" });
+    expect(within(crumbs).getByRole("link", { name: "Medicine" })).toBeTruthy();
   });
 
   it("blocks a direct section when the module or permission is missing", () => {

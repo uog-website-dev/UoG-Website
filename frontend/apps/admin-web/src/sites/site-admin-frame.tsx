@@ -3,28 +3,20 @@
 /**
  * Administration chrome for one Site inside the shared console.
  *
- * Section navigation and the workspace selector live in the console rail,
- * so this frame only keeps the active Site visible: name, status, code and
- * owning organization. Only the editable content boundary remounts per Site.
+ * Section navigation and the active Site live in the console rail, so this
+ * frame only keeps the breadcrumb. Only the editable content boundary
+ * remounts per Site.
  */
 import { createContext, useContext, useEffect, useMemo, useRef } from "react";
 import type { ReactNode } from "react";
-import BusinessIcon from "@mui/icons-material/Business";
-import LanguageRoundedIcon from "@mui/icons-material/LanguageRounded";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Chip from "@mui/material/Chip";
-import Paper from "@mui/material/Paper";
-import Typography from "@mui/material/Typography";
 import type { SiteStatus } from "@uog/types";
-import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
 import { Breadcrumb } from "@/breadcrumb";
 import { normalizeAdminPathname } from "@/navigation";
 import {
-  canActivateCentralModules,
   findSiteSection,
   sectionDecision,
   siteAdminHref,
@@ -33,8 +25,7 @@ import {
   visibleSiteSections,
 } from "@/sites/site-admin";
 import type { SectionDecision, SiteAccessInput, SiteSection } from "@/sites/site-admin";
-import { siteStatusChip } from "@/sites/validation";
-import { ViewPublicSite } from "@/sites/view-public-site";
+
 
 function SiteEditableContent({children}: {children: ReactNode}) {
   const changedForms = useRef(new Set<HTMLFormElement>());
@@ -89,12 +80,6 @@ export function useOptionalSiteAdmin(): SiteAdminValue | null {
   return useContext(SiteAdminContext);
 }
 
-function organizationLabel(site: SiteAdminSite): string {
-  if (site.organizationName) return site.organizationName;
-  if (site.organizationId != null) return `Organization unit #${site.organizationId}`;
-  return "Organization unavailable";
-}
-
 export function SiteAdminFrame({
   site,
   enabledModuleCodes,
@@ -111,9 +96,7 @@ export function SiteAdminFrame({
     (section) => isSiteSectionActive(section,site.id,currentPath),
   );
   const value = useMemo(() => ({site, enabledModuleCodes, permissions}), [site, enabledModuleCodes, permissions]);
-  const chip = siteStatusChip(site.status);
   const dashboardHref = siteAdminHref(site.id);
-  const onDashboard = currentPath === dashboardHref || currentPath === `${dashboardHref}/`;
   if(
     /^\/sites\/[1-9][0-9]*\/admin\/pages\/[^/]+\/(builder|preview)\/?$/.test(currentPath)
     || /^\/sites\/[1-9][0-9]*\/admin\/menus\/preview\/?$/.test(currentPath)
@@ -133,58 +116,8 @@ export function SiteAdminFrame({
             { label: current?.label ?? "Dashboard" },
           ]}
         />
-        {onDashboard ? (
-          <Paper
-            component="section"
-            aria-label="Active Site"
-            variant="outlined"
-            sx={{
-              p: { xs: 2, sm: 3 },
-              borderRadius: 3,
-              borderLeft: 4,
-              borderLeftColor: "secondary.main",
-              display: "flex",
-              flexDirection: "column",
-              gap: 1,
-            }}
-          >
-            <Typography variant="overline" color="primary.main" sx={{ fontWeight: 700, letterSpacing: 1.1 }}>
-              Site administration
-            </Typography>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap" }}>
-              <Typography variant="h4" component="h1" sx={{ fontWeight: 800, overflowWrap: "anywhere" }}>
-                {site.name}
-              </Typography>
-              {chip ? <Chip size="small" variant="outlined" color={chip.color} label={chip.label} /> : null}
-            </Box>
-            <Box sx={{ display: "flex", gap: { xs: 1, sm: 3 }, flexWrap: "wrap", color: "text.secondary" }}>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
-                <LanguageRoundedIcon sx={{ fontSize: 18 }} aria-hidden="true" />
-                <Typography variant="body2" sx={{ fontFamily: "monospace" }}>{site.code}</Typography>
-              </Box>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
-                <BusinessIcon sx={{ fontSize: 18 }} aria-hidden="true" />
-                <Typography variant="body2">{organizationLabel(site)}</Typography>
-              </Box>
-            </Box>
-            <ViewPublicSite
-              siteName={site.name}
-              siteStatus={site.status}
-              primaryDomain={site.primaryDomain}
-            />
-          </Paper>
-        ) : null}
       </Box>
       <SiteEditableContent key={site.id}>{children}</SiteEditableContent>
-      {canActivateCentralModules(permissions) ? (
-        <Button component={Link} href="/modules" size="small" sx={{ alignSelf: "flex-start" }}>
-          Central module registry
-        </Button>
-      ) : (
-        <Typography variant="body2" color="text.secondary">
-          Central module activation stays in platform administration.
-        </Typography>
-      )}
     </Box>
     </SiteAdminContext.Provider>
   );
