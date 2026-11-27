@@ -128,7 +128,7 @@ def test_create_edit_validation_search_filters_and_pagination(document_client, s
 
 def test_document_metadata_is_sanitized_and_access_settings_validate(document_client, sites):
     client, _ = document_client
-    site, _ = sites
+    site, other = sites
     response = add(client, site, "Metadata", description='<p><strong>Safe</strong><script>alert(1)</script><u>underlined</u><a href="javascript:alert(1)">link</a></p>', version="  2.1  ", effective_date="2026-12-01", require_login_to_download=True)
     assert response.status_code == 201, response.content
     data = response.json()
@@ -209,7 +209,7 @@ def test_public_document_access_matrix_and_unpublish_revocation(document_client,
     from apps.sites.services.lifecycle import activate_site
 
     client, author = document_client
-    site, _ = sites
+    site, other = sites
     activate_site(site.pk)
     host = f"docs-{site.pk}.uog.edu.et"
     SiteDomain.objects.create(site=site, hostname=host, is_primary=True, status="ACTIVE")
@@ -322,37 +322,82 @@ def test_public_document_access_matrix_and_unpublish_revocation(document_client,
     hidden_url = root + f"{hidden.pk}/file/"
     draft_url = root + f"{draft.pk}/file/"
     public_file = anonymous.get(public_url, HTTP_HOST=host)
-    assert public_file.status_code == 200 and public_file.content == body
-    assert public_file["Cache-Control"] == "private, no-store"
+    assert public_file.status_code == 200 and b"".join(public_file.streaming_content) == body
+    assert public_file["Cache-Control"] == "private, no-store, max-age=0"
     assert public_file["Content-Type"] == "application/pdf"
     assert public_file["Content-Disposition"].startswith("attachment;")
     assert public_file["X-Content-Type-Options"] == "nosniff"
     assert public_file["X-Robots-Tag"] == "noindex, nofollow"
+    assert public_file["Content-Security-Policy"] == "default-src 'none'; sandbox"
+    public_asset_id = public.file_reference.rsplit("/", 1)[-1]
+    assert client.get(f"/api/v1/sites/{site.pk}/assets/{public_asset_id}/download/").status_code == 404
+    assert anonymous.get(public_url + "?unknown=1", HTTP_HOST=host).status_code == 400
+    assert anonymous.get(public_url + "?inline=1&inline=1", HTTP_HOST=host).status_code == 400
     inline_pdf = anonymous.get(public_url + "?inline=1", HTTP_HOST=host)
-    assert inline_pdf.status_code == 200 and inline_pdf.content == body
+    assert inline_pdf.status_code == 200 and b"".join(inline_pdf.streaming_content) == body
     assert inline_pdf["Content-Type"] == "application/pdf"
     assert inline_pdf["Content-Disposition"].startswith("inline;")
-    assert inline_pdf["Cache-Control"] == "private, no-store"
+    assert inline_pdf["Cache-Control"] == "private, no-store, max-age=0"
     docx_response = anonymous.get(root + f"{docx_file.pk}/file/?inline=1", HTTP_HOST=host)
-    assert docx_response.status_code == 200 and docx_response.content == docx_body
+    assert docx_response.status_code == 200 and b"".join(docx_response.streaming_content) == docx_body
     assert docx_response["Content-Type"] == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     assert docx_response["Content-Disposition"].startswith("attachment;")
     assert anonymous.get(login_url, HTTP_HOST=host).status_code == 401
     assert anonymous.get(hidden_url, HTTP_HOST=host).status_code == 404
     assert anonymous.get(draft_url, HTTP_HOST=host).status_code == 404
+    assert AuditEvent.objects.filter(entity_id=str(draft.pk), action="DOCUMENT_FILE_ACCESS_DENIED",
+                                     after__reason="DOCUMENT_NOT_ELIGIBLE").exists()
     assert anonymous.get(root + f"{removed_file.pk}/file/", HTTP_HOST=host).status_code == 404
     assert anonymous.get(root + f"{quarantined_file.pk}/file/", HTTP_HOST=host).status_code == 404
 
     eligible = client
     assert eligible.get(login_url, HTTP_HOST=host).status_code == 200
     assert eligible.get(hidden_url, HTTP_HOST=host).status_code == 404
+    preview = client.get(ROOT.format(site=site.pk) + f"{draft.pk}/file/", HTTP_HOST=host)
+    assert preview.status_code == 200 and b"".join(preview.streaming_content) == body
+    assert preview["Content-Disposition"].startswith("attachment;")
+    foreign_asset = ready_pdf_asset(other, author)
+    foreign_document = Document.objects.create(
+        site=other, title="Foreign Site draft", slug="foreign-site-draft",
+        file_reference=f"sites/{other.pk}/assets/{foreign_asset.pk}", created_by=author, updated_by=author,
+    )
+    assert anonymous.get(public_url.replace(str(public.pk), str(foreign_document.pk)), HTTP_HOST=host).status_code == 404
+    assert client.get(ROOT.format(site=other.pk) + f"{foreign_document.pk}/file/").status_code == 403
+    delivery_event = AuditEvent.objects.filter(entity_id=str(public.pk), action="DOCUMENT_FILE_DELIVERED").latest("timestamp")
+    assert delivery_event.after == {"site_id": site.pk, "mime_type": "application/pdf"}
+    assert "token" not in str(delivery_event.after).lower() and "storage" not in str(delivery_event.after).lower()
     transition_with_site_role(public, "unpublish", get_user_model().objects.create_user(username="revoker"))
-    assert anonymous.get(public_url, HTTP_HOST=host).status_code == 404
+    revoked = anonymous.get(public_url, HTTP_HOST=host)
+    assert revoked.status_code == 404 and revoked["Cache-Control"] == "private, no-store, max-age=0"
     assert AuditEvent.objects.filter(entity_id=str(public.pk), action="CONTENT_PUBLISHED").exists()
     assert AuditEvent.objects.filter(entity_id=str(public.pk), action="CONTENT_UNPUBLISHED").exists()
     disable_module_for_site(site.pk, Module.objects.get(code="DOCUMENTS").pk)
     assert anonymous.get(root, HTTP_HOST=host).status_code == 404
     assert anonymous.get(public_url, HTTP_HOST=host).status_code == 404
+    assert client.get(ROOT.format(site=site.pk) + f"{public.pk}/file/", HTTP_HOST=host).status_code == 404
+
+
+def test_document_download_throttle_is_site_caller_scoped(document_client, sites, monkeypatch):
+    from django.contrib.auth.models import AnonymousUser
+    from django.test import RequestFactory
+    from apps.cms.services.document_access import DocumentFileThrottle
+
+    _, _ = document_client
+    site, other = sites
+    monkeypatch.setattr(DocumentFileThrottle, "rate", "2/min")
+    factory = RequestFactory()
+    request = factory.get("/api/v1/site-context/documents/")
+    request.site = site
+    request.user = AnonymousUser()
+    request.META["REMOTE_ADDR"] = f"198.51.100.{uuid4().int % 250 + 1}"
+    throttle = DocumentFileThrottle()
+    first_view = SimpleNamespace(kwargs={"document_id": str(uuid4())})
+    second_view = SimpleNamespace(kwargs={"document_id": str(uuid4())})
+    assert throttle.allow_request(request, first_view)
+    assert throttle.allow_request(request, first_view)
+    assert not throttle.allow_request(request, second_view)
+    request.site = other
+    assert throttle.allow_request(request, second_view)
 
 
 def test_edit_keeps_publication_history_and_file_references(document_client, sites):

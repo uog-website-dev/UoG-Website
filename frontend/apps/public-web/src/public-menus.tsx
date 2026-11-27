@@ -95,7 +95,7 @@ function Breadcrumbs({ postTitle }: { postTitle: string | null }) {
         })}
         </MuiBreadcrumbs>
       </Box>
-    </Container>
+    </Box>
   );
 }
 

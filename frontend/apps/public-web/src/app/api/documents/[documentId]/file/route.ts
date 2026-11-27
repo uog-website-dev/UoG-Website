@@ -3,11 +3,18 @@ import { getToken } from "next-auth/jwt";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+function unavailable(status: number, detail = "Document file unavailable.") {
+  const response = NextResponse.json({ detail }, { status });
+  response.headers.set("Cache-Control", "private, no-store, max-age=0");
+  response.headers.set("X-Content-Type-Options", "nosniff");
+  return response;
+}
+
 export async function GET(request: NextRequest, { params }: { params: Promise<{ documentId: string }> }) {
   const { documentId } = await params;
   const host = request.headers.get("host") ?? "";
   if (!UUID.test(documentId) || !/^[a-z0-9.-]+(?::\d{1,5})?$/i.test(host)) {
-    return NextResponse.json({ detail: "Document unavailable." }, { status: 404 });
+    return unavailable(404, "Document unavailable.");
   }
   const secret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET;
   const session = secret ? await getToken({ req: request, secret }) : null;
@@ -24,13 +31,16 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       "Cache-Control": "private, no-store",
       "X-Content-Type-Options": "nosniff",
       "X-Robots-Tag": "noindex, nofollow",
+      "Content-Security-Policy": "default-src 'none'; sandbox",
+      "X-Frame-Options": "SAMEORIGIN",
+      "Cross-Origin-Resource-Policy": "same-origin",
       "Content-Disposition": response.headers.get("content-disposition") ?? "attachment",
     });
     const contentType = response.headers.get("content-type");
     if (contentType) safeHeaders.set("Content-Type", contentType);
-    if (!response.ok) return NextResponse.json({ detail: response.status === 401 ? "Sign in to download this document." : "Document file unavailable." }, { status: response.status });
+    if (!response.ok) return unavailable(response.status, response.status === 401 ? "Sign in to download this document." : "Document file unavailable.");
     return new Response(response.body, { status: 200, headers: safeHeaders });
   } catch {
-    return NextResponse.json({ detail: "Document file unavailable." }, { status: 502 });
+    return unavailable(502);
   }
 }

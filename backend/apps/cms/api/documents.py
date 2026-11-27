@@ -17,6 +17,7 @@ from apps.sites.models import Site
 from apps.sites.selectors.modules import module_is_available
 from ..authorization import require_cms_grant, cms_administrator_allows
 from ..models import ContentRole, Document
+from ..services.document_access import DocumentFileThrottle
 from apps.api.models import Category
 from apps.audit.writer import record_event
 from ..services.workflow import transition_content
@@ -294,6 +295,30 @@ class SiteDocumentWorkflow(SiteDocumentDetail):
         transition = "publish" if action == "publish" else "unpublish"
         obj = transition_content(obj.pk, action=transition, actor=request.user, comment="Document administration")
         return Response(DocumentSerializer(obj, context={"site_id": obj.site_id}).data)
+
+
+class SiteDocumentFilePreview(APIView):
+    """RBAC-protected preview/download for Site document managers."""
+    authentication_classes = [KeycloakBearerAuthentication]
+    permission_classes = [IsAuthenticated]
+    throttle_classes = [DocumentFileThrottle]
+    http_method_names = ["get", "head", "options"]
+
+    def finalize_response(self, request, response, *args, **kwargs):
+        response = super().finalize_response(request, response, *args, **kwargs)
+        response["Cache-Control"] = "private, no-store, max-age=0"
+        response["Vary"] = "Authorization, Cookie, Host"
+        return response
+
+    def get(self, request, site_pk, document_id):
+        site = get_object_or_404(Site, pk=site_pk)
+        from ..services.document_access import authorize_document_file, document_file_response
+        document, asset, bucket, key = authorize_document_file(
+            document_id=document_id, site=site, user=request.user, request=request, management=True,
+        )
+        return document_file_response(
+            request=request, document=document, asset=asset, bucket=bucket, key=key,
+        )
 
 
 class SiteDocumentCategories(APIView):

@@ -235,6 +235,20 @@ class AssetDownload(MediaView):
     """Authenticated, Site-scoped attachment delivery after processing gates."""
     def get(self, request, site_pk, asset_id):
         asset = asset_for_site(request.user, site_pk, asset_id)
+        # A document's file must never bypass publication, visibility, login,
+        # and module checks through the generic media endpoint. Site document
+        # delivery and management preview use the centralized document guard.
+        from apps.cms.models import Document
+        reference = f"sites/{site_pk}/assets/{asset.pk}"
+        from .models import MediaAssetReference
+        if (
+            Document.objects.filter(site_id=site_pk, file_reference=reference).exists()
+            or MediaAssetReference.objects.filter(
+                site_id=site_pk, asset_id=asset.pk, node_id="document-file", field_path="file_reference",
+            ).exists()
+        ):
+            from django.http import Http404
+            raise Http404("Document file is unavailable.")
         job = getattr(asset, "processing", None)
         if asset.status != MediaAsset.Status.READY or asset.detected_mime not in DOCUMENT_TYPES or job is None or job.state != "READY":
             from django.http import Http404
