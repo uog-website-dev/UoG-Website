@@ -19,7 +19,12 @@ from apps.cms.api.event_people import (
     SiteEventSessionPersonDetail,
     SiteEventSessionPeopleReorder,
 )
-from apps.cms.api.event_registrations import SiteEventRegistrations
+from apps.cms.api.event_registrations import (
+    SiteEventRegistrationBadge,
+    SiteEventRegistrationDetail,
+    SiteEventRegistrations,
+    SiteEventRegistrationsExport,
+)
 from .event_categories import SiteEventCategories, SiteEventCategoryDetail
 from apps.cms.api.sidebars import SidebarViewSet
 from apps.cms.api.menus import MenuViewSet, MenuItemViewSet
@@ -50,6 +55,21 @@ urlpatterns = [
     path("<int:site_pk>/events/<uuid:event_id>/", SiteEventDetail.as_view(), name="site-event-detail"),
     path("<int:site_pk>/events/<uuid:event_id>/preview/", SiteEventPreview.as_view(), name="site-event-preview"),
     path("<int:site_pk>/events/<uuid:event_id>/registrations/", SiteEventRegistrations.as_view(), name="site-event-registrations"),
+    path(
+        "<int:site_pk>/events/<uuid:event_id>/registrations/export/",
+        SiteEventRegistrationsExport.as_view(),
+        name="site-event-registrations-export",
+    ),
+    path(
+        "<int:site_pk>/events/<uuid:event_id>/registrations/<uuid:registration_id>/",
+        SiteEventRegistrationDetail.as_view(),
+        name="site-event-registration-detail",
+    ),
+    path(
+        "<int:site_pk>/events/<uuid:event_id>/registrations/<uuid:registration_id>/badge/",
+        SiteEventRegistrationBadge.as_view(),
+        name="site-event-registration-badge",
+    ),
     path("<int:site_pk>/events/<uuid:event_id>/people/", SiteEventPeople.as_view(), name="site-event-people"),
     path(
         "<int:site_pk>/events/<uuid:event_id>/people/<uuid:person_id>/",
