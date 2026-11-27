@@ -9,7 +9,9 @@ Anonymous visitors discover Events through Host-resolved `/api/v1/site-context/`
 | GET | `/events/` | Paginated directory. Filters: `search`, `category` (id or slug), `lifecycle`, `on_date` (YYYY-MM-DD). |
 | GET | `/events/calendar/?year=&month=` | Month markers. Multi-day Events appear on every covered local date. |
 | GET | `/events/categories/` | Active Event categories for the Host Site. |
-| GET | `/events/{slug}/` | Public detail. Prefers the Host Site's own Event when slugs collide under Main aggregation. |
+| GET | `/events/{slug}/` | Public detail with section flags. Prefers the Host Site's own Event when slugs collide under Main aggregation. See [public-event-detail.md](./public-event-detail.md). |
+| GET | `/events/{slug}/agenda/` | Multi-day public agenda (date → track → sessions). |
+| GET | `/events/{slug}/speakers/` | Public speakers/moderators for the Speakers tab. |
 
 `lifecycle` values:
 

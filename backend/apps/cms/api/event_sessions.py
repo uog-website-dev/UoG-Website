@@ -287,6 +287,12 @@ class SiteEventSessionsReorder(APIView):
         return response
 
 
+class PublicAgendaResponse(serializers.Serializer):
+    event = serializers.UUIDField()
+    slug = serializers.SlugField()
+    days = PublicAgendaDaySerializer(many=True)
+
+
 class PublicSiteEventAgenda(APIView):
     authentication_classes = []
     permission_classes = []
@@ -294,9 +300,17 @@ class PublicSiteEventAgenda(APIView):
     @extend_schema(
         operation_id="v1_site_context_events_agenda",
         tags=["Public Events"],
-        responses={200: PublicAgendaDaySerializer(many=True)},
+        responses={200: PublicAgendaResponse},
+        description=(
+            "Public multi-day agenda grouped by date and track. Session visibility and "
+            "people publication are checked independently of Event root publication. "
+            "Cache scope is section-specific so schedule updates do not require "
+            "re-publishing the Event."
+        ),
     )
     def get(self, request, slug):
+        from apps.cms.event_session_domain import public_agenda_etag
+
         site = getattr(request, "site", None)
         if site is None or not module_is_available(site.pk, EVENTS_MODULE_CODE):
             raise NotFound("Events are not available for this Site.")
@@ -304,4 +318,10 @@ class PublicSiteEventAgenda(APIView):
         event = rows.filter(site_id=site.pk).first() or rows.first()
         if event is None:
             raise NotFound("Event not found.")
-        return Response({"event": event.pk, "slug": event.slug, "days": public_agenda(event)})
+        response = Response({"event": event.pk, "slug": event.slug, "days": public_agenda(event)})
+        response["Cache-Control"] = "public, max-age=0, must-revalidate"
+        response["Vary"] = "Host"
+        response["ETag"] = public_agenda_etag(event)
+        response["X-Events-Cache-Scope"] = f"site-{site.pk}-event-{event.slug}-agenda"
+        response["X-Events-Cache-Section"] = "agenda"
+        return response

@@ -140,6 +140,34 @@ export async function postRouteMetadata(slug: string): Promise<Metadata> {
   return { title: values.title, description: values.description, alternates: { canonical }, openGraph: { type: "article", url: canonical, title: values.title, description: values.description } };
 }
 
+/** Published Event payload for the request Host — seeds detail first paint. */
+export async function publicEventPayload(slug: string): Promise<PublicApiResponse | null> {
+  const resolved = await resolvedSite();
+  if (!resolved || !resolved.site.modules.events || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return null;
+  const host = (await headers()).get("host");
+  return publicDocumentForHost(host, `events/${encodeURIComponent(slug)}/`);
+}
+
+export async function eventRouteMetadata(slug: string): Promise<Metadata> {
+  const resolved = await resolvedSite();
+  if (!resolved || !resolved.site.modules.events || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return {};
+  const response = await publicDocument(`events/${encodeURIComponent(slug)}/`);
+  if (!response || response.status !== 200) return {};
+  const event = eventForMetadata(response.body);
+  // Host-resolved API already scopes visibility; aggregated Main listings may
+  // return another Site's published Event without leaking drafts.
+  if (!event) return {};
+  const canonical = new URL(`/events/${event.slug}`, resolved.origin).toString();
+  const title = event.title ? `${event.title} | ${resolved.site.name}` : resolved.site.name;
+  const description = event.summary || event.description || `Event details from ${resolved.site.name}`;
+  return {
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: { type: "website", url: canonical, title, description },
+  };
+}
+
 function plainText(value: unknown, max: number): string {
   if (typeof value !== "string") return "";
   return value.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim().slice(0, max);
@@ -164,4 +192,25 @@ function postForMetadata(value: unknown): { title: string; slug: string; excerpt
   const row = record(value);
   if (!row || (row.status != null && row.status !== "PUBLISHED") || typeof row.title !== "string" || typeof row.slug !== "string" || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(row.slug)) return null;
   return { title: plainText(row.title, 255), slug: row.slug, excerpt: typeof row.excerpt === "string" ? plainText(row.excerpt, 300) : "", site: typeof row.site === "number" ? row.site : null, seo: seoValues(row.seo) };
+}
+
+function eventForMetadata(value: unknown): {
+  title: string;
+  slug: string;
+  summary: string;
+  description: string;
+  site: number | null;
+} | null {
+  const row = record(value);
+  if (!row || typeof row.title !== "string" || typeof row.slug !== "string") return null;
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(row.slug)) return null;
+  if (row.status != null && row.status !== "PUBLISHED" && row.status !== "CANCELLED") return null;
+  if ("organizer_email" in row || "organizer_phone" in row) return null;
+  return {
+    title: plainText(row.title, 255),
+    slug: row.slug,
+    summary: typeof row.summary === "string" ? plainText(row.summary, 300) : "",
+    description: typeof row.description === "string" ? plainText(row.description, 300) : "",
+    site: typeof row.site === "number" ? row.site : null,
+  };
 }

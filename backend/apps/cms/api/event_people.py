@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.authentication import KeycloakBearerAuthentication
-from apps.cms.event_domain import require_events_admin
+from apps.cms.event_domain import public_events_for_site, require_events_admin
 from apps.cms.event_models import Event
 from apps.cms.event_person_domain import (
     PersonConflict,
@@ -21,6 +21,8 @@ from apps.cms.event_person_domain import (
     assign_person,
     create_person,
     person_etag,
+    public_speakers_etag,
+    public_speakers_for_event,
     remove_person,
     reorder_assignments,
     serialize_assignment,
@@ -314,3 +316,62 @@ class SiteEventSessionPeopleReorder(APIView):
                 actor=request.user,
             )
         return Response({"results": [serialize_assignment(row, public=False) for row in rows]})
+
+
+class PublicSpeakerRoleSerializer(serializers.Serializer):
+    role = serializers.CharField()
+    session_id = serializers.UUIDField()
+    session_title = serializers.CharField()
+    day_date = serializers.DateField(allow_null=True)
+
+
+class PublicSpeakerSerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    display_name = serializers.CharField()
+    affiliation = serializers.CharField(allow_blank=True)
+    biography = serializers.CharField(allow_blank=True)
+    profile_photo_url = serializers.CharField(allow_null=True, required=False)
+    public_links = serializers.ListField(child=serializers.DictField(), required=False)
+    sort_order = serializers.IntegerField()
+    roles = PublicSpeakerRoleSerializer(many=True)
+
+
+class PublicSpeakersResponse(serializers.Serializer):
+    event = serializers.UUIDField()
+    slug = serializers.SlugField()
+    results = PublicSpeakerSerializer(many=True)
+
+
+class PublicSiteEventSpeakers(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    @extend_schema(
+        operation_id="v1_site_context_events_speakers",
+        tags=["Public Events"],
+        responses={200: PublicSpeakersResponse},
+        description=(
+            "Public speakers and moderators for an Event. Hidden people and private "
+            "contact fields are omitted. Cache scope is section-specific so speaker "
+            "edits become visible without re-publishing the Event root."
+        ),
+    )
+    def get(self, request, slug):
+        site = getattr(request, "site", None)
+        if site is None or not module_is_available(site.pk, EVENTS_MODULE_CODE):
+            raise NotFound("Events are not available for this Site.")
+        rows = public_events_for_site(site).filter(slug=slug)
+        event = rows.filter(site_id=site.pk).first() or rows.first()
+        if event is None:
+            raise NotFound("Event not found.")
+        response = Response({
+            "event": event.pk,
+            "slug": event.slug,
+            "results": public_speakers_for_event(event),
+        })
+        response["Cache-Control"] = "public, max-age=0, must-revalidate"
+        response["Vary"] = "Host"
+        response["ETag"] = public_speakers_etag(event)
+        response["X-Events-Cache-Scope"] = f"site-{site.pk}-event-{event.slug}-speakers"
+        response["X-Events-Cache-Section"] = "speakers"
+        return response

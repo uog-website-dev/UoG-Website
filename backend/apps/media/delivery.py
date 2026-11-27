@@ -92,13 +92,37 @@ def is_published(asset):
         page__visibility__in=["PUBLIC", "UNLISTED"],
     ).exists():
         return True
-    if not module_is_available(asset.site_id, "POSTS"):
+    if module_is_available(asset.site_id, "POSTS"):
+        latest = PublishedContentSnapshot.objects.filter(content_id=OuterRef("content_id")).order_by("-version").values("pk")[:1]
+        if PublishedContentSnapshot.objects.filter(
+            pk=Subquery(latest), content__site_id=asset.site_id,
+            content__status="PUBLISHED", content__post__isnull=False,
+            approved_revision__media_references__asset=asset,
+        ).exists():
+            return True
+    return is_event_public_media(asset)
+
+
+def is_event_public_media(asset):
+    """True when the asset is the banner or public speaker photo of a listed Event."""
+    from apps.cms.event_models import Event, EventStatus
+    from apps.cms.event_person_models import EventPerson
+    from apps.cms.event_session_models import SessionVisibility
+    from apps.sites.selectors.modules import module_is_available
+
+    if not module_is_available(asset.site_id, "EVENTS"):
         return False
-    latest = PublishedContentSnapshot.objects.filter(content_id=OuterRef("content_id")).order_by("-version").values("pk")[:1]
-    return PublishedContentSnapshot.objects.filter(
-        pk=Subquery(latest), content__site_id=asset.site_id,
-        content__status="PUBLISHED", content__post__isnull=False,
-        approved_revision__media_references__asset=asset,
+    public_statuses = [EventStatus.PUBLISHED, EventStatus.CANCELLED]
+    if Event.objects.filter(
+        site_id=asset.site_id, banner_asset_id=asset.pk, status__in=public_statuses,
+    ).exists():
+        return True
+    return EventPerson.objects.filter(
+        event__site_id=asset.site_id,
+        event__status__in=public_statuses,
+        profile_photo_id=asset.pk,
+        removed_at__isnull=True,
+        visibility=SessionVisibility.PUBLIC,
     ).exists()
 
 
