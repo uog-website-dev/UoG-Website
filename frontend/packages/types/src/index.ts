@@ -556,6 +556,7 @@ export * from "./footer";
 
 export * from "./header";
 export * from "./events";
+export * from "./staff-directory";
 export * from "./event-record";
 export * from "./event-session";
 export * from "./event-person";

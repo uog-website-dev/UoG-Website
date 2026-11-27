@@ -71,7 +71,7 @@ function HeaderEditor({siteId}:{siteId:number}) {
  if(!loaded||!saved)return <Alert severity="error" action={<Button onClick={()=>setAttempt(value=>value+1)}>Retry</Button>}>{error}</Alert>;
  const asset=logoAssetId(loaded.branding.logo_asset_id);
  const previewSite={...EMPTY_SITE,id:siteId,name:admin.site.name,displayName:loaded.branding.name,theme:loaded.branding.theme,
-  modules:{pages:loaded.modules.includes("PAGES"),posts:loaded.modules.includes("POSTS"),menus:loaded.modules.includes("MENUS"),documents:loaded.modules.includes("DOCUMENTS"),events:loaded.modules.includes("EVENTS")},header:values};
+  modules:{pages:loaded.modules.includes("PAGES"),posts:loaded.modules.includes("POSTS"),menus:loaded.modules.includes("MENUS"),documents:loaded.modules.includes("DOCUMENTS"),events:loaded.modules.includes("EVENTS"),staffDirectory:loaded.modules.includes("STAFF_DIRECTORY")},header:values};
  const menuState=loaded.menu_state;
  return <Box sx={{display:"grid",gap:3}}>
   <Box><Typography component="h1" variant="h4">Header</Typography><Typography color="text.secondary">Branding destination, navigation, search and the call to action for {admin.site.name}.</Typography></Box>

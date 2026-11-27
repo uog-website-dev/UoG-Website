@@ -8,7 +8,7 @@ const menu = [{ label: "About", href: "/about" }, { label: "Study", href: "/stud
 
 describe("PublicSiteHeader", () => {
   it("renders the published menus and the default brand link", () => {
-    render(<PublicSiteHeader site={{ ...base, modules: { pages: true, posts: false, menus: true } }} headerItems={menu} />);
+    render(<PublicSiteHeader site={{ ...base, modules: { ...EMPTY_SITE.modules, pages: true, posts: false, menus: true } }} headerItems={menu} />);
     const header = document.querySelector('[data-site-header="11"]') as HTMLElement;
     expect(header).toBeTruthy();
     expect(header.querySelector('a[href="/"]')).toBeTruthy();
@@ -21,7 +21,7 @@ describe("PublicSiteHeader", () => {
 
   it("keeps one compact mobile row and moves utility links and the CTA into the drawer", () => {
     render(<PublicSiteHeader
-      site={{ ...base, modules: { pages: true, posts: false, menus: true } }}
+      site={{ ...base, modules: { ...EMPTY_SITE.modules, pages: true, posts: false, menus: true } }}
       headerItems={[{ label: "About", href: "/about" }]}
       utilityItems={[{ label: "Jobs", href: "/jobs" }]}
       settings={{ brand_href: "/", search_enabled: true, sticky: false, brand_quote: "", cta_label: "Apply now", cta_url: "/apply", language_switcher: false }}
@@ -35,12 +35,12 @@ describe("PublicSiteHeader", () => {
   });
 
   it("hides search when neither PAGES nor POSTS is enabled", () => {
-    render(<PublicSiteHeader site={{ ...base, modules: { pages: false, posts: false, menus: true } }} />);
+    render(<PublicSiteHeader site={{ ...base, modules: { ...EMPTY_SITE.modules, pages: false, posts: false, menus: true } }} />);
     expect(screen.queryByRole("button", { name: "Search this Site" })).toBeNull();
   });
 
   it("hides search when the Site turns it off even with PAGES enabled", () => {
-    render(<PublicSiteHeader site={{ ...base, modules: { pages: true, posts: false, menus: true } }} settings={{
+    render(<PublicSiteHeader site={{ ...base, modules: { ...EMPTY_SITE.modules, pages: true, posts: false, menus: true } }} settings={{
       brand_href: "/", search_enabled: false, sticky: false, brand_quote: "", cta_label: "", cta_url: "", language_switcher: false,
     }} />);
     expect(screen.queryByRole("button", { name: "Search this Site" })).toBeNull();
