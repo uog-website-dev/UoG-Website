@@ -28,6 +28,7 @@ import { getSiteEventSettings } from "@/app/sites/event-actions";
 import { eventAdminHref } from "@/sites/site-admin";
 import { useSiteAdmin } from "@/sites/site-admin-frame";
 import { SiteEventsNav } from "@/sites/site-events-nav";
+import { SiteEventGallery } from "@/sites/site-event-gallery";
 import { SiteEventPeople } from "@/sites/site-event-people";
 import { SiteEventRegistrations } from "@/sites/site-event-registrations";
 import { SiteEventResources } from "@/sites/site-event-resources";
@@ -250,9 +251,10 @@ export function SiteEventEditorPage({
             readOnly={readOnly}
           />
           <SiteEventResources siteId={siteId} eventId={eventId} readOnly={readOnly} />
+          <SiteEventGallery siteId={siteId} eventId={eventId} readOnly={readOnly} />
         </>
       ) : (
-        <Alert severity="info">Save the Event draft first to manage speakers, schedule, and resources.</Alert>
+        <Alert severity="info">Save the Event draft first to manage speakers, schedule, resources, and gallery.</Alert>
       )}
       {!readOnly ? (
         <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>

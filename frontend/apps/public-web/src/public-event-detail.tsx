@@ -6,6 +6,9 @@ import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
+import IconButton from "@mui/material/IconButton";
 import Link from "@mui/material/Link";
 import Skeleton from "@mui/material/Skeleton";
 import Tab from "@mui/material/Tab";
@@ -17,7 +20,17 @@ import type { EventLifecycle, PublicEventSections, SiteEventRecord } from "@uog/
 import { usePublicBreadcrumbTitle } from "@/public-menus";
 import { PublicEventRegistrationForm } from "@/public-event-registration";
 
-type DetailTab = "overview" | "schedule" | "speakers" | "resources";
+type DetailTab = "overview" | "schedule" | "speakers" | "gallery" | "resources";
+
+interface PublicGalleryImage {
+  id: string;
+  caption: string;
+  alt_text: string;
+  session_title?: string | null;
+  thumbnail_url: string;
+  display_url: string;
+  sort_order: number;
+}
 
 interface PublicResource {
   id: string;
@@ -80,6 +93,7 @@ const TAB_LABELS: Record<DetailTab, string> = {
   overview: "Overview",
   schedule: "Schedule & Sessions",
   speakers: "Speakers",
+  gallery: "Gallery",
   resources: "Resources & Downloads",
 };
 
@@ -177,6 +191,7 @@ function visibleTabs(sections: PublicEventSections | undefined): DetailTab[] {
   const tabs: DetailTab[] = ["overview"];
   if (sections?.schedule) tabs.push("schedule");
   if (sections?.speakers) tabs.push("speakers");
+  if (sections?.gallery) tabs.push("gallery");
   if (sections?.resources) tabs.push("resources");
   return tabs;
 }
@@ -214,6 +229,8 @@ export function PublicEventDetailPage({
   const [agenda, setAgenda] = useState<AgendaDay[] | null>(null);
   const [speakers, setSpeakers] = useState<PublicSpeaker[] | null>(null);
   const [resources, setResources] = useState<PublicResource[] | null>(null);
+  const [gallery, setGallery] = useState<PublicGalleryImage[] | null>(null);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [sectionError, setSectionError] = useState("");
   const [entitlement, setEntitlement] = useState({ email: "", token: "", resourceId: "", message: "" });
   const focusRef = useRef<HTMLElement | null>(null);
@@ -325,6 +342,37 @@ export function PublicEventDetailPage({
       controller.abort();
     };
   }, [event, activeTab, speakers, slug]);
+
+  useEffect(() => {
+    if (!event || activeTab !== "gallery") return;
+    if (gallery) return;
+    const controller = new AbortController();
+    let cancelled = false;
+    async function loadGallery() {
+      try {
+        const response = await fetch(`/api/v1/site-context/events/${encodeURIComponent(slug)}/gallery/`, {
+          ...publicFetchInit(),
+          signal: controller.signal,
+        });
+        if (!response.ok) throw new Error("Gallery is temporarily unavailable.");
+        const body = await response.json();
+        if (!Array.isArray(body)) throw new Error("Gallery could not be loaded safely.");
+        if (!cancelled) {
+          setGallery(body as PublicGalleryImage[]);
+          setSectionError("");
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setSectionError(error instanceof Error ? error.message : "Gallery is temporarily unavailable.");
+        }
+      }
+    }
+    void loadGallery();
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
+  }, [event, activeTab, gallery, slug]);
 
   useEffect(() => {
     if (!event || activeTab !== "resources") return;
@@ -631,6 +679,107 @@ export function PublicEventDetailPage({
                 </Box>
               ))}
             </Box>
+          )
+        ) : null}
+
+        {activeTab === "gallery" ? (
+          sectionError ? (
+            <Alert severity="error">{sectionError}</Alert>
+          ) : !gallery ? (
+            <Typography role="status">Loading gallery…</Typography>
+          ) : gallery.length === 0 ? (
+            <Typography role="status">No published photos are available yet.</Typography>
+          ) : (
+            <>
+              <Box
+                component="ul"
+                sx={{
+                  m: 0,
+                  p: 0,
+                  listStyle: "none",
+                  display: "grid",
+                  gap: 1.5,
+                  gridTemplateColumns: { xs: "1fr 1fr", sm: "1fr 1fr 1fr", md: "1fr 1fr 1fr 1fr" },
+                }}
+              >
+                {gallery.map((image, index) => (
+                  <Box component="li" key={image.id}>
+                    <Button
+                      onClick={() => setLightboxIndex(index)}
+                      sx={{
+                        p: 0,
+                        display: "block",
+                        width: "100%",
+                        textAlign: "left",
+                        borderRadius: 1,
+                        overflow: "hidden",
+                        textTransform: "none",
+                        color: "inherit",
+                      }}
+                      aria-label={image.alt_text || image.caption || "Open gallery image"}
+                    >
+                      <Box
+                        component="img"
+                        src={image.thumbnail_url}
+                        alt={image.alt_text || ""}
+                        loading="lazy"
+                        sx={{ width: "100%", aspectRatio: "4 / 3", objectFit: "cover", display: "block" }}
+                      />
+                      {image.caption ? (
+                        <Typography variant="caption" sx={{ display: "block", px: 0.5, pt: 0.5 }}>
+                          {image.caption}
+                        </Typography>
+                      ) : null}
+                    </Button>
+                  </Box>
+                ))}
+              </Box>
+              <Dialog
+                open={lightboxIndex != null}
+                onClose={() => setLightboxIndex(null)}
+                maxWidth="md"
+                fullWidth
+                aria-label="Event photo viewer"
+              >
+                <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+                  {lightboxIndex != null && gallery[lightboxIndex] ? (
+                    <>
+                      <Box
+                        component="img"
+                        src={gallery[lightboxIndex].display_url}
+                        alt={gallery[lightboxIndex].alt_text || ""}
+                        sx={{ width: "100%", maxHeight: "70vh", objectFit: "contain" }}
+                      />
+                      {gallery[lightboxIndex].caption ? (
+                        <Typography>{gallery[lightboxIndex].caption}</Typography>
+                      ) : null}
+                      <Box sx={{ display: "flex", gap: 1, justifyContent: "space-between", flexWrap: "wrap" }}>
+                        <Button
+                          disabled={lightboxIndex <= 0}
+                          onClick={() => setLightboxIndex((value) => (value == null ? value : Math.max(0, value - 1)))}
+                        >
+                          Previous
+                        </Button>
+                        <Typography variant="body2" color="text.secondary">
+                          {lightboxIndex + 1} / {gallery.length}
+                        </Typography>
+                        <Button
+                          disabled={lightboxIndex >= gallery.length - 1}
+                          onClick={() => setLightboxIndex((value) => (
+                            value == null ? value : Math.min(gallery.length - 1, value + 1)
+                          ))}
+                        >
+                          Next
+                        </Button>
+                        <IconButton aria-label="Close photo viewer" onClick={() => setLightboxIndex(null)}>
+                          <Typography component="span" aria-hidden>×</Typography>
+                        </IconButton>
+                      </Box>
+                    </>
+                  ) : null}
+                </DialogContent>
+              </Dialog>
+            </>
           )
         ) : null}
 

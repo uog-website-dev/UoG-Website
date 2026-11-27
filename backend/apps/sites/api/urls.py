@@ -32,6 +32,12 @@ from apps.cms.api.event_resources import (
     SiteEventResources,
     SiteEventResourcesReorder,
 )
+from apps.cms.api.event_gallery import (
+    SiteEventGallery,
+    SiteEventGalleryDetail,
+    SiteEventGalleryPublish,
+    SiteEventGalleryReorder,
+)
 from .event_categories import SiteEventCategories, SiteEventCategoryDetail
 from apps.cms.api.sidebars import SidebarViewSet
 from apps.cms.api.menus import MenuViewSet, MenuItemViewSet
@@ -76,6 +82,22 @@ urlpatterns = [
         "<int:site_pk>/events/<uuid:event_id>/registrations/<uuid:registration_id>/badge/",
         SiteEventRegistrationBadge.as_view(),
         name="site-event-registration-badge",
+    ),
+    path("<int:site_pk>/events/<uuid:event_id>/gallery/", SiteEventGallery.as_view(), name="site-event-gallery"),
+    path(
+        "<int:site_pk>/events/<uuid:event_id>/gallery/reorder/",
+        SiteEventGalleryReorder.as_view(),
+        name="site-event-gallery-reorder",
+    ),
+    path(
+        "<int:site_pk>/events/<uuid:event_id>/gallery/<uuid:image_id>/",
+        SiteEventGalleryDetail.as_view(),
+        name="site-event-gallery-detail",
+    ),
+    path(
+        "<int:site_pk>/events/<uuid:event_id>/gallery/<uuid:image_id>/publish/",
+        SiteEventGalleryPublish.as_view(),
+        name="site-event-gallery-publish",
     ),
     path("<int:site_pk>/events/<uuid:event_id>/resources/", SiteEventResources.as_view(), name="site-event-resources"),
     path(

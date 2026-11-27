@@ -121,6 +121,7 @@ def _banner_url(event: Event, *, public: bool = False) -> str | None:
 
 def _public_sections(event: Event) -> dict:
     """Which detail tabs have public content. Unshipped sections stay false."""
+    from apps.cms.event_gallery_domain import public_gallery_available
     from apps.cms.event_person_domain import public_speakers_available
     from apps.cms.event_resource_domain import public_resources_available
     from apps.cms.event_session_domain import public_schedule_available
@@ -129,7 +130,7 @@ def _public_sections(event: Event) -> dict:
         "overview": True,
         "schedule": public_schedule_available(event),
         "speakers": public_speakers_available(event),
-        "gallery": False,
+        "gallery": public_gallery_available(event),
         "resources": public_resources_available(event),
         "updates": False,
     }
