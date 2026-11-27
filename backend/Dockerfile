@@ -1,4 +1,4 @@
-# UoG Digital Platform — backend image (Python 3.12 / Django 5.1)
+# UoG Digital Platform — backend image (Python 3.12 / Django 5.2)
 FROM python:3.12.15-slim-bookworm
 
 ENV PYTHONDONTWRITEBYTECODE=1 \

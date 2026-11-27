@@ -21,18 +21,6 @@ function failure(status:number, code:string, requestId:string) {
   return Response.json({error:{code,message:code.replaceAll("_"," "),details:null,request_id:requestId}}, {status,headers:{...privateHeaders,"X-Request-ID":requestId}});
 }
 
-function encodedResponse(response:Response,request:Request) {
-  // Route-handler JSON is not compressed by Next's page/Flight pipeline.
-  // Only metadata is returned here (no tokens); preserve private cache policy.
-  const accepted=request.headers.get("accept-encoding")??"";
-  const gzip=accepted.split(",").map(part=>part.trim().split(";")).find(([name])=>name?.toLowerCase()==="gzip");
-  const quality=gzip?.slice(1).find(value=>value.trim().startsWith("q="))?.trim().slice(2);
-  if(!gzip || (quality!==undefined && !(Number(quality)>0)) || !response.body) return response;
-  const headers=new Headers(response.headers);
-  headers.set("Content-Encoding","gzip");headers.set("Vary","Cookie, Accept-Encoding");headers.delete("Content-Length");
-  return new Response(response.body.pipeThrough(new CompressionStream("gzip")),{status:response.status,headers});
-}
-
 export async function readProxy(request:Request) {
   const started=performance.now();
   const supplied=request.headers.get("x-request-id");
@@ -74,7 +62,10 @@ export async function readProxy(request:Request) {
     if(process.env.PERF_INSTRUMENTATION_ENABLED==="1") {
       response.headers.set("Server-Timing",`bff;dur=${(performance.now()-started).toFixed(3)}, upstream;dur=${upstreamMs.toFixed(3)}, encode;dur=${encodeMs.toFixed(3)}`);
     }
-    return encodedResponse(response,request);
+    // Leave transfer encoding to Next/nginx. Manually compressing here causes
+    // the route response to be encoded twice in the browser and breaks JSON
+    // parsing for same-origin Admin reads (for example, the Media picker).
+    return response;
   } catch {
     return failure(request.signal.aborted ? 499 : timeout.aborted ? 504 : 502, request.signal.aborted ? "read_cancelled" : timeout.aborted ? "read_timeout" : "upstream_unavailable",requestId);
   }

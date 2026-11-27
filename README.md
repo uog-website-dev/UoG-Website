@@ -208,7 +208,7 @@ Full setup, troubleshooting and workflow details:
 
 ```
 uog-digital-platform/
-├── backend/                 # Django 5.1 + DRF (Python 3.12)
+├── backend/                 # Django 5.2 + DRF (Python 3.12)
 │   ├── config/              # settings, urls, celery
 │   ├── apps/                # core, api, accounts, organizations
 │   ├── requirements/        # pinned base/dev/prod layers

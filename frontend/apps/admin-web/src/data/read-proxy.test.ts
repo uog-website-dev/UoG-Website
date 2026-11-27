@@ -17,14 +17,10 @@ it("uses distinct upstream IDs when parallel reads share a root ID",async()=>{
   await Promise.all([readProxy(request(undefined,{headers:{"x-request-id":root}})),readProxy(request(undefined,{headers:{"x-request-id":root}}))]);
   const ids=upstream.mock.calls.map(([,init])=>init.headers["X-Request-ID"]);expect(new Set(ids).size).toBe(2);expect(ids).not.toContain(root);
 });
-it("negotiates gzip for JSON without mixing credentials into the compressed body",async()=>{
+it("leaves response encoding to the framework while preserving private JSON",async()=>{
   const response=await readProxy(request(undefined,{headers:{"Accept-Encoding":"gzip, deflate, br"}}));
-  expect(response.headers.get("content-encoding")).toBe("gzip");expect(response.headers.get("vary")).toBe("Cookie, Accept-Encoding");
-  const decoded=await new Response(response.body!.pipeThrough(new DecompressionStream("gzip"))).text();
-  expect(JSON.parse(decoded)).toMatchObject({results:[{site:11}]});expect(decoded).not.toContain("private-access-token");
-});
-it.each(["br", "gzip;q=0, br"])("does not send unaccepted gzip for %s",async encoding=>{
-  const response=await readProxy(request(undefined,{headers:{"Accept-Encoding":encoding}}));expect(response.headers.get("content-encoding")).toBeNull();expect((await response.json()).count).toBe(1);
+  expect(response.headers.get("content-encoding")).toBeNull();expect(response.headers.get("vary")).toBe("Cookie, Accept-Encoding");
+  expect(await response.json()).toMatchObject({results:[{site:11}]});
 });
 it.each(["site=11&resource=http://evil.test","site=11&resource=__proto__","site=11&site=22&resource=pages","site=0&resource=pages","site=9007199254740992&resource=posts","site=11&resource=pages&url=http://evil.test","site=11&resource=pages&site_id=22"])("rejects unsafe target/query %s before auth or upstream",async query=>{
   expect((await readProxy(request(query))).status).toBe(400);expect(upstream).not.toHaveBeenCalled();expect(token).not.toHaveBeenCalled();

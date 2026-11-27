@@ -119,7 +119,9 @@ function DocumentCard({ document }: { document: PublicDocument }) {
         const anchor = window.document.createElement("a");
         anchor.href = blobUrl;
         anchor.download = responseFilename(response.headers.get("content-disposition"), `${document.slug || "document"}.${extension}`);
+        window.document.body.appendChild(anchor);
         anchor.click();
+        anchor.remove();
         window.setTimeout(() => URL.revokeObjectURL(blobUrl), 1_000);
       }
     } catch {
@@ -168,9 +170,9 @@ function DocumentCard({ document }: { document: PublicDocument }) {
         onClick={event => void accessFile(event, isPdf)}
         underline="always"
         sx={{ mt: "auto", minHeight: 44, display: "inline-flex", alignItems: "center", "&:focus-visible": { outline: "3px solid", outlineColor: "primary.main", outlineOffset: 2 } }}
-        aria-label={isPdf ? `Open ${document.title} in a new tab` : `Download ${document.title}`}
+        aria-label={`${isPdf ? "View PDF" : `Download ${typeLabel}`}${document.require_login_to_download ? " (sign in required)" : ""}: ${document.title}`}
       >{isPdf ? "View PDF" : `Download ${typeLabel}`}{document.require_login_to_download ? " (sign in required)" : ""}</Link>
-      {isPdf ? <Link href={attachmentUrl} download onClick={event => void accessFile(event, false)} sx={{ minHeight: 44, display: "inline-flex", alignItems: "center" }} aria-label={`Download ${document.title} as PDF`}>Download PDF</Link> : null}
+      {isPdf ? <Link href={attachmentUrl} download onClick={event => void accessFile(event, false)} sx={{ minHeight: 44, display: "inline-flex", alignItems: "center" }} aria-label={`Download PDF: ${document.title}`}>Download PDF</Link> : null}
       {error ? <Alert severity="error" role="alert" sx={{ width: "100%" }}>{error}{signInHref ? <> <Link href={signInHref}>Sign in</Link> to continue.</> : null}</Alert> : null}
     </CardContent>
   </Card>;

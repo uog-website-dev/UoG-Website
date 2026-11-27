@@ -233,6 +233,13 @@ class AssetDetail(MediaView):
 
 class AssetDownload(MediaView):
     """Authenticated, Site-scoped attachment delivery after processing gates."""
+    serializer_class = AssetSerializer
+
+    @extend_schema(
+        tags=["Media"],
+        responses={(200, "application/octet-stream"): {"type": "string", "format": "binary"}},
+        description="Stream an authorized Site media attachment. Document asset references cannot bypass the document publication and access policy.",
+    )
     def get(self, request, site_pk, asset_id):
         asset = asset_for_site(request.user, site_pk, asset_id)
         # A document's file must never bypass publication, visibility, login,

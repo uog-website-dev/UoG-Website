@@ -1,0 +1,13 @@
+{
+  "date": "2026-11-27",
+  "site_user_create_ui": {
+    "status": 503,
+    "message": "Account creation is temporarily unavailable. Please try again."
+  },
+  "site_role_assignment_ui": {
+    "status": 403,
+    "message": "The existing development identity's attempt to grant itself Site Administrator was denied."
+  },
+  "cleanup": "Verified no non-revoked Site Administrator role assignment was left for the development identity on Site 2 or Site 3.",
+  "security_note": "No database role bypass was used."
+}

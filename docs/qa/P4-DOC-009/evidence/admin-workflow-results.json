@@ -1,0 +1,67 @@
+{
+  "run": "p4doc-53cf0053",
+  "date": "2026-11-27T13:18:52.024Z",
+  "browser": "158.0.4370.45",
+  "sites": [
+    {
+      "id": 2,
+      "code": "MAIN"
+    },
+    {
+      "id": 3,
+      "code": "INFORMATICS"
+    }
+  ],
+  "results": [
+    {
+      "site": "MAIN",
+      "step": "create separate Site Administrator through UI",
+      "status": "PASS"
+    },
+    {
+      "site": "MAIN",
+      "step": "category, upload, metadata, draft, publish",
+      "status": "PASS"
+    },
+    {
+      "site": "MAIN",
+      "step": "published record appears on its Site public directory",
+      "status": "PASS"
+    },
+    {
+      "site": "MAIN",
+      "step": "edit, republish, unpublish revocation",
+      "status": "PASS"
+    },
+    {
+      "site": "MAIN",
+      "step": "remove temporary Site Administrator membership",
+      "status": "PASS"
+    },
+    {
+      "site": "INFORMATICS",
+      "step": "create separate Site Administrator through UI",
+      "status": "PASS"
+    },
+    {
+      "site": "INFORMATICS",
+      "step": "category, upload, metadata, draft, publish",
+      "status": "PASS"
+    },
+    {
+      "site": "INFORMATICS",
+      "step": "published record appears on its Site public directory",
+      "status": "PASS"
+    },
+    {
+      "site": "INFORMATICS",
+      "step": "edit, republish, unpublish revocation",
+      "status": "PASS"
+    },
+    {
+      "site": "INFORMATICS",
+      "step": "remove temporary Site Administrator membership",
+      "status": "PASS"
+    }
+  ]
+}

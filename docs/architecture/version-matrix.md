@@ -20,8 +20,8 @@ The P0 reports disagreed on React, Redis and Keycloak. Resolutions:
 | Component | Version | Pinned in |
 | --- | --- | --- |
 | Python | 3.12.15 | `backend/Dockerfile` (`python:3.12.15-slim-bookworm`) |
-| Django | 5.1.8 | `backend/requirements/base.txt` |
-| Django REST Framework | 3.15.2 | `backend/requirements/base.txt` |
+| Django | 5.2.17 | `backend/requirements/base.txt` |
+| Django REST Framework | 3.18.2 | `backend/requirements/base.txt` |
 | drf-spectacular | 0.30.0 | `backend/requirements/base.txt` (OpenAPI generation/validation) |
 | drf-spectacular-sidecar | 2026.10.1 | `backend/requirements/base.txt` (self-hosted Swagger/ReDoc assets) |
 | WhiteNoise | 6.12.0 | `backend/requirements/base.txt` (static assets with DEBUG=False) |

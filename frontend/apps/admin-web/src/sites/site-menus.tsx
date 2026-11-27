@@ -43,7 +43,7 @@ import { MenuItemTree } from "@/sites/menu-items";
 import { unwrap } from "@/organizations/contract";
 
 const PLACES: readonly MenuPlace[] = ["", "header", "footer", "sidebar", "secondary"];
-const NO_TARGETS: MenuTargets = { pages: [], posts: [], pagesAvailable: true, postsAvailable: true };
+const NO_TARGETS: MenuTargets = { pages: [], posts: [], pagesAvailable: true, postsAvailable: true, documentsAvailable: false };
 
 function menuError(cause: unknown): string {
   if (cause instanceof ApiError && cause.details && typeof cause.details === "object") {

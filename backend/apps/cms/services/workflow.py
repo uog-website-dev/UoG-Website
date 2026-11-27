@@ -18,6 +18,7 @@ from ..models import (
     ContentRevision,
     ContentStatus,
     ContentWorkflowTransition,
+    Document,
     Page,
     PublishedContentSnapshot,
     SiteContent,
@@ -374,6 +375,9 @@ def _content_instance(base, *, using):
     page = Page.objects.using(using).filter(pk=base.pk).first()
     if page is not None:
         return page
+    document = Document.objects.using(using).filter(pk=base.pk).first()
+    if document is not None:
+        return document
     from apps.api.models import Category, Post
     post = Post.objects.using(using).filter(pk=base.pk).first()
     if post is not None:
