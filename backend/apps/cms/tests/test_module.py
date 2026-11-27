@@ -12,12 +12,12 @@ from django.db.migrations.loader import MigrationLoader
 from django.urls import get_resolver
 
 from apps.cms.models import Page, PageRedirect, SiteContent
-from apps.sites.models import Module, SiteModule
+from apps.sites.models import Module, ModuleDependency, SiteModule
 from apps.sites.module_schema import empty_module_schema
-from apps.sites.selectors.modules import capability_is_shipped, usable_modules
+from apps.sites.selectors.modules import capability_is_shipped, module_is_available, usable_modules
 from apps.sites.services.modules import enable_module_for_site
 
-CONTENT_CODES = {"PAGES", "POSTS", "MENUS"}
+CONTENT_CODES = {"PAGES", "POSTS", "MENUS", "DOCUMENTS"}
 
 
 def test_cms_packages_import_and_application_loads():
@@ -25,7 +25,7 @@ def test_cms_packages_import_and_application_loads():
         "", ".apps", ".models", ".page_sql", ".blocks", ".blocks_sql",
         ".workflow_sql", ".revision_sql",
         ".api", ".api.serializers", ".api.workflow", ".api.revisions",
-        ".api.pages", ".api.public",
+        ".api.pages", ".api.documents", ".api.public",
         ".api.menus", ".api.menu_delivery", ".menu_api_sql", ".menu_cache",
         ".api.urls", ".api.sidebars", ".sidebar_models", ".services.sidebars",
         ".selectors", ".selectors.pages", ".services", ".services.pages",
@@ -39,7 +39,7 @@ def test_cms_packages_import_and_application_loads():
     assert config.name == "apps.cms"
     assert "apps.cms" in settings.INSTALLED_APPS
     assert {model.__name__ for model in config.get_models()} == {
-        "SiteContent", "Page", "PageRedirect", "LegacyCMSRoleReconciliation",
+        "SiteContent", "Page", "PageRedirect", "Document", "LegacyCMSRoleReconciliation",
         "ContentWorkflowTransition", "PublishedContentSnapshot",
         "ContentRevision", "SitePublicationVersion",
         "Menu", "MenuItem", "MenuInheritance", "MenuDeliveryVersion", "MenuLocationAssignment",
@@ -64,6 +64,7 @@ def test_cms_mounts_scoped_workflow_revision_admin_and_public_routes():
     assert {
         "site-context", "public-menus", "public-page-list", "public-homepage",
         "public-page-detail", "public-post-list", "public-post-detail", "public-media-image",
+        "public-document-list", "public-document-categories",
     } <= {pattern.name for pattern in context_urls.urlpatterns}
 
 
@@ -159,6 +160,28 @@ def test_a_site_cannot_enable_a_planned_module(sites):
     with pytest.raises(IntegrityError), transaction.atomic():
         SiteModule.objects.bulk_create([SiteModule(site=site, module=module)])
     assert not SiteModule.objects.exists()
+
+
+@pytest.mark.django_db
+def test_documents_is_optional_and_requires_media(sites):
+    from apps.sites.services.modules import disable_module_for_site, enable_module_for_site
+
+    site, _ = sites
+    documents = Module.objects.get(code="DOCUMENTS")
+    media = Module.objects.get(code="MEDIA")
+    media.is_enabled = True
+    media.save(update_fields=("is_enabled",))
+    assert ModuleDependency.objects.filter(module=documents, requires=media).exists()
+    assert not SiteModule.objects.filter(site=site, module=documents, is_enabled=True).exists()
+    with pytest.raises(ValidationError, match="MEDIA"):
+        enable_module_for_site(site.pk, documents.pk)
+    enable_module_for_site(site.pk, media.pk)
+    enable_module_for_site(site.pk, documents.pk)
+    assert module_is_available(site.pk, "DOCUMENTS")
+    with pytest.raises(ValidationError, match="DOCUMENTS"):
+        disable_module_for_site(site.pk, media.pk)
+    disable_module_for_site(site.pk, documents.pk)
+    assert not module_is_available(site.pk, "DOCUMENTS")
 
 
 def test_documented_strategy_matches_the_migration():

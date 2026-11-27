@@ -8,6 +8,7 @@ from uuid import UUID
 from urllib.parse import urlsplit
 
 from django.db import transaction
+from django.utils import timezone
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import serializers
 from rest_framework.exceptions import APIException, NotFound, PermissionDenied
@@ -32,7 +33,7 @@ from ..selectors.pages import public_pages
 
 
 class WidgetQuery(StrictFields, serializers.Serializer):
-    source = serializers.ChoiceField(choices=("identity", "posts", "pages", "taxonomy", "menu", "breadcrumbs"))
+    source = serializers.ChoiceField(choices=("identity", "posts", "pages", "taxonomy", "menu", "breadcrumbs", "documents"))
     page_id = serializers.UUIDField(required=False)
     menu_code = serializers.ChoiceField(choices=("header","footer","sidebar","primary","secondary"),default="header")
     limit = serializers.IntegerField(default=12, min_value=1, max_value=50)
@@ -40,6 +41,8 @@ class WidgetQuery(StrictFields, serializers.Serializer):
     category = serializers.SlugField(required=False, max_length=128)
     tag = serializers.SlugField(required=False, max_length=128)
     taxonomy_code = serializers.ChoiceField(choices=("categories", "category", "tags", "tag"), default="categories")
+    document_categories = serializers.CharField(required=False, max_length=2000)
+    document_sort = serializers.ChoiceField(choices=("newest", "oldest", "title"), default="newest")
 
     def to_internal_value(self, data):
         if hasattr(data, "getlist") and any(len(data.getlist(key)) != 1 for key in data):
@@ -96,6 +99,32 @@ def widget_data(site, parameters):
             crumbs.append({"site":site.pk,"title":payload["title"],"path":payload["path"]})
             current=payload.get("parent_id")
         return {"site":site.pk,"source":source,"results":list(reversed(crumbs))}
+    if source == "documents":
+        if not module_is_available(site.pk, "DOCUMENTS"):
+            raise NotFound()
+        from ..models import Document
+        from apps.media.models import MediaAsset
+        rows = Document.objects.filter(site_id=site.pk, status=ContentStatus.PUBLISHED,
+            published_at__lte=timezone.now(), visibility=Visibility.PUBLIC, visible_to_public=True)
+        category_ids = [value for value in parameters.get("document_categories", "").split(",") if value]
+        if category_ids:
+            rows = rows.filter(categories__site_id=site.pk, categories__kind=Category.Kind.DOCUMENTS,
+                               categories__is_active=True, categories__pk__in=category_ids)
+        sort = parameters.get("document_sort", "newest")
+        ordering = {"newest": ("-published_at", "pk"), "oldest": ("published_at", "pk"), "title": ("title", "pk")}[sort]
+        rows = rows.distinct().order_by(*ordering)[:min(limit, 50)]
+        results = []
+        for document in rows:
+            asset_id = document.file_reference.rsplit("/", 1)[-1]
+            asset = MediaAsset.objects.filter(pk=asset_id, site_id=site.pk, status=MediaAsset.Status.READY,
+                deleted_at__isnull=True, processing__state="READY").first()
+            if asset is None:
+                continue
+            results.append({"id": str(document.pk), "site": site.pk, "title": document.title,
+                "description": document.description, "file_type": asset.detected_mime,
+                "file_size": asset.byte_count, "download_url": f"/api/v1/site-context/documents/{document.pk}/file/",
+                "require_login_to_download": document.require_login_to_download})
+        return {"site": site.pk, "source": source, "results": results}
     if source == "pages":
         if not module_is_available(site.pk, "PAGES"):
             raise NotFound()

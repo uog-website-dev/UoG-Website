@@ -49,10 +49,10 @@ function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, onSe
   const [page, setPage] = useSectionState(siteId, imagesOnly ? "media-images" : "media", "page", 1, !onSelect);
   const [failedPreviews, setFailedPreviews] = useState<Set<string>>(new Set());
   const [previewVersion, setPreviewVersion] = useState(0);
-  const [filters, setFilters] = useSectionState<MediaListQuery>(siteId, imagesOnly ? "media-images" : "media", "filters", {}, !onSelect);
+  const [filters, setFilters] = useSectionState<MediaListQuery>(siteId, imagesOnly ? "media-images" : "media", "filters", documentsOnly ? {type:"document"} : {}, !onSelect);
   const [search, setSearch] = useSectionState(siteId, imagesOnly ? "media-images" : "media", "search", "", !onSelect);
   const [status, setStatus] = useSectionState<MediaStatus | "">(siteId, imagesOnly ? "media-images" : "media", "status", "", !onSelect);
-  const [type, setType] = useSectionState<"image" | "document" | "">(siteId, imagesOnly ? "media-images" : "media", "type", "", !onSelect);
+  const [type, setType] = useSectionState<"image" | "document" | "">(siteId, imagesOnly ? "media-images" : "media", "type", documentsOnly ? "document" : "", !onSelect);
   const [confirmDeletion, setConfirmDeletion] = useState(false);
   const [removalNotice, setRemovalNotice] = useState<string | null>(null);
   const [viewerAsset, setViewerAsset] = useState<MediaAssetRecord | null>(null);
@@ -89,7 +89,7 @@ function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, onSe
   const [watchUntil, setWatchUntil] = useState(() => onSelect || onSelectMany ? Date.now() + 120000 : 0);
   const scope = useRef(0);
   // Invalidate pending background results synchronously when the query changes.
-  const queryIdentity = `${siteId}:${page}:${JSON.stringify(filters)}:${Boolean(onSelect)}:${imagesOnly}`;
+  const queryIdentity = `${siteId}:${page}:${JSON.stringify(filters)}:${Boolean(onSelect)}:${imagesOnly}:${documentsOnly}`;
   const currentQuery = useRef(queryIdentity);
   if (currentQuery.current !== queryIdentity) { currentQuery.current = queryIdentity; scope.current += 1; }
   const rowsRef = useRef(rows);
@@ -166,7 +166,7 @@ function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, onSe
       <Box><Typography variant="h5" component="h2" fontWeight={600}>{picking ? "Choose media" : "Media Library"}</Typography><Typography variant="body2" color="text.secondary" sx={{mt:0.5}}>Your Site's images and documents, in one place.</Typography></Box>
       {canUpload && policy.data ? <Button variant="contained" disabled={uploadBusy || !uploadReady} startIcon={<CloudUploadOutlinedIcon />} onClick={() => uploadInput.current?.click()}>Upload files</Button> : null}
     </Box>
-    {canUpload ? <Box sx={{minHeight:190}}>{policy.data ? <MediaUploadPanel siteId={siteId} policy={policy.data} inputRef={uploadInput} onReady={setUploadReady} onBusyChange={setUploadBusy} onAccepted={() => { setWatchUntil(Date.now()+120000); setPage(1); rows.reload(); }} /> : policy.error ? <Alert severity="error" sx={{minHeight:190}} action={<Button onClick={policy.reload}>Retry upload policy</Button>}>Upload policy unavailable.</Alert> : <Skeleton role="status" aria-label="Loading upload policy" variant="rounded" height={190}/>}</Box> : null}
+    {canUpload ? <Box sx={{minHeight:190}}>{policy.data ? <MediaUploadPanel siteId={siteId} policy={policy.data} inputRef={uploadInput} onReady={setUploadReady} onBusyChange={setUploadBusy} documentsOnly={documentsOnly} onAccepted={() => { setWatchUntil(Date.now()+120000); setPage(1); rows.reload(); }} /> : policy.error ? <Alert severity="error" sx={{minHeight:190}} action={<Button onClick={policy.reload}>Retry upload policy</Button>}>Upload policy unavailable.</Alert> : <Skeleton role="status" aria-label="Loading upload policy" variant="rounded" height={190}/>}</Box> : null}
     <Box component="form" role="search" aria-label="Search Site media" onSubmit={(event) => {
       event.preventDefault(); setFilters({ search, ...(status ? { status } : {}), ...(type ? { type } : {}) }); setPage(1);
     }} sx={{ display: "flex", gap: 1.5, flexWrap: "wrap", bgcolor:"background.paper", p:2, borderRadius:2, boxShadow:1, alignItems:"center" }}>
@@ -175,7 +175,7 @@ function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, onSe
         <MenuItem value="">All statuses</MenuItem>
         {(["PENDING", "READY", "REJECTED", "ARCHIVED"] as const).map((value) => <MenuItem key={value} value={value}>{value === "PENDING" ? "Processing" : value.charAt(0) + value.slice(1).toLowerCase()}</MenuItem>)}
       </TextField> : null}
-      {!imagesOnly ? <TextField size="small" select label="Media type" value={type} onChange={(event) => setType(event.target.value as typeof type)} sx={{ minWidth: 160 }}>
+      {!imagesOnly && !documentsOnly ? <TextField size="small" select label="Media type" value={type} onChange={(event) => setType(event.target.value as typeof type)} sx={{ minWidth: 160 }}>
         <MenuItem value="">All types</MenuItem><MenuItem value="image">Images</MenuItem><MenuItem value="document">Documents</MenuItem>
       </TextField> : null}
       <Button type="submit">Search media</Button>

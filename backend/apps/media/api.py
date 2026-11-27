@@ -1,4 +1,7 @@
 """Site-scoped catalog APIs; never serve bytes or trust client-supplied MIME."""
+import hashlib
+from django.http import HttpResponse
+from django.utils.http import content_disposition_header
 from django.urls import path
 from .delivery import image_response, ImageDeliveryMixin
 from drf_spectacular.utils import extend_schema, extend_schema_field, OpenApiParameter
@@ -13,10 +16,11 @@ from apps.accounts.authentication import KeycloakBearerAuthentication
 from apps.sites.api.access import translate_domain_errors
 from apps.sites.api.serializers import StrictFields
 from .models import MediaAsset, MediaAssetReference, MediaUsage, MediaCleanup
-from .selectors import assets_for_site, asset_for_site, references_for_site, authorize
+from .selectors import assets_for_site, asset_for_site, references_for_site, authorize, DOCUMENT_TYPES
 from .removal import remove_asset
 from .services import update_asset, attach_asset, detach_reference
 from .uploads import upload_asset, limits, UploadTooLarge
+from .storage import ObjectStorage
 
 
 class AssetSerializer(serializers.ModelSerializer):
@@ -123,7 +127,7 @@ class AssetUpload(MediaView):
         OpenApiParameter("Content-Length", int, OpenApiParameter.HEADER, required=True, description="Exact file byte length. The stream is also bounded independently while reading."),
         OpenApiParameter("filename", str, required=True, description="Original filename only; object keys are allocated server-side."),
     ], request={"application/octet-stream": {"type": "string", "format": "binary"}},
-        responses={202: AssetSerializer}, description="Raw bounded file stream. Requires Site content.media.upload and effective MEDIA before reading bytes. Byte detection overrides Content-Type. PNG/JPEG/WebP, passive PDF and UTF-8 plain text only. Returns id, status and processing_state; PENDING/PROCESSING is never selectable. Replays return the same asset. No object paths or public URLs are accepted or returned.")
+        responses={202: AssetSerializer}, description="Raw bounded file stream. Requires Site content.media.upload and effective MEDIA before reading bytes. The server validates filename extension, detected signature, and bounded ZIP/Office package structure; the browser Content-Type is not trusted. Supports PNG/JPEG/WebP, passive PDF, UTF-8 plain text, DOCX, XLSX and ZIP. Document maximum defaults to 50 MiB and is configurable. Returns id, status and processing_state; PENDING/PROCESSING is quarantined and never selectable or downloadable. Replays return the same asset. No object paths or public URLs are accepted or returned.")
     def post(self, request, site_pk):
         if set(request.query_params) != {"filename"}:
             raise ValidationError("Only the filename query parameter is accepted.")
@@ -152,7 +156,7 @@ class UploadPolicy(MediaView):
 class AssetQuery(StrictFields, serializers.Serializer):
     search = serializers.CharField(max_length=255, required=False, allow_blank=True, help_text="Case-insensitive literal media-name or original-filename substring.")
     status = serializers.ChoiceField(choices=MediaAsset.Status.choices, required=False)
-    type = serializers.ChoiceField(choices=["image", "document"], required=False, help_text="image: image/*; document: PDF or plain text.")
+    type = serializers.ChoiceField(choices=["image", "document"], required=False, help_text="image: image/*; document: PDF, plain text, DOCX, XLSX or ZIP.")
     content_type = serializers.RegexField(r"\A[a-z0-9.+-]+/[a-z0-9.+-]+\Z", max_length=127, required=False, help_text="Exact detected MIME, never a filename extension or client upload header.")
     ready_images = serializers.BooleanField(required=False, default=False, help_text="READY PNG/JPEG/WebP only, filtered before pagination. Shared by Image, Slider and Gallery pickers.")
     ordering = serializers.ChoiceField(choices=["created_at", "-created_at", "original_filename", "-original_filename"], default="-created_at", required=False, help_text="Always followed by ascending asset UUID as a stable tie-breaker.")
@@ -225,6 +229,38 @@ class AssetDetail(MediaView):
         with translate_domain_errors():
             asset,job=remove_asset(request.user,site_pk,asset_id)
         return Response(DeletionSerializer(deletion_data(asset,job)).data,status=202)
+
+
+class AssetDownload(MediaView):
+    """Authenticated, Site-scoped attachment delivery after processing gates."""
+    def get(self, request, site_pk, asset_id):
+        asset = asset_for_site(request.user, site_pk, asset_id)
+        job = getattr(asset, "processing", None)
+        if asset.status != MediaAsset.Status.READY or asset.detected_mime not in DOCUMENT_TYPES or job is None or job.state != "READY":
+            from django.http import Http404
+            raise Http404("Document file is unavailable.")
+        try:
+            bucket, key = asset.storage_reference.split(":", 1)
+            with ObjectStorage().open(bucket, key) as stream:
+                body = stream.read(asset.byte_count + 1)
+        except Exception as error:
+            from rest_framework.exceptions import APIException
+            raise APIException("Document storage is temporarily unavailable.") from error
+        if len(body) != asset.byte_count or hashlib.sha256(body).hexdigest() != asset.checksum:
+            from django.http import Http404
+            raise Http404("Document file is unavailable.")
+        if not MediaAsset.objects.filter(pk=asset.pk, site_id=site_pk, status=MediaAsset.Status.READY,
+                deleted_at__isnull=True, processing__state="READY").exists():
+            from django.http import Http404
+            raise Http404("Document file is unavailable.")
+        response = HttpResponse(body, content_type=asset.detected_mime)
+        inline_pdf = request.query_params.get("inline") == "1" and asset.detected_mime == "application/pdf"
+        response["Content-Disposition"] = content_disposition_header(not inline_pdf, asset.original_filename)
+        response["Cache-Control"] = "private, no-store"
+        response["X-Content-Type-Options"] = "nosniff"
+        response["X-Robots-Tag"] = "noindex, nofollow"
+        response["Vary"] = "Authorization, Cookie, Host"
+        return response
 
 
 class UsageSerializer(serializers.Serializer):
@@ -309,6 +345,7 @@ urlpatterns = [
     path("<int:site_pk>/assets/<uuid:asset_id>/references/",AssetInventory.as_view(),name="media-asset-inventory"),
     path("<int:site_pk>/assets/<uuid:asset_id>/deletion/",AssetDeletionStatus.as_view(),name="media-asset-deletion"),
     path("<int:site_pk>/assets/<uuid:asset_id>/image/", AssetImage.as_view(), name="media-asset-image"),
+    path("<int:site_pk>/assets/<uuid:asset_id>/download/", AssetDownload.as_view(), name="media-asset-download"),
     path("<int:site_pk>/assets/<uuid:asset_id>/", AssetDetail.as_view(), name="media-asset-detail"),
     path("<int:site_pk>/asset-references/", ReferenceList.as_view(), name="media-reference-list"),
     path("<int:site_pk>/asset-references/<uuid:reference_id>/", ReferenceDetail.as_view(), name="media-reference-detail"),

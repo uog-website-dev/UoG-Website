@@ -76,6 +76,7 @@ const widgetIcons = {
   table_of_contents: FormatListBulletedOutlined,
   menu_anchor: AnchorOutlined,
   countdown: TimerOutlined,
+  document_list: FolderOutlined,
 } satisfies Record<WidgetType, typeof ImageOutlined>;
 
 export function WidgetIcon({ type }: { type: WidgetType }) {

@@ -109,6 +109,7 @@ export function siteFromContext(status: number, body: unknown): PublicSiteContex
       pages: modules.includes("PAGES"),
       posts: modules.includes("POSTS"),
       menus: modules.includes("MENUS"),
+      documents: modules.includes("DOCUMENTS"),
     },
   };
 }

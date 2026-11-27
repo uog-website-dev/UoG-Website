@@ -16,7 +16,7 @@ import {ApprovedIcon,Countdown,VideoPlayer,LocationMap,TableOfContents} from "./
 import { BlockView } from "./public-page";
 import { ContentCarousel, decorativeStyle, HeroView, PresentationLink } from "./visual-presentation";
 import {WidgetRuntimeProvider, SiteTitleWidget, SiteLogoWidget, LoopGridWidget, TaxonomyFilterWidget,
-  BreadcrumbsWidget, TaxonomyWidget, PostTitleWidget, PostExcerptWidget, FeaturedImageWidget, ContactFormWidget, PostPreviewSelector, MenuWidget} from "./widget-runtime";
+  BreadcrumbsWidget, TaxonomyWidget, PostTitleWidget, PostExcerptWidget, FeaturedImageWidget, ContactFormWidget, PostPreviewSelector, MenuWidget, DocumentListWidget} from "./widget-runtime";
 
 const tokenGap = {none:0,sm:1,md:2,lg:4} as const;
 const focusRing = {"&:focus-visible":{outline:"3px solid",outlineColor:"primary.main",outlineOffset:2}} as const;
@@ -179,6 +179,7 @@ function VisualWidget({widget,siteId,pageTitle,viewportWidth,demoteH1}:{widget:W
     case "site_title":body=<SiteTitleWidget/>;break;
     case "site_logo":body=<SiteLogoWidget/>;break;
     case "menu":body=<MenuWidget menu_code={widget.props.menu_code}/>;break;
+    case "document_list":body=<DocumentListWidget {...widget.props}/>;break;
     case "loop_grid":case "blog":body=<LoopGridWidget {...widget.props}/>;break;
     case "recent_posts":body=<LoopGridWidget {...widget.props} presentation="list"/>;break;
     case "post_carousel":case "loop_carousel":body=<LoopGridWidget {...widget.props} carousel/>;break;

@@ -15,6 +15,9 @@ def authorize(actor, site_id, permission="content.media.view", *, using="default
 
 
 READY_IMAGE_TYPES = ("image/png", "image/jpeg", "image/webp")
+DOCUMENT_TYPES = ("application/pdf", "text/plain",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/zip")
 
 
 def assets_for_site(actor, site_id, *, status=None, search="", type=None,
@@ -28,7 +31,7 @@ def assets_for_site(actor, site_id, *, status=None, search="", type=None,
     if type == "image":
         rows = rows.filter(detected_mime__startswith="image/")
     elif type == "document":
-        rows = rows.filter(detected_mime__in=("application/pdf", "text/plain"))
+        rows = rows.filter(detected_mime__in=DOCUMENT_TYPES)
     if content_type:
         rows = rows.filter(detected_mime=content_type)
     if ready_images:

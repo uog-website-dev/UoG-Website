@@ -4,6 +4,11 @@ import logging
 import tempfile
 import uuid
 import warnings
+import zipfile
+import posixpath
+import stat
+import xml.etree.ElementTree as ET
+import zlib
 from datetime import timedelta
 
 from django.conf import settings
@@ -36,14 +41,74 @@ class StorageUnavailable(APIException):
 
 
 def limits():
-    return {"image_max_bytes": settings.MEDIA_UPLOAD_MAX_BYTES,
+    return {"image_max_bytes": min(settings.MEDIA_IMAGE_MAX_BYTES, settings.MEDIA_UPLOAD_MAX_BYTES),
             "text_max_bytes": min(settings.MEDIA_TEXT_MAX_BYTES, settings.MEDIA_UPLOAD_MAX_BYTES),
             "pdf_max_bytes": min(settings.MEDIA_PDF_MAX_BYTES, settings.MEDIA_UPLOAD_MAX_BYTES),
+            "document_max_bytes": min(settings.MEDIA_DOCUMENT_MAX_BYTES, settings.MEDIA_UPLOAD_MAX_BYTES),
             "image_max_pixels": settings.MEDIA_IMAGE_MAX_PIXELS,
-            "mime_types": ["image/png", "image/jpeg", "image/webp", "text/plain", "application/pdf"]}
+            "mime_types": ["image/png", "image/jpeg", "image/webp", "text/plain", "application/pdf",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/zip"],
+            "extensions": [".png", ".jpg", ".jpeg", ".webp", ".txt", ".pdf", ".docx", ".xlsx", ".zip"]}
 
 
-def inspect_upload(stream, destination):
+DOCUMENT_MIMES = {
+    ".pdf": "application/pdf",
+    ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ".zip": "application/zip",
+}
+EXTENSION_MIMES = {**DOCUMENT_MIMES, ".txt": "text/plain", ".png": "image/png",
+    ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp"}
+
+
+def _validate_archive(stream, *, package_type=None):
+    """Inspect archive structure while it remains quarantined and private."""
+    stream.seek(0)
+    try:
+        with zipfile.ZipFile(stream) as archive:
+            entries = archive.infolist()
+            if not entries or len(entries) > 5000:
+                raise ValueError("Archive entry count is not allowed.")
+            total = 0
+            names = set()
+            for item in entries:
+                name = item.filename.replace("\\", "/")
+                normalized = posixpath.normpath(name)
+                components = normalized.split("/")
+                mode = item.external_attr >> 16
+                if (not name or name.startswith("/") or any(part == ".." for part in components)
+                        or ":" in components[0] or stat.S_ISLNK(mode) or item.flag_bits & 0x1):
+                    raise ValueError("Unsafe or encrypted archive entry.")
+                if normalized in names:
+                    raise ValueError("Duplicate archive paths are not allowed.")
+                names.add(normalized)
+                total += item.file_size
+                if total > 250 * 1024 * 1024 or (item.file_size > 1024 * 1024 and item.compress_size == 0) or (
+                    item.compress_size and item.file_size > max(10 * 1024 * 1024, item.compress_size * 100)
+                ):
+                    raise ValueError("Archive expansion limit exceeded.")
+                if name.lower().endswith(("vbaproject.bin", ".js", ".jse", ".vbs", ".ps1", ".bat", ".cmd", ".exe", ".scr")):
+                    raise ValueError("Active content is not allowed in document archives.")
+            if package_type:
+                required = {"[Content_Types].xml", "_rels/.rels", package_type}
+                if not required.issubset(names):
+                    raise ValueError("Office package structure is invalid.")
+                for member in ("[Content_Types].xml", package_type):
+                    if archive.getinfo(member).file_size > 8 * 1024 * 1024:
+                        raise ValueError("Office package metadata is too large.")
+                    ET.fromstring(archive.read(member))
+            if archive.testzip() is not None:
+                raise ValueError("Archive member checksum is invalid.")
+    except (zipfile.BadZipFile, OSError, RuntimeError, KeyError, ET.ParseError, zlib.error, EOFError) as error:
+        raise ValidationError("Invalid or corrupted document archive.") from error
+    except ValueError as error:
+        raise ValidationError(str(error)) from error
+    finally:
+        stream.seek(0)
+
+
+def inspect_upload(stream, destination, *, filename=None):
     """Bound disk/memory while reading; no client MIME or suffix is authoritative."""
     total, digest, prefix = 0, hashlib.sha256(), b""
     while True:
@@ -60,12 +125,23 @@ def inspect_upload(stream, destination):
         raise ValidationError("Empty files are not allowed.")
     destination.seek(0)
     width = height = None
+    suffix = posixpath.splitext(filename.lower())[1] if filename else None
     if prefix.startswith(b"%PDF-"):
         if total > settings.MEDIA_PDF_MAX_BYTES:
             raise UploadTooLarge("PDF exceeds the configured PDF limit.")
         validate_pdf(destination)
         mime = "application/pdf"
+    elif prefix.startswith(b"PK\x03\x04"):
+        if total > settings.MEDIA_DOCUMENT_MAX_BYTES:
+            raise UploadTooLarge("Document exceeds the configured document limit.")
+        if suffix not in {".docx", ".xlsx", ".zip"}:
+            raise ValidationError("ZIP-based documents must use a .docx, .xlsx or .zip filename.")
+        package_type = {".docx": "word/document.xml", ".xlsx": "xl/workbook.xml"}.get(suffix)
+        _validate_archive(destination, package_type=package_type)
+        mime = DOCUMENT_MIMES[suffix]
     elif prefix.startswith((b"\x89PNG\r\n\x1a\n", b"\xff\xd8\xff")) or (prefix.startswith(b"RIFF") and prefix[8:12] == b"WEBP"):
+        if total > settings.MEDIA_IMAGE_MAX_BYTES:
+            raise UploadTooLarge("Image exceeds the configured image limit.")
         from PIL import Image
         try:
             with warnings.catch_warnings():
@@ -94,6 +170,14 @@ def inspect_upload(stream, destination):
         if any(ord(c) < 32 and c not in "\r\n\t" for c in text) or "<" in text or text.startswith(("MZ", "#!", "%!", "PK")):
             raise ValidationError("Unsafe or unsupported media format.")
         mime = "text/plain"
+    if filename:
+        expected_mime = EXTENSION_MIMES.get(suffix)
+        if expected_mime is None:
+            raise ValidationError("Unsupported file extension. Choose PDF, DOCX, XLSX or ZIP.")
+        if expected_mime != mime:
+            raise ValidationError("File extension does not match the detected file type.")
+    elif mime in {DOCUMENT_MIMES[".docx"], DOCUMENT_MIMES[".xlsx"], DOCUMENT_MIMES[".zip"]}:
+        raise ValidationError("A filename is required to validate this document type.")
     destination.seek(0)
     return dict(detected_mime=mime, byte_count=total, checksum=digest.hexdigest(), width=width, height=height)
 
@@ -167,7 +251,7 @@ def upload_asset(actor, site_id, stream, *, filename, request_key, storage=None,
     bucket, key = storage_parts(reference, site_id)
     try:
         with tempfile.TemporaryFile() as spool:
-            technical = inspect_upload(stream, spool)
+            technical = inspect_upload(stream, spool, filename=filename)
             if expected_length is not None and technical["byte_count"] != expected_length:
                 raise ValidationError("Transfer was incomplete. Retry using the same Idempotency-Key.")
             # Single PUT avoids leaked S3 multipart uploads. Temporary disk bounds RAM.

@@ -13303,6 +13303,241 @@
                           "type",
                           "props"
                         ]
+                      },
+                      {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+                          },
+                          "type": {
+                            "const": "document_list"
+                          },
+                          "props": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                              "categories": {
+                                "type": "array",
+                                "maxItems": 50,
+                                "items": {
+                                  "type": "string",
+                                  "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+                                }
+                              },
+                              "limit": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 50
+                              },
+                              "display": {
+                                "enum": [
+                                  "grid",
+                                  "list"
+                                ]
+                              },
+                              "sort": {
+                                "enum": [
+                                  "newest",
+                                  "oldest",
+                                  "title"
+                                ]
+                              },
+                              "title": {
+                                "type": "string",
+                                "maxLength": 120
+                              }
+                            },
+                            "required": [
+                              "categories",
+                              "limit",
+                              "display",
+                              "sort"
+                            ]
+                          },
+                          "style": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                              "align": {
+                                "enum": [
+                                  "start",
+                                  "center",
+                                  "end"
+                                ]
+                              },
+                              "content_width": {
+                                "enum": [
+                                  "full",
+                                  "wide",
+                                  "reading"
+                                ]
+                              },
+                              "tone": {
+                                "enum": [
+                                  "default",
+                                  "muted",
+                                  "brand"
+                                ]
+                              },
+                              "gap": {
+                                "enum": [
+                                  "none",
+                                  "sm",
+                                  "md",
+                                  "lg"
+                                ]
+                              },
+                              "padding": {
+                                "enum": [
+                                  "none",
+                                  "sm",
+                                  "md",
+                                  "lg",
+                                  "xl"
+                                ]
+                              },
+                              "text_size": {
+                                "enum": [
+                                  "sm",
+                                  "md",
+                                  "lg",
+                                  "xl",
+                                  "display"
+                                ]
+                              },
+                              "text_color": {
+                                "oneOf": [
+                                  {
+                                    "enum": [
+                                      "default",
+                                      "brand",
+                                      "inverse",
+                                      "muted"
+                                    ]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "pattern": "^#[0-9A-Fa-f]{6}$"
+                                  }
+                                ]
+                              },
+                              "background": {
+                                "oneOf": [
+                                  {
+                                    "enum": [
+                                      "none",
+                                      "paper",
+                                      "mist",
+                                      "navy",
+                                      "blue",
+                                      "gold",
+                                      "blue_gradient",
+                                      "navy_gradient"
+                                    ]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "pattern": "^#[0-9A-Fa-f]{6}$"
+                                  }
+                                ]
+                              },
+                              "radius": {
+                                "enum": [
+                                  "none",
+                                  "sm",
+                                  "md",
+                                  "lg",
+                                  "pill"
+                                ]
+                              },
+                              "border": {
+                                "enum": [
+                                  "none",
+                                  "subtle",
+                                  "brand"
+                                ]
+                              },
+                              "shadow": {
+                                "enum": [
+                                  "none",
+                                  "sm",
+                                  "md",
+                                  "lg"
+                                ]
+                              },
+                              "image_fit": {
+                                "enum": [
+                                  "natural",
+                                  "cover",
+                                  "contain"
+                                ]
+                              },
+                              "image_position": {
+                                "enum": [
+                                  "center",
+                                  "top",
+                                  "bottom",
+                                  "left",
+                                  "right"
+                                ]
+                              },
+                              "image_height": {
+                                "enum": [
+                                  "natural",
+                                  "compact",
+                                  "medium",
+                                  "tall"
+                                ]
+                              }
+                            },
+                            "required": []
+                          },
+                          "responsive": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                              "tablet": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "gap": {
+                                    "enum": [
+                                      "none",
+                                      "sm",
+                                      "md",
+                                      "lg"
+                                    ]
+                                  }
+                                },
+                                "required": []
+                              },
+                              "mobile": {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "properties": {
+                                  "gap": {
+                                    "enum": [
+                                      "none",
+                                      "sm",
+                                      "md",
+                                      "lg"
+                                    ]
+                                  }
+                                },
+                                "required": []
+                              }
+                            },
+                            "required": []
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "type",
+                          "props"
+                        ]
                       }
                     ]
                   }
@@ -13792,6 +14027,11 @@
       "type": "countdown",
       "label": "Countdown",
       "profile": "countdown"
+    },
+    {
+      "type": "document_list",
+      "label": "Document List",
+      "profile": "document_list"
     }
   ]
 }

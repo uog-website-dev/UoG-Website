@@ -9,6 +9,9 @@ import TextField from "@mui/material/TextField";
 import Alert from "@mui/material/Alert";
 import Link from "@mui/material/Link";
 import {usePublicSiteBranding, publicLogoSource} from "./site-branding";
+import { documentsCopy } from "@uog/types";
+import { fetchSiteWidgetData, SiteWidgetRequestError } from "@uog/api-client";
+import type { SiteWidgetEnvelope } from "@uog/api-client";
 import {HorizontalCards,containedImageHover,newsCardHover} from "./horizontal-cards";
 import {ContentCarousel} from "./visual-presentation";
 import { menusFromResponse, SiteNavigation } from "./site-navigation";
@@ -23,7 +26,7 @@ export interface WidgetPost {
   featured_alt?:string;
   published_at?:string;
 }
-interface WidgetEnvelope {site:number; results:Record<string,unknown>[]}
+type WidgetEnvelope = SiteWidgetEnvelope;
 interface WidgetScope {
   siteId:number|null;
   pageId?:string;
@@ -68,11 +71,7 @@ function WidgetScopeProvider({siteId,pageId,preview=false,mediaBase,children}:{s
         if(prefix===undefined)throw new Error("Preview data is unavailable.");
         endpoint=`${prefix}/sites/${siteId}/pages/${pageId}/widget-data`;
       }
-      const response=await fetch(`${endpoint}?${params}`,{cache:"no-store",signal:controller.signal,headers:{Accept:"application/json"}});
-      if(!response.ok)throw new Error(response.status===404?"This content source is unavailable for this Site.":"Content could not be loaded. Try again.");
-      const body=await response.json() as WidgetEnvelope;
-      if(body.site!==siteId || !Array.isArray(body.results))throw new Error("Content does not belong to the active Site.");
-      return body;
+      return await fetchSiteWidgetData(fetch,endpoint,query,siteId,controller.signal);
     })();
     pending.current.set(key,request);
     void request.finally(()=>{pending.current.delete(key);controllers.current.delete(controller);}).catch(()=>{});
@@ -94,14 +93,14 @@ function useWidgetData(query:Record<string,string>,enabled=true) {
     if(!scope||!enabled)return;
     setState({key,data:null,error:null});
     void scope.load(JSON.parse(key)).then(data=>{if(active)setState({key,data,error:null});})
-      .catch(error=>{if(active)setState({key,data:null,error:error instanceof Error?error.message:"Content is unavailable."});});
+      .catch(error=>{if(active)setState({key,data:null,error:error instanceof SiteWidgetRequestError?error.kind:error instanceof Error?error.message:"invalid_response"});});
     return ()=>{active=false;};
   },[key,scope?.load,attempt,enabled]);
   return {data:state.key===key?state.data:null,error:state.key===key?state.error:null,retry:()=>setAttempt(value=>value+1)};
 }
 
 function DataState({error,retry}:{error:string|null;retry:()=>void}) {
-  if(error)return <Alert severity="warning" action={<Button onClick={retry}>Retry</Button>}>{error}</Alert>;
+  if(error)return <Alert severity="warning" action={<Button onClick={retry}>Retry</Button>}>{error==="unavailable"?"This content source is unavailable for this Site.":error==="invalid_response"?"Content does not belong to the active Site.":"Content could not be loaded. Try again."}</Alert>;
   return <Typography role="status">Loading content…</Typography>;
 }
 
@@ -121,6 +120,26 @@ export function MenuWidget({menu_code}:{menu_code:string}) {
   const menu=menusFromResponse(200,{locations:{header:state.data.results}}).header;
   if(!menu.length)return <Typography role="status">No published navigation links are available.</Typography>;
   return <SiteNavigation items={menu} label="Page navigation" dropdown/>;
+}
+
+export function DocumentListWidget({categories,limit,display,sort,title}:{categories:string[];limit:number;display:"grid"|"list";sort:"newest"|"oldest"|"title";title?:string}) {
+  const scope=useContext(ScopeContext);
+  const branding=usePublicSiteBranding();
+  const copy=documentsCopy(branding.languages?.[0]);
+  const state=useWidgetData({source:"documents",limit:String(limit),document_categories:categories.join(","),document_sort:sort},scope?.siteId!==null);
+  if(scope?.siteId===null)return <Typography role="status" color="text.secondary">{copy.sectionLabel}</Typography>;
+  if(!state.data)return state.error?<Alert severity="warning" action={<Button onClick={state.retry}>{copy.retry}</Button>}>{copy.loadError}</Alert>:<Typography role="status">{copy.loading}</Typography>;
+  const rows=state.data.results.filter(row=>typeof row.id==="string"&&typeof row.title==="string"&&typeof row.download_url==="string"&&row.download_url.startsWith("/api/v1/site-context/documents/"));
+  return <Box component="section" aria-label={title||copy.sectionLabel} sx={{display:"grid",gap:2,minWidth:0}}>
+    {title?<Typography component="h2" variant="h5">{title}</Typography>:null}
+    {rows.length?<Box component="ul" aria-label={title||copy.sectionLabel} sx={{listStyle:"none",m:0,p:0,display:"grid",gridTemplateColumns:display==="grid"?{xs:"minmax(0,1fr)",sm:"repeat(2,minmax(0,1fr))",lg:"repeat(3,minmax(0,1fr))"}:"minmax(0,1fr)",gap:2}}>
+      {rows.map(row=><Box component="li" key={String(row.id)} sx={{minWidth:0,p:2,border:1,borderColor:"divider",borderRadius:2,display:"grid",gap:1,alignContent:"start"}}>
+        <Typography component="h3" variant="subtitle1" sx={{overflowWrap:"anywhere",m:0}}>{String(row.title)}</Typography>
+        {typeof row.description==="string"&&row.description?<Typography variant="body2" color="text.secondary">{row.description}</Typography>:null}
+        <Link href={String(row.download_url)}>{row.require_login_to_download?copy.signInDownload:copy.download}{typeof row.file_type==="string"?` · ${row.file_type.split("/").pop()?.toUpperCase()}`:""}</Link>
+      </Box>)}
+    </Box>:<Typography role="status" color="text.secondary">{copy.empty}</Typography>}
+  </Box>;
 }
 
 function libraryBase(scope:WidgetScope) {

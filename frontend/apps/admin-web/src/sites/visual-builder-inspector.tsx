@@ -7,6 +7,7 @@ import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import type { MediaPickerResult } from "@/sites/media-picker";
+import { documentsCopy } from "@uog/types";
 import {
   SAFE_LINK_MESSAGE,
   fieldMessages,
@@ -100,6 +101,8 @@ export interface InspectorFieldsProps {
   prefix?: string;
   path?: string;
   errors?: Record<string, string[]>;
+  documentCategories?: Array<{id:string;name:string}>;
+  documentLanguage?: string;
 }
 
 /**
@@ -116,6 +119,8 @@ export function InspectorFields({
   prefix = "",
   path = "",
   errors = {},
+  documentCategories = [],
+  documentLanguage="en",
 }: InspectorFieldsProps) {
   if (schema.type === "object") {
     const record = (value ?? {}) as Record<string, unknown>;
@@ -125,7 +130,10 @@ export function InspectorFields({
           .filter(([key]) => key !== "id" && key !== "children")
           .sort(([a],[b])=>Number(a==="items")-Number(b==="items"))
           .map(([key, child]) => {
-            const label = prefix ? `${prefix} ${human(key)}` : human(key);
+            const isDocumentWidget=Boolean(schema.properties?.categories);
+            const documentCopy=documentsCopy(documentLanguage);
+            const documentLabels:Record<string,string>={categories:documentCopy.categoryLabel,limit:documentCopy.limitLabel,display:documentCopy.displayLabel,sort:documentCopy.sortLabel,title:documentCopy.titleLabel};
+            const label = prefix ? `${prefix} ${human(key)}` : isDocumentWidget?(documentLabels[key]??human(key)):human(key);
             const fieldPath = path ? `${path}.${key}` : key;
             const messages = fieldMessages(errors, fieldPath);
             const update = (next: unknown) => onChange({ ...record, [key]: next });
@@ -200,6 +208,16 @@ export function InspectorFields({
             }
 
             if (child.type === "array") {
+              if (child.items?.type === "string") {
+                if(key==="categories")return <TextField key={key} select size="small" label={label} value={Array.isArray(record[key])?record[key] as string[]:[]} disabled={disabled} SelectProps={{multiple:true,native:true}}
+                  helperText={messages.join(" ")||documentsCopy(documentLanguage).categoryHint} error={messages.length>0}
+                  onChange={event=>update(typeof event.target.value==="string"?event.target.value.split(","):event.target.value as unknown as string[])}>
+                  {documentCategories.map(category=><option key={category.id} value={category.id}>{category.name}</option>)}
+                </TextField>;
+                return <TextField key={key} size="small" label={label} value={Array.isArray(record[key]) ? (record[key] as string[]).join(", ") : ""}
+                  disabled={disabled} multiline minRows={2} helperText={messages.join(" ")||"Enter values separated by commas."}
+                  error={messages.length>0} onChange={event=>update(event.target.value.split(",").map(value=>value.trim()).filter(Boolean))}/>;
+              }
               return (
                 <Box key={key}>
                   <Typography variant="subtitle2">{label}</Typography>
@@ -212,6 +230,8 @@ export function InspectorFields({
                     prefix={label}
                     path={fieldPath}
                     errors={errors}
+                    documentCategories={documentCategories}
+                    documentLanguage={documentLanguage}
                   />
                 </Box>
               );
@@ -253,7 +273,7 @@ export function InspectorFields({
                 >
                   {!schema.required?.includes(key)?<MenuItem value="">Default</MenuItem>:null}
                   {child.enum.map((option) => (
-                    <MenuItem key={String(option)} value={String(option)}>{child.enumLabels?.[String(option)]??human(String(option))}</MenuItem>
+                    <MenuItem key={String(option)} value={String(option)}>{isDocumentWidget?(documentCopy[String(option) as keyof typeof documentCopy]??human(String(option))):child.enumLabels?.[String(option)]??human(String(option))}</MenuItem>
                   ))}
                 </TextField>
               );
@@ -316,6 +336,8 @@ export function InspectorFields({
               prefix={`${prefix} ${index + 1}`.trim()}
               path={`${path}[${index}]`}
               errors={errors}
+              documentCategories={documentCategories}
+              documentLanguage={documentLanguage}
             />
             {"children" in item ? (
               <Typography variant="caption">Select nested content from the outline.</Typography>

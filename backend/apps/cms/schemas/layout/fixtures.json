@@ -2855,5 +2855,41 @@
         }
       ]
     }
+  },
+  {
+    "name": "catalog-document_list",
+    "valid": true,
+    "layout": {
+      "schema_version": 1,
+      "rows": [
+        {
+          "id": "row-1",
+          "type": "section",
+          "ratios": [
+            100
+          ],
+          "columns": [
+            {
+              "id": "column-1",
+              "type": "column",
+              "children": [
+                {
+                  "id": "widget-1",
+                  "type": "document_list",
+                  "props": {
+                    "categories": [
+                      "00000000-0000-4000-8000-000000000001"
+                    ],
+                    "limit": 1,
+                    "display": "grid",
+                    "sort": "newest"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
   }
 ]

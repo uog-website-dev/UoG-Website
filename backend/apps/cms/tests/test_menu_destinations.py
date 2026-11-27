@@ -64,6 +64,20 @@ def test_news_category_options_scope_and_disabled_module(api):
     assert api.client.get(api.base+'targets/',**api.header).json()['categories']==[]
     assert publish(api,url).status_code==400
 
+def test_documents_destination_resolves_to_current_site_and_hides_when_disabled(api):
+    from apps.cms.tests.test_public_site_hosts import _enable
+    _enable([api.site], 'MEDIA')
+    _enable([api.site], 'DOCUMENTS')
+    url=_menu(api)
+    item=_post(api,url+'items/',{'label':'Documents & Files','item_type':'docs'},_tag(api,url))
+    assert item.status_code==201,item.content
+    assert item.json()['destination_status']=='ready'
+    host=_host(api.site)
+    assert publish(api,url).status_code==200
+    assert view(api,host)[0]['href']=='/documents'
+    disable_module_for_site(api.site.pk,Module.objects.get(code='DOCUMENTS').pk)
+    assert view(api,host)==[]
+
 def test_unavailable_page_warns_and_blocks_promotion_without_replacing_public(api):
     enable(api,'PAGES');url=_menu(api);_item(api,url,'Existing')
     host=_host(api.site);assert publish(api,url).status_code==200

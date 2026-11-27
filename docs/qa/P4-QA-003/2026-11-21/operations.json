@@ -1,20 +1,20 @@
-{
-  "backup_restore": {
-    "status": "PENDING_OWNER_EVIDENCE",
-    "reviewed": false,
-    "owner": null,
-    "evidence": null
-  },
-  "deployment_rollback": {
-    "status": "PENDING_OWNER_EVIDENCE",
-    "reviewed": false,
-    "owner": null,
-    "evidence": null
-  },
-  "logs_monitoring": {
-    "status": "PENDING_OWNER_EVIDENCE",
-    "reviewed": false,
-    "owner": null,
-    "evidence": null
-  }
+{
+  "backup_restore": {
+    "status": "PENDING_OWNER_EVIDENCE",
+    "reviewed": false,
+    "owner": null,
+    "evidence": null
+  },
+  "deployment_rollback": {
+    "status": "PENDING_OWNER_EVIDENCE",
+    "reviewed": false,
+    "owner": null,
+    "evidence": null
+  },
+  "logs_monitoring": {
+    "status": "PENDING_OWNER_EVIDENCE",
+    "reviewed": false,
+    "owner": null,
+    "evidence": null
+  }
 }

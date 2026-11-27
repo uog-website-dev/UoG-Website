@@ -107,6 +107,7 @@ function LocalMenuEditor({
   canPublish,
   moduleOn,
   onChanged,
+  language,
 }: {
   siteId: number;
   state: MenuLocationState;
@@ -116,6 +117,7 @@ function LocalMenuEditor({
   moduleOn: boolean;
   targets: MenuTargets;
   onChanged: () => void;
+  language: string;
 }) {
   const toast = useToast();
   const menu = state.menu;
@@ -214,6 +216,7 @@ function LocalMenuEditor({
         siteId={siteId}
         state={state}
         targets={targets}
+        language={language}
         enabled={moduleOn && canWrite}
         onChanged={onChanged}
         onBusyChange={setItemBusy}
@@ -228,10 +231,12 @@ export function SiteMenusPanel({
   siteId,
   menusEnabled,
   permissions,
+  language="en",
 }: {
   siteId: number;
   menusEnabled: boolean | null;
   permissions: readonly string[];
+  language?: string;
 }) {
   const toast = useToast();
   const invalidateSite = useInvalidateSite();
@@ -355,6 +360,7 @@ export function SiteMenusPanel({
                     canPublish={canPublish}
                     moduleOn={moduleOn && !navigation.loading && !navigation.refreshing && !selectedTree.refreshing && (state.itemsLoaded !== false || selectedTree.data?.menu.id === state.menu.id)}
                     targets={targets}
+                    language={language}
                     onChanged={reloadMenus}
                   />
                 ))}

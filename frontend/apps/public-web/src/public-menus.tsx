@@ -95,7 +95,7 @@ function Breadcrumbs({ postTitle }: { postTitle: string | null }) {
         })}
         </MuiBreadcrumbs>
       </Box>
-    </Box>
+    </Container>
   );
 }
 
@@ -207,4 +207,4 @@ export function PublicMenus({ children, initialMenus = null }: { children: React
       <BackToTop />
     </BreadcrumbTitleContext.Provider>
   );
-}
+}

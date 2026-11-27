@@ -422,6 +422,14 @@ def _create_publication_snapshot(content, *, using, approval=None):
             "is_homepage": content.is_homepage,
             "parent_id": str(content.parent_id) if content.parent_id else None,
         })
+    elif content._meta.label_lower == "cms.document":
+        payload.update({"title": content.title, "slug": content.slug,
+                        "description": content.description,
+                        "file_reference": content.file_reference,
+                        "version": content.version,
+                        "effective_date": content.effective_date.isoformat() if content.effective_date else None,
+                        "categories": sorted(str(pk) for pk in content.categories.values_list("pk", flat=True)),
+                        "visibility": content.visibility})
     elif content._meta.model_name == "post":
         author = content.author
         author_name = ""
@@ -457,6 +465,17 @@ def _create_publication_snapshot(content, *, using, approval=None):
                     "id", "code", "name", "slug",
                 )
             ],
+        })
+    elif content._meta.model_name == "document":
+        payload.update({
+            "title": content.title, "slug": content.slug,
+            "description": content.description,
+            "file_reference": content.file_reference,
+            "version": content.version,
+            "effective_date": content.effective_date.isoformat() if content.effective_date else None,
+            "visibility": content.visibility,
+            "categories": [{"id": str(row.pk), "name": row.name, "slug": row.slug}
+                for row in content.categories.order_by("name", "id")],
         })
     PublishedContentSnapshot.objects.using(using).create(
         content_id=content.pk,

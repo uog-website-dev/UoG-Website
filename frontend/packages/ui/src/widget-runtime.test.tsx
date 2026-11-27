@@ -5,6 +5,7 @@ import type {WidgetNode,VisualLayout} from "@uog/types";
 import {EMPTY_SITE} from "./public-site";
 import {PublicSiteBrandingProvider} from "./site-branding";
 import {VisualLayoutView} from "./visual-layout";
+import {documentsCopy} from "@uog/types";
 import {VisualPostProvider} from "./widget-runtime";
 
 const page="00000000-0000-4000-8000-000000000001";
@@ -17,6 +18,21 @@ beforeEach(()=>{fetchMock.mockReset();vi.stubGlobal("fetch",fetchMock);});
 afterEach(()=>vi.unstubAllGlobals());
 
 describe("Configured widget runtime",()=>{
+  it("shows localized loading, failure recovery, and document cards across narrow viewports",async()=>{
+    const docLayout=layout([{id:"documents",type:"document_list",props:{categories:[],limit:3,display:"grid",sort:"newest",title:"Official documents"}}]);
+    fetchMock.mockRejectedValueOnce(new Error("network failure"));
+    fetchMock.mockResolvedValueOnce(response(11,[{id:"doc-1",title:"Policy",description:"Published policy",file_type:"application/pdf",download_url:"/api/v1/site-context/documents/doc-1/file/",require_login_to_download:true}]));
+    render(<PublicSiteBrandingProvider site={{...EMPTY_SITE,id:11,languages:["am"]}}><VisualLayoutView siteId={11} pageTitle="Home" viewportWidth={390} layout={docLayout}/></PublicSiteBrandingProvider>);
+    expect(await screen.findByText(documentsCopy("am").loadError)).toBeTruthy();
+    await userEvent.click(screen.getByRole("button",{name:documentsCopy("am").retry}));
+    expect((await screen.findByRole("link",{name:/ለማውረድ ይግቡ/})).getAttribute("href")).toBe("/api/v1/site-context/documents/doc-1/file/");
+    expect(screen.getByText("Published policy")).toBeTruthy();
+  });
+  it("localizes the empty Documents state",async()=>{
+    fetchMock.mockResolvedValue(response(11,[]));
+    render(<PublicSiteBrandingProvider site={{...EMPTY_SITE,id:11,languages:["am"]}}><VisualLayoutView siteId={11} pageTitle="Home" layout={layout([{id:"documents",type:"document_list",props:{categories:[],limit:5,display:"list",sort:"title"}}])}/></PublicSiteBrandingProvider>);
+    expect(await screen.findByText(documentsCopy("am").empty)).toBeTruthy();
+  });
   it("loads Site title and logo once with same-Site identity data",async()=>{
     fetchMock.mockResolvedValue(response(11,[{name:"Informatics",logo_asset_id:asset,logo_url:"/api/v1/site-context/identity/logo/"}]));
     render(<VisualLayoutView siteId={11} pageTitle="Home" layout={layout([{id:"title",type:"site_title",props:{}},{id:"logo",type:"site_logo",props:{}}])}/>);

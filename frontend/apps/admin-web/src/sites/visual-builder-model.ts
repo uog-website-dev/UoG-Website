@@ -16,7 +16,7 @@ export const categories: {label:string; shortLabel:string; types:WidgetType[]}[]
   {label:"Content",shortLabel:"CONTENT",types:["headline","editor","blog","recent_posts","post_carousel","testimonials","author_box","features"]},
   {label:"Information",shortLabel:"INFORMATION",types:["taxonomy","icon","price_table","google_maps","social_media_buttons"]},
   {label:"Page & navigation",shortLabel:"PAGE NAV",types:["page_title","breadcrumbs"]},
-  {label:"Dynamic content",shortLabel:"DYNAMIC",types:["loop_grid","loop_carousel","taxonomy_filter","post_title","post_excerpt","featured_image"]},
+  {label:"Dynamic content",shortLabel:"DYNAMIC",types:["loop_grid","loop_carousel","taxonomy_filter","post_title","post_excerpt","featured_image","document_list"]},
   {label:"Page utilities",shortLabel:"PAGE",types:["alert","table_of_contents","menu_anchor","countdown"]},
 ];
 export const uid = () => crypto.randomUUID();
