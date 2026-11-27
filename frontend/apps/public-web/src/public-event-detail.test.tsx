@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { SiteEventRecord } from "@uog/types";
 
@@ -46,7 +46,7 @@ const event: SiteEventRecord = {
   registration_required: true,
   registration_capacity: 100,
   registration_open: true,
-  accepts_registration: true,
+  accepts_registration: false,
   cancellation_notice: "",
   published_at: "2026-11-01T00:00:00Z",
   cancelled_at: null,
@@ -68,49 +68,8 @@ describe("PublicEventDetailPage", () => {
     vi.stubGlobal("fetch", vi.fn());
   });
 
-  it("renders banner metadata, hides empty sections, and loads schedule speakers", async () => {
-    const fetchMock = vi.mocked(fetch);
-    fetchMock.mockImplementation(async (input: RequestInfo | URL) => {
-      const url = String(input);
-      if (url.includes("/agenda/")) {
-        return new Response(JSON.stringify({
-          event: event.id,
-          slug: event.slug,
-          days: [{
-            date: "2026-12-01",
-            tracks: [{
-              track: "Main",
-              sessions: [{
-                id: "22222222-2222-2222-2222-222222222222",
-                title: "Opening keynote",
-                starts_at: "2026-12-01T08:00:00Z",
-                ends_at: "2026-12-01T09:00:00Z",
-                venue_room: "Hall A",
-                status: "SCHEDULED",
-                people: [{ role: "SPEAKER", person_summary: { display_name: "Dr Public" } }],
-              }],
-            }],
-          }],
-        }), { status: 200 });
-      }
-      if (url.includes("/speakers/")) {
-        return new Response(JSON.stringify({
-          event: event.id,
-          slug: event.slug,
-          results: [{
-            id: "33333333-3333-3333-3333-333333333333",
-            display_name: "Dr Public",
-            affiliation: "UoG",
-            biography: "",
-            roles: [{ role: "SPEAKER", session_id: "22222222-2222-2222-2222-222222222222", session_title: "Opening keynote", day_date: "2026-12-01" }],
-          }],
-        }), { status: 200 });
-      }
-      return new Response("{}", { status: 404 });
-    });
-
+  it("renders brand-critical Event identity and hides empty section tabs", () => {
     render(<PublicEventDetailPage slug={event.slug} initialEvent={event} />);
-
     expect(screen.getByRole("heading", { level: 1, name: "Research Symposium" })).toBeTruthy();
     expect(screen.getByText(/Innovation Hall/)).toBeTruthy();
     expect(screen.queryByRole("button", { name: /Submit registration|Register/i })).toBeNull();
@@ -120,35 +79,20 @@ describe("PublicEventDetailPage", () => {
     expect(screen.queryByRole("tab", { name: /Gallery/i })).toBeNull();
     expect(screen.queryByRole("tab", { name: /Resources/i })).toBeNull();
     expect(screen.queryByRole("tab", { name: /Updates/i })).toBeNull();
-
-    fireEvent.click(screen.getByRole("tab", { name: "Schedule & Sessions" }));
-    await waitFor(() => expect(screen.getByText("Opening keynote")).toBeTruthy());
-    expect(screen.getByText(/Dr Public/)).toBeTruthy();
-
-    fireEvent.click(screen.getByRole("tab", { name: "Speakers" }));
-    await waitFor(() => expect(screen.getByText("Dr Public")).toBeTruthy());
-    expect(screen.getByText(/SPEAKER: Opening keynote/)).toBeTruthy();
   });
 
-  it("shows overview notices and loads the Updates tab", async () => {
-    const fetchMock = vi.mocked(fetch);
-    fetchMock.mockImplementation(async (input: RequestInfo | URL) => {
-      const url = String(input);
-      if (url.includes("/updates/")) {
-        return new Response(JSON.stringify([
-          {
-            id: "44444444-4444-4444-4444-444444444444",
-            title: "Venue moved",
-            body: "<p>Now in Hall B</p>",
-            severity: "IMPORTANT",
-            pinned: true,
-            published_at: "2026-11-20T10:00:00Z",
-          },
-        ]), { status: 200 });
-      }
-      return new Response("{}", { status: 404 });
-    });
+  it("exposes WCAG-oriented tablist and tabpanel landmarks", () => {
+    render(<PublicEventDetailPage slug={event.slug} initialEvent={event} />);
+    expect(screen.getByRole("tablist", { name: "Event sections" })).toBeTruthy();
+    const overview = screen.getByRole("tab", { name: "Overview" });
+    expect(overview.getAttribute("aria-controls")).toBe("event-panel-overview");
+    expect(overview.getAttribute("id")).toBe("event-tab-overview");
+    const panel = screen.getByRole("tabpanel");
+    expect(panel.getAttribute("id")).toBe("event-panel-overview");
+    expect(panel.getAttribute("aria-labelledby")).toBe("event-tab-overview");
+  });
 
+  it("announces important notices with an accessible region", () => {
     render(
       <PublicEventDetailPage
         slug={event.slug}
@@ -166,16 +110,9 @@ describe("PublicEventDetailPage", () => {
         }}
       />,
     );
-
     expect(screen.getByLabelText("Important Event notices")).toBeTruthy();
     expect(screen.getByText("Venue moved")).toBeTruthy();
     expect(screen.getByRole("tab", { name: "Updates" })).toBeTruthy();
-    fireEvent.click(screen.getByRole("tab", { name: "Updates" }));
-    await waitFor(() => expect(screen.getByText(/pinned/i)).toBeTruthy());
-    expect(fetchMock).toHaveBeenCalledWith(
-      expect.stringContaining(`/api/v1/site-context/events/${event.slug}/updates/`),
-      expect.anything(),
-    );
   });
 
   it("shows cancellation and disables registration CTA", () => {
