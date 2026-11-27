@@ -13,6 +13,7 @@ import Tabs from "@mui/material/Tabs";
 import Typography from "@mui/material/Typography";
 import { publicFetchInit, usePublicSiteBranding } from "@uog/ui";
 import type { EventLifecycle, PublicEventSections, SiteEventRecord } from "@uog/types";
+import { usePublicBreadcrumbTitle } from "@/public-menus";
 
 type DetailTab = "overview" | "schedule" | "speakers";
 
@@ -179,6 +180,7 @@ export function PublicEventDetailPage({
   const [speakers, setSpeakers] = useState<PublicSpeaker[] | null>(null);
   const [sectionError, setSectionError] = useState("");
   const focusRef = useRef<HTMLElement | null>(null);
+  usePublicBreadcrumbTitle(event?.title ?? null);
 
   const tabs = useMemo(() => visibleTabs(event?.sections), [event?.sections]);
   const activeTab: DetailTab = tabs.includes(requestedTab) ? requestedTab : "overview";
@@ -323,24 +325,6 @@ export function PublicEventDetailPage({
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5, maxWidth: 960 }}>
-      <Box
-        component="nav"
-        aria-label="Breadcrumb"
-        sx={{ display: "flex", alignItems: "center", gap: 0.75, flexWrap: "wrap", color: "text.secondary", fontSize: "0.875rem" }}
-      >
-        <Link href="/" underline="hover" color="inherit" sx={{ minHeight: 44, display: "inline-flex", alignItems: "center" }}>
-          Home
-        </Link>
-        <Box component="span" aria-hidden>›</Box>
-        <Link href="/events" underline="hover" color="inherit" sx={{ minHeight: 44, display: "inline-flex", alignItems: "center" }}>
-          Events
-        </Link>
-        <Box component="span" aria-hidden>›</Box>
-        <Typography component="span" aria-current="page" color="text.primary" sx={{ fontWeight: 600 }}>
-          {event.title}
-        </Typography>
-      </Box>
-
       {event.banner_url ? (
         <Box
           component="img"
