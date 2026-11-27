@@ -10,12 +10,12 @@
 export const CENTRAL_MODULE_PERMISSION = "platform.sites.manage_registry";
 
 export interface SiteSection {
-  key: "header" | "footer" | "appearance" | "dashboard" | "sidebars" | "pages" | "builder" | "homepage" | "posts" | "documents" | "events" | "menus" | "media" | "users";
+  key: "header" | "footer" | "appearance" | "dashboard" | "sidebars" | "pages" | "builder" | "homepage" | "posts" | "documents" | "events" | "staff-directory" | "menus" | "media" | "users";
   label: string;
-  segment: "header" | "footer" | "appearance" | "" | "sidebars" | "pages" | "builder" | "homepage" | "posts" | "documents" | "events" | "menus" | "media" | "users";
-  module: "PAGES" | "POSTS" | "DOCUMENTS" | "EVENTS" | "MENUS" | "MEDIA" | "VISUAL_BUILDER" | null;
+  segment: "header" | "footer" | "appearance" | "" | "sidebars" | "pages" | "builder" | "homepage" | "posts" | "documents" | "events" | "staff-directory" | "menus" | "media" | "users";
+  module: "PAGES" | "POSTS" | "DOCUMENTS" | "EVENTS" | "STAFF_DIRECTORY" | "MENUS" | "MEDIA" | "VISUAL_BUILDER" | null;
   /** Any one enabled module satisfies the gate; used when two modules qualify. */
-  modules?: readonly ("PAGES" | "POSTS" | "DOCUMENTS" | "EVENTS" | "MENUS" | "MEDIA" | "VISUAL_BUILDER")[];
+  modules?: readonly ("PAGES" | "POSTS" | "DOCUMENTS" | "EVENTS" | "STAFF_DIRECTORY" | "MENUS" | "MEDIA" | "VISUAL_BUILDER")[];
   permissions: readonly string[];
 }
 
@@ -71,6 +71,7 @@ export const SITE_SECTIONS: readonly SiteSection[] = [
   },
   { key: "documents", label: "Documents", segment: "documents", module: "DOCUMENTS", permissions: ["content.documents.view", "content.documents.create", "content.documents.update", "content.documents.publish"] },
   { key: "events", label: "Events", segment: "events", module: "EVENTS", permissions: ["sites.update"] },
+  { key: "staff-directory", label: "Staff Directory", segment: "staff-directory", module: "STAFF_DIRECTORY", permissions: ["sites.update"] },
   { key: "media", label: "Media", segment: "media", module: "MEDIA", permissions: ["content.media.view"] },
   {
     key: "users",
@@ -144,6 +145,17 @@ export const EVENT_NAV_ITEMS = [
 
 export function eventAdminHref(siteId: number, suffix: "" | "/new" | "/settings" = ""): string {
   return `${siteAdminHref(siteId, "events")}${suffix}`;
+}
+
+/** In-section Staff Directory links: All Staff, Add New, Directory Settings. */
+export const STAFF_NAV_ITEMS = [
+  { key: "all", label: "All Staff", suffix: "" },
+  { key: "new", label: "Add New", suffix: "/new" },
+  { key: "settings", label: "Directory Settings", suffix: "/settings" },
+] as const;
+
+export function staffAdminHref(siteId: number, suffix: "" | "/new" | "/settings" = ""): string {
+  return `${siteAdminHref(siteId, "staff-directory")}${suffix}`;
 }
 
 /** Preserve only a section, never another Site's object ID, query or draft. */

@@ -121,9 +121,13 @@ class SiteContextView(APIView):
             public_identity["footer"] = public_footer(current)
             public_identity["header"] = public_header(current)
             from apps.sites.events import public_event_settings_payload
+            from apps.sites.staff import public_staff_directory_settings_payload
             events = public_event_settings_payload(current)
             if events is not None:
                 public_identity["events"] = events
+            staff = public_staff_directory_settings_payload(current)
+            if staff is not None:
+                public_identity["staff_directory"] = staff
             public_identity["languages"] = list(configuration["language"]["enabled"])
             body = {
                 "site": {

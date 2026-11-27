@@ -15391,6 +15391,331 @@ paths:
               schema:
                 type: string
                 format: uuid
+  /api/v1/sites/{id}/staff-directory-settings/:
+    get:
+      operationId: v1_sites_staff_directory_settings_retrieve
+      description: Read Site-owned Staff Directory settings and resolved Organization
+        scope. Requires sites.update and an enabled STAFF_DIRECTORY module. Aggregation
+        eligibility never grants cross-Site write access.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this site.
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Sites
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffDirectorySettingsEnvelope'
+          description: ''
+          headers:
+            ETag:
+              description: Strong representation validator. Echo exactly in If-Match
+                for mutations.
+              schema:
+                type: string
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+    patch:
+      operationId: v1_sites_staff_directory_settings_partial_update
+      description: Update this Site's Staff Directory settings using the strong ETag.
+        Disabled STAFF_DIRECTORY blocks writes without deleting retained settings.
+        Unknown ownership/version fields are rejected.
+      parameters:
+      - in: header
+        name: If-Match
+        schema:
+          type: string
+        description: Exact strong ETag from GET detail.
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this site.
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Sites
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedStaffDirectorySettingsRequest'
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffDirectorySettingsEnvelope'
+          description: ''
+          headers:
+            ETag:
+              description: Strong representation validator. Echo exactly in If-Match
+                for mutations.
+              schema:
+                type: string
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          description: Invalid body, malformed input, or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    title:
+                    - This field is required.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '409':
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '412':
+          description: If-Match does not match the current strong ETag. Retrieve and
+            reconcile changes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '415':
+          description: Unsupported request content type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '428':
+          description: If-Match header is required for this mutation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '503':
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
   /api/v1/sites/{id}/suspend/:
     post:
       operationId: v1_sites_suspend_create
@@ -55248,6 +55573,18 @@ components:
       - schema_version
       - sections
       - site
+    DefaultSortEnum:
+      enum:
+      - NAME_ASC
+      - NAME_DESC
+      - TITLE_ASC
+      - DEPARTMENT_ASC
+      type: string
+      description: |-
+        * `NAME_ASC` - Name (A–Z)
+        * `NAME_DESC` - Name (Z–A)
+        * `TITLE_ASC` - Title (A–Z)
+        * `DEPARTMENT_ASC` - Department (A–Z)
     Deletion:
       type: object
       properties:
@@ -69864,6 +70201,23 @@ components:
           nullable: true
           description: Template whose defaults were copied at provisioning. Later
             template edits do not change this Site.
+    PatchedStaffDirectorySettingsRequest:
+      type: object
+      properties:
+        page_size:
+          type: integer
+          maximum: 100
+          minimum: 5
+        default_sort:
+          $ref: '#/components/schemas/DefaultSortEnum'
+        public_list_path:
+          type: string
+          minLength: 1
+          maxLength: 2048
+        presentation:
+          $ref: '#/components/schemas/PresentationEnum'
+        public_aggregation_eligible:
+          type: boolean
     Permission:
       type: object
       properties:
@@ -80364,6 +80718,14 @@ components:
       - template_id
       - template_version
       - visual_layout
+    PresentationEnum:
+      enum:
+      - LIST
+      - CARDS
+      type: string
+      description: |-
+        * `LIST` - List
+        * `CARDS` - Cards
     PreviewRequestRequest:
       type: object
       properties:
@@ -83462,6 +83824,71 @@ components:
         * `global` - global
         * `inherited` - inherited
         * `local` - local
+    StaffDirectoryScope:
+      type: object
+      properties:
+        organization_unit_id:
+          type: integer
+          nullable: true
+        organization_ids:
+          type: array
+          items:
+            type: integer
+        mode:
+          type: string
+        aggregation_site_ids:
+          type: array
+          items:
+            type: integer
+      required:
+      - aggregation_site_ids
+      - mode
+      - organization_ids
+      - organization_unit_id
+    StaffDirectorySettings:
+      type: object
+      properties:
+        page_size:
+          type: integer
+          maximum: 100
+          minimum: 5
+        default_sort:
+          $ref: '#/components/schemas/DefaultSortEnum'
+        public_list_path:
+          type: string
+          maxLength: 2048
+        presentation:
+          $ref: '#/components/schemas/PresentationEnum'
+        public_aggregation_eligible:
+          type: boolean
+    StaffDirectorySettingsEnvelope:
+      type: object
+      properties:
+        site:
+          type: integer
+        version:
+          type: integer
+        settings:
+          $ref: '#/components/schemas/StaffDirectorySettings'
+        scope:
+          $ref: '#/components/schemas/StaffDirectoryScope'
+        updated_at:
+          type: string
+          nullable: true
+        modules:
+          type: array
+          items:
+            type: string
+        aggregation_write_access:
+          type: boolean
+      required:
+      - aggregation_write_access
+      - modules
+      - scope
+      - settings
+      - site
+      - updated_at
+      - version
     StateEnum:
       enum:
       - QUEUED

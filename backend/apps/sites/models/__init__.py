@@ -8,8 +8,9 @@ from .site import Site
 from .site_domain import SiteDomain
 from .site_module import SiteModule
 from .site_template import SiteTemplate
+from .staff_directory_settings import SiteStaffDirectorySettings
 
 __all__ = [
-    "SiteEventSettings", "SiteFooter", "SiteHeader", "Module", "ModuleDependency", "Site", "SiteDomain", "SiteModule",
-    "SiteModuleOperation", "SiteModuleOperationChange", "SiteTemplate",
+    "SiteEventSettings", "SiteStaffDirectorySettings", "SiteFooter", "SiteHeader", "Module", "ModuleDependency",
+    "Site", "SiteDomain", "SiteModule", "SiteModuleOperation", "SiteModuleOperationChange", "SiteTemplate",
 ]

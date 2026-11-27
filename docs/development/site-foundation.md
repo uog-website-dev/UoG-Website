@@ -40,12 +40,12 @@ template, with Events enabled, and checks that the migration set is
 unchanged. Disk and applied Site migrations remain `0001` through
 `0006_sitemodule_settings`. No new schema migration is part of this gate.
 
-Module enablement uses the existing registry gate. The test records
-`EVENTS` and `STAFF_DIRECTORY` as shipped only inside the test transaction,
-then marks those registered rows implemented and globally enabled through
-the API. The development database was not given that shipment, so its four
-Sites stay active with independent configuration and **no** enabled modules.
-Planned capabilities are still not usable.
+Module enablement uses the existing registry gate. `EVENTS` and
+`STAFF_DIRECTORY` are shipped as `IMPLEMENTED` by migrations `0022_events_module`
+and `0024_staff_directory_module`. Site Admins still must enable each module
+per Site; disabling retains settings/profiles and hides public module surfaces.
+See [site-events.md](../api/site-events.md) and
+[site-staff-directory.md](../api/site-staff-directory.md).
 
 ## Running development data
 

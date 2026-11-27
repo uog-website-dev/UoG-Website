@@ -14,7 +14,7 @@ vi.mock("@uog/ui", async () => {
     usePublicSiteBranding: () => ({
       id: 11,
       name: "Detail Site",
-      modules: { pages: true, posts: true, menus: true, documents: false, events: true },
+      modules: { pages: true, posts: true, menus: true, documents: false, events: true, staffDirectory: false },
     }),
     publicFetchInit: () => ({ cache: "no-store" as RequestCache }),
   };
