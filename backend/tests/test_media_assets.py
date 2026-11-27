@@ -102,6 +102,28 @@ def test_image_detection_and_stream_limit_do_not_depend_on_filename(monkeypatch)
         inspect_bytes(io.BytesIO(b"123"))
 
 
+def test_private_document_object_rejects_anonymous_minio_get(media_world):
+    """The object exists, but an unsigned direct MinIO URL must not read it."""
+    import urllib.error
+    import urllib.request
+    import uuid
+    from django.conf import settings
+    from apps.media.storage import ObjectStorage
+
+    key = f"sites/{media_world.a.pk}/security-check/{uuid.uuid4()}"
+    storage = ObjectStorage()
+    storage.put("platform-documents", key, io.BytesIO(b"private test object"), content_type="application/pdf")
+    try:
+        url = f"{settings.AWS_S3_ENDPOINT_URL.rstrip('/')}/platform-documents/{key}"
+        try:
+            with urllib.request.urlopen(url, timeout=5) as response:
+                assert response.status != 200, "Anonymous MinIO returned a private document object."
+        except urllib.error.HTTPError as error:
+            assert error.code == 403
+    finally:
+        storage.delete("platform-documents", key)
+
+
 def test_stored_bytes_define_metadata_and_duplicate_object_is_a_database_conflict(media_world):
     w = media_world
     row = _asset(w)

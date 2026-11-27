@@ -54,4 +54,17 @@ describe("Site Documents authoring",()=>{
   expect(screen.queryByRole("button",{name:"Add New Document"})).toBeNull();
   expect(screen.queryByRole("button",{name:"Edit"})).toBeNull();
  });
+ it("does not expose document preview without the document view permission",()=>{
+  permissions=["content.documents.create"];
+  docs=[{id:"no-view",site:17,title:"Restricted policy",slug:"restricted",description:"",file_reference:"sites/17/assets/file",file_type:"application/pdf",original_filename:"policy.pdf",file_size:10,categories:[],status:"DRAFT",creator:1,created_at:"2026-01-01T00:00:00Z",updated_at:"2026-01-01T00:00:00Z",revision_number:1,published_at:null,version:"1",effective_date:null,visibility:"HIDDEN",visible_to_public:false,require_login_to_download:true}];
+  render(<SiteDocuments/>);
+  expect(screen.queryByRole("link",{name:"Preview"})).toBeNull();
+ });
+ it("hides publish controls from a view-only user",()=>{
+  permissions=["content.documents.view"];
+  docs=[{id:"published-view-only",site:17,title:"Published policy",slug:"published",description:"",file_reference:"sites/17/assets/file",file_type:"application/pdf",original_filename:"policy.pdf",file_size:10,categories:[],status:"PUBLISHED",creator:1,created_at:"2026-01-01T00:00:00Z",updated_at:"2026-01-01T00:00:00Z",revision_number:1,published_at:"2026-01-01T00:00:00Z",version:"1",effective_date:null,visibility:"PUBLIC",visible_to_public:true,require_login_to_download:false}];
+  render(<SiteDocuments/>);
+  expect(screen.queryByRole("button",{name:"Unpublish"})).toBeNull();
+  expect(screen.getByRole("link",{name:"Preview"})).toBeTruthy();
+ });
 });

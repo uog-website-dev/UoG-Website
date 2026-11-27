@@ -69,6 +69,15 @@ class Command(BaseCommand):
             self.stdout.write(
                 self.style.SUCCESS(f"policy set: {PUBLIC_READ_BUCKET} (public read)")
             )
+            for bucket in ("platform-private", "platform-documents"):
+                client.put_bucket_acl(Bucket=bucket, ACL="private")
+                try:
+                    client.delete_bucket_policy(Bucket=bucket)
+                except ClientError as error:
+                    # No existing policy is already the required private state.
+                    if error.response.get("Error", {}).get("Code") not in {"NoSuchBucketPolicy", "NoSuchPolicy"}:
+                        raise
+                self.stdout.write(self.style.SUCCESS(f"access enforced: {bucket} (private)"))
         except (BotoCoreError, ClientError) as exc:
             raise CommandError(f"Object storage bootstrap failed: {exc}") from exc
 
