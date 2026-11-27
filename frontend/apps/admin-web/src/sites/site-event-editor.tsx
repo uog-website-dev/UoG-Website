@@ -28,6 +28,7 @@ import { getSiteEventSettings } from "@/app/sites/event-actions";
 import { eventAdminHref } from "@/sites/site-admin";
 import { useSiteAdmin } from "@/sites/site-admin-frame";
 import { SiteEventsNav } from "@/sites/site-events-nav";
+import { SiteEventPeople } from "@/sites/site-event-people";
 import { SiteEventSchedule } from "@/sites/site-event-schedule";
 
 function unwrap<T>(result: { ok: true; data: T } | { ok: false; error: unknown }): T {
@@ -220,15 +221,18 @@ export function SiteEventEditorPage({
         <TextField label="Registration capacity" type="number" value={values.registration_capacity ?? ""} onChange={(e) => set("registration_capacity", e.target.value === "" ? null : Number(e.target.value))} disabled={busy || readOnly} fullWidth inputProps={{ min: 1 }} />
       </Box>
       {mode !== "create" && eventId ? (
-        <SiteEventSchedule
-          siteId={siteId}
-          eventId={eventId}
-          eventEtag={etag}
-          onEventEtagChange={setEtag}
-          readOnly={readOnly}
-        />
+        <>
+          <SiteEventPeople siteId={siteId} eventId={eventId} readOnly={readOnly} />
+          <SiteEventSchedule
+            siteId={siteId}
+            eventId={eventId}
+            eventEtag={etag}
+            onEventEtagChange={setEtag}
+            readOnly={readOnly}
+          />
+        </>
       ) : (
-        <Alert severity="info">Save the Event draft first to manage its multi-day session schedule.</Alert>
+        <Alert severity="info">Save the Event draft first to manage speakers and the multi-day session schedule.</Alert>
       )}
       {!readOnly ? (
         <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>

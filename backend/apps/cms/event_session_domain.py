@@ -149,13 +149,24 @@ def detect_session_conflicts(event: Event, *, candidate: EventSession | None = N
     rows = list(active_sessions(event).order_by("starts_at", "id"))
     if candidate is not None and candidate.removed_at is None:
         rows = [row for row in rows if row.pk != candidate.pk] + [candidate]
+    from apps.cms.event_person_domain import person_ids_for_sessions
+    from apps.cms.event_person_models import EventPerson
+
+    assigned = person_ids_for_sessions([row.pk for row in rows if row.pk])
+    person_names = {
+        str(pk): name
+        for pk, name in EventPerson.objects.filter(
+            event=event, removed_at__isnull=True, pk__in={pid for ids in assigned.values() for pid in ids},
+        ).values_list("pk", "display_name")
+    }
     room_conflicts: list[dict] = []
     speaker_warnings: list[dict] = []
     for index, left in enumerate(rows):
         if left.status == SessionStatus.CANCELLED:
             continue
         left_room = _normalize_room(left.venue_room)
-        left_speakers = {label.lower() for label in (left.speaker_labels or [])}
+        left_labels = {label.lower() for label in (left.speaker_labels or [])}
+        left_people = set(assigned.get(str(left.pk), set()))
         for right in rows[index + 1:]:
             if right.status == SessionStatus.CANCELLED:
                 continue
@@ -169,13 +180,20 @@ def detect_session_conflicts(event: Event, *, candidate: EventSession | None = N
                     "session_ids": [str(left.pk) if left.pk else "candidate", str(right.pk) if right.pk else "candidate"],
                     "room": left.venue_room,
                 })
-            shared = left_speakers & {label.lower() for label in (right.speaker_labels or [])}
-            if shared:
+            right_labels = {label.lower() for label in (right.speaker_labels or [])}
+            shared_labels = left_labels & right_labels
+            shared_people = left_people & set(assigned.get(str(right.pk), set()))
+            if shared_labels or shared_people:
+                names = sorted({
+                    *shared_labels,
+                    *(person_names.get(pid, pid) for pid in shared_people),
+                })
                 speaker_warnings.append({
                     "type": "speaker",
-                    "message": f"Speaker conflict for: {', '.join(sorted(shared))}.",
+                    "message": f"Speaker conflict for: {', '.join(names)}.",
                     "session_ids": [str(left.pk) if left.pk else "candidate", str(right.pk) if right.pk else "candidate"],
-                    "speakers": sorted(shared),
+                    "speakers": names,
+                    "person_ids": sorted(shared_people),
                 })
     return {"room_conflicts": room_conflicts, "speaker_warnings": speaker_warnings}
 
@@ -350,6 +368,12 @@ def public_agenda(event: Event) -> list[dict[str, Any]]:
 
 
 def serialize_session(session: EventSession, *, public: bool = False, conflicts: dict | None = None) -> dict[str, Any]:
+    from apps.cms.event_person_domain import public_people_for_session, serialize_assignment, active_assignments
+    people = (
+        public_people_for_session(session)
+        if public
+        else [serialize_assignment(row, public=False) for row in active_assignments(session)]
+    )
     payload = {
         "id": session.pk,
         "event": session.event_id,
@@ -366,6 +390,7 @@ def serialize_session(session: EventSession, *, public: bool = False, conflicts:
         "status": session.status,
         "public_notes": session.public_notes,
         "speaker_labels": list(session.speaker_labels or []),
+        "people": people,
         "version": session.version,
         "updated_at": session.updated_at,
     }

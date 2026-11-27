@@ -519,6 +519,7 @@ SPECTACULAR_SETTINGS = {
         "SessionVisibilityEnum": "apps.cms.event_session_models.SessionVisibility",
         "SessionStatusEnum": "apps.cms.event_session_models.SessionStatus",
         "SessionTypeEnum": "apps.cms.event_session_models.SessionType",
+        "SessionPersonRoleEnum": "apps.cms.event_person_models.SessionPersonRole",
     },
     "POSTPROCESSING_HOOKS": [
         "drf_spectacular.hooks.postprocess_schema_enums",

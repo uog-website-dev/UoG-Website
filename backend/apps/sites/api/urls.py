@@ -12,6 +12,13 @@ from apps.cms.api.event_sessions import (
     SiteEventSessionAction,
     SiteEventSessionsReorder,
 )
+from apps.cms.api.event_people import (
+    SiteEventPeople,
+    SiteEventPersonDetail,
+    SiteEventSessionPeople,
+    SiteEventSessionPersonDetail,
+    SiteEventSessionPeopleReorder,
+)
 from .event_categories import SiteEventCategories, SiteEventCategoryDetail
 from apps.cms.api.sidebars import SidebarViewSet
 from apps.cms.api.menus import MenuViewSet, MenuItemViewSet
@@ -41,6 +48,12 @@ urlpatterns = [
     path("<int:site_pk>/events/", SiteEvents.as_view(), name="site-events"),
     path("<int:site_pk>/events/<uuid:event_id>/", SiteEventDetail.as_view(), name="site-event-detail"),
     path("<int:site_pk>/events/<uuid:event_id>/preview/", SiteEventPreview.as_view(), name="site-event-preview"),
+    path("<int:site_pk>/events/<uuid:event_id>/people/", SiteEventPeople.as_view(), name="site-event-people"),
+    path(
+        "<int:site_pk>/events/<uuid:event_id>/people/<uuid:person_id>/",
+        SiteEventPersonDetail.as_view(),
+        name="site-event-person-detail",
+    ),
     path("<int:site_pk>/events/<uuid:event_id>/sessions/", SiteEventSessions.as_view(), name="site-event-sessions"),
     path(
         "<int:site_pk>/events/<uuid:event_id>/sessions/reorder/",
@@ -51,6 +64,21 @@ urlpatterns = [
         "<int:site_pk>/events/<uuid:event_id>/sessions/<uuid:session_id>/",
         SiteEventSessionDetail.as_view(),
         name="site-event-session-detail",
+    ),
+    path(
+        "<int:site_pk>/events/<uuid:event_id>/sessions/<uuid:session_id>/people/",
+        SiteEventSessionPeople.as_view(),
+        name="site-event-session-people",
+    ),
+    path(
+        "<int:site_pk>/events/<uuid:event_id>/sessions/<uuid:session_id>/people/reorder/",
+        SiteEventSessionPeopleReorder.as_view(),
+        name="site-event-session-people-reorder",
+    ),
+    path(
+        "<int:site_pk>/events/<uuid:event_id>/sessions/<uuid:session_id>/people/<uuid:assignment_id>/",
+        SiteEventSessionPersonDetail.as_view(),
+        name="site-event-session-person-detail",
     ),
     path(
         "<int:site_pk>/events/<uuid:event_id>/sessions/<uuid:session_id>/<str:action>/",

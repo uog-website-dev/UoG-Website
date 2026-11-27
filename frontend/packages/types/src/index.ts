@@ -558,6 +558,7 @@ export * from "./header";
 export * from "./events";
 export * from "./event-record";
 export * from "./event-session";
+export * from "./event-person";
 
 export { MAX_MENU_DEPTH } from "./navigation";
 export { DOCUMENTS_COPY, documentsCopy } from "./documents-copy";
