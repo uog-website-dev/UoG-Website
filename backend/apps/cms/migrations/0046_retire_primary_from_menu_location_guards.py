@@ -13,6 +13,9 @@ def _clear_primary(apps, schema_editor):
         apps.get_model("cms", model).objects.filter(location="primary").delete()
 
 
+# One-way database rewrite: migrate-back tests that share a transaction with
+# pending menu delivery trigger events cannot ALTER these tables (same rationale
+# as 0042_retire_primary_menu_location).
 FORWARD = """
 ALTER TABLE cms_menuinheritance DROP CONSTRAINT IF EXISTS menu_inheritance_location;
 ALTER TABLE cms_menuinheritance ADD CONSTRAINT menu_inheritance_location
@@ -20,15 +23,6 @@ CHECK (location IN ('header', 'footer', 'sidebar', 'secondary'));
 ALTER TABLE cms_menudeliveryversion DROP CONSTRAINT IF EXISTS menu_delivery_version_location;
 ALTER TABLE cms_menudeliveryversion ADD CONSTRAINT menu_delivery_version_location
 CHECK (location IN ('header', 'footer', 'sidebar', 'secondary'));
-"""
-
-REVERSE = """
-ALTER TABLE cms_menuinheritance DROP CONSTRAINT IF EXISTS menu_inheritance_location;
-ALTER TABLE cms_menuinheritance ADD CONSTRAINT menu_inheritance_location
-CHECK (location IN ('header', 'footer', 'sidebar', 'primary', 'secondary'));
-ALTER TABLE cms_menudeliveryversion DROP CONSTRAINT IF EXISTS menu_delivery_version_location;
-ALTER TABLE cms_menudeliveryversion ADD CONSTRAINT menu_delivery_version_location
-CHECK (location IN ('header', 'footer', 'sidebar', 'primary', 'secondary'));
 """
 
 LOCATIONS = ("header", "footer", "sidebar", "secondary")
@@ -54,6 +48,6 @@ class Migration(migrations.Migration):
                     constraint=models.CheckConstraint(condition=Q(location__in=LOCATIONS), name="menu_inheritance_location"),
                 ),
             ],
-            database_operations=[migrations.RunSQL(FORWARD, REVERSE)],
+            database_operations=[migrations.RunSQL(FORWARD, migrations.RunSQL.noop)],
         ),
     ]
