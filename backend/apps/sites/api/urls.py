@@ -19,6 +19,7 @@ from apps.cms.api.event_people import (
     SiteEventSessionPersonDetail,
     SiteEventSessionPeopleReorder,
 )
+from apps.cms.api.event_registrations import SiteEventRegistrations
 from .event_categories import SiteEventCategories, SiteEventCategoryDetail
 from apps.cms.api.sidebars import SidebarViewSet
 from apps.cms.api.menus import MenuViewSet, MenuItemViewSet
@@ -48,6 +49,7 @@ urlpatterns = [
     path("<int:site_pk>/events/", SiteEvents.as_view(), name="site-events"),
     path("<int:site_pk>/events/<uuid:event_id>/", SiteEventDetail.as_view(), name="site-event-detail"),
     path("<int:site_pk>/events/<uuid:event_id>/preview/", SiteEventPreview.as_view(), name="site-event-preview"),
+    path("<int:site_pk>/events/<uuid:event_id>/registrations/", SiteEventRegistrations.as_view(), name="site-event-registrations"),
     path("<int:site_pk>/events/<uuid:event_id>/people/", SiteEventPeople.as_view(), name="site-event-people"),
     path(
         "<int:site_pk>/events/<uuid:event_id>/people/<uuid:person_id>/",

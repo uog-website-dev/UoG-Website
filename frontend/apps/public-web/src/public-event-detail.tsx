@@ -14,6 +14,7 @@ import Typography from "@mui/material/Typography";
 import { publicFetchInit, usePublicSiteBranding } from "@uog/ui";
 import type { EventLifecycle, PublicEventSections, SiteEventRecord } from "@uog/types";
 import { usePublicBreadcrumbTitle } from "@/public-menus";
+import { PublicEventRegistrationForm } from "@/public-event-registration";
 
 type DetailTab = "overview" | "schedule" | "speakers";
 
@@ -321,7 +322,11 @@ export function PublicEventDetailPage({
   }
 
   const cancelled = event.status === "CANCELLED";
-  const registrationEnabled = !cancelled && event.accepts_registration;
+  const registrationState = event.registration_state
+    || (event.registration_required
+      ? (event.accepts_registration ? "OPEN" : "CLOSED")
+      : "OFF");
+  const showRegistrationCta = event.registration_required && registrationState !== "OFF";
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5, maxWidth: 960 }}>
@@ -368,24 +373,31 @@ export function PublicEventDetailPage({
         </Alert>
       ) : null}
 
-      <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-        <Button
-          variant="contained"
-          disabled={!registrationEnabled}
-          aria-disabled={!registrationEnabled}
-          href={registrationEnabled && event.online_url ? event.online_url : undefined}
-          component={registrationEnabled && event.online_url ? "a" : "button"}
-          target={registrationEnabled && event.online_url ? "_blank" : undefined}
-          rel={registrationEnabled && event.online_url ? "noopener noreferrer" : undefined}
-        >
-          {cancelled ? "Registration unavailable" : registrationEnabled ? "Register for this Event" : "Registration closed"}
-        </Button>
+      <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", alignItems: "center" }}>
+        {showRegistrationCta ? (
+          <Chip
+            color={cancelled || registrationState === "CLOSED" || registrationState === "FULL" ? "warning" : "primary"}
+            label={
+              cancelled
+                ? "Registration unavailable"
+                : registrationState === "WAITLIST_AVAILABLE"
+                  ? "Waitlist available"
+                  : registrationState === "OPEN"
+                    ? "Registration open"
+                    : registrationState === "FULL"
+                      ? "Registration full"
+                      : "Registration closed"
+            }
+          />
+        ) : null}
         {(event.contact_name || event.organizer_name) ? (
-          <Typography sx={{ alignSelf: "center" }} color="text.secondary">
+          <Typography color="text.secondary">
             Contact: {event.contact_name || event.organizer_name}
           </Typography>
         ) : null}
       </Box>
+
+      {showRegistrationCta ? <PublicEventRegistrationForm event={event} /> : null}
 
       <Tabs
         value={activeTab}

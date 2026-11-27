@@ -75,8 +75,17 @@ class EventSerializer(StrictFields, serializers.Serializer):
     banner_url = serializers.CharField(read_only=True, allow_null=True)
     registration_required = serializers.BooleanField(required=False)
     registration_capacity = serializers.IntegerField(required=False, allow_null=True, min_value=1)
-    registration_open = serializers.BooleanField(read_only=True)
+    registration_open = serializers.BooleanField(required=False)
+    registration_opens_at = serializers.DateTimeField(required=False, allow_null=True)
+    registration_closes_at = serializers.DateTimeField(required=False, allow_null=True)
+    waitlist_enabled = serializers.BooleanField(required=False)
+    registration_category = serializers.CharField(required=False, allow_blank=True, max_length=120)
+    registration_required_fields = serializers.ListField(
+        child=serializers.CharField(max_length=64), required=False,
+    )
+    registration_notice = serializers.CharField(required=False, allow_blank=True)
     accepts_registration = serializers.BooleanField(read_only=True)
+    registration_state = serializers.CharField(read_only=True, required=False)
     cancellation_notice = serializers.CharField(required=False, allow_blank=True)
     published_at = serializers.DateTimeField(read_only=True, allow_null=True)
     cancelled_at = serializers.DateTimeField(read_only=True, allow_null=True)
@@ -150,6 +159,12 @@ def serialize_event(event: Event, *, public: bool = False) -> dict:
         "registration_required": event.registration_required,
         "registration_capacity": event.registration_capacity,
         "registration_open": event.registration_open,
+        "registration_opens_at": event.registration_opens_at,
+        "registration_closes_at": event.registration_closes_at,
+        "waitlist_enabled": event.waitlist_enabled,
+        "registration_category": event.registration_category,
+        "registration_required_fields": list(event.registration_required_fields or []),
+        "registration_notice": event.registration_notice,
         "accepts_registration": event.accepts_registration,
         "cancellation_notice": event.cancellation_notice,
         "published_at": event.published_at,
@@ -158,12 +173,22 @@ def serialize_event(event: Event, *, public: bool = False) -> dict:
         "created_at": event.created_at,
         "updated_at": event.updated_at,
     }
+    from apps.cms.event_registration_domain import public_registration_state, registration_summary
+    payload["registration_state"] = public_registration_state(event)
     if public:
         payload["sections"] = _public_sections(event)
         payload["contact_name"] = (event.organizer_name or "").strip() or None
+        # Aggregate only — never email lists or attendee rows.
+        payload["registration_summary"] = {
+            "state": payload["registration_state"],
+            "capacity": event.registration_capacity,
+            "seats_remaining": registration_summary(event)["seats_remaining"] if event.registration_required else None,
+            "waitlist_enabled": event.waitlist_enabled,
+        }
     else:
         payload["organizer_email"] = event.organizer_email
         payload["organizer_phone"] = event.organizer_phone
+        payload["registration_summary"] = registration_summary(event)
     return payload
 
 

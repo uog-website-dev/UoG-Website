@@ -113,7 +113,7 @@ describe("PublicEventDetailPage", () => {
 
     expect(screen.getByRole("heading", { level: 1, name: "Research Symposium" })).toBeTruthy();
     expect(screen.getByText(/Innovation Hall/)).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Register for this Event" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /Submit registration|Register/i })).toBeNull();
     expect(screen.getByRole("tab", { name: "Overview" })).toBeTruthy();
     expect(screen.getByRole("tab", { name: "Schedule & Sessions" })).toBeTruthy();
     expect(screen.getByRole("tab", { name: "Speakers" })).toBeTruthy();
@@ -147,7 +147,7 @@ describe("PublicEventDetailPage", () => {
     );
     expect(screen.getByText(/This Event has been cancelled/)).toBeTruthy();
     expect(screen.getByText(/Moved to next term/)).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Registration unavailable" })).toHaveProperty("disabled", true);
+    expect(screen.queryByLabelText("Event registration")).toBeNull();
     expect(screen.queryByRole("tab", { name: "Schedule & Sessions" })).toBeNull();
     expect(screen.queryByRole("tab", { name: "Speakers" })).toBeNull();
   });

@@ -12,6 +12,7 @@ Anonymous visitors discover Events through Host-resolved `/api/v1/site-context/`
 | GET | `/events/{slug}/` | Public detail with section flags. Prefers the Host Site's own Event when slugs collide under Main aggregation. See [public-event-detail.md](./public-event-detail.md). |
 | GET | `/events/{slug}/agenda/` | Multi-day public agenda (date → track → sessions). |
 | GET | `/events/{slug}/speakers/` | Public speakers/moderators for the Speakers tab. |
+| POST | `/events/{slug}/registrations/` | Optional public registration (capacity/waitlist). See [event-registration.md](./event-registration.md). |
 
 `lifecycle` values:
 

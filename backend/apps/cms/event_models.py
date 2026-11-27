@@ -68,6 +68,12 @@ class Event(models.Model):
     registration_required = models.BooleanField(default=False)
     registration_capacity = models.PositiveIntegerField(null=True, blank=True)
     registration_open = models.BooleanField(default=True)
+    registration_opens_at = models.DateTimeField(null=True, blank=True)
+    registration_closes_at = models.DateTimeField(null=True, blank=True)
+    waitlist_enabled = models.BooleanField(default=False)
+    registration_category = models.CharField(max_length=120, blank=True, default="")
+    registration_required_fields = models.JSONField(default=list, blank=True)
+    registration_notice = models.TextField(blank=True, default="")
     cancellation_notice = models.TextField(blank=True, default="")
     published_at = models.DateTimeField(null=True, blank=True)
     cancelled_at = models.DateTimeField(null=True, blank=True)
@@ -134,8 +140,5 @@ class Event(models.Model):
 
     @property
     def accepts_registration(self) -> bool:
-        return (
-            self.status == EventStatus.PUBLISHED
-            and self.registration_open
-            and self.derived_lifecycle() != EventLifecycle.PAST
-        )
+        from apps.cms.event_registration_domain import event_accepts_registration
+        return event_accepts_registration(self)

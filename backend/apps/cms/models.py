@@ -1233,3 +1233,8 @@ from apps.cms.event_person_models import (  # noqa: E402,F401
     SessionPerson,
     SessionPersonRole,
 )
+from apps.cms.event_registration_models import (  # noqa: E402,F401
+    EventRegistration,
+    NotificationDeliveryStatus,
+    RegistrationStatus,
+)
