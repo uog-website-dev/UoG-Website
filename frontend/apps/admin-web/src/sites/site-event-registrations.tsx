@@ -11,6 +11,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import {
   actOnSiteEventParticipant,
+  checkInSiteEventParticipant,
   createSiteEventParticipant,
   exportSiteEventParticipantsCsv,
   fetchSiteEventParticipantBadge,
@@ -180,6 +181,20 @@ export function SiteEventRegistrations({
     anchor.download = result.data.filename;
     anchor.click();
     URL.revokeObjectURL(url);
+  }
+
+  async function onCheckIn(row: EventRegistrationRow, override = false) {
+    setBusy(true);
+    const result = await checkInSiteEventParticipant(siteId, eventId, row.id, { override });
+    setBusy(false);
+    if (!result.ok) {
+      setError(result.error.message || "Check-in failed.");
+      return;
+    }
+    if (result.data.replayed) {
+      setError("");
+    }
+    await load();
   }
 
   const totalPages = inventory ? Math.max(1, Math.ceil(inventory.count / inventory.page_size)) : 1;
@@ -352,6 +367,16 @@ export function SiteEventRegistrations({
                   <Button size="small" onClick={() => void onAction(row, "cancel")} disabled={busy}>Cancel</Button>
                 ) : null}
                 <Button size="small" onClick={() => void onBadge(row)} disabled={busy}>Print badge</Button>
+                {row.status === "CONFIRMED" || row.status === "INVITED" ? (
+                  <Button size="small" variant="contained" onClick={() => void onCheckIn(row)} disabled={busy}>
+                    Check in
+                  </Button>
+                ) : null}
+                {row.status === "CANCELLED" ? (
+                  <Button size="small" color="warning" onClick={() => void onCheckIn(row, true)} disabled={busy}>
+                    Override check-in
+                  </Button>
+                ) : null}
                 <Button size="small" color="warning" onClick={() => void onAction(row, "delete")} disabled={busy}>
                   Soft delete
                 </Button>

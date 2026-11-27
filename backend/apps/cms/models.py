@@ -1238,6 +1238,10 @@ from apps.cms.event_registration_models import (  # noqa: E402,F401
     NotificationDeliveryStatus,
     RegistrationStatus,
 )
+from apps.cms.event_attendance_models import (  # noqa: E402,F401
+    AttendanceMethod,
+    EventAttendance,
+)
 from apps.cms.event_resource_models import (  # noqa: E402,F401
     EventResource,
     ResourceCategory,

@@ -19,6 +19,14 @@ from apps.cms.api.event_people import (
     SiteEventSessionPersonDetail,
     SiteEventSessionPeopleReorder,
 )
+from apps.cms.api.event_attendance import (
+    SiteEventAttendanceList,
+    SiteEventCheckIn,
+    SiteEventCheckInScan,
+    SiteEventCheckOut,
+    SiteEventReport,
+    SiteEventReportExport,
+)
 from apps.cms.api.event_registrations import (
     SiteEventRegistrationBadge,
     SiteEventRegistrationDetail,
@@ -88,6 +96,36 @@ urlpatterns = [
         "<int:site_pk>/events/<uuid:event_id>/registrations/<uuid:registration_id>/badge/",
         SiteEventRegistrationBadge.as_view(),
         name="site-event-registration-badge",
+    ),
+    path(
+        "<int:site_pk>/events/<uuid:event_id>/attendance/",
+        SiteEventAttendanceList.as_view(),
+        name="site-event-attendance",
+    ),
+    path(
+        "<int:site_pk>/events/<uuid:event_id>/attendance/check-in/",
+        SiteEventCheckIn.as_view(),
+        name="site-event-attendance-check-in",
+    ),
+    path(
+        "<int:site_pk>/events/<uuid:event_id>/attendance/scan/",
+        SiteEventCheckInScan.as_view(),
+        name="site-event-attendance-scan",
+    ),
+    path(
+        "<int:site_pk>/events/<uuid:event_id>/attendance/<uuid:registration_id>/check-out/",
+        SiteEventCheckOut.as_view(),
+        name="site-event-attendance-check-out",
+    ),
+    path(
+        "<int:site_pk>/events/<uuid:event_id>/report/",
+        SiteEventReport.as_view(),
+        name="site-event-report",
+    ),
+    path(
+        "<int:site_pk>/events/<uuid:event_id>/report/export/",
+        SiteEventReportExport.as_view(),
+        name="site-event-report-export",
     ),
     path("<int:site_pk>/events/<uuid:event_id>/updates/", SiteEventUpdates.as_view(), name="site-event-updates"),
     path(

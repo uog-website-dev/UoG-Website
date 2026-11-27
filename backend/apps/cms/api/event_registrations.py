@@ -145,6 +145,7 @@ class ParticipantBadgeSerializer(serializers.Serializer):
     participant_name = serializers.CharField()
     display_category = serializers.CharField()
     check_in_token = serializers.CharField()
+    qr_payload = serializers.CharField(required=False)
     fields = serializers.ListField(child=serializers.CharField())
 
 
@@ -427,8 +428,8 @@ class SiteEventRegistrationBadge(APIView):
         tags=["Event Participants"],
         responses={200: ParticipantBadgeSerializer},
         description=(
-            "Printable badge layout fields: Event title, display name, category, opaque check-in token. "
-            "Reprint returns the same check_in_token and does not create a new registration."
+            "Printable badge layout fields: Event title, display name, category, opaque check-in token, "
+            "and signed qr_payload. Reprint returns the same tokens and does not create a new registration."
         ),
     )
     def get(self, request, site_pk, event_id, registration_id):
@@ -445,7 +446,8 @@ class SiteEventRegistrationBadge(APIView):
             after={"event": str(event.pk)},
             changed_fields=[],
         )
-        response = Response(serialize_badge(event, row))
+        from apps.cms.api.event_attendance import enhance_badge
+        response = Response(enhance_badge(event, row))
         response["Cache-Control"] = "private, no-store"
         return response
 

@@ -33,6 +33,7 @@ import { SiteEventPeople } from "@/sites/site-event-people";
 import { SiteEventRegistrations } from "@/sites/site-event-registrations";
 import { SiteEventResources } from "@/sites/site-event-resources";
 import { SiteEventSchedule } from "@/sites/site-event-schedule";
+import { SiteEventReports } from "@/sites/site-event-reports";
 import { SiteEventUpdates } from "@/sites/site-event-updates";
 
 function unwrap<T>(result: { ok: true; data: T } | { ok: false; error: unknown }): T {
@@ -254,9 +255,10 @@ export function SiteEventEditorPage({
           <SiteEventResources siteId={siteId} eventId={eventId} readOnly={readOnly} />
           <SiteEventGallery siteId={siteId} eventId={eventId} readOnly={readOnly} />
           <SiteEventUpdates siteId={siteId} eventId={eventId} readOnly={readOnly} />
+          <SiteEventReports siteId={siteId} eventId={eventId} readOnly={readOnly} />
         </>
       ) : (
-        <Alert severity="info">Save the Event draft first to manage speakers, schedule, resources, gallery, and updates.</Alert>
+        <Alert severity="info">Save the Event draft first to manage speakers, schedule, resources, gallery, updates, and reports.</Alert>
       )}
       {!readOnly ? (
         <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
