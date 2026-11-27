@@ -25,6 +25,13 @@ from apps.cms.api.event_registrations import (
     SiteEventRegistrations,
     SiteEventRegistrationsExport,
 )
+from apps.cms.api.event_resources import (
+    SiteEventResourceDetail,
+    SiteEventResourceFile,
+    SiteEventResourceVisibility,
+    SiteEventResources,
+    SiteEventResourcesReorder,
+)
 from .event_categories import SiteEventCategories, SiteEventCategoryDetail
 from apps.cms.api.sidebars import SidebarViewSet
 from apps.cms.api.menus import MenuViewSet, MenuItemViewSet
@@ -69,6 +76,27 @@ urlpatterns = [
         "<int:site_pk>/events/<uuid:event_id>/registrations/<uuid:registration_id>/badge/",
         SiteEventRegistrationBadge.as_view(),
         name="site-event-registration-badge",
+    ),
+    path("<int:site_pk>/events/<uuid:event_id>/resources/", SiteEventResources.as_view(), name="site-event-resources"),
+    path(
+        "<int:site_pk>/events/<uuid:event_id>/resources/reorder/",
+        SiteEventResourcesReorder.as_view(),
+        name="site-event-resources-reorder",
+    ),
+    path(
+        "<int:site_pk>/events/<uuid:event_id>/resources/<uuid:resource_id>/",
+        SiteEventResourceDetail.as_view(),
+        name="site-event-resource-detail",
+    ),
+    path(
+        "<int:site_pk>/events/<uuid:event_id>/resources/<uuid:resource_id>/visibility/",
+        SiteEventResourceVisibility.as_view(),
+        name="site-event-resource-visibility",
+    ),
+    path(
+        "<int:site_pk>/events/<uuid:event_id>/resources/<uuid:resource_id>/file/",
+        SiteEventResourceFile.as_view(),
+        name="site-event-resource-file",
     ),
     path("<int:site_pk>/events/<uuid:event_id>/people/", SiteEventPeople.as_view(), name="site-event-people"),
     path(

@@ -27,6 +27,11 @@ from apps.cms.api.event_registrations import (
     PublicSiteEventRegistrations,
     PublicSiteEventRegistrationCancel,
 )
+from apps.cms.api.event_resources import (
+    PublicSiteEventResourceEntitlement,
+    PublicSiteEventResourceFile,
+    PublicSiteEventResources,
+)
 from .context import SiteContextView
 from apps.media.delivery import PublicMediaImage
 from apps.cms.api.widget_runtime import PublicWidgetData, PublicSiteLogo, PublicContact
@@ -53,6 +58,17 @@ urlpatterns = [
     path("events/<slug:slug>/speakers/", PublicSiteEventSpeakers.as_view(), name="public-event-speakers"),
     path("events/<slug:slug>/registrations/", PublicSiteEventRegistrations.as_view(), name="public-event-registrations"),
     path("events/<slug:slug>/registrations/cancel/", PublicSiteEventRegistrationCancel.as_view(), name="public-event-registration-cancel"),
+    path("events/<slug:slug>/resources/", PublicSiteEventResources.as_view(), name="public-event-resources"),
+    path(
+        "events/<slug:slug>/resources/<uuid:resource_id>/entitlement/",
+        PublicSiteEventResourceEntitlement.as_view(),
+        name="public-event-resource-entitlement",
+    ),
+    path(
+        "events/<slug:slug>/resources/<uuid:resource_id>/file/",
+        PublicSiteEventResourceFile.as_view(),
+        name="public-event-resource-file",
+    ),
     path("events/<slug:slug>/", PublicSiteEventDetail.as_view(), name="public-event-detail"),
     path("posts/<slug:post_slug>/", PublicPostDetailView.as_view(), name="public-post-detail"),
     path(
