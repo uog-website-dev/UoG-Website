@@ -3,8 +3,8 @@ import {validateVisualLayout} from "@uog/types";
 import {categories,registry,paletteRegistry,newWidget,newRow,starterLayout,outline,insertWidget,chromeWidgetsIn,LEGACY_CHROME_TYPES} from "./visual-builder-model";
 
 describe("Visual Builder contract helpers",()=>{
-  it("keeps all 43 registered widget types valid while offering 40 in the palette",()=>{
-    expect(registry).toHaveLength(43);
+  it("keeps all 44 registered widget types valid while offering 41 in the palette",()=>{
+    expect(registry).toHaveLength(44);
     // The palette deliberately omits legacy Site chrome while the registry
     // keeps those nodes labelable and renderable for published layouts.
     expect(categories.flatMap(value=>value.types).sort()).toEqual(paletteRegistry.map(value=>value.type).sort());

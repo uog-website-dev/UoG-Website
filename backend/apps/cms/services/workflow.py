@@ -379,9 +379,13 @@ def _content_instance(base, *, using):
     if document is not None:
         return document
     from apps.api.models import Category, Post
+    from apps.cms.models import Document
     post = Post.objects.using(using).filter(pk=base.pk).first()
     if post is not None:
         return post
+    document = Document.objects.using(using).filter(pk=base.pk).first()
+    if document is not None:
+        return document
     category = Category.objects.using(using).filter(pk=base.pk).first()
     if category is not None:
         return category

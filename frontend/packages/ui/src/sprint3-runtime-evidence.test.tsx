@@ -23,7 +23,7 @@ describe("Sprint 3 renderer capability evidence",()=>{
         required_runtime:required.has(type),runtime_status:fallback?"UNAVAILABLE":"MARKUP_ONLY",
         release_status:required.has(type)?(fallback?"FAIL":"NOT_VERIFIED_WITH_PROVIDER"):"CONTRACT_ONLY"};
     });
-    expect(rows).toHaveLength(43);
+    expect(rows).toHaveLength(44);
     const evidence={scope:"actual shared React renderer output; static markup is not provider integration or browser E2E",widgets:rows,
       required_runtime_failures:rows.filter(row=>row.required_runtime && row.integration_fallback).map(row=>row.type),
       provider_credentials_or_bindings_substituted:false};

@@ -107,7 +107,7 @@ def main():
         xml.append({"artifact":file.name,**{key:sum(int(s.get(key,0)) for s in suites) for key in ("tests","failures","errors","skipped")}})
     checks=[
        {"id":"S3-LIVE","expected":"Real role-scoped API upload/worker/publication/root, isolation, recovery","actual":live.get("status") if live else "NOT_RUN","status":live.get("status") if live else "NOT_RUN","evidence":"live-services.json"},
-       {"id":"S3-CONTRACT","expected":"43 widget contracts and required runtime bindings","actual":runtime,"status":"FAIL" if runtime.get("required_runtime_failures") or len(runtime.get("widgets",[]))!=43 else "PASS","evidence":"runtime-matrix.json"},
+       {"id":"S3-CONTRACT","expected":"44 widget contracts and required runtime bindings","actual":runtime,"status":"FAIL" if runtime.get("required_runtime_failures") or len(runtime.get("widgets",[]))!=44 else "PASS","evidence":"runtime-matrix.json"},
        {"id":"S3-BROWSER","expected":"Real seeded-user browser walkthrough","status":"NOT_VERIFIED","defects":["S3-E2E-002"]},
        {"id":"S3-OPENAPI","expected":"Local CI-equivalent schema validation and baseline match","status":"PASS" if schema_match and next(r for r in results if r['name']=='openapi')['status']=='PASS' else "FAIL","evidence":"sprint3-schema.yaml; sprint3-openapi.xml"},
        {"id":"S3-SIGNOFF","expected":"Named stakeholder acceptance signatures","status":"UNSIGNED","defects":["S3-SIGNOFF-003"]}]

@@ -311,7 +311,7 @@ def release_layout(asset_id, slide_text="Informatics slide"):
 
 
 def test_widget_contract_matrix_covers_review_widgets():
-    assert len(REGISTRY) == 43
+    assert len(REGISTRY) == 44
     by_name = {case["name"]: case for case in FIXTURES}
     for name in MATRIX_NAMES:
         case = by_name[name]

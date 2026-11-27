@@ -78,12 +78,21 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
         "/api/v1/sites/{site_pk}/assets/upload-policy/",
         "/api/v1/sites/{site_pk}/assets/{asset_id}/",
         "/api/v1/sites/{site_pk}/assets/{asset_id}/image/",
+        "/api/v1/sites/{site_pk}/assets/{asset_id}/download/",
         "/api/v1/sites/{site_pk}/assets/{asset_id}/references/",
         "/api/v1/sites/{site_pk}/assets/{asset_id}/deletion/",
         "/api/v1/sites/{site_pk}/asset-references/",
         "/api/v1/sites/{site_pk}/asset-references/{reference_id}/",
         "/api/v1/sites/{id}/activate/", "/api/v1/sites/{id}/suspend/",
         "/api/v1/sites/{id}/archive/", "/api/v1/sites/{id}/configuration/",
+        "/api/v1/sites/{id}/header/", "/api/v1/sites/{id}/header/publish/", "/api/v1/sites/{id}/header/restore-previous/",
+        "/api/v1/sites/{id}/footer/", "/api/v1/sites/{id}/footer/publish/", "/api/v1/sites/{id}/footer/restore-previous/",
+        "/api/v1/sites/{site_pk}/documents/",
+        "/api/v1/sites/{site_pk}/documents/categories/",
+        "/api/v1/sites/{site_pk}/documents/categories/{category_id}/",
+        "/api/v1/sites/{site_pk}/documents/{document_id}/",
+        "/api/v1/sites/{site_pk}/documents/{document_id}/file/",
+        "/api/v1/sites/{site_pk}/documents/{document_id}/{action}/",
         "/api/v1/sites/{site_pk}/domains/", "/api/v1/sites/{site_pk}/domains/{id}/",
         "/api/v1/sites/{site_pk}/domains/{id}/activate/",
         "/api/v1/sites/{site_pk}/domains/{id}/deactivate/",
@@ -147,6 +156,10 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
         "/api/v1/site-context/widgets/",
         "/api/v1/site-context/identity/logo/",
         "/api/v1/site-context/contact/{page_id}/{form_code}/",
+        "/api/v1/site-context/search/",
+        "/api/v1/site-context/documents/",
+        "/api/v1/site-context/documents/categories/",
+        "/api/v1/site-context/documents/{document_id}/file/",
         "/api/v1/sites/{site_pk}/pages/{id}/widget-data/",
         "/api/v1/site-context/pages/{page_path}/",
         "/api/v1/site-context/menus/",
@@ -176,7 +189,8 @@ def test_schema_validates_without_warnings_and_describes_live_contract():
     prepare_ref = prepare["requestBody"]["content"]["application/json"]["schema"]["$ref"].rsplit("/", 1)[-1]
     prepare_input = schema["components"]["schemas"][prepare_ref]
     assert set(prepare_input["required"]) == {"template_id", "version"}
-    assert set(prepare_input["properties"]) == {"template_id", "version"}
+    assert {"template_id", "version"} <= set(prepare_input["properties"])
+    assert set(prepare_input["properties"]) <= {"template_id", "version", "assets"}
     post_list = paths["/api/v1/sites/{site_pk}/posts/"]["get"]
     assert {
         "status", "category", "tag", "author", "created_after",
