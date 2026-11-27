@@ -7597,6 +7597,9 @@ paths:
   /api/v1/site-context/events/{slug}/:
     get:
       operationId: v1_site_context_events_retrieve
+      description: Public Event detail for the Host Site. Draft, archived and foreign
+        private Events return 404 without leaking metadata. Child section availability
+        is included so empty Gallery/Resources/Updates tabs stay hidden.
       parameters:
       - in: path
         name: slug
@@ -7617,7 +7620,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Event'
+                $ref: '#/components/schemas/PublicEventDetail'
           description: ''
           headers:
             X-Request-ID:
@@ -7702,6 +7705,10 @@ paths:
   /api/v1/site-context/events/{slug}/agenda/:
     get:
       operationId: v1_site_context_events_agenda
+      description: Public multi-day agenda grouped by date and track. Session visibility
+        and people publication are checked independently of Event root publication.
+        Cache scope is section-specific so schedule updates do not require re-publishing
+        the Event.
       parameters:
       - in: path
         name: slug
@@ -7722,9 +7729,115 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PublicAgendaDay'
+                $ref: '#/components/schemas/PublicAgendaResponse'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/site-context/events/{slug}/speakers/:
+    get:
+      operationId: v1_site_context_events_speakers
+      description: Public speakers and moderators for an Event. Hidden people and
+        private contact fields are omitted. Cache scope is section-specific so speaker
+        edits become visible without re-publishing the Event root.
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Public Events
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicSpeakersResponse'
           description: ''
           headers:
             X-Request-ID:
@@ -48779,6 +48892,10 @@ components:
         site:
           type: integer
           readOnly: true
+        site_code:
+          type: string
+          readOnly: true
+          nullable: true
         title:
           type: string
           maxLength: 255
@@ -48798,6 +48915,10 @@ components:
           type: string
           format: uuid
           nullable: true
+        category_name:
+          type: string
+          readOnly: true
+          nullable: true
         organizer_name:
           type: string
           maxLength: 255
@@ -48812,7 +48933,7 @@ components:
           maxLength: 64
         status:
           allOf:
-          - $ref: '#/components/schemas/EventStatusEnum'
+          - $ref: '#/components/schemas/Status960Enum'
           readOnly: true
         lifecycle:
           allOf:
@@ -48884,12 +49005,14 @@ components:
       - accepts_registration
       - banner_url
       - cancelled_at
+      - category_name
       - created_at
       - id
       - lifecycle
       - published_at
       - registration_open
       - site
+      - site_code
       - status
       - updated_at
       - version
@@ -49393,18 +49516,6 @@ components:
       - site
       - updated_at
       - version
-    EventStatusEnum:
-      enum:
-      - DRAFT
-      - PUBLISHED
-      - CANCELLED
-      - ARCHIVED
-      type: string
-      description: |-
-        * `DRAFT` - Draft
-        * `PUBLISHED` - Published
-        * `CANCELLED` - Cancelled
-        * `ARCHIVED` - Archived
     FileTypeEnum:
       enum:
       - application/pdf
@@ -73008,6 +73119,23 @@ components:
       required:
       - date
       - tracks
+    PublicAgendaResponse:
+      type: object
+      properties:
+        event:
+          type: string
+          format: uuid
+        slug:
+          type: string
+          pattern: ^[-a-zA-Z0-9_]+$
+        days:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicAgendaDay'
+      required:
+      - days
+      - event
+      - slug
     PublicBanner:
       type: object
       properties:
@@ -73239,6 +73367,172 @@ components:
             $ref: '#/components/schemas/PublicEventCategory'
       required:
       - results
+    PublicEventDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        site:
+          type: integer
+          readOnly: true
+        site_code:
+          type: string
+          readOnly: true
+          nullable: true
+        title:
+          type: string
+          maxLength: 255
+        slug:
+          oneOf:
+          - type: string
+            maxLength: 255
+            pattern: ^[-a-zA-Z0-9_]+$
+          - type: string
+            maxLength: 0
+        summary:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+        category:
+          type: string
+          format: uuid
+          nullable: true
+        category_name:
+          type: string
+          readOnly: true
+          nullable: true
+        organizer_name:
+          type: string
+          maxLength: 255
+        organizer_email:
+          oneOf:
+          - type: string
+            format: email
+          - type: string
+            maxLength: 0
+        organizer_phone:
+          type: string
+          maxLength: 64
+        status:
+          allOf:
+          - $ref: '#/components/schemas/Status960Enum'
+          readOnly: true
+        lifecycle:
+          allOf:
+          - $ref: '#/components/schemas/LifecycleEnum'
+          readOnly: true
+        starts_at:
+          type: string
+          format: date-time
+          nullable: true
+        ends_at:
+          type: string
+          format: date-time
+          nullable: true
+        timezone:
+          type: string
+          maxLength: 64
+        venue:
+          type: string
+          maxLength: 255
+        format:
+          $ref: '#/components/schemas/FormatEnum'
+        online_url:
+          type: string
+          maxLength: 2048
+        banner_asset:
+          type: string
+          format: uuid
+          nullable: true
+        banner_url:
+          type: string
+          readOnly: true
+          nullable: true
+        registration_required:
+          type: boolean
+        registration_capacity:
+          type: integer
+          minimum: 1
+          nullable: true
+        registration_open:
+          type: boolean
+          readOnly: true
+        accepts_registration:
+          type: boolean
+          readOnly: true
+        cancellation_notice:
+          type: string
+        published_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        cancelled_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        version:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        sections:
+          allOf:
+          - $ref: '#/components/schemas/PublicEventSections'
+          readOnly: true
+        contact_name:
+          type: string
+          readOnly: true
+          nullable: true
+      required:
+      - accepts_registration
+      - banner_url
+      - cancelled_at
+      - category_name
+      - contact_name
+      - created_at
+      - id
+      - lifecycle
+      - published_at
+      - registration_open
+      - sections
+      - site
+      - site_code
+      - status
+      - updated_at
+      - version
+    PublicEventSections:
+      type: object
+      properties:
+        overview:
+          type: boolean
+        schedule:
+          type: boolean
+        speakers:
+          type: boolean
+        gallery:
+          type: boolean
+        resources:
+          type: boolean
+        updates:
+          type: boolean
+      required:
+      - gallery
+      - overview
+      - resources
+      - schedule
+      - speakers
+      - updates
     PublicEventsCalendarResponse:
       type: object
       properties:
@@ -73551,6 +73845,75 @@ components:
       - next
       - previous
       - results
+    PublicSpeaker:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        display_name:
+          type: string
+        affiliation:
+          type: string
+        biography:
+          type: string
+        profile_photo_url:
+          type: string
+          nullable: true
+        public_links:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        sort_order:
+          type: integer
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicSpeakerRole'
+      required:
+      - affiliation
+      - biography
+      - display_name
+      - id
+      - roles
+      - sort_order
+    PublicSpeakerRole:
+      type: object
+      properties:
+        role:
+          type: string
+        session_id:
+          type: string
+          format: uuid
+        session_title:
+          type: string
+        day_date:
+          type: string
+          format: date
+          nullable: true
+      required:
+      - day_date
+      - role
+      - session_id
+      - session_title
+    PublicSpeakersResponse:
+      type: object
+      properties:
+        event:
+          type: string
+          format: uuid
+        slug:
+          type: string
+          pattern: ^[-a-zA-Z0-9_]+$
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicSpeaker'
+      required:
+      - event
+      - results
+      - slug
     PublicTaxonomy:
       type: object
       properties:
@@ -75431,6 +75794,18 @@ components:
         * `QUEUED` - QUEUED
         * `RETRY` - RETRY
         * `DONE` - DONE
+    Status960Enum:
+      enum:
+      - DRAFT
+      - PUBLISHED
+      - CANCELLED
+      - ARCHIVED
+      type: string
+      description: |-
+        * `DRAFT` - Draft
+        * `PUBLISHED` - Published
+        * `CANCELLED` - Cancelled
+        * `ARCHIVED` - Archived
     Summary:
       type: object
       properties:

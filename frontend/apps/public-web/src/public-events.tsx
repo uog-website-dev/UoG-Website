@@ -14,7 +14,7 @@ import Tabs from "@mui/material/Tabs";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { publicFetchInit, usePublicSiteBranding } from "@uog/ui";
-import type { EventLifecycle, SiteEventRecord } from "@uog/types";
+import type { SiteEventRecord } from "@uog/types";
 
 interface PageResult {
   count: number;
@@ -493,81 +493,4 @@ export function PublicEventsPage() {
   );
 }
 
-export function PublicEventDetailPage({ slug }: { slug: string }) {
-  const site = usePublicSiteBranding();
-  const [event, setEvent] = useState<SiteEventRecord | null>(null);
-  const [phase, setPhase] = useState<"loading" | "ready" | "disabled" | "error" | "missing">("loading");
-  const [message, setMessage] = useState("");
-
-  useEffect(() => {
-    const controller = new AbortController();
-    let cancelled = false;
-    async function load() {
-      if (!site.modules.events || site.id == null) {
-        if (!cancelled) setPhase("disabled");
-        return;
-      }
-      try {
-        const response = await fetch(`/api/v1/site-context/events/${encodeURIComponent(slug)}/`, {
-          ...publicFetchInit(),
-          signal: controller.signal,
-        });
-        if (response.status === 404) {
-          if (!cancelled) setPhase("missing");
-          return;
-        }
-        if (!response.ok) throw new Error("Event details are temporarily unavailable.");
-        const body = await response.json();
-        if (!body || typeof body !== "object" || typeof body.title !== "string") {
-          throw new Error("Event details could not be loaded safely.");
-        }
-        if ("organizer_email" in body) throw new Error("Event details could not be loaded safely.");
-        if (!cancelled) {
-          setEvent(body as SiteEventRecord);
-          setPhase("ready");
-        }
-      } catch (error) {
-        if (!cancelled) {
-          setPhase("error");
-          setMessage(error instanceof Error ? error.message : "Event details are temporarily unavailable.");
-        }
-      }
-    }
-    void load();
-    return () => {
-      cancelled = true;
-      controller.abort();
-    };
-  }, [site, slug]);
-
-  if (phase === "disabled") return <Typography role="status">Events are not available for this Site.</Typography>;
-  if (phase === "missing") return <Typography role="status">This Event was not found.</Typography>;
-  if (phase === "error") return <Alert severity="error">{message}</Alert>;
-  if (phase === "loading" || !event) return <Typography role="status">Loading Event…</Typography>;
-
-  return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 2, maxWidth: 820 }}>
-      <Button href="/events" sx={{ alignSelf: "flex-start" }}>All Events</Button>
-      <Typography variant="h1" component="h1" sx={{ fontSize: { xs: "2rem", sm: "2.75rem" }, fontWeight: 700 }}>
-        {event.title}
-      </Typography>
-      <Typography color="text.secondary">{formatWhen(event)}</Typography>
-      {event.venue ? <Typography>{event.venue}</Typography> : null}
-      <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-        <Chip label={registrationLabel(event)} />
-        <Chip variant="outlined" label={(event.lifecycle as EventLifecycle).replace("_", " ")} />
-      </Box>
-      {event.status === "CANCELLED" && event.cancellation_notice ? (
-        <Alert severity="warning">{event.cancellation_notice}</Alert>
-      ) : null}
-      {event.summary ? <Typography variant="h2" sx={{ fontSize: "1.1rem", fontWeight: 600 }}>{event.summary}</Typography> : null}
-      {event.description ? (
-        <Box
-          component="div"
-          sx={{ "& p": { mb: 1.5 } }}
-          dangerouslySetInnerHTML={{ __html: event.description }}
-        />
-      ) : null}
-    </Box>
-  );
-}
+export { PublicEventDetailPage } from "@/public-event-detail";

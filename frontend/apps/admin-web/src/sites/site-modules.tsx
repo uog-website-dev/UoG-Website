@@ -86,6 +86,7 @@ import {
   validateSettings,
 } from "@/modules/validation";
 import type { ModuleSettings } from "@/modules/validation";
+import { refreshWorkspace } from "@/workspace";
 
 interface SiteModulesProps {
   site: Site | null;
@@ -313,6 +314,8 @@ export function SiteModules({ site, error }: SiteModulesProps) {
       setOpenModule((current) => (current === module.id ? null : current));
       setFormErrors({});
       assignments.reload();
+      // Sidebar sections read enabledModuleCodes from workspace bootstrap.
+      refreshWorkspace();
     } finally {
       setPendingModule(null);
     }
@@ -336,6 +339,7 @@ export function SiteModules({ site, error }: SiteModulesProps) {
       );
       setConfirmRow(null);
       assignments.reload();
+      refreshWorkspace();
     } finally {
       setConfirmPending(false);
     }

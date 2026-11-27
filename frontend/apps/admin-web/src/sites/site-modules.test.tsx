@@ -39,6 +39,11 @@ vi.mock("next/link", () => ({
   ),
 }));
 
+const refreshWorkspace = vi.fn();
+vi.mock("@/workspace", () => ({
+  refreshWorkspace: (...args: unknown[]) => refreshWorkspace(...args),
+}));
+
 import { SiteModules } from "./site-modules";
 
 const STAMP = "2026-01-01T00:00:00Z";
@@ -321,6 +326,7 @@ describe("SiteModules — enabling", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Enable" }));
 
     await waitFor(() => expect(enableSiteModule).toHaveBeenCalledWith(1, 10));
+    await waitFor(() => expect(refreshWorkspace).toHaveBeenCalled());
   });
 
   it("displays a denied write verbatim and does not claim success", async () => {

@@ -102,10 +102,27 @@ class EventPagination(PageNumberPagination):
     max_page_size = 100
 
 
-def _banner_url(event: Event) -> str | None:
+def _banner_url(event: Event, *, public: bool = False) -> str | None:
     if not event.banner_asset_id:
         return None
+    if public:
+        return f"/api/v1/site-context/media/{event.banner_asset_id}/?variant=display"
     return f"/api/v1/sites/{event.site_id}/assets/{event.banner_asset_id}/image/?variant=display"
+
+
+def _public_sections(event: Event) -> dict:
+    """Which detail tabs have public content. Unshipped sections stay false."""
+    from apps.cms.event_person_domain import public_speakers_available
+    from apps.cms.event_session_domain import public_schedule_available
+
+    return {
+        "overview": True,
+        "schedule": public_schedule_available(event),
+        "speakers": public_speakers_available(event),
+        "gallery": False,
+        "resources": False,
+        "updates": False,
+    }
 
 
 def serialize_event(event: Event, *, public: bool = False) -> dict:
@@ -129,7 +146,7 @@ def serialize_event(event: Event, *, public: bool = False) -> dict:
         "format": event.format,
         "online_url": event.online_url,
         "banner_asset": event.banner_asset_id,
-        "banner_url": _banner_url(event),
+        "banner_url": _banner_url(event, public=public),
         "registration_required": event.registration_required,
         "registration_capacity": event.registration_capacity,
         "registration_open": event.registration_open,
@@ -141,7 +158,10 @@ def serialize_event(event: Event, *, public: bool = False) -> dict:
         "created_at": event.created_at,
         "updated_at": event.updated_at,
     }
-    if not public:
+    if public:
+        payload["sections"] = _public_sections(event)
+        payload["contact_name"] = (event.organizer_name or "").strip() or None
+    else:
         payload["organizer_email"] = event.organizer_email
         payload["organizer_phone"] = event.organizer_phone
     return payload
@@ -376,11 +396,34 @@ class PublicSiteEvents(APIView):
         return response
 
 
+class PublicEventSectionsSerializer(serializers.Serializer):
+    overview = serializers.BooleanField()
+    schedule = serializers.BooleanField()
+    speakers = serializers.BooleanField()
+    gallery = serializers.BooleanField()
+    resources = serializers.BooleanField()
+    updates = serializers.BooleanField()
+
+
+class PublicEventDetailSerializer(EventSerializer):
+    sections = PublicEventSectionsSerializer(read_only=True)
+    contact_name = serializers.CharField(read_only=True, allow_null=True, required=False)
+
+
 class PublicSiteEventDetail(APIView):
     authentication_classes = []
     permission_classes = []
 
-    @extend_schema(operation_id="v1_site_context_events_retrieve", tags=["Public Events"], responses={200: EventSerializer})
+    @extend_schema(
+        operation_id="v1_site_context_events_retrieve",
+        tags=["Public Events"],
+        responses={200: PublicEventDetailSerializer},
+        description=(
+            "Public Event detail for the Host Site. Draft, archived and foreign private "
+            "Events return 404 without leaking metadata. Child section availability is "
+            "included so empty Gallery/Resources/Updates tabs stay hidden."
+        ),
+    )
     def get(self, request, slug):
         site = getattr(request, "site", None)
         if site is None or not module_is_available(site.pk, EVENTS_MODULE_CODE):
@@ -392,7 +435,9 @@ class PublicSiteEventDetail(APIView):
         response = Response(serialize_event(event, public=True))
         response["Cache-Control"] = "public, max-age=0, must-revalidate"
         response["Vary"] = "Host"
-        response["X-Events-Cache-Scope"] = f"site-{site.pk}"
+        response["ETag"] = event_etag(event)
+        response["X-Events-Cache-Scope"] = f"site-{site.pk}-event-{event.slug}"
+        response["X-Events-Cache-Section"] = "detail"
         return response
 
 

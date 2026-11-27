@@ -347,9 +347,14 @@ def serialize_person(person: EventPerson, *, public: bool = False) -> dict[str, 
         not public or person.visibility == SessionVisibility.PUBLIC
     )
     if include_photo:
-        photo_url = (
-            f"/api/v1/sites/{person.event.site_id}/assets/{person.profile_photo_id}/image/?variant=display"
-        )
+        if public:
+            photo_url = (
+                f"/api/v1/site-context/media/{person.profile_photo_id}/?variant=display"
+            )
+        else:
+            photo_url = (
+                f"/api/v1/sites/{person.event.site_id}/assets/{person.profile_photo_id}/image/?variant=display"
+            )
     if public:
         if person.visibility != SessionVisibility.PUBLIC or person.removed_at is not None:
             return {}
@@ -411,6 +416,64 @@ def public_people_for_session(session: EventSession) -> list[dict[str, Any]]:
         payload = serialize_assignment(row, public=True)
         if payload:
             result.append(payload)
+    return result
+
+
+def public_speakers_available(event: Event) -> bool:
+    return active_people(event).filter(visibility=SessionVisibility.PUBLIC).exists()
+
+
+def public_speakers_etag(event: Event) -> str:
+    """Section ETag from people rows only — Event root republish is not required."""
+    latest = (
+        active_people(event)
+        .filter(visibility=SessionVisibility.PUBLIC)
+        .order_by("-updated_at", "-version")
+        .values_list("updated_at", "version")
+        .first()
+    )
+    if not latest:
+        return f'"site-event-speakers-{event.pk}-empty"'
+    stamp = latest[0].isoformat() if latest[0] else "0"
+    return f'"site-event-speakers-{event.pk}-v{latest[1]}-{stamp}"'
+
+
+def public_speakers_for_event(event: Event) -> list[dict[str, Any]]:
+    """Deduped public people for the Speakers tab, with session roles they hold."""
+    people = list(
+        active_people(event)
+        .filter(visibility=SessionVisibility.PUBLIC)
+        .order_by("sort_order", "display_name", "id")
+    )
+    if not people:
+        return []
+    person_ids = [row.pk for row in people]
+    assignments = (
+        SessionPerson.objects.filter(
+            person_id__in=person_ids,
+            person__removed_at__isnull=True,
+            session__removed_at__isnull=True,
+            session__visibility=SessionVisibility.PUBLIC,
+            session__event_id=event.pk,
+        )
+        .select_related("session")
+        .order_by("sort_order", "role", "id")
+    )
+    roles_by_person: dict[str, list[dict[str, Any]]] = {str(person_id): [] for person_id in person_ids}
+    for row in assignments:
+        roles_by_person.setdefault(str(row.person_id), []).append({
+            "role": row.role,
+            "session_id": row.session_id,
+            "session_title": row.session.title,
+            "day_date": row.session.day_date.isoformat() if row.session.day_date else None,
+        })
+    result = []
+    for person in people:
+        payload = serialize_person(person, public=True)
+        if not payload:
+            continue
+        payload["roles"] = roles_by_person.get(str(person.pk), [])
+        result.append(payload)
     return result
 
 

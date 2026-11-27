@@ -341,18 +341,37 @@ def reorder_sessions(event: Event, ordered_ids: list[str], *, actor, expected_ev
     return list(active_sessions(event))
 
 
-def public_agenda(event: Event) -> list[dict[str, Any]]:
-    """Group public sessions by day then track. Hidden/cancelled-hidden stay out."""
+def _public_session_rows(event: Event):
     rows = active_sessions(event).filter(visibility=SessionVisibility.PUBLIC).order_by(
         "day_date", "sort_order", "starts_at", "id",
     )
     from apps.sites.models.event_settings import SiteEventSettings
     settings_obj = SiteEventSettings.objects.filter(site_id=event.site_id).first()
     hide_cancelled = bool(settings_obj.hide_cancelled_sessions_publicly) if settings_obj else False
+    if hide_cancelled:
+        rows = rows.exclude(status=SessionStatus.CANCELLED)
+    return rows
+
+
+def public_schedule_available(event: Event) -> bool:
+    return _public_session_rows(event).exists()
+
+
+def public_agenda_etag(event: Event) -> str:
+    """Section ETag from session rows only — Event root republish is not required."""
+    latest = _public_session_rows(event).order_by("-updated_at", "-version").values_list(
+        "updated_at", "version",
+    ).first()
+    if not latest:
+        return f'"site-event-agenda-{event.pk}-empty"'
+    stamp = latest[0].isoformat() if latest[0] else "0"
+    return f'"site-event-agenda-{event.pk}-v{latest[1]}-{stamp}"'
+
+
+def public_agenda(event: Event) -> list[dict[str, Any]]:
+    """Group public sessions by day then track. Hidden/cancelled-hidden stay out."""
     days: dict[str, dict[str, Any]] = {}
-    for row in rows:
-        if hide_cancelled and row.status == SessionStatus.CANCELLED:
-            continue
+    for row in _public_session_rows(event):
         day_key = row.day_date.isoformat()
         day = days.setdefault(day_key, {"date": day_key, "tracks": {}})
         track_key = row.track or "General"

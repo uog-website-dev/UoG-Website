@@ -33,13 +33,14 @@ export function usePublicBreadcrumbTitle(title: string | null) {
   }, [setTitle, title]);
 }
 
-function Breadcrumbs({ postTitle }: { postTitle: string | null }) {
+function Breadcrumbs({ detailTitle }: { detailTitle: string | null }) {
   const pathname = usePathname() || "/";
   if (pathname === "/") return null;
 
   const segments = pathname.split("/").filter(Boolean);
   let href = "";
   const isPostDetail = segments[0] === "posts" && segments.length === 2;
+  const isEventDetail = segments[0] === "events" && segments.length === 2;
   // Title banners own the trail; keep this surface strip only for listing/archive views.
   return (
     <Box
@@ -71,11 +72,13 @@ function Breadcrumbs({ postTitle }: { postTitle: string | null }) {
           const words = decodeURIComponent(segment).replace(/-/g, " ");
           const label = segment === "posts"
             ? "News"
-            : segment === "categories"
-              ? "Categories"
-              : isPostDetail && last
-                ? postTitle || "Detail"
-                : words.replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
+            : segment === "events"
+              ? "Events"
+              : segment === "categories"
+                ? "Categories"
+                : (isPostDetail || isEventDetail) && last
+                  ? detailTitle || "Detail"
+                  : words.replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
           return (
             <Box component="span" key={href} sx={{ minWidth: 0, display: "inline-flex" }}>
               {last ? (
@@ -154,7 +157,7 @@ function BackToTop() {
 
 export function PublicMenus({ children, initialMenus = null }: { children: ReactNode; initialMenus?: PublicMenusPayload | null }) {
   const site = usePublicSiteBranding();
-  const [postTitle, setPostTitle] = useState<string | null>(null);
+  const [detailTitle, setDetailTitle] = useState<string | null>(null);
   const serverMenus = useMemo(() => {
     const payload = menuPayloadForSite(initialMenus, site.id);
     return payload ? menusFromResponse(200, payload) : EMPTY;
@@ -196,11 +199,11 @@ export function PublicMenus({ children, initialMenus = null }: { children: React
   }, [site.id, site.modules.menus]);
 
   return (
-    <BreadcrumbTitleContext.Provider value={setPostTitle}>
+    <BreadcrumbTitleContext.Provider value={setDetailTitle}>
       <Link href="#main-content" sx={{ position: "absolute", left: 16, top: -100, zIndex: 1500, bgcolor: "background.paper", p: 2, "&:focus": { top: 12 } }}>Skip to content</Link>
       <PublicSiteHeader site={site} headerItems={menus.header} utilityItems={menus.utility ?? []} />
       <Box component="main" id="main-content" tabIndex={-1}>
-        <Breadcrumbs postTitle={postTitle} />
+        <Breadcrumbs detailTitle={detailTitle} />
         {children}
       </Box>
       <PublicSiteFooter site={site} items={menus.footer} />

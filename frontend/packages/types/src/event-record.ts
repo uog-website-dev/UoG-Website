@@ -2,6 +2,15 @@ export type EventStatus = "DRAFT" | "PUBLISHED" | "CANCELLED" | "ARCHIVED";
 export type EventLifecycle = "UPCOMING" | "IN_PROGRESS" | "PAST" | "UNKNOWN";
 export type EventFormat = "PHYSICAL" | "ONLINE" | "HYBRID";
 
+export interface PublicEventSections {
+  overview: boolean;
+  schedule: boolean;
+  speakers: boolean;
+  gallery: boolean;
+  resources: boolean;
+  updates: boolean;
+}
+
 export interface SiteEventRecord {
   id: string;
   site: number;
@@ -15,6 +24,7 @@ export interface SiteEventRecord {
   organizer_name: string;
   organizer_email?: string;
   organizer_phone?: string;
+  contact_name?: string | null;
   status: EventStatus;
   lifecycle: EventLifecycle;
   starts_at: string | null;
@@ -35,6 +45,7 @@ export interface SiteEventRecord {
   version: number;
   created_at: string;
   updated_at: string;
+  sections?: PublicEventSections;
   preview?: boolean;
 }
 
