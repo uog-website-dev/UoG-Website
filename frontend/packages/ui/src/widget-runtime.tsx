@@ -213,7 +213,7 @@ export function FeaturedImageWidget({compact=false,variant="inline"}:{compact?:b
     onError={()=>setFailed(true)}
     loading="lazy"
     sx={variant==="hero"
-      ? {width:"100%",maxHeight:{xs:240,sm:360,md:440},objectFit:"cover",display:"block"}
+      ? {width:"100%",aspectRatio:{xs:"16/10",md:"16/9"},maxHeight:{xs:280,sm:380,md:480},objectFit:"cover",display:"block"}
       : {maxWidth:"100%",height:"auto"}}
   />;
 }
@@ -341,5 +341,30 @@ export function BreadcrumbsWidget({pageTitle}:{pageTitle:string}) {
  const state=useWidgetData({source:'breadcrumbs',...(scope?.pageId?{page_id:scope.pageId}:{})},enabled);
  const rows=state.data?.results.filter(row=>row.site===scope?.siteId&&typeof row.title==='string'&&typeof row.path==='string'&&/^\/(?:[a-z0-9]+(?:-[a-z0-9]+)*\/?)*$/.test(row.path))??[];
  const ancestors=rows.slice(0,-1).filter(row=>row.path!=='/');
- return <Box component="nav" aria-label="Breadcrumbs" sx={{display:'flex',alignItems:'center',gap:1,flexWrap:'wrap'}}><Link href="/" sx={{minHeight:44,display:'inline-flex',alignItems:'center'}}>Home</Link>{ancestors.map(row=><Box key={String(row.path)} sx={{display:'flex',gap:1,alignItems:'center'}}><span aria-hidden>/</span><Link href={String(row.path)} sx={{minHeight:44,display:'inline-flex',alignItems:'center'}}>{String(row.title)}</Link></Box>)}<span aria-hidden>/</span><Typography aria-current="page">{pageTitle}</Typography></Box>;
+ return (
+  <Box
+    component="nav"
+    aria-label="Breadcrumb"
+    sx={{
+      display: "flex",
+      alignItems: "center",
+      gap: 0.75,
+      flexWrap: "wrap",
+      fontSize: "0.875rem",
+      fontWeight: 500,
+      letterSpacing: "0.01em",
+      color: "text.secondary",
+    }}
+  >
+    <Link href="/" underline="hover" color="inherit" sx={{ minHeight: 44, display: "inline-flex", alignItems: "center" }}>Home</Link>
+    {ancestors.map((row) => (
+      <Box key={String(row.path)} sx={{ display: "inline-flex", gap: 0.75, alignItems: "center", minWidth: 0 }}>
+        <Box component="span" aria-hidden sx={{ opacity: 0.7, lineHeight: 1 }}>›</Box>
+        <Link href={String(row.path)} underline="hover" color="inherit" sx={{ minHeight: 44, display: "inline-flex", alignItems: "center", whiteSpace: "nowrap" }}>{String(row.title)}</Link>
+      </Box>
+    ))}
+    <Box component="span" aria-hidden sx={{ opacity: 0.7, lineHeight: 1 }}>›</Box>
+    <Typography component="span" aria-current="page" color="text.primary" sx={{ m: 0, font: "inherit", fontWeight: 600, maxWidth: { xs: 180, sm: 360 }, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{pageTitle}</Typography>
+  </Box>
+ );
 }

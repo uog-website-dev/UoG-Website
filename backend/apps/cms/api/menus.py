@@ -38,12 +38,16 @@ class MenuMissingVersion(APIException):
 
 @contextmanager
 def menu_errors():
+    from django.db.models.deletion import ProtectedError
+
     try:
         yield
     except domain.MenuPreconditionRequired as exc:
         raise MenuMissingVersion() from exc
     except domain.MenuConflict as exc:
         raise MenuAPIConflict({"reason": exc.reason}) from exc
+    except ProtectedError as exc:
+        raise MenuAPIConflict({"reason": "menu_assigned"}) from exc
     except DomainValidationError as exc:
         fields = getattr(exc, "message_dict", {"non_field_errors": exc.messages})
         reason = "invalid_tree" if "parent" in fields or "tree" in fields else (
@@ -56,6 +60,10 @@ def menu_errors():
         cause = exc.__cause__
         constraint = getattr(getattr(cause, "diag", None), "constraint_name", "") or ""
         state = getattr(cause, "sqlstate", None)
+        detail = (
+            getattr(getattr(cause, "diag", None), "message_primary", None)
+            or str(cause or exc)
+        ).lower()
         if constraint == "audit_write_failed":
             raise  # The shared handler returns a sanitized 503; transaction rolls back.
         conflicts = {
@@ -66,6 +74,12 @@ def menu_errors():
         }
         if constraint in conflicts or state in {"40001", "40P01"}:
             raise MenuAPIConflict({"reason": conflicts.get(constraint, "concurrent_write")}) from exc
+        if (
+            "footer column" in detail
+            or "menulocationassignment" in constraint
+            or "menulocationassignment" in detail
+        ):
+            raise MenuAPIConflict({"reason": "menu_assigned"}) from exc
         if state in {"23503", "23514"}:
             reason = "invalid_tree" if constraint in {"menu_parent_owner", "menu_acyclic", "menu_max_depth"} else (
                 "module_disabled" if constraint == "menu_module_enabled" else "invalid_target"
@@ -113,6 +127,10 @@ class MenuOutput(serializers.ModelSerializer):
 
     def get_has_unpublished_changes(self, menu) -> bool:
         from ..menu_destinations import snapshot_items
+        # None means a trusted live projection (including an empty menu): nothing
+        # is staged until the first freeze or activate writes published_items.
+        if menu.published_items is None:
+            return False
         return menu.published_items != snapshot_items(menu)
 
     class Meta:
@@ -147,7 +165,7 @@ class ItemOutput(serializers.ModelSerializer):
     class Meta:
         model = MenuItem
         fields = ("id", "menu", "site", "label", "item_type", "page", "post", "target", "parent",
-                  "sort_order", "is_active", "allow_cross_site", "category", "destination_status", "created_at", "updated_at")
+                  "sort_order", "is_active", "category", "destination_status", "created_at", "updated_at")
         read_only_fields = fields
 
 
@@ -161,7 +179,6 @@ class ItemInput(StrictFields, serializers.Serializer):
     parent = serializers.UUIDField(required=False, allow_null=True)
     sort_order = serializers.IntegerField(required=False, min_value=0)
     is_active = serializers.BooleanField(required=False)
-    allow_cross_site = serializers.BooleanField(required=False)
 
 
 class ItemPatch(ItemInput):
@@ -423,7 +440,7 @@ class MenuViewSet(MenuAPIBase):
             query = self._query(TreeQuery)
             return self._response(self._tree(menu, query["include_inactive"]), menu)
 
-    @extend_schema(parameters=[IF_MATCH], request=ReorderInput, responses=TreeOutput, description="menu.write (plus menu.publish for an active menu). Atomic sibling reorder: supply every sibling UUID exactly once; parent=null selects roots. Missing, duplicate or foreign IDs return invalid_order; stale If-Match returns 409 version_conflict.")
+    @extend_schema(parameters=[IF_MATCH], request=ReorderInput, responses=TreeOutput, description="menu.write. Stages an atomic sibling reorder on the working tree (public snapshot unchanged until activate). Supply every sibling UUID exactly once; parent=null selects roots. Missing, duplicate or foreign IDs return invalid_order; stale If-Match returns 409 version_conflict.")
     @action(detail=True, methods=["post"])
     def reorder(self, request, *args, **kwargs):
         with menu_errors(), hierarchy_write():
@@ -480,7 +497,7 @@ class MenuItemViewSet(MenuAPIBase):
             menu = self._menu()
             return self._response(ItemOutput(self._item(menu)).data, menu)
 
-    @extend_schema(parameters=[IF_MATCH], request=ItemInput, responses={201: ItemOutput}, description="menu.write (plus menu.publish for active menus). Site/menu identity derives from the URL. Missing sort_order appends to siblings. Internal foreign targets require explicit opt-in and target-Site content-view permission.")
+    @extend_schema(parameters=[IF_MATCH], request=ItemInput, responses={201: ItemOutput}, description="menu.write. Stages an item on the working tree; the public snapshot stays frozen until activate. Site/menu identity derives from the URL. Missing sort_order appends to siblings. Targets must belong to this Site.")
     def create(self, request, *args, **kwargs):
         with menu_errors(), hierarchy_write():
             menu = self._menu()
@@ -489,7 +506,7 @@ class MenuItemViewSet(MenuAPIBase):
             return self._response(ItemOutput(item).data, menu, status=201,
                 location=reverse("sites:menu-item-detail", kwargs={"site_pk": menu.site_id, "menu_pk": menu.pk, "pk": item.pk}))
 
-    @extend_schema(parameters=[IF_MATCH], request=ItemPatch, responses=ItemOutput, description="menu.write (plus menu.publish for active menus). Use move/reorder for parent and sibling positions. Unsafe targets return invalid_target.")
+    @extend_schema(parameters=[IF_MATCH], request=ItemPatch, responses=ItemOutput, description="menu.write. Stages an item edit on the working tree; the public snapshot stays frozen until activate. Use move/reorder for parent and sibling positions. Unsafe targets return invalid_target.")
     def partial_update(self, request, *args, **kwargs):
         with menu_errors(), hierarchy_write():
             menu = self._menu()
@@ -497,7 +514,7 @@ class MenuItemViewSet(MenuAPIBase):
             item = domain.update_menu_item(item.pk, actor=request.user, expected=self._expected(), **self._fields(self._input(ItemPatch)))
             return self._response(ItemOutput(item).data, menu)
 
-    @extend_schema(parameters=[IF_MATCH], responses={204: None}, description="menu.write (plus menu.publish for active menus). Delete a leaf only; a non-leaf returns 409 children_present. Response ETag is the new owning Menu token.")
+    @extend_schema(parameters=[IF_MATCH], responses={204: None}, description="menu.write. Stages leaf deletion on the working tree; the public snapshot stays frozen until activate. A non-leaf returns 409 children_present. Response ETag is the new owning Menu token.")
     def destroy(self, request, *args, **kwargs):
         with menu_errors(), hierarchy_write():
             menu = self._menu()
@@ -505,7 +522,7 @@ class MenuItemViewSet(MenuAPIBase):
             domain.delete_menu_record(item.pk, actor=request.user, expected=self._expected(), item=True)
             return self._response(None, menu, status=204)
 
-    @extend_schema(parameters=[IF_MATCH], request=MoveInput, responses=ItemOutput, description="menu.write (plus menu.publish for active menus). Atomic subtree move; position is the zero-based destination sibling index. One top-level item plus five submenu levels are supported. Cycles and excessive descendant depth return invalid_tree and roll back every changed position.")
+    @extend_schema(parameters=[IF_MATCH], request=MoveInput, responses=ItemOutput, description="menu.write. Stages an atomic subtree move on the working tree; the public snapshot stays frozen until activate. Position is the zero-based destination sibling index. One top-level item plus five submenu levels are supported. Cycles and excessive descendant depth return invalid_tree and roll back every changed position.")
     @action(detail=True, methods=["post"])
     def move(self, request, *args, **kwargs):
         with menu_errors(), hierarchy_write():

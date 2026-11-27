@@ -6,7 +6,6 @@ import {useSiteQuery} from "@/data/query-cache";
 
 import { useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import AddIcon from "@mui/icons-material/Add";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
@@ -20,6 +19,7 @@ import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { ApiError } from "@uog/api-client";
 import {
+  ConfirmDialog,
   DataTable,
   FilterBar,
   Pagination,
@@ -33,13 +33,14 @@ import type {
   SortState,
   TableColumn,
 } from "@uog/ui";
+import { runBulkLifecycle, summarizeBulkLifecycle } from "@/admin/bulk-lifecycle";
 
 import {
+  deleteSitePage,
   getSitePage,
   getSitePagePreview,
   loadSitePageRevisions,
   loadSitePageWorkflowHistory,
-  openWorkingDraft,
   restoreSitePageRevision,
   setSiteHomepage,
   transitionSitePage,
@@ -178,7 +179,6 @@ function SitePagesPanelContent({
   visualBuilderMode: boolean;
 }) {
   const toast = useToast();
-  const router = useRouter();
   const canView = permissions.includes(PERMISSIONS.view);
   const siteAdmin = useOptionalSiteAdmin();
   const canCreate = permissions.includes(PERMISSIONS.create);
@@ -206,6 +206,10 @@ function SitePagesPanelContent({
   const [workflowPreview, setWorkflowPreview] = useState<SitePagePreview | null>(null);
   const workflowSequence = useRef(0);
   const [busyPageId, setBusyPageId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string | number>>(new Set());
+  const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false);
+  const [bulkBusy, setBulkBusy] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<SitePageRecord | null>(null);
 
   const ordering = orderingForSort(sort);
   const pages = useSiteQuery<SitePageListResponse>(siteId, "pages", {search: appliedFilters.search, status: appliedFilters.status, author: appliedFilters.author, page, page_size: PAGE_SIZE, ordering},
@@ -231,7 +235,82 @@ function SitePagesPanelContent({
   );
 
   const rows = (pages.data?.results ?? []).filter((row) => row.site === siteId);
-  const enabled = pagesEnabled === true && !saving && busyPageId === null;
+  const enabled = pagesEnabled === true && !saving && busyPageId === null && !bulkBusy;
+  const selectedPages = rows.filter((row) => selectedIds.has(row.id) && canDeletePage(row));
+  const canBulkDelete = selectedPages.length > 0 && canEdit;
+
+  function canDeletePage(row: SitePageRecord) {
+    if (!canEdit) return false;
+    if ((row.available_actions ?? []).includes("archive")) return true;
+    return ["DRAFT", "IN_REVIEW", "UNPUBLISHED", "ARCHIVED"].includes(row.status);
+  }
+
+  async function deletePage(row: SitePageRecord) {
+    const current = unwrap(await getSitePage(siteId, row.id));
+    if ((current.available_actions ?? []).includes("archive")) {
+      unwrap(await transitionSitePage(siteId, current.id, "archive", "", current.etag ?? ""));
+      return;
+    }
+    if (!["DRAFT", "IN_REVIEW", "UNPUBLISHED", "ARCHIVED"].includes(current.status)) {
+      throw new Error("This Page cannot be deleted from its current status.");
+    }
+    unwrap(await deleteSitePage(siteId, current.id));
+  }
+
+  async function confirmSingleDelete() {
+    if (!deleteTarget) return;
+    setBulkBusy(true);
+    try {
+      await deletePage(deleteTarget);
+      toast.success(`Deleted ${deleteTarget.title}.`);
+      setDeleteTarget(null);
+      setSelectedIds((current) => {
+        const next = new Set(current);
+        next.delete(deleteTarget.id);
+        return next;
+      });
+      pages.reload();
+      statusCounts.reload();
+    } catch (cause) {
+      toast.error(cause instanceof Error ? cause.message : "The Page could not be deleted.");
+    } finally {
+      setBulkBusy(false);
+    }
+  }
+
+  async function confirmBulkDelete() {
+    if (!canBulkDelete) return;
+    setBulkBusy(true);
+    try {
+      const summary = await runBulkLifecycle(selectedPages, {
+        labelOf: (row) => row.title,
+        apply: async (row) => {
+          try {
+            await deletePage(row);
+            return { ok: true, data: null };
+          } catch (cause) {
+            return {
+              ok: false,
+              error: {
+                status: cause instanceof ApiError ? cause.status : 500,
+                code: "delete_failed",
+                message: cause instanceof Error ? cause.message : "Delete failed.",
+                details: null,
+                requestId: null,
+              },
+            };
+          }
+        },
+      });
+      toast.success(summarizeBulkLifecycle(summary, "page"));
+      setSelectedIds(new Set());
+      setBulkConfirmOpen(false);
+      pages.reload();
+      statusCounts.reload();
+    } finally {
+      setBulkBusy(false);
+    }
+  }
   const activeFilterCount = Number(Boolean(appliedFilters.search)) + Number(Boolean(appliedFilters.status)) + Number(Boolean(appliedFilters.author));
 
   function applyFilters() {
@@ -248,24 +327,6 @@ function SitePagesPanelContent({
     setDraftFilters({ search: "", status: "", author: "" });
     setAppliedFilters({ search: "", status: "", author: "" });
     setPage(1);
-  }
-
-  async function openPublishedDraft(row: SitePageRecord) {
-    setSaving(true);
-    try {
-      const current = unwrap(await getSitePage(siteId, row.id));
-      const opened = unwrap(await openWorkingDraft(siteId, row.id, current.etag ?? ""));
-      if (opened.status !== "DRAFT") {
-        toast.success("This Page already has a draft in review. Continue from its workflow actions.");
-        pages.reload();
-        return;
-      }
-      router.push(`/sites/${siteId}/admin/pages/${opened.id}/edit`);
-    } catch (cause) {
-      toast.error(cause instanceof Error ? cause.message : "The working draft could not be opened.");
-    } finally {
-      setSaving(false);
-    }
   }
 
   async function runPageAction(row: SitePageRecord, action: () => Promise<unknown>): Promise<boolean> {
@@ -434,7 +495,7 @@ function SitePagesPanelContent({
       </Button>] : []),
     ];
 
-    if (canEdit && (row.status === "DRAFT" || row.status === "UNPUBLISHED")) {
+    if (canEdit && ["DRAFT", "UNPUBLISHED", "PUBLISHED"].includes(row.status) && !row.draft_of) {
       actions.push(
         <Button
           key="edit"
@@ -452,17 +513,11 @@ function SitePagesPanelContent({
       canEdit
       && builderEnabled === true
       && ["DRAFT", "UNPUBLISHED", "PUBLISHED"].includes(row.status)
+      && !row.draft_of
     ) {
       actions.push(
         <Button key="builder" component={Link} href={`/sites/${siteId}/admin/pages/${row.id}/builder`} size="small" disabled={!enabled} aria-label={`Open Visual Builder for ${row.title}`}>
           Visual Builder
-        </Button>,
-      );
-    }
-    if (canEdit && row.status === "PUBLISHED" && !row.draft_of) {
-      actions.push(
-        <Button key="working-draft" size="small" aria-label={`Edit a draft of ${row.title}`} disabled={!enabled} onClick={() => void openPublishedDraft(row)}>
-          Edit draft
         </Button>,
       );
     }
@@ -474,11 +529,18 @@ function SitePagesPanelContent({
         </Button>,
       );
     }
+    if (canDeletePage(row)) {
+      actions.push(
+        <Button key="delete" size="small" color="error" aria-label={`Delete ${row.title}`} disabled={!enabled} onClick={() => setDeleteTarget(row)}>
+          Delete
+        </Button>,
+      );
+    }
     actions.push(
       <ContentWorkflowButtons
         key="workflow"
         title={row.title}
-        available={row.available_actions ?? []}
+        available={(row.available_actions ?? []).filter((action) => action !== "archive")}
         disabled={!enabled}
         onAction={(action) => queueWorkflowAction(row, action)}
       />,
@@ -636,6 +698,17 @@ function SitePagesPanelContent({
             {reviewQueue ? "Show all Pages" : "Review queue"}
           </Button>
 
+          {canBulkDelete ? (
+            <Box sx={{ display: "flex", gap: 1, alignItems: "center", flexWrap: "wrap", p: 1.5, bgcolor: "action.hover", borderRadius: 1 }}>
+              <Typography variant="body2" sx={{ flex: 1 }}>
+                {selectedPages.length} page{selectedPages.length === 1 ? "" : "s"} selected
+              </Typography>
+              <Button size="small" color="error" variant="contained" disabled={bulkBusy} onClick={() => setBulkConfirmOpen(true)}>
+                Delete selected
+              </Button>
+              <Button size="small" disabled={bulkBusy} onClick={() => setSelectedIds(new Set())}>Clear selection</Button>
+            </Box>
+          ) : null}
           <Box sx={{ overflowX: "auto" }}>
             <DataTable
               caption="Pages for this Site"
@@ -643,6 +716,12 @@ function SitePagesPanelContent({
               rows={rows}
               getRowKey={(row) => row.id}
               renderActions={renderActions}
+              selection={canEdit ? {
+                selected: selectedIds,
+                onChange: setSelectedIds,
+                isRowSelectable: (row) => canDeletePage(row),
+                getCheckboxLabel: (row) => `Select ${row.title}`,
+              } : undefined}
               sort={sort}
               onSortChange={(nextSort) => {
                 setSort(nextSort);
@@ -739,6 +818,33 @@ function SitePagesPanelContent({
         </DialogContent>
         <DialogActions><Button onClick={() => setHistoryPage(null)}>Close</Button></DialogActions>
       </Dialog>
+
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title="Delete page?"
+        description="Published Pages are archived so they leave public service. Drafts and archived Pages are permanently removed."
+        confirmLabel="Delete page"
+        confirmColor="error"
+        pending={bulkBusy}
+        onConfirm={() => void confirmSingleDelete()}
+        onCancel={() => { if (!bulkBusy) setDeleteTarget(null); }}
+      >
+        {deleteTarget ? <Typography variant="body2">{deleteTarget.title}</Typography> : null}
+      </ConfirmDialog>
+      <ConfirmDialog
+        open={bulkConfirmOpen}
+        title="Delete selected pages?"
+        description="Published Pages are archived. Drafts and archived Pages are permanently removed."
+        confirmLabel="Delete selected"
+        confirmColor="error"
+        pending={bulkBusy}
+        onConfirm={() => void confirmBulkDelete()}
+        onCancel={() => { if (!bulkBusy) setBulkConfirmOpen(false); }}
+      >
+        <Box component="ul" sx={{ m: 0, pl: 2 }}>
+          {selectedPages.map((row) => <li key={row.id}>{row.title}</li>)}
+        </Box>
+      </ConfirmDialog>
     </Paper>
   );
 }

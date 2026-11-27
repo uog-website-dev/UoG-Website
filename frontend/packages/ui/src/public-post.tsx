@@ -7,17 +7,26 @@
  * a draft status, or a disabled POSTS module renders nothing. Body HTML is
  * reduced to text and safe links. Script and javascript: targets are not mounted.
  */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import type { ReactNode } from "react";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 
 import {containedImageHover,newsCardHover} from "./horizontal-cards";
-import { paragraphParts } from "./public-page";
 import { ArticleDocumentView } from "./article-document";
-import { VisualPostProvider, PostTitleWidget, PostExcerptWidget, FeaturedImageWidget } from "./widget-runtime";
+import { VisualPostProvider, PostTitleWidget, FeaturedImageWidget } from "./widget-runtime";
+import { ContentBanner, crumbsForPostDetail } from "./content-banner";
+import {
+  bannerStyleFromUnknown,
+  resolveContentBannerStyle,
+  type PublicTitleBannerStyle,
+} from "./content-banner-model";
+import { PUBLIC_CONTENT_MAX_WIDTH } from "./page-width";
+import { usePublicSiteBranding } from "./site-branding";
+import { publicFetchInit, publicLogoSource } from "./public-site";
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -45,6 +54,7 @@ export interface PublicPostSummary {
 export interface PublicPostDocument extends PublicPostSummary {
   body: string;
   editor_document?: unknown;
+  title_banner?: PublicTitleBannerStyle | null;
 }
 
 function plainSeo(value: unknown, max: number): string {
@@ -115,11 +125,48 @@ export function postFromResponse(status: number, body: unknown): PublicPostDocum
   const row = body as Record<string, unknown>;
   const summary = summaryFrom(row);
   if (!summary) return null;
+  const metadata = row.metadata && typeof row.metadata === "object" && !Array.isArray(row.metadata)
+    ? row.metadata as Record<string, unknown>
+    : {};
+  const bannerOverride = Object.hasOwn(row, "title_banner")
+    ? postBannerFromMetadata({ title_banner: row.title_banner })
+    : postBannerFromMetadata(metadata);
   return {
     ...summary,
     body: typeof row.content === "string" ? row.content : "",
     ...(row.editor_document ? { editor_document: row.editor_document } : {}),
+    ...(bannerOverride ? { title_banner: bannerOverride } : {}),
   };
+}
+
+function postBannerFromMetadata(metadata: Record<string, unknown>): PublicTitleBannerStyle | null {
+  if (!Object.hasOwn(metadata, "title_banner")) return null;
+  const value = metadata.title_banner;
+  if (value == null) return null;
+  if (typeof value === "object" && !Array.isArray(value) && (value as { use_global?: unknown }).use_global === true) {
+    return null;
+  }
+  if (typeof value === "object" && !Array.isArray(value)) {
+    const row = value as Record<string, unknown>;
+    if (Object.keys(row).every((key) => key === "use_global" || key === "enabled") && typeof row.enabled === "boolean") {
+      return { ...resolveContentBannerStyle(undefined, "post"), enabled: row.enabled };
+    }
+  }
+  const parsed = bannerStyleFromUnknown(value);
+  if (!parsed) return null;
+  const ref = typeof (value as { image_ref?: unknown }).image_ref === "string"
+    ? (value as { image_ref: string }).image_ref
+    : null;
+  if (parsed.background_type === "image" && ref) {
+    const assetId = ref.replace(/^sites\/\d+\/assets\//, "");
+    if (/^[0-9a-f-]{36}$/i.test(assetId) || /^[0-9a-f]{32}$/i.test(assetId)) {
+      const uuid = assetId.includes("-")
+        ? assetId
+        : assetId.replace(/^([0-9a-f]{8})([0-9a-f]{4})([0-9a-f]{4})([0-9a-f]{4})([0-9a-f]{12})$/i, "$1-$2-$3-$4-$5");
+      return { ...parsed, image_url: `/api/v1/site-context/media/${uuid}/?variant=display` };
+    }
+  }
+  return parsed;
 }
 
 function formatPublishedAt(value: string): string {
@@ -130,24 +177,6 @@ function formatPublishedAt(value: string): string {
     month: "long",
     day: "numeric",
   }).format(date);
-}
-
-function RichText({ html }: { html: string }): ReactNode {
-  const parts = paragraphParts(html);
-  if (parts.length === 0) return null;
-  return (
-    <Typography component="p" sx={{ maxWidth: "65ch", overflowWrap: "anywhere", color: "text.primary", fontSize: { xs: "1.05rem", md: "1.125rem" }, lineHeight: 1.85 }}>
-      {parts.map((part, index) =>
-        part.type === "link" ? (
-          <Link key={index} href={part.href} rel="noopener noreferrer">
-            {part.label}
-          </Link>
-        ) : (
-          <Box key={index} component="span">{index > 0 ? " " : ""}{part.value}</Box>
-        ),
-      )}
-    </Typography>
-  );
 }
 
 export interface PublicPostPageResult {
@@ -196,6 +225,75 @@ export function PublicPostFeed({ posts }: { posts: PublicPostSummary[] | null })
   </Box>;
 }
 
+/** Related feed under a post detail — grid of other recent posts plus All news. */
+function LatestPostsSection({ excludeSlug }: { excludeSlug: string }): ReactNode {
+  const [posts, setPosts] = useState<PublicPostSummary[] | null>(null);
+  const [phase, setPhase] = useState<"loading" | "ready" | "empty">("loading");
+
+  useEffect(() => {
+    const controller = new AbortController();
+    setPhase("loading");
+    void fetch("/api/v1/site-context/posts/?page_size=6", { ...publicFetchInit(), signal: controller.signal })
+      .then(async (response) => {
+        const body = await response.json().catch(() => null);
+        const list = (postsFromResponse(response.status, body) ?? []).filter((item) => item.slug !== excludeSlug).slice(0, 3);
+        setPosts(list);
+        setPhase(list.length > 0 ? "ready" : "empty");
+      })
+      .catch((cause: unknown) => {
+        if (cause instanceof DOMException && cause.name === "AbortError") return;
+        setPosts([]);
+        setPhase("empty");
+      });
+    return () => controller.abort();
+  }, [excludeSlug]);
+
+  return (
+    <Box
+      component="section"
+      aria-label="Latest posts"
+      data-latest-posts-section=""
+      sx={{ mt: 1, pt: 4, borderTop: 1, borderColor: "divider", display: "grid", gap: 2.5 }}
+    >
+      <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 2 }}>
+        <Typography component="h2" variant="h5" sx={{ m: 0, fontWeight: 700 }}>
+          Latest posts
+        </Typography>
+        <Button
+          component={Link}
+          href="/posts"
+          underline="none"
+          variant="outlined"
+          color="primary"
+          sx={{
+            fontWeight: 700,
+            textTransform: "none",
+            px: 2,
+            py: 1,
+            "&:focus-visible": { outline: "3px solid", outlineColor: "secondary.main", outlineOffset: 3 },
+          }}
+        >
+          All news
+        </Button>
+      </Box>
+      {phase === "loading" ? (
+        <Typography role="status" color="text.secondary">
+          Loading latest posts…
+        </Typography>
+      ) : null}
+      {phase === "ready" && posts ? <PublicPostFeed posts={posts} /> : null}
+      {phase === "empty" ? (
+        <Typography role="status" color="text.secondary">
+          No other published posts yet.{" "}
+          <Link href="/posts" underline="hover">
+            Browse all news
+          </Link>
+        </Typography>
+      ) : null}
+    </Box>
+  );
+}
+
 export function PublicPostDetail({
   post,
   mediaBase,
@@ -203,9 +301,10 @@ export function PublicPostDetail({
 }: {
   post: PublicPostDocument | null;
   mediaBase?: string;
-  /** When false, omit the public “Back to posts” link (private Site preview). */
+  /** When false, omit the public latest-posts grid (private Site preview). */
   showListingLink?: boolean;
 }): ReactNode {
+  const site = usePublicSiteBranding();
   if (!post) {
     return (
       <Typography role="status" color="text.secondary">
@@ -217,6 +316,16 @@ export function PublicPostDetail({
     ? post.published_at
     : null;
   const scoped = post.site !== undefined;
+  const hasFeatured = scoped && Boolean(post.featured_media);
+  /** Align with the banner / page standard column. */
+  const contentMaxWidth = PUBLIC_CONTENT_MAX_WIDTH;
+  const bannerStyle = {
+    ...resolveContentBannerStyle(site.banner, "post", post.title_banner ?? null),
+    // Tall upper band: title stays above the overlapping featured frame.
+    height: "lg" as const,
+    content_position: "top" as const,
+    padding_y: "md" as const,
+  };
 
   return (
     <VisualPostProvider
@@ -235,94 +344,142 @@ export function PublicPostDetail({
           : null
       }
     >
-      <Box component="article" aria-labelledby="public-post-title" sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
+      <Box
+        component="article"
+        aria-labelledby="public-post-title"
+        data-post-layout="featured-overlay"
+        sx={{ display: "flex", flexDirection: "column", width: "100%" }}
+      >
         <Box
-          component="header"
-          aria-label="Article banner"
+          data-post-hero=""
           sx={{
-            bgcolor: "background.paper",
-            color: "text.primary",
+            position: "relative",
+            // Extra navy under the title so the featured frame can cover the lower band.
+            "& [data-content-banner='styled']": {
+              pb: hasFeatured ? { xs: 10, sm: 12, md: 14 } : undefined,
+            },
           }}
         >
+          <ContentBanner
+            title={post.title}
+            titleId="public-post-title"
+            style={bannerStyle}
+            breadcrumbs={crumbsForPostDetail()}
+            watermarkSrc={publicLogoSource(site)}
+          >
+            {scoped ? (
+              <Box sx={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clipPath: "inset(50%)" }} aria-hidden>
+                <PostTitleWidget id="public-post-title-widget" level={1} />
+              </Box>
+            ) : null}
+          </ContentBanner>
+        </Box>
+
+        {hasFeatured ? (
           <Box
+            data-post-featured-overlay=""
             sx={{
-              maxWidth: 1120,
+              position: "relative",
+              zIndex: 3,
+              maxWidth: contentMaxWidth,
               width: "100%",
               mx: "auto",
               px: { xs: 2, sm: 3, md: 4 },
-              pt: { xs: 3, md: 5 },
-              pb: { xs: 3, md: 4 },
+              // Pull into the banner, then keep a clear gap before the article body.
+              mt: { xs: -12, sm: -14, md: -16 },
+              mb: { xs: 3, sm: 4, md: 5 },
             }}
           >
-            {scoped ? (
-              <Box sx={{ "& h1": { fontSize: { xs: "2rem", sm: "2.75rem", md: "3.25rem" }, lineHeight: 1.12, fontWeight: 750, letterSpacing: "-0.025em", overflowWrap: "anywhere", mt: 0, mb: 0 } }}>
-                <PostTitleWidget id="public-post-title" level={1} />
-              </Box>
-            ) : (
-              <Typography
-                id="public-post-title"
-                variant="h1"
-                component="h1"
-                sx={{ fontSize: { xs: "2rem", sm: "2.75rem", md: "3.25rem" }, lineHeight: 1.12, fontWeight: 750, letterSpacing: "-0.025em", overflowWrap: "anywhere", mt: 0, mb: 0 }}
-              >
-                {post.title}
-              </Typography>
-            )}
-            {post.excerpt ? (
-              scoped ? (
-                <Box sx={{ mt: 2, maxWidth: "72ch", color: "text.secondary", fontSize: { xs: "1.05rem", md: "1.2rem" }, lineHeight: 1.65 }}>
-                  <PostExcerptWidget />
-                </Box>
-              ) : (
-                <Typography sx={{ mt: 2, maxWidth: "72ch", color: "text.secondary", fontSize: { xs: "1.05rem", md: "1.2rem" }, lineHeight: 1.65, overflowWrap: "anywhere" }}>{post.excerpt}</Typography>
-              )
-            ) : null}
-            {publishedAt || post.author ? (
-              <Typography
-                component="p"
-                variant="body2"
-                color="text.secondary"
-                sx={{ display: "flex", flexWrap: "wrap", gap: 1, alignItems: "center", mt: 2.5, mb: 0 }}
-              >
-                {publishedAt ? <Box component="time" dateTime={publishedAt}>{formatPublishedAt(publishedAt)}</Box> : null}
-                {publishedAt && post.author ? <Box component="span" aria-hidden>·</Box> : null}
-                {post.author ? <Box component="span">{post.author}</Box> : null}
-              </Typography>
-            ) : null}
-          </Box>
-        </Box>
-
-        {scoped ? (
-          <Box sx={{ maxWidth: 1120, width: "100%", mx: "auto", px: { xs: 2, sm: 3, md: 4 } }}>
-            <Box sx={{ overflow: "hidden", borderRadius: { xs: 1, sm: 2 }, boxShadow: 2, bgcolor: "action.hover" }}>
+            <Box
+              sx={{
+                overflow: "hidden",
+                borderRadius: { xs: 1, sm: 1.5 },
+                boxShadow: "0 22px 48px rgba(0, 26, 51, 0.35)",
+                bgcolor: "grey.100",
+              }}
+            >
               <FeaturedImageWidget compact variant="hero" />
             </Box>
           </Box>
         ) : null}
 
-        {post.categories.length + post.tags.length > 0 ? (
-          <Box component="nav" aria-label="Article topics" sx={{ maxWidth: 760, width: "100%", mx: "auto", px: { xs: 2, sm: 3 }, pt: 2, display: "flex", flexWrap: "wrap", gap: 1 }}>
-            {post.categories.map((item) => (
-              <Link key={`category:${item.slug}`} href={`/posts/categories/${encodeURIComponent(item.slug)}`} underline="none" sx={{ px: 1.25, py: 0.5, borderRadius: 99, bgcolor: "action.hover", color: "text.secondary", fontSize: "0.8rem", fontWeight: 600, "&:hover": { bgcolor: "action.selected", color: "primary.main" } }}>
-                {item.name}
-              </Link>
-            ))}
-            {post.tags.map((item) => (
-              <Link key={`tag:${item.slug}`} href={`/posts?tag=${encodeURIComponent(item.slug)}`} underline="none" sx={{ px: 1.25, py: 0.5, borderRadius: 99, bgcolor: "action.hover", color: "text.secondary", fontSize: "0.8rem", fontWeight: 600, "&:hover": { bgcolor: "action.selected", color: "primary.main" } }}>
-                {item.name}
-              </Link>
-            ))}
+        <Box
+          sx={{
+            maxWidth: contentMaxWidth,
+            width: "100%",
+            mx: "auto",
+            px: { xs: 2, sm: 3, md: 4 },
+            pt: hasFeatured ? { xs: 1, md: 1.5 } : { xs: 3, md: 4 },
+            pb: { xs: 2, md: 2.5 },
+          }}
+        >
+          {publishedAt || post.author ? (
+            <Typography
+              component="p"
+              variant="body2"
+              color="text.secondary"
+              data-post-byline=""
+              sx={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                gap: 0.75,
+                m: 0,
+                mb: post.categories.length + post.tags.length > 0 ? 2 : 0,
+                fontWeight: 500,
+              }}
+            >
+              {publishedAt ? (
+                <Box component="time" dateTime={publishedAt} data-post-published="">
+                  {formatPublishedAt(publishedAt)}
+                </Box>
+              ) : null}
+              {publishedAt && post.author ? <Box component="span" aria-hidden>·</Box> : null}
+              {post.author ? <Box component="span">{post.author}</Box> : null}
+            </Typography>
+          ) : null}
+          {post.categories.length + post.tags.length > 0 ? (
+            <Box component="nav" aria-label="Article topics" sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2.5 }}>
+              {post.categories.map((item) => (
+                <Link key={`category:${item.slug}`} href={`/posts/categories/${encodeURIComponent(item.slug)}`} underline="none" sx={{ px: 1.25, py: 0.5, borderRadius: 99, bgcolor: "action.hover", color: "text.secondary", fontSize: "0.8rem", fontWeight: 600, "&:hover": { bgcolor: "action.selected", color: "primary.main" } }}>
+                  {item.name}
+                </Link>
+              ))}
+              {post.tags.map((item) => (
+                <Link key={`tag:${item.slug}`} href={`/posts?tag=${encodeURIComponent(item.slug)}`} underline="none" sx={{ px: 1.25, py: 0.5, borderRadius: 99, bgcolor: "action.hover", color: "text.secondary", fontSize: "0.8rem", fontWeight: 600, "&:hover": { bgcolor: "action.selected", color: "primary.main" } }}>
+                  {item.name}
+                </Link>
+              ))}
+            </Box>
+          ) : null}
+        </Box>
+
+        <Box
+          data-post-body=""
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            pt: post.categories.length + post.tags.length > 0 ? 1 : 0,
+            pb: showListingLink ? 2 : { xs: 5, md: 7 },
+            maxWidth: contentMaxWidth,
+            width: "100%",
+            mx: "auto",
+            px: { xs: 2, sm: 3, md: 4 },
+          }}
+        >
+          <ArticleDocumentView
+            siteId={post.site}
+            mediaBase={mediaBase}
+            document={post.editor_document ?? { schema_version: 1, html: post.body || "" }}
+            maxWidth="none"
+          />
+        </Box>
+        {showListingLink ? (
+          <Box sx={{ maxWidth: 1100, width: "100%", mx: "auto", px: { xs: 2, sm: 3 }, pb: { xs: 5, md: 7 } }}>
+            <LatestPostsSection excludeSlug={post.slug} />
           </Box>
         ) : null}
-
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: { xs: 3, md: 4 }, pb: { xs: 5, md: 7 }, maxWidth: 760, width: "100%", mx: "auto", px: { xs: 2, sm: 3 } }}>
-          {post.editor_document ? (
-            <ArticleDocumentView siteId={post.site} mediaBase={mediaBase} document={post.editor_document} />
-          ) : (
-            <RichText html={post.body} />
-          )}
-          {showListingLink ? <Link href="/posts" underline="hover" sx={{ alignSelf: "flex-start", mt: 2, fontWeight: 600 }}>Back to posts</Link> : null}
-        </Box>
       </Box>
     </VisualPostProvider>
   );

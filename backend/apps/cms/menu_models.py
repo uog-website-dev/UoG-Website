@@ -1,10 +1,9 @@
 """Site-owned menus: one location per Site, items as an ordered tree.
 
-Internal page and post targets belong to the same Site. A cross-site target
-is stored only when allow_cross_site is set. External targets accept http
-and https URLs and reject scriptable schemes, protocol-relative URLs, and
-credentialed redirects. Editing is refused while the MENUS module is off;
-existing rows are left in place.
+Internal page and post targets belong to the same Site. External targets
+accept http and https URLs and reject scriptable schemes, protocol-relative
+URLs, and credentialed redirects. Editing is refused while the MENUS module
+is off; existing rows are left in place.
 """
 import re
 import uuid
@@ -22,7 +21,7 @@ CUSTOM_PATH = re.compile(r"\A/(?:[a-z0-9][a-z0-9-]{0,63}(?:/[a-z0-9][a-z0-9-]{0,
 MAX_MENU_DEPTH = 6  # Top-level destination plus five submenu levels.
 EXTERNAL_SCHEMES = frozenset({"http", "https"})
 REJECTED_SCHEMES = frozenset({"javascript", "data", "vbscript", "file"})
-MENU_LOCATIONS = ("header", "footer", "sidebar", "primary", "secondary")
+MENU_LOCATIONS = ("header", "footer", "sidebar", "secondary")
 LOCAL_PRECEDENCE = ("override", "append")
 MAX_INHERITANCE_HOPS = 8
 
@@ -130,6 +129,10 @@ class Menu(MenuRecord):
         super().clean()
         if not self.name:
             raise ValidationError({"name": "A menu name is required."})
+        if self.location == "primary":
+            raise ValidationError({
+                "location": "Primary is retired. Use header for the main navigation, or clear the location.",
+            })
         if self.location not in ("", *MENU_LOCATIONS) or (self.is_global and not self.location):
             raise ValidationError({"location": "Choose a configured menu location."})
         if self.pk and not self._state.adding:
@@ -186,10 +189,6 @@ class MenuItem(MenuRecord):
     parent = models.ForeignKey("self", null=True, blank=True, on_delete=models.PROTECT, related_name="children")
     sort_order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
-    allow_cross_site = models.BooleanField(
-        default=False,
-        help_text="Explicit opt-in for a page or post owned by a different Site. External and custom targets cannot set this.",
-    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -246,7 +245,7 @@ class MenuItem(MenuRecord):
             from apps.sites.selectors.modules import module_is_available
             if not module_is_available(self.site_id, "POSTS"):
                 raise ValidationError({"target": "The POSTS module is not enabled for this Site."})
-            if self.page_id or self.post_id or self.target or self.allow_cross_site:
+            if self.page_id or self.post_id or self.target:
                 raise ValidationError({"target": "News destinations must belong to this Site and cannot contain a URL."})
             if kind == self.ItemType.NEWS and self.category_id:
                 raise ValidationError({"category": "A news listing cannot select a category."})
@@ -269,8 +268,8 @@ class MenuItem(MenuRecord):
             from apps.api.models import Post
             self._validate_internal(Post, self.post_id, "post")
             return
-        if self.page_id or self.post_id or self.allow_cross_site:
-            raise ValidationError({"target": "External and custom items cannot reference a Page, Post, or another Site."})
+        if self.page_id or self.post_id:
+            raise ValidationError({"target": "External and custom items cannot reference a Page or Post."})
         if kind == self.ItemType.EXTERNAL:
             validate_external_url(self.target)
             return
@@ -284,10 +283,8 @@ class MenuItem(MenuRecord):
         owner = model.objects.filter(pk=record_id).values_list("site_id", flat=True).first()
         if owner is None:
             raise ValidationError({field: "The target must belong to a Site."})
-        if owner != self.site_id and not self.allow_cross_site:
-            raise ValidationError({
-                field: "The target must belong to this Site. Set allow_cross_site to link another Site's record.",
-            })
+        if owner != self.site_id:
+            raise ValidationError({field: "The target must belong to this Site."})
 
     def _validate_tree(self):
         if self.parent_id == self.pk:
@@ -392,6 +389,11 @@ class MenuInheritance(models.Model):
         if self.inherit_from_id is not None and self.inherit_from_id == self.site_id:
             raise ValidationError({"inherit_from": "A Site cannot inherit its own menu."})
         if self.inherit_from_id is not None:
+            from .selectors.menu_delivery import _is_inheritance_parent
+            if not _is_inheritance_parent(self.site_id, self.inherit_from_id):
+                raise ValidationError({
+                    "inherit_from": "The parent Site must share this Site's organization unit or be an ancestor unit.",
+                })
             seen = {self.site_id}
             current = self.inherit_from_id
             hops = 0

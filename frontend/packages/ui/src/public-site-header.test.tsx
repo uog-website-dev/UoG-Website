@@ -70,6 +70,15 @@ describe("PublicSiteHeader", () => {
     expect(getComputedStyle(header()).position).toBe("sticky");
   });
 
+  it("keeps the full Site display name on one line without ellipsis", () => {
+    render(<PublicSiteHeader site={{ ...base, displayName: "University of Gondar" }} />);
+    const name = document.querySelector("[data-site-branding-name]") as HTMLElement;
+    expect(name?.textContent).toBe("University of Gondar");
+    const styles = getComputedStyle(name);
+    expect(styles.textOverflow).not.toBe("ellipsis");
+    expect(styles.whiteSpace).toBe("nowrap");
+  });
+
   it("renders a configured quote beneath the Site name as plain text", () => {
     const quote = "<b>Inspiring words</b>";
     const view = render(<PublicSiteHeader site={base} settings={{

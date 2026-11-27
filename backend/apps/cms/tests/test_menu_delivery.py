@@ -1,4 +1,5 @@
 """Effective public menus: precedence, inheritance, cache scope and module gate."""
+from unittest.mock import patch
 from uuid import uuid4
 
 import pytest
@@ -10,6 +11,7 @@ from apps.api.models import Post
 from apps.audit.models import AuditEvent
 from apps.authorization.models import Role, UserRoleAssignment
 from apps.cms.menu_cache import delivery_version
+from apps.cms.menu_assignment_models import MenuLocationAssignment
 from apps.cms.menu_models import Menu, MenuInheritance, MenuItem
 from apps.cms.tests.support import transition_with_site_role
 from apps.cms.selectors.menu_delivery import compose_location
@@ -67,7 +69,7 @@ def _link(menu, label, **overrides):
         "target": "/" + label.lower().replace(" ", "-"), "sort_order": 0,
     }
     values.update(overrides)
-    if values["item_type"] in {"page", "post"}:
+    if values["item_type"] in {"page", "post", "category", "news"}:
         values["target"] = ""
     return MenuItem.objects.create(**values)
 
@@ -165,6 +167,47 @@ def test_unpublished_targets_and_inactive_branches_are_omitted(family):
     assert compose_location(child.pk, "header")[1]["href"] == "/posts/visible"
 
 
+def test_public_menu_cache_hit_skips_recompose(family, client):
+    """Finding 2: versioned cache must be returned without recomposing."""
+    _main, _parent, child, _sibling = family
+    menu = Menu.objects.create(site=child, location="header", name="Local")
+    _link(menu, "Department")
+    host = _host(child)
+    first = client.get(PUBLIC + "?location=header", HTTP_HOST=host)
+    assert first.status_code == 200
+    assert [row["label"] for row in first.json()["locations"]["header"]] == ["Department"]
+    with patch(
+        "apps.cms.api.menu_delivery.compose_location", wraps=compose_location,
+    ) as recomposed:
+        second = client.get(PUBLIC + "?location=header", HTTP_HOST=host)
+        assert second.status_code == 200
+        assert second.json()["locations"]["header"] == first.json()["locations"]["header"]
+        recomposed.assert_not_called()
+
+
+def test_compose_location_destination_queries_stay_bounded(family):
+    """Finding 3: destination resolution must not query once per menu item."""
+    from django.db import connection
+    from django.test.utils import CaptureQueriesContext
+
+    _main, _parent, child, _sibling = family
+    menu = Menu.objects.create(site=child, location="header", name="Local")
+    for index in range(12):
+        post = _publish_post(Post.objects.create(
+            site=child, title=f"Story {index}", slug=f"story-{index}", content="Body",
+        ))
+        _link(menu, f"Story {index}", item_type="post", post=post, sort_order=index)
+    _link(menu, "News index", item_type="news", target="", sort_order=12)
+    _link(menu, "Campus", sort_order=13)
+    with CaptureQueriesContext(connection) as captured:
+        tree = compose_location(child.pk, "header")
+    # Batched destinations keep this under one query per linked target.
+    assert len(captured) <= 18, f"{len(captured)} queries: {[q['sql'] for q in captured]}"
+    assert len(tree) == 14
+    assert tree[0]["href"].startswith("/posts/")
+    assert tree[12]["href"] == "/posts"
+
+
 def test_post_publish_and_unpublish_invalidate_linked_menu_delivery(family):
     _main, _parent, child, _sibling = family
     menu = Menu.objects.create(site=child, location="header", name="Local")
@@ -187,6 +230,58 @@ def test_post_publish_and_unpublish_invalidate_linked_menu_delivery(family):
     assert delivery_version(child.pk, "header") > published_version
     assert _roots(child.pk) == []
     assert Post.objects.get(pk=post.pk).status == ContentStatus.UNPUBLISHED
+
+
+def test_page_category_and_global_post_invalidate_linked_menu_delivery(family, client):
+    """Finding 7: Page, Category and global-post targets must bump delivery versions."""
+    from apps.api.models import Category
+
+    main, _parent, child, sibling = family
+    MenuInheritance.objects.create(
+        site=child, location="header", include_global=True,
+        inherit_from=None, local_precedence="append",
+    )
+    global_menu = Menu.objects.create(
+        site=main, location="header", name="Global", is_global=True,
+    )
+    global_post = Post.objects.create(
+        site=main, title="University news", slug="university-news", content="Body",
+    )
+    _link(global_menu, "University news", item_type="post", post=global_post)
+
+    local = Menu.objects.create(site=child, location="header", name="Local")
+    page = create_page(site=child, title="About", slug="about")
+    _link(local, "About", item_type="page", page=page, sort_order=0)
+    category = Category.objects.create(site=child, code="RESEARCH", name="Research")
+    _link(local, "Research", item_type="category", category=category, sort_order=1)
+
+    before_child = delivery_version(child.pk, "header")
+    before_sibling = delivery_version(sibling.pk, "header")
+    assert client.get(PUBLIC + "?location=header", HTTP_HOST=_host(child)).status_code == 200
+
+    _publish_post(global_post)
+    after_global = delivery_version(child.pk, "header")
+    assert after_global > before_child
+    assert delivery_version(sibling.pk, "header") == before_sibling
+    assert ("University news", "global") in _roots(child.pk)
+
+    page_before = after_global
+    for action in ("submit", "approve", "publish"):
+        transition_with_site_role(
+            page, action,
+            get_user_model().objects.create_user(username=f"page-{action}-{uuid4().hex[:6]}"),
+        )
+    assert delivery_version(child.pk, "header") > page_before
+    assert ("About", "local") in _roots(child.pk)
+
+    category_before = delivery_version(child.pk, "header")
+    for action in ("submit", "approve", "publish"):
+        transition_with_site_role(
+            category, action,
+            get_user_model().objects.create_user(username=f"cat-{action}-{uuid4().hex[:6]}"),
+        )
+    assert delivery_version(child.pk, "header") > category_before
+    assert ("Research", "local") in _roots(child.pk)
 
 
 def test_inheritance_rejects_loops_and_does_not_grant_parent_management(family, client, oidc, settings):
@@ -314,3 +409,101 @@ def test_menu_changes_invalidate_only_affected_site_and_location_caches(family, 
     assert [row["label"] for row in client.get(PUBLIC + "?location=header", HTTP_HOST=_host(child)).json()["locations"]["header"]] == [
         "UoG", "Schools", "Department",
     ]
+
+
+def _publish_assignment(site, location, menu):
+    """Persist a published location assignment without going through the HTTP API."""
+    actor = get_user_model().objects.create_user(
+        username=f"assign-{site.pk}-{uuid4().hex[:8]}",
+    )
+    row = MenuLocationAssignment.objects.filter(site=site, location=location).first()
+    if row is None:
+        row = MenuLocationAssignment(site=site, location=location)
+    row.draft_menu = menu
+    row.published_menu = menu
+    row.draft_menus = []
+    row.published_menus = []
+    row.is_published = True
+    row.updated_by = actor
+    row.save()
+    return row
+
+
+def test_published_assignment_keeps_include_global_and_append_inheritance(family):
+    """Finding 1: a published assignment is the local segment, not a hard override of policy."""
+    main, parent, child, _sibling = family
+    global_menu = Menu.objects.create(site=main, location="header", name="Global", is_global=True)
+    _link(global_menu, "University")
+    parent_menu = Menu.objects.create(site=parent, location="header", name="Parent")
+    _link(parent_menu, "Colleges")
+    local_menu = Menu.objects.create(site=child, location="", name="Assigned local", code="assigned-local")
+    _link(local_menu, "Department")
+    _publish_assignment(child, "header", local_menu)
+    MenuInheritance.objects.create(
+        site=child, location="header", inherit_from=parent,
+        include_global=True, local_precedence="append",
+    )
+    assert _roots(child.pk) == [
+        ("University", "global"), ("Colleges", "inherited"), ("Department", "local"),
+    ]
+
+
+def test_child_inherits_parent_assigned_local_menu_not_composed_tree(family):
+    """Finding 1: inheritance copies the parent's assigned local menu only."""
+    main, parent, child, _sibling = family
+    global_menu = Menu.objects.create(site=main, location="header", name="Global", is_global=True)
+    _link(global_menu, "University")
+    parent_assigned = Menu.objects.create(
+        site=parent, location="", name="Parent assigned", code="parent-assigned",
+    )
+    _link(parent_assigned, "Assigned parent")
+    _publish_assignment(parent, "header", parent_assigned)
+    MenuInheritance.objects.create(
+        site=parent, location="header", include_global=True, local_precedence="override",
+    )
+    MenuInheritance.objects.create(
+        site=child, location="header", inherit_from=parent,
+        include_global=False, local_precedence="append",
+    )
+    # Parent composition includes global + assigned local.
+    assert _roots(parent.pk) == [("University", "global"), ("Assigned parent", "local")]
+    # Child inherits only the parent's local assignment, not the parent's global fragment.
+    assert _roots(child.pk) == [("Assigned parent", "inherited")]
+
+
+def test_inheritance_requires_parent_site_organization_hierarchy(family):
+    """Finding 12: inherit_from must share this Site's unit or be an ancestor unit."""
+    _main, parent, child, sibling = family
+    parent_menu = Menu.objects.create(site=parent, location="header", name="Parent")
+    _link(parent_menu, "Colleges")
+    sibling_menu = Menu.objects.create(site=sibling, location="header", name="Sibling")
+    _link(sibling_menu, "Hospital")
+    MenuInheritance.objects.create(
+        site=child, location="header", inherit_from=parent, local_precedence="append",
+    )
+    assert ("Colleges", "inherited") in _roots(child.pk)
+    with pytest.raises(ValidationError, match="organization unit|ancestor"):
+        MenuInheritance.objects.create(
+            site=child, location="footer", inherit_from=sibling, local_precedence="append",
+        )
+    # Delivery also ignores a corrupt cross-branch pointer written without validation.
+    MenuInheritance.objects.filter(site=child, location="header").update(inherit_from_id=sibling.pk)
+    assert ("Hospital", "inherited") not in _roots(child.pk)
+    assert ("Colleges", "inherited") not in _roots(child.pk)
+
+
+def test_published_menu_over_item_cap_raises_instead_of_empty(family):
+    """Finding 12: oversized published menus surface a bounded error, not []."""
+    _main, _parent, child, _sibling = family
+    menu = Menu.objects.create(site=child, location="header", name="Huge")
+    menu.published_items = [
+        {
+            "id": str(uuid4()), "site_id": child.pk, "label": f"Item {index}",
+            "item_type": "custom", "page_id": None, "post_id": None, "category_id": None,
+            "target": f"/item-{index}", "parent_id": None, "sort_order": index, "is_active": True,
+        }
+        for index in range(1001)
+    ]
+    Menu.objects.filter(pk=menu.pk).update(published_items=menu.published_items)
+    with pytest.raises(ValidationError, match="at most 1000"):
+        compose_location(child.pk, "header")

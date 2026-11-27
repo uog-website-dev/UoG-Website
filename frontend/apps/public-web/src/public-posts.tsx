@@ -144,14 +144,43 @@ export function PublicPostsPage({ archiveSlug }: { archiveSlug?: string }) {
   </Box>;
 }
 
-export function PublicPostPage({ slug }: { slug: string }) {
-  return <ScopedPublicPost key={slug} slug={slug} />;
+export type PublicPostSeed = {
+  status: number;
+  body: unknown;
+  location?: string | null;
+} | null;
+
+export function PublicPostPage({
+  slug,
+  initialPayload,
+}: {
+  slug: string;
+  /**
+   * Server-fetched post response. `undefined` means no server seed.
+   * `null` means the server already tried and found nothing.
+   */
+  initialPayload?: PublicPostSeed;
+}) {
+  return <ScopedPublicPost key={slug} slug={slug} initialPayload={initialPayload} />;
 }
 
-function ScopedPublicPost({ slug }: { slug: string }) {
+function ScopedPublicPost({
+  slug,
+  initialPayload,
+}: {
+  slug: string;
+  initialPayload?: PublicPostSeed;
+}) {
   const site = usePublicSiteBranding();
-  const [post, setPost] = useState<PublicPostDocument | null>(null);
-  const [ready, setReady] = useState(false);
+  const serverProvided = initialPayload !== undefined;
+  const [post, setPost] = useState<PublicPostDocument | null>(() => {
+    if (!serverProvided || !initialPayload || site.id === null || !site.modules.posts || !SLUG.test(slug)) {
+      return null;
+    }
+    const document = postFromResponse(initialPayload.status, initialPayload.body);
+    return document && document.site === site.id ? document : null;
+  });
+  const [ready, setReady] = useState(serverProvided);
   usePublicBreadcrumbTitle(post?.title ?? null);
 
   useEffect(() => {
@@ -166,7 +195,45 @@ function ScopedPublicPost({ slug }: { slug: string }) {
       setReady(true);
       return;
     }
+
+    if (serverProvided) {
+      const seeded = initialPayload
+        ? (() => {
+            const document = postFromResponse(initialPayload.status, initialPayload.body);
+            return document && document.site === site.id ? document : null;
+          })()
+        : null;
+      setPost(seeded);
+      setReady(true);
+      if (seeded) applyDocumentMetadata(site, seeded);
+
+      let cancelled = false;
+      const refresh = () => {
+        if (document.visibilityState === "hidden") return;
+        void fetch(`/api/v1/site-context/posts/${slug}/`, publicFetchInit())
+          .then(async (response) => {
+            const body = response.ok ? await response.json().catch(() => null) : null;
+            const document = postFromResponse(response.status, body);
+            const visible = document && document.site === site.id ? document : null;
+            applyDocumentMetadata(site, visible);
+            return visible;
+          })
+          .catch(() => null)
+          .then((next) => {
+            if (!cancelled && next !== undefined) setPost(next);
+          });
+      };
+      window.addEventListener("focus", refresh);
+      document.addEventListener("visibilitychange", refresh);
+      return () => {
+        cancelled = true;
+        window.removeEventListener("focus", refresh);
+        document.removeEventListener("visibilitychange", refresh);
+      };
+    }
+
     let cancelled = false;
+    setReady(false);
     fetch(`/api/v1/site-context/posts/${slug}/`, publicFetchInit())
       .then(async (response) => {
         const body = response.ok ? await response.json().catch(() => null) : null;
@@ -185,8 +252,14 @@ function ScopedPublicPost({ slug }: { slug: string }) {
     return () => {
       cancelled = true;
     };
-  }, [slug, site]);
+  }, [slug, site, serverProvided, initialPayload]);
 
-  if (!ready) return <Typography role="status">Loading published post…</Typography>;
+  if (!ready) {
+    return (
+      <Typography role="status" data-page-loading="">
+        Loading published post…
+      </Typography>
+    );
+  }
   return <PublicPostDetail post={post} />;
 }

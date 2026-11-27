@@ -56,6 +56,12 @@ export function PublicSiteChrome({ children, initialSite = EMPTY_SITE, initialMe
       "&:has([data-page-width])": { px: 0 },
       // Homepage heroes begin directly below the Site header.
       "&:has([data-page-homepage='true'])": { pt: 0 },
+      // Styled title banners are edge-to-edge; page/post bodies keep their own gutters.
+      "&:has([data-content-banner='styled'])": {
+        pt: 0,
+        px: 0,
+        maxWidth: "none",
+      },
       // Wide/Reading caps must apply to the whole viewport, not a 1200 px shell.
       "&:has([data-page-layout='FULL_WIDTH'][data-page-width])": { maxWidth: "none" },
       // Only an explicit Page bleed releases the surrounding shell.

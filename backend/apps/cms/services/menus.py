@@ -24,7 +24,7 @@ from ..menu_models import Menu, MenuItem, require_menus_module, MAX_MENU_DEPTH
 MENU_FIELDS = frozenset({"code", "location", "name", "is_active", "is_global"})
 ITEM_FIELDS = frozenset({
     "label", "item_type", "page", "post", "target", "parent", "sort_order",
-    "is_active", "allow_cross_site", "page_id", "post_id", "parent_id", "category", "category_id",
+    "is_active", "page_id", "post_id", "parent_id", "category", "category_id",
 })
 
 
@@ -113,8 +113,6 @@ def _assign(instance, fields, allowed):
 
 
 def _target_permission(item, actor):
-    # The model's explicit cross-site flag is a trusted domain opt-in, not
-    # permission to read an arbitrary foreign draft in a user request.
     from apps.api.models import Post
     from ..models import Page
     model = Page if item.page_id else Post
@@ -211,12 +209,13 @@ def set_menu_active(menu_id, *, actor, expected, active):
             for item in menu.items.filter(is_active=True):
                 if destination_state(item) != "ready":
                     raise ValidationError({f"items.{item.pk}.target": "Destination is unavailable or unpublished. Update or disable this item before publishing."})
+            # Empty menus store [] so has_unpublished_changes stays false until edits.
             menu.published_items = snapshot_items(menu)
         menu.is_active = active
         menu.save(update_fields=["is_active", "published_items"])
         if active:
             record_event(action="MENU_PUBLISHED", entity_type="cms.menu", entity_id=menu.pk,
-                after={"site_id":menu.site_id,"version":menu.version,"item_count":len(menu.published_items)}, changed_fields=["published_items"])
+                after={"site_id":menu.site_id,"version":menu.version,"item_count":len(menu.published_items or [])}, changed_fields=["published_items"])
         return menu
 
 

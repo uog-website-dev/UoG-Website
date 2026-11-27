@@ -27,6 +27,7 @@ export interface SitePostRecord {
   seo: Record<string, unknown>;
   featured_media: string;
   featured_alt?: string;
+  metadata?: Record<string, unknown>;
   revision_number?: number;
   draft_of?: string | null;
   publication_slug?: string;
@@ -165,7 +166,7 @@ export async function getSitePost(
 
 export async function createSitePost(
   siteId: number,
-  input: Pick<SitePostRecord, "title" | "slug" | "excerpt" | "seo" | "featured_media" | "categories" | "tags"> & Partial<Pick<SitePostRecord,"editor_document"|"content"|"blocks"|"featured_alt">>,
+  input: Pick<SitePostRecord, "title" | "slug" | "excerpt" | "seo" | "featured_media" | "categories" | "tags"> & Partial<Pick<SitePostRecord,"editor_document"|"content"|"blocks"|"featured_alt"|"metadata">>,
 ): Promise<ActionResult<SitePostRecord>> {
   return invalidated(siteId, "posts", attempt(async () => {
     const api = await client();
@@ -178,7 +179,7 @@ export async function updateSitePost(
   siteId: number,
   postId: string,
   ifMatch: string,
-  input: Pick<SitePostRecord, "title" | "slug" | "excerpt" | "seo" | "featured_media" | "categories" | "tags"> & Partial<Pick<SitePostRecord,"editor_document"|"content"|"blocks"|"featured_alt">>,
+  input: Pick<SitePostRecord, "title" | "slug" | "excerpt" | "seo" | "featured_media" | "categories" | "tags"> & Partial<Pick<SitePostRecord,"editor_document"|"content"|"blocks"|"featured_alt"|"metadata">>,
 ): Promise<ActionResult<SitePostRecord>> {
   return invalidated(siteId, "posts", attempt(async () => {
     const api = await client();
@@ -247,6 +248,13 @@ export async function openSitePostWorkingDraft(siteId:number,postId:string,ifMat
     const result = await (await client()).postDetailed<SitePostRecord>(sitePostsPath(siteId,`${postId}/working-draft/`),undefined,{headers:{"If-Match":ifMatch}});
     if (result.data.site !== siteId) throw new Error("The article does not belong to this Site.");
     return {...result.data,etag:result.etag ?? ""};
+  }));
+}
+
+export async function deleteSitePost(siteId: number, postId: string): Promise<ActionResult<null>> {
+  return invalidated(siteId, "posts", attempt(async () => {
+    await (await client()).delete(sitePostsPath(siteId, `${postId}/`));
+    return null;
   }));
 }
 

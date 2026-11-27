@@ -1,5 +1,11 @@
 import {footerSettingsFrom,headerSettingsFrom} from "@uog/types";
 import type {SiteFooterSettings,SiteHeaderSettings} from "@uog/types";
+import {
+  DEFAULT_PUBLIC_BANNER,
+  bannerStyleFromUnknown,
+  type PublicTitleBannerConfig,
+  type PublicTitleBannerStyle,
+} from "./content-banner-model";
 /**
  * Host-resolved public Site decisions.
  *
@@ -38,7 +44,8 @@ export interface PublicSiteContext {
   /** Enabled public languages; locale-prefixed routes are not implemented yet. */
   languages?: string[];
   theme: "institutional" | "high-contrast";
-  modules: { pages: boolean; posts: boolean; menus: boolean; documents?: boolean };
+  banner: PublicTitleBannerConfig;
+  modules: { pages: boolean; posts: boolean; menus: boolean };
 }
 
 export const EMPTY_SITE: PublicSiteContext = {
@@ -50,7 +57,8 @@ export const EMPTY_SITE: PublicSiteContext = {
   canonicalDomain: null,
   logoUrl: null,
   theme: "institutional",
-  modules: { pages: false, posts: false, menus: false, documents: false },
+  banner: DEFAULT_PUBLIC_BANNER,
+  modules: { pages: false, posts: false, menus: false },
 };
 
 /** Site-bound logo URL with a revision token so browser icon caches refresh on branding changes. */
@@ -68,7 +76,7 @@ export function siteFromContext(status: number, body: unknown): PublicSiteContex
     site?: { id?: unknown; code?: unknown; name?: unknown } | null;
     domain?: unknown;
     canonical_domain?: unknown;
-    configuration?: { display_name?: unknown; theme?: unknown; logo_url?: unknown; branding_revision?: unknown; footer?:unknown; header?:unknown; languages?:unknown } | null;
+    configuration?: { display_name?: unknown; theme?: unknown; logo_url?: unknown; branding_revision?: unknown; footer?:unknown; header?:unknown; languages?:unknown; banner?: unknown } | null;
     modules?: unknown;
   };
   const site = row.site;
@@ -96,6 +104,7 @@ export function siteFromContext(status: number, body: unknown): PublicSiteContex
       ? row.configuration.languages.filter((code):code is string=>typeof code==="string"&&/^[a-z]{2,3}(?:-[a-z0-9]{2,8})*$/.test(code))
       : undefined,
     theme,
+    banner: bannerConfigFromUnknown(row.configuration?.banner),
     modules: {
       pages: modules.includes("PAGES"),
       posts: modules.includes("POSTS"),
@@ -104,6 +113,22 @@ export function siteFromContext(status: number, body: unknown): PublicSiteContex
     },
   };
 }
+
+function bannerConfigFromUnknown(value: unknown): PublicTitleBannerConfig {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return DEFAULT_PUBLIC_BANNER;
+  const row = value as Record<string, unknown>;
+  const shared = bannerStyleFromUnknown(row.shared) ?? DEFAULT_PUBLIC_BANNER.shared;
+  const page = bannerStyleFromUnknown(row.page) ?? shared;
+  const post = bannerStyleFromUnknown(row.post) ?? shared;
+  return {
+    scope: row.scope === "independent" ? "independent" : "shared",
+    shared,
+    page,
+    post,
+  };
+}
+
+export type { PublicTitleBannerConfig, PublicTitleBannerStyle };
 
 export interface PublicMenusPayload {
   site: number;

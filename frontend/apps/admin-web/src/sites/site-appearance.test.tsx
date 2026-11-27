@@ -5,10 +5,12 @@ const mocks=vi.hoisted(()=>({get:vi.fn(),save:vi.fn(),site:{id:16,name:"Informat
 vi.mock("@/app/sites/actions",()=>({getSite:mocks.get,updateSiteConfiguration:mocks.save}));
 vi.mock("./site-admin-frame",()=>({useSiteAdmin:()=>({site:mocks.site})}));
 vi.mock("./site-image-field",()=>({SiteImageField:({onChange}:{onChange:(value:{assetId:string;alt:string})=>void})=><button type="button" onClick={()=>onChange({assetId:"00000000-0000-4000-8000-000000000001",alt:"Logo"})}>Choose Site logo</button>}));
-const config={identity:{display_name:"College name",logo_ref:null},presentation:{theme:"institutional"}};
-const loaded=(id=16,title="College name",etag='"original"')=>({ok:true,data:{data:{id,configuration:{...config,identity:{...config.identity,display_name:title}}},etag}});
+import {defaultTitleBannerSettings} from "./title-banner-defaults";
+const config={identity:{display_name:"College name",logo_ref:null},presentation:{theme:"institutional",banner:defaultTitleBannerSettings()}};
+const loaded=(id=16,title="College name",etag='"original"')=>({ok:true,data:{data:{id,configuration:{...config,identity:{...config.identity,display_name:title},presentation:{...config.presentation,banner:defaultTitleBannerSettings()}}},etag}});
 beforeEach(()=>{mocks.site={id:16,name:"Informatics"};mocks.get.mockReset().mockResolvedValue(loaded());mocks.save.mockReset();});
-it("saves only Site appearance with the loaded ETag and reopens effective settings",async()=>{
+it("saves only Site appearance with a fresh ETag and reopens effective settings",async()=>{
+ mocks.get.mockResolvedValueOnce(loaded()).mockResolvedValueOnce(loaded(16,"College name",'"fresh-write"'));
  mocks.save.mockResolvedValue(loaded(16,"New public title",'"saved"'));
  const view=render(<SiteAppearancePanel/>);
  const title=await screen.findByRole("textbox",{name:"Public Site title"});
@@ -16,15 +18,33 @@ it("saves only Site appearance with the loaded ETag and reopens effective settin
  fireEvent.click(screen.getByRole("button",{name:"Choose Site logo"}));
  fireEvent.click(screen.getByRole("button",{name:"Save appearance"}));
  await screen.findByText(/Appearance saved for this Site/);
- expect(mocks.save).toHaveBeenCalledWith(16,'"original"',{identity:{display_name:"New public title",logo_ref:"00000000-0000-4000-8000-000000000001"},presentation:{theme:"institutional"}});
+ expect(mocks.save).toHaveBeenCalledWith(16,'"fresh-write"',{identity:{display_name:"New public title",logo_ref:"00000000-0000-4000-8000-000000000001"},presentation:{theme:"institutional",banner:defaultTitleBannerSettings()}});
  view.unmount();mocks.get.mockResolvedValue(loaded(16,"New public title",'"saved"'));render(<SiteAppearancePanel/>);
  expect((await screen.findByRole("textbox",{name:"Public Site title"}) as HTMLInputElement).value).toBe("New public title");
 });
-it("preserves unsaved text and reports a stale-write conflict",async()=>{
+it("retries once with a newer ETag when the first write is stale",async()=>{
+ mocks.get
+  .mockResolvedValueOnce(loaded())
+  .mockResolvedValueOnce(loaded(16,"College name",'"stale"'))
+  .mockResolvedValueOnce(loaded(16,"College name",'"newer"'));
+ mocks.save
+  .mockResolvedValueOnce({ok:false,error:{status:412,code:"precondition_failed",message:"Changed",details:null,requestId:null}})
+  .mockResolvedValueOnce(loaded(16,"Recovered title",'"saved"'));
+ render(<SiteAppearancePanel/>);
+ const title=await screen.findByRole("textbox",{name:"Public Site title"});
+ fireEvent.change(title,{target:{value:"Recovered title"}});
+ fireEvent.click(screen.getByRole("button",{name:"Save appearance"}));
+ await screen.findByText(/Appearance saved for this Site/);
+ expect(mocks.save).toHaveBeenNthCalledWith(1,16,'"stale"',expect.any(Object));
+ expect(mocks.save).toHaveBeenNthCalledWith(2,16,'"newer"',expect.any(Object));
+});
+it("preserves unsaved text and reports a stale-write conflict after retry",async()=>{
+ mocks.get.mockResolvedValue(loaded());
  mocks.save.mockResolvedValue({ok:false,error:{status:412,code:"precondition_failed",message:"Changed",details:null,requestId:null}});
  render(<SiteAppearancePanel/>);const title=await screen.findByRole("textbox",{name:"Public Site title"});
  fireEvent.change(title,{target:{value:"Unsaved work"}});fireEvent.click(screen.getByRole("button",{name:"Save appearance"}));
  await screen.findByText(/Appearance changed in another session/);expect((title as HTMLInputElement).value).toBe("Unsaved work");
+ expect(mocks.save).toHaveBeenCalledTimes(2);
 });
 it("retries a failed read without displaying an empty editable form",async()=>{
  mocks.get.mockRejectedValueOnce(new Error("Transport failure"));render(<SiteAppearancePanel/>);

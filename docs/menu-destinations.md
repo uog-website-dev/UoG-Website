@@ -11,7 +11,10 @@ Site Administration > Menus keeps the existing Menu/MenuItem hierarchy, stable i
 - **External URL**: existing HTTP/HTTPS allowlist, with credentials, script schemes, protocol-relative URLs, controls and ambiguous escaping rejected. No server-side URL fetching is performed. This validates destination syntax, not remote availability.
 - **Same-site path**: existing bounded local path grammar. These are author-managed paths, not a promise that a public route exists. Prefer typed Page/news/category choices for eligibility tracking.
 
-The user-facing service rejects foreign Page/Post IDs even if `allow_cross_site` is forged or the actor can view both Sites. Historical trusted cross-Site grants remain stored, but public projection omits destinations outside the owning Site; reconcile them before republishing. Category ownership and target shape are also enforced by a database trigger. No new workflow for Pages or Posts is introduced.
+Foreign Page/Post IDs are rejected at the model, API and database layers. Use an
+external URL when a link must point at another Site's public hostname. Category
+ownership and target shape are also enforced by a database trigger. No new
+workflow for Pages or Posts is introduced.
 
 Saving a same-Site unpublished Page/Post/category reference is permitted as a private draft with `destination_status: unavailable`; publishing is blocked with an item-addressed error until the destination is eligible or the item is disabled/removed. All active destinations are checked at publication, including descendants. Disabled source modules suppress public destinations; unrelated navigation still renders. Missing or removed targets safely disappear, including their descendants.
 

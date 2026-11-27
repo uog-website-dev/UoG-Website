@@ -148,6 +148,12 @@ FOR EACH ROW EXECUTE FUNCTION cms_content_revision_append_only();
 CREATE FUNCTION cms_protect_published_content_delete() RETURNS trigger
 LANGUAGE plpgsql AS $$
 BEGIN
+    -- Controlled purge of archived/unpublished content clears publication
+    -- history under cms.content_delete before removing the row.
+    IF current_setting('cms.content_delete', true) IS NOT DISTINCT FROM 'on'
+       AND OLD.status IN ('ARCHIVED', 'UNPUBLISHED') THEN
+        RETURN OLD;
+    END IF;
     IF EXISTS (
         SELECT 1
           FROM cms_contentrevision

@@ -10,7 +10,9 @@ import re
 
 from django.core.exceptions import ValidationError
 
-CURRENT_SCHEMA_VERSION = 1
+from .banner import default_banner, validate_banner
+
+CURRENT_SCHEMA_VERSION = 2
 DEFAULT_THEME = "institutional"
 THEMES = frozenset({DEFAULT_THEME, "high-contrast"})
 BEHAVIOR_FLAGS = ("show_search", "show_language_switcher")
@@ -30,7 +32,7 @@ def default_configuration(default_language="en-us"):
         "schema_version": CURRENT_SCHEMA_VERSION,
         "identity": {"display_name": None, "logo_ref": None, "favicon_ref": None},
         "language": {"enabled": [default_language]},
-        "presentation": {"theme": DEFAULT_THEME},
+        "presentation": {"theme": DEFAULT_THEME, "banner": default_banner()},
         "navigation": {"items": []},
         "behavior": {flag: False for flag in BEHAVIOR_FLAGS},
     }
@@ -80,6 +82,29 @@ def merge_site_configuration(current, changes):
             continue
         if not isinstance(value, dict):
             raise ValidationError({"configuration": f"Configuration {section} must be an object."})
+        if section == "presentation" and "banner" in value:
+            banner_change = value["banner"]
+            if not isinstance(banner_change, dict):
+                raise ValidationError({"configuration": "Configuration presentation.banner must be an object."})
+            current_banner = deepcopy(merged["presentation"].get("banner") or default_banner())
+            for key, child in banner_change.items():
+                if key not in current_banner:
+                    raise ValidationError({"configuration": "Unsupported configuration properties."})
+                if key in {"shared", "page", "post"}:
+                    if not isinstance(child, dict):
+                        raise ValidationError({"configuration": f"Configuration presentation.banner.{key} must be an object."})
+                    extra = set(child) - set(current_banner[key])
+                    if extra:
+                        raise ValidationError({"configuration": "Unsupported configuration properties."})
+                    current_banner[key] = {**current_banner[key], **child}
+                else:
+                    current_banner[key] = child
+            merged["presentation"] = {
+                **merged["presentation"],
+                **{k: v for k, v in value.items() if k != "banner"},
+                "banner": current_banner,
+            }
+            continue
         extra = set(value) - set(merged[section])
         if extra:
             raise ValidationError({"configuration": "Unsupported configuration properties."})
@@ -111,6 +136,17 @@ def _media_ref(value, label):
     return value
 
 
+def _upgrade_v1_to_v2(document, *, default_language):
+    upgraded = deepcopy(document)
+    presentation = upgraded.get("presentation")
+    if not isinstance(presentation, dict):
+        presentation = {"theme": DEFAULT_THEME}
+    theme = presentation.get("theme", DEFAULT_THEME)
+    upgraded["presentation"] = {"theme": theme, "banner": default_banner()}
+    upgraded["schema_version"] = 2
+    return upgraded
+
+
 def _validate_current(document, *, default_language):
     _exact_keys(document, ("schema_version", *SECTIONS), "Unsupported configuration properties.")
     if document["schema_version"] != CURRENT_SCHEMA_VERSION or isinstance(document["schema_version"], bool):
@@ -133,9 +169,12 @@ def _validate_current(document, *, default_language):
     ):
         raise ValidationError({"configuration": "Enabled languages must include the Site default language."})
     presentation = document["presentation"]
-    _exact_keys(presentation, ("theme",), "Configuration presentation does not match the approved schema.")
+    _exact_keys(presentation, ("theme", "banner"), "Configuration presentation does not match the approved schema.")
     if not isinstance(presentation["theme"], str) or presentation["theme"] not in THEMES:
         raise ValidationError({"configuration": "Presentation theme is not approved."})
+    presentation["banner"] = validate_banner(presentation["banner"])
+    for slot in ("shared", "page", "post"):
+        _media_ref(presentation["banner"][slot]["image_ref"], f"banner.{slot}.image_ref")
     navigation = document["navigation"]
     _exact_keys(navigation, ("items",), "Configuration navigation does not match the approved schema.")
     items = navigation["items"]
@@ -161,5 +200,7 @@ def _validate_current(document, *, default_language):
     return deepcopy(document)
 
 
-# Registered upgrades from older schema versions. Version 1 is current.
-UPGRADES = {}
+# Registered upgrades from older schema versions. Version 2 is current.
+UPGRADES = {
+    1: _upgrade_v1_to_v2,
+}

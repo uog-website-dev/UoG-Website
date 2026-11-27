@@ -40,19 +40,31 @@ function Breadcrumbs({ postTitle }: { postTitle: string | null }) {
   const segments = pathname.split("/").filter(Boolean);
   let href = "";
   const isPostDetail = segments[0] === "posts" && segments.length === 2;
+  // Title banners own the trail; keep this surface strip only for listing/archive views.
   return (
-    <Box sx={{ bgcolor: "background.paper", borderBottom: 1, borderColor: "divider" }}>
+    <Box
+      data-public-breadcrumbs=""
+      sx={{
+        bgcolor: "background.paper",
+        borderBottom: 1,
+        borderColor: "divider",
+        // Hide duplicate crumbs when a ContentBanner is present in main.
+        'main:has([data-content-banner]) &, main:has([data-page-loading]) &': { display: "none" },
+      }}
+    >
       <Box sx={{ maxWidth: 1120, width: "100%", mx: "auto", px: { xs: 2, sm: 3, md: 4 }, py: 1.25 }}>
         <MuiBreadcrumbs
           aria-label="Breadcrumb"
-          separator={<Box component="span" aria-hidden sx={{ color: "text.disabled", fontSize: "1.1rem" }}>›</Box>}
+          separator={<Box component="span" aria-hidden sx={{ color: "text.disabled", fontSize: "1.1rem", lineHeight: 1 }}>›</Box>}
           sx={{
             fontSize: ".875rem",
-            "& .MuiBreadcrumbs-ol": { flexWrap: "nowrap" },
-            "& .MuiBreadcrumbs-li": { minWidth: 0 },
+            fontWeight: 500,
+            letterSpacing: "0.01em",
+            "& .MuiBreadcrumbs-ol": { flexWrap: "nowrap", alignItems: "center" },
+            "& .MuiBreadcrumbs-li": { minWidth: 0, display: "inline-flex", alignItems: "center" },
           }}
         >
-          <Link href="/" underline="hover" color="text.secondary" sx={{ whiteSpace: "nowrap", fontWeight: 500 }}>Home</Link>
+          <Link href="/" underline="hover" color="text.secondary" sx={{ whiteSpace: "nowrap", fontWeight: 500, minHeight: 44, display: "inline-flex", alignItems: "center" }}>Home</Link>
         {segments.map((segment, index) => {
           href += "/" + segment;
           const last = index === segments.length - 1;
@@ -62,7 +74,7 @@ function Breadcrumbs({ postTitle }: { postTitle: string | null }) {
             : segment === "categories"
               ? "Categories"
               : isPostDetail && last
-                ? postTitle || "Article"
+                ? postTitle || "Detail"
                 : words.replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
           return (
             <Box component="span" key={href} sx={{ minWidth: 0, display: "inline-flex" }}>
@@ -76,7 +88,7 @@ function Breadcrumbs({ postTitle }: { postTitle: string | null }) {
                   {label}
                 </Typography>
               ) : (
-                <Link href={href} underline="hover" color="text.secondary" sx={{ whiteSpace: "nowrap", fontWeight: 500 }}>{label}</Link>
+                <Link href={href} underline="hover" color="text.secondary" sx={{ whiteSpace: "nowrap", fontWeight: 500, minHeight: 44, display: "inline-flex", alignItems: "center" }}>{label}</Link>
               )}
             </Box>
           );

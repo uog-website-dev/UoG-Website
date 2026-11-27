@@ -89,7 +89,7 @@ See the [module registry](module-registry.md).
 ### Menu trees (P2-MENU-001)
 
 `cms.Menu` owns one Site and one registered location: `header`, `footer`,
-`sidebar`, `primary` or `secondary`. These configured location keys are a
+`sidebar` or `secondary`. These configured location keys are a
 controlled deployment contract; extending them requires a reviewed migration
 and an update to `MENU_LOCATIONS`. The unique `(site, location)` constraint
 allows the same location in different Sites. Menus and items have active flags.
@@ -120,13 +120,11 @@ administrators receive these capabilities when `seed_rbac` reconciles roles.
 Unassigned, inactive, anonymous and foreign-Site actors are rejected. Direct
 model writes are trusted system operations, as with other domain models.
 
-Internal Page/Post links require an existing target in the same Site by default.
-The explicit `allow_cross_site` policy permits foreign targets only when the
-user also has the relevant content-view permission for the target Site. A flag
-in a request never supplies that permission. Referenced Post-owner changes that
-would invalidate a link are blocked; Page ownership is already immutable.
-Targets are PROTECT references. Rendering must still apply content publication
-and visibility rules; a menu link does not publish its target.
+Internal Page/Post links require an existing target in the same Site.
+Referenced Post-owner changes that would invalidate a link are blocked; Page
+ownership is already immutable. Targets are PROTECT references. Rendering must
+still apply content publication and visibility rules; a menu link does not
+publish its target.
 
 External targets accept only well-formed HTTP(S) URLs without credentials,
 control characters, encoded controls/backslashes, ambiguous escaping or invalid

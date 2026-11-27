@@ -23,9 +23,28 @@ import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 import { usePublicSiteBranding } from "./site-branding";
 
-import { publicFetchInit } from "./public-site";
+/** Inline styles so MUI Typography sx/variant cannot override the clip box. */
+const SR_ONLY_TITLE_STYLE = {
+  position: "absolute",
+  width: 1,
+  height: 1,
+  padding: 0,
+  margin: -1,
+  overflow: "hidden",
+  clip: "rect(0, 0, 0, 0)",
+  whiteSpace: "nowrap",
+  border: 0,
+} as const;
+
+import { publicFetchInit, publicLogoSource } from "./public-site";
 import type {PublicMenuNode} from "./site-navigation";
 import { menusFromResponse, SiteNavigation, safeMenuHref } from "./site-navigation";
+import { ContentBanner, crumbsFromPagePath } from "./content-banner";
+import {
+  bannerStyleFromUnknown,
+  resolveContentBannerStyle,
+  type PublicTitleBannerStyle,
+} from "./content-banner-model";
 const PrivateMediaBase = createContext<string | null>(null);
 const focusRing = {"&:focus-visible":{outline:"3px solid",outlineColor:"primary.main",outlineOffset:2}} as const;
 
@@ -101,6 +120,7 @@ export interface PublicPageDocument {
   blocks: PublicBlock[];
   visual_layout?: VisualLayout;
   layout_unavailable?: boolean;
+  title_banner?: PublicTitleBannerStyle | null;
   seo: { title: string; description: string };
 }
 
@@ -127,6 +147,7 @@ export function pageFromResponse(status: number, body: unknown): PublicPageDocum
   const seo = row.seo != null && typeof row.seo === "object" ? row.seo as { meta_title?: unknown; meta_description?: unknown } : {};
   const metadata = row.metadata && typeof row.metadata === "object" ? row.metadata as Record<string,unknown> : {};
   const visual = Object.hasOwn(metadata,"visual_layout") ? validateVisualLayout(withSafePageWidth(metadata.visual_layout)) : null;
+  const bannerOverride = titleBannerFromMetadata(metadata);
   return {
     ...(typeof (body as {id?:unknown}).id==="string" ? {id:(body as {id:string}).id}:{}),
     ...(visual ? visual.ok ? {visual_layout:visual.value} : {layout_unavailable:true} : {}),
@@ -139,11 +160,43 @@ export function pageFromResponse(status: number, body: unknown): PublicPageDocum
     path,
     site: typeof row.site === "number" ? row.site : null,
     blocks: normalizeBlocks(row.blocks),
+    ...(bannerOverride ? { title_banner: bannerOverride } : {}),
     seo: {
       title: plainSeo(seo.meta_title, 120),
       description: plainSeo(seo.meta_description, 300),
     },
   };
+}
+
+function titleBannerFromMetadata(metadata: Record<string, unknown>): PublicTitleBannerStyle | null {
+  if (!Object.hasOwn(metadata, "title_banner")) return null;
+  const value = metadata.title_banner;
+  if (value == null) return null;
+  if (typeof value === "object" && !Array.isArray(value) && (value as { use_global?: unknown }).use_global === true) {
+    return null;
+  }
+  if (typeof value === "object" && !Array.isArray(value)) {
+    const row = value as Record<string, unknown>;
+    if (Object.keys(row).every((key) => key === "use_global" || key === "enabled") && typeof row.enabled === "boolean") {
+      return { ...resolveContentBannerStyle(undefined, "page"), enabled: row.enabled };
+    }
+  }
+  const parsed = bannerStyleFromUnknown(value);
+  if (!parsed) return null;
+  // Admin stores image_ref; public rendering uses the media route when present.
+  const ref = typeof (value as { image_ref?: unknown }).image_ref === "string"
+    ? (value as { image_ref: string }).image_ref
+    : null;
+  if (parsed.background_type === "image" && ref) {
+    const assetId = ref.replace(/^sites\/\d+\/assets\//, "");
+    if (/^[0-9a-f-]{36}$/i.test(assetId) || /^[0-9a-f]{32}$/i.test(assetId)) {
+      const uuid = assetId.includes("-")
+        ? assetId
+        : assetId.replace(/^([0-9a-f]{8})([0-9a-f]{4})([0-9a-f]{4})([0-9a-f]{4})([0-9a-f]{12})$/i, "$1-$2-$3-$4-$5");
+      return { ...parsed, image_url: `/api/v1/site-context/media/${uuid}/?variant=display` };
+    }
+  }
+  return parsed;
 }
 
 function normalizeMediaItems(value: unknown): PublicMediaItem[] {
@@ -320,10 +373,29 @@ function PublishedImage({ block, siteId }: { block: PublicBlock; siteId?: number
   if (!match || Number(match[1]) !== siteId || failed) return block.alt ? <Typography component="p">{block.alt}</Typography> : null;
   const assetId = match[2]!.replace(/^([0-9a-f]{8})([0-9a-f]{4})([0-9a-f]{4})([0-9a-f]{4})([0-9a-f]{12})$/, "$1-$2-$3-$4-$5");
   const url = privateBase ? `${privateBase}/${assetId}/image` : `/api/v1/site-context/media/${assetId}/`;
-  return <picture>
-    <source media="(max-width: 600px)" srcSet={`${url}?variant=thumbnail`} />
-    <Box component="img" src={`${url}?variant=display`} alt={block.alt ?? ""} loading="lazy" onError={() => setFailed(true)} sx={{ display:"block", width:"100%", maxWidth: "100%", maxHeight:560, height: "auto", objectFit:"cover" }} />
-  </picture>;
+  const layout = typeof block.style === "string" && block.style.includes(":")
+    ? Object.fromEntries(
+        block.style.split(";").filter(Boolean).map((part) => {
+          const [prop, ...rest] = part.split(":");
+          const key = (prop ?? "").trim().replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
+          return [key, rest.join(":").trim()];
+        }).filter(([key, value]) => key && value),
+      )
+    : undefined;
+  return <Box sx={layout ? { "&::after": { content: '""', display: "table", clear: "both" } } : undefined}>
+    <picture>
+      <source media="(max-width: 600px)" srcSet={`${url}?variant=thumbnail`} />
+      <Box
+        component="img"
+        src={`${url}?variant=display`}
+        alt={block.alt ?? ""}
+        loading="lazy"
+        onError={() => setFailed(true)}
+        style={layout}
+        sx={layout ? { height: "auto", borderRadius: 1.5 } : { display:"block", width:"100%", maxWidth: "100%", maxHeight:560, height: "auto", objectFit:"cover" }}
+      />
+    </picture>
+  </Box>;
 }
 
 function PageSidebar({ page, preview }: { page: PublicPageDocument; preview: boolean }) {
@@ -420,12 +492,12 @@ export function PublicPageView({ page, privateMediaBase, viewportWidth }: { page
   const titleHidden = heading ? !heading.titleVisible : false;
   // One resolver drives the builder canvas and the public Page alike.
   const pageWidth = page.visual_layout ? resolvePageWidth(page.visual_layout.settings) : null;
-  // A block-built Page has no width setting of its own, so it uses the Reading
-  // column: one centred measure that titles, text, lists and media all share
-  // instead of narrow paragraphs hugging the left edge of a wide Page.
-  const contentMaxWidth = pageWidth?.maxWidth ?? PAGE_CONTENT_WIDTHS.reading;
+  // Block-built Pages share the same standard column as posts and the title banner.
+  const contentMaxWidth = pageWidth?.maxWidth ?? PAGE_CONTENT_WIDTHS.wide;
   // Explicit opt-out only: a stored "global" or absent value keeps the shell.
   const chromeFree = page.visual_layout?.settings?.chrome === "none";
+  // Homepages lead with layout heroes — the title banner stays off.
+  const showTitleBanner = !chromeFree && !page.is_homepage;
   // Device preview uses its explicit canvas width rather than the surrounding browser.
   const stacked = viewportWidth !== undefined && viewportWidth < 900;
   const columns = shell === "FULL_WIDTH" || stacked ? "minmax(0,1fr)" : {
@@ -438,6 +510,9 @@ export function PublicPageView({ page, privateMediaBase, viewportWidth }: { page
     xs: '"content" "sidebar"',
     md: shell === "LEFT_SIDEBAR" ? '"sidebar content"' : '"content sidebar"',
   };
+  const bannerStyle = resolveContentBannerStyle(site.banner, "page", page.title_banner ?? null);
+  // Homepage never shows a title strip; keep the node for aria-labelledby / H1 fallback.
+  const hidePageTitle = Boolean(page.is_homepage) || titleHidden;
   return (
     <PrivateMediaBase.Provider value={privateMediaBase ?? null}>
       <Box
@@ -448,28 +523,55 @@ export function PublicPageView({ page, privateMediaBase, viewportWidth }: { page
         data-page-gutter={pageWidth ? `${pageWidth.gutter}px` : undefined}
         data-page-chrome={chromeFree ? "none" : undefined}
         data-site-code={site.code ?? ""}
-        sx={{
-          display: "grid", width: "100%", minWidth: 0, gap: { xs: 3, md: 4 },
-          gridTemplateColumns: columns, gridTemplateAreas: areas,
-          ...(pageWidth ? { px: `${pageWidth.gutter}px` } : {}),
-        }}
+        sx={{ display: "flex", flexDirection: "column", width: "100%", minWidth: 0, gap: 0 }}
       >
+        {showTitleBanner ? (
+          <ContentBanner
+            title={page.title}
+            titleId="public-page-title"
+            style={bannerStyle}
+            titleHidden={titleHidden}
+            breadcrumbs={crumbsFromPagePath(page.path)}
+            watermarkSrc={publicLogoSource(site)}
+          />
+        ) : null}
         <Box
-          component="article"
-          aria-labelledby="public-page-title"
-          sx={{ gridArea: "content", display: "flex", flexDirection: "column", gap: 2, minWidth: 0, width: "100%", maxWidth: contentMaxWidth, mx: "auto", overflowWrap: "anywhere" }}
+          sx={{
+            display: "grid", width: "100%", minWidth: 0, gap: { xs: 3, md: 4 },
+            gridTemplateColumns: columns, gridTemplateAreas: areas,
+            // Shell drops its gutters for edge-to-edge title banners; restore the standard column inset.
+            ...(pageWidth ? { px: `${pageWidth.gutter}px` } : { px: { xs: 2, sm: 3, md: 4 }, maxWidth: PAGE_CONTENT_WIDTHS.wide, mx: "auto" }),
+            pt: page.is_homepage ? 0 : { xs: 3, md: 4 },
+          }}
         >
-          {chromeFree ? (
-            <Box component="nav" aria-label="Page navigation" sx={{ borderBottom: 1, borderColor: "divider", pb: 1 }}>
-              <Link href="/" sx={{ fontWeight: 700, minHeight: 44, display: "inline-flex", alignItems: "center", ...focusRing }}>← Site home</Link>
-            </Box>
-          ) : null}
-          <Typography id="public-page-title" variant="h3" component={titleHidden ? "span" : "h1"} sx={titleHidden ? {position:"absolute",left:0,top:0,width:1,height:1,p:0,m:-1,overflow:"hidden",clipPath:"inset(50%)",whiteSpace:"nowrap"} : { overflowWrap: "anywhere" }}>
-          {page.title}
-        </Typography>
-      {page.layout_unavailable ? <Typography role="status">This page content is currently unavailable.</Typography> : page.visual_layout ? <VisualLayoutView layout={page.visual_layout} siteId={page.site} pageTitle={page.title} pageId={page.id} preview={Boolean(privateMediaBase)} mediaBase={privateMediaBase} viewportWidth={viewportWidth} demoteH1={heading?.demoteLayoutH1 ?? false} /> : <BlockList blocks={page.blocks} siteId={page.site} />}
+          <Box
+            component="article"
+            aria-labelledby="public-page-title"
+            sx={{ gridArea: "content", display: "flex", flexDirection: "column", gap: 2, minWidth: 0, width: "100%", maxWidth: contentMaxWidth, mx: "auto", overflowWrap: "anywhere" }}
+          >
+            {!showTitleBanner ? (
+              <>
+                {chromeFree ? (
+                  <Box component="nav" aria-label="Page navigation" sx={{ borderBottom: 1, borderColor: "divider", pb: 1 }}>
+                    <Link href="/" sx={{ fontWeight: 700, minHeight: 44, display: "inline-flex", alignItems: "center", ...focusRing }}>← Site home</Link>
+                  </Box>
+                ) : null}
+                <Typography
+                  id="public-page-title"
+                  variant="h3"
+                  component={titleHidden ? "span" : "h1"}
+                  data-page-title-hidden={hidePageTitle ? "true" : undefined}
+                  style={hidePageTitle ? SR_ONLY_TITLE_STYLE : undefined}
+                  sx={hidePageTitle ? undefined : { overflowWrap: "anywhere" }}
+                >
+                  {page.title}
+                </Typography>
+              </>
+            ) : null}
+            {page.layout_unavailable ? <Typography role="status">This page content is currently unavailable.</Typography> : page.visual_layout ? <VisualLayoutView layout={page.visual_layout} siteId={page.site} pageTitle={page.title} pageId={page.id} preview={Boolean(privateMediaBase)} mediaBase={privateMediaBase} viewportWidth={viewportWidth} demoteH1={heading?.demoteLayoutH1 ?? false} /> : <BlockList blocks={page.blocks} siteId={page.site} />}
+          </Box>
+          {shell !== "FULL_WIDTH" ? <PageSidebar key={`${page.site}:${page.path}`} page={page} preview={Boolean(privateMediaBase)} /> : null}
         </Box>
-        {shell !== "FULL_WIDTH" ? <PageSidebar key={`${page.site}:${page.path}`} page={page} preview={Boolean(privateMediaBase)} /> : null}
       </Box>
     </PrivateMediaBase.Provider>
   );

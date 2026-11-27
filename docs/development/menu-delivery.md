@@ -2,7 +2,7 @@
 
 Visitors receive navigation for the Site selected from the trusted Host.
 `GET /api/v1/site-context/menus/` accepts an optional `location` of `header`,
-`footer`, `sidebar`, `primary` or `secondary`. A Site id in the query string
+`footer`, `sidebar` or `secondary`. A Site id in the query string
 is rejected. `X-Forwarded-Host` is ignored. Responses vary by Host and are
 `Cache-Control: public, max-age=0, must-revalidate`.
 
@@ -38,7 +38,7 @@ Inactive items hide their descendants. A page link is included only when that
 Page is `PUBLISHED` and `PUBLIC` or `UNLISTED`. A post link is included only
 when `is_published` is true. Draft, hidden, unpublished and missing targets
 are omitted with their descendants. External and custom items remain.
-Cross-site page or post targets also require `allow_cross_site`.
+Cross-site Page/Post targets are not supported; use an external URL instead.
 
 The public item is `{label, href, source, children}`. `source` is `global`,
 `inherited` or `local`. `href` is the external URL, the custom path, the Page

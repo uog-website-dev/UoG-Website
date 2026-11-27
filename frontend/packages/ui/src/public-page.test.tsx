@@ -108,11 +108,22 @@ describe("published rich text", () => {
     expect(container.querySelector("p > strong")?.textContent).toBe("Loose bold");
   });
 
-  it("unwraps markup outside the allowlist but keeps its text", () => {
+  it("unwraps markup outside the allowlist but keeps safe span color styles", () => {
     const html = '<p><code>code</code> <span style="color:red" onclick="attack()">plain</span> <sub>sub</sub></p>';
     const { container } = renderParagraph(html);
-    expect(container.querySelector("code, span, sub, [onclick]")).toBeNull();
-    expect(container.querySelector("p")?.textContent).toBe("code plain sub");
+    const article = container.querySelector("article") ?? container;
+    expect(article.querySelector("p code, p sub, p [onclick]")).toBeNull();
+    const colored = article.querySelector("p span");
+    expect(colored?.textContent).toBe("plain");
+    expect(colored?.getAttribute("style")).toContain("color");
+    expect(article.querySelector("p")?.textContent).toBe("code plain sub");
+  });
+
+  it("renders tables from the rich-text editor", () => {
+    const html = "<table><thead><tr><th>Term</th></tr></thead><tbody><tr><td>Fall</td></tr></tbody></table>";
+    const { container } = renderParagraph(html);
+    expect(container.querySelector("table th")?.textContent).toBe("Term");
+    expect(container.querySelector("table td")?.textContent).toBe("Fall");
   });
 
   it("renders nothing for a paragraph with no visible text", () => {
@@ -146,6 +157,21 @@ describe("PublicPageView", () => {
     expect(container.querySelector('[data-page-homepage="true"]')).toBeTruthy();
   });
 
+  it("hides the title banner when the Page is the Site homepage", () => {
+    const { container } = render(<PublicPageView page={visualPage(undefined, undefined, true)} />);
+    expect(screen.queryByRole("banner", { name: "Content banner" })).toBeNull();
+    expect(screen.queryByLabelText("Content banner")).toBeNull();
+    // Homepage keeps an accessible title without a visible title strip.
+    const title = container.querySelector("#public-page-title");
+    expect(title?.textContent).toBe("Admissions");
+    expect(title?.tagName.toLowerCase()).toBe("h1");
+  });
+
+  it("shows the title banner on non-homepage Pages", () => {
+    render(<PublicPageView page={visualPage()} />);
+    expect(screen.getByLabelText("Content banner")).toBeTruthy();
+  });
+
   it("keeps the global chrome unless the Page explicitly opts out", () => {
     const { container } = render(<PublicPageView page={visualPage()} />);
     expect(container.querySelector("[data-page-chrome]")).toBeNull();
@@ -174,11 +200,11 @@ describe("PublicPageView", () => {
     expect(container.querySelectorAll("[data-widget-type]").length).toBe(3);
     expect(container.querySelector('[data-widget-type="site_title"]')?.textContent).toContain("placeholder");
   });
-  it("centres a block-built Page in one reading column instead of a narrow left column", () => {
+  it("centres a block-built Page in the standard content column instead of a narrow left column", () => {
     const { container } = renderParagraph("<p>Body copy that should fill the page column.</p>");
     const article = container.querySelector("article") as HTMLElement;
-    expect(getComputedStyle(article).maxWidth).toBe("880px");
-    // No narrower cap of its own: the paragraph fills the reading column.
+    expect(getComputedStyle(article).maxWidth).toBe("1120px");
+    // No narrower cap of its own: the paragraph fills the standard column.
     expect(getComputedStyle(container.querySelector("p") as HTMLElement).maxWidth).toBe("");
   });
 

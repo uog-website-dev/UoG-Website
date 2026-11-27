@@ -46,12 +46,12 @@ BEGIN
               JOIN cms_sitecontent c ON c.id=p.sitecontent_ptr_id
              WHERE p.sitecontent_ptr_id=NEW.post_id;
         END IF;
-        IF target_site IS NULL OR (target_site <> NEW.site_id AND NOT NEW.allow_cross_site) THEN
-            RAISE EXCEPTION 'The target must belong to the same Site unless cross-site linking is explicit.' USING ERRCODE='23514', CONSTRAINT='menu_item_target_site';
+        IF target_site IS NULL OR target_site <> NEW.site_id THEN
+            RAISE EXCEPTION 'The target must belong to the same Site.' USING ERRCODE='23514', CONSTRAINT='menu_item_target_site';
         END IF;
     ELSE
-        IF NEW.page_id IS NOT NULL OR NEW.post_id IS NOT NULL OR NEW.allow_cross_site THEN
-            RAISE EXCEPTION 'Only internal items can reference content or enable cross-site linking.' USING ERRCODE='23514', CONSTRAINT='menu_item_target';
+        IF NEW.page_id IS NOT NULL OR NEW.post_id IS NOT NULL THEN
+            RAISE EXCEPTION 'Only internal items can reference content.' USING ERRCODE='23514', CONSTRAINT='menu_item_target';
         END IF;
         IF NEW.item_type='custom' AND NEW.target !~ '^/([a-z0-9][a-z0-9-]{0,63}(/[a-z0-9][a-z0-9-]{0,63})*)?$' THEN
             RAISE EXCEPTION 'Custom targets must be same-site paths.' USING ERRCODE='23514', CONSTRAINT='menu_custom_target';
@@ -80,7 +80,7 @@ DROP FUNCTION IF EXISTS cms_menu_post_owner();
 CREATE FUNCTION cms_menu_post_owner() RETURNS trigger LANGUAGE plpgsql VOLATILE AS $$
 BEGIN
     IF NEW.site_id IS DISTINCT FROM OLD.site_id AND EXISTS (
-        SELECT 1 FROM cms_menuitem WHERE post_id=NEW.id AND (NEW.site_id IS NULL OR (NOT allow_cross_site AND site_id<>NEW.site_id))
+        SELECT 1 FROM cms_menuitem WHERE post_id=NEW.id AND (NEW.site_id IS NULL OR site_id<>NEW.site_id)
     ) THEN
         RAISE EXCEPTION 'Moving this Post would invalidate a menu target.' USING ERRCODE='23514', CONSTRAINT='menu_post_owner';
     END IF;
@@ -105,7 +105,7 @@ FOR EACH STATEMENT EXECUTE FUNCTION organizations_serialize_hierarchy();
 CREATE FUNCTION cms_menu_post_owner() RETURNS trigger LANGUAGE plpgsql VOLATILE AS $$
 BEGIN
     IF NEW.site_id IS DISTINCT FROM OLD.site_id AND EXISTS (
-        SELECT 1 FROM cms_menuitem WHERE post_id=NEW.id AND (NEW.site_id IS NULL OR (NOT allow_cross_site AND site_id<>NEW.site_id))
+        SELECT 1 FROM cms_menuitem WHERE post_id=NEW.id AND (NEW.site_id IS NULL OR site_id<>NEW.site_id)
     ) THEN
         RAISE EXCEPTION 'Moving this Post would invalidate a menu target.' USING ERRCODE='23514', CONSTRAINT='menu_post_owner';
     END IF;
@@ -141,12 +141,12 @@ BEGIN
         ELSE
             SELECT site_id INTO target_site FROM api_post WHERE id=NEW.post_id;
         END IF;
-        IF target_site IS NULL OR (target_site <> NEW.site_id AND NOT NEW.allow_cross_site) THEN
-            RAISE EXCEPTION 'The target must belong to the same Site unless cross-site linking is explicit.' USING ERRCODE='23514', CONSTRAINT='menu_item_target_site';
+        IF target_site IS NULL OR target_site <> NEW.site_id THEN
+            RAISE EXCEPTION 'The target must belong to the same Site.' USING ERRCODE='23514', CONSTRAINT='menu_item_target_site';
         END IF;
     ELSE
-        IF NEW.page_id IS NOT NULL OR NEW.post_id IS NOT NULL OR NEW.allow_cross_site THEN
-            RAISE EXCEPTION 'Only internal items can reference content or enable cross-site linking.' USING ERRCODE='23514', CONSTRAINT='menu_item_target';
+        IF NEW.page_id IS NOT NULL OR NEW.post_id IS NOT NULL THEN
+            RAISE EXCEPTION 'Only internal items can reference content.' USING ERRCODE='23514', CONSTRAINT='menu_item_target';
         END IF;
         IF NEW.item_type='custom' AND NEW.target !~ '^/([a-z0-9][a-z0-9-]{0,63}(/[a-z0-9][a-z0-9-]{0,63})*)?$' THEN
             RAISE EXCEPTION 'Custom targets must be same-site paths.' USING ERRCODE='23514', CONSTRAINT='menu_custom_target';

@@ -57,7 +57,8 @@ def test_serialization_snapshot_is_site_local_and_not_an_authorization_cache(das
     b_page = Page.objects.create(site=b, title='Private B', slug='private-b', created_by=actor, updated_by=actor)
     request = type('Request', (), {'user': actor})()
     data = PageSerializer([a_page, b_page], many=True, context={'request': request}).data
-    assert data[0]['available_actions'] == ['submit']
+    # Site administrators may submit or publish drafts directly; foreign Sites stay empty.
+    assert data[0]['available_actions'] == ['submit', 'publish']
     assert data[1]['available_actions'] == []
     assignment.revoked_at = timezone.now()
     assignment.save(update_fields=['revoked_at'])

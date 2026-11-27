@@ -91,17 +91,16 @@ export function SiteBrandingLockup({
       role="group"
       aria-label={`${site.displayName} Site branding`}
       data-site-branding={site.code ?? "university"}
-      sx={{ display: "inline-flex", alignItems: "center", gap: compact ? 1 : 1.5, minWidth: 0 }}
+      sx={{ display: "inline-flex", alignItems: "center", gap: compact ? 1 : 1.5, flex: "0 0 auto", maxWidth: "100%" }}
     >
       <SiteBrandingMark site={site} size={compact ? 44 : 75} width={compact ? 44 : 100} />
-      <Box component="span" sx={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
+      <Box component="span" sx={{ display: "flex", flexDirection: "column", flex: "0 0 auto" }}>
         <Typography
           component="span"
           data-site-branding-name=""
           variant={compact ? "subtitle2" : "subtitle1"}
           sx={{
-            minWidth: 0,
-            overflowWrap: "anywhere",
+            whiteSpace: "nowrap",
             fontWeight: 700,
             color: inverse ? "primary.contrastText" : "text.primary",
           }}

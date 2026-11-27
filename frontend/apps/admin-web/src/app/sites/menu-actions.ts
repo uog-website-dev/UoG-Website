@@ -90,7 +90,7 @@ export interface SiteNavigation {
   inheritance: MenuInheritanceRecord[];
 }
 
-export type MenuPlace = "" | "header" | "footer" | "sidebar" | "primary" | "secondary";
+export type MenuPlace = "" | "header" | "footer" | "sidebar" | "secondary";
 
 function apiBaseUrl(): string {
   return process.env.API_BASE_URL ?? "http://backend:8000/api";

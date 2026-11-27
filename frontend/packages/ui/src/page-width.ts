@@ -5,8 +5,8 @@
  * width, the same horizontal gutter and the same bleed decision, so this
  * module is the single source of truth for both surfaces.
  *
- * - `wide` (the default) caps content at 1280 px, `reading` at 880 px, and
- *   `full` uses all available width.
+ * - `wide` (the default) caps content at 1120 px (same column as posts and
+ *   the title banner), `reading` at 880 px, and `full` uses all available width.
  * - Bleed is an explicit, separate setting (`settings.bleed === true`) and is
  *   the only thing that removes the minimum safe gutter.
  * - Missing, unknown or invalid width values fall back to the safe default.
@@ -14,7 +14,10 @@
 /** Minimum horizontal inset every Page keeps unless it explicitly bleeds. */
 export const PAGE_SAFE_GUTTER_PX = 24;
 
-export const PAGE_CONTENT_WIDTHS = { full: "100%", reading: 880, wide: 1280 } as const;
+/** Shared public column for pages, posts, and ContentBanner title/body. */
+export const PUBLIC_CONTENT_MAX_WIDTH = 1120;
+
+export const PAGE_CONTENT_WIDTHS = { full: "100%", reading: 880, wide: PUBLIC_CONTENT_MAX_WIDTH } as const;
 
 export type PageWidthToken = keyof typeof PAGE_CONTENT_WIDTHS;
 
@@ -50,7 +53,7 @@ function isWidthToken(value: unknown): value is PageWidthToken {
 function labelFor(width: PageWidthToken): string {
   if (width === "full") return "Full width · 100%";
   if (width === "reading") return "Reading · 880px";
-  return "Wide · 1280px";
+  return "Wide · 1120px";
 }
 
 /** Resolve stored settings, tolerating absent or invalid values. */

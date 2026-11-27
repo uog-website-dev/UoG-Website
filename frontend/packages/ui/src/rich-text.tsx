@@ -11,7 +11,7 @@
  * unwrapped to its text.
  */
 import { Fragment, createElement } from "react";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { parseFragment } from "parse5";
 import type { DefaultTreeAdapterMap } from "parse5";
 import Box from "@mui/material/Box";
@@ -19,6 +19,7 @@ import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 
 import { articleHref } from "./article-document";
+import { sanitizeInlineStyle } from "./article-style";
 
 type HtmlNode = DefaultTreeAdapterMap["childNode"];
 type HtmlElement = DefaultTreeAdapterMap["element"];
@@ -44,10 +45,14 @@ const inlineTags: Record<string, string> = {
   i: "em",
   u: "u",
   s: "s",
+  mark: "mark",
+  span: "span",
 };
 
 /** Elements that stand alone rather than inside the implicit paragraph. */
-const blockTags = new Set(["p", "div", "blockquote", "ul", "ol"]);
+const blockTags = new Set(["p", "div", "blockquote", "ul", "ol", "table"]);
+
+const styleTags = new Set(["span", "mark", "p", "table", "th", "td", "tr"]);
 
 // Text fills the Page column, whose width is resolved once by PublicPageView.
 const paragraphSx = { overflowWrap: "anywhere" } as const;
@@ -63,9 +68,39 @@ const quoteSx = {
   overflowWrap: "anywhere",
   "& p": { fontStyle: "italic" },
 } as const;
+const tableSx = {
+  width: "100%",
+  borderCollapse: "collapse",
+  my: 2,
+  overflowWrap: "anywhere",
+  "& th, & td": {
+    border: "1px solid",
+    borderColor: "divider",
+    px: 1.5,
+    py: 1,
+    textAlign: "left",
+    verticalAlign: "top",
+  },
+  "& th": { fontWeight: 700, bgcolor: "action.hover" },
+} as const;
 
 function attribute(node: HtmlElement, name: string): string {
   return node.attrs.find((entry) => entry.name === name)?.value ?? "";
+}
+
+function cssFromStyle(style: string): CSSProperties | undefined {
+  if (!style) return undefined;
+  return Object.fromEntries(
+    style
+      .split(";")
+      .filter(Boolean)
+      .map((part) => {
+        const [prop, ...rest] = part.split(":");
+        const key = (prop ?? "").trim().replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
+        return [key, rest.join(":").trim()];
+      })
+      .filter(([key, value]) => key && value),
+  ) as CSSProperties;
 }
 
 function renderNodes(nodes: HtmlNode[], keyPrefix: string): ReactNode[] {
@@ -79,6 +114,7 @@ function renderNodes(nodes: HtmlNode[], keyPrefix: string): ReactNode[] {
     if (removedTags.has(tag)) return null;
     if (tag === "br") return <br key={key} />;
     const children = renderNodes(node.childNodes, key);
+    const style = styleTags.has(tag) ? cssFromStyle(sanitizeInlineStyle(attribute(node, "style"))) : undefined;
     if (tag === "a") {
       const href = articleHref(attribute(node, "href"));
       if (!href) return <Fragment key={key}>{children}</Fragment>;
@@ -88,10 +124,10 @@ function renderNodes(nodes: HtmlNode[], keyPrefix: string): ReactNode[] {
         </Link>
       );
     }
-    if (inlineTags[tag]) return createElement(inlineTags[tag]!, { key }, children);
+    if (inlineTags[tag]) return createElement(inlineTags[tag]!, { key, style }, children);
     if (tag === "p" || tag === "div") {
       return (
-        <Typography key={key} component="p" sx={paragraphSx}>
+        <Typography key={key} component="p" sx={paragraphSx} style={style}>
           {children}
         </Typography>
       );
@@ -115,6 +151,30 @@ function renderNodes(nodes: HtmlNode[], keyPrefix: string): ReactNode[] {
         <Typography key={key} component="li">
           {children}
         </Typography>
+      );
+    }
+    if (tag === "table") {
+      return (
+        <Box key={key} component="table" sx={tableSx} style={style}>
+          {children}
+        </Box>
+      );
+    }
+    if (tag === "thead" || tag === "tbody" || tag === "tr") {
+      return createElement(tag, { key, style }, children);
+    }
+    if (tag === "th" || tag === "td") {
+      const colspan = attribute(node, "colspan");
+      const rowspan = attribute(node, "rowspan");
+      return createElement(
+        tag,
+        {
+          key,
+          style,
+          ...(colspan && /^[1-9]\d?$/.test(colspan) ? { colSpan: Number(colspan) } : {}),
+          ...(rowspan && /^[1-9]\d?$/.test(rowspan) ? { rowSpan: Number(rowspan) } : {}),
+        },
+        children,
       );
     }
     // Unknown markup keeps its reading text but never its element or attributes.
@@ -144,8 +204,9 @@ function textContent(nodes: HtmlNode[]): string {
 
 /**
  * Render one paragraph block's HTML. Formatting the editor offers — bold,
- * italic, line breaks, quotes, lists and links — survives to the public Page;
- * a fragment without block markup is wrapped in a paragraph of its own.
+ * italic, color, highlight, shadow, tables, quotes, lists and links — survives
+ * to the public Page; a fragment without block markup is wrapped in a
+ * paragraph of its own.
  */
 export function RichText({ html }: { html: string }): ReactNode {
   const nodes = parse(html);
@@ -162,5 +223,9 @@ export function RichText({ html }: { html: string }): ReactNode {
       </Typography>
     );
   }
-  return <>{rendered}</>;
+  return (
+    <Box sx={{ "&::after": { content: '""', display: "table", clear: "both" } }}>
+      {rendered}
+    </Box>
+  );
 }

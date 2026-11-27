@@ -445,10 +445,6 @@ function ItemForm({
       setWarning(message);
       return;
     }
-    if (initial && parent !== (initial.parent ?? "") && !canPlace(items, initial.id, parent || null)) {
-      setWarning("Menus support one top-level destination and five submenu levels.");
-      return;
-    }
     setWarning(null);
     onSubmit({
       label: label.trim(),

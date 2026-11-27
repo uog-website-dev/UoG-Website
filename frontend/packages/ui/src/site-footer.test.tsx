@@ -15,7 +15,7 @@ afterEach(cleanup);
 describe("PublicSiteFooter mobile columns", () => {
   it("collapses columns by default and exposes keyboard state changes", () => {
     render(<PublicSiteFooter site={site} items={columns} />);
-    const toggle = screen.getByRole("button", { name: "Explore" });
+    const toggle = screen.getByRole("button", { name: "Expand Explore" });
     expect(toggle.getAttribute("aria-expanded")).toBe("false");
     const panel = document.getElementById(toggle.getAttribute("aria-controls")!);
     expect(panel).toBeTruthy();
@@ -23,6 +23,7 @@ describe("PublicSiteFooter mobile columns", () => {
 
     fireEvent.click(toggle);
     expect(toggle.getAttribute("aria-expanded")).toBe("true");
+    expect(screen.getByRole("button", { name: "Collapse Explore" })).toBeTruthy();
     fireEvent.keyDown(toggle, { key: "Escape" });
     expect(toggle.getAttribute("aria-expanded")).toBe("false");
   });

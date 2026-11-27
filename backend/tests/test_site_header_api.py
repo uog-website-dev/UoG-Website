@@ -39,6 +39,7 @@ def test_header_settings_are_scoped_validated_and_preconditioned(client, oidc, o
     assert body["settings"] == {
         "brand_href": "/", "search_enabled": True, "sticky": False,
         "cta_label": "", "cta_url": "", "language_switcher": False,
+        "variant": "standard", "brand_quote": "",
     }
     assert body["menus"] == {"header": [], "utility": []}
     assert body["menu_state"]["header"]["published"] is None

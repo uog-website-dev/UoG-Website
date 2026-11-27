@@ -1,6 +1,8 @@
-import { PublicPathPage } from "@/public-page";
+import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import { pageRouteMetadata } from "@/public-metadata";
+import { websitePathFromRedirect } from "@uog/ui/public-site";
+import { PublicPathPage } from "@/public-page";
+import { pageRouteMetadata, publicPagePayload } from "@/public-metadata";
 
 export async function generateMetadata({ params }: { params: Promise<{ path: string[] }> }): Promise<Metadata> {
   const { path } = await params;
@@ -14,5 +16,11 @@ export default async function SitePage({
   params: Promise<{ path: string[] }>;
 }) {
   const { path } = await params;
-  return <PublicPathPage segments={path} />;
+  const route = `/${path.join("/")}`;
+  const payload = await publicPagePayload(route);
+  if (payload && (payload.status === 308 || payload.status === 301 || payload.status === 302 || payload.status === 307)) {
+    const next = websitePathFromRedirect(payload.location);
+    if (next && next !== route) redirect(next);
+  }
+  return <PublicPathPage key={route} segments={path} initialPayload={payload} />;
 }

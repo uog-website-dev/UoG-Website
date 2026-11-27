@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor, within } from "@testing-library/rea
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { PaginatedResponse, Site } from "@uog/types";
+import { defaultTitleBannerSettings } from "@uog/api-client";
 
 import { ToastProvider } from "@uog/ui";
 
@@ -59,10 +60,10 @@ function site(partial: Partial<Site> = {}): Site {
     is_main: true,
     template: 1,
     configuration: {
-      schema_version: 1,
+      schema_version: 2,
       identity: { display_name: null, logo_ref: null, favicon_ref: null },
       language: { enabled: ["en-us"] },
-      presentation: { theme: "institutional" },
+      presentation: { theme: "institutional", banner: defaultTitleBannerSettings() },
       navigation: { items: [] },
       behavior: { show_search: false, show_language_switcher: false },
     },

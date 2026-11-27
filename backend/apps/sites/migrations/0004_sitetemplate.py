@@ -6,8 +6,18 @@ import django.db.models.deletion
 import django.db.models.lookups
 from django.db import migrations, models
 
-from apps.sites.configuration import default_configuration
 from apps.sites.template_sql import FORWARD, REVERSE
+
+# Frozen schema-version-1 document. Do not call live default_configuration() —
+# later schema bumps would break fresh migrates that still validate version 1 here.
+SCHEMA_V1_DEFAULT = {
+    "schema_version": 1,
+    "identity": {"display_name": None, "logo_ref": None, "favicon_ref": None},
+    "language": {"enabled": ["en-us"]},
+    "presentation": {"theme": "institutional"},
+    "navigation": {"items": []},
+    "behavior": {"show_search": False, "show_language_switcher": False},
+}
 
 INITIAL_TEMPLATES = (
     ("UNIVERSITY_MAIN", "University Main Site", "Approved starting configuration for the university main website."),
@@ -28,7 +38,7 @@ def seed_initial_templates(apps, schema_editor):
                 "name": name,
                 "description": description,
                 "status": "ACTIVE",
-                "default_configuration": default_configuration("en-us"),
+                "default_configuration": dict(SCHEMA_V1_DEFAULT),
             },
         )
 

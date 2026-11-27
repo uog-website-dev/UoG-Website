@@ -302,12 +302,11 @@ def test_page_post_targets_and_site_local_destination_policy_are_enforced(api):
         response = _post(api, url + "items/", {"label": kind, "item_type": kind, field: pk}, _tag(api, url))
         assert response.status_code == 201, response.content
         assert response.json()[field] == pk
-    body = {"label": "Foreign", "item_type": "page", "page": str(foreign.pk), "allow_cross_site": True}
+    body = {"label": "Foreign", "item_type": "page", "page": str(foreign.pk)}
     assert _post(api, url + "items/", body, _tag(api, url)).status_code == 400
     UserRoleAssignment.objects.create(user=api.user, role=Role.objects.get(code="viewer"), scope="SITE", site=api.other, organization=api.other.organization_unit)
-    denied = _post(api, url + "items/", {**body, "allow_cross_site": False}, _tag(api, url))
+    denied = _post(api, url + "items/", body, _tag(api, url))
     assert denied.status_code == 400 and denied.json()["error"]["details"]["reason"] == "invalid_target"
-    assert _post(api, url + "items/", body, _tag(api, url)).status_code == 400
 
 
 def test_all_changes_have_shared_site_actor_request_audit_and_urls_are_not_logged(api):
@@ -417,6 +416,28 @@ def test_menu_openapi_contract_is_typed_scoped_and_documents_conflicts():
         active = next(parameter for parameter in paths[path]["get"]["parameters"] if parameter["name"] == "is_active")
         assert active.get("required", False) is False
         assert "Omit to include both active and inactive" in active["description"]
+    # Finding 12: Post (and Page/Category) targets are UUIDs, never integers.
+    for schema_name in ("ItemOutput", "ItemInputRequest", "PatchedItemPatchRequest"):
+        props = schema["components"]["schemas"][schema_name].get("properties") or {}
+        for field in ("page", "post", "category"):
+            assert props[field]["type"] == "string" and props[field]["format"] == "uuid", (schema_name, field, props.get(field))
+
+
+def test_public_menu_openapi_documents_footer_column_fields():
+    """Finding 11: public menu nodes declare menu, column and description."""
+    output = io.StringIO()
+    call_command("spectacular", stdout=output, validate=True, fail_on_warn=True)
+    schema = yaml.safe_load(output.getvalue())
+    node = schema["components"]["schemas"]["PublicMenuNode"]
+    properties = node.get("properties") or node.get("allOf", [{}])[-1].get("properties") or {}
+    # drf-spectacular may nest under allOf; also accept direct properties.
+    if not properties and "allOf" in node:
+        for part in node["allOf"]:
+            properties.update(part.get("properties") or {})
+    assert {"label", "href", "source", "children", "menu", "column", "description"} <= set(properties)
+    public = schema["paths"]["/api/v1/site-context/menus/"]["get"]
+    assert public["operationId"] == "public_site_menus"
+    assert "Public menus" in public["tags"]
 
 
 def test_local_location_edit_cross_site_block_and_central_menu_authority(api, settings):

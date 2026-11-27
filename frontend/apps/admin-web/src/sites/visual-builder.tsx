@@ -62,7 +62,7 @@ import type {
 } from "@uog/types";
 import { PublicPageView, pageFromResponse, resolvePageHeading, PAGE_HEADING_ERROR_PATH, resolvePageWidth } from "@uog/ui";
 import {
-  getSiteVisualDraft, saveSiteVisualDraft, openWorkingDraft,
+  getSiteVisualDraft, saveSiteVisualDraft,
   getSitePagePreview, transitionSitePage,
   listSiteSectionTemplates, createSiteSectionTemplate, insertSiteSectionTemplate,
 } from "@/app/sites/page-actions";
@@ -341,7 +341,7 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions,defaultLanguage="e
     if(event.key==="Escape" && focusMode && !picker && !media){setFocusMode(false);focusButton.current?.focus();return;}
     const action=historyShortcut(event.nativeEvent);
     if(!action)return;
-    if(!page || !["DRAFT","UNPUBLISHED"].includes(page.status))return;
+    if(!page || !["DRAFT","UNPUBLISHED","PUBLISHED"].includes(page.status))return;
     event.preventDefault();
     if(action==="undo") undoEdit();
     else redoEdit();
@@ -372,7 +372,7 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions,defaultLanguage="e
   const headingPlan=resolvePageHeading(layout);
   const widthPlan=resolvePageWidth(layout.settings);
   const errors={...(!checked.ok?checked.errors:{}),...(!headingPlan.ok?{[PAGE_HEADING_ERROR_PATH]:[headingPlan.message]}:{}),...serverFields};
-  const editable=page && ["DRAFT","UNPUBLISHED"].includes(page.status);
+  const editable=page && ["DRAFT","UNPUBLISHED","PUBLISHED"].includes(page.status);
 
   useLayoutEffect(()=>{
     if(!selected || !canvasRef.current){setSelectionBox(null);return;}
@@ -573,14 +573,6 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions,defaultLanguage="e
     }catch(cause){if(alive.current)setError(cause instanceof Error?cause.message:"The server draft could not be adopted.");}
     finally{if(alive.current)setSaving(false);}
   }
-  async function editPublished() {
-    if(!page?.etag)return;setSaving(true);setError(null);
-    try{
-      const draft=unwrap(await openWorkingDraft(siteId,page.id,page.etag));
-      if(alive.current && draft.site===siteId)router.push(`/sites/${siteId}/admin/pages/${draft.id}/builder`);
-    }catch(cause){if(alive.current)setError(cause instanceof Error?cause.message:"The working draft could not be opened.");}
-    finally{if(alive.current)setSaving(false);}
-  }
   async function queueWorkflow(action:WorkflowAction) {
     if(!page?.etag)return;
     if(!headingPlan.ok){setError(headingPlan.message);return;}
@@ -672,10 +664,10 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions,defaultLanguage="e
       {editable?<>
         <Button aria-expanded={showHomepageTemplates} disabled={saving || workflowBusy} onClick={()=>setShowHomepageTemplates(value=>!value)}>Homepage templates</Button>
         <Button ref={focusButton} startIcon={focusMode?<FullscreenExit/>:<Fullscreen/>} aria-pressed={focusMode} onClick={()=>setFocusMode(value=>!value)}>{focusMode?"Exit focus mode":"Focus mode"}</Button>
-        <Button variant="contained" startIcon={saving?<CircularProgress size={16} color="inherit"/>:<SaveOutlined/>} disabled={!dirty || saving || !checked.ok || !headingPlan.ok} onClick={()=>void save()}>{saving?"Saving…":"Save draft"}</Button>
+        <Button variant="contained" startIcon={saving?<CircularProgress size={16} color="inherit"/>:<SaveOutlined/>} disabled={!dirty || saving || !checked.ok || !headingPlan.ok} onClick={()=>void save()}>{saving?"Saving…":page.status==="PUBLISHED"?"Save":"Save draft"}</Button>
       </>:null}
     </Paper>
-    {editable && showHomepageTemplates?<Box sx={{p:2,overflow:"auto",maxHeight:"70vh",flexShrink:0}}><HomepageTemplateCatalogue siteId={siteId} canEdit onChoose={(value,name)=>{change(value,{selection:null});setShowHomepageTemplates(false);setMessage(`${name} loaded into the unsaved draft. Save to retain it; publication is unchanged.`);}}/></Box>:null}
+    {editable && showHomepageTemplates?<Box sx={{p:2,overflow:"auto",maxHeight:"70vh",flexShrink:0}}><HomepageTemplateCatalogue siteId={siteId} canEdit onChoose={(value,name)=>{change(value,{selection:null});setShowHomepageTemplates(false);setMessage(page.status==="PUBLISHED"?`${name} loaded. Save to update the live Page.`:`${name} loaded into the unsaved draft. Save to retain it.`);}}/></Box>:null}
     {error?<Alert severity={conflict?"warning":"error"} role="alert" action={conflict?<Box sx={{display:"flex",gap:1,flexWrap:"wrap"}}>
       <Button color="inherit" size="small" disabled={saving} onClick={()=>void reloadServerDraft()}>Reload server draft</Button>
       <Button color="inherit" size="small" disabled={saving} onClick={()=>void adoptServerDraft()}>Adopt server draft</Button>
@@ -684,8 +676,8 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions,defaultLanguage="e
     {editable && !headingPlan.ok?<Alert severity="warning" role="alert">{headingPlan.message}</Alert>:null}
     {chromeWidgets.length?<Alert severity="warning" role="alert">Legacy Site chrome was found in this Page: {chromeWidgets.map(widget=>widget.label).join(", ")}. It still renders and nothing was removed or rewritten. The Site header already supplies branding and navigation, so remove these widgets from the Page when you can to avoid repeating them.</Alert>:null}
     <Typography component="div" aria-live="polite" sx={{position:"absolute",width:1,height:1,overflow:"hidden",clip:"rect(0 0 0 0)"}}>{announcement}</Typography>
-    {!editable?<Alert severity="info" action={page.status==="PUBLISHED"?<Button disabled={saving} onClick={()=>void editPublished()}>Open working draft</Button>:undefined}>
-      {page.status==="PUBLISHED"?"This is the published Page. Open its private working draft to use the Visual Builder.":"This Page is locked for review. Return to Pages to follow its CMS workflow."}
+    {!editable?<Alert severity="info">
+      This Page is locked for review. Return to Pages to follow its CMS workflow.
     </Alert>:<>
       {!page.metadata?.visual_layout && (page.blocks?.length??0)>0?<Alert severity="info" sx={{mb:2}} action={<Button onClick={()=>change(structuredClone(layout))}>Convert legacy draft</Button>}>
         Legacy blocks are shown through the compatibility adapter. Saving converts this draft to a visual layout; revision history and the public snapshot stay intact.
@@ -1131,7 +1123,7 @@ function BuilderWorkspace({siteId,siteName,pageId,permissions,defaultLanguage="e
             <TextField select fullWidth size="small" sx={{mt:2}} label="Content width" value={widthPlan.width} disabled={saving}
               helperText="Full width uses all available space. Every option keeps a 24 px safe gutter; use Edge-to-edge bleed to remove it."
               onChange={event=>change({...layout,settings:{...layout.settings,content_width:event.target.value as "full"|"wide"|"reading"}})}>
-              <MenuItem value="wide">Wide · 1280px</MenuItem><MenuItem value="full">Full width · 100%</MenuItem><MenuItem value="reading">Reading · 880px</MenuItem>
+              <MenuItem value="wide">Wide · 1120px</MenuItem><MenuItem value="full">Full width · 100%</MenuItem><MenuItem value="reading">Reading · 880px</MenuItem>
             </TextField>
             <FormControlLabel sx={{mt:2,alignItems:"flex-start",ml:0,gap:1}} control={<Switch size="small" checked={widthPlan.bleed} disabled={saving} inputProps={{"aria-describedby":"page-bleed-help"}} onChange={event=>change({...layout,settings:{...layout.settings,bleed:event.target.checked}})}/>}
               label={<Box><Typography variant="body2">Edge-to-edge bleed</Typography><Typography id="page-bleed-help" variant="caption" color="text.secondary" component="p">Off by default. Turning it on lets this Page reach the viewport edge instead of keeping its safe gutter.</Typography></Box>}/>

@@ -61,7 +61,7 @@ function SectionRow({row,siteId,pageTitle,width,demoteH1}:{row:LayoutSection;sit
     data-resolved-breakpoint={resolved.breakpoint}
     data-resolved-gap={resolved.gap}
     data-resolved-stack={resolved.stack ? "true" : "false"}
-    sx={{width:"100%",mx:"auto",maxWidth:row.style?.content_width==="wide"?1280:row.style?.content_width==="reading"?880:undefined,display:"grid",gridTemplateColumns:columns,...presentationStyle(resolved),...decorativeStyle(row.style),...(resolved.tone==="muted" && !row.style?.padding ? {p:{xs:2.5,md:4}} : {}),...(resolved.tone==="muted" && !row.style?.radius ? {borderRadius:2} : {})}}
+    sx={{width:"100%",mx:"auto",maxWidth:row.style?.content_width==="wide"?1120:row.style?.content_width==="reading"?880:undefined,display:"grid",gridTemplateColumns:columns,...presentationStyle(resolved),...decorativeStyle(row.style),...(resolved.tone==="muted" && !row.style?.padding ? {p:{xs:2.5,md:4}} : {}),...(resolved.tone==="muted" && !row.style?.radius ? {borderRadius:2} : {})}}
   >
     {row.columns.map((column) => (
       <Box key={column.id} data-node-id={column.id} sx={{minWidth:0,display:"flex",flexDirection:"column",gap:2}}>

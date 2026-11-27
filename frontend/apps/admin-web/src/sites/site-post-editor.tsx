@@ -31,6 +31,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
+import { TitleBannerOverrideSection, titleBannerFromMetadata } from "./title-banner-override";
 
 import {
   createSiteTaxonomy,
@@ -39,7 +40,6 @@ import {
   loadSiteTaxonomy,
   updateSitePost,
   transitionSitePost,
-  openSitePostWorkingDraft,
 } from "@/app/sites/post-actions";
 import type {
   SitePostRecord,
@@ -59,8 +59,8 @@ const PERMISSIONS = {
   update: "content.posts.update",
 } as const;
 const EMPTY_TAXONOMY: SiteTaxonomyRecord[] = [];
-const PostRichEditor = dynamic(
-  () => import("./post-rich-editor").then((module) => module.PostRichEditor),
+const SharedRichTextEditor = dynamic(
+  () => import("./rich-text-editor").then((module) => module.RichTextEditor),
   { loading: () => <Box role="status" aria-label="Loading article editor" sx={{ minHeight: 460 }}><Skeleton aria-hidden variant="rounded" height={460} /></Box> },
 );
 
@@ -76,12 +76,15 @@ interface PostForm {
   featured_alt: string;
   categories: string[];
   tags: string[];
+  bannerOverride: import("@uog/types").TitleBannerStyle | null;
+  metadata: Record<string, unknown>;
 }
 
 function emptyForm(): PostForm {
   return {
     title: "", slug: "", excerpt: "", blocks: [], html: "", legacy: false,
     seo: "{}", featured_media: "", featured_alt: "", categories: [], tags: [],
+    bannerOverride: null, metadata: {},
   };
 }
 
@@ -211,6 +214,7 @@ function apiErrorText(cause: unknown, fallback: string): string {
 
 function formFromRecord(current: SitePostRecord): PostForm {
   const converted = legacyArticle(current.blocks ?? []);
+  const metadata = { ...(current.metadata ?? {}) };
   const nextForm: PostForm = {
     html: current.editor_document?.html ?? converted ?? "",
     legacy: !current.editor_document && converted === null,
@@ -225,6 +229,8 @@ function formFromRecord(current: SitePostRecord): PostForm {
     featured_alt: current.featured_alt ?? "",
     categories: current.categories ?? [],
     tags: current.tags ?? [],
+    bannerOverride: titleBannerFromMetadata(metadata),
+    metadata,
   };
   if (!current.editor_document && !current.blocks?.length) {
     nextForm.html = `<p>${escapeHtml(current.content ?? "").replace(/\n/g, "<br>")}</p>`;
@@ -311,7 +317,7 @@ function SitePostEditorContent({
   const slugFieldError = fieldErrors.slug?.join(" ") || slugError(form.slug);
   const categoryFieldError = fieldErrors.categories?.join(" ") ?? "";
   const tagFieldError = fieldErrors.tags?.join(" ") ?? "";
-  const metadataEditable = !activePost || activePost.status === "DRAFT" || activePost.status === "UNPUBLISHED";
+  const metadataEditable = !activePost || ["DRAFT", "UNPUBLISHED", "PUBLISHED"].includes(activePost.status);
   const [taxonomyTarget, setTaxonomyTarget] = useState<"categories" | "tags" | null>(null);
   const [taxonomyName, setTaxonomyName] = useState("");
   const [taxonomyCode, setTaxonomyCode] = useState("");
@@ -380,7 +386,9 @@ function SitePostEditorContent({
     ? form.tags.filter(id => !tagNames.has(id)) : [];
   const enabled = postsEnabled === true && !saving && !loadingPost;
   const settingsEnabled = enabled && metadataEditable && (activePost ? canEdit : canCreate);
-  const titleLabel = mode === "edit" || activePost ? "Edit Post" : "Create Post";
+  const titleLabel = mode === "create" && !activePost
+    ? "Create Post"
+    : "Edit Post";
   const bodyFieldError = [
     attemptedSave || editorFieldError ? bodyProblem : "",
     editorFieldError,
@@ -429,16 +437,6 @@ function SitePostEditorContent({
     } finally { if (isCurrentOperation()) setSaving(false); }
   }
 
-  async function openWorkingDraft() {
-    if (!activePost?.etag || dirty || saving) return;
-    setSaving(true); setDialogError("");
-    try {
-      const draft = unwrap(await openSitePostWorkingDraft(siteId,activePost.id,activePost.etag));
-      if (isCurrentOperation()) router.push(`/sites/${siteId}/admin/posts/${draft.id}/edit`);
-    } catch (cause) { if (isCurrentOperation()) setDialogError(apiErrorText(cause,"The working draft could not be opened.")); }
-    finally { if (isCurrentOperation()) setSaving(false); }
-  }
-
   function leaveEditor() {
     if (saving || (dirty && !window.confirm("Discard unsaved article changes?"))) return;
     router.push(listHref);
@@ -464,6 +462,14 @@ function SitePostEditorContent({
         featured_alt: form.featured_alt.trim(),
         categories: form.categories,
         tags: form.tags,
+        metadata: (() => {
+          const metadata = { ...form.metadata };
+          delete metadata.post_editor;
+          delete metadata.post_media;
+          if (form.bannerOverride) metadata.title_banner = { ...form.bannerOverride, use_global: false };
+          else delete metadata.title_banner;
+          return metadata;
+        })(),
       };
       const saved = activePost
         ? (() => {
@@ -668,7 +674,7 @@ function SitePostEditorContent({
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
           <Button onClick={leaveEditor} disabled={saving}>Cancel</Button>
           <Button variant="outlined" onClick={() => void savePost()} disabled={!settingsEnabled}>
-            {saving ? "Saving…" : "Save Draft"}
+            {saving ? "Saving…" : activePost?.status === "PUBLISHED" ? "Save" : "Save Draft"}
           </Button>
           <Button
             variant="outlined"
@@ -767,7 +773,7 @@ function SitePostEditorContent({
               Article body *
             </Typography>
             {!form.legacy ? (
-              <RenderProbe id="rich-text"><PostRichEditor
+              <RenderProbe id="rich-text"><SharedRichTextEditor
                 siteId={siteId}
                 canUseMedia={canUseMedia}
                 canUploadMedia={canUploadMedia}
@@ -776,6 +782,11 @@ function SitePostEditorContent({
                 disabled={!settingsEnabled}
                 onSave={() => void savePost()}
                 error={bodyFieldError}
+                label="Article body"
+                toolbarLabel="Article formatting"
+                placeholder="Write your article content here…"
+                imageDialogTitle="Insert article image"
+                linkDialogTitle="Insert article link"
               /></RenderProbe>
             ) : (
               <Box component="section" aria-label="Post content blocks" sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
@@ -859,14 +870,15 @@ function SitePostEditorContent({
                     : "Never published"}
                 </Typography>
                 {activePost.review_comment ? <Alert severity="info">Reviewer comment: {activePost.review_comment}</Alert> : null}
-                {activePost.draft_of ? <Alert severity="info">This working draft revises /posts/{activePost.publication_slug}. Original article status {activePost.publication_status?.replaceAll("_"," ").toLowerCase() || "published"}. <Link href={`/sites/${siteId}/admin/posts/${activePost.draft_of}/edit`}>Open original article</Link></Alert> : null}
+                {activePost.status === "PUBLISHED" ? (
+                  <Alert severity="info">
+                    You are editing the live published article. Save applies your changes to the public site immediately.
+                  </Alert>
+                ) : null}
                 {dirty ? <Typography variant="body2">Save or use Preview in the top bar before changing review status.</Typography> : null}
                 <Typography variant="body2" color="text.secondary">
                   Preview opens in a new tab with this Site’s header, footer and article banner.
                 </Typography>
-                {canEdit && activePost.status === "PUBLISHED" ? (
-                  <Button disabled={!enabled || dirty} size="small" onClick={() => void openWorkingDraft()}>Edit working draft</Button>
-                ) : null}
                 <ContentWorkflowButtons
                   title={activePost.title}
                   available={activePost.available_actions ?? []}
@@ -899,6 +911,14 @@ function SitePostEditorContent({
             />
           </Paper>
 
+          <Paper variant="outlined" component="section" aria-label="Title banner" sx={sidebarCardSx}>
+            <TitleBannerOverrideSection
+              siteId={siteId}
+              value={form.bannerOverride}
+              disabled={!settingsEnabled}
+              onChange={(bannerOverride) => setForm((current) => ({ ...current, bannerOverride }))}
+            />
+          </Paper>
           <Paper variant="outlined" component="section" aria-label="Featured image" sx={sidebarCardSx}>
             <Typography variant="subtitle2" component="h2" sx={{ fontWeight: 700 }}>Featured image</Typography>
             {form.featured_media && /^sites\/\d+\/assets\/[0-9a-f-]{36}$/.test(form.featured_media) ? (

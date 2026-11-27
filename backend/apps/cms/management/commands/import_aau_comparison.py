@@ -104,6 +104,6 @@ class Command(BaseCommand):
         after={s.pk:{'homepage':str(s.homepage_id),'configuration':s.configuration} for s in Site.objects.exclude(pk=site.pk)}
         if after!=before:raise CommandError('Another Site changed during import; inspect the isolation report.')
         draft,_=open_working_draft(page,actor=actor,if_match=content_etag(page))
-        report={'draft':str(draft.pk),'site':site.pk,'page':str(page.pk),'host':'aau-review.uog.local','assets':states,'posts':post_ids,'rows':len(layout['rows']),'other_sites_unchanged':True,'layout':layout}
+        report={'draft':str(draft.pk),'site':site.pk,'page':str(page.pk),'host':'aau-review.localhost','assets':states,'posts':post_ids,'rows':len(layout['rows']),'other_sites_unchanged':True,'layout':layout}
         (directory/'result.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
         self.stdout.write(json.dumps({'site':site.pk,'page':str(page.pk),'assets':len(assets),'posts':len(post_ids),'rows':len(layout['rows']),'other_sites_unchanged':True}))

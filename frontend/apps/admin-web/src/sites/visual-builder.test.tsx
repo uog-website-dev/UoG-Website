@@ -321,14 +321,12 @@ describe("Visual Builder workspace",()=>{
     fireEvent.click(await screen.findByRole("button",{name:"Retry"}));
     expect(load).toHaveBeenCalledWith(11,other);
   });
-  it("opens the existing private working draft for a published Page before allowing canvas edits",async()=>{
-    load.mockResolvedValue({ok:true,data:record({status:"PUBLISHED"})});open.mockResolvedValue({ok:true,data:record({id:other,draft_of:id})});
-    const user=userEvent.setup();render(<VisualBuilder {...props}/>);
-    expect(await screen.findByText(/This is the published Page/)).toBeTruthy();
-    expect(screen.queryByRole("button",{name:"Save draft"})).toBeNull();
-    await user.click(screen.getByRole("button",{name:"Open working draft"}));
-    await waitFor(()=>expect(push).toHaveBeenCalledWith(`/sites/11/admin/pages/${other}/builder`));
-    expect(open).toHaveBeenCalledWith(11,id,'"revision-1"');
+  it("edits a published Page in place in the Visual Builder",async()=>{
+    load.mockResolvedValue({ok:true,data:record({status:"PUBLISHED",metadata:{visual_layout:starterLayout()}})});
+    render(<VisualBuilder {...props}/>);
+    expect(await screen.findByRole("button",{name:"Save"})).toBeTruthy();
+    expect(screen.queryByRole("button",{name:"Open working draft"})).toBeNull();
+    expect(open).not.toHaveBeenCalled();
   });
   it("keeps the canvas visible in focus mode and Escape returns to the full workspace",async()=>{
     const user=userEvent.setup();render(<VisualBuilder {...props}/>);
@@ -391,7 +389,7 @@ describe("Visual Builder workspace",()=>{
     expect((screen.getByRole("button",{name:"Preview in new tab"}) as HTMLButtonElement).disabled).toBe(true);
     expect((screen.getByRole("button",{name:/Submit Admissions for review/}) as HTMLButtonElement).disabled).toBe(true);
     fireEvent.mouseDown(screen.getByRole("combobox",{name:"Content width"}));
-    fireEvent.click(await screen.findByRole("option",{name:"Wide · 1280px"}));
+    fireEvent.click(await screen.findByRole("option",{name:"Wide · 1120px"}));
     expect((screen.getByRole("button",{name:"Save draft"}) as HTMLButtonElement).disabled).toBe(true);
     fireEvent.mouseDown(screen.getByRole("combobox",{name:"Page title"}));
     fireEvent.click(await screen.findByRole("option",{name:"Hide title visually"}));
@@ -419,7 +417,7 @@ describe("Visual Builder workspace",()=>{
     await screen.findByRole("region",{name:"Live Page canvas"});
     await user.click(screen.getByRole("button",{name:"Page settings"}));
     const width=screen.getByRole("combobox",{name:"Content width"});
-    expect(width.textContent).toContain("Wide · 1280px");
+    expect(width.textContent).toContain("Wide · 1120px");
     expect(screen.getByText(/24 px safe gutter/)).toBeTruthy();
     fireEvent.mouseDown(width);
     fireEvent.click(await screen.findByRole("option",{name:"Full width · 100%"}));

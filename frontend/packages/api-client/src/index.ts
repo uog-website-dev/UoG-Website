@@ -80,7 +80,9 @@ export type {
 
 export {
   SiteConfigurationError,
+  DEFAULT_TITLE_BANNER_STYLE,
   defaultSiteConfiguration,
+  defaultTitleBannerSettings,
   mergeSiteConfiguration,
   hasSecretKey,
   SITE_CONFIGURATION_SCHEMA_VERSION,

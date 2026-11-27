@@ -8,7 +8,13 @@ import type { PublicMenusPayload, PublicSiteContext } from "@uog/ui/public-site"
 
 const API = process.env.API_BASE_URL ?? "http://backend:8000/api";
 
-async function requestPublicApi(path: string, host: string): Promise<{ status: number; body: unknown } | null> {
+export type PublicApiResponse = {
+  status: number;
+  body: unknown;
+  location: string | null;
+};
+
+async function requestPublicApi(path: string, host: string): Promise<PublicApiResponse | null> {
   try {
     const url = new URL(`${API}/v1/site-context/${path}`);
     const transport = url.protocol === "https:" ? https : http;
@@ -22,7 +28,9 @@ async function requestPublicApi(path: string, host: string): Promise<{ status: n
         response.on("end", () => {
           let body: unknown = null;
           try { body = JSON.parse(Buffer.concat(chunks).toString("utf8")); } catch { /* invalid JSON stays unavailable */ }
-          resolve({ status: response.statusCode ?? 0, body });
+          const rawLocation = response.headers.location;
+          const location = typeof rawLocation === "string" ? rawLocation : Array.isArray(rawLocation) ? rawLocation[0] ?? null : null;
+          resolve({ status: response.statusCode ?? 0, body, location });
         });
       });
       request.on("error", reject);
@@ -30,6 +38,15 @@ async function requestPublicApi(path: string, host: string): Promise<{ status: n
     });
   } catch { return null; }
 }
+
+/**
+ * Host-scoped public document fetch shared by metadata and the page RSC.
+ * One network call per request path; never reused across requests.
+ */
+export const publicDocumentForHost = cache(async (host: string | null, path: string): Promise<PublicApiResponse | null> => {
+  if (!host || /[\s,/@\\]/.test(host) || !path) return null;
+  return requestPublicApi(path, host);
+});
 
 /** Resolve public Site branding from the request Host without accepting Site ids. */
 export const publicSiteForHost = cache(async (host: string | null): Promise<PublicSiteContext> => {
@@ -67,12 +84,35 @@ async function resolvedSite(): Promise<{ site: PublicSiteContext; origin: string
   } catch { return null; }
 }
 
-async function publicDocument(path: string): Promise<{ status: number; body: unknown } | null> {
+async function publicDocument(path: string): Promise<PublicApiResponse | null> {
   try {
     const host = (await headers()).get("host");
-    if (!host || /[\s,/@\\]/.test(host)) return null;
-    return await requestPublicApi(path, host);
+    return await publicDocumentForHost(host, path);
   } catch { return null; }
+}
+
+/** Published page payload for the request Host — seeds the first paint. */
+export async function publicPagePayload(path: string): Promise<PublicApiResponse | null> {
+  const resolved = await resolvedSite();
+  if (!resolved || !resolved.site.modules.pages) return null;
+  const host = (await headers()).get("host");
+  return publicDocumentForHost(host, `pages${path}/`);
+}
+
+/** Published homepage payload for the request Host — seeds the first paint. */
+export async function publicHomepagePayload(): Promise<PublicApiResponse | null> {
+  const resolved = await resolvedSite();
+  if (!resolved || !resolved.site.modules.pages) return null;
+  const host = (await headers()).get("host");
+  return publicDocumentForHost(host, "homepage/");
+}
+
+/** Published post payload for the request Host — seeds the first paint. */
+export async function publicPostPayload(slug: string): Promise<PublicApiResponse | null> {
+  const resolved = await resolvedSite();
+  if (!resolved || !resolved.site.modules.posts || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return null;
+  const host = (await headers()).get("host");
+  return publicDocumentForHost(host, `posts/${encodeURIComponent(slug)}/`);
 }
 
 export async function pageRouteMetadata(path: string): Promise<Metadata> {

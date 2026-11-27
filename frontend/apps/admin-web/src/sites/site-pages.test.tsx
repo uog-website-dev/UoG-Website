@@ -20,6 +20,7 @@ const loadSitePageWorkflowHistory = vi.fn();
 const loadSitePageRevisions = vi.fn();
 const restoreSitePageRevision = vi.fn();
 const openWorkingDraft = vi.fn();
+const deleteSitePage = vi.fn();
 
 vi.mock("@/app/sites/page-actions", () => ({
   loadSitePages: (...args: unknown[]) => loadSitePages(...args),
@@ -29,6 +30,7 @@ vi.mock("@/app/sites/page-actions", () => ({
   createSitePage: (...args: unknown[]) => createSitePage(...args),
   updateSitePage: (...args: unknown[]) => updateSitePage(...args),
   transitionSitePage: (...args: unknown[]) => transitionSitePage(...args),
+  deleteSitePage: (...args: unknown[]) => deleteSitePage(...args),
   loadSitePageWorkflowHistory: (...args: unknown[]) => loadSitePageWorkflowHistory(...args),
   loadSitePageRevisions: (...args: unknown[]) => loadSitePageRevisions(...args),
   restoreSitePageRevision: (...args: unknown[]) => restoreSitePageRevision(...args),
@@ -174,6 +176,7 @@ beforeEach(() => {
   loadSitePageRevisions.mockResolvedValue({ ok: true, data: { count: 0, next: null, previous: null, results: [], etag: '"cms-content-page-1-r1"' } });
   restoreSitePageRevision.mockResolvedValue({ ok: true, data: { revision_number: 9, restored_from_revision: 1 } });
   openWorkingDraft.mockResolvedValue({ ok: true, data: draft() });
+  deleteSitePage.mockResolvedValue({ ok: true, data: null });
   setSiteHomepage.mockResolvedValue({ ok: true, data: draft({ is_homepage: true }) });
   updateSitePage.mockResolvedValue({ ok: true, data: draft({ title: "Admissions updated" }) });
 });
@@ -515,7 +518,7 @@ describe("SitePagesPanel", () => {
   it("previews private draft content and blocks malformed block JSON", async () => {
     renderEditor("create");
     await screen.findByRole("heading", { name: "Create Page" });
-    fireEvent.click(screen.getByRole("button", { name: "Add paragraph block" }));
+    fireEvent.click(screen.getByRole("button", { name: "Add button block" }));
     fireEvent.click(screen.getByRole("button", { name: "Preview draft" }));
     expect(screen.getByText("Private draft preview")).toBeTruthy();
     expect(screen.queryByRole("script")).toBeNull();
@@ -682,40 +685,69 @@ describe("SitePagesPanel", () => {
     expect(screen.queryByRole("link", { name: /^Edit/ })).toBeNull();
   });
 
-  it("opens a working draft of a published Page and keeps the live route fixed", async () => {
+  it("edits a published Page in place without cloning a working draft", async () => {
     const published = draft({
       id: "live-1",
       status: "PUBLISHED",
       title: "Admissions",
       etag: '"cms-content-live-1-r1"',
     });
-    const working = draft({
-      id: "draft-1",
-      title: "Admissions",
-      slug: "wip-abc123",
-      path: "/wip-abc123",
-      status: "DRAFT",
-      draft_of: "live-1",
-      etag: '"cms-content-draft-1-r1"',
-    });
     loadSitePages.mockResolvedValue(pageResult([published]));
-    getSitePage.mockImplementation(async (_site: number, id: string) => ({
-      ok: true,
-      data: id === "draft-1" ? working : published,
-    }));
-    openWorkingDraft.mockResolvedValue({ ok: true, data: working });
+    getSitePage.mockResolvedValue({ ok: true, data: published });
     renderPanel();
 
-    fireEvent.click(await screen.findByRole("button", { name: "Edit a draft of Admissions" }));
-    await waitFor(() => expect(openWorkingDraft).toHaveBeenCalledWith(
-      11, "live-1", '"cms-content-live-1-r1"',
-    ));
-    expect(push).toHaveBeenCalledWith("/sites/11/admin/pages/draft-1/edit");
+    const edit = await screen.findByRole("link", { name: "Edit Admissions" });
+    expect(edit.getAttribute("href")).toBe("/sites/11/admin/pages/live-1/edit");
+    expect(openWorkingDraft).not.toHaveBeenCalled();
 
-    renderEditor("edit", { pageId: "draft-1" });
-    await screen.findByRole("heading", { name: "Edit draft of published Page" });
+    renderEditor("edit", { pageId: "live-1" });
+    await screen.findByRole("heading", { name: "Edit Page" });
+    expect(screen.getByText(/Save applies your changes to the public site immediately/i)).toBeTruthy();
     expect(screen.getByRole("textbox", { name: "Slug" })).toHaveProperty("disabled", true);
     expect(screen.getByRole("combobox", { name: "Parent Page" }).getAttribute("aria-disabled")).toBe("true");
+  });
+
+  it("archives a published Page through Delete and Delete selected", async () => {
+    const live = draft({
+      id: "live-delete",
+      status: "PUBLISHED",
+      title: "Archive me",
+      available_actions: ["unpublish", "archive"],
+      etag: '"cms-content-live-delete-r1"',
+    });
+    const other = draft({
+      id: "live-delete-2",
+      status: "PUBLISHED",
+      title: "Archive us",
+      available_actions: ["unpublish", "archive"],
+      etag: '"cms-content-live-delete-2-r1"',
+    });
+    loadSitePages.mockResolvedValue(pageResult([live, other]));
+    getSitePage.mockImplementation(async (_site: number, id: string) => ({
+      ok: true,
+      data: id === other.id ? other : live,
+    }));
+    transitionSitePage.mockResolvedValue({
+      ok: true,
+      data: draft({ ...live, status: "ARCHIVED", available_actions: [] }),
+    });
+    renderPanel();
+
+    fireEvent.click(await screen.findByRole("button", { name: "Delete Archive me" }));
+    const single = await screen.findByRole("dialog", { name: "Delete page?" });
+    fireEvent.click(within(single).getByRole("button", { name: "Delete page" }));
+    await waitFor(() => expect(transitionSitePage).toHaveBeenCalledWith(
+      11, "live-delete", "archive", "", '"cms-content-live-delete-r1"',
+    ));
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "Delete page?" })).toBeNull());
+
+    transitionSitePage.mockClear();
+    fireEvent.click(screen.getByRole("checkbox", { name: "Select Archive me" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Select Archive us" }));
+    fireEvent.click(screen.getByRole("button", { name: "Delete selected" }));
+    const bulk = await screen.findByRole("dialog", { name: "Delete selected pages?" });
+    fireEvent.click(within(bulk).getByRole("button", { name: "Delete selected" }));
+    await waitFor(() => expect(transitionSitePage.mock.calls.some((call) => call[2] === "archive")).toBe(true));
   });
 });
 
