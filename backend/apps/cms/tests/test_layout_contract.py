@@ -23,7 +23,7 @@ def test_shared_contract_cases(case):
 
 
 def test_exact_product_catalog():
-    assert len(REGISTRY) == len({entry["type"] for entry in REGISTRY}) == 43
+    assert len(REGISTRY) == len({entry["type"] for entry in REGISTRY}) == 44
 
 
 @pytest.mark.django_db

@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.parsers import JSONParser, FormParser, MultiPartParser
-from drf_spectacular.utils import OpenApiParameter, extend_schema
+from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_field
 
 from apps.accounts.authentication import KeycloakBearerAuthentication
 from apps.sites.models import Site
@@ -64,12 +64,15 @@ class DocumentSerializer(serializers.ModelSerializer):
         fields = ("id", "site", "title", "slug", "description", "file_reference", "file_type", "original_filename", "file_size", "categories", "categories_detail", "status", "creator", "created_at", "updated_at", "revision_number", "published_at", "version", "effective_date", "visibility", "visible_to_public", "require_login_to_download")
         read_only_fields = ("id", "site", "status", "creator", "created_at", "updated_at", "revision_number", "published_at", "categories_detail")
 
+    @extend_schema_field(serializers.CharField())
     def get_file_type(self, obj):
         return self._asset(obj).detected_mime
 
+    @extend_schema_field(serializers.CharField())
     def get_original_filename(self, obj):
         return self._asset(obj).original_filename
 
+    @extend_schema_field(serializers.IntegerField())
     def get_file_size(self, obj):
         return self._asset(obj).byte_count
 
@@ -187,7 +190,7 @@ class SiteDocuments(APIView):
         roles = (ContentRole.AUTHOR,) if write or delete else tuple(ContentRole.values)
         require_cms_grant(request.user, site.pk, roles, request=request)
 
-    @extend_schema(tags=["CMS documents"], responses={200: DocumentListResponse}, parameters=[
+    @extend_schema(operation_id="v1_sites_documents_list", tags=["CMS documents"], responses={200: DocumentListResponse}, parameters=[
         OpenApiParameter("search", str, description="Case-insensitive document title search."),
         OpenApiParameter("category", str, description="Site document category UUID."),
         OpenApiParameter("status", str, enum=["DRAFT","IN_REVIEW","APPROVED","PUBLISHED","UNPUBLISHED","ARCHIVED"]),
@@ -220,7 +223,7 @@ class SiteDocuments(APIView):
         page = paginator.paginate_queryset(rows, request, view=self)
         return paginator.get_paginated_response(DocumentSerializer(page, many=True, context={"site_id": site.pk}).data)
 
-    @extend_schema(tags=["CMS documents"], request=DocumentSerializer, responses={201: DocumentSerializer})
+    @extend_schema(operation_id="v1_sites_documents_create", tags=["CMS documents"], request=DocumentSerializer, responses={201: DocumentSerializer})
     @transaction.atomic
     def post(self, request, site_pk):
         site = self.site(request, site_pk)
@@ -249,12 +252,12 @@ class SiteDocumentDetail(APIView):
         require_cms_grant(request.user, site.pk, (ContentRole.AUTHOR,) if write else tuple(ContentRole.values), request=request)
         return get_object_or_404(Document, pk=document_id, site_id=site.pk)
 
-    @extend_schema(tags=["CMS documents"], responses={200: DocumentSerializer})
+    @extend_schema(operation_id="v1_sites_documents_retrieve", tags=["CMS documents"], responses={200: DocumentSerializer})
     def get(self, request, site_pk, document_id):
         obj = self._record(request, site_pk, document_id)
         return Response(DocumentSerializer(obj, context={"site_id": obj.site_id}).data)
 
-    @extend_schema(tags=["CMS documents"], request=DocumentSerializer, responses={200: DocumentSerializer})
+    @extend_schema(operation_id="v1_sites_documents_partial_update", tags=["CMS documents"], request=DocumentSerializer, responses={200: DocumentSerializer})
     @transaction.atomic
     def patch(self, request, site_pk, document_id):
         obj = self._record(request, site_pk, document_id, write=True)
@@ -272,7 +275,7 @@ class SiteDocumentDetail(APIView):
                          before=before, after=after, changed_fields=changed)
         return Response(DocumentSerializer(obj, context={"site_id": obj.site_id}).data)
 
-    @extend_schema(tags=["CMS documents"], responses={204: None})
+    @extend_schema(operation_id="v1_sites_documents_destroy", tags=["CMS documents"], responses={204: None})
     def delete(self, request, site_pk, document_id):
         site = get_object_or_404(Site, pk=site_pk)
         if not module_is_available(site.pk, "DOCUMENTS"):
@@ -285,10 +288,17 @@ class SiteDocumentDetail(APIView):
         return Response(status=204)
 
 
-class SiteDocumentWorkflow(SiteDocumentDetail):
-    @extend_schema(tags=["CMS documents"], request=None, responses={200: DocumentSerializer})
+class SiteDocumentWorkflow(APIView):
+    authentication_classes = [KeycloakBearerAuthentication]
+    permission_classes = [IsAuthenticated]
+    http_method_names = ["post", "head", "options"]
+
+    @extend_schema(operation_id="v1_sites_documents_workflow", tags=["CMS documents"], request=None, responses={200: DocumentSerializer})
     def post(self, request, site_pk, document_id, action):
-        obj = self._record(request, site_pk, document_id)
+        site = get_object_or_404(Site, pk=site_pk)
+        if not module_is_available(site.pk, "DOCUMENTS"):
+            raise NotFound("Documents are not enabled for this Site.")
+        obj = get_object_or_404(Document, pk=document_id, site_id=site.pk)
         require_cms_grant(request.user, obj.site_id, (ContentRole.PUBLISHER,) if action in ("publish", "unpublish") else (ContentRole.AUTHOR,), request=request)
         if action not in ("publish", "unpublish"):
             return Response({"detail": "Unknown document action."}, status=404)
@@ -310,6 +320,12 @@ class SiteDocumentFilePreview(APIView):
         response["Vary"] = "Authorization, Cookie, Host"
         return response
 
+    @extend_schema(
+        operation_id="v1_sites_documents_file_retrieve",
+        tags=["CMS documents"],
+        responses={(200, "application/octet-stream"): {"type": "string", "format": "binary"}},
+        description="Authorized management preview/download of a Site document file.",
+    )
     def get(self, request, site_pk, document_id):
         site = get_object_or_404(Site, pk=site_pk)
         from ..services.document_access import authorize_document_file, document_file_response
@@ -324,20 +340,20 @@ class SiteDocumentFilePreview(APIView):
 class SiteDocumentCategories(APIView):
     authentication_classes = [KeycloakBearerAuthentication]
     permission_classes = [IsAuthenticated]
-    @extend_schema(tags=["CMS documents"], responses={200: DocumentCategorySerializer(many=True)})
-    def get(self, request, site_pk, category_id=None):
+    http_method_names = ["get", "post", "head", "options"]
+
+    @extend_schema(operation_id="v1_sites_documents_categories_list", tags=["CMS documents"], responses={200: DocumentCategorySerializer(many=True)})
+    def get(self, request, site_pk):
         site = get_object_or_404(Site, pk=site_pk)
         if not module_is_available(site.pk, "DOCUMENTS"):
             raise NotFound("Documents are not enabled for this Site.")
         require_cms_grant(request.user, site.pk, tuple(ContentRole.values), request=request)
         rows = Category.objects.filter(site_id=site.pk, kind=Category.Kind.DOCUMENTS)
-        if category_id:
-            return Response(DocumentCategorySerializer(get_object_or_404(rows, pk=category_id)).data)
         if request.query_params.get("include_inactive") != "true":
             rows = rows.filter(is_active=True)
         return Response(DocumentCategorySerializer(rows.order_by("position", "name"), many=True).data)
 
-    @extend_schema(tags=["CMS documents"], request=DocumentCategorySerializer, responses={201: DocumentCategorySerializer})
+    @extend_schema(operation_id="v1_sites_documents_categories_create", tags=["CMS documents"], request=DocumentCategorySerializer, responses={201: DocumentCategorySerializer})
     def post(self, request, site_pk):
         site = get_object_or_404(Site, pk=site_pk)
         if not module_is_available(site.pk, "DOCUMENTS"):
@@ -356,9 +372,25 @@ class SiteDocumentCategories(APIView):
             raise serializers.ValidationError({"slug": "An active category with this slug already exists in this Site and language."}) from error
         return Response(DocumentCategorySerializer(category).data, status=201)
 
+
+class SiteDocumentCategoryDetail(APIView):
+    authentication_classes = [KeycloakBearerAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(operation_id="v1_sites_documents_categories_retrieve", tags=["CMS documents"], responses={200: DocumentCategorySerializer})
+    def get(self, request, site_pk, category_id):
+        site = get_object_or_404(Site, pk=site_pk)
+        if not module_is_available(site.pk, "DOCUMENTS"):
+            raise NotFound("Documents are not enabled for this Site.")
+        require_cms_grant(request.user, site.pk, tuple(ContentRole.values), request=request)
+        category = get_object_or_404(Category, pk=category_id, site_id=site.pk, kind=Category.Kind.DOCUMENTS)
+        return Response(DocumentCategorySerializer(category).data)
+
+    @extend_schema(operation_id="v1_sites_documents_categories_partial_update", tags=["CMS documents"], request=DocumentCategorySerializer, responses={200: DocumentCategorySerializer})
     def patch(self, request, site_pk, category_id):
         return self._update(request, site_pk, category_id, partial=True)
 
+    @extend_schema(operation_id="v1_sites_documents_categories_update", tags=["CMS documents"], request=DocumentCategorySerializer, responses={200: DocumentCategorySerializer})
     def put(self, request, site_pk, category_id):
         return self._update(request, site_pk, category_id, partial=False)
 
@@ -381,6 +413,7 @@ class SiteDocumentCategories(APIView):
             raise serializers.ValidationError({"slug": "An active category with this slug already exists in this Site and language."}) from error
         return Response(DocumentCategorySerializer(category).data)
 
+    @extend_schema(operation_id="v1_sites_documents_categories_destroy", tags=["CMS documents"], responses={204: None})
     def delete(self, request, site_pk, category_id):
         site = get_object_or_404(Site, pk=site_pk)
         if not module_is_available(site.pk, "DOCUMENTS"):

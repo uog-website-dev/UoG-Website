@@ -68,6 +68,9 @@ def resolve_destinations(items):
         if kind in {"external", "custom"}:
             resolved[_item_key(item)] = _static_target(item)
             continue
+        if kind == "docs":
+            site_ids.add(item.site_id)
+            continue
         if kind not in {"page", "post", "news", "category"}:
             resolved[_item_key(item)] = None
             continue
@@ -82,6 +85,12 @@ def resolve_destinations(items):
     modules_by_site = {
         site_id: available_module_codes(site_id) for site_id in site_ids
     }
+    for item in items:
+        if item.item_type != "docs" or _item_key(item) in resolved:
+            continue
+        resolved[_item_key(item)] = (
+            "/documents" if "DOCUMENTS" in modules_by_site.get(item.site_id, ()) else None
+        )
     pages = {
         str(row.pk): row
         for row in (

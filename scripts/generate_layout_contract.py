@@ -46,7 +46,7 @@ PROFILES = {
     "contact": obj({"title": TEXT, "text": LONG, "href": HREF}),
     "feed": obj({"title": TEXT, "limit": {"type": "integer", "minimum": 1, "maximum": 20}}),
 }
-# Product-provided 43-widget palette (2026-11-12).
+# Product-provided 44-widget palette (document_list added).
 PROFILES.update({
  "rich_text": obj({"html":LONG}),
  "hero": obj({"asset_id":ASSET,"alt":{"type":"string","maxLength":255},"title":TEXT,"text":LONG},["asset_id","alt","title"]),
