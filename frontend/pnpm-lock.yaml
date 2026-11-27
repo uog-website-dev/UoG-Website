@@ -121,6 +121,12 @@ importers:
         specifier: 19.2.9
         version: 19.2.9(react@19.2.9)
     devDependencies:
+      '@testing-library/dom':
+        specifier: 10.4.0
+        version: 10.4.0
+      '@testing-library/react':
+        specifier: 16.1.0
+        version: 16.1.0(@testing-library/dom@10.4.0)(@types/react-dom@19.2.4(@types/react@19.2.9))(@types/react@19.2.9)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
       '@types/node':
         specifier: 22.10.5
         version: 22.10.5
@@ -133,9 +139,15 @@ importers:
       '@uog/config':
         specifier: workspace:*
         version: link:../../packages/config
+      jsdom:
+        specifier: 25.0.1
+        version: 25.0.1
       typescript:
         specifier: 5.6.3
         version: 5.6.3
+      vitest:
+        specifier: 5.0.5
+        version: 5.0.5(@types/node@22.10.5)(jsdom@25.0.1)(vite@8.3.5(@types/node@22.10.5))
 
   packages/api-client:
     dependencies:

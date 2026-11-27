@@ -18,7 +18,20 @@ pytestmark = pytest.mark.django_db
 
 
 def _enable_events(site):
-    enable_module_for_site(site.pk, Module.objects.get(code="EVENTS").pk)
+    module, _ = Module.objects.get_or_create(
+        code="EVENTS",
+        defaults={
+            "name": "Events",
+            "description": "Events",
+            "status": "IMPLEMENTED",
+            "is_enabled": True,
+        },
+    )
+    if module.status != "IMPLEMENTED" or not module.is_enabled:
+        module.status = "IMPLEMENTED"
+        module.is_enabled = True
+        module.save(update_fields=["status", "is_enabled"])
+    enable_module_for_site(site.pk, module.pk)
 
 
 def _event(site, **overrides):

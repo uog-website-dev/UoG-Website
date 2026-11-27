@@ -1,0 +1,73 @@
+{
+  "story": "P0-EVENT-015",
+  "title": "Event Management release gate — University Main + pilot college",
+  "collected_at": "2026-11-27T21:10:00Z",
+  "base_commit": "148492d",
+  "branch": "P0-EVENT-015",
+  "scope_note": "P0 release gate. P0-EVENT-008 badges and P0-EVENT-013 attendance reports remain optional P1 and are not required for Go.",
+  "results": {
+    "backend_event_suite": {
+      "status": "PASS",
+      "tests": 42,
+      "failures": 0,
+      "errors": 0,
+      "evidence": ["backend-tests.txt", "backend-tests.xml"],
+      "includes": [
+        "test_event_release_pilot.py",
+        "test_event_security_matrix.py",
+        "events/sessions/people/registrations/resources/gallery/updates/calendar/detail/navigation"
+      ]
+    },
+    "admin_ui_rbac": {
+      "status": "PASS",
+      "tests": 16,
+      "evidence": ["admin-event-ui-tests.txt"]
+    },
+    "public_event_ui_a11y": {
+      "status": "PASS",
+      "tests": 4,
+      "evidence": ["public-event-ui-tests.txt"],
+      "notes": "WCAG-oriented landmarks: tablist/tab/tabpanel pairing, notices region, cancellation messaging."
+    },
+    "public_typecheck": {
+      "status": "PASS",
+      "evidence": ["public-typecheck.txt"]
+    },
+    "security_negative_matrix": {
+      "status": "PASS",
+      "source": "apps/cms/tests/test_event_security_matrix.py (P0-EVENT-014)"
+    },
+    "concurrency_last_seat": {
+      "status": "PASS",
+      "source": "test_release_concurrent_last_seat_capacity + test_concurrent_last_seat_does_not_overbook"
+    },
+    "cache_freshness": {
+      "status": "PASS",
+      "policy_seconds": 30,
+      "evidence": ["cache-recovery-smoke.md", "release pilot update assertions"]
+    },
+    "backup_recovery_smoke": {
+      "status": "PENDING_INFRA",
+      "owner": "infrastructure",
+      "checklist": "cache-recovery-smoke.md"
+    },
+    "full_browser_e2e_screenshots": {
+      "status": "DEFERRED",
+      "notes": "API/integration release pilot covers Main+college workflows. Live browser screenshots remain optional if product requests a visual walkthrough package."
+    },
+    "performance_targets": {
+      "status": "PASS_WITH_EXISTING_BASELINE",
+      "notes": "No new Event-specific perf regressions introduced. Prior P0-PERF Event build baselines remain under docs/qa/P0-PERF-*."
+    }
+  },
+  "defects": [],
+  "risk_exceptions": [
+    {
+      "id": "RX-EVENT-015-01",
+      "summary": "PostgreSQL backup/restore smoke requires infrastructure scheduling on staging.",
+      "severity": "medium",
+      "release_blocker": false,
+      "mitigation": "Module disable + content-level rollback documented in ROLLBACK.md; restore checklist recorded."
+    }
+  ]
+}
