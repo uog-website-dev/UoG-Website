@@ -5,6 +5,7 @@ from rest_framework.routers import SimpleRouter
 
 from apps.cms.api.pages import SitePageViewSet
 from apps.cms.api.documents import SiteDocuments, SiteDocumentCategories, SiteDocumentCategoryDetail, SiteDocumentDetail, SiteDocumentWorkflow, SiteDocumentFilePreview
+from apps.cms.api.events import SiteEvents, SiteEventDetail, SiteEventAction, SiteEventPreview
 from .event_categories import SiteEventCategories, SiteEventCategoryDetail
 from apps.cms.api.sidebars import SidebarViewSet
 from apps.cms.api.menus import MenuViewSet, MenuItemViewSet
@@ -31,6 +32,10 @@ router.register("", SiteViewSet, basename="site")
 urlpatterns = [
     path("<int:site_pk>/event-categories/", SiteEventCategories.as_view(), name="site-event-categories"),
     path("<int:site_pk>/event-categories/<uuid:category_id>/", SiteEventCategoryDetail.as_view(), name="site-event-category-detail"),
+    path("<int:site_pk>/events/", SiteEvents.as_view(), name="site-events"),
+    path("<int:site_pk>/events/<uuid:event_id>/", SiteEventDetail.as_view(), name="site-event-detail"),
+    path("<int:site_pk>/events/<uuid:event_id>/preview/", SiteEventPreview.as_view(), name="site-event-preview"),
+    path("<int:site_pk>/events/<uuid:event_id>/<str:action>/", SiteEventAction.as_view(), name="site-event-action"),
     path("<int:site_pk>/documents/categories/", SiteDocumentCategories.as_view(), name="site-document-categories"),
     path("<int:site_pk>/documents/categories/<uuid:category_id>/", SiteDocumentCategoryDetail.as_view(), name="site-document-category-detail"),
     path("<int:site_pk>/documents/", SiteDocuments.as_view(), name="site-documents"),

@@ -1221,3 +1221,4 @@ from apps.cms.section_template_models import SectionTemplate, SectionTemplateSta
 from apps.cms.sidebar_models import Sidebar  # noqa: E402,F401
 
 from apps.cms.menu_assignment_models import MenuLocationAssignment  # noqa: E402,F401
+from apps.cms.event_models import Event, EventFormat, EventLifecycle, EventStatus  # noqa: E402,F401

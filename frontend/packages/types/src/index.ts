@@ -556,6 +556,7 @@ export * from "./footer";
 
 export * from "./header";
 export * from "./events";
+export * from "./event-record";
 
 export { MAX_MENU_DEPTH } from "./navigation";
 export { DOCUMENTS_COPY, documentsCopy } from "./documents-copy";
