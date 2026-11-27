@@ -104,7 +104,8 @@ def is_published(asset):
 
 
 def is_event_public_media(asset):
-    """True when the asset is the banner or public speaker photo of a listed Event."""
+    """True when the asset is used on a publicly listed Event surface."""
+    from apps.cms.event_gallery_models import EventGalleryImage
     from apps.cms.event_models import Event, EventStatus
     from apps.cms.event_person_models import EventPerson
     from apps.cms.event_session_models import SessionVisibility
@@ -117,12 +118,21 @@ def is_event_public_media(asset):
         site_id=asset.site_id, banner_asset_id=asset.pk, status__in=public_statuses,
     ).exists():
         return True
-    return EventPerson.objects.filter(
+    if EventPerson.objects.filter(
         event__site_id=asset.site_id,
         event__status__in=public_statuses,
         profile_photo_id=asset.pk,
         removed_at__isnull=True,
         visibility=SessionVisibility.PUBLIC,
+    ).exists():
+        return True
+    return EventGalleryImage.objects.filter(
+        site_id=asset.site_id,
+        media_asset_id=asset.pk,
+        removed_at__isnull=True,
+        is_published=True,
+        published_at__isnull=False,
+        event__status__in=public_statuses,
     ).exists()
 
 

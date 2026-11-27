@@ -1243,3 +1243,4 @@ from apps.cms.event_resource_models import (  # noqa: E402,F401
     ResourceCategory,
     ResourceVisibility,
 )
+from apps.cms.event_gallery_models import EventGalleryImage  # noqa: E402,F401

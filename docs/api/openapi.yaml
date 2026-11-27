@@ -7811,6 +7811,115 @@ paths:
               schema:
                 type: string
                 format: uuid
+  /api/v1/site-context/events/{slug}/gallery/:
+    get:
+      operationId: v1_site_context_events_gallery_list
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Public Events
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PublicGalleryImage'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
   /api/v1/site-context/events/{slug}/registrations/:
     post:
       operationId: v1_site_context_events_registrations_create
@@ -22878,6 +22987,1115 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Event'
+          description: ''
+          headers:
+            ETag:
+              description: Strong representation validator. Echo exactly in If-Match
+                for mutations.
+              schema:
+                type: string
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          description: Invalid body, malformed input, or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    title:
+                    - This field is required.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '409':
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '412':
+          description: If-Match does not match the current strong ETag. Retrieve and
+            reconcile changes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '415':
+          description: Unsupported request content type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '428':
+          description: If-Match header is required for this mutation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '503':
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/sites/{site_pk}/events/{event_id}/gallery/:
+    get:
+      operationId: v1_sites_events_gallery_list
+      parameters:
+      - in: path
+        name: event_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Event Gallery
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GalleryImage'
+          description: ''
+          headers:
+            ETag:
+              description: Strong representation validator. Echo exactly in If-Match
+                for mutations.
+              schema:
+                type: string
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+    post:
+      operationId: v1_sites_events_gallery_create
+      description: Attach one or more Site Media Library images. Does not duplicate
+        bytes. usage_consent is required. Quarantined/PENDING assets are rejected.
+      parameters:
+      - in: path
+        name: event_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Event Gallery
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GalleryCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GalleryCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GalleryCreateRequest'
+        required: true
+      security:
+      - keycloakBearer: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GalleryImage'
+          description: ''
+          headers:
+            ETag:
+              description: Strong representation validator. Echo exactly in If-Match
+                for mutations.
+              schema:
+                type: string
+            Location:
+              description: Created resource URL.
+              schema:
+                type: string
+                format: uri-reference
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          description: Invalid body, malformed input, or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    title:
+                    - This field is required.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '409':
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '412':
+          description: If-Match does not match the current strong ETag. Retrieve and
+            reconcile changes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '415':
+          description: Unsupported request content type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '428':
+          description: If-Match header is required for this mutation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '503':
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/sites/{site_pk}/events/{event_id}/gallery/{image_id}/:
+    patch:
+      operationId: v1_sites_events_gallery_partial_update
+      parameters:
+      - in: path
+        name: event_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: image_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Event Gallery
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedGalleryImageRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedGalleryImageRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedGalleryImageRequest'
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GalleryImage'
+          description: ''
+          headers:
+            ETag:
+              description: Strong representation validator. Echo exactly in If-Match
+                for mutations.
+              schema:
+                type: string
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          description: Invalid body, malformed input, or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    title:
+                    - This field is required.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '409':
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '412':
+          description: If-Match does not match the current strong ETag. Retrieve and
+            reconcile changes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '415':
+          description: Unsupported request content type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '428':
+          description: If-Match header is required for this mutation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '503':
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+    delete:
+      operationId: v1_sites_events_gallery_destroy
+      description: Detach from the Event gallery. Canonical Site media is retained.
+      parameters:
+      - in: path
+        name: event_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: image_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Event Gallery
+      security:
+      - keycloakBearer: []
+      responses:
+        '204':
+          description: No response body
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/sites/{site_pk}/events/{event_id}/gallery/{image_id}/publish/:
+    post:
+      operationId: v1_sites_events_gallery_publish
+      description: Publish/unpublish independently of the root Event.
+      parameters:
+      - in: path
+        name: event_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: image_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Event Gallery
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GalleryPublishRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GalleryPublishRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GalleryPublishRequest'
+        required: true
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GalleryImage'
+          description: ''
+          headers:
+            ETag:
+              description: Strong representation validator. Echo exactly in If-Match
+                for mutations.
+              schema:
+                type: string
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          description: Invalid body, malformed input, or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    title:
+                    - This field is required.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '409':
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '412':
+          description: If-Match does not match the current strong ETag. Retrieve and
+            reconcile changes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '415':
+          description: Unsupported request content type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '428':
+          description: If-Match header is required for this mutation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '503':
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/sites/{site_pk}/events/{event_id}/gallery/reorder/:
+    post:
+      operationId: v1_sites_events_gallery_reorder
+      parameters:
+      - in: path
+        name: event_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Event Gallery
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GalleryReorderRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GalleryReorderRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GalleryReorderRequest'
+        required: true
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GalleryImage'
           description: ''
           headers:
             ETag:
@@ -53104,6 +54322,147 @@ components:
         * `PHYSICAL` - Physical
         * `ONLINE` - Online
         * `HYBRID` - Hybrid
+    GalleryCreateItemRequest:
+      type: object
+      properties:
+        media_asset:
+          type: string
+          format: uuid
+        caption:
+          type: string
+          maxLength: 500
+        alt_text:
+          type: string
+          maxLength: 255
+        session:
+          type: string
+          format: uuid
+          nullable: true
+        is_published:
+          type: boolean
+          default: false
+        usage_consent:
+          type: boolean
+      required:
+      - media_asset
+      - usage_consent
+    GalleryCreateRequest:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/GalleryCreateItemRequest'
+      required:
+      - items
+    GalleryImage:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        event:
+          type: string
+          format: uuid
+          readOnly: true
+        media_asset:
+          type: string
+          format: uuid
+        session:
+          type: string
+          format: uuid
+          nullable: true
+        session_title:
+          type: string
+          readOnly: true
+          nullable: true
+        caption:
+          type: string
+          maxLength: 500
+        alt_text:
+          type: string
+          maxLength: 255
+        sort_order:
+          type: integer
+          minimum: 0
+        is_published:
+          type: boolean
+        usage_consent:
+          type: boolean
+        published_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        version:
+          type: integer
+          readOnly: true
+        thumbnail_url:
+          type: string
+          readOnly: true
+        display_url:
+          type: string
+          readOnly: true
+        original_filename:
+          type: string
+          readOnly: true
+        content_type:
+          type: string
+          readOnly: true
+        byte_count:
+          type: integer
+          readOnly: true
+        asset_ready:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - asset_ready
+      - byte_count
+      - content_type
+      - created_at
+      - display_url
+      - event
+      - id
+      - original_filename
+      - published_at
+      - session_title
+      - thumbnail_url
+      - updated_at
+      - version
+    GalleryPublishRequest:
+      type: object
+      properties:
+        is_published:
+          type: boolean
+        version:
+          type: integer
+          minimum: 1
+      required:
+      - is_published
+    GalleryReorderRequest:
+      type: object
+      properties:
+        order:
+          type: array
+          items:
+            type: string
+            format: uuid
+        versions:
+          type: object
+          additionalProperties:
+            type: integer
+            minimum: 1
+      required:
+      - order
     HeaderBranding:
       type: object
       properties:
@@ -65450,6 +66809,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/FooterColumnRequest'
+    PatchedGalleryImageRequest:
+      type: object
+      properties:
+        media_asset:
+          type: string
+          format: uuid
+        session:
+          type: string
+          format: uuid
+          nullable: true
+        caption:
+          type: string
+          maxLength: 500
+        alt_text:
+          type: string
+          maxLength: 255
+        sort_order:
+          type: integer
+          minimum: 0
+        is_published:
+          type: boolean
+        usage_consent:
+          type: boolean
     PatchedHeaderSettingsRequest:
       type: object
       properties:
@@ -77132,6 +78514,38 @@ components:
       - month
       - timezone
       - year
+    PublicGalleryImage:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        session:
+          type: string
+          format: uuid
+          nullable: true
+        session_title:
+          type: string
+          nullable: true
+        caption:
+          type: string
+        alt_text:
+          type: string
+        sort_order:
+          type: integer
+        thumbnail_url:
+          type: string
+        display_url:
+          type: string
+      required:
+      - alt_text
+      - caption
+      - display_url
+      - id
+      - session
+      - session_title
+      - sort_order
+      - thumbnail_url
     PublicLink:
       type: object
       properties:

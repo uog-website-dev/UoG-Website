@@ -32,6 +32,7 @@ from apps.cms.api.event_resources import (
     PublicSiteEventResourceFile,
     PublicSiteEventResources,
 )
+from apps.cms.api.event_gallery import PublicSiteEventGallery
 from .context import SiteContextView
 from apps.media.delivery import PublicMediaImage
 from apps.cms.api.widget_runtime import PublicWidgetData, PublicSiteLogo, PublicContact
@@ -58,6 +59,7 @@ urlpatterns = [
     path("events/<slug:slug>/speakers/", PublicSiteEventSpeakers.as_view(), name="public-event-speakers"),
     path("events/<slug:slug>/registrations/", PublicSiteEventRegistrations.as_view(), name="public-event-registrations"),
     path("events/<slug:slug>/registrations/cancel/", PublicSiteEventRegistrationCancel.as_view(), name="public-event-registration-cancel"),
+    path("events/<slug:slug>/gallery/", PublicSiteEventGallery.as_view(), name="public-event-gallery"),
     path("events/<slug:slug>/resources/", PublicSiteEventResources.as_view(), name="public-event-resources"),
     path(
         "events/<slug:slug>/resources/<uuid:resource_id>/entitlement/",
