@@ -125,6 +125,7 @@ def _public_sections(event: Event) -> dict:
     from apps.cms.event_person_domain import public_speakers_available
     from apps.cms.event_resource_domain import public_resources_available
     from apps.cms.event_session_domain import public_schedule_available
+    from apps.cms.event_update_domain import public_updates_available
 
     return {
         "overview": True,
@@ -132,7 +133,7 @@ def _public_sections(event: Event) -> dict:
         "speakers": public_speakers_available(event),
         "gallery": public_gallery_available(event),
         "resources": public_resources_available(event),
-        "updates": False,
+        "updates": public_updates_available(event),
     }
 
 
@@ -187,6 +188,8 @@ def serialize_event(event: Event, *, public: bool = False) -> dict:
             "seats_remaining": registration_summary(event)["seats_remaining"] if event.registration_required else None,
             "waitlist_enabled": event.waitlist_enabled,
         }
+        from apps.cms.event_update_domain import list_public_notices
+        payload["notices"] = list_public_notices(event)
     else:
         payload["organizer_email"] = event.organizer_email
         payload["organizer_phone"] = event.organizer_phone

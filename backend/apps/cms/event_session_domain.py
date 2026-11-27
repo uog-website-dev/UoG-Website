@@ -263,6 +263,17 @@ def update_session(session: EventSession, payload: dict[str, Any], *, actor, exp
                     action="EVENT_SESSION_UPDATED", entity_type="cms.event_session", entity_id=session.pk,
                     before=before, after=after, changed_fields=changed,
                 )
+                from apps.cms.event_update_models import EventSessionRevision
+                EventSessionRevision.objects.create(
+                    session=session,
+                    event_id=session.event_id,
+                    site_id=session.event.site_id,
+                    session_version=session.version,
+                    before=before,
+                    after=after,
+                    changed_fields=changed,
+                    actor=actor if getattr(actor, "is_authenticated", False) else None,
+                )
     return session
 
 

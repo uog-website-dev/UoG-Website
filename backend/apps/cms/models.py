@@ -1244,3 +1244,9 @@ from apps.cms.event_resource_models import (  # noqa: E402,F401
     ResourceVisibility,
 )
 from apps.cms.event_gallery_models import EventGalleryImage  # noqa: E402,F401
+from apps.cms.event_update_models import (  # noqa: E402,F401
+    EventSessionRevision,
+    EventUpdate,
+    UpdateSeverity,
+    UpdateStatus,
+)

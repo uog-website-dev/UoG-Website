@@ -20,7 +20,16 @@ import type { EventLifecycle, PublicEventSections, SiteEventRecord } from "@uog/
 import { usePublicBreadcrumbTitle } from "@/public-menus";
 import { PublicEventRegistrationForm } from "@/public-event-registration";
 
-type DetailTab = "overview" | "schedule" | "speakers" | "gallery" | "resources";
+type DetailTab = "overview" | "schedule" | "speakers" | "gallery" | "resources" | "updates";
+
+interface PublicUpdateNotice {
+  id: string;
+  title: string;
+  body: string;
+  severity: string;
+  pinned: boolean;
+  published_at: string | null;
+}
 
 interface PublicGalleryImage {
   id: string;
@@ -95,6 +104,7 @@ const TAB_LABELS: Record<DetailTab, string> = {
   speakers: "Speakers",
   gallery: "Gallery",
   resources: "Resources & Downloads",
+  updates: "Updates",
 };
 
 function formatFileSize(bytes: number | null) {
@@ -193,6 +203,7 @@ function visibleTabs(sections: PublicEventSections | undefined): DetailTab[] {
   if (sections?.speakers) tabs.push("speakers");
   if (sections?.gallery) tabs.push("gallery");
   if (sections?.resources) tabs.push("resources");
+  if (sections?.updates) tabs.push("updates");
   return tabs;
 }
 
@@ -230,6 +241,7 @@ export function PublicEventDetailPage({
   const [speakers, setSpeakers] = useState<PublicSpeaker[] | null>(null);
   const [resources, setResources] = useState<PublicResource[] | null>(null);
   const [gallery, setGallery] = useState<PublicGalleryImage[] | null>(null);
+  const [updates, setUpdates] = useState<PublicUpdateNotice[] | null>(null);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [sectionError, setSectionError] = useState("");
   const [entitlement, setEntitlement] = useState({ email: "", token: "", resourceId: "", message: "" });
@@ -344,6 +356,37 @@ export function PublicEventDetailPage({
   }, [event, activeTab, speakers, slug]);
 
   useEffect(() => {
+    if (!event || activeTab !== "updates") return;
+    if (updates) return;
+    const controller = new AbortController();
+    let cancelled = false;
+    async function loadUpdates() {
+      try {
+        const response = await fetch(`/api/v1/site-context/events/${encodeURIComponent(slug)}/updates/`, {
+          ...publicFetchInit(),
+          signal: controller.signal,
+        });
+        if (!response.ok) throw new Error("Updates are temporarily unavailable.");
+        const body = await response.json();
+        if (!Array.isArray(body)) throw new Error("Updates could not be loaded safely.");
+        if (!cancelled) {
+          setUpdates(body as PublicUpdateNotice[]);
+          setSectionError("");
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setSectionError(error instanceof Error ? error.message : "Updates are temporarily unavailable.");
+        }
+      }
+    }
+    void loadUpdates();
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
+  }, [event, activeTab, updates, slug]);
+
+  useEffect(() => {
     if (!event || activeTab !== "gallery") return;
     if (gallery) return;
     const controller = new AbortController();
@@ -445,6 +488,7 @@ export function PublicEventDetailPage({
       ? (event.accepts_registration ? "OPEN" : "CLOSED")
       : "OFF");
   const showRegistrationCta = event.registration_required && registrationState !== "OFF";
+  const notices = Array.isArray(event.notices) ? event.notices : [];
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5, maxWidth: 960 }}>
@@ -489,6 +533,26 @@ export function PublicEventDetailPage({
           This Event has been cancelled.
           {event.cancellation_notice ? ` ${event.cancellation_notice}` : ""}
         </Alert>
+      ) : null}
+
+      {notices.length > 0 ? (
+        <Box component="section" aria-label="Important Event notices" sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+          {notices.map((notice) => (
+            <Alert
+              key={notice.id}
+              severity={notice.severity === "URGENT" ? "error" : notice.severity === "IMPORTANT" ? "warning" : "info"}
+            >
+              <Typography sx={{ fontWeight: 700 }}>{notice.title}</Typography>
+              {notice.body ? (
+                <Box
+                  component="div"
+                  sx={{ mt: 0.5, "& p": { mb: 0.5 }, overflowWrap: "anywhere" }}
+                  dangerouslySetInnerHTML={{ __html: notice.body }}
+                />
+              ) : null}
+            </Alert>
+          ))}
+        </Box>
       ) : null}
 
       <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", alignItems: "center" }}>
@@ -676,6 +740,42 @@ export function PublicEventDetailPage({
                       </Box>
                     ) : null}
                   </Box>
+                </Box>
+              ))}
+            </Box>
+          )
+        ) : null}
+
+        {activeTab === "updates" ? (
+          sectionError ? (
+            <Alert severity="error">{sectionError}</Alert>
+          ) : !updates ? (
+            <Typography role="status">Loading updates…</Typography>
+          ) : updates.length === 0 ? (
+            <Typography role="status">No published updates yet.</Typography>
+          ) : (
+            <Box component="ul" sx={{ m: 0, p: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 1.5 }}>
+              {updates.map((item) => (
+                <Box
+                  component="li"
+                  key={item.id}
+                  sx={{ borderBottom: "1px solid", borderColor: "divider", pb: 1.5 }}
+                >
+                  <Typography sx={{ fontWeight: 700 }}>
+                    {item.title}
+                    {item.pinned ? " · pinned" : ""}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {item.severity}
+                    {item.published_at ? ` · ${new Date(item.published_at).toLocaleString()}` : ""}
+                  </Typography>
+                  {item.body ? (
+                    <Box
+                      component="div"
+                      sx={{ mt: 1, "& p": { mb: 1 }, overflowWrap: "anywhere" }}
+                      dangerouslySetInnerHTML={{ __html: item.body }}
+                    />
+                  ) : null}
                 </Box>
               ))}
             </Box>
