@@ -2,16 +2,15 @@
 from __future__ import annotations
 
 from django.core.exceptions import ValidationError as DomainValidationError
-from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from rest_framework import serializers
-from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.authentication import KeycloakBearerAuthentication
-from apps.cms.event_domain import public_events_for_site, require_events_admin
+from apps.cms.event_access import admin_event, public_event
 from apps.cms.event_gallery_domain import (
     GalleryConflict,
     GalleryNotFound,
@@ -24,11 +23,7 @@ from apps.cms.event_gallery_domain import (
     set_gallery_published,
     update_gallery_image,
 )
-from apps.cms.event_models import Event
 from apps.sites.api.access import Conflict
-from apps.sites.events import EVENTS_MODULE_CODE
-from apps.sites.models import Site
-from apps.sites.selectors.modules import module_is_available
 
 
 class StrictFields:
@@ -114,26 +109,6 @@ def _domain_error(error):
     raise error
 
 
-def _admin_event(request, site_pk, event_id) -> tuple[Site, Event]:
-    site = get_object_or_404(Site, pk=site_pk)
-    if not module_is_available(site.pk, EVENTS_MODULE_CODE):
-        raise PermissionDenied("Events are not enabled for this Site.")
-    require_events_admin(request.user, site)
-    event = get_object_or_404(Event, pk=event_id, site_id=site.pk)
-    return site, event
-
-
-def _public_event(request, slug) -> Event:
-    site = getattr(request, "site", None)
-    if site is None or not module_is_available(site.pk, EVENTS_MODULE_CODE):
-        raise NotFound("Events are not available for this Site.")
-    rows = public_events_for_site(site).filter(slug=slug)
-    event = rows.filter(site_id=site.pk).first() or rows.first()
-    if event is None:
-        raise NotFound("Event not found.")
-    return event
-
-
 class SiteEventGallery(APIView):
     authentication_classes = [KeycloakBearerAuthentication]
     permission_classes = [IsAuthenticated]
@@ -144,7 +119,7 @@ class SiteEventGallery(APIView):
         responses={200: GalleryImageSerializer(many=True)},
     )
     def get(self, request, site_pk, event_id):
-        _site, event = _admin_event(request, site_pk, event_id)
+        _site, event = admin_event(request, site_pk, event_id)
         response = Response(list_admin_gallery(event))
         response["Cache-Control"] = "private, no-store"
         return response
@@ -160,7 +135,7 @@ class SiteEventGallery(APIView):
         ),
     )
     def post(self, request, site_pk, event_id):
-        _site, event = _admin_event(request, site_pk, event_id)
+        _site, event = admin_event(request, site_pk, event_id)
         payload = GalleryCreateSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         try:
@@ -186,7 +161,7 @@ class SiteEventGalleryReorder(APIView):
         responses={200: GalleryImageSerializer(many=True)},
     )
     def post(self, request, site_pk, event_id):
-        _site, event = _admin_event(request, site_pk, event_id)
+        _site, event = admin_event(request, site_pk, event_id)
         payload = GalleryReorderSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         try:
@@ -214,7 +189,7 @@ class SiteEventGalleryDetail(APIView):
         responses={200: GalleryImageSerializer},
     )
     def patch(self, request, site_pk, event_id, image_id):
-        _site, event = _admin_event(request, site_pk, event_id)
+        _site, event = admin_event(request, site_pk, event_id)
         payload = GalleryImageSerializer(data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
         expected = request.data.get("version")
@@ -238,7 +213,7 @@ class SiteEventGalleryDetail(APIView):
         description="Detach from the Event gallery. Canonical Site media is retained.",
     )
     def delete(self, request, site_pk, event_id, image_id):
-        _site, event = _admin_event(request, site_pk, event_id)
+        _site, event = admin_event(request, site_pk, event_id)
         try:
             detach_gallery_image(event, image_id, actor=request.user)
         except Exception as error:
@@ -258,7 +233,7 @@ class SiteEventGalleryPublish(APIView):
         description="Publish/unpublish independently of the root Event.",
     )
     def post(self, request, site_pk, event_id, image_id):
-        _site, event = _admin_event(request, site_pk, event_id)
+        _site, event = admin_event(request, site_pk, event_id)
         payload = GalleryPublishSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         try:
@@ -293,5 +268,5 @@ class PublicSiteEventGallery(APIView):
         responses={200: PublicGalleryImageSerializer(many=True)},
     )
     def get(self, request, slug):
-        event = _public_event(request, slug)
+        event = public_event(request, slug)
         return Response(list_public_gallery(event))

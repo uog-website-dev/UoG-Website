@@ -2,17 +2,15 @@
 from __future__ import annotations
 
 from django.core.exceptions import ValidationError as DomainValidationError
-from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from rest_framework import serializers
-from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.authentication import KeycloakBearerAuthentication
-from apps.cms.event_domain import public_events_for_site, require_events_admin
-from apps.cms.event_models import Event
+from apps.cms.event_access import admin_event, owned_child, public_event
 from apps.cms.event_update_domain import (
     PUBLIC_UPDATES_MAX_AGE,
     UpdateConflict,
@@ -29,9 +27,6 @@ from apps.cms.event_update_domain import (
 from apps.cms.event_update_models import EventSessionRevision, UpdateSeverity, UpdateStatus
 from apps.cms.event_session_models import EventSession
 from apps.sites.api.access import Conflict
-from apps.sites.events import EVENTS_MODULE_CODE
-from apps.sites.models import Site
-from apps.sites.selectors.modules import module_is_available
 
 
 class StrictFields:
@@ -108,26 +103,6 @@ def _domain_error(error):
     raise error
 
 
-def _admin_event(request, site_pk, event_id) -> tuple[Site, Event]:
-    site = get_object_or_404(Site, pk=site_pk)
-    if not module_is_available(site.pk, EVENTS_MODULE_CODE):
-        raise PermissionDenied("Events are not enabled for this Site.")
-    require_events_admin(request.user, site)
-    event = get_object_or_404(Event, pk=event_id, site_id=site.pk)
-    return site, event
-
-
-def _public_event(request, slug) -> Event:
-    site = getattr(request, "site", None)
-    if site is None or not module_is_available(site.pk, EVENTS_MODULE_CODE):
-        raise NotFound("Events are not available for this Site.")
-    rows = public_events_for_site(site).filter(slug=slug)
-    event = rows.filter(site_id=site.pk).first() or rows.first()
-    if event is None:
-        raise NotFound("Event not found.")
-    return event
-
-
 class SiteEventUpdates(APIView):
     authentication_classes = [KeycloakBearerAuthentication]
     permission_classes = [IsAuthenticated]
@@ -138,7 +113,7 @@ class SiteEventUpdates(APIView):
         responses={200: EventUpdateSerializer(many=True)},
     )
     def get(self, request, site_pk, event_id):
-        _site, event = _admin_event(request, site_pk, event_id)
+        _site, event = admin_event(request, site_pk, event_id)
         response = Response(list_admin_updates(event))
         response["Cache-Control"] = "private, no-store"
         return response
@@ -151,7 +126,7 @@ class SiteEventUpdates(APIView):
         description="Create a draft Event notice. Does not send email/SMS/push.",
     )
     def post(self, request, site_pk, event_id):
-        _site, event = _admin_event(request, site_pk, event_id)
+        _site, event = admin_event(request, site_pk, event_id)
         payload = EventUpdateCreateSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         try:
@@ -174,7 +149,7 @@ class SiteEventUpdateDetail(APIView):
         responses={200: EventUpdateSerializer},
     )
     def patch(self, request, site_pk, event_id, update_id):
-        _site, event = _admin_event(request, site_pk, event_id)
+        _site, event = admin_event(request, site_pk, event_id)
         payload = EventUpdateSerializer(data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
         expected = request.data.get("version")
@@ -208,7 +183,7 @@ class SiteEventUpdateAction(APIView):
         ),
     )
     def post(self, request, site_pk, event_id, update_id):
-        _site, event = _admin_event(request, site_pk, event_id)
+        _site, event = admin_event(request, site_pk, event_id)
         payload = EventUpdateActionSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         try:
@@ -236,8 +211,8 @@ class SiteEventSessionRevisions(APIView):
         responses={200: SessionRevisionSerializer(many=True)},
     )
     def get(self, request, site_pk, event_id, session_id):
-        _site, event = _admin_event(request, site_pk, event_id)
-        session = get_object_or_404(EventSession, pk=session_id, event_id=event.pk)
+        _site, event = admin_event(request, site_pk, event_id)
+        session = owned_child(EventSession, pk=session_id, event=event)
         rows = EventSessionRevision.objects.filter(
             session_id=session.pk, event_id=event.pk,
         ).order_by("-created_at", "-session_version")[:100]
@@ -279,7 +254,7 @@ class PublicSiteEventUpdates(APIView):
         ),
     )
     def get(self, request, slug):
-        event = _public_event(request, slug)
+        event = public_event(request, slug)
         response = Response(list_public_updates(event))
         response["ETag"] = public_updates_etag(event)
         response["X-Events-Cache-Scope"] = f"site-{event.site_id}-event-{event.slug}-updates"
@@ -305,7 +280,7 @@ class PublicSiteEventNotices(APIView):
         description="Pinned and high-priority published notices for Overview prominence.",
     )
     def get(self, request, slug):
-        event = _public_event(request, slug)
+        event = public_event(request, slug)
         response = Response(list_public_notices(event))
         response["ETag"] = public_updates_etag(event)
         response["X-Events-Cache-Section"] = "notices"

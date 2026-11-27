@@ -2,6 +2,8 @@
 
 Event Management settings are mounted under `/api/v1/sites/{id}/event-settings/` and Event categories under `/api/v1/sites/{site_pk}/event-categories/`. Both require Keycloak bearer authentication, Site-scoped `sites.update`, and an enabled `EVENTS` module for that Site. Disabling the module blocks reads and writes without deleting retained `SiteEventSettings` or category rows.
 
+Authorization, privacy, file access, registration abuse controls, PII export policy, and audit expectations for the full Event surface are documented in [event-security-privacy.md](./event-security-privacy.md).
+
 ## Settings
 
 | Method | Path | Notes |

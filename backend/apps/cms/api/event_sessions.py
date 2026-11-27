@@ -2,17 +2,16 @@
 from __future__ import annotations
 
 from django.db.models import Q
-from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import serializers
-from rest_framework.exceptions import NotFound, PermissionDenied
+from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.authentication import KeycloakBearerAuthentication
-from apps.cms.event_domain import event_etag, public_events_for_site, require_events_admin
-from apps.cms.event_models import Event
+from apps.cms.event_access import admin_event_only, owned_child, public_event
+from apps.cms.event_domain import event_etag
 from apps.cms.event_session_domain import (
     SessionConflict,
     SessionPreconditionRequired,
@@ -29,9 +28,6 @@ from apps.cms.event_session_domain import (
 )
 from apps.cms.event_session_models import EventSession, SessionStatus, SessionType, SessionVisibility
 from apps.sites.api.access import PreconditionFailed, PreconditionRequired, translate_domain_errors
-from apps.sites.events import EVENTS_MODULE_CODE
-from apps.sites.models import Site
-from apps.sites.selectors.modules import module_is_available
 
 
 class StrictFields:
@@ -87,25 +83,16 @@ class PublicAgendaDaySerializer(serializers.Serializer):
     tracks = serializers.ListField(child=serializers.DictField())
 
 
-def _site(site_pk: int) -> Site:
-    site = get_object_or_404(Site, pk=site_pk)
-    if not module_is_available(site.pk, EVENTS_MODULE_CODE):
-        raise PermissionDenied("Events are not enabled for this Site.")
-    return site
-
-
-def _load_event(request, site_pk, event_id) -> Event:
-    site = _site(site_pk)
-    require_events_admin(request.user, site)
-    return get_object_or_404(Event, pk=event_id, site_id=site.pk)
+def _load_event(request, site_pk, event_id):
+    return admin_event_only(request, site_pk, event_id)
 
 
 def _load_session(request, site_pk, event_id, session_id) -> EventSession:
     event = _load_event(request, site_pk, event_id)
-    return get_object_or_404(EventSession, pk=session_id, event_id=event.pk)
+    return owned_child(EventSession, pk=session_id, event=event)
 
 
-def _admin_payload(session: EventSession, event: Event) -> dict:
+def _admin_payload(session: EventSession, event) -> dict:
     conflicts = detect_session_conflicts(event, candidate=session)
     return serialize_session(session, public=False, conflicts=conflicts)
 
@@ -311,13 +298,8 @@ class PublicSiteEventAgenda(APIView):
     def get(self, request, slug):
         from apps.cms.event_session_domain import public_agenda_etag
 
-        site = getattr(request, "site", None)
-        if site is None or not module_is_available(site.pk, EVENTS_MODULE_CODE):
-            raise NotFound("Events are not available for this Site.")
-        rows = public_events_for_site(site).filter(slug=slug)
-        event = rows.filter(site_id=site.pk).first() or rows.first()
-        if event is None:
-            raise NotFound("Event not found.")
+        event = public_event(request, slug)
+        site = event.site
         response = Response({"event": event.pk, "slug": event.slug, "days": public_agenda(event)})
         response["Cache-Control"] = "public, max-age=0, must-revalidate"
         response["Vary"] = "Host"

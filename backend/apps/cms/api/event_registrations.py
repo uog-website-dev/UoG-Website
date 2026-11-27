@@ -10,7 +10,6 @@ from urllib.parse import urlsplit
 
 from django.core.exceptions import ValidationError as DomainValidationError
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import serializers
 from rest_framework.exceptions import APIException, NotFound, PermissionDenied, ValidationError
@@ -21,8 +20,7 @@ from rest_framework.views import APIView
 
 from apps.accounts.authentication import KeycloakBearerAuthentication
 from apps.audit.writer import record_event
-from apps.cms.event_domain import public_events_for_site, require_events_admin
-from apps.cms.event_models import Event
+from apps.cms.event_access import admin_event, owned_child, public_event
 from apps.cms.event_registration_domain import (
     RegistrationClosed,
     RegistrationDuplicate,
@@ -45,9 +43,6 @@ from apps.cms.event_registration_models import (
     RegistrationStatus,
 )
 from apps.sites.api.access import Conflict
-from apps.sites.events import EVENTS_MODULE_CODE
-from apps.sites.models import Site
-from apps.sites.selectors.modules import module_is_available
 
 
 class StrictFields:
@@ -186,26 +181,6 @@ class RegistrationBodyTooLarge(APIException):
     default_detail = "The registration request exceeds the size limit."
 
 
-def _public_event(request, slug) -> Event:
-    site = getattr(request, "site", None)
-    if site is None or not module_is_available(site.pk, EVENTS_MODULE_CODE):
-        raise NotFound("Events are not available for this Site.")
-    rows = public_events_for_site(site).filter(slug=slug)
-    event = rows.filter(site_id=site.pk).first() or rows.first()
-    if event is None:
-        raise NotFound("Event not found.")
-    return event
-
-
-def _admin_event(request, site_pk, event_id) -> tuple[Site, Event]:
-    site = get_object_or_404(Site, pk=site_pk)
-    if not module_is_available(site.pk, EVENTS_MODULE_CODE):
-        raise PermissionDenied("Events are not enabled for this Site.")
-    require_events_admin(request.user, site)
-    event = get_object_or_404(Event, pk=event_id, site_id=site.pk)
-    return site, event
-
-
 def _domain_error(error):
     if isinstance(error, RegistrationClosed):
         raise ValidationError({"non_field_errors": [str(error)]}) from error
@@ -245,7 +220,7 @@ class PublicSiteEventRegistrations(APIView):
         ),
     )
     def post(self, request, slug):
-        event = _public_event(request, slug)
+        event = public_event(request, slug)
         origin = request.headers.get("Origin")
         if origin and urlsplit(origin).netloc.lower() != request.get_host().lower():
             raise PermissionDenied("Submit the form from this Site.")
@@ -285,7 +260,7 @@ class PublicSiteEventRegistrationCancel(APIView):
         ),
     )
     def post(self, request, slug):
-        event = _public_event(request, slug)
+        event = public_event(request, slug)
         payload = RegistrationCancelInput(data=request.data)
         payload.is_valid(raise_exception=True)
         try:
@@ -320,7 +295,7 @@ class SiteEventRegistrations(APIView):
         ),
     )
     def get(self, request, site_pk, event_id):
-        _site, event = _admin_event(request, site_pk, event_id)
+        _site, event = admin_event(request, site_pk, event_id)
         try:
             page = int(request.query_params.get("page") or 1)
             page_size = int(request.query_params.get("page_size") or 25)
@@ -349,7 +324,7 @@ class SiteEventRegistrations(APIView):
         ),
     )
     def post(self, request, site_pk, event_id):
-        _site, event = _admin_event(request, site_pk, event_id)
+        _site, event = admin_event(request, site_pk, event_id)
         payload = AdminParticipantCreateInput(data=request.data)
         payload.is_valid(raise_exception=True)
         try:
@@ -371,12 +346,10 @@ class SiteEventRegistrationDetail(APIView):
         responses={200: ParticipantAdminSerializer},
     )
     def get(self, request, site_pk, event_id, registration_id):
-        _site, event = _admin_event(request, site_pk, event_id)
-        row = EventRegistration.objects.filter(
-            event_id=event.pk, pk=registration_id, deleted_at__isnull=True,
-        ).first()
-        if row is None:
-            raise NotFound("Participant was not found.")
+        site, event = admin_event(request, site_pk, event_id)
+        row = owned_child(
+            EventRegistration, pk=registration_id, event=event, deleted_at__isnull=True,
+        )
         response = Response(serialize_registration(row, public=False))
         response["Cache-Control"] = "private, no-store"
         return response
@@ -388,7 +361,7 @@ class SiteEventRegistrationDetail(APIView):
         responses={200: ParticipantAdminSerializer},
     )
     def patch(self, request, site_pk, event_id, registration_id):
-        _site, event = _admin_event(request, site_pk, event_id)
+        _site, event = admin_event(request, site_pk, event_id)
         payload = AdminParticipantUpdateInput(data=request.data)
         payload.is_valid(raise_exception=True)
         try:
@@ -407,7 +380,7 @@ class SiteEventRegistrationDetail(APIView):
         description="confirm / cancel / soft-delete. Soft-delete retains the row for audit retention.",
     )
     def post(self, request, site_pk, event_id, registration_id):
-        _site, event = _admin_event(request, site_pk, event_id)
+        _site, event = admin_event(request, site_pk, event_id)
         payload = AdminParticipantActionInput(data=request.data)
         payload.is_valid(raise_exception=True)
         try:
@@ -433,17 +406,15 @@ class SiteEventRegistrationBadge(APIView):
         ),
     )
     def get(self, request, site_pk, event_id, registration_id):
-        _site, event = _admin_event(request, site_pk, event_id)
-        row = EventRegistration.objects.filter(
-            event_id=event.pk, pk=registration_id, deleted_at__isnull=True,
-        ).first()
-        if row is None:
-            raise NotFound("Participant was not found.")
+        site, event = admin_event(request, site_pk, event_id)
+        row = owned_child(
+            EventRegistration, pk=registration_id, event=event, deleted_at__isnull=True,
+        )
         record_event(
             action="EVENT_PARTICIPANT_BADGE_VIEWED",
             entity_type="cms.event_registration",
             entity_id=row.pk,
-            after={"event": str(event.pk)},
+            after={"event": str(event.pk), "site": site.pk},
             changed_fields=[],
         )
         from apps.cms.api.event_attendance import enhance_badge
@@ -466,13 +437,13 @@ class SiteEventRegistrationsExport(APIView):
         ),
     )
     def get(self, request, site_pk, event_id):
-        _site, event = _admin_event(request, site_pk, event_id)
+        site, event = admin_event(request, site_pk, event_id)
         filename, content = build_participants_csv(event)
         record_event(
             action="EVENT_PARTICIPANT_CSV_EXPORTED",
             entity_type="cms.event",
             entity_id=event.pk,
-            after={"filename": filename, "bytes": len(content)},
+            after={"filename": filename, "bytes": len(content), "site": site.pk},
             changed_fields=[],
         )
         response = HttpResponse(content, content_type="text/csv; charset=utf-8")
