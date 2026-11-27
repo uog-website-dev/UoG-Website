@@ -183,7 +183,56 @@ export interface ParticipantBadge {
   participant_name: string;
   display_category: string;
   check_in_token: string;
+  qr_payload?: string;
   fields: string[];
+}
+
+export interface AttendanceRow {
+  id: string;
+  event: string;
+  registration: string;
+  checked_in_at: string;
+  checked_out_at: string | null;
+  method: string;
+  operator: number | null;
+  notes: string;
+  replayed?: boolean;
+}
+
+export interface EventReportMetrics {
+  registrations: number;
+  confirmed: number;
+  waitlisted: number;
+  cancelled: number;
+  invited: number;
+  attended: number;
+  capacity: number | null;
+  seats_remaining: number | null;
+  capacity_utilization: number | null;
+}
+
+export interface EventReportPayload {
+  event: string;
+  metrics: EventReportMetrics;
+  categories: Array<{
+    category: string;
+    registrations: number;
+    confirmed: number;
+    waitlisted: number;
+    cancelled: number;
+    attended: number;
+  }>;
+  filtered_count: number;
+  results: Array<{
+    id: string;
+    participant_name: string;
+    email: string;
+    organization: string;
+    status: string;
+    display_category: string;
+    attended: boolean;
+    created_at: string;
+  }>;
 }
 
 export async function listSiteEventRegistrations(
@@ -291,6 +340,99 @@ export async function exportSiteEventParticipantsCsv(
     const match = /filename="([^"]+)"/.exec(disposition);
     const content = await response.text();
     return {ok: true, data: {filename: match?.[1] || "participants.csv", content}};
+  } catch (cause) {
+    return {ok: false, error: serializeApiError(cause)};
+  }
+}
+
+export async function checkInSiteEventParticipant(
+  site: number,
+  eventId: string,
+  registrationId: string,
+  options: {override?: boolean; notes?: string} = {},
+): Promise<ActionResult<AttendanceRow>> {
+  try {
+    const data = await (await api()).post<AttendanceRow>(
+      `${base(site)}${eventId}/attendance/check-in/`,
+      {registration_id: registrationId, ...options},
+    );
+    return {ok: true, data};
+  } catch (cause) {
+    return {ok: false, error: serializeApiError(cause)};
+  }
+}
+
+export async function scanSiteEventCheckIn(
+  site: number,
+  eventId: string,
+  token: string,
+  options: {override?: boolean; notes?: string} = {},
+): Promise<ActionResult<AttendanceRow>> {
+  try {
+    const data = await (await api()).post<AttendanceRow>(
+      `${base(site)}${eventId}/attendance/scan/`,
+      {token, ...options},
+    );
+    return {ok: true, data};
+  } catch (cause) {
+    return {ok: false, error: serializeApiError(cause)};
+  }
+}
+
+export async function fetchSiteEventReport(
+  site: number,
+  eventId: string,
+  query: {
+    status?: string;
+    category?: string;
+    attended?: string;
+    date_from?: string;
+    date_to?: string;
+  } = {},
+): Promise<ActionResult<EventReportPayload>> {
+  try {
+    const params = new URLSearchParams();
+    Object.entries(query).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && String(value).length > 0) params.set(key, String(value));
+    });
+    const suffix = params.toString() ? `?${params}` : "";
+    const data = await (await api()).get<EventReportPayload>(`${base(site)}${eventId}/report/${suffix}`);
+    return {ok: true, data};
+  } catch (cause) {
+    return {ok: false, error: serializeApiError(cause)};
+  }
+}
+
+export async function exportSiteEventReportCsv(
+  site: number,
+  eventId: string,
+  query: {
+    status?: string;
+    category?: string;
+    attended?: string;
+    date_from?: string;
+    date_to?: string;
+  } = {},
+): Promise<ActionResult<{filename: string; content: string}>> {
+  try {
+    const token = (await getAccessToken()) ?? undefined;
+    const baseUrl = process.env.API_BASE_URL ?? "http://backend:8000/api";
+    const params = new URLSearchParams();
+    Object.entries(query).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && String(value).length > 0) params.set(key, String(value));
+    });
+    const suffix = params.toString() ? `?${params}` : "";
+    const response = await serverApiFetch(
+      `${baseUrl}/v1/sites/${site}/events/${eventId}/report/export/${suffix}`,
+      {headers: token ? {Authorization: `Bearer ${token}`} : undefined},
+    );
+    if (!response.ok) {
+      return {ok: false, error: {message: `Report export failed (${response.status})`}};
+    }
+    const disposition = response.headers.get("Content-Disposition") || "";
+    const match = /filename="([^"]+)"/.exec(disposition);
+    const content = await response.text();
+    return {ok: true, data: {filename: match?.[1] || "attendance-report.csv", content}};
   } catch (cause) {
     return {ok: false, error: serializeApiError(cause)};
   }
