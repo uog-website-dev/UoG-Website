@@ -16,7 +16,7 @@ pytestmark = pytest.mark.django_db
 
 INITIAL_CODES = {
     "CMS", "MEDIA", "STAFF_DIRECTORY", "ACADEMICS", "NEWS_ANNOUNCEMENTS",
-    "EVENTS", "JOB_NOTICE_BOARD", "SEARCH", "ANALYTICS",
+    "JOB_NOTICE_BOARD", "SEARCH", "ANALYTICS",
 }
 
 
@@ -37,7 +37,7 @@ def test_planned_seeded_capabilities_are_not_advertised_as_usable(owner):
     assert not capability_is_shipped("CMS")
     assert not usable_modules().filter(code__in=INITIAL_CODES).exists()
     assert set(usable_modules().values_list("code", flat=True)) == {
-        "PAGES", "POSTS", "MENUS", "VISUAL_BUILDER", "DOCUMENTS",
+        "PAGES", "POSTS", "MENUS", "VISUAL_BUILDER", "DOCUMENTS", "EVENTS",
     }
     assert not any(field.name == "module_code" for field in Site._meta.local_fields)
     source = Path(usable_modules.__code__.co_filename).read_text(encoding="utf-8")

@@ -349,8 +349,10 @@ class SiteDocumentCategories(APIView):
     authentication_classes = [KeycloakBearerAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = DocumentCategorySerializer
-    @extend_schema(tags=["CMS documents"], responses={200: DocumentCategorySerializer(many=True)})
-    def get(self, request, site_pk, category_id=None):
+    http_method_names = ["get", "post", "head", "options"]
+
+    @extend_schema(operation_id="v1_sites_documents_categories_list", tags=["CMS documents"], responses={200: DocumentCategorySerializer(many=True)})
+    def get(self, request, site_pk):
         site = get_object_or_404(Site, pk=site_pk)
         if not module_is_available(site.pk, "DOCUMENTS"):
             raise NotFound("Documents are not enabled for this Site.")
@@ -379,14 +381,6 @@ class SiteDocumentCategories(APIView):
             raise serializers.ValidationError({"slug": "An active category with this slug already exists in this Site and language."}) from error
         return Response(DocumentCategorySerializer(category).data, status=201)
 
-    @extend_schema(tags=["CMS documents"], request=DocumentCategorySerializer, responses={200: DocumentCategorySerializer})
-    def patch(self, request, site_pk, category_id):
-        return self._update(request, site_pk, category_id, partial=True)
-
-    @extend_schema(tags=["CMS documents"], request=DocumentCategorySerializer, responses={200: DocumentCategorySerializer})
-    def put(self, request, site_pk, category_id):
-        return self._update(request, site_pk, category_id, partial=False)
-
     def _update(self, request, site_pk, category_id, *, partial):
         site = get_object_or_404(Site, pk=site_pk)
         if not module_is_available(site.pk, "DOCUMENTS"):
@@ -406,8 +400,7 @@ class SiteDocumentCategories(APIView):
             raise serializers.ValidationError({"slug": "An active category with this slug already exists in this Site and language."}) from error
         return Response(DocumentCategorySerializer(category).data)
 
-    @extend_schema(tags=["CMS documents"], responses={204: None})
-    def delete(self, request, site_pk, category_id):
+    def _destroy(self, request, site_pk, category_id):
         site = get_object_or_404(Site, pk=site_pk)
         if not module_is_available(site.pk, "DOCUMENTS"):
             raise NotFound("Documents are not enabled for this Site.")
@@ -418,3 +411,39 @@ class SiteDocumentCategories(APIView):
             raise serializers.ValidationError({"detail": "This category is assigned to documents. Deactivate it to retain those associations."})
         category.delete()
         return Response(status=204)
+
+
+class SiteDocumentCategoryDetail(APIView):
+    """Detail routes for document categories; keeps OpenAPI operationIds distinct from the list view."""
+
+    authentication_classes = [KeycloakBearerAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = DocumentCategorySerializer
+    http_method_names = ["get", "put", "patch", "delete", "head", "options"]
+
+    @extend_schema(operation_id="v1_sites_documents_categories_retrieve", tags=["CMS documents"], responses={200: DocumentCategorySerializer})
+    def get(self, request, site_pk, category_id):
+        site = get_object_or_404(Site, pk=site_pk)
+        if not module_is_available(site.pk, "DOCUMENTS"):
+            raise NotFound("Documents are not enabled for this Site.")
+        require_cms_grant(request.user, site.pk, tuple(ContentRole.values), request=request)
+        category = get_object_or_404(Category, pk=category_id, site_id=site.pk, kind=Category.Kind.DOCUMENTS)
+        return Response(DocumentCategorySerializer(category).data)
+
+    @extend_schema(operation_id="v1_sites_documents_categories_partial_update", tags=["CMS documents"], request=DocumentCategorySerializer, responses={200: DocumentCategorySerializer})
+    def patch(self, request, site_pk, category_id):
+        return SiteDocumentCategories()._update(request, site_pk, category_id, partial=True)
+
+    @extend_schema(operation_id="v1_sites_documents_categories_update", tags=["CMS documents"], request=DocumentCategorySerializer, responses={200: DocumentCategorySerializer})
+    def put(self, request, site_pk, category_id):
+        return SiteDocumentCategories()._update(request, site_pk, category_id, partial=False)
+
+    @extend_schema(operation_id="v1_sites_documents_categories_destroy", tags=["CMS documents"], responses={204: None})
+    def delete(self, request, site_pk, category_id):
+        return SiteDocumentCategories()._destroy(request, site_pk, category_id)
+
+    def finalize_response(self, request, response, *args, **kwargs):
+        response = super().finalize_response(request, response, *args, **kwargs)
+        response["Cache-Control"] = "private, no-store, max-age=0"
+        response["Vary"] = "Authorization, Cookie, Host"
+        return response

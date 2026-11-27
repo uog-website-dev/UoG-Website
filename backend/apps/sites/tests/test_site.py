@@ -55,7 +55,8 @@ def test_template_relationship_is_a_nullable_provenance_link():
     assert field.remote_field.on_delete is django_models.PROTECT
     assert {model.__name__ for model in apps.get_app_config("sites").get_models()} == {
         "Module", "ModuleDependency", "Site", "SiteDomain", "SiteModule",
-        "SiteModuleOperation", "SiteModuleOperationChange", "SiteTemplate", "SiteFooter", "SiteHeader",
+        "SiteModuleOperation", "SiteModuleOperationChange", "SiteTemplate",
+        "SiteEventSettings", "SiteFooter", "SiteHeader",
     }
 
 

@@ -284,6 +284,7 @@ class Category(SiteContent):
     class Kind(models.TextChoices):
         POSTS = "POSTS", "Posts"
         DOCUMENTS = "DOCUMENTS", "Documents"
+        EVENTS = "EVENTS", "Events"
 
     kind = models.CharField(max_length=12, choices=Kind.choices, default=Kind.POSTS)
     description = models.TextField(blank=True, default="")

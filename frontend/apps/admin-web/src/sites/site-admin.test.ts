@@ -80,6 +80,9 @@ describe("site administration matrix", () => {
     expect(sectionDecision(sectionByKey("documents"), {enabledModuleCodes:["MEDIA"],permissions:["content.documents.view"]})).toBe("module_disabled");
     expect(sectionDecision(sectionByKey("documents"), {enabledModuleCodes:["DOCUMENTS"],permissions:["content.pages.view"]})).toBe("permission_denied");
     expect(sectionDecision(sectionByKey("documents"), {enabledModuleCodes:["DOCUMENTS"],permissions:["content.documents.view"]})).toBe("visible");
+    expect(sectionDecision(sectionByKey("events"), {enabledModuleCodes:[],permissions:["sites.update"]})).toBe("module_disabled");
+    expect(sectionDecision(sectionByKey("events"), {enabledModuleCodes:["EVENTS"],permissions:["content.pages.view"]})).toBe("permission_denied");
+    expect(sectionDecision(sectionByKey("events"), {enabledModuleCodes:["EVENTS"],permissions:["sites.update"]})).toBe("visible");
   });
 
   it("hides a section when the user lacks that permission", () => {

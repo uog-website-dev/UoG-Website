@@ -10,12 +10,12 @@
 export const CENTRAL_MODULE_PERMISSION = "platform.sites.manage_registry";
 
 export interface SiteSection {
-  key: "header" | "footer" | "appearance" | "dashboard" | "sidebars" | "pages" | "builder" | "homepage" | "posts" | "documents" | "menus" | "media" | "users";
+  key: "header" | "footer" | "appearance" | "dashboard" | "sidebars" | "pages" | "builder" | "homepage" | "posts" | "documents" | "events" | "menus" | "media" | "users";
   label: string;
-  segment: "header" | "footer" | "appearance" | "" | "sidebars" | "pages" | "builder" | "homepage" | "posts" | "documents" | "menus" | "media" | "users";
-  module: "PAGES" | "POSTS" | "DOCUMENTS" | "MENUS" | "MEDIA" | "VISUAL_BUILDER" | null;
+  segment: "header" | "footer" | "appearance" | "" | "sidebars" | "pages" | "builder" | "homepage" | "posts" | "documents" | "events" | "menus" | "media" | "users";
+  module: "PAGES" | "POSTS" | "DOCUMENTS" | "EVENTS" | "MENUS" | "MEDIA" | "VISUAL_BUILDER" | null;
   /** Any one enabled module satisfies the gate; used when two modules qualify. */
-  modules?: readonly ("PAGES" | "POSTS" | "DOCUMENTS" | "MENUS" | "MEDIA" | "VISUAL_BUILDER")[];
+  modules?: readonly ("PAGES" | "POSTS" | "DOCUMENTS" | "EVENTS" | "MENUS" | "MEDIA" | "VISUAL_BUILDER")[];
   permissions: readonly string[];
 }
 
@@ -70,6 +70,7 @@ export const SITE_SECTIONS: readonly SiteSection[] = [
     ],
   },
   { key: "documents", label: "Documents", segment: "documents", module: "DOCUMENTS", permissions: ["content.documents.view", "content.documents.create", "content.documents.update", "content.documents.publish"] },
+  { key: "events", label: "Events", segment: "events", module: "EVENTS", permissions: ["sites.update"] },
   { key: "media", label: "Media", segment: "media", module: "MEDIA", permissions: ["content.media.view"] },
   {
     key: "users",
@@ -132,6 +133,17 @@ export function isSiteSectionActive(section:SiteSection,siteId:number,path:strin
   if(canvas)return section.key==="builder";
   const href=siteAdminHref(siteId,section.segment);
   return path===href || Boolean(section.segment && path.startsWith(`${href}/`));
+}
+
+/** In-section Events links: All Events, Add New Event, Event Settings. */
+export const EVENT_NAV_ITEMS = [
+  { key: "all", label: "All Events", suffix: "" },
+  { key: "new", label: "Add New Event", suffix: "/new" },
+  { key: "settings", label: "Event Settings", suffix: "/settings" },
+] as const;
+
+export function eventAdminHref(siteId: number, suffix: "" | "/new" | "/settings" = ""): string {
+  return `${siteAdminHref(siteId, "events")}${suffix}`;
 }
 
 /** Preserve only a section, never another Site's object ID, query or draft. */
