@@ -1,0 +1,23 @@
+{
+  "story": "P0-STAFF-001",
+  "title": "Activate and configure Site Staff Directory",
+  "branch": "P0-STAFF-001",
+  "base": "P0-EVENT-015",
+  "executed_at": "2026-11-27",
+  "results": {
+    "AC01_enable_disable_authorized_site": "PASS — Site module registry STAFF_DIRECTORY; settings API 403 when disabled",
+    "AC02_nav_settings_authorized_only": "PASS — site-staff-directory-nav.test.tsx + SiteSection module gate",
+    "AC03_college_mapped_org_descendants": "PASS — test_college_scope_includes_mapped_organization_and_descendants",
+    "AC04_main_aggregation_eligibility": "PASS — test_main_aggregation_only_includes_eligible_configured_sites",
+    "AC05_cross_site_idor": "PASS — foreign Site GET/PATCH 403; client site/version fields rejected",
+    "AC06_disable_retains_blocks_public": "PASS — settings retained; site-context omits staff_directory and STAFF_DIRECTORY",
+    "AC07_validation_audit_openapi": "PASS — validation 400s, SITE_STAFF_DIRECTORY_SETTINGS_* audit, OpenAPI StaffDirectory schemas"
+  },
+  "tests": {
+    "backend": "pytest tests/test_site_staff_directory_settings_api.py — 5 passed",
+    "frontend_unit": "vitest site-staff-directory-nav.test.tsx — 2 passed",
+    "openapi": "docs/api/openapi.yaml regenerated with /staff-directory-settings/"
+  },
+  "migration": "sites.0024_staff_directory_module (rollback reverses IMPLEMENTED + drops settings/triggers)",
+  "docs": ["docs/api/site-staff-directory.md", "docs/development/site-foundation.md"]
+}

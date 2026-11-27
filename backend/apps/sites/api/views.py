@@ -30,8 +30,14 @@ from ..events import (
     save_event_settings,event_settings_etag,EventSettingsConflict,EventSettingsPreconditionRequired,
     require_events_module,
 )
+from .staff import StaffDirectorySettingsSerializer,StaffDirectorySettingsEnvelopeSerializer,staff_directory_settings_envelope
+from ..staff import (
+    save_staff_directory_settings,staff_directory_settings_etag,StaffDirectorySettingsConflict,
+    StaffDirectorySettingsPreconditionRequired,require_staff_directory_module,
+)
 from ..models import SiteFooter, SiteHeader
 from ..models.event_settings import SiteEventSettings
+from ..models.staff_directory_settings import SiteStaffDirectorySettings
 from .module_management import ActivationSummarySerializer
 from .query import (
     LIST_PARAMETERS, DomainQuerySerializer, ModuleQuerySerializer, SiteModuleQuerySerializer,
@@ -71,6 +77,7 @@ class SiteViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Administrati
         "footer_publish":"sites.update","footer_restore_previous":"sites.update",
         "header_publish":"sites.update","header_restore_previous":"sites.update",
         "event_settings":"sites.update",
+        "staff_directory_settings":"sites.update",
     }
     queryset = Site.objects.select_related("organization_unit", "template").prefetch_related(
         Prefetch("domains", queryset=SiteDomain.objects.filter(is_primary=True), to_attr="primary_domain_rows"),
@@ -239,6 +246,21 @@ class SiteViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Administrati
                 except EventSettingsConflict:raise PreconditionFailed()
             else:row=SiteEventSettings.objects.filter(site=site).first()
             return Response(event_settings_envelope(site,row),headers={"ETag":event_settings_etag(site.pk,row),"Cache-Control":"private, no-store"})
+
+    @extend_schema(methods=["GET"],responses=StaffDirectorySettingsEnvelopeSerializer,description="Read Site-owned Staff Directory settings and resolved Organization scope. Requires sites.update and an enabled STAFF_DIRECTORY module. Aggregation eligibility never grants cross-Site write access.")
+    @extend_schema(methods=["PATCH"],parameters=[IF_MATCH],request=StaffDirectorySettingsSerializer,responses=StaffDirectorySettingsEnvelopeSerializer,description="Update this Site's Staff Directory settings using the strong ETag. Disabled STAFF_DIRECTORY blocks writes without deleting retained settings. Unknown ownership/version fields are rejected.")
+    @action(detail=True,methods=["get","patch"],url_path="staff-directory-settings")
+    def staff_directory_settings(self,request,pk=None):
+        site=self.get_object()
+        with translate_domain_errors():
+            require_staff_directory_module(site)
+            if request.method=="PATCH":
+                serializer=StaffDirectorySettingsSerializer(data=request.data);serializer.is_valid(raise_exception=True)
+                try:row=save_staff_directory_settings(site.pk,serializer.validated_data,actor=request.user,expected=request.headers.get("If-Match"))
+                except StaffDirectorySettingsPreconditionRequired:raise PreconditionRequired()
+                except StaffDirectorySettingsConflict:raise PreconditionFailed()
+            else:row=SiteStaffDirectorySettings.objects.filter(site=site).first()
+            return Response(staff_directory_settings_envelope(site,row),headers={"ETag":staff_directory_settings_etag(site.pk,row),"Cache-Control":"private, no-store"})
 
 
 @extend_schema(tags=["Domains"])

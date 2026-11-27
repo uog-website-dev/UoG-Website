@@ -68,7 +68,7 @@ def _disable(site_id, module_id, *, operation, using):
     return enablement
 
 
-_MENU_DESTINATION_MODULES = frozenset({"MENUS", "PAGES", "POSTS", "DOCUMENTS", "EVENTS"})
+_MENU_DESTINATION_MODULES = frozenset({"MENUS", "PAGES", "POSTS", "DOCUMENTS", "EVENTS", "STAFF_DIRECTORY"})
 
 
 def _invalidate_menu_delivery(site_id, module_code, *, using):
