@@ -1228,3 +1228,8 @@ from apps.cms.event_session_models import (  # noqa: E402,F401
     SessionType,
     SessionVisibility,
 )
+from apps.cms.event_person_models import (  # noqa: E402,F401
+    EventPerson,
+    SessionPerson,
+    SessionPersonRole,
+)
