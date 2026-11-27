@@ -45,7 +45,7 @@ export interface PublicSiteContext {
   languages?: string[];
   theme: "institutional" | "high-contrast";
   banner: PublicTitleBannerConfig;
-  modules: { pages: boolean; posts: boolean; menus: boolean; documents: boolean };
+  modules: { pages: boolean; posts: boolean; menus: boolean; documents: boolean; events: boolean };
 }
 
 export const EMPTY_SITE: PublicSiteContext = {
@@ -58,7 +58,7 @@ export const EMPTY_SITE: PublicSiteContext = {
   logoUrl: null,
   theme: "institutional",
   banner: DEFAULT_PUBLIC_BANNER,
-  modules: { pages: false, posts: false, menus: false, documents: false },
+  modules: { pages: false, posts: false, menus: false, documents: false, events: false },
 };
 
 /** Site-bound logo URL with a revision token so browser icon caches refresh on branding changes. */
@@ -110,6 +110,7 @@ export function siteFromContext(status: number, body: unknown): PublicSiteContex
       posts: modules.includes("POSTS"),
       menus: modules.includes("MENUS"),
       documents: modules.includes("DOCUMENTS"),
+      events: modules.includes("EVENTS"),
     },
   };
 }

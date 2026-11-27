@@ -25,7 +25,13 @@ from .footer import FooterSettingsSerializer,FooterEnvelopeSerializer,footer_env
 from ..footer import save_footer,publish_footer,restore_previous_footer,footer_etag,FooterConflict,FooterPreconditionRequired
 from .header import HeaderSettingsSerializer,HeaderEnvelopeSerializer,header_envelope
 from ..header import save_header,publish_header,restore_previous_header,header_etag,HeaderConflict,HeaderPreconditionRequired
+from .events import EventSettingsSerializer,EventSettingsEnvelopeSerializer,event_settings_envelope
+from ..events import (
+    save_event_settings,event_settings_etag,EventSettingsConflict,EventSettingsPreconditionRequired,
+    require_events_module,
+)
 from ..models import SiteFooter, SiteHeader
+from ..models.event_settings import SiteEventSettings
 from .module_management import ActivationSummarySerializer
 from .query import (
     LIST_PARAMETERS, DomainQuerySerializer, ModuleQuerySerializer, SiteModuleQuerySerializer,
@@ -64,6 +70,7 @@ class SiteViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Administrati
         "footer":"sites.update","header":"sites.update",
         "footer_publish":"sites.update","footer_restore_previous":"sites.update",
         "header_publish":"sites.update","header_restore_previous":"sites.update",
+        "event_settings":"sites.update",
     }
     queryset = Site.objects.select_related("organization_unit", "template").prefetch_related(
         Prefetch("domains", queryset=SiteDomain.objects.filter(is_primary=True), to_attr="primary_domain_rows"),
@@ -217,6 +224,21 @@ class SiteViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, Administrati
             except HeaderPreconditionRequired:raise PreconditionRequired()
             except HeaderConflict:raise PreconditionFailed()
             return Response(header_envelope(site,row),headers={"ETag":header_etag(site.pk,row),"Cache-Control":"private, no-store"})
+
+    @extend_schema(methods=["GET"],responses=EventSettingsEnvelopeSerializer,description="Read Site-owned Event Management settings. Requires sites.update and an enabled EVENTS module. Aggregation eligibility never grants cross-Site write access.")
+    @extend_schema(methods=["PATCH"],parameters=[IF_MATCH],request=EventSettingsSerializer,responses=EventSettingsEnvelopeSerializer,description="Update this Site's Event settings using the strong ETag. Disabled EVENTS blocks writes without deleting retained settings. Unknown ownership/version fields are rejected.")
+    @action(detail=True,methods=["get","patch"],url_path="event-settings")
+    def event_settings(self,request,pk=None):
+        site=self.get_object()
+        with translate_domain_errors():
+            require_events_module(site)
+            if request.method=="PATCH":
+                serializer=EventSettingsSerializer(data=request.data);serializer.is_valid(raise_exception=True)
+                try:row=save_event_settings(site.pk,serializer.validated_data,actor=request.user,expected=request.headers.get("If-Match"))
+                except EventSettingsPreconditionRequired:raise PreconditionRequired()
+                except EventSettingsConflict:raise PreconditionFailed()
+            else:row=SiteEventSettings.objects.filter(site=site).first()
+            return Response(event_settings_envelope(site,row),headers={"ETag":event_settings_etag(site.pk,row),"Cache-Control":"private, no-store"})
 
 
 @extend_schema(tags=["Domains"])

@@ -23,6 +23,7 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import DescriptionIcon from "@mui/icons-material/Description";
 import ViewQuiltIcon from "@mui/icons-material/ViewQuilt";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import EventOutlinedIcon from "@mui/icons-material/EventOutlined";
 import type { SvgIconComponent } from "@mui/icons-material";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
@@ -67,6 +68,7 @@ const SITE_SECTION_ICONS: Record<SiteSection["key"], SvgIconComponent> = {
   footer: VerticalAlignBottomOutlinedIcon,
   posts: ArticleIcon,
   documents: DescriptionIcon,
+  events: EventOutlinedIcon,
   menus: AccountTreeIcon,
   media: ArticleIcon,
   users: GroupIcon,
@@ -83,6 +85,7 @@ const SITE_SECTION_DESCRIPTIONS: Record<SiteSection["key"], string> = {
   footer: "Footer content, contact and social links",
   posts: "News and announcements",
   documents: "Official Site documents",
+  events: "Site events, registration defaults and categories",
   menus: "Header and footer navigation",
   media: "Private Site media library",
   users: "Site members and roles",

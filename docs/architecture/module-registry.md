@@ -1,14 +1,16 @@
 # Module registry
 
 Implementation date: 2026-10-27 (content codes added 2026-10-29 by
-P2-CMS-001; PAGES shipped by P2-CMS-006; VISUAL_BUILDER shipped 2026-11-12).
+P2-CMS-001; PAGES shipped by P2-CMS-006; VISUAL_BUILDER shipped 2026-11-12;
+EVENTS shipped by P0-EVENT-001).
 `Module` is the platform catalog of capabilities. Sites do not invent module
 names. Pages, Media, Staff directory, Academics, News and announcements,
 Events, Job notice board, Search and Analytics are registry rows. POSTS,
-MENUS and VISUAL_BUILDER are implemented; platform operators enable their
-global switches, then Site administrators enable them per Site.
+MENUS, VISUAL_BUILDER, DOCUMENTS and EVENTS are implemented; platform operators
+enable their global switches, then Site administrators enable them per Site.
 VISUAL_BUILDER requires PAGES on the same Site and drives the Visual Builder
-admin menu.
+admin menu. EVENTS is administered only by Site Administrators (`sites.update`);
+University Main aggregation eligibility never grants cross-Site write access.
 
 ## Fields
 

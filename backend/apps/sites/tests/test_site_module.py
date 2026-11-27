@@ -28,8 +28,12 @@ def sites():
     SiteDomain.objects.create(site=informatics, hostname="informatics.uog.edu.et", is_primary=True, status="ACTIVE")
     SiteDomain.objects.create(site=medicine, hostname="medicine.uog.edu.et", is_primary=True, status="ACTIVE")
     with connection.cursor() as cursor:
-        cursor.execute("INSERT INTO sites_module_implementation (code) VALUES ('EVENTS'), ('STAFF_DIRECTORY')")
+        cursor.execute(
+            "INSERT INTO sites_module_implementation (code) VALUES ('EVENTS'), ('STAFF_DIRECTORY') "
+            "ON CONFLICT (code) DO NOTHING"
+        )
     events = Module.objects.get(code="EVENTS")
+    # EVENTS may already be shipped platform-wide; keep a required schema for this fixture.
     events.status = "IMPLEMENTED"
     events.is_enabled = True
     events.configuration_schema = {"schema_version": 1, "properties": [

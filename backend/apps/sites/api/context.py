@@ -120,6 +120,10 @@ class SiteContextView(APIView):
             public_identity["branding_revision"] = revision
             public_identity["footer"] = public_footer(current)
             public_identity["header"] = public_header(current)
+            from apps.sites.events import public_event_settings_payload
+            events = public_event_settings_payload(current)
+            if events is not None:
+                public_identity["events"] = events
             public_identity["languages"] = list(configuration["language"]["enabled"])
             body = {
                 "site": {
