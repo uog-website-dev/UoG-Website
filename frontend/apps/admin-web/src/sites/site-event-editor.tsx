@@ -29,6 +29,7 @@ import { eventAdminHref } from "@/sites/site-admin";
 import { useSiteAdmin } from "@/sites/site-admin-frame";
 import { SiteEventsNav } from "@/sites/site-events-nav";
 import { SiteEventPeople } from "@/sites/site-event-people";
+import { SiteEventRegistrations } from "@/sites/site-event-registrations";
 import { SiteEventSchedule } from "@/sites/site-event-schedule";
 
 function unwrap<T>(result: { ok: true; data: T } | { ok: false; error: unknown }): T {
@@ -236,6 +237,9 @@ export function SiteEventEditorPage({
       </Box>
       {mode !== "create" && eventId ? (
         <>
+          {values.registration_required ? (
+            <SiteEventRegistrations siteId={siteId} eventId={eventId} />
+          ) : null}
           <SiteEventPeople siteId={siteId} eventId={eventId} readOnly={readOnly} />
           <SiteEventSchedule
             siteId={siteId}
