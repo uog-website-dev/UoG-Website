@@ -15,7 +15,12 @@ from apps.cms.api.public import (
 )
 
 from apps.cms.api.public_search import PublicSearch
-from apps.cms.api.events import PublicSiteEvents, PublicSiteEventDetail
+from apps.cms.api.events import (
+    PublicSiteEvents,
+    PublicSiteEventDetail,
+    PublicSiteEventsCalendar,
+    PublicSiteEventCategories,
+)
 from apps.cms.api.event_sessions import PublicSiteEventAgenda
 from .context import SiteContextView
 from apps.media.delivery import PublicMediaImage
@@ -37,6 +42,8 @@ urlpatterns = [
     path("documents/", PublicDocumentListView.as_view(), name="public-document-list"),
     path("documents/<uuid:document_id>/file/", PublicDocumentFileView.as_view(), name="public-document-file"),
     path("events/", PublicSiteEvents.as_view(), name="public-event-list"),
+    path("events/calendar/", PublicSiteEventsCalendar.as_view(), name="public-event-calendar"),
+    path("events/categories/", PublicSiteEventCategories.as_view(), name="public-event-categories"),
     path("events/<slug:slug>/agenda/", PublicSiteEventAgenda.as_view(), name="public-event-agenda"),
     path("events/<slug:slug>/", PublicSiteEventDetail.as_view(), name="public-event-detail"),
     path("posts/<slug:post_slug>/", PublicPostDetailView.as_view(), name="public-post-detail"),

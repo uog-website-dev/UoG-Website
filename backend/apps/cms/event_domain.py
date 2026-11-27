@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 from uuid import UUID
 
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.text import slugify
 
@@ -16,7 +17,7 @@ from apps.audit.writer import record_event
 from apps.authorization.access import effective_scope_for_site
 from apps.authorization.services import permission_granted
 from apps.cms.blocks import Rejection, check_image_ref, sanitize_rich_text
-from apps.cms.event_models import Event, EventFormat, EventStatus
+from apps.cms.event_models import Event, EventFormat, EventLifecycle, EventStatus
 from apps.cms.menu_models import validate_external_url
 from apps.organizations.hierarchy_lock import hierarchy_write
 from apps.sites.events import EVENTS_MODULE_CODE, DEFAULT_EVENT_SETTINGS
@@ -346,10 +347,84 @@ def duplicate_event(event: Event, *, actor) -> Event:
 
 
 def public_events_queryset(site_id: int):
+    """Same-Site published/cancelled Events only (legacy helper)."""
     return Event.objects.filter(
         site_id=site_id,
         status__in=[EventStatus.PUBLISHED, EventStatus.CANCELLED],
     )
+
+
+def public_events_for_site(site: Site):
+    """Public Event directory queryset for a Host-resolved Site.
+
+    College Sites return their own published/cancelled Events. University Main
+    also includes published Events from Sites with public_aggregation_eligible
+    and an enabled EVENTS module. Never grants cross-Site writes.
+    """
+    from apps.sites.models.event_settings import SiteEventSettings
+    from apps.sites.selectors.modules import available_module_codes
+
+    local = Event.objects.filter(
+        site_id=site.pk,
+        status__in=[EventStatus.PUBLISHED, EventStatus.CANCELLED],
+    )
+    if not getattr(site, "is_main", False):
+        return local.select_related("banner_asset", "category", "site")
+
+    eligible_ids = list(
+        SiteEventSettings.objects.filter(public_aggregation_eligible=True)
+        .exclude(site_id=site.pk)
+        .values_list("site_id", flat=True)
+    )
+    eligible_ids = [
+        site_id for site_id in eligible_ids
+        if EVENTS_MODULE_CODE in available_module_codes(site_id)
+    ]
+    if not eligible_ids:
+        return local.select_related("banner_asset", "category", "site")
+    aggregated = Event.objects.filter(
+        Q(site_id=site.pk, status__in=[EventStatus.PUBLISHED, EventStatus.CANCELLED])
+        | Q(site_id__in=eligible_ids, status=EventStatus.PUBLISHED)
+    ).distinct()
+    return aggregated.select_related("banner_asset", "category", "site")
+
+
+def public_event_day_bounds(day, *, tz_name: str):
+    """Return aware UTC [start, end] covering a calendar date in tz_name."""
+    import zoneinfo
+    from datetime import datetime, time, timezone as dt_timezone
+
+    try:
+        tz = zoneinfo.ZoneInfo((tz_name or "UTC").strip() or "UTC")
+    except (zoneinfo.ZoneInfoNotFoundError, KeyError, ValueError):
+        tz = zoneinfo.ZoneInfo("UTC")
+    start = datetime.combine(day, time.min, tzinfo=tz)
+    end = datetime.combine(day, time.max, tzinfo=tz)
+    return start.astimezone(dt_timezone.utc), end.astimezone(dt_timezone.utc)
+
+
+def filter_public_events(rows, *, now=None, lifecycle=None, on_date=None, tz_name="UTC"):
+    """Apply lifecycle and calendar-day overlap filters without duplicating rows."""
+    from datetime import date as date_cls
+
+    now = now or timezone.now()
+    if lifecycle in {EventLifecycle.UPCOMING, "upcoming"}:
+        rows = rows.filter(starts_at__gt=now)
+    elif lifecycle in {EventLifecycle.IN_PROGRESS, "in_progress"}:
+        rows = rows.filter(starts_at__lte=now, ends_at__gte=now)
+    elif lifecycle in {EventLifecycle.PAST, "past"}:
+        rows = rows.filter(ends_at__lt=now)
+    elif lifecycle in {"directory_upcoming", "UPCOMING_TAB"}:
+        # Upcoming tab: not yet ended (upcoming + in progress).
+        rows = rows.filter(ends_at__gte=now)
+    elif lifecycle in {"directory_past", "PAST_TAB"}:
+        rows = rows.filter(ends_at__lt=now)
+
+    if on_date:
+        day = on_date if isinstance(on_date, date_cls) else date_cls.fromisoformat(str(on_date))
+        start_utc, end_utc = public_event_day_bounds(day, tz_name=tz_name)
+        rows = rows.filter(starts_at__lte=end_utc, ends_at__gte=start_utc)
+    return rows
 
 
 def _assign_fields(event: Event, payload: dict[str, Any], *, site_id: int) -> None:
