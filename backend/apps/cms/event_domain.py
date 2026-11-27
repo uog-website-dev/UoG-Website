@@ -252,6 +252,8 @@ def publish_event(event: Event, *, actor, expected: str | None) -> Event:
     if event.status == EventStatus.ARCHIVED:
         raise ValidationError({"status": ["Archived Events cannot be published."]})
     validate_event(event, require_publishable=True)
+    from apps.cms.event_session_domain import assert_publishable_schedule
+    assert_publishable_schedule(event)
     before = _snapshot(event)
     event.status = EventStatus.PUBLISHED
     event.registration_open = True

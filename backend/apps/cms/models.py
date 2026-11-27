@@ -1222,3 +1222,9 @@ from apps.cms.sidebar_models import Sidebar  # noqa: E402,F401
 
 from apps.cms.menu_assignment_models import MenuLocationAssignment  # noqa: E402,F401
 from apps.cms.event_models import Event, EventFormat, EventLifecycle, EventStatus  # noqa: E402,F401
+from apps.cms.event_session_models import (  # noqa: E402,F401
+    EventSession,
+    SessionStatus,
+    SessionType,
+    SessionVisibility,
+)

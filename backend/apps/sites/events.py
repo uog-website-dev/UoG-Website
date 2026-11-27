@@ -23,6 +23,8 @@ DEFAULT_EVENT_SETTINGS: dict[str, Any] = {
     "registration_required_by_default": False,
     "registration_default_capacity": None,
     "public_aggregation_eligible": False,
+    "block_publish_on_session_room_conflicts": True,
+    "hide_cancelled_sessions_publicly": False,
 }
 
 
@@ -135,6 +137,13 @@ def validate_event_settings(payload: dict[str, Any]) -> dict[str, Any]:
         errors["public_aggregation_eligible"] = ["Must be true or false."]
     else:
         cleaned["public_aggregation_eligible"] = eligible
+
+    for flag in ("block_publish_on_session_room_conflicts", "hide_cancelled_sessions_publicly"):
+        value = payload.get(flag, DEFAULT_EVENT_SETTINGS[flag])
+        if not isinstance(value, bool):
+            errors[flag] = ["Must be true or false."]
+        else:
+            cleaned[flag] = value
 
     if errors:
         raise ValidationError(errors)

@@ -13,6 +13,8 @@ class EventSettingsSerializer(StrictFields, serializers.Serializer):
     registration_required_by_default = serializers.BooleanField(required=False)
     registration_default_capacity = serializers.IntegerField(required=False, allow_null=True, min_value=1)
     public_aggregation_eligible = serializers.BooleanField(required=False)
+    block_publish_on_session_room_conflicts = serializers.BooleanField(required=False)
+    hide_cancelled_sessions_publicly = serializers.BooleanField(required=False)
 
 
 class EventSettingsEnvelopeSerializer(serializers.Serializer):

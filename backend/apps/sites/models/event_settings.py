@@ -23,6 +23,14 @@ class SiteEventSettings(models.Model):
         default=False,
         help_text="When true, University Main may list this Site's published Events. Never grants cross-Site write access.",
     )
+    block_publish_on_session_room_conflicts = models.BooleanField(
+        default=True,
+        help_text="When true, Event publish is blocked while same-room session overlaps exist.",
+    )
+    hide_cancelled_sessions_publicly = models.BooleanField(
+        default=False,
+        help_text="When true, cancelled sessions are omitted from the public agenda instead of labelled.",
+    )
     version = models.PositiveIntegerField(default=1, editable=False)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True,
@@ -63,4 +71,6 @@ EVENT_SETTINGS_FIELDS = (
     "registration_required_by_default",
     "registration_default_capacity",
     "public_aggregation_eligible",
+    "block_publish_on_session_room_conflicts",
+    "hide_cancelled_sessions_publicly",
 )

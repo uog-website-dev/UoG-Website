@@ -177,6 +177,26 @@ function EventSettingsEditor({ siteId, siteName }: { siteId: number; siteName: s
             }
             label="Eligible for University Main public aggregation"
           />
+          <FormControlLabel
+            control={
+              <Switch
+                checked={values.block_publish_on_session_room_conflicts}
+                onChange={(event) => set("block_publish_on_session_room_conflicts", event.target.checked)}
+                disabled={busy}
+              />
+            }
+            label="Block publish when sessions overlap in the same room"
+          />
+          <FormControlLabel
+            control={
+              <Switch
+                checked={values.hide_cancelled_sessions_publicly}
+                onChange={(event) => set("hide_cancelled_sessions_publicly", event.target.checked)}
+                disabled={busy}
+              />
+            }
+            label="Hide cancelled sessions from the public agenda"
+          />
           <Alert severity="info">
             Aggregation eligibility only allows University Main to list this Site&apos;s published Events.
             It never grants another Site write access. Current write access from aggregation: {loaded.aggregation_write_access ? "yes" : "no"}.
