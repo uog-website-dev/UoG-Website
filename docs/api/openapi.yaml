@@ -7811,6 +7811,326 @@ paths:
               schema:
                 type: string
                 format: uuid
+  /api/v1/site-context/events/{slug}/registrations/:
+    post:
+      operationId: v1_site_context_events_registrations_create
+      description: 'Anonymous Event registration with atomic capacity enforcement.
+        Duplicate active emails return 409. Full Events without waitlist return 409.
+        Honeypot field `website` must be blank. Rate limit: 10/min per Site visitor.'
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Public Events
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationInputRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RegistrationInputRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RegistrationInputRequest'
+        required: true
+      security:
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationReceipt'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationReceipt'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          description: Invalid body, malformed input, or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    title:
+                    - This field is required.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '415':
+          description: Unsupported request content type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/site-context/events/{slug}/registrations/cancel/:
+    post:
+      operationId: v1_site_context_events_registrations_cancel
+      description: Cancel using email + management token issued at registration. Unknown
+        pairs return 404 without revealing whether the email exists. Freed seats promote
+        the oldest waitlisted registration.
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Public Events
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationCancelInputRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RegistrationCancelInputRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RegistrationCancelInputRequest'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationReceipt'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          description: Invalid body, malformed input, or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    title:
+                    - This field is required.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '415':
+          description: Unsupported request content type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
   /api/v1/site-context/events/{slug}/speakers/:
     get:
       operationId: v1_site_context_events_speakers
@@ -23155,6 +23475,128 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Event'
+          description: ''
+          headers:
+            ETag:
+              description: Strong representation validator. Echo exactly in If-Match
+                for mutations.
+              schema:
+                type: string
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/sites/{site_pk}/events/{event_id}/registrations/:
+    get:
+      operationId: v1_sites_events_registrations_list
+      parameters:
+      - in: path
+        name: event_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        required: true
+      - in: query
+        name: status
+        schema:
+          type: string
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Event Registrations
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationSummary'
           description: ''
           headers:
             ETag:
@@ -48974,9 +49416,31 @@ components:
           nullable: true
         registration_open:
           type: boolean
-          readOnly: true
+        registration_opens_at:
+          type: string
+          format: date-time
+          nullable: true
+        registration_closes_at:
+          type: string
+          format: date-time
+          nullable: true
+        waitlist_enabled:
+          type: boolean
+        registration_category:
+          type: string
+          maxLength: 120
+        registration_required_fields:
+          type: array
+          items:
+            type: string
+            maxLength: 64
+        registration_notice:
+          type: string
         accepts_registration:
           type: boolean
+          readOnly: true
+        registration_state:
+          type: string
           readOnly: true
         cancellation_notice:
           type: string
@@ -49010,7 +49474,7 @@ components:
       - id
       - lifecycle
       - published_at
-      - registration_open
+      - registration_state
       - site
       - site_code
       - status
@@ -49312,6 +49776,29 @@ components:
           type: integer
           minimum: 1
           nullable: true
+        registration_open:
+          type: boolean
+        registration_opens_at:
+          type: string
+          format: date-time
+          nullable: true
+        registration_closes_at:
+          type: string
+          format: date-time
+          nullable: true
+        waitlist_enabled:
+          type: boolean
+        registration_category:
+          type: string
+          maxLength: 120
+        registration_required_fields:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 64
+        registration_notice:
+          type: string
         cancellation_notice:
           type: string
     EventSession:
@@ -61757,6 +62244,29 @@ components:
           type: integer
           minimum: 1
           nullable: true
+        registration_open:
+          type: boolean
+        registration_opens_at:
+          type: string
+          format: date-time
+          nullable: true
+        registration_closes_at:
+          type: string
+          format: date-time
+          nullable: true
+        waitlist_enabled:
+          type: boolean
+        registration_category:
+          type: string
+          maxLength: 120
+        registration_required_fields:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 64
+        registration_notice:
+          type: string
         cancellation_notice:
           type: string
     PatchedEventSessionRequest:
@@ -73459,9 +73969,31 @@ components:
           nullable: true
         registration_open:
           type: boolean
-          readOnly: true
+        registration_opens_at:
+          type: string
+          format: date-time
+          nullable: true
+        registration_closes_at:
+          type: string
+          format: date-time
+          nullable: true
+        waitlist_enabled:
+          type: boolean
+        registration_category:
+          type: string
+          maxLength: 120
+        registration_required_fields:
+          type: array
+          items:
+            type: string
+            maxLength: 64
+        registration_notice:
+          type: string
         accepts_registration:
           type: boolean
+          readOnly: true
+        registration_state:
+          type: string
           readOnly: true
         cancellation_notice:
           type: string
@@ -73504,7 +74036,7 @@ components:
       - id
       - lifecycle
       - published_at
-      - registration_open
+      - registration_state
       - sections
       - site
       - site_code
@@ -74019,6 +74551,98 @@ components:
       - field_path
       - node_id
       - page_revision_id
+    RegistrationCancelInputRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          minLength: 1
+        token:
+          type: string
+          minLength: 1
+          maxLength: 64
+      required:
+      - email
+      - token
+    RegistrationInputRequest:
+      type: object
+      properties:
+        request_id:
+          type: string
+          format: uuid
+        participant_name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        email:
+          type: string
+          format: email
+          minLength: 1
+        organization:
+          type: string
+          maxLength: 255
+        phone:
+          type: string
+          maxLength: 64
+        consent:
+          type: boolean
+        consent_text:
+          type: string
+          maxLength: 500
+        website:
+          type: string
+          maxLength: 200
+      required:
+      - consent
+      - email
+      - participant_name
+      - request_id
+    RegistrationReceipt:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+        management_token:
+          type: string
+        waitlist_position:
+          type: integer
+          nullable: true
+        notification_status:
+          type: string
+      required:
+      - id
+      - management_token
+      - notification_status
+      - status
+      - waitlist_position
+    RegistrationSummary:
+      type: object
+      properties:
+        confirmed:
+          type: integer
+        waitlisted:
+          type: integer
+        cancelled:
+          type: integer
+        capacity:
+          type: integer
+          nullable: true
+        seats_remaining:
+          type: integer
+          nullable: true
+        state:
+          type: string
+      required:
+      - cancelled
+      - capacity
+      - confirmed
+      - seats_remaining
+      - state
+      - waitlisted
     ReorderInputRequest:
       type: object
       properties:

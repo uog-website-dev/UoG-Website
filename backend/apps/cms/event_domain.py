@@ -181,6 +181,18 @@ def validate_event(event: Event, *, require_publishable: bool = False) -> None:
     if event.registration_capacity is not None and event.registration_capacity < 1:
         errors["registration_capacity"] = ["Capacity must be at least 1 when set."]
 
+    from apps.cms.event_registration_domain import normalize_required_fields
+    try:
+        event.registration_required_fields = normalize_required_fields(event.registration_required_fields)
+    except ValidationError as error:
+        errors.update(error.message_dict)
+
+    event.registration_category = (event.registration_category or "").strip()
+    event.registration_notice = (event.registration_notice or "").strip()
+    if event.registration_opens_at and event.registration_closes_at:
+        if event.registration_closes_at <= event.registration_opens_at:
+            errors["registration_closes_at"] = ["Registration close must be after open."]
+
     if event.banner_asset_id:
         try:
             event.banner_asset = _validate_banner(event.banner_asset_id, site_id=event.site_id)
@@ -201,8 +213,11 @@ def apply_event_defaults(event: Event, site: Site) -> None:
     if not event.timezone:
         event.timezone = settings_obj.timezone or DEFAULT_EVENT_SETTINGS["timezone"]
     if event._state.adding:
+        from apps.cms.event_registration_domain import DEFAULT_REQUIRED_FIELDS
         event.registration_required = settings_obj.registration_required_by_default
         event.registration_capacity = settings_obj.registration_default_capacity
+        if not event.registration_required_fields:
+            event.registration_required_fields = list(DEFAULT_REQUIRED_FIELDS)
 
 
 def create_event(site: Site, payload: dict[str, Any], *, actor) -> Event:
@@ -454,6 +469,18 @@ def _assign_fields(event: Event, payload: dict[str, Any], *, site_id: int) -> No
     if "registration_capacity" in payload:
         capacity = payload["registration_capacity"]
         event.registration_capacity = None if capacity in ("", None) else capacity
+    if "registration_opens_at" in payload:
+        event.registration_opens_at = _parse_datetime(payload["registration_opens_at"], field="registration_opens_at")
+    if "registration_closes_at" in payload:
+        event.registration_closes_at = _parse_datetime(payload["registration_closes_at"], field="registration_closes_at")
+    if "waitlist_enabled" in payload:
+        event.waitlist_enabled = bool(payload["waitlist_enabled"])
+    if "registration_category" in payload:
+        event.registration_category = payload["registration_category"] or ""
+    if "registration_required_fields" in payload:
+        event.registration_required_fields = payload["registration_required_fields"]
+    if "registration_notice" in payload:
+        event.registration_notice = payload["registration_notice"] or ""
     if "category" in payload:
         category = payload["category"]
         event.category_id = None if category in ("", None) else category

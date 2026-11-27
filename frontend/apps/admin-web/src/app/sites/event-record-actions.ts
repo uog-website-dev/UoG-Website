@@ -125,3 +125,44 @@ export async function previewSiteEvent(
     return {ok: false, error: serializeApiError(cause)};
   }
 }
+
+export interface EventRegistrationRow {
+  id: string;
+  email: string;
+  participant_name: string;
+  organization: string;
+  phone: string;
+  status: string;
+  waitlist_position: number | null;
+  notification_status: string;
+  created_at: string;
+  cancelled_at: string | null;
+}
+
+export interface EventRegistrationInventory {
+  summary: {
+    confirmed: number;
+    waitlisted: number;
+    cancelled: number;
+    capacity: number | null;
+    seats_remaining: number | null;
+    state: string;
+  };
+  results: EventRegistrationRow[];
+}
+
+export async function listSiteEventRegistrations(
+  site: number,
+  eventId: string,
+  status?: string,
+): Promise<ActionResult<EventRegistrationInventory>> {
+  try {
+    const params = status ? `?status=${encodeURIComponent(status)}` : "";
+    const data = await (await api()).get<EventRegistrationInventory>(
+      `${base(site)}${eventId}/registrations/${params}`,
+    );
+    return {ok: true, data};
+  } catch (cause) {
+    return {ok: false, error: serializeApiError(cause)};
+  }
+}

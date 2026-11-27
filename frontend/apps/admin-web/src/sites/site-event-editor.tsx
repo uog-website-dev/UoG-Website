@@ -29,6 +29,7 @@ import { eventAdminHref } from "@/sites/site-admin";
 import { useSiteAdmin } from "@/sites/site-admin-frame";
 import { SiteEventsNav } from "@/sites/site-events-nav";
 import { SiteEventPeople } from "@/sites/site-event-people";
+import { SiteEventRegistrations } from "@/sites/site-event-registrations";
 import { SiteEventSchedule } from "@/sites/site-event-schedule";
 
 function unwrap<T>(result: { ok: true; data: T } | { ok: false; error: unknown }): T {
@@ -114,6 +115,12 @@ export function SiteEventEditorPage({
             banner_asset: envelope.data.banner_asset,
             registration_required: envelope.data.registration_required,
             registration_capacity: envelope.data.registration_capacity,
+            registration_open: envelope.data.registration_open,
+            registration_opens_at: envelope.data.registration_opens_at,
+            registration_closes_at: envelope.data.registration_closes_at,
+            waitlist_enabled: envelope.data.waitlist_enabled,
+            registration_category: envelope.data.registration_category,
+            registration_notice: envelope.data.registration_notice,
           });
         }
       } else {
@@ -122,6 +129,8 @@ export function SiteEventEditorPage({
           timezone: settings.timezone,
           registration_required: settings.registration_required_by_default,
           registration_capacity: settings.registration_default_capacity,
+          registration_open: true,
+          waitlist_enabled: false,
         }));
       }
     }).catch((cause) => { if (active) setError(cause); })
@@ -217,11 +226,20 @@ export function SiteEventEditorPage({
         <TextField label="Organizer name" value={values.organizer_name ?? ""} onChange={(e) => set("organizer_name", e.target.value)} disabled={busy || readOnly} fullWidth />
         <TextField label="Organizer email" value={values.organizer_email ?? ""} onChange={(e) => set("organizer_email", e.target.value)} disabled={busy || readOnly} fullWidth />
         <TextField label="Organizer phone" value={values.organizer_phone ?? ""} onChange={(e) => set("organizer_phone", e.target.value)} disabled={busy || readOnly} fullWidth />
-        <FormControlLabel control={<Switch checked={Boolean(values.registration_required)} onChange={(e) => set("registration_required", e.target.checked)} disabled={busy || readOnly} />} label="Registration required" />
-        <TextField label="Registration capacity" type="number" value={values.registration_capacity ?? ""} onChange={(e) => set("registration_capacity", e.target.value === "" ? null : Number(e.target.value))} disabled={busy || readOnly} fullWidth inputProps={{ min: 1 }} />
+        <FormControlLabel control={<Switch checked={Boolean(values.registration_required)} onChange={(e) => set("registration_required", e.target.checked)} disabled={busy || readOnly} />} label="Enable registration" />
+        <FormControlLabel control={<Switch checked={values.registration_open !== false} onChange={(e) => set("registration_open", e.target.checked)} disabled={busy || readOnly || !values.registration_required} />} label="Registration open" />
+        <FormControlLabel control={<Switch checked={Boolean(values.waitlist_enabled)} onChange={(e) => set("waitlist_enabled", e.target.checked)} disabled={busy || readOnly || !values.registration_required} />} label="Enable waitlist when full" />
+        <TextField label="Registration capacity" type="number" value={values.registration_capacity ?? ""} onChange={(e) => set("registration_capacity", e.target.value === "" ? null : Number(e.target.value))} disabled={busy || readOnly || !values.registration_required} fullWidth inputProps={{ min: 1 }} helperText="Leave blank for unlimited confirmed seats" />
+        <TextField label="Registration opens" type="datetime-local" InputLabelProps={{ shrink: true }} value={toLocalInput(values.registration_opens_at ?? null)} onChange={(e) => set("registration_opens_at", fromLocalInput(e.target.value))} disabled={busy || readOnly || !values.registration_required} fullWidth />
+        <TextField label="Registration closes" type="datetime-local" InputLabelProps={{ shrink: true }} value={toLocalInput(values.registration_closes_at ?? null)} onChange={(e) => set("registration_closes_at", fromLocalInput(e.target.value))} disabled={busy || readOnly || !values.registration_required} fullWidth />
+        <TextField label="Registration category label" value={values.registration_category ?? ""} onChange={(e) => set("registration_category", e.target.value)} disabled={busy || readOnly || !values.registration_required} fullWidth helperText="Optional public label such as General admission" />
+        <TextField label="Registration notice" value={values.registration_notice ?? ""} onChange={(e) => set("registration_notice", e.target.value)} disabled={busy || readOnly || !values.registration_required} fullWidth multiline minRows={2} />
       </Box>
       {mode !== "create" && eventId ? (
         <>
+          {values.registration_required ? (
+            <SiteEventRegistrations siteId={siteId} eventId={eventId} />
+          ) : null}
           <SiteEventPeople siteId={siteId} eventId={eventId} readOnly={readOnly} />
           <SiteEventSchedule
             siteId={siteId}

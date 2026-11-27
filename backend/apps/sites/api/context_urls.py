@@ -23,6 +23,10 @@ from apps.cms.api.events import (
 )
 from apps.cms.api.event_sessions import PublicSiteEventAgenda
 from apps.cms.api.event_people import PublicSiteEventSpeakers
+from apps.cms.api.event_registrations import (
+    PublicSiteEventRegistrations,
+    PublicSiteEventRegistrationCancel,
+)
 from .context import SiteContextView
 from apps.media.delivery import PublicMediaImage
 from apps.cms.api.widget_runtime import PublicWidgetData, PublicSiteLogo, PublicContact
@@ -47,6 +51,8 @@ urlpatterns = [
     path("events/categories/", PublicSiteEventCategories.as_view(), name="public-event-categories"),
     path("events/<slug:slug>/agenda/", PublicSiteEventAgenda.as_view(), name="public-event-agenda"),
     path("events/<slug:slug>/speakers/", PublicSiteEventSpeakers.as_view(), name="public-event-speakers"),
+    path("events/<slug:slug>/registrations/", PublicSiteEventRegistrations.as_view(), name="public-event-registrations"),
+    path("events/<slug:slug>/registrations/cancel/", PublicSiteEventRegistrationCancel.as_view(), name="public-event-registration-cancel"),
     path("events/<slug:slug>/", PublicSiteEventDetail.as_view(), name="public-event-detail"),
     path("posts/<slug:post_slug>/", PublicPostDetailView.as_view(), name="public-post-detail"),
     path(

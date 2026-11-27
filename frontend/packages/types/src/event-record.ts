@@ -38,7 +38,23 @@ export interface SiteEventRecord {
   registration_required: boolean;
   registration_capacity: number | null;
   registration_open: boolean;
+  registration_opens_at?: string | null;
+  registration_closes_at?: string | null;
+  waitlist_enabled?: boolean;
+  registration_category?: string;
+  registration_required_fields?: string[];
+  registration_notice?: string;
   accepts_registration: boolean;
+  registration_state?: "OFF" | "OPEN" | "FULL" | "CLOSED" | "WAITLIST_AVAILABLE";
+  registration_summary?: {
+    state?: string;
+    capacity?: number | null;
+    seats_remaining?: number | null;
+    waitlist_enabled?: boolean;
+    confirmed?: number;
+    waitlisted?: number;
+    cancelled?: number;
+  };
   cancellation_notice: string;
   published_at: string | null;
   cancelled_at: string | null;
@@ -69,6 +85,13 @@ export type SiteEventInput = Partial<
     | "banner_asset"
     | "registration_required"
     | "registration_capacity"
+    | "registration_open"
+    | "registration_opens_at"
+    | "registration_closes_at"
+    | "waitlist_enabled"
+    | "registration_category"
+    | "registration_required_fields"
+    | "registration_notice"
   >
 >;
 
@@ -91,5 +114,12 @@ export function emptyEventInput(): SiteEventInput {
     banner_asset: null,
     registration_required: false,
     registration_capacity: null,
+    registration_open: true,
+    waitlist_enabled: false,
+    registration_opens_at: null,
+    registration_closes_at: null,
+    registration_category: "",
+    registration_notice: "",
+    registration_required_fields: ["participant_name", "email"],
   };
 }
