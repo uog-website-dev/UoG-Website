@@ -1,0 +1,10 @@
+{
+  "date": "2026-11-27",
+  "route": "/admin/api/reads?site=2&resource=media&type=document&page=1&status=READY",
+  "browser_http_status": 200,
+  "content_type": "application/json",
+  "content_encoding": "gzip",
+  "browser_body_started_with_gzip_magic_bytes": true,
+  "impact": "The browser API client could not parse the media picker JSON despite a successful backend 200 response.",
+  "fix": "Removed manual response compression from the Next.js read proxy; framework/proxy owns response encoding now."
+}

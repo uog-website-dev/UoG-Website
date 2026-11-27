@@ -1,0 +1,110 @@
+{
+  "run": "P4-DOC-009",
+  "date": "2026-11-27T13:15:51.944Z",
+  "browser": "158.0.4370.45",
+  "fixtures": "synthetic fixture files returned by test-only API routes; Main/College site context loaded from the running application",
+  "results": [
+    {
+      "site": "MAIN",
+      "test": "current-Site listing and hover/focus details",
+      "status": "PASS"
+    },
+    {
+      "site": "MAIN",
+      "test": "login-required handling, PDF view, DOCX/XLSX/ZIP downloads",
+      "status": "PASS"
+    },
+    {
+      "site": "MAIN",
+      "test": "search, category filters, and pagination",
+      "status": "PASS"
+    },
+    {
+      "site": "MAIN",
+      "test": "responsive layout and axe WCAG 2.1 A/AA automated subset",
+      "status": "PASS",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "axe": [
+        {
+          "width": 1440,
+          "violations": [],
+          "passes": 27,
+          "incomplete": [
+            "color-contrast"
+          ]
+        },
+        {
+          "width": 768,
+          "violations": [],
+          "passes": 27,
+          "incomplete": [
+            "color-contrast"
+          ]
+        },
+        {
+          "width": 390,
+          "violations": [],
+          "passes": 27,
+          "incomplete": [
+            "color-contrast"
+          ]
+        }
+      ]
+    },
+    {
+      "site": "INFORMATICS",
+      "test": "current-Site listing and hover/focus details",
+      "status": "PASS"
+    },
+    {
+      "site": "INFORMATICS",
+      "test": "login-required handling, PDF view, DOCX/XLSX/ZIP downloads",
+      "status": "PASS"
+    },
+    {
+      "site": "INFORMATICS",
+      "test": "search, category filters, and pagination",
+      "status": "PASS"
+    },
+    {
+      "site": "INFORMATICS",
+      "test": "responsive layout and axe WCAG 2.1 A/AA automated subset",
+      "status": "PASS",
+      "widths": [
+        1440,
+        768,
+        390
+      ],
+      "axe": [
+        {
+          "width": 1440,
+          "violations": [],
+          "passes": 27,
+          "incomplete": [
+            "color-contrast"
+          ]
+        },
+        {
+          "width": 768,
+          "violations": [],
+          "passes": 27,
+          "incomplete": [
+            "color-contrast"
+          ]
+        },
+        {
+          "width": 390,
+          "violations": [],
+          "passes": 27,
+          "incomplete": [
+            "color-contrast"
+          ]
+        }
+      ]
+    }
+  ]
+}

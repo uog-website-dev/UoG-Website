@@ -233,12 +233,12 @@ class AssetDetail(MediaView):
 
 class AssetDownload(MediaView):
     """Authenticated, Site-scoped attachment delivery after processing gates."""
+    serializer_class = AssetSerializer
 
     @extend_schema(
         tags=["Media"],
-        parameters=[OpenApiParameter("inline", str, description="Set to 1 for inline PDF preview.")],
         responses={(200, "application/octet-stream"): {"type": "string", "format": "binary"}},
-        description="Authenticated Site media download. Document-linked assets are rejected; use the document file endpoint.",
+        description="Stream an authorized Site media attachment. Document asset references cannot bypass the document publication and access policy.",
     )
     def get(self, request, site_pk, asset_id):
         asset = asset_for_site(request.user, site_pk, asset_id)

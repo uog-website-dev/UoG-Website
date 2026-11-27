@@ -1,0 +1,98 @@
+{
+  "run": "P4-DOC-009",
+  "synthetic": true,
+  "sites": {
+    "main-university": {
+      "documents": [
+        {
+          "filename": "policy.pdf",
+          "title": "Main University Public Policy",
+          "category": "Policies",
+          "require_login_to_download": false,
+          "bytes": 695,
+          "sha256": "b66c5870502522a672c9f3f86d681103dc3b1da87ba1d09e3a79275417884110"
+        },
+        {
+          "filename": "admissions-login.pdf",
+          "title": "Main University Admissions Guide",
+          "category": "Student resources",
+          "require_login_to_download": true,
+          "bytes": 686,
+          "sha256": "778d3c6828d82bb4bff6fb023e975d45229c91ad13d0e267fcb70e5649a8227c"
+        },
+        {
+          "filename": "student-handbook.docx",
+          "title": "Main University Student Handbook",
+          "category": "Student resources",
+          "require_login_to_download": false,
+          "bytes": 817,
+          "sha256": "f9914c3c2cbac5764e2fab09927834245978b1d2011bb0f384c9397f7626a5ab"
+        },
+        {
+          "filename": "budget-template.xlsx",
+          "title": "Main University Budget Template",
+          "category": "Forms",
+          "require_login_to_download": false,
+          "bytes": 1388,
+          "sha256": "e8e0a907f6c5851a0913916eef21bf284d83563b17809ddda9949054c8647065"
+        },
+        {
+          "filename": "records-package.zip",
+          "title": "Main University Records Package",
+          "category": "Forms",
+          "require_login_to_download": false,
+          "bytes": 342,
+          "sha256": "877d6fbb8303f9f533541cf62125e54962a5bfc393d44327369f35470969cd75"
+        }
+      ]
+    },
+    "informatics-college": {
+      "documents": [
+        {
+          "filename": "college-regulations.pdf",
+          "title": "College of Informatics Regulations",
+          "category": "Policies",
+          "require_login_to_download": false,
+          "bytes": 704,
+          "sha256": "96816d75e0a66befa42ece68f41a7ce0058b50e1f277f42b9509f0c90ac3c528"
+        },
+        {
+          "filename": "registrar-login.pdf",
+          "title": "College Registrar Procedure",
+          "category": "Staff resources",
+          "require_login_to_download": true,
+          "bytes": 691,
+          "sha256": "b659a147d9f9b01a9b8b55cf85cb9fc05d70213b724083a9d4f7a57c23d63142"
+        },
+        {
+          "filename": "faculty-handbook.docx",
+          "title": "College Faculty Handbook",
+          "category": "Staff resources",
+          "require_login_to_download": false,
+          "bytes": 811,
+          "sha256": "4777dcfba8c93cbe1da7bbec6a07d591f999fc8b41cdb95dcb74ffe5546c1001"
+        },
+        {
+          "filename": "course-schedule.xlsx",
+          "title": "College Course Schedule",
+          "category": "Forms",
+          "require_login_to_download": false,
+          "bytes": 1380,
+          "sha256": "ce990a7393d7c8e3a914a911ec44063c2c74770b4482000891b4780d0a723bd5"
+        },
+        {
+          "filename": "registrar-forms.zip",
+          "title": "College Registrar Forms",
+          "category": "Forms",
+          "require_login_to_download": false,
+          "bytes": 334,
+          "sha256": "9463cd69057cfe4b790b3cceae45090f6ece61232edc217eb93ff661fa60ece5"
+        }
+      ]
+    }
+  },
+  "invalid_fixtures": [
+    "invalid/mismatched-pdf.pdf",
+    "invalid/active-content.zip"
+  ]
+}

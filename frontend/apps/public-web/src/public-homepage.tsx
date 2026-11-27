@@ -12,7 +12,7 @@ import {
   usePublicSiteBranding,
 } from "@uog/ui";
 import type { PublicPageDocument } from "@uog/ui";
-import type { PublicPageSeed } from "@/public-page";
+import type { PublicPageSeed } from "./public-page";
 
 export function PublicHomepage({
   initialPayload,

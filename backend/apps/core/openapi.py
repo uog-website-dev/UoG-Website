@@ -189,7 +189,10 @@ def add_common_contract(result, generator, request, public):
                         detail = {"status": ['"INVALID" is not a valid choice.']}
                     if code == "400" and path == "/api/v1/authorization/assignments/users/{user_id}/effective/":
                         detail = {"scope": ["This scope is not valid."]}
-                    responses[code]["content"]["application/json"]["example"] = {
+                    responses[code].setdefault("content", {}).setdefault(
+                        "application/json",
+                        {"schema": {"$ref": "#/components/schemas/APIError"}},
+                    )["example"] = {
                         "error": {"code": names[code], "message": messages[code], "details": detail},
                         "request_id": "1ea47c51-f2d7-402b-ad9a-4df619d03055",
                     }
