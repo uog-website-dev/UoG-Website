@@ -30,6 +30,7 @@ import { useSiteAdmin } from "@/sites/site-admin-frame";
 import { SiteEventsNav } from "@/sites/site-events-nav";
 import { SiteEventPeople } from "@/sites/site-event-people";
 import { SiteEventRegistrations } from "@/sites/site-event-registrations";
+import { SiteEventResources } from "@/sites/site-event-resources";
 import { SiteEventSchedule } from "@/sites/site-event-schedule";
 
 function unwrap<T>(result: { ok: true; data: T } | { ok: false; error: unknown }): T {
@@ -248,9 +249,10 @@ export function SiteEventEditorPage({
             onEventEtagChange={setEtag}
             readOnly={readOnly}
           />
+          <SiteEventResources siteId={siteId} eventId={eventId} readOnly={readOnly} />
         </>
       ) : (
-        <Alert severity="info">Save the Event draft first to manage speakers and the multi-day session schedule.</Alert>
+        <Alert severity="info">Save the Event draft first to manage speakers, schedule, and resources.</Alert>
       )}
       {!readOnly ? (
         <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>

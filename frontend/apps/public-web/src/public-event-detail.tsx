@@ -10,13 +10,29 @@ import Link from "@mui/material/Link";
 import Skeleton from "@mui/material/Skeleton";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
+import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { publicFetchInit, usePublicSiteBranding } from "@uog/ui";
 import type { EventLifecycle, PublicEventSections, SiteEventRecord } from "@uog/types";
 import { usePublicBreadcrumbTitle } from "@/public-menus";
 import { PublicEventRegistrationForm } from "@/public-event-registration";
 
-type DetailTab = "overview" | "schedule" | "speakers";
+type DetailTab = "overview" | "schedule" | "speakers" | "resources";
+
+interface PublicResource {
+  id: string;
+  title: string;
+  description?: string;
+  category: string;
+  session_title?: string | null;
+  requires_registration: boolean;
+  file_type: string | null;
+  original_filename: string | null;
+  file_size: number | null;
+  file_ready: boolean;
+  download_path: string | null;
+  visibility: string;
+}
 
 interface AgendaSessionPerson {
   role?: string;
@@ -64,7 +80,24 @@ const TAB_LABELS: Record<DetailTab, string> = {
   overview: "Overview",
   schedule: "Schedule & Sessions",
   speakers: "Speakers",
+  resources: "Resources & Downloads",
 };
+
+function formatFileSize(bytes: number | null) {
+  if (bytes == null) return "";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function fileTypeLabel(mime: string | null) {
+  if (!mime) return "File";
+  if (mime.includes("pdf")) return "PDF";
+  if (mime.includes("wordprocessingml")) return "Word";
+  if (mime.includes("spreadsheetml")) return "Excel";
+  if (mime.includes("zip")) return "ZIP";
+  return "File";
+}
 
 function formatWhen(event: SiteEventRecord) {
   if (!event.starts_at) return "Schedule to be announced";
@@ -144,6 +177,7 @@ function visibleTabs(sections: PublicEventSections | undefined): DetailTab[] {
   const tabs: DetailTab[] = ["overview"];
   if (sections?.schedule) tabs.push("schedule");
   if (sections?.speakers) tabs.push("speakers");
+  if (sections?.resources) tabs.push("resources");
   return tabs;
 }
 
@@ -179,7 +213,9 @@ export function PublicEventDetailPage({
   const [message, setMessage] = useState("");
   const [agenda, setAgenda] = useState<AgendaDay[] | null>(null);
   const [speakers, setSpeakers] = useState<PublicSpeaker[] | null>(null);
+  const [resources, setResources] = useState<PublicResource[] | null>(null);
   const [sectionError, setSectionError] = useState("");
+  const [entitlement, setEntitlement] = useState({ email: "", token: "", resourceId: "", message: "" });
   const focusRef = useRef<HTMLElement | null>(null);
   usePublicBreadcrumbTitle(event?.title ?? null);
 
@@ -289,6 +325,40 @@ export function PublicEventDetailPage({
       controller.abort();
     };
   }, [event, activeTab, speakers, slug]);
+
+  useEffect(() => {
+    if (!event || activeTab !== "resources") return;
+    if (resources) return;
+    const controller = new AbortController();
+    let cancelled = false;
+    async function loadResources() {
+      try {
+        const response = await fetch(`/api/v1/site-context/events/${encodeURIComponent(slug)}/resources/`, {
+          ...publicFetchInit(),
+          signal: controller.signal,
+        });
+        if (!response.ok) throw new Error("Resources are temporarily unavailable.");
+        const body = await response.json();
+        if (!Array.isArray(body)) throw new Error("Resources could not be loaded safely.");
+        if (JSON.stringify(body).includes("organizer_email") || JSON.stringify(body).includes("private_email")) {
+          throw new Error("Resources could not be loaded safely.");
+        }
+        if (!cancelled) {
+          setResources(body as PublicResource[]);
+          setSectionError("");
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setSectionError(error instanceof Error ? error.message : "Resources are temporarily unavailable.");
+        }
+      }
+    }
+    void loadResources();
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
+  }, [event, activeTab, resources, slug]);
 
   useEffect(() => {
     if (activeTab !== "schedule" || !sessionFocus || !agenda) return;
@@ -560,6 +630,134 @@ export function PublicEventDetailPage({
                   </Box>
                 </Box>
               ))}
+            </Box>
+          )
+        ) : null}
+
+        {activeTab === "resources" ? (
+          sectionError ? (
+            <Alert severity="error">{sectionError}</Alert>
+          ) : !resources ? (
+            <Typography role="status">Loading resources…</Typography>
+          ) : resources.length === 0 ? (
+            <Typography role="status">No downloadable resources are published yet.</Typography>
+          ) : (
+            <Box component="ul" sx={{ m: 0, p: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 1.5 }}>
+              {resources.map((resource) => {
+                const isPdf = (resource.file_type || "").includes("pdf");
+                const publicPath = resource.download_path
+                  ? `${resource.download_path}${isPdf ? "?inline=1" : ""}`
+                  : null;
+                return (
+                  <Box
+                    component="li"
+                    key={resource.id}
+                    sx={{ borderBottom: "1px solid", borderColor: "divider", pb: 1.5, display: "flex", flexDirection: "column", gap: 1 }}
+                  >
+                    <Typography sx={{ fontWeight: 700 }}>{resource.title}</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {fileTypeLabel(resource.file_type)}
+                      {resource.file_size != null ? ` · ${formatFileSize(resource.file_size)}` : ""}
+                      {resource.session_title ? ` · ${resource.session_title}` : ""}
+                      {resource.requires_registration ? " · Registered participants only" : ""}
+                    </Typography>
+                    {resource.description ? (
+                      <Typography variant="body2">{resource.description}</Typography>
+                    ) : null}
+                    {!resource.requires_registration && publicPath ? (
+                      <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                        {isPdf ? (
+                          <Button size="small" variant="contained" href={publicPath} target="_blank" rel="noopener noreferrer">
+                            Open PDF
+                          </Button>
+                        ) : null}
+                        <Button
+                          size="small"
+                          variant={isPdf ? "outlined" : "contained"}
+                          href={resource.download_path || "#"}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Download
+                        </Button>
+                      </Box>
+                    ) : null}
+                    {resource.requires_registration ? (
+                      <Box sx={{ display: "grid", gap: 1, maxWidth: 480 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          Use the email and management token from your registration receipt. Access is rechecked on every download; grants expire in 5 minutes.
+                        </Typography>
+                        <TextField
+                          size="small"
+                          label="Registration email"
+                          value={entitlement.resourceId === resource.id ? entitlement.email : ""}
+                          onChange={(event) => setEntitlement({
+                            email: event.target.value,
+                            token: entitlement.resourceId === resource.id ? entitlement.token : "",
+                            resourceId: resource.id,
+                            message: "",
+                          })}
+                        />
+                        <TextField
+                          size="small"
+                          label="Management token"
+                          value={entitlement.resourceId === resource.id ? entitlement.token : ""}
+                          onChange={(event) => setEntitlement({
+                            email: entitlement.resourceId === resource.id ? entitlement.email : "",
+                            token: event.target.value,
+                            resourceId: resource.id,
+                            message: "",
+                          })}
+                        />
+                        {entitlement.resourceId === resource.id && entitlement.message ? (
+                          <Alert severity="error">{entitlement.message}</Alert>
+                        ) : null}
+                        <Button
+                          size="small"
+                          variant="contained"
+                          onClick={async () => {
+                            try {
+                              const response = await fetch(
+                                `/api/v1/site-context/events/${encodeURIComponent(slug)}/resources/${resource.id}/entitlement/`,
+                                {
+                                  ...publicFetchInit(),
+                                  method: "POST",
+                                  headers: { "Content-Type": "application/json", ...(publicFetchInit().headers || {}) },
+                                  body: JSON.stringify({
+                                    email: entitlement.email,
+                                    token: entitlement.token,
+                                  }),
+                                },
+                              );
+                              if (!response.ok) {
+                                setEntitlement((prev) => ({
+                                  ...prev,
+                                  resourceId: resource.id,
+                                  message: "Registration could not be verified for this download.",
+                                }));
+                                return;
+                              }
+                              const grant = await response.json();
+                              const path = isPdf
+                                ? `${grant.download_path}${grant.download_path.includes("?") ? "&" : "?"}inline=1`
+                                : grant.download_path;
+                              window.open(path, "_blank", "noopener,noreferrer");
+                            } catch {
+                              setEntitlement((prev) => ({
+                                ...prev,
+                                resourceId: resource.id,
+                                message: "Download is temporarily unavailable.",
+                              }));
+                            }
+                          }}
+                        >
+                          {isPdf ? "Verify and open" : "Verify and download"}
+                        </Button>
+                      </Box>
+                    ) : null}
+                  </Box>
+                );
+              })}
             </Box>
           )
         ) : null}
