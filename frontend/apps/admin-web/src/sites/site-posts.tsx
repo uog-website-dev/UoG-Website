@@ -15,12 +15,15 @@ import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { ApiError } from "@uog/api-client";
 import {
-  DataTable, FilterBar, Pagination, SelectFilter, TextFilter, useToast,
+  ConfirmDialog, DataTable, FilterBar, Pagination, SelectFilter, TextFilter, useToast,
 } from "@uog/ui";
 import type { SortState, TableColumn } from "@uog/ui";
 import Link from "next/link";
+import { runBulkLifecycle, summarizeBulkLifecycle } from "@/admin/bulk-lifecycle";
 
 import {
+  deleteSitePost,
+  getSitePost,
   loadSitePostWorkflowHistory,
   transitionSitePost,
 } from "@/app/sites/post-actions";
@@ -138,6 +141,10 @@ function SitePostsPanelContent({
   const [history, setHistory] = useState<WorkflowTransition[]>([]);
   const [historyError, setHistoryError] = useState("");
   const [historyLoading, setHistoryLoading] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string | number>>(new Set());
+  const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false);
+  const [bulkBusy, setBulkBusy] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<SitePostRecord | null>(null);
 
   const ordering = orderingForSort(sort);
   const posts = useSiteQuery<SitePostListResponse>(siteId, "posts", {search: appliedFilters.search, status: appliedFilters.status, author: appliedFilters.author, page, page_size: PAGE_SIZE, ordering, category: appliedFilters.category, tag: appliedFilters.tag},
@@ -169,7 +176,80 @@ function SitePostsPanelContent({
   const categoryNames = useMemo(() => new Map(categories.map((row) => [row.id, row.name])), [categories]);
   const tagNames = useMemo(() => new Map(tags.map((row) => [row.id, row.name])), [tags]);
   const rows = (posts.data?.results ?? []).filter((row) => row.site === siteId);
-  const enabled = postsEnabled === true && busyPostId === null;
+  const enabled = postsEnabled === true && busyPostId === null && !bulkBusy;
+  const selectedPosts = rows.filter((row) => selectedIds.has(row.id) && canDeletePost(row));
+  const canBulkDelete = selectedPosts.length > 0 && canEdit;
+
+  function canDeletePost(row: SitePostRecord) {
+    if (!canEdit) return false;
+    if ((row.available_actions ?? []).includes("archive")) return true;
+    return ["DRAFT", "IN_REVIEW", "UNPUBLISHED", "ARCHIVED"].includes(row.status);
+  }
+
+  async function deletePost(row: SitePostRecord) {
+    const current = unwrap(await getSitePost(siteId, row.id));
+    if ((current.available_actions ?? []).includes("archive")) {
+      unwrap(await transitionSitePost(siteId, current.id, "archive", "", current.etag ?? ""));
+      return;
+    }
+    if (!["DRAFT", "IN_REVIEW", "UNPUBLISHED", "ARCHIVED"].includes(current.status)) {
+      throw new Error("This Post cannot be deleted from its current status.");
+    }
+    unwrap(await deleteSitePost(siteId, current.id));
+  }
+
+  async function confirmSingleDelete() {
+    if (!deleteTarget) return;
+    setBulkBusy(true);
+    try {
+      await deletePost(deleteTarget);
+      toast.success(`Deleted ${deleteTarget.title}.`);
+      setDeleteTarget(null);
+      setSelectedIds((current) => {
+        const next = new Set(current);
+        next.delete(deleteTarget.id);
+        return next;
+      });
+      posts.reload();
+    } catch (cause) {
+      toast.error(cause instanceof Error ? cause.message : "The Post could not be deleted.");
+    } finally {
+      setBulkBusy(false);
+    }
+  }
+
+  async function confirmBulkDelete() {
+    if (!canBulkDelete) return;
+    setBulkBusy(true);
+    try {
+      const summary = await runBulkLifecycle(selectedPosts, {
+        labelOf: (row) => row.title,
+        apply: async (row) => {
+          try {
+            await deletePost(row);
+            return { ok: true, data: null };
+          } catch (cause) {
+            return {
+              ok: false,
+              error: {
+                status: cause instanceof ApiError ? cause.status : 500,
+                code: "delete_failed",
+                message: cause instanceof Error ? cause.message : "Delete failed.",
+                details: null,
+                requestId: null,
+              },
+            };
+          }
+        },
+      });
+      toast.success(summarizeBulkLifecycle(summary, "post"));
+      setSelectedIds(new Set());
+      setBulkConfirmOpen(false);
+      posts.reload();
+    } finally {
+      setBulkBusy(false);
+    }
+  }
   const activeFilterCount = Number(Boolean(appliedFilters.search))
     + Number(Boolean(appliedFilters.status))
     + Number(Boolean(appliedFilters.author))
@@ -303,32 +383,52 @@ function SitePostsPanelContent({
             <SelectFilter label="Tag" value={draftFilters.tag} options={tags.map((row) => ({ value: row.id, label: row.name }))} onChange={(tag) => setDraftFilters((current) => ({ ...current, tag }))} />
           </FilterBar>
 
+          {canBulkDelete ? (
+            <Box sx={{ display: "flex", gap: 1, alignItems: "center", flexWrap: "wrap", p: 1.5, bgcolor: "action.hover", borderRadius: 1 }}>
+              <Typography variant="body2" sx={{ flex: 1 }}>
+                {selectedPosts.length} post{selectedPosts.length === 1 ? "" : "s"} selected
+              </Typography>
+              <Button size="small" color="error" variant="contained" disabled={bulkBusy} onClick={() => setBulkConfirmOpen(true)}>
+                Delete selected
+              </Button>
+              <Button size="small" disabled={bulkBusy} onClick={() => setSelectedIds(new Set())}>Clear selection</Button>
+            </Box>
+          ) : null}
           <Box data-testid="posts-table-scroll" sx={{ overflowX: "auto", width: "100%" }}>
             <DataTable
               caption="Posts for this Site"
               columns={columns}
               rows={rows}
               getRowKey={(row) => row.id}
+              selection={canEdit ? {
+                selected: selectedIds,
+                onChange: setSelectedIds,
+                isRowSelectable: (row) => canDeletePost(row),
+                getCheckboxLabel: (row) => `Select ${row.title}`,
+              } : undefined}
               renderActions={(row) => postsEnabled !== true || !canView ? null : (
                 <Box role="group" aria-label={`Actions for ${row.title}`} sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                   <Button size="small" aria-label={`Workflow history for ${row.title}`} onClick={() => void openHistory(row)}>History</Button>
-                  {canEdit && ["DRAFT", "UNPUBLISHED", "PUBLISHED"].includes(row.status) ? (
+                  {canEdit && ["DRAFT", "UNPUBLISHED", "PUBLISHED"].includes(row.status) && !row.draft_of ? (
                     <Button
                       component={Link}
                       href={`/sites/${siteId}/admin/posts/${row.id}/edit`}
                       size="small"
-                      aria-label={`${row.status === "PUBLISHED" ? "Edit draft of" : "Edit"} ${row.title}`}
+                      aria-label={`Edit ${row.title}`}
                       disabled={!enabled}
                     >
-                      {row.status === "PUBLISHED" ? "Edit draft" : "Edit"}
+                      Edit
                     </Button>
                   ) : null}
                   {!canEdit && row.available_actions?.length ? <Button component={Link} href={`/sites/${siteId}/admin/posts/${row.id}/edit`} size="small" aria-label={`Review ${row.title}`} disabled={!enabled}>Review</Button> : null}
                   {row.status === "PUBLISHED" && siteAdmin?.site.id === siteId ? (() => { const href = sitePublicContentUrl(siteAdmin.site, `/posts/${row.publication_slug || row.slug}`); return href ? <Button component="a" href={href} target="_blank" rel="noopener noreferrer" size="small" aria-label={`View public ${row.title}`}>View Public</Button> : null; })() : null}
+                  {canDeletePost(row) ? (
+                    <Button size="small" color="error" aria-label={`Delete ${row.title}`} disabled={!enabled} onClick={() => setDeleteTarget(row)}>Delete</Button>
+                  ) : null}
                   {postsEnabled === true ? (
                     <ContentWorkflowButtons
                       title={row.title}
-                      available={row.available_actions ?? []}
+                      available={(row.available_actions ?? []).filter((action) => action !== "archive")}
                       disabled={!enabled}
                       onAction={(action) => queueWorkflow(row, action)}
                     />
@@ -368,6 +468,32 @@ function SitePostsPanelContent({
         statusLabel={(status) => STATUS_LABELS[status as SitePostStatus] ?? status}
         onClose={() => setHistoryPost(null)}
       />
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title="Delete post?"
+        description="Published Posts are archived so they leave public service. Drafts and archived Posts are permanently removed."
+        confirmLabel="Delete post"
+        confirmColor="error"
+        pending={bulkBusy}
+        onConfirm={() => void confirmSingleDelete()}
+        onCancel={() => { if (!bulkBusy) setDeleteTarget(null); }}
+      >
+        {deleteTarget ? <Typography variant="body2">{deleteTarget.title}</Typography> : null}
+      </ConfirmDialog>
+      <ConfirmDialog
+        open={bulkConfirmOpen}
+        title="Delete selected posts?"
+        description="Published Posts are archived. Drafts and archived Posts are permanently removed."
+        confirmLabel="Delete selected"
+        confirmColor="error"
+        pending={bulkBusy}
+        onConfirm={() => void confirmBulkDelete()}
+        onCancel={() => { if (!bulkBusy) setBulkConfirmOpen(false); }}
+      >
+        <Box component="ul" sx={{ m: 0, pl: 2 }}>
+          {selectedPosts.map((row) => <li key={row.id}>{row.title}</li>)}
+        </Box>
+      </ConfirmDialog>
     </Paper>
   );
 }

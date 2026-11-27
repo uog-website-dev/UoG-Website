@@ -42,7 +42,7 @@ export function decorativeStyle(style:LayoutStyle={}) {
   const background=(theme:Theme)=>customColour(style.background) ?? ({none:'transparent',paper:theme.palette.background.paper,mist:theme.palette.action.hover,navy:theme.palette.primary.dark,blue:theme.palette.primary.main,gold:theme.palette.secondary.main,blue_gradient:`linear-gradient(120deg,${theme.palette.primary.main},${theme.palette.primary.light})`,navy_gradient:`linear-gradient(120deg,${theme.palette.primary.dark},${theme.palette.primary.main})`})[style.background??'none'];
   const height={natural:"auto",compact:200,medium:360,tall:520}[style.image_height??"natural"];
   return {
-    ...(style.content_width?{width:"100%",maxWidth:{full:"100%",wide:1280,reading:880}[style.content_width],mx:"auto"}:{}),
+    ...(style.content_width?{width:"100%",maxWidth:{full:"100%",wide:1120,reading:880}[style.content_width],mx:"auto"}:{}),
     p:{none:0,sm:1.5,md:3,lg:5,xl:8}[style.padding??"none"],
     color:(theme:Theme)=>customColour(style.text_color) ?? ({default:"inherit",brand:theme.palette.primary.main,inverse:theme.palette.primary.contrastText,muted:theme.palette.text.secondary})[style.text_color??"default"],
     ...(style.background ? {background} : {}),

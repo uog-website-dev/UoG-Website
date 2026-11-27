@@ -404,6 +404,13 @@ export async function transitionSitePage(
   }));
 }
 
+export async function deleteSitePage(siteId: number, pageId: string): Promise<ActionResult<null>> {
+  return invalidated(siteId, "pages", attempt(async () => {
+    await (await client()).delete(sitePagePath(siteId, `${pageId}/`));
+    return null;
+  }));
+}
+
 export interface SitePagePreview {
   revision_id:number;revision_number:number;content_hash:string;status:SitePageStatus;
   approval_id:number|null;reviewed_revision_id:number|null;approved_revision_id:number|null;

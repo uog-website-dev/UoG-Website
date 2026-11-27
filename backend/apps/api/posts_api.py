@@ -279,7 +279,9 @@ class SiteContentAdminViewSet(
                     instance, data=request.data, partial=True,
                 )
                 serializer.is_valid(raise_exception=True)
-                instance = serializer.save(updated_by=request.user)
+                from apps.cms.services.published_edits import published_content_write
+                with published_content_write(instance):
+                    instance = serializer.save(updated_by=request.user)
         except DomainValidationError as error:
             raise serializers.ValidationError(_domain_detail(error)) from error
         except IntegrityError as error:
@@ -301,13 +303,16 @@ class SiteContentAdminViewSet(
         return self._response(instance)
 
     def destroy(self, request, *args, **kwargs):
+        from apps.cms.services.content_delete import hard_delete_content
         site = self._site()
         self._authorize(site, (ContentRole.AUTHOR,))
         self._module(site)
         instance = get_object_or_404(self.get_queryset(), pk=self.kwargs["pk"])
         try:
             with transaction.atomic():
-                instance.delete()
+                hard_delete_content(instance)
+        except DomainValidationError as error:
+            raise serializers.ValidationError(_domain_detail(error)) from error
         except ProtectedError as error:
             raise ContentInUse(self.protected_detail) from error
         except IntegrityError as error:

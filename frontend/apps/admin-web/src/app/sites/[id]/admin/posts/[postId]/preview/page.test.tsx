@@ -57,7 +57,7 @@ it("opens the private Post preview across the full Site surface with header and 
   expect(screen.getByText("Informatics")).toBeTruthy();
   expect(screen.getByRole("img", { name: "Campus lawn" })).toBeTruthy();
   expect(screen.getByLabelText("Full post preview")).toBeTruthy();
-  expect(screen.getByLabelText("Article banner")).toBeTruthy();
+  expect(screen.getByLabelText("Content banner")).toBeTruthy();
   expect(screen.getByRole("link", { name: "Back to Posts" }).getAttribute("href")).toContain("/posts");
   expect(screen.getByRole("link", { name: "Open editor" }).getAttribute("href")).toContain("/edit");
   expect(screen.queryByRole("dialog")).toBeNull();

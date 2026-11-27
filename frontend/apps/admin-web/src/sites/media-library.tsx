@@ -30,15 +30,21 @@ const previewKey = (asset: MediaAssetRecord) => `${asset.id}:${asset.thumbnail_s
 
 /** Shared library and ready-only picker. Selection always passes an asset ID. */
 interface MediaLibraryProps {
-  siteId: number; canUpload: boolean; canDelete?: boolean; onSelect?: (asset: MediaAssetRecord) => void; imagesOnly?: boolean;
+  siteId: number;
+  canUpload: boolean;
+  canDelete?: boolean;
+  onSelect?: (asset: MediaAssetRecord) => void;
+  onSelectMany?: (assets: MediaAssetRecord[]) => void;
+  multiSelect?: boolean;
+  imagesOnly?: boolean;
 }
 
 /** Site changes reset editable state; library controls restore only in their scoped cache. */
 export function MediaLibrary(props: MediaLibraryProps) {
-  return <SiteMediaLibrary key={`${props.siteId}:${Boolean(props.onSelect)}:${Boolean(props.imagesOnly)}`} {...props} />;
+  return <SiteMediaLibrary key={`${props.siteId}:${Boolean(props.onSelect)}:${Boolean(props.multiSelect)}:${Boolean(props.imagesOnly)}`} {...props} />;
 }
 
-function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, imagesOnly = false }: MediaLibraryProps) {
+function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, onSelectMany, multiSelect = false, imagesOnly = false }: MediaLibraryProps) {
   const [layout, setLayout] = useSectionState<"grid" | "list">(siteId, imagesOnly ? "media-images" : "media", "layout", "grid", !onSelect);
   const [page, setPage] = useSectionState(siteId, imagesOnly ? "media-images" : "media", "page", 1, !onSelect);
   const [failedPreviews, setFailedPreviews] = useState<Set<string>>(new Set());
@@ -72,14 +78,15 @@ function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, imag
   const uploadInput = useRef<HTMLInputElement | null>(null);
   const [uploadBusy, setUploadBusy] = useState(false);
   const [uploadReady,setUploadReady] = useState(false);
-  const rows = useSiteQuery(siteId, "media", {filters, page, picker: Boolean(onSelect), imagesOnly}, async (signal) => unwrap(await listSiteMedia(siteId, {
+  const rows = useSiteQuery(siteId, "media", {filters, page, picker: Boolean(onSelect || onSelectMany), imagesOnly}, async (signal) => unwrap(await listSiteMedia(siteId, {
     ...filters, page,
-    ...(onSelect ? imagesOnly ? { ready_images: true } : { status: "READY" as const } : imagesOnly ? { type: "image" as const } : {}),
+    ...(onSelect || onSelectMany ? imagesOnly ? { ready_images: true } : { status: "READY" as const } : imagesOnly ? { type: "image" as const } : {}),
   }, signal)));
   usePageBoundary(page, setPage, rows.data, rows.error);
   const policy = useSiteQuery(siteId, "media-policy", {}, async () => unwrap(await getMediaUploadPolicy(siteId)), {enabled: canUpload});
   const [pollError, setPollError] = useState(false);
-  const [watchUntil, setWatchUntil] = useState(() => onSelect ? Date.now() + 120000 : 0);
+  const [selectedAssets, setSelectedAssets] = useState<MediaAssetRecord[]>([]);
+  const [watchUntil, setWatchUntil] = useState(() => onSelect || onSelectMany ? Date.now() + 120000 : 0);
   const scope = useRef(0);
   // Invalidate pending background results synchronously when the query changes.
   const queryIdentity = `${siteId}:${page}:${JSON.stringify(filters)}:${Boolean(onSelect)}:${imagesOnly}`;
@@ -151,11 +158,12 @@ function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, imag
   };
   const activeReferences = inventory.data?.asset_id === detailId ? inventory.data.references : [];
   const inUse = activeReferences.length > 0;
-  const visible = (rows.data?.results ?? []).filter((asset) => asset.site === siteId && (!onSelect || (asset.status === "READY" && asset.processing_state === "READY" && !["PROCESSING", "FAILED", "UNAVAILABLE"].includes(asset.thumbnail_status))) && (!imagesOnly || asset.detected_mime.startsWith("image/")));
+  const picking = Boolean(onSelect || onSelectMany);
+  const visible = (rows.data?.results ?? []).filter((asset) => asset.site === siteId && (!picking || (asset.status === "READY" && asset.processing_state === "READY" && !["PROCESSING", "FAILED", "UNAVAILABLE"].includes(asset.thumbnail_status))) && (!imagesOnly || asset.detected_mime.startsWith("image/")));
   const metadataChanged = currentDetail && (altText !== currentDetail.alt_text || mediaName !== (currentDetail.display_name || currentDetail.original_filename) || JSON.stringify(mediaCategories(categoryText)) !== JSON.stringify(currentDetail.categories ?? []));
   return <Box data-perf-section="media" data-perf-pending={rows.loading || policy.loading ? "true" : "false"} component="section" aria-label="Site media library" sx={{ display: "grid", gap: 2.5, minWidth: 0, bgcolor: "grey.50", p: { xs: 1.5, sm: 2.5 }, borderRadius: 2 }}>
     <Box sx={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:2,flexWrap:"wrap"}}>
-      <Box><Typography variant="h5" component="h2" fontWeight={600}>{onSelect ? "Choose media" : "Media Library"}</Typography><Typography variant="body2" color="text.secondary" sx={{mt:0.5}}>Your Site's images and documents, in one place.</Typography></Box>
+      <Box><Typography variant="h5" component="h2" fontWeight={600}>{picking ? "Choose media" : "Media Library"}</Typography><Typography variant="body2" color="text.secondary" sx={{mt:0.5}}>Your Site's images and documents, in one place.</Typography></Box>
       {canUpload && policy.data ? <Button variant="contained" disabled={uploadBusy || !uploadReady} startIcon={<CloudUploadOutlinedIcon />} onClick={() => uploadInput.current?.click()}>Upload files</Button> : null}
     </Box>
     {canUpload ? <Box sx={{minHeight:190}}>{policy.data ? <MediaUploadPanel siteId={siteId} policy={policy.data} inputRef={uploadInput} onReady={setUploadReady} onBusyChange={setUploadBusy} onAccepted={() => { setWatchUntil(Date.now()+120000); setPage(1); rows.reload(); }} /> : policy.error ? <Alert severity="error" sx={{minHeight:190}} action={<Button onClick={policy.reload}>Retry upload policy</Button>}>Upload policy unavailable.</Alert> : <Skeleton role="status" aria-label="Loading upload policy" variant="rounded" height={190}/>}</Box> : null}
@@ -203,13 +211,39 @@ function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, imag
           <Typography variant="caption" color="text.secondary" sx={{whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>Alt text: {asset.alt_text || "Not set"}</Typography>
           <Box sx={{display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:1,mt:"auto"}}>
             <Button size="small" aria-label={`Edit details for ${asset.original_filename}`} onClick={() => { altTextDirty.current=false; setDetailId(asset.id); setMetadataError(null); setMetadataNotice(null); }}>Edit details</Button>
-            {onSelect ? <Button variant="contained" size="small" disabled={rows.refreshing || Boolean(rows.error) || failedPreviews.has(previewKey(asset))} onClick={() => onSelect(asset)}>Select {asset.original_filename}</Button> : null}
+            {multiSelect && onSelectMany ? (
+              <Button
+                variant={selectedAssets.some((row) => row.id === asset.id) ? "contained" : "outlined"}
+                size="small"
+                disabled={rows.refreshing || Boolean(rows.error) || failedPreviews.has(previewKey(asset))}
+                onClick={() => setSelectedAssets((current) => current.some((row) => row.id === asset.id)
+                  ? current.filter((row) => row.id !== asset.id)
+                  : [...current, asset])}
+                aria-pressed={selectedAssets.some((row) => row.id === asset.id)}
+              >
+                {selectedAssets.some((row) => row.id === asset.id) ? `Selected ${asset.original_filename}` : `Select ${asset.original_filename}`}
+              </Button>
+            ) : onSelect ? (
+              <Button variant="contained" size="small" disabled={rows.refreshing || Boolean(rows.error) || failedPreviews.has(previewKey(asset))} onClick={() => onSelect(asset)}>Select {asset.original_filename}</Button>
+            ) : null}
           </Box>
         </Box>
       </Paper>)}
     </Box>
+    {multiSelect && onSelectMany ? (
+      <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
+        <Button disabled={selectedAssets.length === 0} onClick={() => setSelectedAssets([])}>Clear selection</Button>
+        <Button
+          variant="contained"
+          disabled={selectedAssets.length === 0}
+          onClick={() => onSelectMany(selectedAssets)}
+        >
+          Insert selected ({selectedAssets.length})
+        </Button>
+      </Box>
+    ) : null}
     {rows.status === "success" && visible.length === 0 ? <Paper variant="outlined" sx={{ p: 3, textAlign: "center" }}>
-      <Typography>No {onSelect ? "ready " : ""}media found.</Typography>
+      <Typography>No {picking ? "ready " : ""}media found.</Typography>
       <Typography color="text.secondary">{Object.keys(filters).length ? "Try another filename or clear the filters." : canUpload ? "Upload a file to start this Site's library. Images appear in pickers when processing finishes." : "This Site has no matching media. Ask a Site Editor to upload a file or refresh the library."}</Typography>
       {Object.keys(filters).length ? <Button onClick={() => { setFilters({}); setSearch(""); setStatus(""); setType(""); setPage(1); }}>Show all media</Button> : <Button onClick={() => rows.reload()}>Check for media</Button>}
     </Paper> : null}

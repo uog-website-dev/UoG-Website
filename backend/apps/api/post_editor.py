@@ -7,12 +7,28 @@ from html.parser import HTMLParser
 import nh3
 from django.core.exceptions import ValidationError
 
-from apps.cms.blocks import _filter_rich_text_attribute
+from apps.cms.blocks import _filter_rich_text_attribute, sanitize_inline_style
 
-TAGS = {"p", "br", "h2", "h3", "h4", "strong", "em", "b", "i", "ul", "ol", "li", "blockquote", "a", "img"}
+TAGS = {
+    "p", "br", "h2", "h3", "h4", "strong", "em", "b", "i", "u", "s", "mark", "span",
+    "ul", "ol", "li", "blockquote", "a", "img",
+    "table", "thead", "tbody", "tr", "th", "td",
+}
 MAX_BYTES = 200_000
 MAX_ELEMENTS = 2_000
 MAX_DEPTH = 16
+
+
+def _article_attribute_filter(tag, attr, value):
+    if attr == "style":
+        return sanitize_inline_style(value)
+    if tag == "img":
+        return value
+    if tag in {"td", "th"} and attr in {"colspan", "rowspan"}:
+        if isinstance(value, str) and re.fullmatch(r"[1-9]\d?", value):
+            return value
+        return None
+    return _filter_rich_text_attribute(tag, attr, value)
 
 
 class ArticleMeasure(HTMLParser):
@@ -56,9 +72,22 @@ def normalize_document(value):
     cleaned = nh3.clean(
         html,
         tags=TAGS,
-        attributes={"a": {"href", "title"}, "img": {"data-asset-id", "data-node-id", "alt"}},
+        attributes={
+            "a": {"href", "title"},
+            "img": {"data-asset-id", "data-node-id", "alt", "style"},
+            "span": {"style"},
+            "mark": {"style"},
+            "p": {"style"},
+            "h2": {"style"},
+            "h3": {"style"},
+            "h4": {"style"},
+            "table": {"style"},
+            "tr": {"style"},
+            "th": {"style", "colspan", "rowspan"},
+            "td": {"style", "colspan", "rowspan"},
+        },
         clean_content_tags={"script", "style", "iframe", "object"},
-        attribute_filter=lambda tag, attr, value: value if tag == "img" else _filter_rich_text_attribute(tag, attr, value),
+        attribute_filter=_article_attribute_filter,
         url_schemes={"http", "https", "mailto"},
         link_rel="noopener noreferrer",
     )

@@ -60,7 +60,7 @@ it("inserts inline images with a stable placement ID and requires alternative te
   const changed = vi.fn();
   const previous = Object.getOwnPropertyDescriptor(document,"execCommand");
   Object.defineProperty(document,"execCommand",{configurable:true,value:(command:string,_ui:boolean,html:string) => {
-    if (command === "insertHTML") document.querySelector('[aria-label="Article body"]')!.insertAdjacentHTML("beforeend",html);
+    if (command === "insertHTML") document.querySelector('[aria-label="Content"]')!.insertAdjacentHTML("beforeend",html);
     return true;
   }});
   try {

@@ -55,15 +55,19 @@ function FooterLinks({items,origin,preview,depth=0,label="footer"}:{items:Public
 }
 function FooterGroup({group,preview,siteOrigin}:{group:{title:string;description?:string;href:string;items:PublicMenuNode[]};preview:boolean;siteOrigin?:string}) {
  const [open,setOpen]=useState(false);const id=useId();const href=linkUrl(group.href,siteOrigin,preview);
+ // One heading node only — a second breakpoint copy of the title inside the same
+ // heading concatenated accessible names to "UniversityUniversity" in tests/jsdom.
  return <Box component="section" data-footer-group sx={{minWidth:0,borderBottom:{xs:1,md:0},borderColor:"rgba(255,255,255,.18)"}}>
-  <Typography component="h2" variant="subtitle1" sx={{m:0,fontWeight:750,lineHeight:1.45}}>
-   <ButtonBase aria-expanded={open} aria-controls={`${id}-panel`} onClick={()=>setOpen(value=>!value)} onKeyDown={event=>{if(event.key==="Escape"){event.stopPropagation();setOpen(false);}}}
-    sx={{display:{xs:"flex",md:"none"},alignItems:"center",justifyContent:"space-between",gap:1,width:"100%",minHeight:48,py:1,textAlign:"start",font:"inherit",fontWeight:750,borderRadius:1,"&:focus-visible":{outline:"3px solid",outlineColor:"secondary.main",outlineOffset:-3}}}>
-    <Box component="span" sx={{minWidth:0,overflowWrap:"anywhere"}}>{group.title}</Box>
-    <ExpandMoreRoundedIcon aria-hidden sx={{flexShrink:0,transform:open?"rotate(180deg)":"none",transition:"transform 150ms ease","@media (prefers-reduced-motion: reduce)":{transition:"none"}}}/>
+  <Box sx={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:1,minWidth:0}}>
+   <Typography component="h2" variant="subtitle1" sx={{m:0,flex:1,minWidth:0,fontWeight:750,lineHeight:1.45}}>
+    {href?<Link href={href} color="inherit" underline="hover" target={preview?"_blank":undefined} rel={preview?"noopener noreferrer":undefined} sx={focus}>{group.title}</Link>:group.title}
+   </Typography>
+   <ButtonBase aria-expanded={open} aria-controls={`${id}-panel`} aria-label={`${open?"Collapse":"Expand"} ${group.title}`}
+    onClick={()=>setOpen(value=>!value)} onKeyDown={event=>{if(event.key==="Escape"){event.stopPropagation();setOpen(false);}}}
+    sx={{display:{xs:"inline-flex",md:"none"},flexShrink:0,alignItems:"center",justifyContent:"center",minWidth:44,minHeight:44,borderRadius:1,"&:focus-visible":{outline:"3px solid",outlineColor:"secondary.main",outlineOffset:-3}}}>
+    <ExpandMoreRoundedIcon aria-hidden sx={{transform:open?"rotate(180deg)":"none",transition:"transform 150ms ease","@media (prefers-reduced-motion: reduce)":{transition:"none"}}}/>
    </ButtonBase>
-   <Box component="span" sx={{display:{xs:"none",md:"inline"}}}>{href?<Link href={href} color="inherit" underline="hover" target={preview?"_blank":undefined} rel={preview?"noopener noreferrer":undefined} sx={focus}>{group.title}</Link>:group.title}</Box>
-  </Typography>
+  </Box>
   <Box id={`${id}-panel`} sx={{display:{xs:open?"block":"none",md:"block"},pt:{xs:1,md:0}}}>
    {group.description?<Typography variant="body2" sx={{mb:1.5,opacity:.85,lineHeight:1.6}}>{group.description}</Typography>:null}
    <Box sx={{opacity:.85}}><FooterLinks items={group.items} origin={siteOrigin} preview={preview} label={group.title}/></Box>

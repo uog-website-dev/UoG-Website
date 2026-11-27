@@ -13,6 +13,7 @@ const createSitePost = vi.fn();
 const updateSitePost = vi.fn();
 const transitionSitePost = vi.fn();
 const openSitePostWorkingDraft = vi.fn();
+const deleteSitePost = vi.fn();
 
 vi.mock("@/app/sites/post-actions", () => ({
   loadSitePosts: (...args: unknown[]) => loadSitePosts(...args),
@@ -23,6 +24,7 @@ vi.mock("@/app/sites/post-actions", () => ({
   updateSitePost: (...args: unknown[]) => updateSitePost(...args),
   transitionSitePost: (...args: unknown[]) => transitionSitePost(...args),
   openSitePostWorkingDraft: (...args: unknown[]) => openSitePostWorkingDraft(...args),
+  deleteSitePost: (...args: unknown[]) => deleteSitePost(...args),
 }));
 
 vi.mock("next/navigation", () => ({
@@ -112,6 +114,8 @@ beforeEach(() => {
   updateSitePost.mockReset();
   transitionSitePost.mockReset();
   openSitePostWorkingDraft.mockReset();
+  deleteSitePost.mockReset();
+  deleteSitePost.mockResolvedValue(result(null));
   loadSitePosts.mockResolvedValue(list([post()]));
   loadSiteTaxonomy.mockImplementation(async (siteId: number, kind: "categories" | "tags") => result(
     (siteId === 11 ? (kind === "categories" ? [category] : [tag]) : []).map((row) => ({ ...row, site: siteId })),
@@ -239,6 +243,57 @@ describe("SitePostsPanel", () => {
     await waitFor(() => expect(transitionSitePost).toHaveBeenCalledWith(11, postId, "publish", ""));
     expect(screen.queryByRole("button", { name: "Submit Campus update for review" })).toBeNull();
   });
+
+  it("edits a published Post in place without cloning a working draft", async () => {
+    const live = post({
+      id: "live-post",
+      status: "PUBLISHED",
+      available_actions: ["unpublish", "archive"],
+      etag: '"post-live"',
+    });
+    loadSitePosts.mockResolvedValue(list([live]));
+    renderPanel();
+    const edit = await screen.findByRole("link", { name: "Edit Campus update" });
+    expect(edit.getAttribute("href")).toBe("/sites/11/admin/posts/live-post/edit");
+    expect(openSitePostWorkingDraft).not.toHaveBeenCalled();
+  });
+
+  it("archives Posts through Delete and Delete selected", async () => {
+    const first = post({
+      id: "post-del-1",
+      title: "Delete one",
+      status: "PUBLISHED",
+      available_actions: ["unpublish", "archive"],
+      etag: '"post-del-1"',
+    });
+    const second = post({
+      id: "post-del-2",
+      title: "Delete two",
+      status: "PUBLISHED",
+      available_actions: ["unpublish", "archive"],
+      etag: '"post-del-2"',
+    });
+    loadSitePosts.mockResolvedValue(list([first, second]));
+    getSitePost.mockImplementation(async (_site: number, id: string) => result(id === second.id ? second : first));
+    transitionSitePost.mockResolvedValue(result(post({ ...first, status: "ARCHIVED", available_actions: [] })));
+    renderPanel();
+
+    fireEvent.click(await screen.findByRole("button", { name: "Delete Delete one" }));
+    const single = await screen.findByRole("dialog", { name: "Delete post?" });
+    fireEvent.click(within(single).getByRole("button", { name: "Delete post" }));
+    await waitFor(() => expect(transitionSitePost).toHaveBeenCalledWith(
+      11, "post-del-1", "archive", "", '"post-del-1"',
+    ));
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "Delete post?" })).toBeNull());
+
+    transitionSitePost.mockClear();
+    fireEvent.click(screen.getByRole("checkbox", { name: "Select Delete one" }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "Select Delete two" }));
+    fireEvent.click(screen.getByRole("button", { name: "Delete selected" }));
+    const bulk = await screen.findByRole("dialog", { name: "Delete selected posts?" });
+    fireEvent.click(within(bulk).getByRole("button", { name: "Delete selected" }));
+    await waitFor(() => expect(transitionSitePost.mock.calls.some((call) => call[2] === "archive")).toBe(true));
+  });
 });
 
 describe("SitePostEditor", () => {
@@ -265,6 +320,21 @@ describe("SitePostEditor", () => {
     expect(await screen.findByRole("textbox", { name: "SEO metadata (JSON object)" })).toHaveProperty("value", JSON.stringify(seo, null, 2));
     fireEvent.click(screen.getByRole("button", { name: "Save Draft" }));
     await waitFor(() => expect(updateSitePost).toHaveBeenCalledWith(11, "post-1", '"post-v1"', expect.any(Object)));
+  });
+
+  it("labels a published Post editor for in-place live saves", async () => {
+    getSitePost.mockResolvedValue(result({
+      ...post({
+        id: "live-post",
+        status: "PUBLISHED",
+        available_actions: ["unpublish", "archive"],
+      }),
+      etag: '"post-live"',
+      editor_document: { schema_version: 1, html: "<p>Updated body</p>" },
+    }));
+    renderEditor("edit", { postId: "live-post" });
+    expect(await screen.findByRole("heading", { name: "Edit Post" })).toBeTruthy();
+    expect(screen.getByText(/Save applies your changes to the public site immediately/i)).toBeTruthy();
   });
 
   it("validates media scope and offers taxonomy creation only to authorized creators", async () => {
@@ -422,14 +492,14 @@ describe("SitePostEditor", () => {
     await waitFor(() => expect(updateSitePost).toHaveBeenLastCalledWith(11, "post-1", '"post-v1"', expect.objectContaining({ slug: "corrected-slug" })));
   });
 
-  it("locks Post settings while the Post is published", async () => {
+  it("allows in-place editing of a published Post", async () => {
     getSitePost.mockResolvedValue(result({ ...post({ status: "PUBLISHED" }), etag: '"post-v1"', editor_document: { schema_version: 1, html: "<p>Post body</p>" } }));
     renderEditor("edit", { postId: "post-1" });
     await screen.findByRole("heading", { name: "Edit Post" });
-    expect(screen.getByText(/locked while this Post is published/i)).toBeTruthy();
-    expect(screen.getByRole("textbox", { name: "Title" })).toHaveProperty("disabled", true);
-    expect(screen.getByRole("textbox", { name: "Permalink slug" })).toHaveProperty("disabled", true);
-    expect(screen.getByRole("button", { name: "Save Draft" })).toHaveProperty("disabled", true);
+    expect(screen.getByText(/Save applies your changes to the public site immediately/i)).toBeTruthy();
+    expect(screen.getByRole("textbox", { name: "Title" })).toHaveProperty("disabled", false);
+    expect(screen.getByRole("textbox", { name: "Permalink slug" })).toHaveProperty("disabled", false);
+    expect(screen.getByRole("button", { name: "Save" })).toHaveProperty("disabled", false);
   });
 
   it("lets an editor remove selected taxonomy that is no longer eligible", async () => {

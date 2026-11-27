@@ -604,9 +604,9 @@ describe("fixture contract conformance", () => {
     }
   });
 
-  it("site fixture configurations are schema-version-1 documents", () => {
+  it("site fixture configurations are schema-version-2 documents", () => {
     for (const fixture of siteFixtures) {
-      expect(fixture.configuration.schema_version).toBe(1);
+      expect(fixture.configuration.schema_version).toBe(2);
       expect(fixture.configuration.language.enabled).toContain(
         fixture.default_language,
       );

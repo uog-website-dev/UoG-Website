@@ -24,6 +24,28 @@ class ResolvedSiteSerializer(serializers.Serializer):
     organization_unit = serializers.IntegerField()
 
 
+class PublicBannerStyleSerializer(serializers.Serializer):
+    enabled = serializers.BooleanField()
+    background_type = serializers.CharField()
+    image_url = serializers.CharField(allow_null=True)
+    pattern = serializers.CharField()
+    background_color = serializers.CharField()
+    overlay_color = serializers.CharField()
+    overlay_opacity = serializers.FloatField()
+    height = serializers.CharField()
+    title_color = serializers.CharField()
+    title_align = serializers.CharField()
+    content_position = serializers.CharField()
+    padding_y = serializers.CharField()
+
+
+class PublicBannerSerializer(serializers.Serializer):
+    scope = serializers.CharField()
+    shared = PublicBannerStyleSerializer()
+    page = PublicBannerStyleSerializer()
+    post = PublicBannerStyleSerializer()
+
+
 class PublicConfigurationSerializer(serializers.Serializer):
     display_name = serializers.CharField(allow_null=True)
     theme = serializers.CharField()
@@ -32,6 +54,7 @@ class PublicConfigurationSerializer(serializers.Serializer):
     footer = FooterSettingsSerializer()
     header = HeaderSettingsSerializer()
     languages = serializers.ListField(child=serializers.CharField())
+    banner = PublicBannerSerializer()
 
 
 class SiteContextSerializer(serializers.Serializer):
@@ -59,11 +82,33 @@ class SiteContextView(APIView):
         else:
             current = Site.objects.select_related("organization_unit").get(pk=site.pk)
             from apps.cms.api.widget_runtime import logo_asset
+            from apps.sites.banner import default_banner, public_style, resolve_banner_style
+            from apps.sites.configuration import normalize_site_configuration
             asset = logo_asset(current)
+            configuration = normalize_site_configuration(
+                current.configuration, default_language=current.default_language,
+            )
+            banner = configuration["presentation"].get("banner") or default_banner()
             public_identity = {
-                "display_name": current.configuration["identity"]["display_name"],
-                "theme": current.configuration["presentation"]["theme"],
+                "display_name": configuration["identity"]["display_name"],
+                "theme": configuration["presentation"]["theme"],
                 "logo_url": "/api/v1/site-context/identity/logo/" if asset else None,
+                "banner": {
+                    "scope": banner.get("scope", "shared"),
+                    "shared": public_style(banner.get("shared"), image_url=_banner_image_url(banner.get("shared"))),
+                    "page": public_style(
+                        resolve_banner_style(banner, "page") if banner.get("scope") == "independent" else banner.get("shared"),
+                        image_url=_banner_image_url(
+                            resolve_banner_style(banner, "page") if banner.get("scope") == "independent" else banner.get("shared"),
+                        ),
+                    ),
+                    "post": public_style(
+                        resolve_banner_style(banner, "post") if banner.get("scope") == "independent" else banner.get("shared"),
+                        image_url=_banner_image_url(
+                            resolve_banner_style(banner, "post") if banner.get("scope") == "independent" else banner.get("shared"),
+                        ),
+                    ),
+                },
             }
             # Hash only public identity and opaque media identity; no storage keys.
             revision = hashlib.sha256(json.dumps([
@@ -71,11 +116,11 @@ class SiteContextView(APIView):
                 str(asset.pk) if asset else None,
                 asset.updated_at.isoformat() if asset else None,
                 sorted(request.enabled_module_codes),
-            ], sort_keys=True).encode()).hexdigest()
+            ], sort_keys=True, default=str).encode()).hexdigest()
             public_identity["branding_revision"] = revision
             public_identity["footer"] = public_footer(current)
             public_identity["header"] = public_header(current)
-            public_identity["languages"] = list(current.configuration["language"]["enabled"])
+            public_identity["languages"] = list(configuration["language"]["enabled"])
             body = {
                 "site": {
                     "id": current.pk,
@@ -99,3 +144,17 @@ class SiteContextView(APIView):
     def _logo_url(site):
         from apps.cms.api.widget_runtime import logo_asset
         return "/api/v1/site-context/identity/logo/" if logo_asset(site) else None
+
+
+def _banner_image_url(style):
+    if not isinstance(style, dict) or style.get("background_type") != "image":
+        return None
+    reference = style.get("image_ref")
+    if not isinstance(reference, str) or not reference.strip():
+        return None
+    from uuid import UUID
+    try:
+        asset_id = str(UUID(reference))
+    except (TypeError, ValueError, AttributeError):
+        return None
+    return f"/api/v1/site-context/media/{asset_id}/?variant=display"

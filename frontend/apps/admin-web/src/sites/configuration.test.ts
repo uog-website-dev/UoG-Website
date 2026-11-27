@@ -91,9 +91,9 @@ describe("configurationRows — provenance", () => {
 });
 
 describe("configuration documents", () => {
-  it("produces a schema-version-1 document for a given language", () => {
+  it("produces a schema-version-2 document for a given language", () => {
     const document: SiteConfiguration = defaultSiteConfiguration("am");
-    expect(document.schema_version).toBe(1);
+    expect(document.schema_version).toBe(2);
     expect(document.language.enabled).toEqual(["am"]);
     expect(document.presentation.theme).toBe("institutional");
     expect(document.behavior).toEqual({

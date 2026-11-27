@@ -12,11 +12,11 @@ describe("resolvePageWidth", () => {
       const resolved = resolvePageWidth(settings);
       expect(resolved.width).toBe(DEFAULT_PAGE_WIDTH);
       expect(resolved.width).toBe("wide");
-      expect(resolved.maxWidth).toBe(1280);
+      expect(resolved.maxWidth).toBe(1120);
       expect(resolved.gutter).toBe(PAGE_SAFE_GUTTER_PX);
       expect(resolved.gutter).toBe(24);
       expect(resolved.bleed).toBe(false);
-      expect(resolved.label).toBe("Wide · 1280px");
+      expect(resolved.label).toBe("Wide · 1120px");
     }
   });
 
@@ -25,9 +25,9 @@ describe("resolvePageWidth", () => {
       width: "reading", maxWidth: 880, gutter: 24, bleed: false,
     });
     expect(resolvePageWidth({ content_width: "wide" })).toMatchObject({
-      width: "wide", maxWidth: 1280, gutter: 24, bleed: false,
+      width: "wide", maxWidth: 1120, gutter: 24, bleed: false,
     });
-    expect(PAGE_CONTENT_WIDTHS).toEqual({ full: "100%", reading: 880, wide: 1280 });
+    expect(PAGE_CONTENT_WIDTHS).toEqual({ full: "100%", reading: 880, wide: 1120 });
   });
 
   it("uses the available width while preserving the safe gutter for Full width", () => {
@@ -56,7 +56,7 @@ describe("resolvePageWidth", () => {
     for (const value of ["huge", "", "Wide", 1280, true, {}, [], null]) {
       const resolved = resolvePageWidth({ content_width: value });
       expect(resolved.width).toBe("wide");
-      expect(resolved.maxWidth).toBe(1280);
+      expect(resolved.maxWidth).toBe(1120);
       expect(resolved.gutter).toBe(PAGE_SAFE_GUTTER_PX);
     }
   });

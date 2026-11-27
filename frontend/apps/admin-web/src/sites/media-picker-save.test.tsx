@@ -135,13 +135,13 @@ describe("CMS media picker save integration", () => {
     expect(link.getAttribute("href")).toBe("/sites/11/admin/pages/page-1/edit");
     directory.unmount();
     render(<ToastProvider><SitePageEditor siteId={11} pageId="page-1" mode="edit" pagesEnabled permissions={["content.pages.view", "content.pages.update", "content.media.view", "content.media.upload"]} /></ToastProvider>);
-    expect(await screen.findByText(`Asset ID: ${assetId}`, {}, {timeout: 5000})).toBeTruthy();
-    expect(screen.getByDisplayValue("Campus green")).toBeTruthy();
+    const content = await screen.findByRole("textbox", { name: "Page content" }, { timeout: 5000 });
+    expect(content.querySelector(`img[data-asset-id="${assetId}"]`)).toBeTruthy();
+    expect(content.querySelector('img[alt="Campus green"]')).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
     expect(await screen.findByText(/Only a ready image owned by this Site may be selected/i)).toBeTruthy();
-    expect(screen.getByText(`Asset ID: ${assetId}`)).toBeTruthy();
-    expect(screen.getByDisplayValue("Campus green")).toBeTruthy();
-    expect((screen.getByLabelText("Block 1 JSON") as HTMLInputElement).value).toContain(assetId);
+    expect(content.querySelector(`img[data-asset-id="${assetId}"]`)).toBeTruthy();
+    expect(content.querySelector('img[alt="Campus green"]')).toBeTruthy();
   });
 });
 

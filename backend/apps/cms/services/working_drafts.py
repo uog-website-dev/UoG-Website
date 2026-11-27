@@ -39,8 +39,8 @@ def save_visual_draft(*, site_id, page_id, actor, if_match, visual_layout, using
         page = get_object_or_404(Page.objects.using(using).select_for_update(), pk=page_id, site_id=site_id)
         if not if_match or if_match != content_etag(page):
             raise ContentEditConflict("Content changed. Retrieve the current Page.")
-        if page.status not in {ContentStatus.DRAFT, ContentStatus.UNPUBLISHED}:
-            raise ValidationError({"status": "Save an editable working draft; the published Page stays unchanged."})
+        if page.status not in {ContentStatus.DRAFT, ContentStatus.UNPUBLISHED, ContentStatus.PUBLISHED}:
+            raise ValidationError({"status": "Save an editable draft or the published Page directly."})
         validated = validate_layout(visual_layout)
         validate_layout_media(validated, site_id=site_id)
         page.metadata = {**page.metadata, "visual_layout": validated}
@@ -49,7 +49,9 @@ def save_visual_draft(*, site_id, page_id, actor, if_match, visual_layout, using
         # not as inactive references that could later fail asset validation.
         page.blocks = []
         page.updated_by = actor
-        page.save(using=using, update_fields={"metadata", "blocks", "updated_by"})
+        from .published_edits import published_content_write
+        with published_content_write(page):
+            page.save(using=using, update_fields={"metadata", "blocks", "updated_by"})
         return page
 
 

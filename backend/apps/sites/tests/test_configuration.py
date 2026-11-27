@@ -117,7 +117,7 @@ def test_logo_write_requires_the_site_media_module(owners):
     {"language": {"enabled": ["en"]}},
     {"identity": {"logo_ref": "https://cdn.example/logo.png"}},
     {"navigation": {"items": [{"code": "HOME", "label": "Home", "path": "javascript:alert(1)"}]}},
-    {"schema_version": 2},
+    {"schema_version": 3},
     {"schema_version": 0, "custom": True},
 ])
 def test_invalid_configuration_is_rejected(owners, changes):
@@ -156,4 +156,6 @@ def test_current_schema_round_trips_and_exposes_an_upgrade_path():
     document = default_configuration("en-us")
     assert upgrade_configuration(document, default_language="en-us") == document
     assert upgrade_configuration({}, default_language="am") == default_configuration("am")
-    assert CURRENT_SCHEMA_VERSION == 1
+    assert CURRENT_SCHEMA_VERSION == 2
+    assert document["presentation"]["banner"]["scope"] == "shared"
+    assert upgrade_configuration({"schema_version": 1, "identity": {"display_name": None, "logo_ref": None, "favicon_ref": None}, "language": {"enabled": ["en-us"]}, "presentation": {"theme": "institutional"}, "navigation": {"items": []}, "behavior": {"show_search": False, "show_language_switcher": False}}, default_language="en-us")["presentation"]["banner"]["shared"]["pattern"] == "gradient-navy"

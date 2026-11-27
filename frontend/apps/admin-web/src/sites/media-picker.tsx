@@ -43,8 +43,10 @@ interface MediaPickerDialogProps {
   useCase?: MediaPickerUseCase;
   canUpload?: boolean;
   title?: string;
+  multiple?: boolean;
   onCancel: () => void;
   onConfirm: (result: MediaPickerResult) => void;
+  onConfirmMany?: (results: MediaPickerResult[]) => void;
 }
 
 /**
@@ -63,8 +65,10 @@ function MediaPickerDialogInner({
   useCase = "ready_image",
   canUpload = false,
   title = "Choose a ready image",
+  multiple = false,
   onCancel,
   onConfirm,
+  onConfirmMany,
 }: MediaPickerDialogProps) {
   const titleId = useId();
   const [candidate, setCandidate] = useState<MediaAssetRecord | null>(null);
@@ -122,6 +126,34 @@ function MediaPickerDialogInner({
     }
   };
 
+  const confirmMany = async (assets: MediaAssetRecord[]) => {
+    if (confirming || !onConfirmMany || assets.length === 0) return;
+    setConfirming(true);
+    setError(null);
+    const requestGeneration = ++generation.current;
+    const current = () => mounted.current && generation.current === requestGeneration && open;
+    try {
+      const results: MediaPickerResult[] = [];
+      for (const asset of assets) {
+        const checked = await confirmReadyImageSelection(siteId, asset.id);
+        if (!current()) return;
+        if (!checked.ok) {
+          setError(checked.message);
+          setCandidate(asset);
+          return;
+        }
+        results.push(checked.data);
+      }
+      closedByAction.current = true;
+      onConfirmMany(results);
+      restoreFocus();
+    } catch {
+      if (current()) setError("One or more images could not be verified. Check your connection and try again.");
+    } finally {
+      if (current()) setConfirming(false);
+    }
+  };
+
   return (
     <Dialog
       open={open}
@@ -142,7 +174,8 @@ function MediaPickerDialogInner({
       <DialogTitle id={titleId}>{title}</DialogTitle>
       <DialogContent>
         <Typography variant="body2" sx={{ mb: 2 }}>
-          Only ready images owned by this Site can be selected. Alt text from the library is suggested for accessibility; adjust it on the field after choosing.
+          Only ready images owned by this Site can be selected.
+          {multiple ? " Select one or more images, then insert them together." : " Alt text from the library is suggested for accessibility; adjust it on the field after choosing."}
         </Typography>
         {useCase === "ready_image" ? (
           <Box key={siteId}>
@@ -150,7 +183,12 @@ function MediaPickerDialogInner({
               siteId={siteId}
               canUpload={canUpload}
               imagesOnly
-              onSelect={(asset) => {
+              multiSelect={multiple}
+              onSelectMany={multiple ? (assets) => {
+                setError(null);
+                void confirmMany(assets);
+              } : undefined}
+              onSelect={multiple ? undefined : (asset) => {
                 setError(null);
                 setCandidate(asset);
                 void confirm(asset);

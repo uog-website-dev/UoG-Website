@@ -135,6 +135,7 @@ class PublicPostListSerializer(serializers.Serializer):
 class PublicPostDetailSerializer(PublicPostListSerializer):
     content = serializers.CharField()
     editor_document = serializers.JSONField(required=False,allow_null=True)
+    title_banner = serializers.JSONField(required=False, allow_null=True)
 
 
 class PublicPostPageSerializer(serializers.Serializer):
@@ -345,6 +346,7 @@ def _post_snapshot_payload(snapshot):
     if "content" in payload:
         data["content"] = payload["content"]
     data["editor_document"]=payload.get("metadata",{}).get("post_editor")
+    data["title_banner"] = payload.get("metadata", {}).get("title_banner")
     return data
 
 

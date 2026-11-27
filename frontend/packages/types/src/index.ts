@@ -118,9 +118,50 @@ export interface SiteNavigationItem {
 /** Approved presentation themes (backend `THEMES` allowlist). */
 export type SiteTheme = "institutional" | "high-contrast";
 
+export type TitleBannerBackgroundType = "color" | "image" | "pattern";
+export type TitleBannerPattern =
+  | "geometric-grid"
+  | "geometric-dots"
+  | "abstract-waves"
+  | "gradient-navy"
+  | "gradient-gold"
+  | "minimal-lines"
+  | "minimal-solid"
+  | "heritage"
+  | "diamonds"
+  | "diagonal"
+  | "chevron-field";
+export type TitleBannerHeight = "sm" | "md" | "lg";
+export type TitleBannerAlign = "left" | "center" | "right";
+export type TitleBannerPosition = "top" | "center" | "bottom";
+export type TitleBannerScope = "shared" | "independent";
+
+/** Allowlisted page/post title-banner style (Appearance + per-item override). */
+export interface TitleBannerStyle {
+  enabled: boolean;
+  background_type: TitleBannerBackgroundType;
+  image_ref: string | null;
+  pattern: TitleBannerPattern;
+  background_color: string;
+  overlay_color: string;
+  overlay_opacity: number;
+  height: TitleBannerHeight;
+  title_color: string;
+  title_align: TitleBannerAlign;
+  content_position: TitleBannerPosition;
+  padding_y: TitleBannerHeight;
+}
+
+export interface TitleBannerSettings {
+  scope: TitleBannerScope;
+  shared: TitleBannerStyle;
+  page: TitleBannerStyle;
+  post: TitleBannerStyle;
+}
+
 /**
  * Versioned, allowlisted site settings stored on `Site.configuration`
- * (schema version 1). This is never a free-form document: unknown keys and
+ * (schema version 2). This is never a free-form document: unknown keys and
  * keys that look like secrets are rejected by the backend, and the console
  * only edits the typed fields below.
  */
@@ -136,7 +177,7 @@ export interface SiteConfiguration {
     /** One to ten unique normalized codes; must include `default_language`. */
     enabled: string[];
   };
-  presentation: { theme: SiteTheme };
+  presentation: { theme: SiteTheme; banner: TitleBannerSettings };
   navigation: { items: SiteNavigationItem[] };
   behavior: {
     show_search: boolean;

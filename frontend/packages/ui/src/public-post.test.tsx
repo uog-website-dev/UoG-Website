@@ -82,10 +82,12 @@ describe("PublicPostFeed and PublicPostDetail", () => {
         <PublicPostDetail post={post} />
       </PublicSiteBrandingProvider>,
     );
-    const banner = screen.getByRole("banner", { name: "Article banner" });
+    const banner = screen.getByRole("banner", { name: "Content banner" });
     expect(banner.querySelector("h1")?.textContent).toBe("Campus update");
     expect(banner.querySelector("[data-site-branding]")).toBeNull();
-    expect(banner.querySelector('a[href="/posts"]')).toBeNull();
+    expect(banner.querySelector("[data-banner-breadcrumbs]")?.textContent).toContain("News");
+    expect(banner.querySelector("[data-banner-breadcrumbs]")?.textContent).toContain("Detail");
+    expect(banner.querySelector('a[href="/posts"]')?.textContent).toBe("News");
   });
 
   it("renders versioned editor_document bodies without executing hostile markup", () => {
@@ -105,22 +107,77 @@ describe("PublicPostFeed and PublicPostDetail", () => {
     expect(container.textContent).not.toContain("fallback plain text");
   });
 
-  it("renders a hero banner, date, optional author, back navigation and omits a broken featured image", () => {
+  it("renders tables and formatting from content HTML when editor_document is absent", () => {
+    const document = postFromResponse(200, {
+      ...published,
+      content: '<table><thead><tr><th>Header 2</th><th>Header 3</th></tr></thead><tbody><tr><td>Cell</td><td>Cell</td></tr></tbody></table><p><span style="color:#b42318">Colored</span></p>',
+    });
+    const { container } = render(<PublicPostDetail post={document} />);
+    expect(container.querySelector("[data-post-body] table")).toBeTruthy();
+    expect(container.querySelector("[data-post-body] table th")?.textContent).toBe("Header 2");
+    expect(container.querySelectorAll("[data-post-body] table td")).toHaveLength(2);
+    expect(screen.getByText("Colored")).toBeTruthy();
+  });
+
+  it("renders a hero banner, date and author below the media band, latest-posts section and omits a broken featured image", () => {
     const document = postFromResponse(200, published);
     const { container } = render(<PublicPostDetail post={document} />);
-    expect(screen.getByLabelText("Article banner")).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Back to posts" }).getAttribute("href")).toBe("/posts");
-    const time = container.querySelector("time");
-    expect(time?.getAttribute("datetime")).toBe("2026-11-13T09:30:00Z");
-    expect(screen.getByText("Communications Office")).toBeTruthy();
+    expect(screen.getByLabelText("Content banner")).toBeTruthy();
+    expect(container.querySelector('[data-post-layout="featured-overlay"]')).toBeTruthy();
+    expect(container.querySelector("[data-latest-posts-section]")).toBeTruthy();
+    expect(screen.getByRole("heading", { level: 2, name: "Latest posts" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "All news" }).getAttribute("href")).toBe("/posts");
+    const byline = container.querySelector("[data-post-byline]");
+    expect(byline?.textContent).toContain("Communications Office");
+    expect(byline?.querySelector("[data-post-published]")?.getAttribute("datetime")).toBe("2026-11-13T09:30:00Z");
+    expect(container.querySelector("[data-content-banner] [data-post-byline]")).toBeNull();
+    expect(screen.queryByText("News for this Site")).toBeNull();
     expect(container.querySelector("img")).toBeNull();
     expect(container.textContent).not.toContain("This Post has no available featured image.");
   });
 
-  it("can hide the public listing link for private Site preview chrome", () => {
-    render(<PublicPostDetail post={postFromResponse(200, published)} showListingLink={false} />);
-    expect(screen.queryByRole("link", { name: "Back to posts" })).toBeNull();
-    expect(screen.getByLabelText("Article banner")).toBeTruthy();
+  it("keeps the article body as wide as the featured image column", () => {
+    const detail = postFromResponse(200, {
+      ...published,
+      featured_media: "sites/11/assets/00000000-0000-4000-8000-000000000099",
+      featured_alt: "Campus event",
+      editor_document: {
+        schema_version: 1,
+        html: "<p>Wide body copy that should match the featured image column.</p>",
+      },
+    });
+    const { container } = render(<PublicPostDetail post={detail} />);
+    const featured = container.querySelector("[data-post-featured-overlay]") as HTMLElement;
+    const body = container.querySelector("[data-post-body]") as HTMLElement;
+    const article = container.querySelector("[data-article-version]") as HTMLElement;
+    expect(featured).toBeTruthy();
+    expect(body).toBeTruthy();
+    expect(getComputedStyle(featured).maxWidth).toBe(getComputedStyle(body).maxWidth);
+    expect(getComputedStyle(article).maxWidth).toBe("none");
+  });
+
+  it("pulls a featured image over the title banner for the AAU-style overlay", () => {
+    const document = postFromResponse(200, {
+      ...published,
+      featured_media: "sites/11/assets/00000000-0000-4000-8000-000000000099",
+      featured_alt: "Campus event",
+    });
+    const { container } = render(<PublicPostDetail post={document} />);
+    const hero = container.querySelector("[data-post-hero]");
+    const overlay = container.querySelector("[data-post-featured-overlay]");
+    expect(hero).toBeTruthy();
+    expect(overlay).toBeTruthy();
+    expect(container.querySelector('[data-post-layout="featured-overlay"]')?.contains(overlay)).toBe(true);
+    const image = overlay?.querySelector("img");
+    expect(image?.getAttribute("alt")).toBe("Campus event");
+    expect(image?.getAttribute("src")).toContain("/api/v1/site-context/media/00000000-0000-4000-8000-000000000099/");
+  });
+
+  it("can hide the latest-posts section for private Site preview chrome", () => {
+    const { container } = render(<PublicPostDetail post={postFromResponse(200, published)} showListingLink={false} />);
+    expect(container.querySelector("[data-latest-posts-section]")).toBeNull();
+    expect(screen.queryByRole("link", { name: "All news" })).toBeNull();
+    expect(screen.getByLabelText("Content banner")).toBeTruthy();
   });
 
   it("keeps Site B documents out of Site A rendering helpers", () => {

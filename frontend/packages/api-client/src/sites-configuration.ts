@@ -19,10 +19,35 @@
  * responses are rendered verbatim. This only gives immediate feedback and
  * keeps the mock honest.
  */
-import type { SiteConfiguration, SiteTheme } from "@uog/types";
+import type { SiteConfiguration, SiteTheme, TitleBannerSettings, TitleBannerStyle } from "@uog/types";
 
 /** Current schema version the backend accepts. */
-export const SITE_CONFIGURATION_SCHEMA_VERSION = 1;
+export const SITE_CONFIGURATION_SCHEMA_VERSION = 2;
+
+export const DEFAULT_TITLE_BANNER_STYLE: TitleBannerStyle = {
+  enabled: true,
+  background_type: "pattern",
+  image_ref: null,
+  pattern: "gradient-navy",
+  background_color: "#003366",
+  overlay_color: "#001a33",
+  overlay_opacity: 0.35,
+  height: "md",
+  title_color: "#ffffff",
+  title_align: "left",
+  content_position: "center",
+  padding_y: "md",
+};
+
+export function defaultTitleBannerSettings(): TitleBannerSettings {
+  const style = { ...DEFAULT_TITLE_BANNER_STYLE };
+  return {
+    scope: "shared",
+    shared: { ...style },
+    page: { ...style },
+    post: { ...style },
+  };
+}
 
 /** Approved themes (backend `THEMES`). */
 export const SITE_THEMES: readonly SiteTheme[] = [
@@ -84,7 +109,7 @@ export function hasSecretKey(value: unknown): boolean {
 }
 
 /**
- * Schema-version-1 defaults for one site language, matching
+ * Schema-version-2 defaults for one site language, matching
  * `default_configuration()` on the backend: callers may mutate the result.
  */
 export function defaultSiteConfiguration(
@@ -94,7 +119,7 @@ export function defaultSiteConfiguration(
     schema_version: SITE_CONFIGURATION_SCHEMA_VERSION,
     identity: { display_name: null, logo_ref: null, favicon_ref: null },
     language: { enabled: [defaultLanguage] },
-    presentation: { theme: "institutional" },
+    presentation: { theme: "institutional", banner: defaultTitleBannerSettings() },
     navigation: { items: [] },
     behavior: { show_search: false, show_language_switcher: false },
   };

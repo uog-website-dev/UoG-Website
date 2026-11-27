@@ -36,7 +36,7 @@ import {
 import { listSiteSidebars } from "@/app/sites/sidebar-actions";
 import type { SidebarRecord } from "@/app/sites/sidebar-actions";
 import { LazyMediaPickerDialog as MediaPickerDialog } from "@/sites/lazy-media-picker";
-import { richTextBlocksFromHtml, richTextIsEmpty } from "@/sites/page-rich-content";
+import { richTextBlocksFromHtml, richTextIsEmpty, splitPageBlocksForEditor } from "@/sites/page-rich-content";
 import type { MediaPickerResult } from "@/sites/media-picker-model";
 import { imageRefForAsset } from "@/sites/site-image-field";
 import {
@@ -51,15 +51,17 @@ import type {
 } from "@/app/sites/page-actions";
 import { unwrap } from "@/organizations/contract";
 import { APP_BASE_PATH } from "@/base-path";
+import type { TitleBannerStyle } from "@uog/types";
+import { TitleBannerOverrideSection, titleBannerFromMetadata } from "./title-banner-override";
 
 const MediaBlockEditor = dynamic(
   () => import("@/sites/media-block-editor").then((module) => module.MediaBlockEditor),
   { loading: () => <Box role="status" aria-label="Loading media block controls"><Skeleton aria-hidden variant="rounded" height={72} /></Box> },
 );
 
-const PageRichEditor = dynamic(
-  () => import("@/sites/post-rich-editor").then((module) => module.PostRichEditor),
-  { loading: () => <Box role="status" aria-label="Loading Page content editor" sx={{ minHeight: 360 }}><Skeleton aria-hidden variant="rounded" height={360} /></Box> },
+const SharedRichTextEditor = dynamic(
+  () => import("@/sites/rich-text-editor").then((module) => module.RichTextEditor),
+  { loading: () => <Box role="status" aria-label="Loading content editor" sx={{ minHeight: 360 }}><Skeleton aria-hidden variant="rounded" height={360} /></Box> },
 );
 
 export interface PageLanguages {
@@ -90,6 +92,7 @@ interface PageForm {
   seoImage: string;
   seoExtra: string;
   blocks: string[];
+  bannerOverride: TitleBannerStyle | null;
 }
 
 const PERMISSIONS = {
@@ -108,7 +111,7 @@ function seoPreview(seo: Record<string, unknown> | undefined): PublicPageDocumen
 function emptyForm(locale = "en"): PageForm {
   return {
     sidebar: "", layout:"FULL_WIDTH", title: "", slug: "", parent: "", locale, visibility: "PUBLIC",
-    metadata: "{}", seoTitle: "", seoDescription: "", seoImage: "", seoExtra: "{}",
+    metadata: "{}", seoTitle: "", seoDescription: "", seoImage: "", seoExtra: "{}", bannerOverride: null,
     blocks: [],
   };
 }
@@ -117,7 +120,11 @@ function slugFromTitle(title: string): string {
   return title.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 }
 
-function formFromRecord(current: SitePageRecord, fallbackLocale: string): PageForm {
+function formFromRecord(
+  current: SitePageRecord,
+  fallbackLocale: string,
+  structuredBlocks?: SitePageBlock[],
+): PageForm {
   const seo = { ...(current.seo ?? {}) };
   const metaTitle = seo.meta_title;
   const metaDescription = seo.meta_description;
@@ -133,13 +140,22 @@ function formFromRecord(current: SitePageRecord, fallbackLocale: string): PageFo
     parent: current.parent ?? "",
     locale: current.locale || fallbackLocale,
     visibility: current.visibility,
-    metadata: JSON.stringify(current.metadata ?? {}, null, 2),
+    metadata: JSON.stringify((() => {
+      const meta = { ...(current.metadata ?? {}) };
+      delete meta.title_banner;
+      return meta;
+    })(), null, 2),
     seoTitle: typeof metaTitle === "string" ? metaTitle : "",
     seoDescription: typeof metaDescription === "string" ? metaDescription : "",
     seoImage: typeof image === "string" ? image : "",
     seoExtra: JSON.stringify(seo, null, 2),
-    blocks: (current.blocks ?? []).map((block) => JSON.stringify(block, null, 2)),
+    bannerOverride: titleBannerFromMetadata(current.metadata),
+    blocks: (structuredBlocks ?? current.blocks ?? []).map((block) => JSON.stringify(block, null, 2)),
   };
+}
+
+function pageBlocksForSave(bodyHtml: string, form: PageForm, siteId: number): SitePageBlock[] {
+  return [...richTextBlocksFromHtml(bodyHtml, siteId), ...blockInputs(form)];
 }
 
 function blockInputs(form: PageForm): SitePageBlock[] {
@@ -152,6 +168,11 @@ function metadataInput(form: PageForm): Record<string, unknown> {
     const result = validateVisualLayout(value.visual_layout);
     if (!result.ok) throw new Error(Object.entries(result.errors).map(([path, messages]) => `${path}: ${messages.join(" ")}`).join("\n"));
     value.visual_layout = result.value;
+  }
+  if (form.bannerOverride) {
+    value.title_banner = { ...form.bannerOverride, use_global: false };
+  } else {
+    delete value.title_banner;
   }
   return value;
 }
@@ -260,12 +281,22 @@ function SitePageEditorContent({
   const [activePage, setActivePage] = useState<SitePageRecord | null>(null);
   const [form, setForm] = useState<PageForm>(() => emptyForm(defaultLocale));
   const [body, setBody] = useState("");
+  const [baseline, setBaseline] = useState<{ form: PageForm; body: string } | null>(null);
   const [saving, setSaving] = useState(false);
   const isCurrentOperation = useSiteOperationGuard(siteId);
   const dirty = mode === "create"
     ? JSON.stringify(form) !== JSON.stringify(emptyForm(defaultLocale)) || !richTextIsEmpty(body)
-    : activePage !== null && JSON.stringify(form) !== JSON.stringify(formFromRecord(activePage, defaultLocale));
+    : baseline !== null && (JSON.stringify(form) !== JSON.stringify(baseline.form) || body !== baseline.body);
   useSiteDraftGuard(dirty);
+
+  function applyLoadedPage(current: SitePageRecord) {
+    const { html, structured } = splitPageBlocksForEditor(current.blocks ?? [], siteId);
+    const nextForm = formFromRecord(current, defaultLocale, structured);
+    setActivePage(current);
+    setForm(nextForm);
+    setBody(html);
+    setBaseline({ form: nextForm, body: html });
+  }
   const [loadingPage, setLoadingPage] = useState(mode === "edit");
   const [loadError, setLoadError] = useState("");
   const [dialogError, setDialogError] = useState("");
@@ -285,11 +316,7 @@ function SitePageEditorContent({
   const [parentPages, setParentPages] = useState<SitePageRecord[]>([]);
   const [parentsReady, setParentsReady] = useState(false);
   const enabled = pagesEnabled === true && !saving && !loadingPage;
-  const titleLabel = mode === "create"
-    ? "Create Page"
-    : activePage?.draft_of
-      ? "Edit draft of published Page"
-      : "Edit Page";
+  const titleLabel = mode === "create" ? "Create Page" : "Edit Page";
 
   useEffect(() => {
     let cancelled = false;
@@ -318,6 +345,7 @@ function SitePageEditorContent({
     if (mode === "create") {
       setForm(emptyForm(defaultLocale));
       setBody("");
+      setBaseline(null);
       setActivePage(null);
       setLoadingPage(false);
       return;
@@ -336,8 +364,7 @@ function SitePageEditorContent({
       try {
         const current = unwrap(await getSitePage(siteId, pageId));
         if (cancelled) return;
-        setActivePage(current);
-        setForm(formFromRecord(current, defaultLocale));
+        applyLoadedPage(current);
       } catch (cause) {
         if (!cancelled) setLoadError(cause instanceof Error ? cause.message : "The Page could not be loaded.");
       } finally {
@@ -372,23 +399,25 @@ function SitePageEditorContent({
           visibility: form.visibility,
           metadata: metadataInput(form),
           seo: seoInput(form),
-          blocks: [...richTextBlocksFromHtml(body, siteId), ...blockInputs(form)],
+          blocks: pageBlocksForSave(body, form, siteId),
         }));
         if (!isCurrentOperation()) return;
         toast.success("Page created.");
       } else if (activePage?.etag) {
-        const original=formFromRecord(activePage,defaultLocale);
-        const layoutOnly=JSON.stringify({...form,layout:original.layout,sidebar:original.sidebar})===JSON.stringify(original);
+        const original = baseline?.form ?? formFromRecord(activePage, defaultLocale);
+        const layoutOnly =
+          body === (baseline?.body ?? "") &&
+          JSON.stringify({ ...form, layout: original.layout, sidebar: original.sidebar }) === JSON.stringify(original);
         unwrap(await updateSitePage(siteId, activePage.id, activePage.etag, layoutOnly ? { layout: form.layout, ...(form.sidebar || activePage.sidebar ? { sidebar: form.sidebar || null } : {}) } : {
           layout:form.layout,
           ...(form.sidebar || activePage.sidebar ? { sidebar: form.sidebar || null } : {}),
           title: form.title.trim(),
-          slug: activePage.draft_of ? activePage.slug : form.slug.trim(),
-          parent: activePage.draft_of ? null : form.parent || null,
+          slug: form.slug.trim(),
+          parent: form.parent || null,
           visibility: form.visibility,
           metadata: metadataInput(form),
           seo: seoInput(form),
-          blocks: blockInputs(form),
+          blocks: pageBlocksForSave(body, form, siteId),
         }));
         if (!isCurrentOperation()) return;
         toast.success("Page updated.");
@@ -415,8 +444,7 @@ function SitePageEditorContent({
     try {
       const current = unwrap(await getSitePage(siteId, activePage.id));
       if (!isCurrentOperation()) return;
-      setActivePage(current);
-      setForm(formFromRecord(current, defaultLocale));
+      applyLoadedPage(current);
       setDialogConflict(false);
       setDialogError("");
     } catch (cause) {
@@ -476,7 +504,9 @@ function SitePageEditorContent({
             {titleLabel}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Create or revise this Page on a full editor screen.
+            {activePage?.status === "PUBLISHED"
+              ? "You are editing the live published Page. Save applies your changes to the public site immediately."
+              : "Write simple Page content here. Use the Visual Builder for complex layouts."}
           </Typography>
         </Box>
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
@@ -519,28 +549,26 @@ function SitePageEditorContent({
         autoFocus
         required
       />
-      {mode === "create" ? (
-        <Box component="section" aria-label="Page content" sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-          <Typography variant="subtitle2">Page content</Typography>
-          <PageRichEditor
-            siteId={siteId}
-            canUseMedia={permissions.includes("content.media.view")}
-            canUploadMedia={permissions.includes("content.media.upload")}
-            value={body}
-            onChange={setBody}
-            disabled={!enabled}
-            onSave={() => void savePage()}
-            label="Page content"
-            toolbarLabel="Page content formatting"
-            placeholder="Write the Page content here…"
-            imageDialogTitle="Insert page image"
-            linkDialogTitle="Insert page link"
-          />
-          <Typography variant="caption" color="text.secondary">
-            Headings, paragraphs, lists and images become this Page&apos;s text blocks. Add buttons and other structured blocks under Content blocks.
-          </Typography>
-        </Box>
-      ) : null}
+      <Box component="section" aria-label="Page content" sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+        <Typography variant="subtitle2">Page content</Typography>
+        <SharedRichTextEditor
+          siteId={siteId}
+          canUseMedia={permissions.includes("content.media.view")}
+          canUploadMedia={permissions.includes("content.media.upload")}
+          value={body}
+          onChange={setBody}
+          disabled={!enabled}
+          onSave={() => void savePage()}
+          label="Page content"
+          toolbarLabel="Page content formatting"
+          placeholder="Write the Page content here…"
+          imageDialogTitle="Insert page image"
+          linkDialogTitle="Insert page link"
+        />
+        <Typography variant="caption" color="text.secondary">
+          Headings, paragraphs, lists and images are edited here. Add buttons, sliders and galleries under Extra blocks. Complex layouts use the Visual Builder.
+        </Typography>
+      </Box>
       <TextField select label="Page layout" value={form.layout} disabled={!enabled} onChange={event=>setForm(current=>({...current,layout:event.target.value,sidebar:event.target.value === "FULL_WIDTH" ? "" : current.sidebar}))} helperText="Changes are saved to this draft. Existing builder content is preserved. On mobile, content appears before navigation.">
         {Object.entries(PAGE_LAYOUTS).map(([code,label])=><MenuItem key={code} value={code}>{label}</MenuItem>)}
       </TextField>
@@ -556,9 +584,11 @@ function SitePageEditorContent({
         label="Slug"
         value={form.slug}
         onChange={(event) => setForm((current) => ({ ...current, slug: event.target.value }))}
-        disabled={!enabled || Boolean(activePage?.draft_of)}
+        disabled={!enabled || Boolean(activePage?.draft_of) || activePage?.status === "PUBLISHED"}
         required
-        helperText={activePage?.draft_of
+        helperText={activePage?.status === "PUBLISHED"
+          ? "The live Page route stays fixed while the Page is published."
+          : activePage?.draft_of
           ? "Publication keeps the live Page route. This draft uses an internal slug."
           : mode === "create"
             ? "Filled from the title until you edit it. Use lowercase letters, numbers and hyphens."
@@ -568,7 +598,7 @@ function SitePageEditorContent({
         select
         label="Parent Page"
         value={form.parent}
-        disabled={!enabled || Boolean(activePage?.draft_of)}
+        disabled={!enabled || Boolean(activePage?.draft_of) || activePage?.status === "PUBLISHED"}
         helperText="Only Pages from this Site are available. Route history is preserved when a Page moves."
         onChange={(event) => setForm((current) => ({ ...current, parent: event.target.value }))}
       >
@@ -626,6 +656,11 @@ function SitePageEditorContent({
         Search preview: <strong>{form.seoTitle.trim() || form.title || "Untitled Page"}</strong>
         <br />Description: {form.seoDescription.trim() || "Site display name (fallback)"}
       </Alert>
+      <TitleBannerOverrideSection
+        siteId={siteId}
+        value={form.bannerOverride}
+        onChange={(bannerOverride) => setForm((current) => ({ ...current, bannerOverride }))}
+      />
       <Accordion disableGutters elevation={0} sx={{ border: 1, borderColor: "divider", "&:before": { display: "none" } }}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>Advanced</AccordionSummary>
         <AccordionDetails sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
@@ -633,8 +668,11 @@ function SitePageEditorContent({
           <TextField label="Additional SEO (JSON object)" value={form.seoExtra} onChange={(event) => setForm((current) => ({ ...current, seoExtra: event.target.value }))} multiline minRows={3} helperText="Other search settings. SEO title and description are edited above." />
         </AccordionDetails>
       </Accordion>
-      <Box component="section" aria-label="Content blocks" sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-        <Typography variant="subtitle2">Content blocks</Typography>
+      <Box component="section" aria-label="Extra blocks" sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+        <Typography variant="subtitle2">Extra blocks</Typography>
+        <Typography variant="caption" color="text.secondary">
+          Optional structured blocks after the rich text above. Prefer the content editor for ordinary images and text.
+        </Typography>
         {permissions.includes("content.media.view") ? (
           <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
             <Button
@@ -698,11 +736,7 @@ function SitePageEditorContent({
             </Paper>
           );
         })}
-        <Button onClick={() => setForm((current) => ({ ...current, blocks: [...current.blocks, '{"type":"heading","level":2,"text":"New heading"}'] }))}>Add heading block</Button>
-        <Button onClick={() => setForm((current) => ({ ...current, blocks: [...current.blocks, '{"type":"paragraph","html":"<p>New paragraph</p>"}'] }))}>Add paragraph block</Button>
-        <Button onClick={() => setForm((current) => ({ ...current, blocks: [...current.blocks, JSON.stringify(createEmptyImageBlock(siteId), null, 2)] }))}>Add image block</Button>
         <Button onClick={() => setForm((current) => ({ ...current, blocks: [...current.blocks, '{"type":"button","label":"Learn more","href":"/"}'] }))}>Add button block</Button>
-        <Button onClick={() => setForm((current) => ({ ...current, blocks: [...current.blocks, '{"type":"list","style":"unordered","items":["First item"]}'] }))}>Add list block</Button>
         <Button onClick={() => setForm((current) => ({ ...current, blocks: [...current.blocks, '{"type":"section","heading":"New section","children":[{"type":"paragraph","html":"<p>Section content</p>"}]}'] }))}>Add section block</Button>
       </Box>
       <Button onClick={() => setShowDraftPreview((value) => !value)} aria-expanded={showDraftPreview}>
@@ -723,7 +757,7 @@ function SitePageEditorContent({
                     title: form.title || "Untitled Page",
                     path: activePage?.path ?? `/${form.slug}`,
                     site: siteId,
-                    blocks: [...richTextBlocksFromHtml(body, siteId), ...blockInputs(form)],
+                    blocks: pageBlocksForSave(body, form, siteId),
                     ...(metadataInput(form).visual_layout ? {visual_layout:metadataInput(form).visual_layout as VisualLayout} : {}),
                     seo: seoPreview(seoInput(form)),
                   }}

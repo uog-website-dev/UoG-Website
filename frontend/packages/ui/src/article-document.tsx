@@ -1,11 +1,12 @@
 "use client";
 
 import { createElement, useState } from "react";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { parseFragment } from "parse5";
 import type { DefaultTreeAdapterMap } from "parse5";
 import Box from "@mui/material/Box";
 import { safeMenuHref } from "./site-navigation";
+import { sanitizeInlineStyle } from "./article-style";
 
 export interface ArticleDocument {
   schema_version: 1;
@@ -20,6 +21,9 @@ type ArticleNode = {
   assetId?: string;
   nodeId?: string;
   alt?: string;
+  style?: string;
+  colspan?: string;
+  rowspan?: string;
   children?: ArticleNode[];
 };
 /** Keep in sync with backend apps.api.post_editor.MAX_* */
@@ -35,11 +39,21 @@ const allowed = new Set([
   "h4",
   "strong",
   "em",
+  "u",
+  "s",
+  "mark",
+  "span",
   "ul",
   "ol",
   "li",
   "blockquote",
   "a",
+  "table",
+  "thead",
+  "tbody",
+  "tr",
+  "th",
+  "td",
 ]);
 const removed = new Set([
   "script",
@@ -50,12 +64,17 @@ const removed = new Set([
   "math",
   "template",
 ]);
+const styleTags = new Set(["span", "mark", "p", "h2", "h3", "h4", "table", "th", "td", "tr", "img"]);
 
 export function articleHref(value: string): string | null {
   if (/^mailto:[a-z0-9.!%+_-]+@[a-z0-9.-]+\.[a-z]{2,}$/i.test(value))
     return value;
   if (value.startsWith("#")) return null;
   return safeMenuHref(value);
+}
+
+function attr(node: DefaultTreeAdapterMap["element"], name: string): string {
+  return node.attrs.find((entry) => entry.name === name)?.value ?? "";
 }
 
 function nodesFrom(html: string): ArticleNode[] {
@@ -80,17 +99,27 @@ function nodesFrom(html: string): ArticleNode[] {
       if (!("tagName" in node)) return [];
       if (removed.has(node.tagName)) return [];
       if (node.tagName === "img") {
-        const attr = (name: string) => node.attrs.find(a => a.name === name)?.value ?? "";
-        const assetId = attr("data-asset-id");
+        const assetId = attr(node, "data-asset-id");
         if (!assetId) return [];
-        const nodeId = attr("data-node-id");
-        const alt = attr("alt").trim();
+        const nodeId = attr(node, "data-node-id");
+        const alt = attr(node, "alt").trim();
         const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
         if (!uuid.test(assetId) || !uuid.test(nodeId) || !alt || alt.length > 1000)
           throw new Error("Images require an asset, unique placement ID and alternative text.");
         if (imageNodes.has(nodeId.toLowerCase())) throw new Error("Image placement identifiers must be unique.");
         imageNodes.add(nodeId.toLowerCase());
-        return [{tag:"img", assetId, nodeId, alt}];
+        const style = sanitizeInlineStyle(attr(node, "style"));
+        return [{ tag: "img", assetId, nodeId, alt, ...(style ? { style } : {}) }];
+      }
+      // Browsers often wrap foreColor as <font color>, which we normalize to span.
+      if (node.tagName === "font") {
+        const children = visit(node.childNodes, depth + 1);
+        const color = attr(node, "color").trim();
+        const style = sanitizeInlineStyle(
+          [color ? `color: ${color}` : "", attr(node, "style")].filter(Boolean).join("; "),
+        );
+        if (!style) return children;
+        return [{ tag: "span", style, children }];
       }
       const children = visit(node.childNodes, depth + 1);
       const tag =
@@ -100,16 +129,22 @@ function nodesFrom(html: string): ArticleNode[] {
       if (!allowed.has(tag)) return children;
       const href =
         tag === "a"
-          ? articleHref(node.attrs.find((a) => a.name === "href")?.value ?? "")
+          ? articleHref(attr(node, "href"))
           : null;
       if (tag === "a" && !href) return children;
+      const style = styleTags.has(tag) ? sanitizeInlineStyle(attr(node, "style")) : "";
+      const colspan = tag === "td" || tag === "th" ? attr(node, "colspan") : "";
+      const rowspan = tag === "td" || tag === "th" ? attr(node, "rowspan") : "";
       return [
         {
           tag,
           children,
           ...(href
-            ? { href, title: node.attrs.find((a) => a.name === "title")?.value }
+            ? { href, title: attr(node, "title") || undefined }
             : {}),
+          ...(style ? { style } : {}),
+          ...(colspan && /^[1-9]\d{0,1}$/.test(colspan) ? { colspan } : {}),
+          ...(rowspan && /^[1-9]\d{0,1}$/.test(rowspan) ? { rowspan } : {}),
         },
       ];
     });
@@ -127,10 +162,18 @@ function serialize(nodes: ArticleNode[]): string {
     .map((node) => {
       if (node.tag === "text") return escape(node.text ?? "");
       if (node.tag === "br") return "<br>";
-      if (node.tag === "img") return `<img data-asset-id="${escape(node.assetId!)}" data-node-id="${escape(node.nodeId!)}" alt="${escape(node.alt!)}">`;
-      const attributes = node.href
-        ? ` href="${escape(node.href)}"${node.title ? ` title="${escape(node.title)}"` : ""} rel="noopener noreferrer"`
-        : "";
+      if (node.tag === "img") {
+        const style = node.style ? ` style="${escape(node.style)}"` : "";
+        return `<img data-asset-id="${escape(node.assetId!)}" data-node-id="${escape(node.nodeId!)}" alt="${escape(node.alt!)}"${style}>`;
+      }
+      const attributes = [
+        node.href
+          ? ` href="${escape(node.href)}"${node.title ? ` title="${escape(node.title)}"` : ""} rel="noopener noreferrer"`
+          : "",
+        node.style ? ` style="${escape(node.style)}"` : "",
+        node.colspan ? ` colspan="${escape(node.colspan)}"` : "",
+        node.rowspan ? ` rowspan="${escape(node.rowspan)}"` : "",
+      ].join("");
       return `<${node.tag}${attributes}>${serialize(node.children ?? [])}</${node.tag}>`;
     })
     .join("");
@@ -142,7 +185,7 @@ function articleDisplayBlocks(nodes: ArticleNode[]): ArticleNode[] {
       : (node.children ?? []).map(textContent).join("");
   const containsImage = (node: ArticleNode): boolean =>
     node.tag === "img" || (node.children ?? []).some(containsImage);
-  const inlineTags = new Set(["text", "br", "strong", "em", "a", "img"]);
+  const inlineTags = new Set(["text", "br", "strong", "em", "u", "s", "mark", "span", "a", "img"]);
 
   return nodes.flatMap((node) => {
     const text = textContent(node).trim();
@@ -192,14 +235,53 @@ export function articlePlainText(html: string): string {
       .join(" ");
   return text(nodesFrom(html)).replace(/\s+/g, " ").trim();
 }
-export function ArticleAssetImage({assetId, alt, siteId, mediaBase}: {assetId:string; alt:string; siteId:number; mediaBase?:string}) {
+export function ArticleAssetImage({
+  assetId,
+  alt,
+  siteId,
+  mediaBase,
+  style,
+}: {
+  assetId: string;
+  alt: string;
+  siteId: number;
+  mediaBase?: string;
+  style?: string;
+}) {
   const [failed, setFailed] = useState(false);
   const src = mediaBase ? `${mediaBase}/${assetId}/image?variant=display` : `/api/v1/site-context/media/${assetId}/?variant=display`;
   if (failed) return <Box role="status">Image unavailable. {alt}</Box>;
-  return <Box component="img" src={src} alt={alt} loading="lazy" onError={() => setFailed(true)} sx={{maxWidth:"100%",maxHeight:{xs:360,sm:520},width:"auto",height:"auto",mx:"auto",display:"block",my:3,borderRadius:1.5}} />;
+  return (
+    <Box
+      component="img"
+      src={src}
+      alt={alt}
+      loading="lazy"
+      onError={() => setFailed(true)}
+      style={style ? Object.fromEntries(
+        style.split(";").filter(Boolean).map((part) => {
+          const [prop, ...rest] = part.split(":");
+          const key = (prop ?? "").trim().replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
+          return [key, rest.join(":").trim()];
+        }).filter(([key, value]) => key && value),
+      ) as CSSProperties : undefined}
+      sx={{ maxWidth: "100%", height: "auto", borderRadius: 1.5, my: style ? 0 : 3 }}
+    />
+  );
 }
 
-export function ArticleDocumentView({ document, siteId, mediaBase }: { document: unknown; siteId?:number; mediaBase?:string }) {
+export function ArticleDocumentView({
+  document,
+  siteId,
+  mediaBase,
+  maxWidth = "75ch",
+}: {
+  document: unknown;
+  siteId?: number;
+  mediaBase?: string;
+  /** Reading measure for editor previews; public posts pass `none` to match the featured column. */
+  maxWidth?: string | number;
+}) {
   let nodes: ArticleNode[];
   try {
     nodes = articleDisplayBlocks(nodesFrom(normalizeArticleDocument(document).html));
@@ -211,7 +293,18 @@ export function ArticleDocumentView({ document, siteId, mediaBase }: { document:
       node.tag === "text"
         ? node.text
         : node.tag === "img"
-        ? siteId ? <ArticleAssetImage key={`${node.nodeId}:${node.assetId}`} assetId={node.assetId!} alt={node.alt!} siteId={siteId} mediaBase={mediaBase} /> : <Box key={index}>Image unavailable. {node.alt}</Box>
+        ? siteId ? (
+            <ArticleAssetImage
+              key={`${node.nodeId}:${node.assetId}`}
+              assetId={node.assetId!}
+              alt={node.alt!}
+              siteId={siteId}
+              mediaBase={mediaBase}
+              style={node.style}
+            />
+          ) : (
+            <Box key={index}>Image unavailable. {node.alt}</Box>
+          )
         : createElement(
             node.tag,
             {
@@ -223,6 +316,15 @@ export function ArticleDocumentView({ document, siteId, mediaBase }: { document:
                     rel: "noopener noreferrer",
                   }
                 : {}),
+              ...(node.style ? { style: Object.fromEntries(
+                node.style.split(";").filter(Boolean).map((part) => {
+                  const [prop, ...rest] = part.split(":");
+                  const key = (prop ?? "").trim().replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
+                  return [key, rest.join(":").trim()];
+                }).filter(([key, value]) => key && value),
+              ) } : {}),
+              ...(node.colspan ? { colSpan: Number(node.colspan) } : {}),
+              ...(node.rowspan ? { rowSpan: Number(node.rowspan) } : {}),
             },
             node.tag === "br" ? undefined : render(node.children ?? []),
           ),
@@ -231,7 +333,8 @@ export function ArticleDocumentView({ document, siteId, mediaBase }: { document:
     <Box
       data-article-version="1"
       sx={{
-        maxWidth: "75ch",
+        maxWidth,
+        width: maxWidth === "none" ? "100%" : undefined,
         overflowWrap: "anywhere",
         lineHeight: 1.8,
         color: "text.primary",
@@ -251,7 +354,24 @@ export function ArticleDocumentView({ document, siteId, mediaBase }: { document:
           bgcolor: "action.hover",
           color: "text.secondary",
         },
+        "& table": {
+          width: "100%",
+          borderCollapse: "collapse",
+          my: 2.5,
+          fontSize: { xs: "0.95rem", md: "1.05rem" },
+        },
+        "& th, & td": {
+          border: "1px solid",
+          borderColor: "divider",
+          px: 1.5,
+          py: 1,
+          textAlign: "left",
+          verticalAlign: "top",
+        },
+        "& th": { fontWeight: 700, bgcolor: "action.hover" },
+        "& mark": { bgcolor: "warning.light", px: 0.25 },
         "& img": { borderRadius: 1.5 },
+        "&::after": { content: '""', display: "table", clear: "both" },
         "& a:focus-visible": {
           outline: "3px solid",
           outlineColor: "primary.main",

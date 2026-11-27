@@ -184,7 +184,8 @@ CREATE FUNCTION cms_validate_snapshot_insert() RETURNS trigger
 LANGUAGE plpgsql AS $$
 DECLARE content_site_id bigint; content_status text; next_version integer;
 BEGIN
-    IF current_setting('cms.workflow_transition', true) IS DISTINCT FROM 'on' THEN
+    IF current_setting('cms.workflow_transition', true) IS DISTINCT FROM 'on'
+       AND current_setting('cms.apply_working_draft', true) IS DISTINCT FROM 'on' THEN
         RAISE EXCEPTION 'Publication snapshots are written by the workflow service.'
             USING ERRCODE = '23514', CONSTRAINT = 'cms_snapshot_service_only';
     END IF;
@@ -212,6 +213,14 @@ FOR EACH ROW EXECUTE FUNCTION cms_validate_snapshot_insert();
 CREATE FUNCTION cms_reject_history_mutation() RETURNS trigger
 LANGUAGE plpgsql AS $$
 BEGIN
+    -- Permanent delete of removable content clears append-only history under
+    -- the same transactional cms.content_delete flag used for revisions.
+    -- UPDATE is allowed so live publication snapshots can drop provenance
+    -- FKs that point at a purged working-draft approval/revision.
+    IF current_setting('cms.content_delete', true) IS NOT DISTINCT FROM 'on'
+       AND TG_OP IN ('DELETE', 'UPDATE') THEN
+        RETURN CASE WHEN TG_OP = 'DELETE' THEN OLD ELSE NEW END;
+    END IF;
     RAISE EXCEPTION 'CMS workflow history and publication snapshots are immutable.'
         USING ERRCODE = '23514', CONSTRAINT = 'cms_history_append_only';
 END;

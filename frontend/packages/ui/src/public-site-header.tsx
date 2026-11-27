@@ -100,14 +100,56 @@ export function PublicSiteHeader({
           <SiteNavigation items={utilityItems} label="Site utility" />
         </Container>
       ) : null}
-      <Container maxWidth="lg" data-mobile-header-row sx={{ display: "flex", alignItems: "center", justifyContent: centered ? "center" : "space-between", flexDirection: centered ? "column" : "row", gap: { xs: 1, md: 2 }, "& [data-site-branding-name]": { fontSize: { xs: ".875rem", md: "1.2rem" }, letterSpacing: "-.015em", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: { xs: 200, sm: "none" } }, "& [data-site-branding-quote]": { fontSize: { xs: ".625rem", md: ".75rem" }, lineHeight: 1.2, overflowWrap: "anywhere", whiteSpace: "normal" }, "& [data-site-branding-mark]": { width: { xs: compact ? 32 : 40, md: compact ? 64 : 100 }, height: { xs: compact ? 32 : 40, md: compact ? 48 : 75 }, fontSize: { xs: ".7rem", md: "1rem" }, flexShrink: 0 }, minHeight: { xs: compact ? 56 : 64, md: compact ? 72 : 104 }, py: { xs: compact ? 0.25 : 0.5, md: compact ? 0.75 : 1.5 }, boxSizing: "border-box" }}>
+      <Container maxWidth="lg" data-mobile-header-row sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: centered ? "center" : "space-between",
+        flexDirection: centered ? "column" : "row",
+        gap: { xs: 1, md: 2 },
+        // Brand stays one line and keeps its natural width — no ellipsis, no wrap
+        // (P4-F-CHROME-03: “University of G…” / stacked “University of Gondar”).
+        "& [data-site-branding-name]": {
+          fontSize: { xs: ".875rem", md: "1.2rem" },
+          letterSpacing: "-.015em",
+          lineHeight: 1.2,
+          whiteSpace: "nowrap",
+          overflow: "visible",
+          textOverflow: "clip",
+          maxWidth: "none",
+        },
+        "& [data-site-branding-quote]": {
+          fontSize: { xs: ".625rem", md: ".75rem" },
+          lineHeight: 1.2,
+          overflowWrap: "anywhere",
+          whiteSpace: "normal",
+        },
+        "& [data-site-branding-mark]": {
+          width: { xs: compact ? 32 : 40, md: compact ? 64 : 100 },
+          height: { xs: compact ? 32 : 40, md: compact ? 48 : 75 },
+          fontSize: { xs: ".7rem", md: "1rem" },
+          flexShrink: 0,
+        },
+        minHeight: { xs: compact ? 56 : 64, md: compact ? 72 : 104 },
+        py: { xs: compact ? 0.25 : 0.5, md: compact ? 0.75 : 1.5 },
+        boxSizing: "border-box",
+      }}>
         <Link
           href={brand ?? "/"}
           color="inherit"
           underline="none"
           target={preview ? "_blank" : undefined}
           rel={preview ? "noopener noreferrer" : undefined}
-          sx={{ minWidth: 0, minHeight: 44, flex: "1 1 auto", display: "inline-flex", alignItems: "center", gap: 1.25, ...focus }}
+          sx={{
+            minHeight: 44,
+            // Natural one-line width; do not flex-shrink beside menus.
+            flex: "0 0 auto",
+            minWidth: "max-content",
+            maxWidth: { xs: "calc(100% - 7rem)", md: "none" },
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 1.25,
+            ...focus,
+          }}
         >
           {privateLogo ? <Box component="img" data-site-branding-mark="" src={privateLogo} alt={`${site.displayName} logo`} sx={{ width: { xs: 40, md: 100 }, height: { xs: 40, md: 75 }, objectFit: "contain", flex: "0 0 auto" }} /> : <SiteBrandingLockup site={site} inverse quote={config.brand_quote} />}
           {privateLogo ? (

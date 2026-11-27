@@ -5,6 +5,20 @@ export { PublicSiteBrandingProvider, SiteBrandingLockup, SiteBrandingMark, usePu
 export { SiteNavigation, PublicMenuFrame, safeMenuHref, menusFromResponse } from "./site-navigation";
 export type { PublicMenuNode } from "./site-navigation";
 export { PublicPageView, pageFromResponse, paragraphParts } from "./public-page";
+export {
+  ContentBanner,
+  BannerBreadcrumbs,
+  crumbsFromPagePath,
+  crumbsForPostDetail,
+} from "./content-banner";
+export type { ContentBannerCrumb } from "./content-banner";
+export {
+  DEFAULT_PUBLIC_BANNER,
+  DEFAULT_PUBLIC_BANNER_STYLE,
+  resolveContentBannerStyle,
+  bannerStyleFromUnknown,
+} from "./content-banner-model";
+export type { PublicTitleBannerConfig, PublicTitleBannerStyle } from "./content-banner-model";
 export { VisualLayoutView } from "./visual-layout";
 export { countLayoutH1, resolvePageHeading, PAGE_HEADING_ERROR_PATH } from "./page-heading";
 export type { PageHeadingResolution } from "./page-heading";
@@ -12,6 +26,7 @@ export {
   DEFAULT_PAGE_WIDTH,
   PAGE_BLEED_ERROR_PATH,
   PAGE_CONTENT_WIDTHS,
+  PUBLIC_CONTENT_MAX_WIDTH,
   PAGE_SAFE_GUTTER_PX,
   PAGE_WIDTH_ERROR_PATH,
   resolvePageWidth,
@@ -78,6 +93,8 @@ export {
   ARTICLE_MAX_DEPTH,
 } from "./article-document";
 export type { ArticleDocument } from "./article-document";
+export { sanitizeInlineStyle, imageLayoutStyle } from "./article-style";
+export type { ImageAlign } from "./article-style";
 export type { ToastApi, ToastOptions } from "./toast";
 
 export { WidgetRuntimeProvider } from "./widget-runtime";

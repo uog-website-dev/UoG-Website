@@ -64,10 +64,20 @@ HREF_SCHEMES = ("http", "https", "mailto")
 #: (frontend/packages/ui/src/rich-text.tsx): the editor offers bold, italic,
 #: quotes, lists and links, so nothing outside this set can reach a reader.
 _RICH_TEXT_TAGS = frozenset({
-    "a", "p", "br", "strong", "b", "em", "i", "u", "s", "ul", "ol", "li",
-    "blockquote",
+    "a", "p", "br", "strong", "b", "em", "i", "u", "s", "mark", "span",
+    "ul", "ol", "li", "blockquote",
+    "table", "thead", "tbody", "tr", "th", "td",
 })
-_RICH_TEXT_ATTRIBUTES = {"a": frozenset({"href", "title"})}
+_RICH_TEXT_ATTRIBUTES = {
+    "a": frozenset({"href", "title"}),
+    "span": frozenset({"style"}),
+    "mark": frozenset({"style"}),
+    "p": frozenset({"style"}),
+    "table": frozenset({"style"}),
+    "tr": frozenset({"style"}),
+    "th": frozenset({"style", "colspan", "rowspan"}),
+    "td": frozenset({"style", "colspan", "rowspan"}),
+}
 
 
 class Rejection(Exception):
@@ -93,12 +103,57 @@ def sanitize_rich_text(html):
     )
 
 
+_ALLOWED_STYLE_PROPS = {
+    "color", "background-color", "text-shadow", "width", "max-width", "height",
+    "float", "display", "margin", "margin-left", "margin-right", "margin-top", "margin-bottom",
+    "text-align", "border", "border-collapse", "border-color", "border-width", "border-style",
+    "padding", "vertical-align",
+}
+_LENGTH = r"-?[\d.]+(?:px|%|em|rem|pt)?"
+_LENGTH_OR_AUTO = rf"(?:{_LENGTH}|auto)"
+_COLOR = r"(?:#[0-9a-fA-F]{3,8}|rgba?\(\s*[\d.%\s,]+\s*\)|[a-zA-Z]+)"
+_SAFE_STYLE_VALUE = re.compile(
+    rf"^(?:{_COLOR}|[a-zA-Z]+|{_LENGTH_OR_AUTO}(?:\s+{_LENGTH_OR_AUTO}){{0,3}}|"
+    rf"(?:{_LENGTH}\s+){{2,4}}{_COLOR}|"
+    r"none|solid|dashed|dotted|left|right|center|justify|top|middle|bottom|"
+    r"block|inline|inline-block)$"
+)
+
+
+def sanitize_inline_style(value):
+    """Keep only allowlisted CSS declarations for rich-text / article HTML."""
+    if not isinstance(value, str) or not value.strip():
+        return None
+    parts = []
+    for raw in value.split(";"):
+        chunk = raw.strip()
+        if not chunk or ":" not in chunk:
+            continue
+        prop, _, remainder = chunk.partition(":")
+        prop = prop.strip().lower()
+        val = " ".join(remainder.strip().split())
+        if prop not in _ALLOWED_STYLE_PROPS:
+            continue
+        if re.search(r"url\s*\(|expression\s*\(|@import|javascript:|<|>|\{|\}", val, re.I):
+            continue
+        if not _SAFE_STYLE_VALUE.match(val):
+            continue
+        parts.append(f"{prop}: {val}")
+    return "; ".join(parts) or None
+
+
 def _filter_rich_text_attribute(tag, attribute, value):
     if tag == "a" and attribute == "href":
         try:
             return check_href(value)
         except Rejection:
             return None
+    if attribute == "style":
+        return sanitize_inline_style(value)
+    if tag in {"td", "th"} and attribute in {"colspan", "rowspan"}:
+        if isinstance(value, str) and re.fullmatch(r"[1-9]\d?", value):
+            return value
+        return None
     return value
 
 
@@ -291,7 +346,7 @@ def _clean_paragraph(block, key, errors):
 
 
 def _clean_image(block, key, errors, *, site_id):
-    _clean_keys(block, {"ref", "alt", "caption"}, key, errors, required={"ref", "alt"})
+    _clean_keys(block, {"ref", "alt", "caption", "style"}, key, errors, required={"ref", "alt"})
     cleaned = {}
     try:
         cleaned["ref"] = check_image_ref(block.get("ref"), site_id=site_id)
@@ -310,6 +365,10 @@ def _clean_image(block, key, errors, *, site_id):
         )
         if caption is not None:
             cleaned["caption"] = caption
+    if "style" in block:
+        style = sanitize_inline_style(block.get("style"))
+        if style:
+            cleaned["style"] = style
     return cleaned if "ref" in cleaned and "alt" in cleaned else None
 
 

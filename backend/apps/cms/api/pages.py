@@ -175,7 +175,7 @@ class SitePageViewSet(
     queryset = Page.objects.none()
     lookup_value_regex = r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
     pagination_class = SitePagePagination
-    http_method_names = ["get", "post", "patch", "head", "options"]
+    http_method_names = ["get", "post", "patch", "delete", "head", "options"]
 
     def get_queryset(self):
         return Page.objects.filter(site_id=self.kwargs["site_pk"]).select_related(
@@ -341,12 +341,14 @@ class SitePageViewSet(
                     route_changes["slug"] = requested_slug
                 if requested_parent != page.parent:
                     route_changes["parent"] = requested_parent
-                if route_changes:
-                    page = change_route(
-                        page, **route_changes, actor=request.user,
-                    )
-                else:
-                    page.save()
+                from apps.cms.services.published_edits import published_content_write
+                with published_content_write(page):
+                    if route_changes:
+                        page = change_route(
+                            page, **route_changes, actor=request.user,
+                        )
+                    else:
+                        page.save()
         except ContentEditConflict as error:
             raise PageEditConflict() from error
         except IntegrityError as error:
@@ -358,6 +360,35 @@ class SitePageViewSet(
             )
             raise serializers.ValidationError(detail) from error
         return self._response(page)
+
+    @extend_schema(
+        tags=["CMS pages"],
+        parameters=[SITE_PARAMETER, PAGE_PARAMETER],
+        responses={204: OpenApiResponse(description="Page permanently deleted.")},
+        description=(
+            "Permanently delete a draft or archived Page. Published Pages must "
+            "be archived through the workflow first. Requires Site AUTHOR access."
+        ),
+    )
+    def destroy(self, request, *args, **kwargs):
+        from django.core.exceptions import ValidationError as DomainValidationError
+        from django.db.models.deletion import ProtectedError
+        from apps.cms.services.content_delete import hard_delete_content
+        site = self._site()
+        self._authorize(site, (ContentRole.AUTHOR,))
+        ensure_pages_module_enabled(site.pk)
+        page = get_object_or_404(self.get_queryset(), pk=self.kwargs["pk"])
+        try:
+            hard_delete_content(page)
+        except DomainValidationError as error:
+            raise serializers.ValidationError(
+                getattr(error, "message_dict", None) or error.messages,
+            ) from error
+        except ProtectedError as error:
+            raise Conflict() from error
+        except IntegrityError as error:
+            raise Conflict() from error
+        return Response(status=204, headers={"Cache-Control": "private, no-store"})
 
     @extend_schema(
         tags=["CMS pages"],
