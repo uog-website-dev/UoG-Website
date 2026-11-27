@@ -37,14 +37,15 @@ interface MediaLibraryProps {
   onSelectMany?: (assets: MediaAssetRecord[]) => void;
   multiSelect?: boolean;
   imagesOnly?: boolean;
+  documentsOnly?: boolean;
 }
 
 /** Site changes reset editable state; library controls restore only in their scoped cache. */
 export function MediaLibrary(props: MediaLibraryProps) {
-  return <SiteMediaLibrary key={`${props.siteId}:${Boolean(props.onSelect)}:${Boolean(props.multiSelect)}:${Boolean(props.imagesOnly)}`} {...props} />;
+  return <SiteMediaLibrary key={`${props.siteId}:${Boolean(props.onSelect)}:${Boolean(props.multiSelect)}:${Boolean(props.imagesOnly)}:${Boolean(props.documentsOnly)}`} {...props} />;
 }
 
-function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, onSelectMany, multiSelect = false, imagesOnly = false }: MediaLibraryProps) {
+function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, onSelectMany, multiSelect = false, imagesOnly = false, documentsOnly = false }: MediaLibraryProps) {
   const [layout, setLayout] = useSectionState<"grid" | "list">(siteId, imagesOnly ? "media-images" : "media", "layout", "grid", !onSelect);
   const [page, setPage] = useSectionState(siteId, imagesOnly ? "media-images" : "media", "page", 1, !onSelect);
   const [failedPreviews, setFailedPreviews] = useState<Set<string>>(new Set());
@@ -78,9 +79,17 @@ function SiteMediaLibrary({ siteId, canUpload, canDelete = false, onSelect, onSe
   const uploadInput = useRef<HTMLInputElement | null>(null);
   const [uploadBusy, setUploadBusy] = useState(false);
   const [uploadReady,setUploadReady] = useState(false);
-  const rows = useSiteQuery(siteId, "media", {filters, page, picker: Boolean(onSelect || onSelectMany), imagesOnly}, async (signal) => unwrap(await listSiteMedia(siteId, {
+  const rows = useSiteQuery(siteId, "media", {filters, page, picker: Boolean(onSelect || onSelectMany), imagesOnly, documentsOnly}, async (signal) => unwrap(await listSiteMedia(siteId, {
     ...filters, page,
-    ...(onSelect || onSelectMany ? imagesOnly ? { ready_images: true } : { status: "READY" as const } : imagesOnly ? { type: "image" as const } : {}),
+    ...(onSelect || onSelectMany
+      ? imagesOnly
+        ? { ready_images: true }
+        : { status: "READY" as const, ...(documentsOnly ? { type: "document" as const } : {}) }
+      : imagesOnly
+        ? { type: "image" as const }
+        : documentsOnly
+          ? { type: "document" as const }
+          : {}),
   }, signal)));
   usePageBoundary(page, setPage, rows.data, rows.error);
   const policy = useSiteQuery(siteId, "media-policy", {}, async () => unwrap(await getMediaUploadPolicy(siteId)), {enabled: canUpload});
