@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.authentication import KeycloakBearerAuthentication
-from apps.cms.event_domain import event_etag, public_events_queryset, require_events_admin
+from apps.cms.event_domain import event_etag, public_events_for_site, require_events_admin
 from apps.cms.event_models import Event
 from apps.cms.event_session_domain import (
     SessionConflict,
@@ -300,7 +300,8 @@ class PublicSiteEventAgenda(APIView):
         site = getattr(request, "site", None)
         if site is None or not module_is_available(site.pk, EVENTS_MODULE_CODE):
             raise NotFound("Events are not available for this Site.")
-        event = public_events_queryset(site.pk).filter(slug=slug).first()
+        rows = public_events_for_site(site).filter(slug=slug)
+        event = rows.filter(site_id=site.pk).first() or rows.first()
         if event is None:
             raise NotFound("Event not found.")
         return Response({"event": event.pk, "slug": event.slug, "days": public_agenda(event)})

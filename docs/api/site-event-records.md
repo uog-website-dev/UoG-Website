@@ -18,4 +18,4 @@ Statuses are explicit: `DRAFT`, `PUBLISHED`, `CANCELLED`, `ARCHIVED`. `lifecycle
 
 ## Public
 
-Only `PUBLISHED` and `CANCELLED` Events are listed or retrieved by slug. Draft and archived Events return 404 on guessed identifiers. Public agenda is `GET /api/v1/site-context/events/{slug}/agenda/`.
+Only `PUBLISHED` and `CANCELLED` Events are listed or retrieved by slug. Draft and archived Events return 404 on guessed identifiers. Public agenda is `GET /api/v1/site-context/events/{slug}/agenda/`. Directory, calendar markers and Main aggregation are documented in [public-events-calendar.md](./public-events-calendar.md).

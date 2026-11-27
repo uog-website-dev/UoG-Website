@@ -23,6 +23,9 @@ from apps.cms.event_domain import (
     create_event,
     duplicate_event,
     event_etag,
+    filter_public_events,
+    public_event_day_bounds,
+    public_events_for_site,
     public_events_queryset,
     publish_event,
     require_events_admin,
@@ -30,7 +33,7 @@ from apps.cms.event_domain import (
 )
 from apps.cms.event_models import Event, EventFormat, EventLifecycle, EventStatus
 from apps.sites.api.access import PreconditionFailed, PreconditionRequired, translate_domain_errors
-from apps.sites.events import EVENTS_MODULE_CODE
+from apps.sites.events import EVENTS_MODULE_CODE, DEFAULT_EVENT_SETTINGS, ensure_event_settings
 from apps.sites.models import Site
 from apps.sites.selectors.modules import module_is_available
 
@@ -50,11 +53,13 @@ class StrictFields:
 class EventSerializer(StrictFields, serializers.Serializer):
     id = serializers.UUIDField(read_only=True)
     site = serializers.IntegerField(read_only=True)
+    site_code = serializers.CharField(read_only=True, allow_null=True, required=False)
     title = serializers.CharField(required=False, allow_blank=True, max_length=255)
     slug = serializers.SlugField(required=False, allow_blank=True, max_length=255)
     summary = serializers.CharField(required=False, allow_blank=True, max_length=500)
     description = serializers.CharField(required=False, allow_blank=True)
     category = serializers.UUIDField(required=False, allow_null=True)
+    category_name = serializers.CharField(read_only=True, allow_null=True, required=False)
     organizer_name = serializers.CharField(required=False, allow_blank=True, max_length=255)
     organizer_email = serializers.EmailField(required=False, allow_blank=True)
     organizer_phone = serializers.CharField(required=False, allow_blank=True, max_length=64)
@@ -103,18 +108,18 @@ def _banner_url(event: Event) -> str | None:
     return f"/api/v1/sites/{event.site_id}/assets/{event.banner_asset_id}/image/?variant=display"
 
 
-def serialize_event(event: Event) -> dict:
-    return {
+def serialize_event(event: Event, *, public: bool = False) -> dict:
+    payload = {
         "id": event.pk,
         "site": event.site_id,
+        "site_code": getattr(event.site, "code", None),
         "title": event.title,
         "slug": event.slug,
         "summary": event.summary,
         "description": event.description,
         "category": event.category_id,
+        "category_name": event.category.name if event.category_id and getattr(event, "category", None) else None,
         "organizer_name": event.organizer_name,
-        "organizer_email": event.organizer_email,
-        "organizer_phone": event.organizer_phone,
         "status": event.status,
         "lifecycle": event.derived_lifecycle(),
         "starts_at": event.starts_at,
@@ -136,6 +141,15 @@ def serialize_event(event: Event) -> dict:
         "created_at": event.created_at,
         "updated_at": event.updated_at,
     }
+    if not public:
+        payload["organizer_email"] = event.organizer_email
+        payload["organizer_phone"] = event.organizer_phone
+    return payload
+
+
+def _public_tz_name(site: Site) -> str:
+    settings_obj = ensure_event_settings(site)
+    return settings_obj.timezone or DEFAULT_EVENT_SETTINGS["timezone"]
 
 
 def _site(site_pk: int) -> Site:
@@ -310,19 +324,56 @@ class PublicSiteEvents(APIView):
     authentication_classes = []
     permission_classes = []
 
-    @extend_schema(operation_id="v1_site_context_events_list", tags=["Public Events"], responses={200: EventListResponse})
+    @extend_schema(
+        operation_id="v1_site_context_events_list",
+        tags=["Public Events"],
+        responses={200: EventListResponse},
+        parameters=[
+            OpenApiParameter("search", str),
+            OpenApiParameter("category", str),
+            OpenApiParameter("lifecycle", str, enum=["upcoming", "past", "in_progress", "directory_upcoming", "directory_past"]),
+            OpenApiParameter("on_date", str, description="YYYY-MM-DD; Events overlapping this local calendar day"),
+            OpenApiParameter("page", int),
+            OpenApiParameter("page_size", int),
+        ],
+    )
     def get(self, request):
         site = getattr(request, "site", None)
         if site is None or not module_is_available(site.pk, EVENTS_MODULE_CODE):
             raise NotFound("Events are not available for this Site.")
-        rows = public_events_queryset(site.pk).select_related("banner_asset")
+        rows = public_events_for_site(site)
         search = request.query_params.get("search", "").strip()
+        category = request.query_params.get("category", "").strip()
+        lifecycle = request.query_params.get("lifecycle", "").strip()
+        on_date = request.query_params.get("on_date", "").strip()
         if search:
             rows = rows.filter(Q(title__icontains=search) | Q(summary__icontains=search))
-        rows = rows.order_by("starts_at", "id")
+        if category:
+            from uuid import UUID
+            try:
+                rows = rows.filter(category_id=UUID(str(category)))
+            except (TypeError, ValueError, AttributeError):
+                rows = rows.filter(category__slug=category)
+        try:
+            rows = filter_public_events(
+                rows,
+                lifecycle=lifecycle or None,
+                on_date=on_date or None,
+                tz_name=_public_tz_name(site),
+            )
+        except ValueError as error:
+            raise serializers.ValidationError({"on_date": ["Use YYYY-MM-DD."]}) from error
+        if lifecycle in {"directory_upcoming", "upcoming", EventLifecycle.UPCOMING, "in_progress"}:
+            rows = rows.order_by("starts_at", "id")
+        else:
+            rows = rows.order_by("-starts_at", "id")
         paginator = EventPagination()
         page = paginator.paginate_queryset(rows, request, view=self)
-        return paginator.get_paginated_response([serialize_event(row) for row in page])
+        response = paginator.get_paginated_response([serialize_event(row, public=True) for row in page])
+        response["Cache-Control"] = "public, max-age=0, must-revalidate"
+        response["Vary"] = "Host"
+        response["X-Events-Cache-Scope"] = f"site-{site.pk}"
+        return response
 
 
 class PublicSiteEventDetail(APIView):
@@ -334,7 +385,124 @@ class PublicSiteEventDetail(APIView):
         site = getattr(request, "site", None)
         if site is None or not module_is_available(site.pk, EVENTS_MODULE_CODE):
             raise NotFound("Events are not available for this Site.")
-        event = public_events_queryset(site.pk).filter(slug=slug).select_related("banner_asset").first()
+        rows = public_events_for_site(site).filter(slug=slug)
+        event = rows.filter(site_id=site.pk).first() or rows.first()
         if event is None:
             raise NotFound("Event not found.")
-        return Response(serialize_event(event))
+        response = Response(serialize_event(event, public=True))
+        response["Cache-Control"] = "public, max-age=0, must-revalidate"
+        response["Vary"] = "Host"
+        response["X-Events-Cache-Scope"] = f"site-{site.pk}"
+        return response
+
+
+class PublicCalendarDaySerializer(serializers.Serializer):
+    date = serializers.DateField()
+    count = serializers.IntegerField()
+    event_ids = serializers.ListField(child=serializers.UUIDField())
+
+
+class PublicEventsCalendarResponse(serializers.Serializer):
+    year = serializers.IntegerField()
+    month = serializers.IntegerField()
+    timezone = serializers.CharField()
+    days = PublicCalendarDaySerializer(many=True)
+
+
+class PublicEventCategorySerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    name = serializers.CharField()
+    slug = serializers.SlugField()
+    code = serializers.CharField()
+
+
+class PublicEventCategoryListResponse(serializers.Serializer):
+    results = PublicEventCategorySerializer(many=True)
+
+
+class PublicSiteEventsCalendar(APIView):
+    """Month markers: multi-day Events appear on every covered date without list duplication."""
+
+    authentication_classes = []
+    permission_classes = []
+
+    @extend_schema(
+        operation_id="v1_site_context_events_calendar",
+        tags=["Public Events"],
+        parameters=[OpenApiParameter("year", int, required=True), OpenApiParameter("month", int, required=True)],
+        responses={200: PublicEventsCalendarResponse},
+    )
+    def get(self, request):
+        site = getattr(request, "site", None)
+        if site is None or not module_is_available(site.pk, EVENTS_MODULE_CODE):
+            raise NotFound("Events are not available for this Site.")
+        try:
+            year = int(request.query_params.get("year", ""))
+            month = int(request.query_params.get("month", ""))
+            if month < 1 or month > 12 or year < 1970 or year > 2100:
+                raise ValueError
+        except ValueError as error:
+            raise serializers.ValidationError({"detail": ["Provide year and month as integers."]}) from error
+        import calendar
+        import zoneinfo
+        from datetime import date
+
+        tz_name = _public_tz_name(site)
+        try:
+            tz = zoneinfo.ZoneInfo(tz_name)
+        except (zoneinfo.ZoneInfoNotFoundError, KeyError, ValueError):
+            tz = zoneinfo.ZoneInfo("UTC")
+        month_start = date(year, month, 1)
+        month_end = date(year, month, calendar.monthrange(year, month)[1])
+        start_utc, _ = public_event_day_bounds(month_start, tz_name=tz_name)
+        _, end_utc = public_event_day_bounds(month_end, tz_name=tz_name)
+        rows = public_events_for_site(site).filter(starts_at__lte=end_utc, ends_at__gte=start_utc)
+        days: dict[str, dict] = {}
+        for event in rows.iterator():
+            local_start = timezone.localtime(event.starts_at, tz).date()
+            local_end = timezone.localtime(event.ends_at, tz).date()
+            cursor = max(local_start, month_start)
+            last = min(local_end, month_end)
+            while cursor <= last:
+                key = cursor.isoformat()
+                bucket = days.setdefault(key, {"date": key, "count": 0, "event_ids": []})
+                bucket["count"] += 1
+                bucket["event_ids"].append(str(event.pk))
+                cursor = date.fromordinal(cursor.toordinal() + 1)
+        response = Response({
+            "year": year,
+            "month": month,
+            "timezone": tz_name,
+            "days": [days[key] for key in sorted(days)],
+        })
+        response["Cache-Control"] = "public, max-age=0, must-revalidate"
+        response["Vary"] = "Host"
+        response["X-Events-Cache-Scope"] = f"site-{site.pk}"
+        return response
+
+
+class PublicSiteEventCategories(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    @extend_schema(
+        operation_id="v1_site_context_event_categories_list",
+        tags=["Public Events"],
+        responses={200: PublicEventCategoryListResponse},
+    )
+    def get(self, request):
+        site = getattr(request, "site", None)
+        if site is None or not module_is_available(site.pk, EVENTS_MODULE_CODE):
+            raise NotFound("Events are not available for this Site.")
+        rows = Category.objects.filter(
+            site_id=site.pk, kind=Category.Kind.EVENTS, is_active=True,
+        ).order_by("position", "name", "id")
+        response = Response({
+            "results": [
+                {"id": row.pk, "name": row.name, "slug": row.slug, "code": row.code}
+                for row in rows
+            ],
+        })
+        response["Cache-Control"] = "public, max-age=0, must-revalidate"
+        response["Vary"] = "Host"
+        return response

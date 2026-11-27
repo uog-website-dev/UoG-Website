@@ -5,14 +5,16 @@ export type EventFormat = "PHYSICAL" | "ONLINE" | "HYBRID";
 export interface SiteEventRecord {
   id: string;
   site: number;
+  site_code?: string | null;
   title: string;
   slug: string;
   summary: string;
   description: string;
   category: string | null;
+  category_name?: string | null;
   organizer_name: string;
-  organizer_email: string;
-  organizer_phone: string;
+  organizer_email?: string;
+  organizer_phone?: string;
   status: EventStatus;
   lifecycle: EventLifecycle;
   starts_at: string | null;

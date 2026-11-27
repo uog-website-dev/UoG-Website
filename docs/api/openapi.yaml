@@ -7478,6 +7478,45 @@ paths:
   /api/v1/site-context/events/:
     get:
       operationId: v1_site_context_events_list
+      parameters:
+      - in: query
+        name: category
+        schema:
+          type: string
+      - in: query
+        name: lifecycle
+        schema:
+          type: string
+          enum:
+          - directory_past
+          - directory_upcoming
+          - in_progress
+          - past
+          - upcoming
+      - in: query
+        name: on_date
+        schema:
+          type: string
+        description: YYYY-MM-DD; Events overlapping this local calendar day
+      - in: query
+        name: page
+        schema:
+          type: integer
+      - in: query
+        name: page_size
+        schema:
+          type: integer
+      - in: query
+        name: search
+        schema:
+          type: string
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
       tags:
       - Public Events
       responses:
@@ -7555,14 +7594,6 @@ paths:
               schema:
                 type: string
                 format: uuid
-      parameters:
-      - name: X-Request-ID
-        in: header
-        required: false
-        description: Optional UUID correlation ID. Invalid values are replaced.
-        schema:
-          type: string
-          format: uuid
   /api/v1/site-context/events/{slug}/:
     get:
       operationId: v1_site_context_events_retrieve
@@ -7775,6 +7806,194 @@ paths:
               schema:
                 type: string
                 format: uuid
+  /api/v1/site-context/events/calendar/:
+    get:
+      operationId: v1_site_context_events_calendar
+      description: 'Month markers: multi-day Events appear on every covered date without
+        list duplication.'
+      parameters:
+      - in: query
+        name: month
+        schema:
+          type: integer
+        required: true
+      - in: query
+        name: year
+        schema:
+          type: integer
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Public Events
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicEventsCalendarResponse'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/site-context/events/categories/:
+    get:
+      operationId: v1_site_context_event_categories_list
+      tags:
+      - Public Events
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicEventCategoryListResponse'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+      parameters:
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
   /api/v1/site-context/homepage/:
     get:
       operationId: public_site_homepage
@@ -72847,6 +73066,23 @@ components:
       - pattern
       - title_align
       - title_color
+    PublicCalendarDay:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        count:
+          type: integer
+        event_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+      required:
+      - count
+      - date
+      - event_ids
     PublicCategoryArchive:
       type: object
       properties:
@@ -72976,6 +73212,51 @@ components:
       - next
       - previous
       - results
+    PublicEventCategory:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        slug:
+          type: string
+          pattern: ^[-a-zA-Z0-9_]+$
+        code:
+          type: string
+      required:
+      - code
+      - id
+      - name
+      - slug
+    PublicEventCategoryListResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicEventCategory'
+      required:
+      - results
+    PublicEventsCalendarResponse:
+      type: object
+      properties:
+        year:
+          type: integer
+        month:
+          type: integer
+        timezone:
+          type: string
+        days:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicCalendarDay'
+      required:
+      - days
+      - month
+      - timezone
+      - year
     PublicLink:
       type: object
       properties:
