@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from django.core.exceptions import ValidationError as DomainValidationError
 from django.db.models import Q
-from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import serializers
@@ -15,6 +14,7 @@ from rest_framework.views import APIView
 
 from apps.accounts.authentication import KeycloakBearerAuthentication
 from apps.api.models import Category
+from apps.cms.event_access import admin_event_only, load_site, public_event
 from apps.cms.event_domain import (
     EventConflict,
     EventPreconditionRequired,
@@ -202,13 +202,6 @@ def _public_tz_name(site: Site) -> str:
     return settings_obj.timezone or DEFAULT_EVENT_SETTINGS["timezone"]
 
 
-def _site(site_pk: int) -> Site:
-    site = get_object_or_404(Site, pk=site_pk)
-    if not module_is_available(site.pk, EVENTS_MODULE_CODE):
-        raise PermissionDenied("Events are not enabled for this Site.")
-    return site
-
-
 class SiteEvents(APIView):
     authentication_classes = [KeycloakBearerAuthentication]
     permission_classes = [IsAuthenticated]
@@ -227,9 +220,13 @@ class SiteEvents(APIView):
             OpenApiParameter("page", int),
             OpenApiParameter("page_size", int),
         ],
+        description=(
+            "List Events for a Site. Requires Site Administrator (`sites.update`) and an "
+            "enabled EVENTS module. No Event-specific management roles exist."
+        ),
     )
     def get(self, request, site_pk):
-        site = _site(site_pk)
+        site = load_site(site_pk)
         require_events_admin(request.user, site)
         rows = Event.objects.filter(site_id=site.pk).select_related("category", "banner_asset")
         search = request.query_params.get("search", "").strip()
@@ -265,7 +262,8 @@ class SiteEvents(APIView):
 
     @extend_schema(operation_id="v1_sites_events_create", tags=["Events"], request=EventSerializer, responses={201: EventSerializer})
     def post(self, request, site_pk):
-        site = _site(site_pk)
+        site = load_site(site_pk)
+        require_events_admin(request.user, site)
         serializer = EventSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         with translate_domain_errors():
@@ -281,9 +279,7 @@ class SiteEventDetail(APIView):
     permission_classes = [IsAuthenticated]
 
     def _load(self, request, site_pk, event_id) -> Event:
-        site = _site(site_pk)
-        require_events_admin(request.user, site)
-        return get_object_or_404(Event, pk=event_id, site_id=site.pk)
+        return admin_event_only(request, site_pk, event_id)
 
     @extend_schema(operation_id="v1_sites_events_retrieve", tags=["Events"], responses={200: EventSerializer})
     def get(self, request, site_pk, event_id):
@@ -321,9 +317,7 @@ class SiteEventAction(APIView):
 
     @extend_schema(operation_id="v1_sites_events_action", tags=["Events"], request=EventActionSerializer, responses={200: EventSerializer})
     def post(self, request, site_pk, event_id, action):
-        site = _site(site_pk)
-        require_events_admin(request.user, site)
-        event = get_object_or_404(Event, pk=event_id, site_id=site.pk)
+        event = admin_event_only(request, site_pk, event_id)
         expected = request.headers.get("If-Match")
         serializer = EventActionSerializer(data=request.data or {})
         serializer.is_valid(raise_exception=True)
@@ -360,9 +354,7 @@ class SiteEventPreview(APIView):
 
     @extend_schema(operation_id="v1_sites_events_preview", tags=["Events"], responses={200: EventSerializer})
     def get(self, request, site_pk, event_id):
-        site = _site(site_pk)
-        require_events_admin(request.user, site)
-        event = get_object_or_404(Event, pk=event_id, site_id=site.pk)
+        event = admin_event_only(request, site_pk, event_id)
         payload = serialize_event(event)
         payload["preview"] = True
         response = Response(payload)
@@ -455,13 +447,8 @@ class PublicSiteEventDetail(APIView):
         ),
     )
     def get(self, request, slug):
-        site = getattr(request, "site", None)
-        if site is None or not module_is_available(site.pk, EVENTS_MODULE_CODE):
-            raise NotFound("Events are not available for this Site.")
-        rows = public_events_for_site(site).filter(slug=slug)
-        event = rows.filter(site_id=site.pk).first() or rows.first()
-        if event is None:
-            raise NotFound("Event not found.")
+        event = public_event(request, slug)
+        site = event.site
         response = Response(serialize_event(event, public=True))
         response["Cache-Control"] = "public, max-age=0, must-revalidate"
         response["Vary"] = "Host"

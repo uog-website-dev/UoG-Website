@@ -2,17 +2,15 @@
 from __future__ import annotations
 
 from django.core.exceptions import ValidationError as DomainValidationError
-from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import serializers
-from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.authentication import KeycloakBearerAuthentication
-from apps.cms.event_domain import public_events_for_site, require_events_admin
-from apps.cms.event_models import Event
+from apps.cms.event_access import admin_event, public_event
 from apps.cms.event_resource_access import (
     ResourceFileThrottle,
     authorize_resource_file,
@@ -35,9 +33,6 @@ from apps.cms.event_resource_domain import (
 )
 from apps.cms.event_resource_models import ResourceCategory, ResourceVisibility
 from apps.sites.api.access import Conflict
-from apps.sites.events import EVENTS_MODULE_CODE
-from apps.sites.models import Site
-from apps.sites.selectors.modules import module_is_available
 
 
 class StrictFields:
@@ -134,26 +129,6 @@ def _domain_error(error):
     raise error
 
 
-def _admin_event(request, site_pk, event_id) -> tuple[Site, Event]:
-    site = get_object_or_404(Site, pk=site_pk)
-    if not module_is_available(site.pk, EVENTS_MODULE_CODE):
-        raise PermissionDenied("Events are not enabled for this Site.")
-    require_events_admin(request.user, site)
-    event = get_object_or_404(Event, pk=event_id, site_id=site.pk)
-    return site, event
-
-
-def _public_event(request, slug) -> Event:
-    site = getattr(request, "site", None)
-    if site is None or not module_is_available(site.pk, EVENTS_MODULE_CODE):
-        raise NotFound("Events are not available for this Site.")
-    rows = public_events_for_site(site).filter(slug=slug)
-    event = rows.filter(site_id=site.pk).first() or rows.first()
-    if event is None:
-        raise NotFound("Event not found.")
-    return event
-
-
 class SiteEventResources(APIView):
     authentication_classes = [KeycloakBearerAuthentication]
     permission_classes = [IsAuthenticated]
@@ -164,7 +139,7 @@ class SiteEventResources(APIView):
         responses={200: EventResourceSerializer(many=True)},
     )
     def get(self, request, site_pk, event_id):
-        _site, event = _admin_event(request, site_pk, event_id)
+        _site, event = admin_event(request, site_pk, event_id)
         response = Response(list_admin_resources(event))
         response["Cache-Control"] = "private, no-store"
         return response
@@ -180,7 +155,7 @@ class SiteEventResources(APIView):
         ),
     )
     def post(self, request, site_pk, event_id):
-        _site, event = _admin_event(request, site_pk, event_id)
+        _site, event = admin_event(request, site_pk, event_id)
         payload = EventResourceCreateSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         try:
@@ -203,7 +178,7 @@ class SiteEventResourcesReorder(APIView):
         responses={200: EventResourceSerializer(many=True)},
     )
     def post(self, request, site_pk, event_id):
-        _site, event = _admin_event(request, site_pk, event_id)
+        _site, event = admin_event(request, site_pk, event_id)
         payload = EventResourceReorderSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         try:
@@ -226,7 +201,7 @@ class SiteEventResourceDetail(APIView):
         responses={200: EventResourceSerializer},
     )
     def patch(self, request, site_pk, event_id, resource_id):
-        _site, event = _admin_event(request, site_pk, event_id)
+        _site, event = admin_event(request, site_pk, event_id)
         payload = EventResourceSerializer(data=request.data, partial=True)
         payload.is_valid(raise_exception=True)
         try:
@@ -243,7 +218,7 @@ class SiteEventResourceDetail(APIView):
         description="Remove the Event association only. Canonical Document/File is retained.",
     )
     def delete(self, request, site_pk, event_id, resource_id):
-        _site, event = _admin_event(request, site_pk, event_id)
+        _site, event = admin_event(request, site_pk, event_id)
         try:
             remove_resource(event, resource_id, actor=request.user)
         except Exception as error:
@@ -263,7 +238,7 @@ class SiteEventResourceVisibility(APIView):
         description="Publish/unpublish independently of the root Event and unrelated sessions.",
     )
     def post(self, request, site_pk, event_id, resource_id):
-        _site, event = _admin_event(request, site_pk, event_id)
+        _site, event = admin_event(request, site_pk, event_id)
         payload = EventResourceVisibilitySerializer(data=request.data)
         payload.is_valid(raise_exception=True)
         try:
@@ -288,7 +263,7 @@ class SiteEventResourceFile(APIView):
         responses={200: {"description": "Authorized file stream"}},
     )
     def get(self, request, site_pk, event_id, resource_id):
-        _site, event = _admin_event(request, site_pk, event_id)
+        _site, event = admin_event(request, site_pk, event_id)
         parse_file_query(request)
         resource, asset, bucket, key = authorize_resource_file(
             event=event, resource_id=resource_id, request=request, management=True,
@@ -314,7 +289,7 @@ class PublicSiteEventResources(APIView):
         responses={200: PublicResourceSerializer(many=True)},
     )
     def get(self, request, slug):
-        event = _public_event(request, slug)
+        event = public_event(request, slug)
         return Response(list_public_resources(event))
 
 
@@ -334,7 +309,7 @@ class PublicSiteEventResourceEntitlement(APIView):
         ),
     )
     def post(self, request, slug, resource_id):
-        event = _public_event(request, slug)
+        event = public_event(request, slug)
         payload = ResourceEntitlementInput(data=request.data)
         payload.is_valid(raise_exception=True)
         resource, _asset, _bucket, _key = authorize_resource_file(
@@ -384,7 +359,7 @@ class PublicSiteEventResourceFile(APIView):
         ),
     )
     def get(self, request, slug, resource_id):
-        event = _public_event(request, slug)
+        event = public_event(request, slug)
         query = parse_file_query(request)
         resource, asset, bucket, key = authorize_resource_file(
             event=event,

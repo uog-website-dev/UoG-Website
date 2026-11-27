@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from django.core.exceptions import ValidationError as DomainValidationError
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import serializers
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
@@ -13,6 +12,7 @@ from rest_framework.views import APIView
 
 from apps.accounts.authentication import KeycloakBearerAuthentication
 from apps.audit.writer import record_event
+from apps.cms.event_access import admin_event
 from apps.cms.event_attendance_domain import (
     AttendanceForbidden,
     AttendanceNotFound,
@@ -25,13 +25,8 @@ from apps.cms.event_attendance_domain import (
     serialize_attendance,
 )
 from apps.cms.event_attendance_models import AttendanceMethod, EventAttendance
-from apps.cms.event_domain import require_events_admin
-from apps.cms.event_models import Event
 from apps.cms.event_registration_domain import serialize_badge
 from apps.cms.event_registration_models import EventRegistration
-from apps.sites.events import EVENTS_MODULE_CODE
-from apps.sites.models import Site
-from apps.sites.selectors.modules import module_is_available
 
 
 class StrictFields:
@@ -96,15 +91,6 @@ def _domain_error(error):
     raise error
 
 
-def _admin_event(request, site_pk, event_id) -> tuple[Site, Event]:
-    site = get_object_or_404(Site, pk=site_pk)
-    if not module_is_available(site.pk, EVENTS_MODULE_CODE):
-        raise PermissionDenied("Events are not enabled for this Site.")
-    require_events_admin(request.user, site)
-    event = get_object_or_404(Event, pk=event_id, site_id=site.pk)
-    return site, event
-
-
 class SiteEventCheckIn(APIView):
     authentication_classes = [KeycloakBearerAuthentication]
     permission_classes = [IsAuthenticated]
@@ -120,7 +106,7 @@ class SiteEventCheckIn(APIView):
         ),
     )
     def post(self, request, site_pk, event_id):
-        _site, event = _admin_event(request, site_pk, event_id)
+        _site, event = admin_event(request, site_pk, event_id)
         payload = ManualCheckInInput(data=request.data)
         payload.is_valid(raise_exception=True)
         try:
@@ -155,7 +141,7 @@ class SiteEventCheckInScan(APIView):
         ),
     )
     def post(self, request, site_pk, event_id):
-        _site, event = _admin_event(request, site_pk, event_id)
+        _site, event = admin_event(request, site_pk, event_id)
         payload = TokenCheckInInput(data=request.data)
         payload.is_valid(raise_exception=True)
         try:
@@ -185,7 +171,7 @@ class SiteEventCheckOut(APIView):
         responses={200: AttendanceSerializer},
     )
     def post(self, request, site_pk, event_id, registration_id):
-        _site, event = _admin_event(request, site_pk, event_id)
+        _site, event = admin_event(request, site_pk, event_id)
         try:
             row = check_out_registration(event, registration_id, actor=request.user)
         except Exception as error:
@@ -205,7 +191,7 @@ class SiteEventAttendanceList(APIView):
         responses={200: AttendanceSerializer(many=True)},
     )
     def get(self, request, site_pk, event_id):
-        _site, event = _admin_event(request, site_pk, event_id)
+        _site, event = admin_event(request, site_pk, event_id)
         rows = EventAttendance.objects.filter(event_id=event.pk).order_by("-checked_in_at", "id")[:500]
         response = Response([serialize_attendance(row) for row in rows])
         response["Cache-Control"] = "private, no-store"
@@ -233,7 +219,7 @@ class SiteEventReport(APIView):
         ),
     )
     def get(self, request, site_pk, event_id):
-        _site, event = _admin_event(request, site_pk, event_id)
+        _site, event = admin_event(request, site_pk, event_id)
         try:
             payload = event_report(
                 event,
@@ -261,7 +247,7 @@ class SiteEventReportExport(APIView):
         description="Privacy-controlled attendance report CSV with spreadsheet formula injection protection.",
     )
     def get(self, request, site_pk, event_id):
-        _site, event = _admin_event(request, site_pk, event_id)
+        site, event = admin_event(request, site_pk, event_id)
         try:
             filename, content = build_report_csv(
                 event,
@@ -277,7 +263,7 @@ class SiteEventReportExport(APIView):
             action="EVENT_ATTENDANCE_REPORT_EXPORTED",
             entity_type="cms.event",
             entity_id=event.pk,
-            after={"filename": filename, "bytes": len(content)},
+            after={"filename": filename, "bytes": len(content), "site": site.pk},
             changed_fields=[],
         )
         response = HttpResponse(content, content_type="text/csv; charset=utf-8")

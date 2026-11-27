@@ -22488,6 +22488,8 @@ paths:
   /api/v1/sites/{site_pk}/events/:
     get:
       operationId: v1_sites_events_list
+      description: List Events for a Site. Requires Site Administrator (`sites.update`)
+        and an enabled EVENTS module. No Event-specific management roles exist.
       parameters:
       - in: query
         name: category
