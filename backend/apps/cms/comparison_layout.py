@@ -1,4 +1,4 @@
-﻿"""Construct the AAU comparison using only the shared, versioned 43-widget contract."""
+﻿"""Construct the AAU comparison using only the shared, versioned 44-widget contract."""
 from html import escape
 
 

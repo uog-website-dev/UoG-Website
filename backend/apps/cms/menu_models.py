@@ -238,7 +238,7 @@ class MenuItem(MenuRecord):
             from apps.sites.selectors.modules import module_is_available
             if not module_is_available(self.site_id, "DOCUMENTS"):
                 raise ValidationError({"target": "The DOCUMENTS module is not enabled for this Site."})
-            if self.page_id or self.post_id or self.category_id or self.target or self.allow_cross_site:
+            if self.page_id or self.post_id or self.category_id or self.target:
                 raise ValidationError({"target": "Documents destinations use this Site's document directory."})
             return
         if kind in {self.ItemType.NEWS, self.ItemType.CATEGORY}:

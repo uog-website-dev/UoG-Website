@@ -99,7 +99,7 @@ it("isolates private revision image URLs from public rendering and retries a cha
 describe("shared renderer preview/public parity", () => {
   it("produces the same content structure for approved fixtures on both surfaces", () => {
     const approved = fixtures.filter((fixture) => fixture.valid && fixture.name.startsWith("catalog-"));
-    expect(approved.length).toBe(43);
+    expect(approved.length).toBe(44);
     for (const fixture of approved) {
       const page = pageDoc(fixture.layout, fixture.name);
       const publicView = render(<PublicPageView page={page} />);
