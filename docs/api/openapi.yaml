@@ -10649,6 +10649,22 @@ paths:
           * `oldest` - oldest
           * `title` - title
       - in: query
+        name: lifecycle
+        schema:
+          enum:
+          - upcoming
+          - past
+          - in_progress
+          - directory_upcoming
+          type: string
+          default: upcoming
+          minLength: 1
+        description: |-
+          * `upcoming` - upcoming
+          * `past` - past
+          * `in_progress` - in_progress
+          * `directory_upcoming` - directory_upcoming
+      - in: query
         name: limit
         schema:
           type: integer
@@ -10695,6 +10711,7 @@ paths:
           - menu
           - breadcrumbs
           - documents
+          - events
           type: string
           minLength: 1
         description: |-
@@ -10705,6 +10722,7 @@ paths:
           * `menu` - menu
           * `breadcrumbs` - breadcrumbs
           * `documents` - documents
+          * `events` - events
         required: true
       - in: query
         name: tag
@@ -43375,6 +43393,7 @@ paths:
                                               enum:
                                               - posts
                                               - pages
+                                              - events
                                             limit:
                                               type: integer
                                               minimum: 1
@@ -43546,6 +43565,7 @@ paths:
                                               enum:
                                               - posts
                                               - pages
+                                              - events
                                             limit:
                                               type: integer
                                               minimum: 1
@@ -43717,6 +43737,7 @@ paths:
                                               enum:
                                               - posts
                                               - pages
+                                              - events
                                             limit:
                                               type: integer
                                               minimum: 1
@@ -45861,6 +45882,7 @@ paths:
                                               enum:
                                               - posts
                                               - pages
+                                              - events
                                             limit:
                                               type: integer
                                               minimum: 1
@@ -46032,6 +46054,7 @@ paths:
                                               enum:
                                               - posts
                                               - pages
+                                              - events
                                             limit:
                                               type: integer
                                               minimum: 1
@@ -48277,6 +48300,22 @@ paths:
         description: Page UUID.
         required: true
       - in: query
+        name: lifecycle
+        schema:
+          enum:
+          - upcoming
+          - past
+          - in_progress
+          - directory_upcoming
+          type: string
+          default: upcoming
+          minLength: 1
+        description: |-
+          * `upcoming` - upcoming
+          * `past` - past
+          * `in_progress` - in_progress
+          * `directory_upcoming` - directory_upcoming
+      - in: query
         name: limit
         schema:
           type: integer
@@ -48329,6 +48368,7 @@ paths:
           - menu
           - breadcrumbs
           - documents
+          - events
           type: string
           minLength: 1
         description: |-
@@ -48339,6 +48379,7 @@ paths:
           * `menu` - menu
           * `breadcrumbs` - breadcrumbs
           * `documents` - documents
+          * `events` - events
         required: true
       - in: query
         name: tag
@@ -61219,6 +61260,7 @@ components:
                                       enum:
                                       - posts
                                       - pages
+                                      - events
                                     limit:
                                       type: integer
                                       minimum: 1
@@ -61390,6 +61432,7 @@ components:
                                       enum:
                                       - posts
                                       - pages
+                                      - events
                                     limit:
                                       type: integer
                                       minimum: 1
@@ -61561,6 +61604,7 @@ components:
                                       enum:
                                       - posts
                                       - pages
+                                      - events
                                     limit:
                                       type: integer
                                       minimum: 1
@@ -63705,6 +63749,7 @@ components:
                                       enum:
                                       - posts
                                       - pages
+                                      - events
                                     limit:
                                       type: integer
                                       minimum: 1
@@ -63876,6 +63921,7 @@ components:
                                       enum:
                                       - posts
                                       - pages
+                                      - events
                                     limit:
                                       type: integer
                                       minimum: 1
@@ -65942,6 +65988,7 @@ components:
       - news
       - category
       - docs
+      - events
       type: string
       description: |-
         * `page` - Page
@@ -65951,6 +65998,7 @@ components:
         * `news` - News listing
         * `category` - News category
         * `docs` - Documents & Files
+        * `events` - Events & Calendar
     LayoutEnum:
       enum:
       - FULL_WIDTH
@@ -66124,9 +66172,12 @@ components:
           type: boolean
         documentsAvailable:
           type: boolean
+        eventsAvailable:
+          type: boolean
       required:
       - categories
       - documentsAvailable
+      - eventsAvailable
       - pages
       - pagesAvailable
       - posts
@@ -74729,6 +74780,7 @@ components:
                                       enum:
                                       - posts
                                       - pages
+                                      - events
                                     limit:
                                       type: integer
                                       minimum: 1
@@ -74900,6 +74952,7 @@ components:
                                       enum:
                                       - posts
                                       - pages
+                                      - events
                                     limit:
                                       type: integer
                                       minimum: 1
@@ -75071,6 +75124,7 @@ components:
                                       enum:
                                       - posts
                                       - pages
+                                      - events
                                     limit:
                                       type: integer
                                       minimum: 1
@@ -77215,6 +77269,7 @@ components:
                                       enum:
                                       - posts
                                       - pages
+                                      - events
                                     limit:
                                       type: integer
                                       minimum: 1
@@ -77386,6 +77441,7 @@ components:
                                       enum:
                                       - posts
                                       - pages
+                                      - events
                                     limit:
                                       type: integer
                                       minimum: 1

@@ -29,7 +29,7 @@ export interface MenuRecord {
   is_global: boolean;
 }
 
-export type MenuItemKind = "page" | "post" | "external" | "custom" | "news" | "category" | "docs";
+export type MenuItemKind = "page" | "post" | "external" | "custom" | "news" | "category" | "docs" | "events";
 
 export interface MenuItemRecord {
   id: string;
@@ -67,6 +67,7 @@ export interface MenuTargets {
   pagesAvailable: boolean;
   postsAvailable: boolean;
   documentsAvailable: boolean;
+  eventsAvailable?: boolean;
 }
 
 export interface MenuLocationState {
@@ -194,7 +195,7 @@ function itemBody(input: MenuItemInput): Record<string, unknown> {
     page: kind === "page" ? input.page ?? null : null,
     post: kind === "post" ? input.post ?? null : null,
     category: kind === "category" ? input.category ?? null : null,
-    target: ["page","post","category","news"].includes(kind) ? "" : input.target ?? "",
+    target: ["page", "post", "category", "news", "docs", "events"].includes(kind) ? "" : input.target ?? "",
   };
   if (input.parent) body.parent = input.parent;
   return body;

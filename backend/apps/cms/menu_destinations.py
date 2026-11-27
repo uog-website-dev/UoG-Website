@@ -68,7 +68,7 @@ def resolve_destinations(items):
         if kind in {"external", "custom"}:
             resolved[_item_key(item)] = _static_target(item)
             continue
-        if kind == "docs":
+        if kind in {"docs", "events"}:
             site_ids.add(item.site_id)
             continue
         if kind not in {"page", "post", "news", "category"}:
@@ -85,12 +85,31 @@ def resolve_destinations(items):
     modules_by_site = {
         site_id: available_module_codes(site_id) for site_id in site_ids
     }
+    event_paths = {}
+    events_sites = {
+        item.site_id for item in items
+        if item.item_type == "events" and "EVENTS" in modules_by_site.get(item.site_id, ())
+    }
+    if events_sites:
+        from apps.sites.models.event_settings import SiteEventSettings
+
+        for row in SiteEventSettings.objects.filter(site_id__in=events_sites).only("site_id", "public_list_path"):
+            path = (row.public_list_path or "/events").strip() or "/events"
+            event_paths[row.site_id] = path if CUSTOM_PATH.fullmatch(path) else "/events"
     for item in items:
-        if item.item_type != "docs" or _item_key(item) in resolved:
+        key = _item_key(item)
+        if key in resolved:
             continue
-        resolved[_item_key(item)] = (
-            "/documents" if "DOCUMENTS" in modules_by_site.get(item.site_id, ()) else None
-        )
+        if item.item_type == "docs":
+            resolved[key] = (
+                "/documents" if "DOCUMENTS" in modules_by_site.get(item.site_id, ()) else None
+            )
+        elif item.item_type == "events":
+            resolved[key] = (
+                event_paths.get(item.site_id, "/events")
+                if "EVENTS" in modules_by_site.get(item.site_id, ())
+                else None
+            )
     pages = {
         str(row.pk): row
         for row in (

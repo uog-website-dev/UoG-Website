@@ -364,6 +364,7 @@ class MenuViewSet(MenuAPIBase):
         "posts": serializers.ListField(child=serializers.DictField()),
         "categories": serializers.ListField(child=serializers.DictField()),
         "pagesAvailable": serializers.BooleanField(), "postsAvailable": serializers.BooleanField(), "documentsAvailable": serializers.BooleanField(),
+        "eventsAvailable": serializers.BooleanField(),
     }), description="menu.read. Published eligible same-Site destination choices; disabled modules return empty choices.")
     @action(detail=False, methods=["get"])
     def targets(self, request, *args, **kwargs):
@@ -374,7 +375,13 @@ class MenuViewSet(MenuAPIBase):
         from types import SimpleNamespace
         with menu_errors(), hierarchy_write():
             site = self._site()
-            result = {"pages": [], "posts": [], "categories": [], "pagesAvailable": module_is_available(site.pk,"PAGES"), "postsAvailable": module_is_available(site.pk,"POSTS"), "documentsAvailable": module_is_available(site.pk,"DOCUMENTS")}
+            result = {
+                "pages": [], "posts": [], "categories": [],
+                "pagesAvailable": module_is_available(site.pk, "PAGES"),
+                "postsAvailable": module_is_available(site.pk, "POSTS"),
+                "documentsAvailable": module_is_available(site.pk, "DOCUMENTS"),
+                "eventsAvailable": module_is_available(site.pk, "EVENTS"),
+            }
             for kind, model, output in (("page",Page,"pages"),("post",Post,"posts"),("category",Category,"categories")):
                 if not result["pagesAvailable" if kind == "page" else "postsAvailable"]: continue
                 for row in model.objects.filter(site=site,status=ContentStatus.PUBLISHED,**({} if kind=="category" else {"draft_of__isnull":True})).order_by("name" if kind=="category" else "title","pk"):
