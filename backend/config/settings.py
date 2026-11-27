@@ -515,6 +515,10 @@ SPECTACULAR_SETTINGS = {
         "SiteModuleStateEnum": "apps.sites.models.SiteModuleOperationChange.State",
         # MENU_LOCATIONS and template MENU_SLOTS share the same keys after primary retired.
         "MenuLocationsEnum": "apps.cms.menu_models.MENU_LOCATIONS",
+        "VisibilityEnum": "apps.cms.models.Visibility",
+        "SessionVisibilityEnum": "apps.cms.event_session_models.SessionVisibility",
+        "SessionStatusEnum": "apps.cms.event_session_models.SessionStatus",
+        "SessionTypeEnum": "apps.cms.event_session_models.SessionType",
     },
     "POSTPROCESSING_HOOKS": [
         "drf_spectacular.hooks.postprocess_schema_enums",

@@ -4,6 +4,8 @@ export interface SiteEventSettings {
   registration_required_by_default: boolean;
   registration_default_capacity: number | null;
   public_aggregation_eligible: boolean;
+  block_publish_on_session_room_conflicts: boolean;
+  hide_cancelled_sessions_publicly: boolean;
 }
 
 export interface SiteEventCategory {
@@ -26,6 +28,8 @@ export function defaultSiteEventSettings(): SiteEventSettings {
     registration_required_by_default: false,
     registration_default_capacity: null,
     public_aggregation_eligible: false,
+    block_publish_on_session_room_conflicts: true,
+    hide_cancelled_sessions_publicly: false,
   };
 }
 
@@ -47,6 +51,12 @@ export function eventSettingsFrom(value: unknown): SiteEventSettings {
   }
   if (typeof row.public_aggregation_eligible === "boolean") {
     result.public_aggregation_eligible = row.public_aggregation_eligible;
+  }
+  if (typeof row.block_publish_on_session_room_conflicts === "boolean") {
+    result.block_publish_on_session_room_conflicts = row.block_publish_on_session_room_conflicts;
+  }
+  if (typeof row.hide_cancelled_sessions_publicly === "boolean") {
+    result.hide_cancelled_sessions_publicly = row.hide_cancelled_sessions_publicly;
   }
   return result;
 }
