@@ -224,19 +224,54 @@ function asPost(row:Record<string,unknown>,siteId:number|null):WidgetPost|null {
     published_at:typeof row.published_at==="string"&&!Number.isNaN(Date.parse(row.published_at))?row.published_at:undefined,featured_alt:typeof row.featured_alt==="string"?row.featured_alt:"",excerpt:typeof row.excerpt==="string"?row.excerpt:"",featured_media:typeof row.featured_media==="string"?row.featured_media:""};
 }
 
-export function LoopGridWidget({source,limit,category,presentation="grid",carousel=false,display="grid",columns,image_hover="zoom"}:{source:"posts"|"pages";limit:number;category?:string;presentation?:"grid"|"list"|"featured";carousel?:boolean;display?:"grid"|"slider";columns?:number;image_hover?:"none"|"zoom"}) {
+function asEvent(row:Record<string,unknown>,siteId:number|null) {
+  if(typeof row.id!=="string" || typeof row.title!=="string" || typeof row.slug!=="string" || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(row.slug))return null;
+  if(typeof row.site==="number" && siteId!==null && row.site!==siteId && !row.href)return null;
+  const href=typeof row.href==="string" && row.href.startsWith("/events/") ? row.href : `/events/${row.slug}`;
+  return {
+    id:row.id,
+    title:row.title,
+    slug:row.slug,
+    href,
+    summary:typeof row.summary==="string"?row.summary:"",
+    venue:typeof row.venue==="string"?row.venue:"",
+    category_name:typeof row.category_name==="string"?row.category_name:"",
+    starts_at:typeof row.starts_at==="string"&&!Number.isNaN(Date.parse(row.starts_at))?row.starts_at:undefined,
+    banner_url:typeof row.banner_url==="string"&&row.banner_url.startsWith("/")?row.banner_url:"",
+  };
+}
+
+export function LoopGridWidget({source,limit,category,presentation="grid",carousel=false,display="grid",columns,image_hover="zoom"}:{source:"posts"|"pages"|"events";limit:number;category?:string;presentation?:"grid"|"list"|"featured";carousel?:boolean;display?:"grid"|"slider";columns?:number;image_hover?:"none"|"zoom"}) {
   const scope=useContext(ScopeContext);
   const query:Record<string,string>={source,limit:String(limit)};
   if(category || scope?.filters.category)query.category=category || scope!.filters.category;
-  if(scope?.filters.tag)query.tag=scope.filters.tag;
+  if(scope?.filters.tag && source!=="events")query.tag=scope.filters.tag;
+  if(source==="events")query.lifecycle="upcoming";
   const state=useWidgetData(query);
-  if(scope?.siteId===null)return <Typography role="status" color="text.secondary">{source === "posts" ? "Site news preview: published articles will appear here." : "Site pages preview: published Pages will appear here."}</Typography>;
+  if(scope?.siteId===null){
+    const preview=source==="posts"?"Site news preview: published articles will appear here.":source==="events"?"Site events preview: published Events will appear here.":"Site pages preview: published Pages will appear here.";
+    return <Typography role="status" color="text.secondary">{preview}</Typography>;
+  }
   if(!state.data)return <DataState {...state}/>;
   if(!state.data.results.length)return <Typography role="status">No published {source} match these filters.</Typography>;
   const cards=state.data.results.flatMap((row,index)=>{
     if(source==="pages"){
       if(row.site!==scope?.siteId || typeof row.path!=="string" || !/^\/(?:[a-z0-9]+(?:-[a-z0-9]+)*\/?)*$/.test(row.path))return [];
       return [{id:String(row.id),content:<Box component="article" sx={{p:3,border:1,borderColor:'divider',borderRadius:2}}><Link href={row.path} sx={{fontWeight:700}}>{String(row.title)}</Link></Box>}];
+    }
+    if(source==="events"){
+      const event=asEvent(row,scope?.siteId??null);if(!event)return [];
+      const compact=display!=='slider'&&(presentation==='list'||(presentation==='featured'&&index>0));
+      return [{id:event.id,content:
+        <Box component="article" sx={{...newsCardHover,display:'grid',gridTemplateColumns:compact?{xs:'minmax(0,1fr)',sm:'minmax(100px,30%) minmax(0,1fr)'}:'minmax(0,1fr)',gap:2,pb:3,borderBottom:1,borderColor:'divider',height:'100%',minWidth:0}}>
+          {event.banner_url?<Box data-image-hover={image_hover} sx={image_hover==='zoom'?containedImageHover:{overflow:'hidden',borderRadius:2}}><Link href={event.href} aria-label={`Open ${event.title}`} sx={{display:'block'}}><Box component="img" src={event.banner_url} alt="" loading="lazy" sx={{width:'100%',height:compact?140:220,objectFit:'cover',display:'block'}}/></Link></Box>:null}
+          <Box sx={{display:'grid',alignContent:'start',gap:1,minWidth:0}}>
+            <Typography component="h3" variant={compact?'h6':'h5'} sx={{lineHeight:1.4,fontWeight:750}}><Link href={event.href} color="inherit" underline="hover">{event.title}</Link></Typography>
+            {event.starts_at?<Typography component="time" dateTime={event.starts_at} variant="body2" color="text.secondary">{new Date(event.starts_at).toLocaleString()}</Typography>:null}
+            {event.venue?<Typography variant="body2" color="text.secondary">{event.venue}</Typography>:null}
+            {!compact && event.summary?<Typography variant="body2">{event.summary}</Typography>:null}
+          </Box>
+        </Box>}];
     }
     const post=asPost(row,scope?.siteId??null);if(!post)return [];
     const compact=display!=='slider'&&(presentation==='list'||(presentation==='featured'&&index>0));
@@ -250,8 +285,9 @@ export function LoopGridWidget({source,limit,category,presentation="grid",carous
       </Box>
     </VisualPostProvider>}];
   });
-  if(display==='slider')return <HorizontalCards items={cards} columns={columns??3} label={source==='posts'?'News slider':'Pages slider'}/>;
-  if(carousel)return <ContentCarousel items={cards} label={source==='posts'?'News carousel':'Pages carousel'}/>;
+  const label=source==='posts'?'News':source==='events'?'Events':'Pages';
+  if(display==='slider')return <HorizontalCards items={cards} columns={columns??3} label={`${label} slider`}/>;
+  if(carousel)return <ContentCarousel items={cards} label={`${label} carousel`}/>;
   return <Box aria-label="Published content grid" data-news-presentation={presentation} sx={{display:'grid',gridTemplateColumns:presentation==='list'?'minmax(0,1fr)':{xs:'minmax(0,1fr)',md:`repeat(${presentation==='featured'?2:columns??2},minmax(0,1fr))`},gap:3}}>{cards.map((card,index)=><Box key={card.id} sx={{minWidth:0,...(presentation==='featured'&&index===0?{gridRow:{md:`span ${Math.max(1,cards.length-1)}`}}:{})}}>{card.content}</Box>)}</Box>;
 }
 

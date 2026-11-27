@@ -7920,6 +7920,116 @@ paths:
               schema:
                 type: string
                 format: uuid
+  /api/v1/site-context/events/{slug}/notices/:
+    get:
+      operationId: v1_site_context_events_notices_list
+      description: Pinned and high-priority published notices for Overview prominence.
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Public Events
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PublicUpdate'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
   /api/v1/site-context/events/{slug}/registrations/:
     post:
       operationId: v1_site_context_events_registrations_create
@@ -8671,6 +8781,117 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PublicSpeakersResponse'
+          description: ''
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/site-context/events/{slug}/updates/:
+    get:
+      operationId: v1_site_context_events_updates_list
+      description: 'Published updates only. Freshness target: revalidate within 30s.
+        Draft/unpublished updates are never returned.'
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Public Events
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PublicUpdate'
           description: ''
           headers:
             X-Request-ID:
@@ -10428,6 +10649,22 @@ paths:
           * `oldest` - oldest
           * `title` - title
       - in: query
+        name: lifecycle
+        schema:
+          enum:
+          - upcoming
+          - past
+          - in_progress
+          - directory_upcoming
+          type: string
+          default: upcoming
+          minLength: 1
+        description: |-
+          * `upcoming` - upcoming
+          * `past` - past
+          * `in_progress` - in_progress
+          * `directory_upcoming` - directory_upcoming
+      - in: query
         name: limit
         schema:
           type: integer
@@ -10474,6 +10711,7 @@ paths:
           - menu
           - breadcrumbs
           - documents
+          - events
           type: string
           minLength: 1
         description: |-
@@ -10484,6 +10722,7 @@ paths:
           * `menu` - menu
           * `breadcrumbs` - breadcrumbs
           * `documents` - documents
+          * `events` - events
         required: true
       - in: query
         name: tag
@@ -29517,6 +29756,132 @@ paths:
               schema:
                 type: string
                 format: uuid
+  /api/v1/sites/{site_pk}/events/{event_id}/sessions/{session_id}/revisions/:
+    get:
+      operationId: v1_sites_events_session_revisions_list
+      parameters:
+      - in: path
+        name: event_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: session_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Event Updates
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SessionRevision'
+          description: ''
+          headers:
+            ETag:
+              description: Strong representation validator. Echo exactly in If-Match
+                for mutations.
+              schema:
+                type: string
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
   /api/v1/sites/{site_pk}/events/{event_id}/sessions/reorder/:
     post:
       operationId: v1_sites_event_sessions_reorder
@@ -29561,6 +29926,783 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EventSessionListResponse'
+          description: ''
+          headers:
+            ETag:
+              description: Strong representation validator. Echo exactly in If-Match
+                for mutations.
+              schema:
+                type: string
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          description: Invalid body, malformed input, or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    title:
+                    - This field is required.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '409':
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '412':
+          description: If-Match does not match the current strong ETag. Retrieve and
+            reconcile changes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '415':
+          description: Unsupported request content type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '428':
+          description: If-Match header is required for this mutation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '503':
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/sites/{site_pk}/events/{event_id}/updates/:
+    get:
+      operationId: v1_sites_events_updates_list
+      parameters:
+      - in: path
+        name: event_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Event Updates
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventUpdate'
+          description: ''
+          headers:
+            ETag:
+              description: Strong representation validator. Echo exactly in If-Match
+                for mutations.
+              schema:
+                type: string
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+    post:
+      operationId: v1_sites_events_updates_create
+      description: Create a draft Event notice. Does not send email/SMS/push.
+      parameters:
+      - in: path
+        name: event_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Event Updates
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventUpdateCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EventUpdateCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EventUpdateCreateRequest'
+        required: true
+      security:
+      - keycloakBearer: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventUpdate'
+          description: ''
+          headers:
+            ETag:
+              description: Strong representation validator. Echo exactly in If-Match
+                for mutations.
+              schema:
+                type: string
+            Location:
+              description: Created resource URL.
+              schema:
+                type: string
+                format: uri-reference
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          description: Invalid body, malformed input, or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    title:
+                    - This field is required.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '409':
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '412':
+          description: If-Match does not match the current strong ETag. Retrieve and
+            reconcile changes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '415':
+          description: Unsupported request content type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '428':
+          description: If-Match header is required for this mutation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '503':
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/sites/{site_pk}/events/{event_id}/updates/{update_id}/:
+    patch:
+      operationId: v1_sites_events_updates_partial_update
+      parameters:
+      - in: path
+        name: event_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: update_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Event Updates
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedEventUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedEventUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedEventUpdateRequest'
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventUpdate'
+          description: ''
+          headers:
+            ETag:
+              description: Strong representation validator. Echo exactly in If-Match
+                for mutations.
+              schema:
+                type: string
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '400':
+          description: Invalid body, malformed input, or validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: validation_error
+                  message: The request is invalid.
+                  details:
+                    title:
+                    - This field is required.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '401':
+          description: Missing, expired or invalid Keycloak credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: not_authenticated
+                  message: Authentication failed or credentials are missing.
+                  details:
+                    detail: Authentication failed or credentials are missing.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '403':
+          description: Authenticated caller lacks permission, or session CSRF failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+              example:
+                error:
+                  code: permission_denied
+                  message: You do not have permission to perform this action.
+                  details:
+                    detail: You do not have permission to perform this action.
+                request_id: 1ea47c51-f2d7-402b-ad9a-4df619d03055
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '404':
+          description: Resource or requested page does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '405':
+          description: Method is not supported.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '406':
+          description: Requested response format is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '409':
+          description: A unique-resource, transaction or optimistic-concurrency conflict
+            occurred. Retrieve current state and reconcile before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '412':
+          description: If-Match does not match the current strong ETag. Retrieve and
+            reconcile changes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '415':
+          description: Unsupported request content type.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '428':
+          description: If-Match header is required for this mutation.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+        '503':
+          description: Required storage or audit infrastructure is unavailable. Failed
+            mutations are rolled back; no provider or SQL details are exposed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+          headers:
+            X-Request-ID:
+              description: Correlation ID for this request.
+              schema:
+                type: string
+                format: uuid
+  /api/v1/sites/{site_pk}/events/{event_id}/updates/{update_id}/action/:
+    post:
+      operationId: v1_sites_events_updates_action
+      description: Publish or unpublish independently of the root Event. No email/SMS/push
+        delivery is performed or claimed.
+      parameters:
+      - in: path
+        name: event_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: site_pk
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: update_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - name: X-Request-ID
+        in: header
+        required: false
+        description: Optional UUID correlation ID. Invalid values are replaced.
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - Event Updates
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventUpdateActionRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/EventUpdateActionRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EventUpdateActionRequest'
+        required: true
+      security:
+      - keycloakBearer: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventUpdate'
           description: ''
           headers:
             ETag:
@@ -42251,6 +43393,7 @@ paths:
                                               enum:
                                               - posts
                                               - pages
+                                              - events
                                             limit:
                                               type: integer
                                               minimum: 1
@@ -42422,6 +43565,7 @@ paths:
                                               enum:
                                               - posts
                                               - pages
+                                              - events
                                             limit:
                                               type: integer
                                               minimum: 1
@@ -42593,6 +43737,7 @@ paths:
                                               enum:
                                               - posts
                                               - pages
+                                              - events
                                             limit:
                                               type: integer
                                               minimum: 1
@@ -44737,6 +45882,7 @@ paths:
                                               enum:
                                               - posts
                                               - pages
+                                              - events
                                             limit:
                                               type: integer
                                               minimum: 1
@@ -44908,6 +46054,7 @@ paths:
                                               enum:
                                               - posts
                                               - pages
+                                              - events
                                             limit:
                                               type: integer
                                               minimum: 1
@@ -47153,6 +48300,22 @@ paths:
         description: Page UUID.
         required: true
       - in: query
+        name: lifecycle
+        schema:
+          enum:
+          - upcoming
+          - past
+          - in_progress
+          - directory_upcoming
+          type: string
+          default: upcoming
+          minLength: 1
+        description: |-
+          * `upcoming` - upcoming
+          * `past` - past
+          * `in_progress` - in_progress
+          * `directory_upcoming` - directory_upcoming
+      - in: query
         name: limit
         schema:
           type: integer
@@ -47205,6 +48368,7 @@ paths:
           - menu
           - breadcrumbs
           - documents
+          - events
           type: string
           minLength: 1
         description: |-
@@ -47215,6 +48379,7 @@ paths:
           * `menu` - menu
           * `breadcrumbs` - breadcrumbs
           * `documents` - documents
+          * `events` - events
         required: true
       - in: query
         name: tag
@@ -54128,6 +55293,114 @@ components:
       - site
       - updated_at
       - version
+    EventUpdate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        event:
+          type: string
+          format: uuid
+          readOnly: true
+        title:
+          type: string
+          maxLength: 255
+        body:
+          type: string
+        severity:
+          $ref: '#/components/schemas/SeverityEnum'
+        status:
+          allOf:
+          - $ref: '#/components/schemas/EventUpdateStatusEnum'
+          readOnly: true
+        pinned:
+          type: boolean
+        published_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        unpublished_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        version:
+          type: integer
+          readOnly: true
+        created_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        updated_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - created_by
+      - event
+      - id
+      - published_at
+      - status
+      - unpublished_at
+      - updated_at
+      - updated_by
+      - version
+    EventUpdateActionActionEnum:
+      enum:
+      - publish
+      - unpublish
+      type: string
+      description: |-
+        * `publish` - publish
+        * `unpublish` - unpublish
+    EventUpdateActionRequest:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/EventUpdateActionActionEnum'
+        version:
+          type: integer
+          minimum: 1
+      required:
+      - action
+    EventUpdateCreateRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 255
+        body:
+          type: string
+        severity:
+          $ref: '#/components/schemas/SeverityEnum'
+        pinned:
+          type: boolean
+          default: false
+      required:
+      - title
+    EventUpdateStatusEnum:
+      enum:
+      - DRAFT
+      - PUBLISHED
+      - UNPUBLISHED
+      type: string
+      description: |-
+        * `DRAFT` - Draft
+        * `PUBLISHED` - Published
+        * `UNPUBLISHED` - Unpublished
     FileTypeEnum:
       enum:
       - application/pdf
@@ -59987,6 +61260,7 @@ components:
                                       enum:
                                       - posts
                                       - pages
+                                      - events
                                     limit:
                                       type: integer
                                       minimum: 1
@@ -60158,6 +61432,7 @@ components:
                                       enum:
                                       - posts
                                       - pages
+                                      - events
                                     limit:
                                       type: integer
                                       minimum: 1
@@ -60329,6 +61604,7 @@ components:
                                       enum:
                                       - posts
                                       - pages
+                                      - events
                                     limit:
                                       type: integer
                                       minimum: 1
@@ -62473,6 +63749,7 @@ components:
                                       enum:
                                       - posts
                                       - pages
+                                      - events
                                     limit:
                                       type: integer
                                       minimum: 1
@@ -62644,6 +63921,7 @@ components:
                                       enum:
                                       - posts
                                       - pages
+                                      - events
                                     limit:
                                       type: integer
                                       minimum: 1
@@ -64710,6 +65988,7 @@ components:
       - news
       - category
       - docs
+      - events
       type: string
       description: |-
         * `page` - Page
@@ -64719,6 +65998,7 @@ components:
         * `news` - News listing
         * `category` - News category
         * `docs` - Documents & Files
+        * `events` - Events & Calendar
     LayoutEnum:
       enum:
       - FULL_WIDTH
@@ -64892,9 +66172,12 @@ components:
           type: boolean
         documentsAvailable:
           type: boolean
+        eventsAvailable:
+          type: boolean
       required:
       - categories
       - documentsAvailable
+      - eventsAvailable
       - pages
       - pagesAvailable
       - posts
@@ -66748,6 +68031,19 @@ components:
         block_publish_on_session_room_conflicts:
           type: boolean
         hide_cancelled_sessions_publicly:
+          type: boolean
+    PatchedEventUpdateRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 255
+        body:
+          type: string
+        severity:
+          $ref: '#/components/schemas/SeverityEnum'
+        pinned:
           type: boolean
     PatchedFooterSettingsRequest:
       type: object
@@ -73484,6 +74780,7 @@ components:
                                       enum:
                                       - posts
                                       - pages
+                                      - events
                                     limit:
                                       type: integer
                                       minimum: 1
@@ -73655,6 +74952,7 @@ components:
                                       enum:
                                       - posts
                                       - pages
+                                      - events
                                     limit:
                                       type: integer
                                       minimum: 1
@@ -73826,6 +75124,7 @@ components:
                                       enum:
                                       - posts
                                       - pages
+                                      - events
                                     limit:
                                       type: integer
                                       minimum: 1
@@ -75970,6 +77269,7 @@ components:
                                       enum:
                                       - posts
                                       - pages
+                                      - events
                                     limit:
                                       type: integer
                                       minimum: 1
@@ -76141,6 +77441,7 @@ components:
                                       enum:
                                       - posts
                                       - pages
+                                      - events
                                     limit:
                                       type: integer
                                       minimum: 1
@@ -78980,6 +80281,35 @@ components:
       - id
       - name
       - slug
+    PublicUpdate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        body:
+          type: string
+        severity:
+          type: string
+        pinned:
+          type: boolean
+        published_at:
+          type: string
+          format: date-time
+          nullable: true
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - body
+      - id
+      - pinned
+      - published_at
+      - severity
+      - title
+      - updated_at
     PublishedContentStatusEnum:
       enum:
       - PUBLISHED
@@ -79537,6 +80867,42 @@ components:
         * `MODERATOR` - Moderator
         * `PANELIST` - Panelist
         * `ORGANIZER` - Organizer
+    SessionRevision:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        session:
+          type: string
+          format: uuid
+        session_version:
+          type: integer
+        before:
+          type: object
+          additionalProperties: {}
+        after:
+          type: object
+          additionalProperties: {}
+        changed_fields:
+          type: array
+          items:
+            type: string
+        actor:
+          type: integer
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - actor
+      - after
+      - before
+      - changed_fields
+      - created_at
+      - id
+      - session
+      - session_version
     SessionStatusEnum:
       enum:
       - SCHEDULED
@@ -79571,6 +80937,16 @@ components:
       description: |-
         * `PUBLIC` - Public
         * `HIDDEN` - Hidden
+    SeverityEnum:
+      enum:
+      - INFO
+      - IMPORTANT
+      - URGENT
+      type: string
+      description: |-
+        * `INFO` - Info
+        * `IMPORTANT` - Important
+        * `URGENT` - Urgent
     SidebarInputRequest:
       type: object
       properties:

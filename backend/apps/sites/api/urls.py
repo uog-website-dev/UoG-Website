@@ -38,6 +38,12 @@ from apps.cms.api.event_gallery import (
     SiteEventGalleryPublish,
     SiteEventGalleryReorder,
 )
+from apps.cms.api.event_updates import (
+    SiteEventSessionRevisions,
+    SiteEventUpdateAction,
+    SiteEventUpdateDetail,
+    SiteEventUpdates,
+)
 from .event_categories import SiteEventCategories, SiteEventCategoryDetail
 from apps.cms.api.sidebars import SidebarViewSet
 from apps.cms.api.menus import MenuViewSet, MenuItemViewSet
@@ -82,6 +88,22 @@ urlpatterns = [
         "<int:site_pk>/events/<uuid:event_id>/registrations/<uuid:registration_id>/badge/",
         SiteEventRegistrationBadge.as_view(),
         name="site-event-registration-badge",
+    ),
+    path("<int:site_pk>/events/<uuid:event_id>/updates/", SiteEventUpdates.as_view(), name="site-event-updates"),
+    path(
+        "<int:site_pk>/events/<uuid:event_id>/updates/<uuid:update_id>/",
+        SiteEventUpdateDetail.as_view(),
+        name="site-event-update-detail",
+    ),
+    path(
+        "<int:site_pk>/events/<uuid:event_id>/updates/<uuid:update_id>/action/",
+        SiteEventUpdateAction.as_view(),
+        name="site-event-update-action",
+    ),
+    path(
+        "<int:site_pk>/events/<uuid:event_id>/sessions/<uuid:session_id>/revisions/",
+        SiteEventSessionRevisions.as_view(),
+        name="site-event-session-revisions",
     ),
     path("<int:site_pk>/events/<uuid:event_id>/gallery/", SiteEventGallery.as_view(), name="site-event-gallery"),
     path(

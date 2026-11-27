@@ -7620,7 +7620,8 @@
                               "source": {
                                 "enum": [
                                   "posts",
-                                  "pages"
+                                  "pages",
+                                  "events"
                                 ]
                               },
                               "limit": {
@@ -7865,7 +7866,8 @@
                               "source": {
                                 "enum": [
                                   "posts",
-                                  "pages"
+                                  "pages",
+                                  "events"
                                 ]
                               },
                               "limit": {
@@ -8110,7 +8112,8 @@
                               "source": {
                                 "enum": [
                                   "posts",
-                                  "pages"
+                                  "pages",
+                                  "events"
                                 ]
                               },
                               "limit": {
@@ -11174,7 +11177,8 @@
                               "source": {
                                 "enum": [
                                   "posts",
-                                  "pages"
+                                  "pages",
+                                  "events"
                                 ]
                               },
                               "limit": {
@@ -11419,7 +11423,8 @@
                               "source": {
                                 "enum": [
                                   "posts",
-                                  "pages"
+                                  "pages",
+                                  "events"
                                 ]
                               },
                               "limit": {

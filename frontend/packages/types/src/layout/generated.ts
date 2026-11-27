@@ -17,9 +17,9 @@ export interface WidgetPropsMap {
   call_to_action: { title: string; text: string; label?: string; href?: string };
   headline: { text: string; level: 2 | 3 | 4 };
   editor: { html: string };
-  blog: { source: "posts" | "pages"; limit: number; category?: string; display?: "grid" | "slider"; columns?: 1 | 2 | 3 | 4; image_hover?: "none" | "zoom"; presentation?: "grid" | "list" | "featured" };
-  recent_posts: { source: "posts" | "pages"; limit: number; category?: string; display?: "grid" | "slider"; columns?: 1 | 2 | 3 | 4; image_hover?: "none" | "zoom"; presentation?: "grid" | "list" | "featured" };
-  post_carousel: { source: "posts" | "pages"; limit: number; category?: string; display?: "grid" | "slider"; columns?: 1 | 2 | 3 | 4; image_hover?: "none" | "zoom"; presentation?: "grid" | "list" | "featured" };
+  blog: { source: "posts" | "pages" | "events"; limit: number; category?: string; display?: "grid" | "slider"; columns?: 1 | 2 | 3 | 4; image_hover?: "none" | "zoom"; presentation?: "grid" | "list" | "featured" };
+  recent_posts: { source: "posts" | "pages" | "events"; limit: number; category?: string; display?: "grid" | "slider"; columns?: 1 | 2 | 3 | 4; image_hover?: "none" | "zoom"; presentation?: "grid" | "list" | "featured" };
+  post_carousel: { source: "posts" | "pages" | "events"; limit: number; category?: string; display?: "grid" | "slider"; columns?: 1 | 2 | 3 | 4; image_hover?: "none" | "zoom"; presentation?: "grid" | "list" | "featured" };
   testimonials: { text: string; attribution: string };
   author_box: { title: string; text: string; label?: string; href?: string };
   features: { items: Array<{ id: string; title: string; text: string }>; columns?: 1 | 2 | 3 | 4; presentation?: "plain" | "statistics" };
@@ -33,8 +33,8 @@ export interface WidgetPropsMap {
   page_title: {  };
   menu: { menu_code: string };
   breadcrumbs: {  };
-  loop_grid: { source: "posts" | "pages"; limit: number; category?: string; display?: "grid" | "slider"; columns?: 1 | 2 | 3 | 4; image_hover?: "none" | "zoom"; presentation?: "grid" | "list" | "featured" };
-  loop_carousel: { source: "posts" | "pages"; limit: number; category?: string; display?: "grid" | "slider"; columns?: 1 | 2 | 3 | 4; image_hover?: "none" | "zoom"; presentation?: "grid" | "list" | "featured" };
+  loop_grid: { source: "posts" | "pages" | "events"; limit: number; category?: string; display?: "grid" | "slider"; columns?: 1 | 2 | 3 | 4; image_hover?: "none" | "zoom"; presentation?: "grid" | "list" | "featured" };
+  loop_carousel: { source: "posts" | "pages" | "events"; limit: number; category?: string; display?: "grid" | "slider"; columns?: 1 | 2 | 3 | 4; image_hover?: "none" | "zoom"; presentation?: "grid" | "list" | "featured" };
   taxonomy_filter: { taxonomy_code: string; limit: number };
   post_title: {  };
   post_excerpt: {  };

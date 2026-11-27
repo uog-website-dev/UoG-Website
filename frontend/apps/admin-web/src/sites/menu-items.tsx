@@ -44,6 +44,7 @@ const EMPTY_TARGETS: MenuTargets = {
   pagesAvailable: true,
   postsAvailable: true,
   documentsAvailable: true,
+  eventsAvailable: true,
 };
 
 function siblings(items: MenuItemRecord[], parent: string | null): MenuItemRecord[] {
@@ -113,6 +114,7 @@ function targetText(item: MenuItemRecord, targets: MenuTargets, language="en"): 
   if (item.destination_status === "unavailable") return "Unavailable destination: update or disable before publishing";
   if (item.item_type === "news") return "Site news listing";
   if (item.item_type === "docs") return documentsCopy(language).menuTarget;
+  if (item.item_type === "events") return "Site Events & Calendar";
   if (item.item_type === "category") return (targets.categories ?? []).find(row => row.id === item.category)?.label ?? "Unavailable category";
   if (item.item_type === "page") {
     const page = targets.pages.find((row) => row.id === item.page);
@@ -127,6 +129,7 @@ function targetText(item: MenuItemRecord, targets: MenuTargets, language="en"): 
 
 function targetError(kind: MenuItemKind, value: string, targets: MenuTargets, language="en"): string | null {
   if (kind === "docs") return targets.documentsAvailable ? null : documentsCopy(language).unavailable;
+  if (kind === "events") return targets.eventsAvailable ? null : "Events are not available for this Site.";
   if (kind === "custom") {
     return PATH.test(value) ? null : "Use a same-site path such as /about.";
   }
@@ -383,6 +386,9 @@ export function MenuItemTree({
         <Alert severity="info">Posts are not available for this Site. Post targets stay blocked.</Alert>
       ) : null}
       {showAvailability && !targets.documentsAvailable ? <Alert severity="info">{documentsCopy(language).unavailable}</Alert> : null}
+      {showAvailability && !targets.eventsAvailable ? (
+        <Alert severity="info">Events are not available for this Site. Events & Calendar targets stay blocked.</Alert>
+      ) : null}
       {items.length === 0 ? (
         <Typography variant="body2" color="text.secondary">This menu has no items yet.</Typography>
       ) : renderItems(null, 0)}
@@ -418,7 +424,7 @@ function ItemForm({
   onSubmit: (input: MenuItemInput) => void;
   language?: string;
 }) {
-  const initialKind: MenuItemKind = initial?.item_type === "page" || initial?.item_type === "post" || initial?.item_type === "category" || initial?.item_type === "news" || initial?.item_type === "external" || initial?.item_type === "docs"
+  const initialKind: MenuItemKind = initial?.item_type === "page" || initial?.item_type === "post" || initial?.item_type === "category" || initial?.item_type === "news" || initial?.item_type === "external" || initial?.item_type === "docs" || initial?.item_type === "events"
     ? initial.item_type
     : "custom";
   const [label, setLabel] = useState(initial?.label ?? "");
@@ -490,6 +496,7 @@ function ItemForm({
         <option value="post" disabled={!targets.postsAvailable}>Post</option>
         <option value="news" disabled={!targets.postsAvailable}>News listing</option>
         <option value="docs" disabled={!targets.documentsAvailable}>{copy.menuLabel}</option>
+        <option value="events" disabled={!targets.eventsAvailable}>Events & Calendar</option>
         <option value="category" disabled={!targets.postsAvailable}>News category</option>
         <option value="external">External URL</option>
       </TextField>

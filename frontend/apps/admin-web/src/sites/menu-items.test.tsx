@@ -26,6 +26,7 @@ const TARGETS: MenuTargets = {
   pagesAvailable: true,
   postsAvailable: true,
   documentsAvailable: true,
+  eventsAvailable: true,
 };
 
 function state(): MenuLocationState {
@@ -77,6 +78,10 @@ describe("MenuItemTree", () => {
     fireEvent.change(within(form).getByLabelText("Item target"),{target:{value:"docs"}});
     fireEvent.click(within(form).getByRole("button",{name:"Add link"}));
     await waitFor(()=>expect(createMenuLink).toHaveBeenCalledWith(11,"menu-1",'"menu-1-v3"',expect.objectContaining({item_type:"docs",target:""})));
+    fireEvent.change(within(form).getByLabelText(/Item label/),{target:{value:"Events"}});
+    fireEvent.change(within(form).getByLabelText("Item target"),{target:{value:"events"}});
+    fireEvent.click(within(form).getByRole("button",{name:"Add link"}));
+    await waitFor(()=>expect(createMenuLink).toHaveBeenCalledWith(11,"menu-1",'"menu-1-v3"',expect.objectContaining({item_type:"events",target:""})));
 
     localized.unmount();
     const unavailable=renderTree(state(),{...TARGETS,documentsAvailable:false},vi.fn(),"am");

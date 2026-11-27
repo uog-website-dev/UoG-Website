@@ -62,6 +62,15 @@ export interface SiteEventRecord {
   created_at: string;
   updated_at: string;
   sections?: PublicEventSections;
+  notices?: Array<{
+    id: string;
+    title: string;
+    body: string;
+    severity: string;
+    pinned: boolean;
+    published_at: string | null;
+    updated_at?: string;
+  }>;
   preview?: boolean;
 }
 

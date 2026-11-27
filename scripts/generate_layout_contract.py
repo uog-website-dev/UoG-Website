@@ -50,7 +50,7 @@ PROFILES = {
 PROFILES.update({
  "rich_text": obj({"html":LONG}),
  "hero": obj({"asset_id":ASSET,"alt":{"type":"string","maxLength":255},"title":TEXT,"text":LONG},["asset_id","alt","title"]),
- "source": obj({"source":{"enum":["posts","pages"]},"limit":{"type":"integer","minimum":1,"maximum":20},"category":ID},["source","limit"]),
+ "source": obj({"source":{"enum":["posts","pages","events"]},"limit":{"type":"integer","minimum":1,"maximum":20},"category":ID},["source","limit"]),
  "identity": obj({}),
  "menu": obj({"menu_code":ID}),
  "form": obj({"form_code":ID,"submit_label":TEXT}),
@@ -269,7 +269,7 @@ def main():
                 path.write_text(content, encoding="utf-8")
 
     if args.check:
-        frozen = ROOT / "backend/apps/cms/migrations/0044_layout_schema.json"
+        frozen = ROOT / "backend/apps/cms/migrations/0056_layout_schema.json"
         if json.loads(frozen.read_text(encoding="utf-8")) != build_schema(): raise SystemExit("Frozen migration schema drift")
     types_path=ROOT / "frontend/packages/types/src/layout/generated.ts"
     content=types_source()

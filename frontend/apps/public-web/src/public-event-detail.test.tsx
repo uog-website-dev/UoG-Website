@@ -130,6 +130,54 @@ describe("PublicEventDetailPage", () => {
     expect(screen.getByText(/SPEAKER: Opening keynote/)).toBeTruthy();
   });
 
+  it("shows overview notices and loads the Updates tab", async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockImplementation(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes("/updates/")) {
+        return new Response(JSON.stringify([
+          {
+            id: "44444444-4444-4444-4444-444444444444",
+            title: "Venue moved",
+            body: "<p>Now in Hall B</p>",
+            severity: "IMPORTANT",
+            pinned: true,
+            published_at: "2026-11-20T10:00:00Z",
+          },
+        ]), { status: 200 });
+      }
+      return new Response("{}", { status: 404 });
+    });
+
+    render(
+      <PublicEventDetailPage
+        slug={event.slug}
+        initialEvent={{
+          ...event,
+          sections: { ...event.sections!, updates: true },
+          notices: [{
+            id: "44444444-4444-4444-4444-444444444444",
+            title: "Venue moved",
+            body: "<p>Now in Hall B</p>",
+            severity: "IMPORTANT",
+            pinned: true,
+            published_at: "2026-11-20T10:00:00Z",
+          }],
+        }}
+      />,
+    );
+
+    expect(screen.getByLabelText("Important Event notices")).toBeTruthy();
+    expect(screen.getByText("Venue moved")).toBeTruthy();
+    expect(screen.getByRole("tab", { name: "Updates" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("tab", { name: "Updates" }));
+    await waitFor(() => expect(screen.getByText(/pinned/i)).toBeTruthy());
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining(`/api/v1/site-context/events/${event.slug}/updates/`),
+      expect.anything(),
+    );
+  });
+
   it("shows cancellation and disables registration CTA", () => {
     render(
       <PublicEventDetailPage

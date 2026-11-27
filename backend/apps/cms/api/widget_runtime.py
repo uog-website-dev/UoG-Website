@@ -33,7 +33,7 @@ from ..selectors.pages import public_pages
 
 
 class WidgetQuery(StrictFields, serializers.Serializer):
-    source = serializers.ChoiceField(choices=("identity", "posts", "pages", "taxonomy", "menu", "breadcrumbs", "documents"))
+    source = serializers.ChoiceField(choices=("identity", "posts", "pages", "taxonomy", "menu", "breadcrumbs", "documents", "events"))
     page_id = serializers.UUIDField(required=False)
     menu_code = serializers.ChoiceField(choices=("header","footer","sidebar","primary","secondary"),default="header")
     limit = serializers.IntegerField(default=12, min_value=1, max_value=50)
@@ -43,6 +43,11 @@ class WidgetQuery(StrictFields, serializers.Serializer):
     taxonomy_code = serializers.ChoiceField(choices=("categories", "category", "tags", "tag"), default="categories")
     document_categories = serializers.CharField(required=False, max_length=2000)
     document_sort = serializers.ChoiceField(choices=("newest", "oldest", "title"), default="newest")
+    lifecycle = serializers.ChoiceField(
+        choices=("upcoming", "past", "in_progress", "directory_upcoming"),
+        required=False,
+        default="upcoming",
+    )
 
     def to_internal_value(self, data):
         if hasattr(data, "getlist") and any(len(data.getlist(key)) != 1 for key in data):
@@ -131,6 +136,56 @@ def widget_data(site, parameters):
         if parameters.get("category") or parameters.get("tag"):
             raise serializers.ValidationError({"source": "Taxonomy filters apply to Posts."})
         data = _snapshot_data(list(public_pages(site.pk, locale)[:limit]))
+        return {"site": site.pk, "source": source, "results": data}
+    if source == "events":
+        from apps.cms.api.events import serialize_event
+        from apps.cms.event_domain import filter_public_events, public_events_for_site
+        from apps.cms.event_models import EventLifecycle
+        from apps.sites.events import EVENTS_MODULE_CODE, ensure_event_settings
+
+        if not module_is_available(site.pk, EVENTS_MODULE_CODE):
+            raise NotFound()
+        if parameters.get("tag"):
+            raise serializers.ValidationError({"tag": ["Event widgets do not support tag filters."]})
+        rows = public_events_for_site(site)
+        category = parameters.get("category")
+        if category:
+            from uuid import UUID
+            try:
+                rows = rows.filter(category_id=UUID(str(category)))
+            except (TypeError, ValueError, AttributeError):
+                rows = rows.filter(category__slug=category, category__site_id=site.pk)
+        lifecycle = parameters.get("lifecycle") or "upcoming"
+        settings = ensure_event_settings(site)
+        try:
+            rows = filter_public_events(
+                rows,
+                lifecycle=lifecycle,
+                tz_name=settings.timezone,
+            )
+        except ValueError:
+            rows = filter_public_events(rows, lifecycle="upcoming", tz_name=settings.timezone)
+        if lifecycle in {"directory_upcoming", "upcoming", EventLifecycle.UPCOMING, "in_progress"}:
+            rows = rows.order_by("starts_at", "id")
+        else:
+            rows = rows.order_by("-starts_at", "id")
+        data = []
+        for event in rows[: min(limit, 20)]:
+            payload = serialize_event(event, public=True)
+            data.append({
+                "id": str(payload["id"]),
+                "site": payload["site"],
+                "title": payload["title"],
+                "slug": payload["slug"],
+                "summary": payload.get("summary") or "",
+                "starts_at": payload.get("starts_at"),
+                "ends_at": payload.get("ends_at"),
+                "venue": payload.get("venue") or "",
+                "category_name": payload.get("category_name"),
+                "banner_url": payload.get("banner_url"),
+                "lifecycle": payload.get("lifecycle"),
+                "href": f"/events/{payload['slug']}",
+            })
         return {"site": site.pk, "source": source, "results": data}
     if not module_is_available(site.pk, "POSTS"):
         raise NotFound()

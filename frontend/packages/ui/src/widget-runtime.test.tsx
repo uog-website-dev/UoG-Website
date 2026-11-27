@@ -79,6 +79,15 @@ describe("Configured widget runtime",()=>{
     expect(screen.queryByRole("heading",{name:"Campus news"})).toBeNull();
     expect(screen.getByRole("img",{name:"Filtered news"}).getAttribute("src")).toContain(`/api/v1/site-context/media/${asset}/`);
   });
+  it("renders upcoming Event cards from the approved Loop Grid source",async()=>{
+    fetchMock.mockResolvedValueOnce(response(11,[{
+      id:"evt-1",site:11,title:"Open day",slug:"open-day",summary:"Campus tour",
+      starts_at:"2030-06-01T08:00:00Z",venue:"Hall A",href:"/events/open-day",
+    }]));
+    render(<VisualLayoutView siteId={11} pageTitle="Home" layout={layout([{id:"events",type:"loop_grid",props:{source:"events",limit:3,presentation:"featured"}}])}/>);
+    expect((await screen.findByRole("link",{name:"Open day"})).getAttribute("href")).toBe("/events/open-day");
+    expect(String(fetchMock.mock.calls.at(-1)![0])).toContain("source=events");
+  });
   it("shows an explicit empty state when this Site has no published news",async()=>{
     fetchMock.mockResolvedValue(response(11,[]));
     render(<VisualLayoutView siteId={11} pageTitle="Home" layout={layout([{id:"news",type:"loop_grid",props:{source:"posts",limit:3}}])}/>);
